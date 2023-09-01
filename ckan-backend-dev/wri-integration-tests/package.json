@@ -1,0 +1,16 @@
+{
+  "name": "wri-integration-tests",
+  "version": "1.0.0",
+  "description": "Integration tests for WRI",
+  "main": "test.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^9.5.1",
+    "ckan-integration-tests": "git+https://github.com/datopian/ckan-integration-tests.git"
+  }
+}

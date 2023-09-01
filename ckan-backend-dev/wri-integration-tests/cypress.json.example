@@ -1,0 +1,14 @@
+{
+  "chromeWebSecurity": false,
+  "baseUrl": "http://ckan-dev:5000",
+  "pageLoadTimeout": 120000,
+  "video": false,
+  "env": {
+    "FRONTEND_URL": "",
+    "API_KEY": "USER_API_KEY",
+    "CKAN_USERNAME": "ckan_admin",
+    "CKAN_PASSWORD": "test1234",
+    "ORG_NAME_SUFFIX": "_organization_test",
+    "DATASET_NAME_SUFFIX": "_dataset_test"
+  }
+}
