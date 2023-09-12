@@ -46,16 +46,10 @@ jobs:
           chmod 600 ~/.kube/config
         env:
           GITHUB_SHA: '${{ github.sha }}'
-      - name: 'Deploy'
-        uses: 'datopian/helm@master'
+      - uses: azure/setup-helm@v3
         with:
-          release: '${{ env.PROJECT_NAME }}-${{ env.BRANCH_NAME }}'
-          namespace: '${{ env.PROJECT_NAME }}-${{ env.BRANCH_NAME }}'
-          chart: 'ckan-deployment/helm-templates'
-          helm: 'helm3'
-          token: '${{ github.token }}'
-          value-files: "ckan-deployment/helm-templates/values.yaml"
-          timeout: '900s'
-        env:
-          KUBECONFIG_FILE: '~/.kube/config'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          id: install
+      - name: 'Deploy'
+        run: helm upgrade -i wri-dev-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n wri-odp-dev --create-namespace --wait
 
