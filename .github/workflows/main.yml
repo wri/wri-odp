@@ -1,0 +1,22 @@
+name: Build and Deploy to AWS
+on:
+  push:
+    branches:
+      - develop
+permissions:
+      id-token: write
+      contents: read    
+jobs:
+  BuildAndPushImageToAWS:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: {{ secret.OIDC_ROLE }}
+          aws-region: {{ secret.AWS_REGION }}
+      - name: Print-assume-role
+        run: aws sts get-caller-identity
+
