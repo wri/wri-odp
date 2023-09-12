@@ -10,7 +10,7 @@ permissions:
       id-token: write
       contents: read    
 jobs:
-  BuildAndPushImageToAWS:
+  BuildAndDeployToAWS:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -50,5 +50,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: install
       - name: 'Deploy'
-        run: helm upgrade -i dx-helm-wri-${{BRANCH_NAME}}-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n ${{PROJECT_NAME}}-${{BRANCH_NAME}} --create-namespace --wait
+        run: helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait
 
