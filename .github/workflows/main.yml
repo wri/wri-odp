@@ -22,6 +22,10 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Print-assume-role
         run: aws sts get-caller-identity
+      - name: Build and push CMS Image
+        run: |
+          docker build ckan-deployment/ckan -t ${{ secrets.REGISTRY_NAME }}:${{ github.sha }}
+          docker push ${{ secrets.REGISTRY_NAME }}:${{ github.sha }}
       - name: Update values.yaml
         run: |
           echo $BRANCH_NAME

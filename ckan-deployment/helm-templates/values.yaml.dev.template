@@ -46,8 +46,8 @@ ckan:
         memory: 1G
     image:
       pullPolicy: Always
-      repository: viderum/ckan
-      tag: wri
+      repository: {{REGISTRY_NAME}}
+      tag: {{GITHUB_SHA}}
     runInitContainers: false
     service:
       port: 80
