@@ -2,7 +2,7 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - develop
+      - ckan-setup
 permissions:
       id-token: write
       contents: read    
