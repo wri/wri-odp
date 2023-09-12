@@ -35,12 +35,12 @@ jobs:
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ckan-deployment/ckan
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-      - name: Update values.yaml
-        run: |
-          echo $BRANCH_NAME
           cd ckan-deployment
           curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
           bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
+      - name: Update values.yaml
+        run: |
+          echo $BRANCH_NAME
           mkdir -p /home/runner/.kube
           aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --role-arn ${{ secrets.KUBEROLE }}
           chmod 600 ~/.kube/config
