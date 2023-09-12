@@ -45,8 +45,16 @@ jobs:
           aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --dry-run > /home/runner/.kube/config
         env:
           GITHUB_SHA: '${{ github.sha }}'
-      - name: Helm deploy
-        uses: datopian/helm@master
+      - name: 'Deploy'
+        uses: 'datopian/helm@master'
         with:
-          command: helm upgrade -i ${{ env.PROJECT_NAME }}-${{ env.BRANCH_NAME }}-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n ${{ env.PROJECT_NAME }}-dev --create-namespace --wait
+          release: '${{ env.PROJECT_NAME }}-${{ env.BRANCH_NAME }}'
+          namespace: '${{ env.PROJECT_NAME }}-${{ env.BRANCH_NAME }}'
+          chart: 'ckan-deployment/helm-templates'
+          helm: 'helm3'
+          token: '${{ github.token }}'
+          value-files: "ckan-deployment/helm-templates/values.yaml"
+          timeout: '900s'
+        env:
+          KUBECONFIG_FILE: '/home/runner/.kube/config'
 
