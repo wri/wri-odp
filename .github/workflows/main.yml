@@ -20,14 +20,12 @@ jobs:
         with:
           role-to-assume: ${{ secrets.OIDC_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - name: Print-assume-role
-        run: aws sts get-caller-identity
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with:
           mask-password: 'true'
-      - name: Build, tag, and push docker image to Amazon ECR
+      - name: Build and push image to ECR and update values.yaml
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ckan-dev-ecr
@@ -38,7 +36,7 @@ jobs:
           cd ckan-deployment
           curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
           bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
-      - name: Update values.yaml
+      - name: Configure Kubekonfig
         run: |
           echo $BRANCH_NAME
           mkdir -p /home/runner/.kube
@@ -46,10 +44,11 @@ jobs:
           chmod 600 ~/.kube/config
         env:
           GITHUB_SHA: '${{ github.sha }}'
-      - uses: azure/setup-helm@v3
+      - name: Deploy to EKS using Helm
+        uses: azure/setup-helm@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: install
       - name: 'Deploy'
-        run: helm upgrade -i dx-helm-wri-dev-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n wri-odp-dev --create-namespace --wait
+        run: helm upgrade -i dx-helm-wri-${{BRANCH_NAME}}-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n ${{PROJECT_NAME}}-${{BRANCH_NAME}} --create-namespace --wait
 
