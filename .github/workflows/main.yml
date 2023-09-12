@@ -27,7 +27,7 @@ jobs:
           echo $BRANCH_NAME
           cd ckan-deployment
           curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
-          bash /tmp/templater.sh helm-templates/values.yaml.template > helm-templates/values.yaml
+          bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
           mkdir -p /home/runner/.kube
           aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --dry-run > /home/runner/.kube/config
         env:
