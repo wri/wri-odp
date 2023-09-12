@@ -48,5 +48,7 @@ jobs:
       - name: Helm deploy
         uses: datopian/helm@master
         with:
-          command: helm upgrade -i ${{ env.PROJECT_NAME }}-dev-release ./helm-templates -f ./helm-templates/values.yaml -n ${{ env.PROJECT_NAME }}-dev --create-namespace --wait
+          command: | 
+          cd ckan-deployment
+          helm upgrade -i ${{ env.PROJECT_NAME }}-${{ env.BRANCH_NAME }}-release ./helm-templates -f ./helm-templates/values.yaml -n ${{ env.PROJECT_NAME }}-dev --create-namespace --wait
 

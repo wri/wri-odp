@@ -46,7 +46,7 @@ ckan:
         memory: 1G
     image:
       pullPolicy: Always
-      repository: {{REGISTRY_NAME}}
+      repository: {{REGISTRY}}/{{REPOSITORY}}
       tag: {{GITHUB_SHA}}
     runInitContainers: false
     service:
