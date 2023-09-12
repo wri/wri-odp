@@ -51,5 +51,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: install
       - name: 'Deploy'
-        run: helm upgrade -i wri-dev-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n wri-odp-dev --create-namespace --wait
+        run: helm upgrade -i wri-odp-dev-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n wri-odp-dev --create-namespace --wait
 
