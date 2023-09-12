@@ -33,10 +33,10 @@ jobs:
           aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --dry-run > /home/runner/.kube/config
         env:
           GITHUB_SHA: '${{ github.sha }}'
-    - name: Helm deploy
-        uses: datopian/helm@master
-        with:
-          command: helm upgrade -i ${{ env.PROJECT_NAME }}-dev-release ./helm-templates -f ./helm-templates/values.yaml -n ${{ env.PROJECT_NAME }}-dev --create-namespace --wait
-        timeout: '900s'
+      - name: Helm deploy
+          uses: datopian/helm@master
+          with:
+            command: helm upgrade -i ${{ env.PROJECT_NAME }}-dev-release ./helm-templates -f ./helm-templates/values.yaml -n ${{ env.PROJECT_NAME }}-dev --create-namespace --wait
+          timeout: '900s'
 
 
