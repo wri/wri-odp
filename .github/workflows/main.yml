@@ -42,8 +42,8 @@ jobs:
           curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
           bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
           mkdir -p /home/runner/.kube
-          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --role-arn ${{ secrets.KUBEROLE }} --dry-run > /home/runner/.kube/config
-          chmod 600 /home/runner/.kube/config
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --role-arn ${{ secrets.KUBEROLE }}
+          chmod 600 ~/.kube/config
         env:
           GITHUB_SHA: '${{ github.sha }}'
       - name: 'Deploy'
@@ -57,5 +57,5 @@ jobs:
           value-files: "ckan-deployment/helm-templates/values.yaml"
           timeout: '900s'
         env:
-          KUBECONFIG_FILE: '/home/runner/.kube/config'
+          KUBECONFIG_FILE: '~/.kube/config'
 
