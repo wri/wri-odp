@@ -10,9 +10,6 @@ CKAN_DB_NAME := ckandb
 build:
 	docker compose -f $(DOCKER_COMPOSE_YML) build
 
-clean:
-	docker compose -f $(DOCKER_COMPOSE_YML) down -v --remove-orphans
-
 up:
 	docker compose -f $(DOCKER_COMPOSE_YML) up
 
@@ -21,6 +18,9 @@ down:
 
 restart:
 	docker compose -f $(DOCKER_COMPOSE_YML) restart
+
+clean:
+	docker compose -f $(DOCKER_COMPOSE_YML) down -v --remove-orphans
 
 search-index-rebuild:
 	docker compose -f $(DOCKER_COMPOSE_YML) exec $(CKAN_CONTAINER) ckan -c ckan.ini search-index rebuild
@@ -31,5 +31,11 @@ access-db:
 shell:
 	docker compose -f $(DOCKER_COMPOSE_YML) exec $(CKAN_CONTAINER) /bin/bash
 
+cypress-config:
+	/bin/bash ckan/scripts/cypress_setup.sh
+
 integration-tests:
 	cd wri-integration-tests && node test.js
+
+unit-tests:
+	docker compose -f $(DOCKER_COMPOSE_YML) exec -T $(CKAN_CONTAINER) /bin/bash -c "/srv/app/run_unit_tests.sh"
