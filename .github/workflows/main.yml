@@ -42,7 +42,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ckan-dev-ecr
         with:
-          image-ref: '${{ REGISTRY }}/${{ REPOSITORY }}:${{ IMAGE_TAG }}'
+          image-ref: $REGISTRY/$REPOSITORY:${{ github.sha }}
           format: 'table'
           exit-code: '0'
           ignore-unfixed: true
