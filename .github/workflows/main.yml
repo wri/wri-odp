@@ -36,7 +36,19 @@ jobs:
           cd ckan-deployment
           curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
           bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
-      - name: Configure Kubekonfig
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ckan-dev-ecr
+        with:
+          image-ref: '${{ REGISTRY }}/${{ REPOSITORY }}:${{ IMAGE_TAG }}'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+      - name: Configure Kubeconfig
         run: |
           echo $BRANCH_NAME
           mkdir -p /home/runner/.kube
@@ -48,7 +60,5 @@ jobs:
         uses: azure/setup-helm@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          id: install
-      - name: 'Deploy'
         run: helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait
 
