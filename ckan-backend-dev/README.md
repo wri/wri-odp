@@ -7,9 +7,12 @@
     - [Prerequisites](#prerequisites)
     - [Build and Run the Environment](#build-and-run-the-environment)
     - [Additional Useful Make Commands](#additional-useful-make-commands)
+    - [Local S3 Emulation (optional)](#local-s3-emulation-optional)
   - [Cypress Integration Tests](#cypress-integration-tests)
     - [Prerequisites](#prerequisites-1)
     - [Run the Integration Tests](#run-the-integration-tests)
+  - [Unit Tests](#unit-tests)
+    - [Run the Unit Tests](#run-the-unit-tests)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -33,6 +36,8 @@ To access the running environment via http://ckan-dev:5000, you must add "ckan-d
     127.0.0.1 ckan-dev
 
 Otherwise, you will have to change the `.env` entry for `CKAN_SITE_URL`.
+
+**Important**: When you add a new plugin to `CKAN__PLUGINS` in the `.env`, it **must** be added _before_ `envvars`. For more information, see the [envvars README Requirements section](https://github.com/okfn/ckanext-envvars#requirements).
 
 ### Build and Run the Environment
 
@@ -69,6 +74,37 @@ Access the DB container:
 Access the CKAN container:
 
     make shell
+
+### Local S3 Emulation (optional)
+
+You can use [minio](https://min.io/) to run a local S3-like instance for testing purposes (for use with `ckanext-s3filestore`).
+
+Install minio using your package manager or download the binary from the [minio website](https://min.io/download#/linux).
+
+Make a directory to store the data (this can be located wherever you want):
+
+    mkdir -p minio/data
+
+Start minio:
+
+    minio server minio/data
+
+You should now be able to access minio at http://127.0.0.1:9000. You can find all of the information needed in the `minio server` command output.
+
+To configure CKAN to use minio, add the following to your `.env` file (most of the variables below are the default values and should work as expected):
+
+    CKANEXT__S3FILESTORE__AWS_BUCKET_NAME=ckan # Create a bucket in the minio UI and use that name here
+    CKANEXT__S3FILESTORE__REGION_NAME=us-east-1 # This is the default region in minio
+    CKANEXT__S3FILESTORE__SIGNATURE_VERSION=s3v4 # This is the default signature version in minio
+    CKANEXT__S3FILESTORE__AWS_ACCESS_KEY_ID=minioadmin # This is the minio RootUser
+    CKANEXT__S3FILESTORE__AWS_SECRET_ACCESS_KEY=minioadmin # This is the minio RootPass
+    CKANEXT__S3FILESTORE__HOST_NAME=http://192.168.0.12:9000 # Set this to the first URL listed in the S3-API section of the minio server output
+
+Add `s3filestore` to `CKAN__PLUGINS` in your `.env` file (anywhere before `envvars`):
+
+    CKAN__PLUGINS=... s3filestore envvars
+
+This extension is not enabled by default because CKAN will fail to start if there's no S3 instance available.
 
 ## Cypress Integration Tests
 
@@ -111,3 +147,34 @@ Start the containers (if they're not already running):
 Run the integration tests:
 
     make integration-tests
+
+## Unit Tests
+
+**Note**: We do not currently have a way to run all of the unit tests at once. You will need to run them per extension.
+
+### Run the Unit Tests
+
+Start the containers (if they're not already running):
+
+    make up
+
+Enter the CKAN container:
+
+    make shell
+
+If running the tests for `ckanext-s3filestore`, you will first need to update a few environment variables in its `test.ini` file to match your local minio server (see [Local S3 Emulation](#local-s3-emulation)):
+
+    cd src/ckanext-s3filestore
+    vi test.ini
+
+Update the following variables in `src/ckanext-s3filestore/test.ini`:
+
+    ckanext.s3filestore.aws_access_key_id = test-access-key # e.g. minioadmin
+    ckanext.s3filestore.aws_secret_access_key = test-secret-key # e.g. minioadmin
+    ckanext.s3filestore.aws_bucket_name = test-bucket # e.g. ckan
+    ckanext.s3filestore.host_name = http://127.0.0.1:9000 # e.g. http://192.168.0.12:9000
+
+Run the tests for the extension:
+
+    cd src/<extension-name>
+    pytest --ckan-ini=test.ini ckanext/<extension-name>/tests
