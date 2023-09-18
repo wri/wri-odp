@@ -2,7 +2,7 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - ckan-setup
+      - dev
 env:
   PROJECT_NAME: wri-odp
   BRANCH_NAME: dev
