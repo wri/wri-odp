@@ -3,19 +3,39 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [CKAN Backend Development Environment](#ckan-backend-development-environment)
+  - [Make Commands](#make-commands)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Build and Run the Environment](#build-and-run-the-environment)
-    - [Additional Useful Make Commands](#additional-useful-make-commands)
   - [Cypress Integration Tests](#cypress-integration-tests)
     - [Prerequisites](#prerequisites-1)
     - [Run the Integration Tests](#run-the-integration-tests)
+  - [Unit Tests](#unit-tests)
+    - [Run the Unit Tests](#run-the-unit-tests)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # CKAN Backend Development Environment
 
 A `docker compose` development environment for the CKAN backend.
+
+## Make Commands
+
+Usage: `make <command>`
+
+| Command | Description |
+| --- | --- |
+| `build` | Build the images |
+| `up` | Start the containers |
+| `down` | Stop the containers |
+| `restart` | Restart the containers |
+| `clean` | Stop and remove the containers |
+| `search-index-rebuild` | Rebuild the search index |
+| `access-db` | Access the DB container |
+| `shell` | Access the CKAN container |
+| `cypress-config` | Generate the Cypress config file |
+| `integration-tests` | Run the integration tests |
+| `unit-tests` | Run the unit tests |
 
 ## Getting Started
 
@@ -34,6 +54,8 @@ To access the running environment via http://ckan-dev:5000, you must add "ckan-d
 
 Otherwise, you will have to change the `.env` entry for `CKAN_SITE_URL`.
 
+**Important**: When you add a new plugin to `CKAN__PLUGINS` in the `.env`, it **must** be added _before_ `envvars`. For more information, see the [envvars README Requirements section](https://github.com/okfn/ckanext-envvars#requirements).
+
 ### Build and Run the Environment
 
 Build the images:
@@ -44,7 +66,9 @@ Start the containers:
 
 	make up
 
-### Additional Useful Make Commands
+Restart the containers:
+
+    make restart
 
 Stop the containers:
 
@@ -53,22 +77,6 @@ Stop the containers:
 Stop and remove the containers:
 
     make clean
-
-Restart the containers:
-
-    make restart
-
-Rebuild the search index:
-
-    make search-index-rebuild
-
-Access the DB container:
-
-    make access-db
-
-Access the CKAN container:
-
-    make shell
 
 ## Cypress Integration Tests
 
@@ -102,6 +110,10 @@ To generate a new API token:
     "API_KEY": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
     ```
 
+**Alternatively**, if you haven't changed the default values in the `.env` file, you can run the following command to generate a new API token, copy the example to `cypress.json`, and update the `API_KEY` field for you:
+
+    make cypress-config
+
 ### Run the Integration Tests
 
 Start the containers (if they're not already running):
@@ -111,3 +123,17 @@ Start the containers (if they're not already running):
 Run the integration tests:
 
     make integration-tests
+
+## Unit Tests
+
+**Note**: The following command assumes that extensions have their unit tests located in `ckanext/<extension_name>/tests`. If a new extension is added and this is not the case, [`run_unit_tests.sh`](ckan-backend-dev/ckan/scripts/run_unit_tests.sh) must be updated to include the alternate path.
+
+### Run the Unit Tests
+
+Start the containers (if they're not already running):
+
+    make up
+
+Enter the CKAN container:
+
+    make unit-tests
