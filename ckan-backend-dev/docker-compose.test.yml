@@ -10,13 +10,9 @@ services:
 
   ckan-dev:
     container_name: ${CKAN_CONTAINER_NAME}
-    build:
-      context: ckan/
-      dockerfile: Dockerfile.dev
-      args:
-        - TZ=${TZ}
+    image: ${CKAN_IMAGE}
     env_file:
-      - .env
+      - ".env.example"
     depends_on:
       db:
         condition: service_healthy
@@ -32,7 +28,6 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
-    image: ${CKAN_IMAGE}
 
   datapusher:
     container_name: ${DATAPUSHER_CONTAINER_NAME}
