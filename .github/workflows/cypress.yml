@@ -10,7 +10,8 @@ jobs:
       - name: Add url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers
-        run: docker compose -f ./ckan-backend-dev/docker-compose.dev.yml --env-file ./ckan-backend-dev/.env.example up --build -d
+        run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
+        working-directory: ./ckan-backend-dev
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
@@ -18,7 +19,7 @@ jobs:
           wait-on-timeout: 120
           node-version: 18
           runTests: false
-          working-directory: ./wri-integration-tests
+          working-directory: ./integration-tests
       - name: Curl the connection
         run: curl --request GET --url "http://ckan-dev:5000/api/action/status_show"
       - name: Create sysadmin API for Authorization
@@ -27,8 +28,8 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           command: node test.js
-          working-directory: ./wri-integration-tests
+          working-directory: ./integration-tests
       - name: Tear down containers
         if: failure() || success()
-        run: docker-compose -f docker-compose.dev.yml down --env-file ./ckan-backend-dev/.env.example -v --remove-orphans
-        working-directory: ../ckan-backend-dev
+        run: docker-compose -f docker-compose.dev.yml --env-file .env.example down -v --remove-orphans
+        working-directory: ./ckan-backend-dev
