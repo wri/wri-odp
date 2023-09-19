@@ -10,8 +10,7 @@ jobs:
       - name: Add url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers
-        run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
-        working-directory: ./ckan-backend-dev        
+        run: docker compose -f ./ckan-backend-dev/docker-compose.dev.yml --env-file ./ckan-backend-dev/.env.example up --build -d
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
@@ -31,5 +30,5 @@ jobs:
           working-directory: ./wri-integration-tests
       - name: Tear down containers
         if: failure() || success()
-        run: docker-compose -f docker-compose.dev.yml down -v --remove-orphans
-        working-directory: ./ckan-backend-dev
+        run: docker-compose -f docker-compose.dev.yml down --env-file ./ckan-backend-dev/.env.example -v --remove-orphans
+        working-directory: ../ckan-backend-dev
