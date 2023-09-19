@@ -10,7 +10,7 @@ jobs:
       - name: Add url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers
-        run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
+        run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build
         working-directory: ./ckan-backend-dev
       - name: Sleep for 30 seconds
         run: sleep 60s
@@ -25,9 +25,6 @@ jobs:
           node-version: 18
           runTests: false
           working-directory: ./integration-tests
-      - name: Debug Logs
-        if: failure() || success()
-        run: docker logs ckan-wri
       - name: Curl the connection
         run: curl --request GET --url "http://ckan-dev:5000/api/action/status_show"
       - name: Create sysadmin API for Authorization
