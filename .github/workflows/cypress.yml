@@ -12,6 +12,11 @@ jobs:
       - name: Set up Docker Containers
         run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
+      - name: Sleep for 30 seconds
+        run: sleep 60s
+        shell: bash
+      - name: Debug Logs
+        run: docker logs ckan-wri
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
