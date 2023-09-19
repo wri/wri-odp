@@ -26,7 +26,7 @@ jobs:
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
-        run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build --image ${{ env.CKAN_IMAGE }} ckan-dev -d
+        run: docker-compose up --build --image ${{ env.CKAN_IMAGE }} ckan-dev -d -f docker-compose.dev.yml --env-file .env.example
         working-directory: ./ckan-backend-dev        
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
