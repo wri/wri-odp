@@ -16,7 +16,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           wait-on: 'http://ckan-dev:5000'
-          wait-on-timeout: 120
+          wait-on-timeout: 180
           node-version: 18
           runTests: false
           working-directory: ./integration-tests
