@@ -80,7 +80,7 @@ Stop and remove the containers:
 
 ## Cypress Integration Tests
 
-The integration tests are located in the `wri-integration-tests` directory. They are run using [Cypress](https://www.cypress.io/).
+The integration tests are located in the `wri-odp/integration-tests` directory. They are run using [Cypress](https://www.cypress.io/).
 
 ### Prerequisites
 
@@ -92,7 +92,7 @@ Before running the integration tests, you need to install the dependencies and c
 
 Install the dependencies:
 
-    cd wri-integration-tests
+    cd ../integration-tests
     npm install
 
 Create a working `cypress.json`:

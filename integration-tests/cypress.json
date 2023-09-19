@@ -1,0 +1,14 @@
+{
+  "chromeWebSecurity": false,
+  "baseUrl": "http://ckan-dev:5000",
+  "pageLoadTimeout": 120000,
+  "video": false,
+  "env": {
+    "FRONTEND_URL": "",
+    "API_KEY": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI0NF9lbWFWTjNLcHhma1RJcUo2blViZkZyTlFKWlRfX25maFR0VE9CbTdJIiwiaWF0IjoxNjk1MTI1NjgyfQ.RUcBztu6X4lr9J2vxVgyN3dXXFWgJE5myOWIbaNyhHM",
+    "CKAN_USERNAME": "ckan_admin",
+    "CKAN_PASSWORD": "test1234",
+    "ORG_NAME_SUFFIX": "_organization_test",
+    "DATASET_NAME_SUFFIX": "_dataset_test"
+  }
+}
