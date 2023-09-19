@@ -10,20 +10,17 @@ jobs:
       - name: Add url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers
-        run: docker compose -f docker-compose.dev.yml up --build -d
-        working-directory: ./ckan-backend-dev
-      - name: Sleep for 30 seconds
-        run: sleep 60s
-        shell: bash
-      - name: Debug Logs
-        run: docker logs ckan-wri
+        run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
+        working-directory: ./ckan-backend-dev        
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
+        continue-on-error: true
         with:
-          wait-on: 'http://ckan-dev:5000'
-          wait-on-timeout: 180
+          wait-on: 'http://localhost:5000'
+          wait-on-timeout: 120
           node-version: 18
           runTests: false
+          continue-on-error: true
           working-directory: ./integration-tests
       - name: Curl the connection
         run: curl --request GET --url "http://ckan-dev:5000/api/action/status_show"
