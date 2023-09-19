@@ -13,7 +13,7 @@ import time
 import re
 import json
 
-ckan_ini = os.environ.get("CKAN_INI", "/srv/app/ckan.ini")
+ckan_ini = os.environ.get("CKAN_INI", "/srv/app/production.ini")
 
 RETRY = 5
 
