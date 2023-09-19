@@ -26,7 +26,7 @@ jobs:
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
-        run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev        
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
@@ -49,5 +49,5 @@ jobs:
           working-directory: ./integration-tests
       - name: Tear down containers
         if: failure() || success()
-        run: docker-compose -f docker-compose.dev.yml --env-file .env.example down -v --remove-orphans
+        run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
         working-directory: ./ckan-backend-dev
