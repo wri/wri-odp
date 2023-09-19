@@ -1,5 +1,10 @@
 name: CKAN Integration Tests using Cypress
 on: push
+needs:
+  - BuildAndDeployToAWS
+permissions:
+      id-token: write
+      contents: read
 jobs:
   cypress-run:
     name: Integration Tests
