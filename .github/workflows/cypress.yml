@@ -7,9 +7,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
       - name: Add url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
         run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev        
       - name: Cypress Install and CKAN setup

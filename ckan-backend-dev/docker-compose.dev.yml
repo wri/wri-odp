@@ -32,6 +32,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
+    image: ${CKAN_IMAGE}
 
   datapusher:
     container_name: ${DATAPUSHER_CONTAINER_NAME}

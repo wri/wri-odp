@@ -2,7 +2,7 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - dev
+      - integration-tests
 env:
   PROJECT_NAME: wri-odp
   BRANCH_NAME: dev
