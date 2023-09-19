@@ -64,7 +64,7 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
       - name: Run Unit Tests 🧪
-        run: docker compose -f docker-compose.test.yml exec -T ckan-wri /bin/bash -c "/srv/app/run_unit_tests.sh"
+        run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-wri /bin/bash -c "/srv/app/run_unit_tests.sh"
         working-directory: ./ckan-backend-dev
       - name: Run Integration tests 🧪
         uses: cypress-io/github-action@v6
