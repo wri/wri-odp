@@ -1,24 +1,18 @@
-FROM ckan/ckan-base:2.10.1-dev
-#FROM ckan/ckan-base:2.9.9-dev
+FROM viderum/ckan:v2.10-dev
 
 
 # Set up environment variables
 ENV APP_DIR=/srv/app
-ENV TZ=UTC
-RUN echo ${TZ} > /etc/timezone
 ENV AWS_ACCESS_KEY_ID=minioadmin
 ENV AWS_SECRET_ACCESS_KEY=minioadmin
 ENV AWS_BUCKET_NAME=ckan
 ENV HOST_NAME=http://minio:9000
-
-# Make sure both files are not exactly the same
-RUN if ! [ /usr/share/zoneinfo/${TZ} -ef /etc/localtime ]; then \
-        cp /usr/share/zoneinfo/${TZ} /etc/localtime ;\
-    fi ;
+ENV UWSGI_HARAKIRI=50
+ENV CKAN_INI=${APP_DIR}/production.ini
 
 # Install any extensions needed by your CKAN instance
 # - Make sure to add the plugins to CKAN__PLUGINS in the .env file
-# - Also make sure all extra configuration options are added to the CKAN config file (ckan.ini)
+# - Also make sure all extra configuration options are added to the CKAN config file (production.ini)
 #   This can be done by creating an overriding start_ckan_dev_development.sh file:
 #   (https://github.com/ckan/ckan-docker-base/blob/main/ckan-2.9/dev/setup/start_ckan_development.sh) ie: updating the 'ckan config-tool' lines
 #   For more on config-tool please see https://docs.ckan.org/en/latest/maintaining/cli.html#config-tool-tool-for-editing-options-in-a-ckan-config-file
@@ -40,7 +34,9 @@ RUN sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3
     sed -i "s|ckanext.s3filestore.host_name = http://127.0.0.1:9000|ckanext.s3filestore.host_name = ${HOST_NAME}|g" src/ckanext-s3filestore/test.ini
 
 COPY scripts/run_unit_tests.sh ${APP_DIR}/run_unit_tests.sh
+USER root
 RUN chmod +x ${APP_DIR}/run_unit_tests.sh
+USER ckan
 
 # Apply any patches needed to CKAN core or any of the built extensions (not the
 # runtime mounted ones)
@@ -54,3 +50,8 @@ RUN for d in $APP_DIR/patches/*; do \
             done ; \
         fi ; \
     done
+
+COPY setup/prerun.py.override ${APP_DIR}/prerun.py
+USER root
+RUN chmod +x ${APP_DIR}/prerun.py
+USER ckan

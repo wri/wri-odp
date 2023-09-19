@@ -163,6 +163,6 @@ cython_debug/
 node_modules/
 
 # Cypress integration tests
-ckan-backend-dev/wri-integration-tests/cypress/videos
-ckan-backend-dev/wri-integration-tests/cypress/screenshots
-ckan-backend-dev/wri-integration-tests/cypress.json
+integration-tests/cypress/videos
+integration-tests/cypress/screenshots
+integration-tests/cypress.json
