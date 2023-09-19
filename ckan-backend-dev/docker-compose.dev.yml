@@ -4,6 +4,7 @@ volumes:
   ckan_storage:
   pg_data:
   solr_data:
+  minio_data:
 
 services:
 
@@ -74,3 +75,32 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "-e", "QUIT"]
+
+  minio:
+    container_name: ${MINIO_CONTAINER_NAME}
+    image: minio/minio
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "39323:39323"
+    command: server --console-address ":39323" /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    depends_on:
+      - ckan-dev
+
+  minio-setup:
+    image: minio/mc
+    entrypoint: ["/bin/sh"]
+    depends_on:
+      - minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./ckan/setup/create_minio_bucket.sh:/srv/app/create_minio_bucket.sh
+    command: ["-c", "/srv/app/create_minio_bucket.sh"]
