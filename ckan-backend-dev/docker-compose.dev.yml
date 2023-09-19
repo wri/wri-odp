@@ -16,7 +16,7 @@ services:
       args:
         - TZ=${TZ}
     env_file:
-      - .env.example
+      - ".env.example"
     depends_on:
       db:
         condition: service_healthy
