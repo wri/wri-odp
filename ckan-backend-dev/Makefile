@@ -35,7 +35,7 @@ cypress-config:
 	/bin/bash ckan/scripts/cypress_setup.sh
 
 integration-tests:
-	cd wri-integration-tests && node test.js
+	cd ../integration-tests && node test.js
 
 unit-tests:
 	docker compose -f $(DOCKER_COMPOSE_YML) exec -T $(CKAN_CONTAINER) /bin/bash -c "/srv/app/run_unit_tests.sh"

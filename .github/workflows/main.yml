@@ -1,0 +1,66 @@
+name: Build and Deploy to AWS
+on:
+  push:
+    branches:
+      - dev
+env:
+  PROJECT_NAME: wri-odp
+  BRANCH_NAME: dev
+permissions:
+      id-token: write
+      contents: read    
+jobs:
+  BuildAndDeployToAWS:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+      - name: Build and push image to ECR and update values.yaml
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ckan-dev-ecr
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ckan-deployment/ckan
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          cd ckan-deployment
+          curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
+          bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ckan-dev-ecr
+        with:
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+      - name: Configure Kubeconfig
+        run: |
+          echo $BRANCH_NAME
+          mkdir -p /home/runner/.kube
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --role-arn ${{ secrets.KUBEROLE }}
+          chmod 600 ~/.kube/config
+        env:
+          GITHUB_SHA: '${{ github.sha }}'
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          id: install
+      - name: 'Deploy using Helm Upgrade'
+        run: helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait
+

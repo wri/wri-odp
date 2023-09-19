@@ -1,0 +1,9 @@
+dependencies:
+- name: ckan
+  repository: https://raw.githubusercontent.com/datopian/dx-helm-ckan/wri-setup/charts/
+  version: v3.1.2-wri
+- name: solr
+  repository: https://raw.githubusercontent.com/datopian/ckan-cloud-solr/upgrade/v.1.25/charts/
+  version: v1.1.0
+digest: sha256:50d58e85d46237ad5ed625765b9fe7ace85c961ce00650ef7e75f6cbce4a0863
+generated: "2023-09-07T17:34:01.74914341+05:00"
