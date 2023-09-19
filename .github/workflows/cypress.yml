@@ -1,0 +1,35 @@
+name: CKAN Integration Tests using Cypress
+on: push
+jobs:
+  cypress-run:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Add url to hosts
+        run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+      - name: Set up Docker Containers
+        run: docker compose -f docker-compose.dev.yml up --build -d
+        working-directory: ./ckan-backend-dev        
+      - name: Cypress Install and CKAN setup
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://ckan-dev:5000'
+          wait-on-timeout: 120
+          node-version: 18
+          runTests: false
+          working-directory: ./wri-integration-tests
+      - name: Curl the connection
+        run: curl --request GET --url "http://ckan-dev:5000/api/action/status_show"
+      - name: Create sysadmin API for Authorization
+        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
+      - name: Run tests 🧪
+        uses: cypress-io/github-action@v6
+        with:
+          command: node test.js
+          working-directory: ./wri-integration-tests
+      - name: Tear down containers
+        if: failure() || success()
+        run: docker-compose -f docker-compose.dev.yml down -v --remove-orphans
+        working-directory: ./ckan-backend-dev
