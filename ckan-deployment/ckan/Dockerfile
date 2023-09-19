@@ -28,7 +28,7 @@ ENV CKAN__PLUGINS image_view text_view recline_view datastore datapusher envvars
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 
-COPY ../../ckan-backend-dev/ckan/setup/prerun.py.override ${APP_DIR}/prerun.py
+COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 USER root
 RUN chmod +x ${APP_DIR}/prerun.py
 USER ckan
