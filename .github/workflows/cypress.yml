@@ -10,7 +10,7 @@ jobs:
       - name: Add url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers
-        run: docker compose --env-file ".env.example" -f docker-compose.dev.yml up --build -d
+        run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev        
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
