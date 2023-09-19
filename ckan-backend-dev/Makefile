@@ -8,10 +8,10 @@ CKAN_DB_USER := ckandbuser
 CKAN_DB_NAME := ckandb
 
 build:
-	docker compose -f $(DOCKER_COMPOSE_YML) build --env-file .env
+	docker compose -f $(DOCKER_COMPOSE_YML) build
 
 up:
-	docker compose -f $(DOCKER_COMPOSE_YML) up --env-file .env
+	docker compose -f $(DOCKER_COMPOSE_YML) up
 
 down:
 	docker compose -f $(DOCKER_COMPOSE_YML) down

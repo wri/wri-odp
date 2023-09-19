@@ -10,7 +10,7 @@ jobs:
       - name: Add url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers
-        run: docker compose -f docker-compose.dev.yml --env-file .env.example up --build
+        run: docker compose -f docker-compose.dev.yml --build -d
         working-directory: ./ckan-backend-dev
       - name: Sleep for 30 seconds
         run: sleep 60s
@@ -36,5 +36,5 @@ jobs:
           working-directory: ./integration-tests
       - name: Tear down containers
         if: failure() || success()
-        run: docker-compose -f docker-compose.dev.yml --env-file .env.example down -v --remove-orphans
+        run: docker-compose -f docker-compose.dev.yml down -v --remove-orphans
         working-directory: ./ckan-backend-dev
