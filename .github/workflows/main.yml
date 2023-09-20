@@ -52,11 +52,11 @@ jobs:
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Copy run_unit_tests.sh
-        run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-dev:/srv/app/run_unit_tests.sh
+        run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev
       - name: Fix s3filestore test.ini for minio
         run: |
-          docker cp ./ckan/scripts/fix_s3filestore_test_ini.sh ckan-dev:/srv/app/fix_s3filestore_test_ini.sh
+          docker cp ./ckan/scripts/fix_s3filestore_test_ini.sh ckan-wri:/srv/app/fix_s3filestore_test_ini.sh
           docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
         working-directory: ./ckan-backend-dev
       - name: Run Unit Tests 🧪
