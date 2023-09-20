@@ -66,7 +66,12 @@ jobs:
           AWS_SECRET_ACCESS_KEY: minioadmin
           AWS_BUCKET_NAME: ckan
           HOST_NAME: http://minio:9000
-        run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
+        run: |
+          docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "cat /srv/app/src/ckanext-s3filestore/test.ini"
+          docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
+          docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "cat /srv/app/src/ckanext-s3filestore/test.ini"
+          docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "cat /srv/app/production.ini"
+          docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "env"
         working-directory: ./ckan-backend-dev
       - name: Run Unit Tests 🧪
         env:
