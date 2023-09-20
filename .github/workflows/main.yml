@@ -66,12 +66,7 @@ jobs:
       - name: Fix s3filestore test.ini for minio
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
-        run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "cat /srv/app/src/ckanext-s3filestore/test.ini"
-          docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
-          docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "cat /srv/app/src/ckanext-s3filestore/test.ini"
-          docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "cat /srv/app/production.ini"
-          docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "env"
+        run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
         working-directory: ./ckan-backend-dev
       - name: Run Unit Tests 🧪
         env:
