@@ -166,3 +166,5 @@ node_modules/
 integration-tests/cypress/videos
 integration-tests/cypress/screenshots
 integration-tests/cypress.json
+
+ckan-backend-dev/src/*
