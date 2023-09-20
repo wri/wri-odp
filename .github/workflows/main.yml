@@ -51,6 +51,11 @@ jobs:
           working-directory: ./integration-tests
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
+      - name: Run Integration tests 🧪
+        uses: cypress-io/github-action@v6
+        with:
+          command: node test.js
+          working-directory: ./integration-tests
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev
@@ -73,11 +78,6 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/run_unit_tests.sh"
         working-directory: ./ckan-backend-dev
-      - name: Run Integration tests 🧪
-        uses: cypress-io/github-action@v6
-        with:
-          command: node test.js
-          working-directory: ./integration-tests
       - name: Run Trivy Vulnerability Scanner 🧪
         uses: aquasecurity/trivy-action@master
         env:
