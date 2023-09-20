@@ -57,7 +57,8 @@ jobs:
       - name: Fix s3filestore test.ini for minio
         run: |
           docker cp ./ckan/scripts/fix_s3filestore_test_ini.sh ckan-wri:/srv/app/fix_s3filestore_test_ini.sh
-          docker exec ckan-dev /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
+          docker ps
+          docker exec -it ckan-wri /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
         working-directory: ./ckan-backend-dev
       - name: Run Unit Tests 🧪
         env:
