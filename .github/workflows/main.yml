@@ -10,7 +10,8 @@ permissions:
       id-token: write
       contents: read    
 jobs:
-  BuildAndDeployToAWS:
+  buildandtest:
+    name: Build and Scan Image with Integration Tests
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -25,7 +26,9 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
         with:
           mask-password: 'true'
-      - name: Build and push image to ECR and update values.yaml
+      - name: Add CKAN url to hosts
+        run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+      - name: Build and push image to ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ckan-dev-ecr
@@ -33,10 +36,44 @@ jobs:
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ckan-deployment/ckan
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-          cd ckan-deployment
-          curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
-          bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
-      - name: Run Trivy vulnerability scanner
+      - name: Set up Docker Containers
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
+        working-directory: ./ckan-backend-dev        
+      - name: Cypress Install and CKAN setup
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:5000'
+          wait-on-timeout: 120
+          node-version: 18
+          runTests: false
+          working-directory: ./integration-tests
+      - name: Create sysadmin API for Authorization
+        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
+      - name: Run Integration tests 🧪
+        uses: cypress-io/github-action@v6
+        with:
+          command: node test.js
+          working-directory: ./integration-tests
+      - name: Copy run_unit_tests.sh
+        run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
+        working-directory: ./ckan-backend-dev
+      - name: Copy s3filestore test.ini fix script for minio
+        run: |
+          docker cp ./ckan/scripts/fix_s3filestore_test_ini.sh ckan-wri:/srv/app/fix_s3filestore_test_ini.sh
+        working-directory: ./ckan-backend-dev
+      - name: Fix s3filestore test.ini for minio
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
+        working-directory: ./ckan-backend-dev
+      - name: Run Unit Tests 🧪
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/run_unit_tests.sh"
+        working-directory: ./ckan-backend-dev
+      - name: Run Trivy Vulnerability Scanner 🧪
         uses: aquasecurity/trivy-action@master
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -48,6 +85,39 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+          
+      - name: Tear down containers
+        if: failure() || success()
+        run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
+        working-directory: ./ckan-backend-dev
+
+  deploy:
+    name: Deploy To AWS
+    runs-on: ubuntu-latest
+    needs:
+      - buildandtest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+      - name: Run Templater and update values.yaml
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ckan-dev-ecr
+          IMAGE_TAG: ${{ github.sha }}
+        run: |    
+          cd ckan-deployment
+          curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
+          bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
       - name: Configure Kubeconfig
         run: |
           echo $BRANCH_NAME
@@ -63,4 +133,3 @@ jobs:
           id: install
       - name: 'Deploy using Helm Upgrade'
         run: helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait
-

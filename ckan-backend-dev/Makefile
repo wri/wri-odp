@@ -23,7 +23,7 @@ clean:
 	docker compose -f $(DOCKER_COMPOSE_YML) down -v --remove-orphans
 
 search-index-rebuild:
-	docker compose -f $(DOCKER_COMPOSE_YML) exec $(CKAN_CONTAINER) ckan -c ckan.ini search-index rebuild
+	docker compose -f $(DOCKER_COMPOSE_YML) exec $(CKAN_CONTAINER) ckan -c production.ini search-index rebuild
 
 access-db:
 	docker compose -f $(DOCKER_COMPOSE_YML) exec $(CKAN_DB_CONTAINER) /bin/bash -c "psql -U $(CKAN_DB_USER) $(CKAN_DB_NAME)"
