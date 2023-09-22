@@ -17,4 +17,4 @@ See the [CKAN Backend Development README](ckan-backend-dev/README.md) for instru
 
 ## CKAN Deployment
 
-See the [CKAN Backend Development README](ckan-deployment/README.md) for instructions on how to deploy CKAN to EKS.
+See the [CKAN Deployment README](ckan-deployment/README.md) for instructions on how to deploy CKAN to EKS.
