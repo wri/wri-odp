@@ -14,3 +14,7 @@ The WRI Open Data Portal monorepo
 ## CKAN Backend Development
 
 See the [CKAN Backend Development README](ckan-backend-dev/README.md) for instructions on how to set up a local Docker CKAN backend development environment.
+
+## CKAN Deployment
+
+See the [CKAN Deployment README](ckan-deployment/README.md) for instructions on how to deploy CKAN to EKS.
