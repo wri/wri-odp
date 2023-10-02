@@ -32,6 +32,7 @@ ckan:
       CKAN__SITE_TITLE: x demo
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
+      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity envvars
       CKAN__AUTH__CREATE_UNOWNED_DATASET: True
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: True
       CKAN__AUTH__ALLOW_ADMIN_COLLABORATORS: True
