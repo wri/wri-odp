@@ -21,7 +21,7 @@ ENV SRC_EXTENSIONS_DIR=${APP_DIR}/src_extensions
 
 # Clone the extension(s) your are writing for your own project in the `src` folder
 # to get them mounted in this image at runtime
-
+USER root
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
@@ -35,9 +35,8 @@ RUN sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3
     sed -i "s|ckanext.s3filestore.host_name = http://127.0.0.1:9000|ckanext.s3filestore.host_name = ${HOST_NAME}|g" src/ckanext-s3filestore/test.ini
 
 COPY scripts/run_unit_tests.sh ${APP_DIR}/run_unit_tests.sh
-USER root
 RUN chmod +x ${APP_DIR}/run_unit_tests.sh
-USER ckan
+RUN chown ckan:ckan ${APP_DIR}/run_unit_tests.sh
 
 # Apply any patches needed to CKAN core or any of the built extensions (not the
 # runtime mounted ones)
@@ -53,16 +52,17 @@ RUN for d in $APP_DIR/patches/*; do \
     done
 
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
-USER root
 RUN chmod +x ${APP_DIR}/prerun.py
-USER ckan
+RUN chown ckan:ckan ${APP_DIR}/prerun.py
 
 # Copy the entrypoint script
 COPY setup/start_ckan_development.sh.override ${APP_DIR}/start_ckan_development.sh
-USER root
 RUN chmod +x ${APP_DIR}/start_ckan_development.sh
+RUN chown ckan:ckan ${APP_DIR}/start_ckan_development.sh
 
 COPY setup/jwtRS256.key ${APP_DIR}/jwtRS256.key
 COPY setup/jwtRS256.key.pub ${APP_DIR}/jwtRS256.key.pub
+RUN chown ckan:ckan ${APP_DIR}/jwtRS256.key
+RUN chown ckan:ckan ${APP_DIR}/jwtRS256.key.pub
 
 CMD ["sh", "-c", "${APP_DIR}/start_ckan_development.sh"]

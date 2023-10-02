@@ -3,7 +3,7 @@
 # Install any local extensions in the src_extensions volume
 echo "Looking for local extensions to install..."
 echo "Extension dir contents:"
-ls -la $SRC_EXTENSIONS_DIR
+
 for i in $SRC_EXTENSIONS_DIR/*
 do
     if [ -d $i ];
@@ -11,17 +11,17 @@ do
 
         if [ -f $i/pip-requirements.txt ];
         then
-            pip install -r $i/pip-requirements.txt
+            pip3 install -r $i/pip-requirements.txt
             echo "Found requirements file in $i"
         fi
         if [ -f $i/requirements.txt ];
         then
-            pip install -r $i/requirements.txt
+            pip3 install -r $i/requirements.txt
             echo "Found requirements file in $i"
         fi
         if [ -f $i/dev-requirements.txt ];
         then
-            pip install -r $i/dev-requirements.txt
+            pip3 install -r $i/dev-requirements.txt
             echo "Found dev-requirements file in $i"
         fi
         if [ -f $i/setup.py ];
