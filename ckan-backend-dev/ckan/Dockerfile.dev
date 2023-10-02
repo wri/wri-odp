@@ -9,6 +9,7 @@ ENV AWS_BUCKET_NAME=ckan
 ENV HOST_NAME=http://minio:9000
 ENV UWSGI_HARAKIRI=50
 ENV CKAN_INI=${APP_DIR}/production.ini
+ENV SRC_EXTENSIONS_DIR=${APP_DIR}/src_extensions
 
 # Install any extensions needed by your CKAN instance
 # - Make sure to add the plugins to CKAN__PLUGINS in the .env file
@@ -23,9 +24,9 @@ ENV CKAN_INI=${APP_DIR}/production.ini
 
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@ckan-2.10#egg=ckanext-s3filestore' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/ckan-2.10/requirements.txt' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/ckan-2.10/dev-requirements.txt'
+    pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt'
 
 # Update ckanext-s3filestore test.ini with minio credentials
 RUN sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \
@@ -55,3 +56,13 @@ COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 USER root
 RUN chmod +x ${APP_DIR}/prerun.py
 USER ckan
+
+# Copy the entrypoint script
+COPY setup/start_ckan_development.sh.override ${APP_DIR}/start_ckan_development.sh
+USER root
+RUN chmod +x ${APP_DIR}/start_ckan_development.sh
+
+COPY setup/jwtRS256.key ${APP_DIR}/jwtRS256.key
+COPY setup/jwtRS256.key.pub ${APP_DIR}/jwtRS256.key.pub
+
+CMD ["sh", "-c", "${APP_DIR}/start_ckan_development.sh"]
