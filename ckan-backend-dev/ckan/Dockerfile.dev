@@ -62,4 +62,7 @@ COPY setup/start_ckan_development.sh.override ${APP_DIR}/start_ckan_development.
 USER root
 RUN chmod +x ${APP_DIR}/start_ckan_development.sh
 
+COPY setup/jwtRS256.key ${APP_DIR}/jwtRS256.key
+COPY setup/jwtRS256.key.pub ${APP_DIR}/jwtRS256.key.pub
+
 CMD ["sh", "-c", "${APP_DIR}/start_ckan_development.sh"]
