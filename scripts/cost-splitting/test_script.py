@@ -15,7 +15,7 @@ def s3_boto():
 
 @mock_s3
 def test_list_of_orgs(s3_boto):
-    """Test the custom s3 ls function mocking S3 with moto"""
+    """Test if we can get a list of all orgs"""
 
     bucket = "testbucket"
     key = "org_test_1/test_file"
@@ -31,7 +31,7 @@ def test_list_of_orgs(s3_boto):
 
 @mock_s3
 def test_storage_report(s3_boto):
-    """Test the custom s3 ls function mocking S3 with moto"""
+    """Test if the storage reports are accurate hello world will have 11 bytes therefore each org should have 11 bytes stored"""
 
     bucket = "testbucket"
     key = "org_test_1/test_file"
