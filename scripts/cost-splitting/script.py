@@ -7,11 +7,7 @@ from dotenv import load_dotenv
 ## Env variables
 load_dotenv()
 
-ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-SECRET_KEY_ID = os.getenv("AWS_SECRET_KEY_ID")
-AWS_REGION = os.getenv("AWS_REGION")
 BUCKET_NAME = os.getenv("BUCKET_NAME")
-
 
 def get_storage_costs_from_org(bucket_name, path):
     s3 = boto3.resource("s3")
