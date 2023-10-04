@@ -2,7 +2,7 @@ import boto3
 from moto import mock_s3
 import pytest
 import os
-from script import get_all_orgs, get_storage_for_every_org, get_total_costs
+from lib import get_all_orgs, get_storage_for_every_org, get_total_costs
 
 @pytest.fixture
 def s3_boto():
