@@ -1,5 +1,31 @@
 import boto3
-from dotenv import load_dotenv
+import smtplib
+from email.mime.text import MIMEText
+
+
+def build_email(current_date):
+    body = f"Please access <a href='https://raw.githubusercontent.com/wri/wri-odp/main/scripts/cost-splitting/data/storage_costs.csv'> here</a> to get a report with the aggregate of storage costs, you can also get a version with just the current values at <a href='https://raw.githubusercontent.com/wri/wri-odp/main/scripts/cost-splitting/data/storage_costs_{current_date}_.csv'> this link</a> "
+    return MIMEText(body, "html")
+
+
+def build_subject(current_date):
+    subject = "AWS Storage Costs for {}".format(current_date)
+    return subject
+
+
+def send_email(subject, body, sender, recipients, host, port, smtp_user, password):
+    msg = body
+    msg["Subject"] = subject
+    msg["From"] = sender
+    msg["To"] = ", ".join(recipients)
+
+    # This should take a config object with password, host, port, etc.
+    s = smtplib.SMTP(host, port)
+    s.starttls()
+    s.login(smtp_user, password)
+    s.sendmail(sender, recipients, msg.as_string())
+    s.quit()
+
 
 def get_storage_costs_from_org(bucket_name, path):
     s3 = boto3.resource("s3")
