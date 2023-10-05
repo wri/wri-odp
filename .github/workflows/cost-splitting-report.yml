@@ -1,14 +1,24 @@
 name: "Get cost splitting report"
 on:
   workflow_dispatch:
+    email_recipients:
+        description: 'Comma separated list of emails that you want the link to the reports being sent to'
+        type: string
   schedule:
     - cron:  '0 0 1 * *'
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+  SMTP_SENDER: ${{ secrets.SMTP_SENDER }}
+  SMTP_USER: ${{ secrets.SMTP_USER }}
+  SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+  SMTP_SERVER: ${{ secrets.SMTP_SERVER}}
+  SMTP_PORT: ${{ secrets.SMTP_PORT}}
+  EMAIL_RECIPIENTS: ${{ inputs.email_recipients }}
 permissions:
       id-token: write
-      contents: read 
+      contents: write
+      pull-requests: write
 defaults:
   run:
     shell: bash
