@@ -2,10 +2,10 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - dev
+      - fix-build
 env:
   PROJECT_NAME: wri-odp
-  BRANCH_NAME: dev
+  BRANCH_NAME: fix-build
 permissions:
       id-token: write
       contents: read    
@@ -132,4 +132,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: install
       - name: 'Deploy using Helm Upgrade'
-        run: helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait
+        run: helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait > deployment-logs.txt
