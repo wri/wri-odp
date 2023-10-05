@@ -117,7 +117,8 @@ jobs:
         run: |    
           cd ckan-deployment
           curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
-          bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
+          #bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
+          bash /tmp/templater.sh helm-templates/values.yaml.dev.template > helm-templates/values.yaml
       - name: Configure Kubeconfig
         run: |
           echo $BRANCH_NAME
