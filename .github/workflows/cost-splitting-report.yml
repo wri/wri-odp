@@ -6,6 +6,9 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+permissions:
+      id-token: write
+      contents: read 
 defaults:
   run:
     shell: bash
