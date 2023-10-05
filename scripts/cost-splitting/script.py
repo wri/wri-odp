@@ -40,13 +40,14 @@ append_csv_to_file(csv_string_to_append, "data/storage_costs.csv")
 append_csv_to_file(csv_string_to_create, f"data/storage_costs_{current_date}.csv")
 
 # Send email with link
-send_email(
-    build_subject(current_date),
-    build_email(current_date),
-    SMTP_SENDER,
-    EMAIL_RECIPIENTS.split(","),
-    SMTP_SERVER,
-    SMTP_PORT,
-    SMTP_USER,
-    SMTP_PASSWORD,
-)
+if EMAIL_RECIPIENTS and EMAIL_RECIPIENTS != "":
+    send_email(
+        build_subject(current_date),
+        build_email(current_date),
+        SMTP_SENDER,
+        EMAIL_RECIPIENTS.split(","),
+        SMTP_SERVER,
+        SMTP_PORT,
+        SMTP_USER,
+        SMTP_PASSWORD,
+    )
