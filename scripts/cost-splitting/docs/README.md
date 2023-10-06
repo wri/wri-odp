@@ -50,6 +50,11 @@ org_2/resources/{resourceId}/filename.csv
 
 Obs: Theoretically there could be a scenario where the person opens the links in the emails and the files are not comitted yet from my experience this process takes miliseconds, plus this allows us to simplify the code and use the official github action which is probably much more robust than any solution i can come up inside the python script specially because there isnt even an official SDK for github in Python
 
+Besides this there are two more caveats
+
+- Firstly if you delete a resource in CKAN, that's going to only do a soft delete in the metadata entity, the file will stay in S3, you can periodically do a purge of unused files, but thats an extra steps that has its own risks
+- Secondly, if you move a dataset and its corresponding resources from one organization to another, the bucket structure will stay the same, you could theoretically run a cron job that checks that and tries to move things around, but i would advise against it as it would lead to a lot of broken links
+
 ## What are we testing 
 
 We are testing mostly the logic that decides the percentage costs, we use `moto` whic is a library that allows us to mock S3 Services, we then put two files with the "hello world" content, which takes exactly 11 bytes and then check if those results match what we expect
