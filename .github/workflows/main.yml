@@ -134,4 +134,4 @@ jobs:
           id: install
       - name: 'Deploy using Helm Upgrade'
         run:  |
-          helm upgrade -i dx-helm-wri-dev-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n $PROJECT_NAME-dev --create-namespace --wait |  sed 's/Invalid value:.*//'
+          helm upgrade -i dx-helm-wri-dev-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n $PROJECT_NAME-dev --create-namespace --wait
