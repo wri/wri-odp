@@ -64,7 +64,7 @@ def get_storage_for_every_org(bucket_name, total_cost, orgs, current_date):
         orgs_storage.append(
             {
                 "date": current_date,
-                "org": org,
+                "org": org if org != "resources" else "datasets without org",
                 "storage": org_storage,
                 "percentage": org_storage / total_cost,
             }
