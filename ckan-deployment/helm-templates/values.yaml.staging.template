@@ -26,10 +26,10 @@ ckan:
       CKAN__HARVEST__MQ__TYPE: redis
       CKAN__LOCALE_DEFAULT: en
       CKAN__RESOURCE_PROXY__MAX_FILE_SIZE: "100000000"
-      CKAN__SITE_TITLE: x demo
+      CKAN__SITE_TITLE: WRI Staging
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
-      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity envvars
+      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore envvars
       CKAN__AUTH__CREATE_UNOWNED_DATASET: "True"
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_ADMIN_COLLABORATORS: "True"
@@ -50,7 +50,7 @@ ckan:
       pullPolicy: Always
       repository: {{REGISTRY}}/{{REPOSITORY}}
       tag: {{GITHUB_SHA}}
-    runInitContainers: true
+    runInitContainers: false
     service:
       port: 80
       type: ClusterIP
