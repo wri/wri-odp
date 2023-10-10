@@ -26,3 +26,5 @@ COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 USER root
 RUN chmod +x ${APP_DIR}/prerun.py
 USER ckan
+
+RUN unset CKAN___API_TOKEN__JWT__ENCODE__SECRET && unset CKAN___API_TOKEN__JWT__DECODE__SECRET
