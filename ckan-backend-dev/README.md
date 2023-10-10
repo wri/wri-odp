@@ -56,6 +56,10 @@ Otherwise, you will have to change the `.env` entry for `CKAN_SITE_URL`.
 
 **Important**: When you add a new plugin to `CKAN__PLUGINS` in the `.env`, it **must** be added _before_ `envvars`. For more information, see the [envvars README Requirements section](https://github.com/okfn/ckanext-envvars#requirements).
 
+Finally, copy the WRI extension (ckanext-wri) into the `src` directory:
+
+    cp -r ../ckanext-wri src/ckanext-wri
+
 ### Build and Run the Environment
 
 Build the images:
