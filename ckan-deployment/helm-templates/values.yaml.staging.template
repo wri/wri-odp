@@ -50,7 +50,7 @@ ckan:
       pullPolicy: Always
       repository: {{REGISTRY}}/{{REPOSITORY}}
       tag: {{GITHUB_SHA}}
-    runInitContainers: false
+    runInitContainers: true
     service:
       port: 80
       type: ClusterIP
