@@ -18,7 +18,7 @@ env:
   EMAIL_RECIPIENTS: ${{ inputs.email_recipients }}
 permissions:
       id-token: write
-      contents: read
+      contents: write
       pull-requests: write
 defaults:
   run:
