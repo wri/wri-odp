@@ -124,7 +124,7 @@ jobs:
           aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --role-arn ${{ secrets.KUBEROLE }}
           chmod 600 ~/.kube/config
         env:
-          GITHUB_SHA: '486950a96b14f2c26a9aceafc8104504eeddc21'
+          GITHUB_SHA: '1486950a96b14f2c26a9aceafc8104504eeddc21'
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
