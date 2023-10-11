@@ -2,10 +2,10 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - init-staging
+      - init-prod
 env:
   PROJECT_NAME: wri-odp
-  BRANCH_NAME: staging
+  BRANCH_NAME: prod
 permissions:
       id-token: write
       contents: read    

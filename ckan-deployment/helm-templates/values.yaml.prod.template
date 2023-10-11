@@ -6,10 +6,10 @@ ckan:
       UWSGI_HARAKIRI: "50"
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
-      CKAN_SITE_ID: wri-staging
-      CKAN_SITE_URL: https://wri.staging.ckan.datopian.com
+      CKAN_SITE_ID: wri-prod
+      CKAN_SITE_URL: https://wri.prod.ckan.datopian.com
       CKAN_HOMEPAGE_STYLE: "2"
-      CKAN__DATAPUSHER__URL: http://wri-staging-datapusher-svc:80/
+      CKAN__DATAPUSHER__URL: http://wri-prod-datapusher-svc:80/
       CKAN_SVC_PORT_80_TCP_PROTO: tcp
       CKAN__AUTH__ANON_CREATE_DATASET: "False"
       CKAN__AUTH__CREATE_DATASET_IF_NOT_IN_ORGANIZATION: "True"
@@ -26,7 +26,7 @@ ckan:
       CKAN__HARVEST__MQ__TYPE: redis
       CKAN__LOCALE_DEFAULT: en
       CKAN__RESOURCE_PROXY__MAX_FILE_SIZE: "100000000"
-      CKAN__SITE_TITLE: WRI Staging
+      CKAN__SITE_TITLE: WRI Open Data Platform
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
       CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore envvars
@@ -79,11 +79,11 @@ ckan:
     autoscaling:
       enable: false
     customResource: true
-    projectId: wri-staging
+    projectId: wri-prod
     resources: {}
     useProductionCerts: true
   ingress:
-    domain: wri.staging.ckan.datopian.com
+    domain: wri.prod.ckan.datopian.com
     enable: true
     enableExternal: false
     extraAnnotations:
@@ -102,18 +102,18 @@ ckan:
           }
         }
     hosts:
-      - host: wri.staging.ckan.datopian.com
+      - host: wri.prod.ckan.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-staging-ckan-svc
+            service: wri-prod-ckan-svc
     ingressNamespace: nginx-ingress
     ingressClass: nginx
     tls:
       - hosts:
-          - wri.staging.ckan.datopian.com
-        secretName: wri.staging.ckan.datopian.com
+          - wri.prod.ckan.datopian.com
+        secretName: wri.prod.ckan.datopian.com
   frontend:
     enable: false
   giftless:
