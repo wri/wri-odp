@@ -59,8 +59,8 @@ dataset_fields:
   form_snippet: markdown.html
   form_placeholder: eg. Citation information
 
-- field_name: visibility
-  label: Visibility
+- field_name: visibility_type
+  label: Visibility Type
   preset: select
   choices:
   - value: draft
