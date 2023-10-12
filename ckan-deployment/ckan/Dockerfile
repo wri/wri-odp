@@ -5,9 +5,10 @@ ENV CKAN_INI /srv/app/production.ini
 # Install any extensions needed by your CKAN instance
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@ckan-2.10#egg=ckanext-s3filestore' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/ckan-2.10/requirements.txt' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/ckan-2.10/dev-requirements.txt'
+    pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt'
+
 
 #COPY patches ${APP_DIR}/patches
 #RUN for d in $APP_DIR/patches/*; do \
