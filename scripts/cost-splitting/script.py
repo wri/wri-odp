@@ -39,13 +39,14 @@ orgs_storage.append(total)
 csv_string_to_append = get_csv_string(orgs_storage)
 csv_string_to_create = get_csv_string(orgs_storage, "date,org,storage,percentage\n")
 append_csv_to_file(csv_string_to_append, "data/storage_costs.csv")
-append_csv_to_file(csv_string_to_create, f"data/storage_costs_{current_date}.csv")
+date_path = current_date.replace(".", "_").replace(":", "_").replace("-", "_")
+append_csv_to_file(csv_string_to_create, f"data/storage_costs_{date_path}.csv")
 
 # Send email with link
 if EMAIL_RECIPIENTS and EMAIL_RECIPIENTS != "":
     send_email(
         build_subject(current_date),
-        build_email(current_date, BRANCH_NAME),
+        build_email(date_path, BRANCH_NAME),
         SMTP_SENDER,
         EMAIL_RECIPIENTS.split(","),
         SMTP_SERVER,
