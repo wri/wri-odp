@@ -2,10 +2,10 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - dev
+      - staging
 env:
   PROJECT_NAME: wri-odp
-  BRANCH_NAME: dev
+  BRANCH_NAME: staging
 permissions:
       id-token: write
       contents: read    
@@ -85,7 +85,6 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-          
       - name: Tear down containers
         if: failure() || success()
         run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans

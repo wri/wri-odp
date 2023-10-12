@@ -1,18 +1,15 @@
 ckan:
-  auth:
-    enable: false
   ckan:
     replicaCount: 2
     envVarsSecretName: ckan-cloud-centeralized-sql
     env:
       UWSGI_HARAKIRI: "50"
-      CKANEXT__DCAT__ENABLE_CONTENT_NEGOTIATION: "True"
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
-      CKAN_SITE_ID: wri-dev
-      CKAN_SITE_URL: https://wri.dev.ckan.datopian.com
+      CKAN_SITE_ID: wri-staging
+      CKAN_SITE_URL: https://wri.staging.ckan.datopian.com
       CKAN_HOMEPAGE_STYLE: "2"
-      CKAN__DATAPUSHER__URL: http://wri-dev-datapusher-svc:80/
+      CKAN__DATAPUSHER__URL: http://wri-staging-datapusher-svc:80/
       CKAN_SVC_PORT_80_TCP_PROTO: tcp
       CKAN__AUTH__ANON_CREATE_DATASET: "False"
       CKAN__AUTH__CREATE_DATASET_IF_NOT_IN_ORGANIZATION: "True"
@@ -29,10 +26,10 @@ ckan:
       CKAN__HARVEST__MQ__TYPE: redis
       CKAN__LOCALE_DEFAULT: en
       CKAN__RESOURCE_PROXY__MAX_FILE_SIZE: "100000000"
-      CKAN__SITE_TITLE: x demo
+      CKAN__SITE_TITLE: WRI Staging
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
-      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity envvars
+      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore envvars
       CKAN__AUTH__CREATE_UNOWNED_DATASET: "True"
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_ADMIN_COLLABORATORS: "True"
@@ -57,10 +54,6 @@ ckan:
     service:
       port: 80
       type: ClusterIP
-  ckanmiddleware:
-    enable: false
-  dataSubscriptions:
-    enable: false
   datapusher:
     enable: enable
     env:
@@ -82,19 +75,15 @@ ckan:
       pullPolicy: Always
       repository: viderum/datapusher
     replicaCount: 1
-  frontend:
-    enable: false
   general:
     autoscaling:
       enable: false
     customResource: true
-    projectId: wri-dev
+    projectId: wri-staging
     resources: {}
     useProductionCerts: true
-  giftless:
-    enable: false
   ingress:
-    domain: wri.dev.ckan.datopian.com
+    domain: wri.staging.ckan.datopian.com
     enable: true
     enableExternal: false
     extraAnnotations:
@@ -113,19 +102,31 @@ ckan:
           }
         }
     hosts:
-      - host: wri.dev.ckan.datopian.com
+      - host: wri.staging.ckan.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-dev-ckan-svc
+            service: wri-staging-ckan-svc
     ingressNamespace: nginx-ingress
     ingressClass: nginx
     tls:
       - hosts:
-          - wri.dev.ckan.datopian.com
-        secretName: wri.dev.ckan.datopian.com
+          - wri.staging.ckan.datopian.com
+        secretName: wri.staging.ckan.datopian.com
+  frontend:
+    enable: false
+  giftless:
+    enable: false
+  auth:
+    enable: false
+  ckanmiddleware:
+    enable: false
+  dataSubscriptions:
+    enable: false
   postgresql:
+    enable: false
+  xloader:
     enable: false
   solr:
     enable: false
@@ -138,8 +139,6 @@ ckan:
       requests:
         memory: 2.8G
         cpu: 0.2
-  xloader:
-    enable: false
 solr:
   nodeSelector: {}
   image:
