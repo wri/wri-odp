@@ -138,5 +138,7 @@ jobs:
           chart: './ckan-deployment/helm-templates'
           helm: 'helm3'
           token: '${{ github.token }}'
-          value-files: "/ckan-deployment/helm-templates/values.yaml"
+          value-files: "./ckan-deployment/helm-templates/values.yaml"
           timeout: '900s'
+        env:
+          KUBECONFIG_FILE: '~/.kube/config'
