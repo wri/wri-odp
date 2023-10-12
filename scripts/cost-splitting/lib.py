@@ -3,8 +3,8 @@ import smtplib
 from email.mime.text import MIMEText
 
 
-def build_email(current_date):
-    body = f"Please access <a href='https://raw.githubusercontent.com/wri/wri-odp/main/scripts/cost-splitting/data/storage_costs.csv'> here</a> to get a report with the aggregate of storage costs, you can also get a version with just the current values at <a href='https://raw.githubusercontent.com/wri/wri-odp/main/scripts/cost-splitting/data/storage_costs_{current_date}_.csv'> this link</a> "
+def build_email(current_date, branch_name):
+    body = f"Please access <a href='https://raw.githubusercontent.com/wri/wri-odp/{branch_name}/scripts/cost-splitting/data/storage_costs.csv'> here</a> to get a report with the aggregate of storage costs, you can also get a version with just the current values at <a href='https://raw.githubusercontent.com/wri/wri-odp/{branch_name}/scripts/cost-splitting/data/storage_costs_{current_date}_.csv'> this link</a> "
     return MIMEText(body, "html")
 
 

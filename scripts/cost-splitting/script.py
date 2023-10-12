@@ -15,13 +15,15 @@ from lib import (
 ## Env variables
 load_dotenv()
 
-BUCKET_NAME = os.getenv("BUCKET_NAME")
 EMAIL_RECIPIENTS = os.getenv("EMAIL_RECIPIENTS")
 SMTP_SERVER = os.getenv("SMTP_SERVER")
 SMTP_SENDER = os.getenv("SMTP_SENDER")
 SMTP_USER = os.getenv("SMTP_USER")
 SMTP_PORT = os.getenv("SMTP_PORT")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+BRANCH_NAME = os.getenv("BRANCH_NAME")
+
+BUCKET_NAME = f"ckan-{BRANCH_NAME}-storage"
 
 current_date = datetime.datetime.utcnow().isoformat()
 
@@ -43,7 +45,7 @@ append_csv_to_file(csv_string_to_create, f"data/storage_costs_{current_date}.csv
 if EMAIL_RECIPIENTS and EMAIL_RECIPIENTS != "":
     send_email(
         build_subject(current_date),
-        build_email(current_date),
+        build_email(current_date, BRANCH_NAME),
         SMTP_SENDER,
         EMAIL_RECIPIENTS.split(","),
         SMTP_SERVER,
