@@ -2,7 +2,7 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - init-staging
+      - staging
 env:
   PROJECT_NAME: wri-odp
   BRANCH_NAME: staging
