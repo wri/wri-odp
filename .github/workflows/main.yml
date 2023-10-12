@@ -130,8 +130,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: install
-      - name: 'Deploy using Helm Upgrade'
-        logging:
-          disabled: true
-        run: | 
-          helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait
+      - name: 'Deploy'
+        uses: 'datopian/helm@master'
+        with:
+          release: 'dx-helm-wri-$BRANCH_NAME-release'
+          namespace: '$PROJECT_NAME-$BRANCH_NAME'
+          chart: './ckan-deployment/helm-templates'
+          helm: 'helm3'
+          token: '${{ github.token }}'
+          value-files: "/ckan-deployment/helm-templates/values.yaml"
+          timeout: '900s'
