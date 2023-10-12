@@ -8,9 +8,11 @@ def get_org_name(org_id, branch_name):
     # make a get request
     try:
         r = requests.get(f'https://wri.{branch_name}.ckan.datopian.com/api/action/organization_show?id={org_id}')
+        print(r.json())
         org = r.json()['result']
         return org['title']
     except:
+        print("Coudlnt find org")
         return org_id
 
 def build_email(current_date, branch_name):
