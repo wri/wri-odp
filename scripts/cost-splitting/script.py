@@ -31,7 +31,7 @@ current_date = datetime.datetime.utcnow().isoformat()
 orgs = get_all_orgs(BUCKET_NAME)
 total = get_total_costs(BUCKET_NAME, current_date)
 orgs_storage = get_storage_for_every_org(
-    BUCKET_NAME, total["storage"], orgs, current_date
+    BUCKET_NAME, total["storage"], orgs, current_date, BRANCH_NAME
 )
 orgs_storage.append(total)
 

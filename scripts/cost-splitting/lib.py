@@ -1,7 +1,17 @@
 import boto3
 import smtplib
+import requests
 from email.mime.text import MIMEText
 
+def get_org_name(org_id, branch_name):
+    # make an http request to the get the org name using organization_show from ckan
+    # make a get request
+    try:
+        r = requests.get(f'https://wri.{branch_name}.ckan.datopian.com/api/action/organization_show?id={org_id}')
+        org = r.json()['result']
+        return org['title']
+    except:
+        return org_id
 
 def build_email(current_date, branch_name):
     body = f"Please access <a href='https://raw.githubusercontent.com/wri/wri-odp/{branch_name}/scripts/cost-splitting/data/storage_costs.csv'> here</a> to get a report with the aggregate of storage costs, you can also get a version with just the current values at <a href='https://raw.githubusercontent.com/wri/wri-odp/{branch_name}/scripts/cost-splitting/data/storage_costs_{current_date}.csv'> this link</a> "
@@ -57,14 +67,14 @@ def get_total_costs(bucket_name, current_date):
     return total
 
 
-def get_storage_for_every_org(bucket_name, total_cost, orgs, current_date):
+def get_storage_for_every_org(bucket_name, total_cost, orgs, current_date, branch_name):
     orgs_storage = []
     for org in orgs:
         org_storage = get_storage_costs_from_org(bucket_name, org)
         orgs_storage.append(
             {
                 "date": current_date,
-                "org": org if org != "resources" else "datasets without org",
+                "org": org if org != "resources" else get_org_name(org, branch_name),
                 "storage": org_storage,
                 "percentage": org_storage / total_cost,
             }
