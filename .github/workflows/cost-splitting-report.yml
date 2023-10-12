@@ -63,7 +63,8 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit --allow-empty -m "Updating the storage report" -a
+          git add .
+          git commit --allow-empty -m "Updating the storage report"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
