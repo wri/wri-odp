@@ -74,7 +74,7 @@ def get_storage_for_every_org(bucket_name, total_cost, orgs, current_date, branc
         orgs_storage.append(
             {
                 "date": current_date,
-                "org": org if org != "resources" else get_org_name(org, branch_name),
+                "org": get_org_name(org, branch_name) if org != "resources" else "unwoned resources",
                 "storage": org_storage,
                 "percentage": org_storage / total_cost,
             }
