@@ -89,7 +89,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ckan-dev-ecr
+          REPOSITORY: ${{ secrets.ECR_CKAN_REPO }}
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
           format: 'table'
