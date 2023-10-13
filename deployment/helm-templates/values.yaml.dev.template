@@ -32,7 +32,7 @@ ckan:
       CKAN__SITE_TITLE: x demo
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
-      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore envvars
+      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore auth envvars
       CKAN__AUTH__CREATE_UNOWNED_DATASET: "True"
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_ADMIN_COLLABORATORS: "True"
@@ -89,6 +89,7 @@ ckan:
       tag: {{GITHUB_SHA}}
     env:
       SITE_TITLE: WRI ODP
+    targetPort: 3000
   general:
     autoscaling:
       enable: false
@@ -101,6 +102,7 @@ ckan:
     enable: true
     enableExternal: false
     extraAnnotations:
+      cert-manager.io/cluster-issuer: cert-manager
       nginx.ingress.kubernetes.io/configuration-snippet: |
         more_set_headers "server: hide";
         more_set_headers "X-Content-Type-Options: nosniff";
@@ -127,7 +129,7 @@ ckan:
         paths:
           - path: /(.*)
             port: 80
-            service: wri-dev-frontend-sv
+            service: wri-dev-frontend-svc
     ingressNamespace: nginx-ingress
     ingressClass: nginx
     tls:
