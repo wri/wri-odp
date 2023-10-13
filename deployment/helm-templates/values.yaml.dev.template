@@ -78,9 +78,9 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: wri
+      tag: datapusher
       pullPolicy: Always
-      repository: viderum/datapusher
+      repository: {{REGISTRY}}/{{REPOSITORY}}
     replicaCount: 1
   frontend:
     enable: false
