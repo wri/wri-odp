@@ -3,9 +3,9 @@ FROM node:18
 # Create app directory
 WORKDIR /usr/src/app
 
-ENV NEXTAUTH_SECRET "secret"
-ENV NEXTAUTH_URL "http://localhost:3000" 
-ENV CKAN_URL "https://demo.dev.datopian.com"
+ARG NEXTAUTH_SECRET
+ARG NEXTAUTH_URL
+ARG CKAN_URL
 
 COPY . .
 
