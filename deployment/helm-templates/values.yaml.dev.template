@@ -120,12 +120,21 @@ ckan:
           - path: /(.*)
             port: 80
             service: wri-dev-ckan-svc
+      - host: wri.dev.frontend.datopian.com
+        isExternal: false
+        paths:
+          - path: /(.*)
+            port: 80
+            service: wri-dev-frontend-sv
     ingressNamespace: nginx-ingress
     ingressClass: nginx
     tls:
       - hosts:
           - wri.dev.ckan.datopian.com
         secretName: wri.dev.ckan.datopian.com
+      - hosts:
+          - wri.dev.frontend.datopian.com
+        secretName: wri.dev.frontend.datopian.com
   solr:
     enable: false
     image:
