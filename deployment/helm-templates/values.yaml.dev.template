@@ -87,6 +87,8 @@ ckan:
     image:
       repository: {{REGISTRY}}/{{FRONTEND_REPO}}
       tag: {{GITHUB_SHA}}
+    env:
+      SITE_TITLE: WRI ODP
   general:
     autoscaling:
       enable: false
