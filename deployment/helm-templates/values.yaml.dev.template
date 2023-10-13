@@ -51,16 +51,12 @@ ckan:
         memory: 1G
     image:
       pullPolicy: Always
-      repository: {{REGISTRY}}/{{REPOSITORY}}
+      repository: {{REGISTRY}}/{{CKAN_REPO}}
       tag: {{GITHUB_SHA}}
     runInitContainers: false
     service:
       port: 80
       type: ClusterIP
-  ckanmiddleware:
-    enable: false
-  dataSubscriptions:
-    enable: false
   datapusher:
     enable: enable
     env:
@@ -78,12 +74,19 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: datapusher
+      tag: latest
       pullPolicy: Always
-      repository: {{REGISTRY}}/{{REPOSITORY}}
+      repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
   frontend:
-    enable: false
+    enable: true
+    hpa:
+      enable: false
+    replicaCount: 1
+    enable: true
+    image:
+      repository: {{REGISTRY}}/{{FRONTEND_REPO}}
+      tag: {{GITHUB_SHA}}
   general:
     autoscaling:
       enable: false
@@ -91,8 +94,6 @@ ckan:
     projectId: wri-dev
     resources: {}
     useProductionCerts: true
-  giftless:
-    enable: false
   ingress:
     domain: wri.dev.ckan.datopian.com
     enable: true
@@ -125,8 +126,6 @@ ckan:
       - hosts:
           - wri.dev.ckan.datopian.com
         secretName: wri.dev.ckan.datopian.com
-  postgresql:
-    enable: false
   solr:
     enable: false
     image:
@@ -138,6 +137,14 @@ ckan:
       requests:
         memory: 2.8G
         cpu: 0.2
+  ckanmiddleware:
+    enable: false
+  dataSubscriptions:
+    enable: false
+  giftless:
+    enable: false
+  postgresql:
+    enable: false
   xloader:
     enable: false
 solr:
