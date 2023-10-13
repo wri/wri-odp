@@ -2,7 +2,10 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - cicd/frontend
+      - dev
+  pull_request:
+    branches:
+      - dev
 env:
   PROJECT_NAME: wri-odp
   BRANCH_NAME: dev
@@ -107,6 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - buildandtest
+    if: github.event_name != 'pull_request'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
