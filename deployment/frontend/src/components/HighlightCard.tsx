@@ -16,7 +16,7 @@ export default function HighlightCard({ highlight }: { highlight: HiglightProps 
       <div className='relative w-full h-56'>
         <Image src={`${highlight.img}`} alt="higlight" fill />
       </div>
-      <div className='bg-white text-wri-green font-bold text-[0.938rem] w-[70%] py-4 -mt-6 z-10'>
+      <div className='bg-white text-wri-green font-bold text-[0.938rem] w-[70%] pt-4 pb-2 -mt-6 z-10'>
         FORESTS
       </div>
       <h2 className='text-wri-black text-2xl font-bold w-[80%]'>Title of the dataset goes here lorem ipsum.</h2>

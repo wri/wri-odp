@@ -14,7 +14,7 @@ export default function Header() {
         <Image src="/images/WRI_logo_4c.png" alt="Picture of the author" fill />
       </div> */}
       <div className=' ml-auto flex mt-auto gap-x-6'>
-        <div className=' hidden sm:flex gap-x-6 font-medium text-[1.0625rem] text-wri-black'>
+        <div className=' hidden sm:flex gap-x-6 font-semibold text-[1.0625rem] text-wri-black'>
           <span className=' border-b-2 border-b-wri-gold'>Search</span>
           <span className=' '>Teams</span>
           <span className=' '>Topics</span>

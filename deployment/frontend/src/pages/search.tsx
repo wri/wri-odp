@@ -12,7 +12,8 @@ export default function test() {
       <Header />
       <Search />
       <Highlights />
-      <Recent />
+      <Recent title='Recently added' />
+      <Recent title='Recently updated' />
       <Footer />
     </>
   )

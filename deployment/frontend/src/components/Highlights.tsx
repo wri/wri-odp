@@ -37,9 +37,9 @@ const higlights = [
 
 export default function Highlights() {
   return (
-    <section id="highlights" className='w-[94%] mx-auto flex flex-col font-acumin gap-y-4 mt-8'>
-      <h1 className='font-bold text-[2rem]'>Highlights</h1>
-      <div className='grid lg:grid-cols-2 lg:gap-x-8 xl:grid-cols-4 xl:gap-x-10 gap-y-12'>
+    <section id="highlights" className=' w-[91%] 2xl:w-[94%] mx-auto flex flex-col font-acumin gap-y-6 mt-16'>
+      <h1 className='font-bold text-[2rem] ml-2'>Highlights</h1>
+      <div className='grid lg:grid-cols-2 lg:gap-x-8 xl:grid-cols-4 2xl:gap-x-10 gap-y-12'>
         {
           higlights.map((highlight, index) => {
             return <HighlightCard key={index} highlight={highlight} />
