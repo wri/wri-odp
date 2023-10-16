@@ -1,1 +1,2 @@
 pytest-ckan
+ckanapi==4.7

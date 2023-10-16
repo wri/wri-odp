@@ -1,7 +1,7 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 
-from ckanext.wri.logic.validators import iso_datetime_range, iso_language_code
+from ckanext.wri.logic.validators import iso_language_code
 
 
 class WriPlugin(plugins.SingletonPlugin):
@@ -19,6 +19,5 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def get_validators(self):
         return {
-            "iso_datetime_range": iso_datetime_range,
             "iso_language_code": iso_language_code
         }
