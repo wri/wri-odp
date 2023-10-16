@@ -8,12 +8,12 @@ import Footer from '@/components/_shared/Footer'
 
 export default function test() {
   return (
-    <div className="">
+    <>
       <Header />
       <Search />
       <Highlights />
       <Recent />
       <Footer />
-    </div>
+    </>
   )
 }
