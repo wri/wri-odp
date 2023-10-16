@@ -14,7 +14,8 @@ export default {
         "wri-gold": "#F3B229",
         "wri-black": "#1A1919",
         "wri-green": "#32864B",
-        "wri-gray": "#eae8e4"
+        "wri-gray": "#eae8e4",
+        "wri-dark-green": "#2B7340"
       },
       screens: {
         "4xl": "2048px",

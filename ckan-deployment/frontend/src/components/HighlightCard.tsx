@@ -1,13 +1,25 @@
 import React from 'react'
 import Image from 'next/image'
 
-export default function Card() {
+export interface HiglightProps {
+  title: string,
+  description: string,
+  date: string,
+  location: string,
+  tag: string,
+  img: string
+}
+
+export default function HighlightCard({ highlight }: { highlight: HiglightProps }) {
   return (
-    <div className='flex flex-col w-full sm:w-1/2 lg:w-1/3 2xl:w-1/5  font-acumin p-4 pb-6 border-b-2 border-b-wri-green shadow'>
-      <div className='bg-white text-wri-green font-bold text-[0.938rem] w-full py-4'>
-        LAND AND CARBON LAB
+    <div className='flex flex-col w-full  font-acumin'>
+      <div className='relative w-full h-56'>
+        <Image src={`${highlight.img}`} alt="higlight" fill />
       </div>
-      <h2 className='text-wri-black text-2xl font-bold w-full'>Title of the dataset goes here lorem ipsum.</h2>
+      <div className='bg-white text-wri-green font-bold text-[0.938rem] w-[70%] py-4 -mt-6 z-10'>
+        FORESTS
+      </div>
+      <h2 className='text-wri-black text-2xl font-bold w-[80%]'>Title of the dataset goes here lorem ipsum.</h2>
       <article className=' line-clamp-3 w-[88%] font-light text-base mt-4 leading-[1.375rem]'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore maxime ut aspernatur laborum quod architecto, repellat commodi, iure suscipit, perspiciatis vitae dolor eveniet saepe aliquid? Quae labore incidunt odit reprehenderit?</article>
       <div className='flex font-light text-sm text-wri-black mt-4 leading-[1.375rem]'>
         <div className='flex items-center'>

@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 export default function Footer() {
   return (
-    <section id="footer" className='w-full  flex font-acumin flex-col'>
+    <section id="footer" className='w-full  flex font-acumin flex-col mt-16 mb-6'>
       <div className='w-full flex flex-col bg-wri-green pl-6 px-4 sm:px-9 py-10'>
         <p className='text-white mb-4 font-bold text-[1.5rem]'>Didn&apos;t find what you were looking for? </p>
         <div className='flex flex-col sm:flex-row gap-y-4 sm:gap-x-4 font-bold'>
