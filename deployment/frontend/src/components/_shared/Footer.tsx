@@ -35,8 +35,8 @@ export default function Footer() {
           </div>
           <div className='w-full sm:w-1/2 flex flex-col items-center sm:items-start gap-y-4 shrink xl:ml-20 mt-10 sm:mt-0'>
             <p className='font-bold text-base sm:text-[1.375rem]'>STAY UP TO DATE WITH THE NEWS </p>
-            <div className='flex flex-col sm:flex-row gap-y-4 gap-x-4 w-full'>
-              <div className='outline outline-1 rounded-sm pl-1 py-2 gap-x-2 flex flex-row items-center min-w-fit  w-full sm:w-1/2 2xl:w-[58%]'>
+            <div className='flex flex-col lg:flex-row gap-y-4 gap-x-4 w-full'>
+              <div className='outline outline-1 rounded-sm pl-1 py-2 gap-x-2 flex flex-row items-center min-w-fit  w-full lg:w-1/2 2xl:w-[58%]'>
                 <div className=' my-auto'><EnvelopeIcon className='w-5 h-5 text-wri-gray' /></div>
                 <div className='grow shrink basis-auto'><input type="text" placeholder='Enter your email address' className=' focus:outline-none placeholder:text-xs text-xs font-normal w-full' /></div>
               </div>
@@ -64,7 +64,7 @@ export default function Footer() {
           <div className=' w-52 h-16 sm:w-56 sm:h-20 relative mx-auto sm:ml-0'>
             <Image src="/images/WRI_logo_4c.png" alt="Picture of the author" fill />
           </div>
-          <div className='mx-auto sm:ml-auto sm:mr-0 md:mr-16 xl:mr-24 2xl:mr-[6.5rem] 3xl:mr-52  w-fit flex  items-end gap-x-1 font-normal text-base mt-auto'>
+          <div className='mx-auto sm:ml-auto sm:mr-0 lg:mr-16 xl:mr-20 2xl:mr-[6.5rem] 3xl:mr-52  w-fit flex  items-end gap-x-1 font-normal text-base mt-auto'>
             <span>Powered by <a href='#' className=' text-wri-green'>Portal.js</a> from</span>
             <div className=' w-24 h-6 relative'><Image src="/images/datopian.png" alt="" fill></Image></div>
           </div>
