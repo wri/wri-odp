@@ -54,10 +54,7 @@ jobs:
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
-        run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
-          npm install -g wait-on
-          wait-on http://localhost:5000 --timeout 30000
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
