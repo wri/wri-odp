@@ -51,13 +51,20 @@ jobs:
           key: venv-${{ hashFiles('poetry.lock') }}
       - name: Install the project dependencies
         run: poetry install
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
       - name: Run the report creation
         run: poetry run python script.py
+        env:
+          BRANCH_NAME: ${{ steps.extract_branch.outputs.branch }}
       - name: Commit files
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit --allow-empty -m "Updating the storage report" -a
+          git add .
+          git commit --allow-empty -m "Updating the storage report"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
