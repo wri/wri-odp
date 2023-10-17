@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -14,12 +14,11 @@ type CarouselProps = {
 export default function Carousel({ children, identifier }: CarouselProps) {
   const prevEl = `.nav-prev-button${identifier ? '--' + identifier : ''}`;
   const nextEl = `.nav-next-button${identifier ? '--' + identifier : ''}`;
-  const [swiper, setSwiper] = useState(null);
+  // const [swiper, setSwiper] = useState<Swiper | null>(null);;
   return (
     <>
       <Swiper
         modules={[Navigation]}
-        onSwiper={(instance) => setSwiper(instance)}
         spaceBetween={identifier.includes("recent") ? 18 : 40}
         breakpoints={{
           1: {

@@ -13,7 +13,7 @@ const CarouselNavButton: React.FC<{
   return (
     <>
       <button
-        className={`bg-white shadow ${sizes[size]} rounded-full flex justify-center items-center`}
+        className={`bg-white shadow ${sizes[size ?? 'medium']} rounded-full flex justify-center items-center`}
       >
         <ArrowRightIcon className={`w-8 h-8 text-wri-black font-light ${orientation === "right" ? "block" : "hidden"}`} />
         <ArrowLeftIcon className={`w-8 h-8 text-wri-black font-light ${orientation === "left" ? "block" : "hidden"}`} />
