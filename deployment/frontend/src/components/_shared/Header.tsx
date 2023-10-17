@@ -10,9 +10,6 @@ export default function Header() {
         <Image src="/images/WRI_logo_4c.png" alt="Picture of the author" width={400} height={500} className='hidden sm:block' />
         <Image src="/images/WRI_logo_4c.png" alt="Picture of the author" width={150} height={300} className='block sm:hidden' />
       </div>
-      {/* <div className=' w-56 h-20 relative'>
-        <Image src="/images/WRI_logo_4c.png" alt="Picture of the author" fill />
-      </div> */}
       <div className=' ml-auto flex mt-auto gap-x-6'>
         <div className=' hidden sm:flex gap-x-6 font-semibold text-[1.0625rem] text-wri-black'>
           <span className=' border-b-2 border-b-wri-gold'>Search</span>
