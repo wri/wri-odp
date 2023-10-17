@@ -1,6 +1,7 @@
 FROM viderum/ckan:v2.10-dev
 
 ENV CKAN_INI /srv/app/production.ini
+ENV APP_DIR=/srv/app
 
 # Install any extensions needed by your CKAN instance
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
@@ -10,7 +11,7 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@v2.9#egg=ckanext-auth'
 
-COPY ../../ckan-backend-dev/src/ckanext-wri ${APP_DIR}/src/ckanext-wri
+COPY ../../ckanext-wri ${APP_DIR}/src/ckanext-wri
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
 #COPY patches ${APP_DIR}/patches
