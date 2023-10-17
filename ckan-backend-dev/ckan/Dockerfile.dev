@@ -26,10 +26,11 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt'
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@v2.9#egg=ckanext-auth'
 
 COPY ../src/ckanext-wri ${APP_DIR}/src/ckanext-wri
-RUN pip3 install -e ${APP_DIR}/src/ckanext-wri
+RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
 # Update ckanext-s3filestore test.ini with minio credentials
 RUN sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \

@@ -37,6 +37,10 @@ ckan:
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_ADMIN_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_COLLABORATORS_TO_CHANGE_OWNER_ORG: "True"
+      CKAN___SCHEMING__DATASET_SCHEMAS: ckanext.scheming:ckan_dataset.yaml
+      CKAN___SCHEMING__ORGANIZATION_SCHEMAS: ckanext.scheming:custom_org_with_address.json
+      CKAN___SCHEMING__GROUP_SCHEMAS: ckanext.scheming:custom_group_with_status.json
+      CKAN___SCHEMING__PRESETS: ckanext.wri.schema:presets.json
     hpa:
       enable: true
       minReplicas: 2

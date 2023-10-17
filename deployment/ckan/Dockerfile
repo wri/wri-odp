@@ -9,6 +9,10 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@v2.9#egg=ckanext-auth'
+
+COPY ../../../ckan-backend-dev/src/ckanext-wri ${APP_DIR}/src/ckanext-wri
+RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
+
 #COPY patches ${APP_DIR}/patches
 #RUN for d in $APP_DIR/patches/*; do \
 #        if [ -d $d ]; then \
@@ -18,7 +22,7 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
 #        fi ; \
 #    done
 
-ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore auth envvars
+ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth envvars
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 
