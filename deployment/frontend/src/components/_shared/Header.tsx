@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react'
 import Image from 'next/image'
 import { Menu, Transition } from '@headlessui/react'
-import { XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
+import { Bars3Icon } from "@heroicons/react/20/solid";
 
 export default function Header() {
   return (
-    <section id="header" className='w-full px-4 sm:px-9 py-10 flex font-acumin items-baseline'>
+    <section id="header" className='w-full py-10 px-4 sm:px-6 xxl:px-0 max-w-[1380px] mx-auto flex font-acumin items-baseline'>
       <div className=' w-fit sm:w-52 h-fit'>
         <Image src="/images/WRI_logo_4c.png" alt="Picture of the author" width={400} height={500} className='hidden sm:block' />
         <Image src="/images/WRI_logo_4c.png" alt="Picture of the author" width={150} height={300} className='block sm:hidden' />

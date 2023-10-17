@@ -73,7 +73,7 @@ const recents = [
 export default function Recent({ title }: { title: string }) {
   const identifier = title.toLowerCase().replace(' ', '-')
   return (
-    <section id="highlights" className=' w-[94%] sm:w-[86%] xl:w-[91%] 2xl:w-[93.5%] mx-auto flex flex-col font-acumin gap-y-6 mt-16'>
+    <section id="highlights" className=' px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin gap-y-6 mt-16'>
       <h1 className='font-bold text-[2rem] ml-2'>{title}</h1>
       <div className='relative '>
         <div className='peer'>

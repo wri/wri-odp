@@ -20,6 +20,10 @@ export default {
       screens: {
         "4xl": "2048px",
         "3xl": "1920px",
+        "xxl": "1440px",
+      },
+      maxWidth: {
+        "8xl": "1350px"
       }
     },
   },

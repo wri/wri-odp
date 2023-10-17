@@ -13,7 +13,7 @@ export interface HiglightProps {
 export default function HighlightCard({ highlight }: { highlight: HiglightProps }) {
   return (
     <div className='flex flex-col w-full  font-acumin'>
-      <div className='relative w-full h-56 2xl:h-72'>
+      <div className='relative w-full h-56 2xl:h-64'>
         <Image src={`${highlight.img}`} alt="higlight" fill />
       </div>
       <div className='bg-white text-wri-green font-bold text-[0.938rem] w-[70%] pt-4 pb-2 -mt-6 z-10'>
