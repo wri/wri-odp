@@ -12,7 +12,9 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@v2.9#egg=ckanext-auth'
 
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
+USER root
 RUN chown -R ckan:ckan ${APP_DIR}/src/ckanext-wri
+USER ckan
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
 #COPY patches ${APP_DIR}/patches
