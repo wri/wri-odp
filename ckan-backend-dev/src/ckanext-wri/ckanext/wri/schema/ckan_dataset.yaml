@@ -21,7 +21,7 @@ dataset_fields:
   form_placeholder: http://example.com/dataset.json
   display_property: foaf:homepage
   display_snippet: link.html
-  validators: url_validator
+  validators: ignore_missing url_validator
 
 - field_name: language
   label: Language
@@ -34,6 +34,7 @@ dataset_fields:
 - field_name: projects
   label: Projects
   preset: multiple_text
+  validators: ignore_missing
 
 - field_name: application
   label: Application
@@ -41,7 +42,7 @@ dataset_fields:
 - field_name: technical_notes
   label: Technical Notes
   form_placeholder: eg. https://example.com/technical_notes.pdf
-  validators: url_validator
+  validators: ignore_missing url_validator
   output_validators: url_validator
 
 - field_name: tag_string
@@ -155,7 +156,7 @@ dataset_fields:
 - field_name: learn_more
   label: Learn More
   form_placeholder: eg. https://example.com/learn_more.pdf
-  validators: url_validator
+  validators: ignore_missing url_validator
   output_validators: url_validator
 
 - field_name: cautions
