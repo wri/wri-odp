@@ -7,6 +7,7 @@ import classNames from '@/utils/classnames';
 export default function Search() {
   const router = useRouter()
   const { pathname } = router
+
   return (
     <section id="search" className='bg-cover bg-center bg-no-repeat w-full flex flex-col font-acumin h-[30vh]' style={{
       backgroundImage: 'url(/images/bg.png)'
