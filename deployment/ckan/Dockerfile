@@ -34,8 +34,10 @@ USER root
 RUN apk --no-cache add openssl
 USER ckan
 
-RUN openssl genpkey -algorithm RSA -out jwtRS256.key && \
-    openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
+RUN openssl genpkey -algorithm RSA -out ${APP_DIR}/jwtRS256.key && \
+    openssl rsa -in ${APP_DIR}/jwtRS256.key -pubout -outform PEM -out ${APP_DIR}/jwtRS256.key.pub && \
+    chown ckan:ckan ${APP_DIR}/jwtRS256.key && \
+    chown ckan:ckan ${APP_DIR}/jwtRS256.key.pub
 
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 USER root

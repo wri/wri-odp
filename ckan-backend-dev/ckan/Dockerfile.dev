@@ -61,13 +61,20 @@ COPY setup/start_ckan_development.sh.override ${APP_DIR}/start_ckan_development.
 RUN chmod +x ${APP_DIR}/start_ckan_development.sh
 RUN chown ckan:ckan ${APP_DIR}/start_ckan_development.sh
 
-COPY setup/jwtRS256.key ${APP_DIR}/jwtRS256.key
-COPY setup/jwtRS256.key.pub ${APP_DIR}/jwtRS256.key.pub
-RUN chown ckan:ckan ${APP_DIR}/jwtRS256.key
-RUN chown ckan:ckan ${APP_DIR}/jwtRS256.key.pub
+#COPY setup/jwtRS256.key ${APP_DIR}/jwtRS256.key
+#COPY setup/jwtRS256.key.pub ${APP_DIR}/jwtRS256.key.pub
+#RUN chown ckan:ckan ${APP_DIR}/jwtRS256.key
+#RUN chown ckan:ckan ${APP_DIR}/jwtRS256.key.pub
 
-RUN ckan config-tool ${CKAN_INI} "api_token.jwt.algorithm = RS256" && \
-    ckan config-tool ${CKAN_INI} "api_token.jwt.encode.secret = file:${APP_DIR}/jwtRS256.key" && \
-    ckan config-tool ${CKAN_INI} "api_token.jwt.decode.secret = file:${APP_DIR}/jwtRS256.key.pub"
+RUN apk --no-cache add openssl
+
+RUN openssl genpkey -algorithm RSA -out ${APP_DIR}/jwtRS256.key && \
+    openssl rsa -in ${APP_DIR}/jwtRS256.key -pubout -outform PEM -out ${APP_DIR}/jwtRS256.key.pub && \
+    chown ckan:ckan ${APP_DIR}/jwtRS256.key && \
+    chown ckan:ckan ${APP_DIR}/jwtRS256.key.pub
+
+#RUN ckan config-tool ${CKAN_INI} "api_token.jwt.algorithm = RS256" && \
+#    ckan config-tool ${CKAN_INI} "api_token.jwt.encode.secret = file:${APP_DIR}/jwtRS256.key" && \
+#    ckan config-tool ${CKAN_INI} "api_token.jwt.decode.secret = file:${APP_DIR}/jwtRS256.key.pub"
 
 CMD ["sh", "-c", "${APP_DIR}/start_ckan_development.sh"]
