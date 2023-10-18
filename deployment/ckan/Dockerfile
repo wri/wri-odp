@@ -30,8 +30,11 @@ ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_vi
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 
-RUN apk --no-cache add openssl && \
-    openssl genpkey -algorithm RSA -out jwtRS256.key -aes256 && \
+USER root
+RUN apk --no-cache add openssl
+USER ckan
+
+RUN openssl genpkey -algorithm RSA -out jwtRS256.key -aes256 && \
     openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
 
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
