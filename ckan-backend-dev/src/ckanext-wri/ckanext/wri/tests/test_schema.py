@@ -13,6 +13,8 @@ Invalid = df.Invalid
 
 @pytest.mark.usefixtures(u"with_plugins", u"test_request_context")
 def test_package_create():
+    # Add plugins to config
+    config["ckan.plugins"] = "image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth envvars"
     config["api_token.jwt.algorithm"] = "RS256"
     config["api_token.jwt.encode.secret"] = "file:/srv/app/jwtRS256.key"
     config["api_token.jwt.decode.secret"] = "file:/srv/app/jwtRS256.key.pub"
