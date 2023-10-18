@@ -1,6 +1,6 @@
 import { Disclosure, Transition } from "@headlessui/react";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
-import { GeolocateControl, Map } from "react-map-gl";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { Map } from "react-map-gl";
 import GeocoderControl from "./GeocoderControl";
 
 export default function LocationSearch() {
@@ -31,10 +31,13 @@ export default function LocationSearch() {
             <Disclosure.Panel className="h-[300px] border-t-2 border-amber-400 ">
               <Map
                 mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
-                style={{height: 300}}
+                style={{ height: 300 }}
                 mapStyle="mapbox://styles/mapbox/streets-v9"
               >
-                <GeocoderControl mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w" position="bottom-right" />
+                <GeocoderControl
+                  mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                  position="bottom-right"
+                />
               </Map>
             </Disclosure.Panel>
           </Transition>
