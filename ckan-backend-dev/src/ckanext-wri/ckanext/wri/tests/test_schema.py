@@ -16,17 +16,21 @@ def test_package_create():
     config["api_token.jwt.algorithm"] = "RS256"
     config["api_token.jwt.encode.secret"] = "file:/srv/app/jwtRS256.key"
     config["api_token.jwt.decode.secret"] = "file:/srv/app/jwtRS256.key.pub"
-    userobj = model.User.get("ckan_admin")
+
+    userobj = factories.Sysadmin()
     session = model.Session
     context = {
         "model": model, "session": session,
-        "user": userobj.name, "ignore_auth": True,
+        "user": userobj["name"], "ignore_auth": True,
         "auth_user_obj": userobj
     }
 
     API_KEY = get_action("api_token_create")(
         context=context,
-        data_dict={"user": "ckan_admin", "name": "Custom schema tests"}
+        data_dict={
+            "user": userobj["name"],
+            "name": "Custom schema tests"
+        }
     )
     API_KEY = API_KEY[u"token"]
 
