@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-export default function CardsGrid<T extends unknown>({
+export default function CardsGrid<T>({
   Card,
   items,
   className,

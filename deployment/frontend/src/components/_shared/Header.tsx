@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import Image from "next/image";
 import { Menu, Transition } from "@headlessui/react";
 import { Bars3Icon } from "@heroicons/react/20/solid";
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -9,7 +10,7 @@ export default function Header() {
       id="header"
       className="w-full py-10 px-4 sm:px-6 xxl:px-0 max-w-[1380px] mx-auto flex font-acumin items-baseline"
     >
-      <a href="/" className=" w-fit sm:w-52 h-fit">
+      <Link href="/" className=" w-fit sm:w-52 h-fit">
         <Image
           src="/images/WRI_logo_4c.png"
           alt="Picture of the author"
@@ -24,7 +25,7 @@ export default function Header() {
           height={300}
           className="block sm:hidden"
         />
-      </a>
+      </Link>
       <div className=" ml-auto flex mt-auto gap-x-6">
         <div className=" hidden sm:flex gap-x-6 font-semibold text-[1.0625rem] text-wri-black">
           <a href="" className=" border-b-2 border-b-wri-gold">
