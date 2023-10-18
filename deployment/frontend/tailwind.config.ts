@@ -23,7 +23,8 @@ export default {
         "xxl": "1440px",
       },
       maxWidth: {
-        "8xl": "1350px"
+        "8xl": "1350px",
+        "9xl": "1440px",
       }
     },
   },
