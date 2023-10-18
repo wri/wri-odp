@@ -1,3 +1,6 @@
+import Search from "@/components/Search";
+import Footer from "@/components/_shared/Footer";
+import Header from "@/components/_shared/Header";
 import DatasetCard from "@/components/search/DatasetCard";
 import FilteredSearchLayout from "@/components/search/FilteredSearchLayout";
 import FiltersSelected from "@/components/search/FiltersSelected";
@@ -7,6 +10,8 @@ import SortBy from "@/components/search/SortBy";
 export default function SearchPage() {
   return (
     <>
+      <Header />
+      <Search />
       <FilteredSearchLayout>
         <SortBy />
         <FiltersSelected />
@@ -17,6 +22,7 @@ export default function SearchPage() {
         </div>
         <Pagination />
       </FilteredSearchLayout>
+      <Footer />
     </>
   );
 }

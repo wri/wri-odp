@@ -7,7 +7,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", ...defaultTheme.fontFamily.sans],
-        acumin: ['"Acumin Pro"', ...defaultTheme.fontFamily.sans],
+        acumin: ['var(--font-acumin)', ...defaultTheme.fontFamily.sans],
       },
       boxShadow: {
         "wri": "0px 4px 4px 0px rgba(147, 147, 147, 0.25)",

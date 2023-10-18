@@ -23,7 +23,7 @@ export default function FilteredSearchLayout({
         <body class="h-full">
         ```
       */}
-      <div className="flex">
+      <div className="flex font-acumin">
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog
             as="div"
@@ -217,7 +217,7 @@ export default function FilteredSearchLayout({
         <Disclosure defaultOpen>
           {({ open }) => (
             <>
-              <Disclosure.Button className="absolute lg:block hidden left-[calc(25%-1.5rem)] top-1/4 z-20">
+              <Disclosure.Button className="absolute lg:block hidden left-[calc(25%-1.5rem)] top-[60vh] z-20">
                 <div className={classNames("flex h-12 w-12 items-center rounded-full bg-white shadow-lg transition", open ? "" : "-translate-x-[23.5vw]")}>
                   <ArrowRightIcon
                     className={classNames(
