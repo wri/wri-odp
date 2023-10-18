@@ -7,7 +7,7 @@ export default class CustomDocument extends Document {
         <Head>
           <link rel="stylesheet" href="https://use.typekit.net/ckz5ous.css" />
         </Head>
-        <body>
+        <body className="font-acumin">
           <Main />
         </body>
         <NextScript />
