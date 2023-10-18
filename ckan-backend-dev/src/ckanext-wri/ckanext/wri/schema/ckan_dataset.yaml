@@ -34,7 +34,6 @@ dataset_fields:
 - field_name: projects
   label: Projects
   preset: multiple_text
-  validators: ignore_missing
 
 - field_name: application
   label: Application
