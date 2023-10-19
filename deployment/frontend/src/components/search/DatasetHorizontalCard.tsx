@@ -30,19 +30,19 @@ export default function DatasetHorizontalCard() {
           <div className="mt-[0.33rem] flex justify-start gap-x-3">
             <div className="flex flex-row items-center gap-x-1">
               <ArrowPathIcon className="h-3 w-3 text-blue-800" />
-              <p className="font-['Acumin Pro SemiCondensed'] text-sm font-light leading-snug text-stone-900">
+              <p className="font-['Acumin Pro SemiCondensed'] text-xs sm:text-sm font-light leading-snug text-stone-900">
                 2 Feb 2023
               </p>
             </div>
             <div className="flex items-center gap-x-1">
               <ClockIcon className="h-3 w-3 text-blue-800" />
-              <p className="font-['Acumin Pro SemiCondensed'] text-sm font-light leading-snug text-stone-900">
+              <p className="font-['Acumin Pro SemiCondensed'] text-xs sm:text-sm font-light leading-snug text-stone-900">
                 2020 - 2023
               </p>
             </div>
             <div className="flex items-center gap-x-1">
               <MapPinIcon className="h-3 w-3 text-blue-800" />
-              <p className="font-['Acumin Pro SemiCondensed'] text-sm font-light leading-snug text-stone-900">
+              <p className="font-['Acumin Pro SemiCondensed'] text-xs sm:text-sm font-light leading-snug text-stone-900">
                 Sub-Regional
               </p>
             </div>
