@@ -1,6 +1,6 @@
 import React from 'react'
 import DatasetHorizontalCard from '../search/DatasetHorizontalCard'
-import Pagination from '../search/Pagination'
+import Pagination from '@/components/_shared/Pagination'
 
 export default function DatasetList({ datasets }: { datasets: number[] }) {
   return (

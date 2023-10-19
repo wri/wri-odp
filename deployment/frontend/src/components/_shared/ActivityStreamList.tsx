@@ -1,7 +1,6 @@
 import React from 'react'
 import ActivityStreamCard from './ActivityStreamCard'
-import Pagination from '../search/Pagination'
-
+import Pagination from '@/components/_shared/Pagination'
 const activity = [
   {
     description: "someone updated the dataset XYZ Lorem ipsum this will probably be longer",
