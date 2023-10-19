@@ -37,9 +37,7 @@ jobs:
           CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          ls -la
           mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
-          ls -la
           docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
       - name: Build and push Frontend image to ECR
