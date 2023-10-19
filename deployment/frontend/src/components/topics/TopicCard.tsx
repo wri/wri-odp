@@ -3,6 +3,7 @@ import Image from "next/image";
 import Topic from "@/interfaces/topic.interface";
 
 export default function TopicCard({ topic }: { topic: Topic }) {
+
   return (
     <a
       href={`/topics/${topic.name}`}
