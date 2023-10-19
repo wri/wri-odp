@@ -1,15 +1,21 @@
 import React from 'react'
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import classNames from '@/utils/classnames';
 
 export default function Search() {
+  const router = useRouter()
+  const { pathname } = router
+
   return (
     <section id="search" className='bg-cover bg-center bg-no-repeat w-full flex flex-col font-acumin h-[30vh]' style={{
       backgroundImage: 'url(/images/bg.png)'
     }}>
       <div className='w-full bg-wri-green'>
         <div className='flex px-8 xxl:px-0 max-w-8xl mx-auto  text-white font-semibold text-[1.063rem] gap-x-2'>
-          <div className='p-4 bg-wri-dark-green'>Explore data</div>
-          <div className='p-4 '>Advance search</div>
+          <div className={classNames('p-4', pathname === '/search' ? 'bg-wri-dark-green' : 'bg-wri-green')}><Link href="/search">Explore data</Link></div>
+          <div className={classNames('p-4', pathname === '/advanced_search' ? 'bg-wri-dark-green' : 'bg-wri-green')}><Link href="/advanced_search">Advance data</Link></div>
         </div>
       </div>
       <div className=' w-full'>
