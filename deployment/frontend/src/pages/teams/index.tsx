@@ -4,6 +4,7 @@ import TeamsSearch from "@/components/team/TeamsSearch";
 import TeamsSearchResults from "@/components/team/TeamsSearchResults";
 
 export default function TeamsPage() {
+
   return (
     <>
       <Header />
