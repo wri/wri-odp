@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+body, html {
+	letter-spacing: 0px;
   accent-color: #32864B;
 }
 
