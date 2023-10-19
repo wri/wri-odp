@@ -1,10 +1,10 @@
 import Search from "@/components/Search";
 import Footer from "@/components/_shared/Footer";
 import Header from "@/components/_shared/Header";
+import Pagination from "@/components/_shared/Pagination";
 import DatasetHorizontalCard from "@/components/search/DatasetHorizontalCard";
 import FilteredSearchLayout from "@/components/search/FilteredSearchLayout";
 import FiltersSelected from "@/components/search/FiltersSelected";
-import Pagination from "@/components/search/Pagination";
 import SortBy from "@/components/search/SortBy";
 
 export default function SearchPage() {

@@ -1,0 +1,31 @@
+{% import 'macros/form.html' as form %}
+
+<style>
+    fieldset.checkbox label {
+        font-weight: normal;
+        display: block;
+    }
+
+    fieldset.checkbox label:after {
+        content: none;
+    }
+
+    fieldset.checkbox label input {
+        width: auto;
+        top: 0;
+    }
+</style>
+
+{%- call form.input_block(
+label=h.scheming_language_text(field.label),
+classes=field.classes if 'classes' in field else ['control-medium'],
+error=errors[field.field_name],
+is_required=h.scheming_field_required(field)) -%}
+<fieldset class="checkbox">
+    <label for="field-{{ field.field_name }}">
+        <input id="field-{{ field.field_name }}" type="checkbox" name="{{ field.field_name }}" value="true" {{"checked " if data[field.field_name] == true }} />
+        {{ field.label }}
+    </label>
+</fieldset>
+{%- snippet 'scheming/form_snippets/help_text.html', field=field -%}
+{%- endcall -%}
