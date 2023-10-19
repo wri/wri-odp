@@ -6,7 +6,7 @@ import Footer from "@/components/_shared/Footer";
 import TopicsSearchResults from "@/components/topics/TopicsSearchResults";
 import TopicsSearch from "@/components/topics/TopicsSearch";
 
-export default function test() {
+export default function TopicsPage() {
   return (
     <>
       <Header />
