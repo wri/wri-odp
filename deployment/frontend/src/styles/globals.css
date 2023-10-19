@@ -4,4 +4,20 @@
 
 body, html {
 	letter-spacing: 0px;
+  accent-color: #32864B;
+}
+
+.mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-attrib{
+  display: none;
+}
+
+.mapboxgl-ctrl-bottom-right {
+  width: 100%;
+}
+
+.mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
+  width: 100%;
+  max-width: 95%;
+  margin: 10px auto;
+  float: none;
 }
