@@ -4,12 +4,12 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import classNames from '@/utils/classnames';
 
 interface Option {
-  value: number;
+  id: number;
   label: string;
 }
 
 export default function Select({options}: {options: Option[]}) {
-  const [selected, setSelected] = useState(options[0] ? options[0] : {value: 0, label: ''})
+  const [selected, setSelected] = useState(options[0] ? options[0] : {id: 0, label: ''})
 
   return (
     <Listbox value={selected} onChange={setSelected}>
@@ -33,31 +33,20 @@ export default function Select({options}: {options: Option[]}) {
               <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 {options.map((option) => (
                   <Listbox.Option
-                    key={option.value}
+                    key={option.id}
                     className={({ active }) =>
                       classNames(
                         active ? 'bg-wri-green text-white' : 'text-gray-900',
                         'relative cursor-default select-none py-2 px-4'
                       )
                     }
-                    value={option.value}
+                    value={option}
                   >
                     {({ selected, active }) => (
                       <>
                         <span className={classNames(selected ? 'font-semibold' : 'font-normal', 'block truncate')}>
                           {option.label}
                         </span>
-
-                        {selected ? (
-                          <span
-                            className={classNames(
-                              active ? 'text-white' : 'text-wri-green',
-                              'absolute inset-y-0 left-0 flex items-center pl-1.5'
-                            )}
-                          >
-                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                          </span>
-                        ) : null}
                       </>
                     )}
                   </Listbox.Option>

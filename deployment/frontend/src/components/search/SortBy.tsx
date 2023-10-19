@@ -13,9 +13,9 @@ export default function SortBy() {
           </div>
           <Select
             options={[
-              { value: 1, label: "1" },
-              { value: 2, label: "2" },
-              { value: 3, label: "3" },
+              { id: 1, label: "1" },
+              { id: 2, label: "2" },
+              { id: 3, label: "3" },
             ]}
           />
         </div>
@@ -25,9 +25,9 @@ export default function SortBy() {
           </div>
           <Select
             options={[
-              { value: 1, label: "Relevance" },
-              { value: 2, label: "Name" },
-              { value: 3, label: "Title" },
+              { id: 1, label: "Relevance" },
+              { id: 2, label: "Name" },
+              { id: 3, label: "Title" },
             ]}
           />
         </div>

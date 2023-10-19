@@ -10,7 +10,7 @@ import {
   MapPinIcon,
 } from "@heroicons/react/24/outline";
 
-export default function DatasetCard() {
+export default function DatasetHorizontalCard() {
   return (
     <div className="grid lg:grid-cols-5 gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri hover:bg-slate-100 transition">
       <div className="lg:col-span-4 col-span-full">
@@ -18,10 +18,10 @@ export default function DatasetCard() {
           <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green">
             LAND AND CARBON LAB
           </p>
-          <h3 className="font-['Acumin Pro SemiCondensed'] text-xl font-bold leading-loose text-stone-900">
+          <h3 className="font-['Acumin Pro SemiCondensed'] text-xl font-bold text-stone-900 mt-2">
             Title of the dataset goes here lorem ipsum.
           </h3>
-          <p className="font-['Acumin Pro SemiCondensed'] text-base font-light leading-snug text-stone-900">
+          <p className="font-['Acumin Pro SemiCondensed'] text-base font-light text-stone-900">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta
             sem malesuada magna mollis euismod. Aenean lacinia bibendum nulla
             sed consectetur. Nullam quis risus eget urna mollis ornare vel eu
