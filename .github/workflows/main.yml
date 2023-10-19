@@ -37,6 +37,7 @@ jobs:
           CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
           docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
       - name: Build and push Frontend image to ECR
@@ -55,7 +56,7 @@ jobs:
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
-        working-directory: ./ckan-backend-dev        
+        working-directory: ./ckan-backend-dev
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
