@@ -2,6 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { Button } from "../_shared/Button";
+import { BellAlertIcon } from '@heroicons/react/24/outline';
 
 export default function TeamHeaderCard() {
   return (
@@ -20,11 +21,9 @@ export default function TeamHeaderCard() {
         </div>
       </div>
       <div className='w-full px-2 md:w-fit flex flex-col justify-center gap-y-3 md:pl-8'>
-        <div className=' flex outline-wri-gold outline-1 outline font-bold text-[14px] text-black rounded-md px-6 py-3 gap-x-1 w-fit'>
-          <span className=' text-[0.875rem] w-fit'>Follow</span>
-          <div className='relative w-4 h-4'>
-            <Image src='/icons/bell.svg' alt="" fill />
-          </div>
+        <div className='flex items-center outline-wri-gold outline-1 outline font-bold text-[14px] text-black rounded-md px-6 py-3 gap-x-1 w-fit'>
+          <span className='text-[0.875rem] w-fit'>Follow</span>
+          <BellAlertIcon className='h-5 w-5' />
         </div>
         <div className='flex flex-col md:w-[90%] lg:w-[579.33px] gap-y-2 '>
           <h2 className='font-bold text-[2.063rem]'>Team 1</h2>

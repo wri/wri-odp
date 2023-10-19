@@ -30,12 +30,12 @@ export default function TeamTab() {
           {tabs.map((tab) => (
             <Tab key={tab.title} className=" bg-wri-green text-white font-semibold text-[1.063rem] w-[50%] sm:w-[316px]">
               {({ selected }) => (
-                <button
+                <div
                   className={`font-semibold  px-6 py-4 focus:outline-0 w-full  ${selected ? " bg-wri-dark-green" : ""
                     } `}
                 >
                   {tab.title}
-                </button>
+                </div>
               )}
             </Tab>
           ))}
