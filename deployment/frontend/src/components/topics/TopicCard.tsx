@@ -22,7 +22,7 @@ export default function TopicCard({ topic }: { topic: Topic }) {
       <article className=" line-clamp-3 w-[88%] font-light text-base mt-2 leading-[1.375rem] line-clamp-3">
         {topic.description}
       </article>
-      <div className="flex font-light text-sm text-wri-black mt-1 leading-[1.375rem]">
+      <div className="flex font-light text-sm text-wri-black mt-1 leading-[1.375rem] items-cente">
         <span className="mr-2">{topic.num_datasets} datasets</span>
         <div className="border-l border-wri-black h-4  mx-2"></div>
         <span className="ml-2">{topic.num_subtopics} Subtopics</span>

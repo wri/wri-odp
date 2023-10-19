@@ -7,7 +7,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", ...defaultTheme.fontFamily.sans],
-        acumin: ['"Acumin Pro"', ...defaultTheme.fontFamily.sans],
+        acumin: ['var(--font-acumin)', ...defaultTheme.fontFamily.sans],
       },
       colors: {
         white: "#FFFFFF",
