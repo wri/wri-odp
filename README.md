@@ -9,7 +9,7 @@
 
 # WRI ODP
 
-The WRI Open Data Portal monorepo
+The WRI Open Data Portal monorepo 
 
 ## CKAN Backend Development
 
