@@ -8,7 +8,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# ckanext-wri 
+# ckanext-wri
 
 This is the WRI Open Data Portal extension for CKAN. It contains CKAN backend customizations for this project.
 
