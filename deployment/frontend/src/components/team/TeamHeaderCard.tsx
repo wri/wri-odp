@@ -19,14 +19,14 @@ export default function TeamHeaderCard() {
           </div>
         </div>
       </div>
-      <div className='w-full px-2 md:w-fit flex flex-col justify-center gap-y-4 md:pl-8'>
+      <div className='w-full px-2 md:w-fit flex flex-col justify-center gap-y-3 md:pl-8'>
         <div className=' flex outline-wri-gold outline-1 outline font-bold text-[14px] text-black rounded-md px-6 py-3 gap-x-1 w-fit'>
           <span className=' text-[0.875rem] w-fit'>Follow</span>
           <div className='relative w-4 h-4'>
             <Image src='/icons/bell.svg' alt="" fill />
           </div>
         </div>
-        <div className='flex flex-col md:w-[90%] lg:w-[579.33px] gap-y-4 '>
+        <div className='flex flex-col md:w-[90%] lg:w-[579.33px] gap-y-2 '>
           <h2 className='font-bold text-[2.063rem]'>Team 1</h2>
           <p className='  line-clamp-3 font-light text-[1.125rem]'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam. Ut enim ad minim veniam.</p>
           <span className=' font-light text-base'>363 Datasets</span>
