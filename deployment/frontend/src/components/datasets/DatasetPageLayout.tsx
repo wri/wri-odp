@@ -30,7 +30,7 @@ export default function DatasetPageLayout({
             </Disclosure.Button>
             <Disclosure.Panel
               as="div"
-              className="min-w-1/2 h-full hidden w-1/2 lg:z-10 lg:flex lg:flex-col px-4 sm:px-6 py-4 border-r border-gray-200"
+              className="min-w-1/2 h-full hidden w-1/2 lg:z-10 lg:flex lg:flex-col pl-4 sm:pl-6 py-4 border-r border-gray-200"
             >
               {children}
             </Disclosure.Panel>
