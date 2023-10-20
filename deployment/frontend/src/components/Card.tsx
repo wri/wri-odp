@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 export default function Card() {
   return (
-    <div className='flex flex-col w-full font-acumin p-4 pb-6 border-b-2 border-b-wri-green shadow'>
+    <div className='flex flex-col w-full font-acumin p-4 pb-6 border-b-2 border-b-wri-green shadow-wri mb-2'>
       <div className='bg-white text-wri-green font-bold text-[0.938rem] leading-[1.125rem] w-full pt-4 pb-2'>
         LAND AND CARBON LAB
       </div>
