@@ -3,6 +3,7 @@ import Image from "next/image";
 import Team from "@/interfaces/team.interface";
 
 export default function TeamCard({ team }: { team: Team }) {
+
   return (
     <a
       href={`/teams/${team.name}`}
