@@ -19,7 +19,7 @@ export default function Search() {
         </div>
       </div>
       <div className=' w-full'>
-        <div className=' mt-16 px-8 sm:pl-12  xxl:pl-5 max-w-8xl mx-auto sm:mt-8 md:mt-20 lg:mt-[3.9rem]'>
+        <div className=' mt-16 px-8 sm:pl-12  xxl:pl-5 max-w-8xl mx-auto sm:mt-8 md:mt-[3.9rem]'>
           <div className='shadow rounded-sm px-4 py-4 gap-x-2 flex flex-row items-center min-w-fit  w-full sm:w-1/2 bg-white'>
             <div className='grow shrink basis-auto'><input type="text" placeholder='Search data' className=' focus:outline-none placeholder:text-xs text-xs font-normal w-full' /></div>
             <div className=' my-auto'><MagnifyingGlassIcon className='w-4 h-4 text-wri-black' /></div>
