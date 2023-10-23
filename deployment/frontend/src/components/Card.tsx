@@ -5,6 +5,7 @@ import {
   TableCellsIcon,
 } from "@heroicons/react/20/solid";
 import { ClockIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 
 export default function Card() {
   return (
@@ -14,15 +15,23 @@ export default function Card() {
       </div>
       <h2 className='text-wri-black text-2xl font-bold w-full'>Title of the dataset goes here lorem ipsum.</h2>
       <article className=' line-clamp-3 w-[88%] font-light text-base mt-4 leading-[1.375rem]'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore maxime ut aspernatur laborum quod architecto, repellat commodi, iure suscipit, perspiciatis vitae dolor eveniet saepe aliquid? Quae labore incidunt odit reprehenderit?</article>
-      <div className="mt-4 flex text-sm font-light leading-[1.375rem] text-wri-black">
-        <div className="flex items-center">
-          <ClockIcon className="h-3 w-3 text-blue-800 mb-1" />
-          <span className="ml-2">2020 - 2023</span>
+      <div className='flex font-light text-sm text-wri-black mt-4 leading-[1.375rem] '>
+        <div className='flex  '>
+          <div className='w-4 h-4 relative'>
+            <Image src='/icons/time.svg' alt="eye" fill />
+          </div>
+          <div className='ml-2 w-fit h-[14px]'>
+            2020 - 2023
+          </div>
         </div>
-        <div className="mx-2 h-4 border-l  border-wri-black"></div>
-        <div className="flex items-center">
-          <MapPinIcon className="h-3 w-3 text-blue-800 mb-1" />
-          <span className="ml-2">Sub-regional</span>
+        <div className='border-l border-wri-black h-4  mx-2'></div>
+        <div className='flex '>
+          <div className='w-4 h-4 relative'>
+            <Image src='/icons/Framelocation.svg' alt="comment" fill />
+          </div>
+          <div className='ml-1 w-fit h-[14px]'>
+            Sub-regional
+          </div>
         </div>
       </div>
       <div className="mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black">
