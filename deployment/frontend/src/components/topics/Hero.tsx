@@ -6,7 +6,7 @@ import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 
 export function Hero() {
   return (
-    <div className="mx-auto mb-8 mt-10 grid max-w-[1440px] max-h-[18.5rem] font-acumin lg:mb-16 lg:grid-cols-5">
+    <div className="mx-auto mb-8 mt-10 grid max-w-[1440px] font-acumin lg:mb-16 lg:max-h-[18.5rem] lg:grid-cols-5">
       <div className="relative h-[18.5rem] lg:col-span-2">
         <Image alt="Topic name" fill={true} src="/images/topics/1.png" />
         <div className="absolute bottom-0 z-10 flex h-[68px] w-56 items-center justify-center rounded-t-[3px] bg-white">
@@ -38,9 +38,14 @@ function CopyLink() {
   const [clicked, setClicked] = useState(false);
   return (
     <>
-      {clicked ? (
+      {!clicked ? (
         <Button
-          onClick={() => setClicked(!clicked)}
+          onClick={() => {
+            setClicked(!clicked);
+            setTimeout(() => {
+              setClicked(false);
+            }, 3000);
+          }}
           variant="outline"
           className="mr-auto mt-3"
         >
@@ -49,12 +54,14 @@ function CopyLink() {
       ) : (
         <button
           onClick={() => setClicked(!clicked)}
-          className="flex h-auto max-w-[578px] gap-2 rounded-sm border border-amber-400 px-5 py-3 mt-3"
+          className="mt-3 flex h-auto max-w-[578px] gap-2 rounded-sm border border-amber-400 px-5 py-3"
         >
           <ClipboardDocumentIcon className="h-6 w-6 text-gray-800" />
           <div className="max-w-[30rem]">
-            <p className="font-semibold text-black text-start text-sm">Link copied to clipboard</p>
-            <p className="font-light text-start text-sm">
+            <p className="text-start text-sm font-semibold text-black">
+              Link copied to clipboard
+            </p>
+            <p className="text-start text-sm font-light">
               Make sure that the users who you are sharing the collection with,
               have permissions to see it.
             </p>

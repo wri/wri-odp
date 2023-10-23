@@ -86,6 +86,13 @@ ckan:
     enable: true
     hpa:
       enable: false
+    resources:
+      limits:
+        cpu: 400m
+        memory: 2.2G
+      requests:
+        cpu: 200m
+        memory: 1.8G
     replicaCount: 1
     enable: true
     image:

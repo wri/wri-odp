@@ -1,22 +1,27 @@
-import React from 'react'
-import Image from 'next/image'
+import React from "react";
+import Image from "next/image";
+import { ChartBarIcon, GlobeAltIcon, TableCellsIcon } from "@heroicons/react/20/solid";
 
 export interface HiglightProps {
-  title: string,
-  description: string,
-  date: string,
-  location: string,
-  tag: string,
-  img: string
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  tag: string;
+  img: string;
 }
 
-export default function HighlightCard({ highlight }: { highlight: HiglightProps }) {
+export default function HighlightCard({
+  highlight,
+}: {
+  highlight: HiglightProps;
+}) {
   return (
-    <div className='flex flex-col w-full  font-acumin'>
-      <div className='relative w-full h-56 2xl:h-64'>
+    <div className="flex w-full flex-col font-acumin">
+      <div className="relative h-56 w-full 2xl:h-64">
         <Image src={`${highlight.img}`} alt="higlight" fill />
       </div>
-      <div className='bg-white text-wri-green font-bold text-[0.938rem] w-[70%] pt-4 pb-2 -mt-6 z-10'>
+      <div className="z-10 -mt-6 w-[70%] bg-white pb-2 pt-4 text-[0.938rem] font-bold text-wri-green">
         FORESTS
       </div>
       <h2 className='text-wri-black text-2xl font-bold w-[80%]'>Title of the dataset goes here lorem ipsum.</h2>
@@ -40,17 +45,17 @@ export default function HighlightCard({ highlight }: { highlight: HiglightProps 
           </div>
         </div>
       </div>
-      <div className='flex font-light text-sm text-wri-black mt-4 leading-[1.375rem] gap-x-2'>
-        <div className=' bg-gray-300 w-fit rounded-full p-1'>
-          <Image src='/icons/Framechart.svg' alt="chart" width={20} height={20} />
+      <div className="mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black">
+        <div className="rounded-full bg-stone-100 p-1">
+          <ChartBarIcon className="h-5 w-5 text-blue-700" />
         </div>
-        <div className='  w-fit bg-gray-300 rounded-full'>
-          <Image src='/icons/globe.svg' alt="chart" width={30} height={30} />
+        <div className="rounded-full bg-stone-100 p-1">
+          <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
         </div>
-        <div className=' bg-gray-300 w-fit rounded-full p-1'>
-          <Image src='/icons/table.svg' alt="chart" width={20} height={20} />
+        <div className="rounded-full bg-stone-100 p-1">
+          <TableCellsIcon className="h-5 w-5 text-green-600" />
         </div>
       </div>
     </div>
-  )
+  );
 }
