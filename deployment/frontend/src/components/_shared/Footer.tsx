@@ -11,7 +11,7 @@ export default function Footer({
   return (
     <section
       id="footer"
-      className="w-full  flex font-acumin flex-col mt-16 mb-6"
+      className="w-full  flex font-acumin flex-col mt-16 pb-16"
     >
       <div className=" w-full bg-wri-green">
         <div className=" flex flex-col px-8 xxl:px-0  max-w-8xl mx-auto py-10">
@@ -38,7 +38,7 @@ export default function Footer({
       </div>
 
       <div className="flex flex-col w-full px-8 xxl:px-0  max-w-8xl mx-auto">
-        <div className=" pt-16 lg:pl-16 flex flex-col items-center sm:items-start sm:flex-row gap-y-4 sm:gap-x-4 font-bold text-wri-black">
+        <div className=" pt-16 lg:pl-10 flex flex-col items-center sm:items-start sm:flex-row gap-y-4 sm:gap-x-4 font-bold text-wri-black">
           <div className="w-full sm:w-1/5 flex flex-col items-center sm:items-start gap-y-4 mb-6 sm:mb-0">
             <p className="text-base font-bold">ABOUT WRI</p>
             <p className=" font-normal">About us</p>
@@ -61,8 +61,8 @@ export default function Footer({
             <p className="font-bold text-base sm:text-[1.375rem]">
               STAY UP TO DATE WITH THE NEWS{" "}
             </p>
-            <div className="flex flex-col lg:flex-row gap-y-4 gap-x-4 w-full">
-              <div className="outline outline-1 rounded-sm pl-1 py-2 gap-x-2 flex flex-row items-center min-w-fit  w-full">
+            <div className="flex flex-col lg:flex-row gap-y-4 gap-x-2 w-full ">
+              <div className="outline outline-1 rounded-sm pl-1 py-2 gap-x-2 flex flex-row items-center min-w-fit  w-full lg:w-[337px]">
                 <div className=" my-auto">
                   <EnvelopeIcon className="w-5 h-5 text-wri-gray" />
                 </div>
@@ -74,7 +74,7 @@ export default function Footer({
                   />
                 </div>
               </div>
-              <div className="px-4 py-2 sm:px-6 2xl:px-10 bg-wri-gold text-wri-black font-bold  text-[0.875rem] rounded-sm text-center">
+              <div className="px-4 py-2 sm:px-6 2xl:px-10 bg-wri-gold text-wri-black font-bold  text-[0.875rem] xxl:w-[139px] rounded-sm text-center">
                 SUBSCRIBE
               </div>
             </div>
@@ -94,7 +94,7 @@ export default function Footer({
             </div>
           </div>
         </div>
-        <div className=" w-full mx-auto pt-16 lg:pl-16  flex flex-col sm:flex-row  gap-y-8 sm:gap-y-4 items sm:items-start">
+        <div className=" w-full mx-auto pt-16 lg:pl-10  flex flex-col sm:flex-row  gap-y-8 sm:gap-y-4 items sm:items-start">
           <div className=" w-52 h-16 sm:w-56 sm:h-20 relative mx-auto sm:ml-0">
             <Image
               src="/images/WRI_logo_4c.png"
@@ -102,7 +102,7 @@ export default function Footer({
               fill
             />
           </div>
-          <div className="mx-auto sm:ml-auto sm:mr-0   w-fit flex  items-end gap-x-1 font-normal text-base mt-auto">
+          <div className="mx-auto sm:ml-auto sm:mr-0 xxl:mr-14  w-fit flex  items-end gap-x-1 font-normal text-base mt-auto">
             <span>
               Powered by{" "}
               <a href="#" className=" text-wri-green">
