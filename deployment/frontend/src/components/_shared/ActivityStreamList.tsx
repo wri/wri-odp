@@ -51,7 +51,7 @@ const activity = [
 ]
 export default function ActivityStreamList() {
   return (
-    <section className='w-full px-8 xxl:px-0 max-w-[1317px] xxl:mx-auto flex flex-col gap-y-6 mt-10' id='activitystream'>
+    <section className='w-full px-4 xxl:px-0 max-w-[1317px] xxl:mx-auto flex flex-col gap-y-6 mt-10 overflow-hidden' id='activitystream'>
       {
         activity.map((activity, index) => (
           <ActivityStreamCard key={index} activity={activity} />
