@@ -49,8 +49,7 @@ export default function DatasetHorizontalCard() {
           </div>
         </div>
         <div className="mt-4 flex justify-start gap-x-3">
-          <div className="border-r border-black pr-3 flex justify-start gap-x-3
-            ">
+          <div className="border-r border-black pr-3 flex justify-start gap-x-3">
             <div className="rounded-full bg-stone-100 p-1">
               <ChartBarIcon className="h-5 w-5 text-blue-700" />
             </div>

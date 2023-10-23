@@ -1,5 +1,11 @@
-import React from 'react'
-import Image from 'next/image'
+import React from "react";
+import {
+  ChartBarIcon,
+  GlobeAltIcon,
+  TableCellsIcon,
+} from "@heroicons/react/20/solid";
+import { ClockIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 
 export default function Card() {
   return (
@@ -28,17 +34,17 @@ export default function Card() {
           </div>
         </div>
       </div>
-      <div className='flex font-light text-sm text-wri-black mt-4 leading-[1.375rem] gap-x-2'>
-        <div className=' bg-gray-300 w-fit rounded-full p-1'>
-          <Image src='/icons/Framechart.svg' alt="chart" width={20} height={20} />
+      <div className="mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black">
+        <div className="rounded-full bg-stone-100 p-1">
+          <ChartBarIcon className="h-5 w-5 text-blue-700" />
         </div>
-        <div className='  w-fit bg-gray-300 rounded-full'>
-          <Image src='/icons/globe.svg' alt="chart" width={30} height={30} />
+        <div className="rounded-full bg-stone-100 p-1">
+          <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
         </div>
-        <div className=' bg-gray-300 w-fit rounded-full p-1'>
-          <Image src='/icons/table.svg' alt="chart" width={20} height={20} />
+        <div className="rounded-full bg-stone-100 p-1">
+          <TableCellsIcon className="h-5 w-5 text-green-600" />
         </div>
       </div>
     </div>
-  )
+  );
 }
