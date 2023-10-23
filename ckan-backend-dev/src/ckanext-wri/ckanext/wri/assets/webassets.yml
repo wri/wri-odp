@@ -1,0 +1,14 @@
+# wri-js:
+#   filter: rjsmin
+#   output: ckanext-wri/%(version)s-wri.js
+#   contents:
+#     - js/wri.js
+#   extra:
+#     preload:
+#       - base/main
+
+# wri-css:
+#   filter: cssrewrite
+#   output: ckanext-wri/%(version)s-wri.css
+#   contents:
+#     - css/wri.css
