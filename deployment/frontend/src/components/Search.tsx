@@ -15,7 +15,7 @@ export default function Search() {
       <div className='w-full bg-wri-green'>
         <div className='flex px-8 xxl:px-0 max-w-8xl mx-auto  text-white font-semibold text-[1.063rem] gap-x-2'>
           <div className={classNames('p-4', pathname === '/search' ? 'bg-wri-dark-green' : 'bg-wri-green')}><Link href="/search">Explore data</Link></div>
-          <div className={classNames('p-4', pathname === '/advanced_search' ? 'bg-wri-dark-green' : 'bg-wri-green')}><Link href="/advanced_search">Advance data</Link></div>
+          <div className={classNames('p-4', pathname === '/search_advanced' ? 'bg-wri-dark-green' : 'bg-wri-green')}><Link href="/search_advanced">Advanced search</Link></div>
         </div>
       </div>
       <div className=' w-full'>
