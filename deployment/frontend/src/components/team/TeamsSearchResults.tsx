@@ -2,6 +2,7 @@ import Team from "@/interfaces/team.interface";
 import CardsGrid from "../_shared/CardsGrid";
 import Container from "../_shared/Container";
 import TeamCard from "./TeamCard";
+import Pagination from "../_shared/Pagination";
 
 const teams: Array<Team> = [
   {
@@ -123,12 +124,13 @@ export default function TeamsSearchResults() {
     <Container className="mb-28">
       <span className="font-semibold text-xl">{teams.length} teams</span>
       <CardsGrid<Team>
-        className="mt-5"
+        className="mt-5 mb-5"
         items={teams}
         Card={({ item: team }) => {
           return <TeamCard team={team} />;
         }}
       />
+      <Pagination />
     </Container>
   );
 }
