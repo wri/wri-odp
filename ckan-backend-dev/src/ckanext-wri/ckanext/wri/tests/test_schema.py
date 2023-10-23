@@ -7,36 +7,20 @@ from ckan.common import config
 import ckan.lib.navl.dictization_functions as df
 from ckan import model
 import ckan.tests.factories as factories
+from ckan.logic import get_action
 
 Invalid = df.Invalid
 
 
 @pytest.mark.usefixtures(u"with_plugins", u"test_request_context")
 def test_package_create():
-    config["api_token.jwt.algorithm"] = "RS256"
-    config["api_token.jwt.encode.secret"] = "file:/srv/app/jwtRS256.key"
-    config["api_token.jwt.decode.secret"] = "file:/srv/app/jwtRS256.key.pub"
-
     userobj = factories.Sysadmin()
     session = model.Session
     context = {
         "model": model, "session": session,
         "user": userobj["name"], "ignore_auth": True,
-        "auth_user_obj": userobj
+        "user_obj": userobj
     }
-
-    API_KEY = get_action("api_token_create")(
-        context=context,
-        data_dict={
-            "user": userobj["name"],
-            "name": "Custom schema tests"
-        }
-    )
-    API_KEY = API_KEY[u"token"]
-
-    CKAN_URL = "http://ckan-dev:5000"
-
-    ckan_api = RemoteCKAN(CKAN_URL, apikey=API_KEY)
 
     organization_dict = factories.Organization()
     group_dict = factories.Group()
@@ -50,7 +34,7 @@ def test_package_create():
         "owner_org": organization_dict["id"],
         "projects": ["wri", "gfw"],
         "application": "rw",
-        "groups": [{"name": group_dict["name"]}],
+        "groups": [{"id": group_dict["id"]}],
         "technical_notes": "http://example.com/technical_notes.pdf",
         "tag_string": "economy,mental health,government",
         "temporal_coverage": "2007-2021",
@@ -81,8 +65,9 @@ def test_package_create():
     except NotFound:
         pass
 
-    result = ckan_api.action.package_create(
-        **dataset
+    result = get_action("package_create")(
+        context=context,
+        data_dict=dataset
     )
 
     tag_string = dataset["tag_string"].split(",")
@@ -126,7 +111,10 @@ def test_package_create():
             updated_dataset[field_name] = invalid_url
 
             with pytest.raises(ValidationError) as excinfo:
-                ckan_api.action.package_update(**updated_dataset)
+                get_action("package_update")(
+                    context=context,
+                    data_dict=updated_dataset
+                )
 
             assert "Please provide a valid URL" in str(excinfo.value)
 
@@ -135,7 +123,10 @@ def test_package_create():
     updated_dataset["language"] = invalid_language
 
     with pytest.raises(ValidationError) as excinfo:
-        ckan_api.action.package_update(**updated_dataset)
+        get_action("package_update")(
+            context=context,
+            data_dict=updated_dataset
+        )
 
     assert "Value must be a valid ISO 639-1 language code" in str(excinfo.value)
 

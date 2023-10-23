@@ -24,29 +24,25 @@ export default function HighlightCard({
       <div className="z-10 -mt-6 w-[70%] bg-white pb-2 pt-4 text-[0.938rem] font-bold text-wri-green">
         FORESTS
       </div>
-      <h2 className="w-[80%] text-2xl font-bold text-wri-black">
-        Title of the dataset goes here lorem ipsum.
-      </h2>
-      <article className=" mt-4 line-clamp-3 w-[88%] text-base font-light leading-[1.375rem]">
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore
-        maxime ut aspernatur laborum quod architecto, repellat commodi, iure
-        suscipit, perspiciatis vitae dolor eveniet saepe aliquid? Quae labore
-        incidunt odit reprehenderit?
-      </article>
-      <div className="mt-4 flex text-sm font-light leading-[1.375rem] text-wri-black">
-        <div className="flex items-center">
-          <Image src="/icons/time.svg" alt="eye" width={15} height={15} />
-          <span className="ml-2">2020 - 2023</span>
+      <h2 className='text-wri-black text-2xl font-bold w-[80%]'>Title of the dataset goes here lorem ipsum.</h2>
+      <article className=' line-clamp-3 w-[88%] font-light text-base mt-4 leading-[1.375rem]'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore maxime ut aspernatur laborum quod architecto, repellat commodi, iure suscipit, perspiciatis vitae dolor eveniet saepe aliquid? Quae labore incidunt odit reprehenderit?</article>
+      <div className='flex font-light text-sm text-wri-black mt-4 leading-[1.375rem] '>
+        <div className='flex  '>
+          <div className='w-4 h-4 relative'>
+            <Image src='/icons/time.svg' alt="eye" fill />
+          </div>
+          <div className='ml-2 w-fit h-[14px]'>
+            2020 - 2023
+          </div>
         </div>
-        <div className="mx-2 h-4 border-l  border-wri-black"></div>
-        <div className="flex items-center">
-          <Image
-            src="/icons/Framelocation.svg"
-            alt="comment"
-            width={15}
-            height={15}
-          />
-          <span className="ml-2">Sub-regional</span>
+        <div className='border-l border-wri-black h-4  mx-2'></div>
+        <div className='flex '>
+          <div className='w-4 h-4 relative'>
+            <Image src='/icons/Framelocation.svg' alt="comment" fill />
+          </div>
+          <div className='ml-1 w-fit h-[14px]'>
+            Sub-regional
+          </div>
         </div>
       </div>
       <div className="mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black">

@@ -8,19 +8,12 @@ import { ClockIcon, MapPinIcon } from "@heroicons/react/24/outline";
 
 export default function Card() {
   return (
-    <div className="flex w-full flex-col border-b-2 border-b-wri-green p-4 pb-6 font-acumin shadow">
-      <div className="w-full bg-white pb-2 pt-4 text-[0.938rem] font-bold leading-[1.125rem] text-wri-green">
+    <div className='flex flex-col w-full font-acumin p-4 pb-6 border-b-2 border-b-wri-green shadow-wri mb-2'>
+      <div className='bg-white text-wri-green font-bold text-[0.938rem] leading-[1.125rem] w-full pt-4 pb-2'>
         LAND AND CARBON LAB
       </div>
-      <h2 className="w-full text-2xl font-bold text-wri-black">
-        Title of the dataset goes here lorem ipsum.
-      </h2>
-      <article className=" mt-4 line-clamp-3 w-[88%] text-base font-light leading-[1.375rem]">
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore
-        maxime ut aspernatur laborum quod architecto, repellat commodi, iure
-        suscipit, perspiciatis vitae dolor eveniet saepe aliquid? Quae labore
-        incidunt odit reprehenderit?
-      </article>
+      <h2 className='text-wri-black text-2xl font-bold w-full'>Title of the dataset goes here lorem ipsum.</h2>
+      <article className=' line-clamp-3 w-[88%] font-light text-base mt-4 leading-[1.375rem]'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore maxime ut aspernatur laborum quod architecto, repellat commodi, iure suscipit, perspiciatis vitae dolor eveniet saepe aliquid? Quae labore incidunt odit reprehenderit?</article>
       <div className="mt-4 flex text-sm font-light leading-[1.375rem] text-wri-black">
         <div className="flex items-center">
           <ClockIcon className="h-3 w-3 text-blue-800 mb-1" />
