@@ -6,7 +6,7 @@ import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 
 export function Hero() {
   return (
-    <div className="mx-auto mb-8 mt-10 grid max-w-[1440px] max-h-[18.5rem] font-acumin lg:mb-16 lg:grid-cols-5">
+    <div className="mx-auto mb-8 mt-10 grid max-w-[1440px] lg:max-h-[18.5rem] font-acumin lg:mb-16 lg:grid-cols-5">
       <div className="relative h-[18.5rem] lg:col-span-2">
         <Image alt="Topic name" fill={true} src="/images/topics/1.png" />
         <div className="absolute bottom-0 z-10 flex h-[68px] w-56 items-center justify-center rounded-t-[3px] bg-white">
