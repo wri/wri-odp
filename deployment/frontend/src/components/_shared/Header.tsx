@@ -5,6 +5,7 @@ import { Bars3Icon, UserCircleIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Login from "./Login";
+import UserMenu from "./UserMenu";
 
 export default function Header() {
   const { asPath } = useRouter();
@@ -84,11 +85,7 @@ export default function Header() {
 
         {
           asPath.startsWith("/dashboard") ? (
-            <div className="flex ">
-              <UserCircleIcon className="text-black h-5 w-5 mr-2" />
-              <div className="font-normal text-[1.1251rem] border-b-2 border-b-wri-gold">{asPath.split("/dashboard/")[1]}</div>
-            </div>
-
+            <UserMenu />
           ) : (
             <button
               type="button"
