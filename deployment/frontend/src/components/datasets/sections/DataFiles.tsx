@@ -1,17 +1,17 @@
 import { Button } from "@/components/_shared/Button";
 import classNames from "@/utils/classnames";
 import { Disclosure, Transition } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import {
-  ChevronDownIcon,
-} from "@heroicons/react/20/solid";
-import {
-    ArrowDownTrayIcon,
   ArrowPathIcon,
   ArrowTopRightOnSquareIcon,
   ClockIcon,
   LightBulbIcon,
   MapPinIcon,
 } from "@heroicons/react/24/outline";
+import { DownloadButton } from "./datafiles/Download";
+import { LearnMoreButton } from "./datafiles/LearnMore";
+import { OpenInButton } from "./datafiles/OpenIn";
 
 const datafilesMock = [
   { format: "TIFF", name: "Name of the file", canShow: true, showing: true },
@@ -26,7 +26,7 @@ const datafilesMock = [
 
 export function DataFiles() {
   return (
-    <div className="flex flex-col py-2 gap-y-4 pr-4 sm:pr-6">
+    <div className="flex flex-col gap-y-4 py-2 pr-4 sm:pr-6">
       {datafilesMock.map((datafile) => (
         <DatafileCard datafile={datafile} />
       ))}
@@ -49,12 +49,14 @@ interface Datafile {
 
 function DatafileCard({ datafile }: { datafile: Datafile }) {
   return (
-    <Disclosure
-      as="div"
-      className="flex flex-col gap-y-2 border-b-2 border-green-700 p-5 shadow hover:bg-slate-100 transition"
-    >
+    <Disclosure>
       {({ open }) => (
-        <>
+        <div
+          className={classNames(
+            "flex flex-col gap-y-2 border-b-2 border-green-700 p-5 shadow transition hover:bg-slate-100",
+            open ? "bg-slate-100" : "",
+          )}
+        >
           <div
             className={classNames(
               "flex flex-row items-center justify-between",
@@ -64,7 +66,7 @@ function DatafileCard({ datafile }: { datafile: Datafile }) {
             <div className="flex items-center gap-3">
               <span
                 className={classNames(
-                  "flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black",
+                  "hidden md:flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black",
                   colors[datafile.format] ?? "bg-gray-400",
                 )}
               >
@@ -134,47 +136,16 @@ function DatafileCard({ datafile }: { datafile: Datafile }) {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-3 py-4">
+              <div className="grid grid-cols-3 gap-x-3 max-w-[30rem] py-4 ">
                 <DownloadButton />
-                <LearnMore />
-                <OpenIn />
+                <LearnMoreButton />
+                <OpenInButton />
               </div>
             </Disclosure.Panel>
           </Transition>
-        </>
+        </div>
       )}
     </Disclosure>
   );
 }
 
-function DownloadButton() {
-  return (
-  <div className="gap-y-2 py-7 px-10 hover:bg-amber-400 transition flex flex-col justify-center items-center bg-white rounded-sm shadow border-2 border-wri-green">
-      <ArrowDownTrayIcon className="h-9 w-9" />
-      <div className="flex flex-col items-center">
-      <div className="text-black text-sm font-normal font-acumin">Download</div>
-      <div className="text-black text-xs font-normal font-acumin">2.8 MB</div>
-      </div>
-    </div>
-  )
-}
-
-function LearnMore() {
-  return (
-  <div className="gap-y-2 py-7 px-10 hover:bg-amber-400 transition flex flex-col justify-center items-center bg-white rounded-sm shadow border-2 border-wri-green">
-      <LightBulbIcon className="h-9 w-9" />
-      <div className="text-black text-sm font-normal font-acumin">Learn More</div>
-      <div className="text-black text-xs font-normal font-acumin h-4"></div>
-    </div>
-  )
-}
-
-function OpenIn() {
-  return (
-  <div className="gap-y-2 py-7 px-10 hover:bg-amber-400 transition flex flex-col justify-center items-center bg-white rounded-sm shadow border-2 border-wri-green">
-      <ArrowTopRightOnSquareIcon className="h-9 w-9" />
-      <div className="text-black text-sm font-normal font-acumin">Learn More</div>
-      <div className="text-black text-xs font-normal font-acumin h-4"></div>
-    </div>
-  )
-}

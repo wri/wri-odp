@@ -6,7 +6,12 @@ import {
   TableCellsIcon,
 } from "@heroicons/react/20/solid";
 import { Button } from "../_shared/Button";
-import { ArrowPathIcon, ClockIcon, FingerPrintIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathIcon,
+  ClockIcon,
+  FingerPrintIcon,
+  MapPinIcon,
+} from "@heroicons/react/24/outline";
 
 export function DatasetHeader() {
   return (
@@ -37,7 +42,7 @@ export function DatasetHeader() {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-y-2 max-w-[560px]">
+      <div className="flex max-w-[560px] flex-col gap-y-2">
         <h2 className="text-xs font-bold uppercase leading-none tracking-wide text-green-700">
           LAND AND CARBON LAB
         </h2>
@@ -49,47 +54,65 @@ export function DatasetHeader() {
           sem malesuada magna mollis euismod. Aenean lacinia bibendum nulla sed
           consectetur. Nullam quis risus eget urna mollis ornare vel eu leo.
         </p>
-        <div className="flex gap-x-4 py-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-4">
           <div className="flex gap-x-1">
             <FingerPrintIcon className="h-5 w-5 text-blue-800" />
             <div>
-              <div className="text-neutral-700 text-sm font-semibold">Created</div>
-              <div className="text-stone-900 text-sm font-light"> 2 Feb 2023</div>
+              <div className="text-sm font-semibold text-neutral-700">
+                Created
+              </div>
+              <div className="text-sm font-light text-stone-900">
+                {" "}
+                2 Feb 2023
+              </div>
             </div>
           </div>
           <div className="flex gap-x-1">
             <ArrowPathIcon className="h-5 w-5 text-blue-800" />
             <div>
-              <div className="text-neutral-700 text-sm font-semibold">Last Updated</div>
-              <div className="text-stone-900 text-sm font-light"> 2 Feb 2023</div>
+              <div className="text-sm font-semibold text-neutral-700">
+                Last Updated
+              </div>
+              <div className="text-sm font-light text-stone-900">
+                {" "}
+                2 Feb 2023
+              </div>
             </div>
           </div>
           <div className="flex gap-x-1">
             <ClockIcon className="h-5 w-5 text-blue-800" />
             <div>
-              <div className="text-neutral-700 text-sm font-semibold">Temporal Coverage</div>
-              <div className="text-stone-900 text-sm font-light">2020 - 2023</div>
+              <div className="text-sm font-semibold text-neutral-700">
+                Temporal Coverage
+              </div>
+              <div className="text-sm font-light text-stone-900">
+                2020 - 2023
+              </div>
             </div>
           </div>
           <div className="flex gap-x-1">
             <MapPinIcon className="h-5 w-5 text-blue-800" />
             <div>
-              <div className="text-neutral-700 text-sm font-semibold">Location</div>
-              <div className="text-stone-900 text-sm font-light">Sub-Regional</div>
+              <div className="text-sm font-semibold text-neutral-700">
+                Location
+              </div>
+              <div className="text-sm font-light text-stone-900">
+                Sub-Regional
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div className="flex gap-x-2 pb-10">
-          <span className="flex h-7 w-fit items-center justify-center rounded-sm bg-wri-light-green px-3 text-center text-xs font-normal text-black">
-            <span className="my-auto">TIFF</span>
-          </span>
-          <span className="flex h-7 w-fit items-center justify-center rounded-sm bg-wri-light-yellow px-3 text-center text-xs font-normal text-black">
-            <span className="my-auto">CSV</span>
-          </span>
-          <span className="flex h-7 w-fit items-center justify-center rounded-sm bg-wri-light-blue px-3 text-center text-xs font-normal text-black">
-            <span className="my-auto">GeoJSON</span>
-          </span>
+        <span className="flex h-7 w-fit items-center justify-center rounded-sm bg-wri-light-green px-3 text-center text-xs font-normal text-black">
+          <span className="my-auto">TIFF</span>
+        </span>
+        <span className="flex h-7 w-fit items-center justify-center rounded-sm bg-wri-light-yellow px-3 text-center text-xs font-normal text-black">
+          <span className="my-auto">CSV</span>
+        </span>
+        <span className="flex h-7 w-fit items-center justify-center rounded-sm bg-wri-light-blue px-3 text-center text-xs font-normal text-black">
+          <span className="my-auto">GeoJSON</span>
+        </span>
       </div>
     </div>
   );

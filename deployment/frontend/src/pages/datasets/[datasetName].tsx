@@ -31,7 +31,7 @@ export default function DatasetPage() {
       <DatasetPageLayout>
         <DatasetHeader />
         <Tab.Group>
-          <Tab.List as="nav" className="mb-4 flex border-b border-zinc-300">
+          <Tab.List as="nav" className="mb-4 flex border-b border-zinc-300 max-w-[95%]">
             <DatasetTabs tabs={tabs} />
           </Tab.List>
           <Tab.Panels>
