@@ -117,6 +117,7 @@ export const authOptions: NextAuthOptions = {
             );
           }
         } catch (e) {
+          console.log("Error", e)
           return Promise.reject(
             "/auth/signin?error=Could%20not%20login%20user%20please%20check%20your%20password%20and%20username",
           );
