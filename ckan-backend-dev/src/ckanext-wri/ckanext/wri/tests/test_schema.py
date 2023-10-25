@@ -1,15 +1,9 @@
 import pytest
 
-from ckanapi import RemoteCKAN
-
 from ckan.logic import NotFound, get_action, ValidationError
-from ckan.common import config
-import ckan.lib.navl.dictization_functions as df
 from ckan import model
 import ckan.tests.factories as factories
 from ckan.logic import get_action
-
-Invalid = df.Invalid
 
 
 @pytest.mark.usefixtures(u"with_plugins", u"test_request_context")
