@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 
-interface activity {
+export interface activity {
   description: string,
   time: string,
   icon: string

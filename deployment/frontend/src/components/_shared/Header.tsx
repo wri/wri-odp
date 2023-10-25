@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import Image from "next/image";
 import { Menu, Transition, Dialog } from "@headlessui/react";
-import { Bars3Icon, UserCircleIcon } from "@heroicons/react/20/solid";
+import { Bars3Icon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Login from "./Login";
