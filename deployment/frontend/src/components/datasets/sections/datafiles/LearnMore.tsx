@@ -19,10 +19,10 @@ export function LearnMoreButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="w-full flex aspect-square flex-col items-center justify-center gap-y-2 rounded-sm border-2 border-wri-green bg-white px-10 py-7 shadow transition hover:bg-amber-400"
+        className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
       >
-        <LightBulbIcon className="h-9 w-9" />
-        <div className="font-acumin text-sm font-normal text-black">
+        <LightBulbIcon className="w-5 h-5 sm:h-9 sm:w-9" />
+        <div className="font-acumin text-xs sm:text-sm font-normal text-black">
           Learn More
         </div>
         <div className="h-4 font-acumin text-xs font-normal text-black"></div>

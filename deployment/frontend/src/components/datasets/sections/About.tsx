@@ -19,7 +19,7 @@ const tags = [
 
 export function About() {
   return (
-    <div className="flex flex-col gap-y-4 py-2 pr-4 sm:pr-6">
+    <div className="flex flex-col gap-y-4 py-2">
       <div className="font-acumin text-base font-normal text-black">
         Details
       </div>

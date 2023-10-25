@@ -7,6 +7,7 @@ import {
   ArrowTopRightOnSquareIcon,
   ClockIcon,
   LightBulbIcon,
+  MagnifyingGlassIcon,
   MapPinIcon,
 } from "@heroicons/react/24/outline";
 import { DownloadButton } from "./datafiles/Download";
@@ -26,11 +27,33 @@ const datafilesMock = [
 
 export function DataFiles() {
   return (
-    <div className="flex flex-col gap-y-4 py-2 pr-4 sm:pr-6">
-      {datafilesMock.map((datafile) => (
-        <DatafileCard datafile={datafile} />
-      ))}
-    </div>
+    <>
+      <div className="relative py-4">
+      <input
+        className="block w-full rounded-md border-b border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
+        placeholder="Search data"
+      />
+        <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
+      </div>
+      <div className="flex justify-between pb-1">
+        <span className="font-acumin text-base font-normal text-black">
+          3 Data Files
+        </span>
+        <div className="flex gap-x-4">
+          <div className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline">
+            Show All Layers
+          </div>
+          <div className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline">
+            Hide All
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-y-4">
+        {datafilesMock.map((datafile) => (
+          <DatafileCard key={datafile.format} datafile={datafile} />
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -66,7 +89,7 @@ function DatafileCard({ datafile }: { datafile: Datafile }) {
             <div className="flex items-center gap-3">
               <span
                 className={classNames(
-                  "hidden md:flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black",
+                  "hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex",
                   colors[datafile.format] ?? "bg-gray-400",
                 )}
               >
@@ -136,7 +159,7 @@ function DatafileCard({ datafile }: { datafile: Datafile }) {
                   </p>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-x-3 max-w-[30rem] py-4 ">
+              <div className="grid max-w-[30rem] grid-cols-3 gap-x-3 py-4 ">
                 <DownloadButton />
                 <LearnMoreButton />
                 <OpenInButton />
@@ -148,4 +171,3 @@ function DatafileCard({ datafile }: { datafile: Datafile }) {
     </Disclosure>
   );
 }
-

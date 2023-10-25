@@ -2,7 +2,7 @@ import { Button } from "@/components/_shared/Button";
 
 export function Methodology() {
   return (
-    <div className="flex flex-col gap-y-4 py-2 pr-4 sm:pr-6">
+    <div className="flex flex-col gap-y-4 py-2">
       <p className="max-w-[36rem] font-acumin text-sm font-light text-stone-900">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem
         malesuada magna mollis euismod. Aenean lacinia bibendum nulla sed

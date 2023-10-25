@@ -29,7 +29,7 @@ export default function DatasetPageLayout({
             </Disclosure.Button>
             <Disclosure.Panel
               as="div"
-              className="max-h-[90vh] overflow-y-scroll overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-1/2 lg:z-10 lg:flex lg:flex-col pl-4 sm:pl-6 py-4 border-r border-gray-200"
+              className="max-h-[90vh] overflow-y-scroll overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-1/2 lg:z-10 lg:flex lg:flex-col pl-4 sm:pl-6 py-4 border-r border-gray-200 @container"
             >
               {children}
             </Disclosure.Panel>
