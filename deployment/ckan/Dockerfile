@@ -9,7 +9,8 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@v2.10#egg=ckanext-auth'
+    # We're using the v2.10 branch of ckanext-auth, but I'm adding a commit to force a rebuild of the image. This can be removed once ckanext-auth is approved
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@e45cccf43abbdf9d9069047e646b3e42307e81e1#egg=ckanext-auth'
 
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 USER root
