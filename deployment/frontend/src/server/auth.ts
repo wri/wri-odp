@@ -80,6 +80,8 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, _req) {
         try {
+          console.log('Login credentials', credentials)
+          console.log('Ckan URL', env.CKAN_URL)
           if (!credentials) return null;
           const user: CkanResponse<User> = await ky
             .post(`${env.CKAN_URL}/api/3/action/user_login`, {
@@ -90,6 +92,7 @@ export const authOptions: NextAuthOptions = {
             })
             .json();
 
+          console.log('Ckan Response to User', user)
           if (user.result.id) {
             const orgList: CkanResponse<Organization[]> = await ky
               .post(`${env.CKAN_URL}/api/3/action/organization_list_for_user`, {
@@ -98,6 +101,7 @@ export const authOptions: NextAuthOptions = {
               })
               .json();
 
+            console.log('Org list', orgList)
             return {
               ...user.result,
               image: "",
