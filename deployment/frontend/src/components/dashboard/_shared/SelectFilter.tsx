@@ -16,7 +16,7 @@ export default function SelectFilter({ options }: { options: Option[] }) {
       {({ open }) => (
         <>
           <div className="relative w-48">
-            <Listbox.Button className="relative w-full cursor-default rounded-md bg-wri-gray py-3 pl-3 pr-8 text-left shadow-sm border-b-wri-gold border-b-2 focus:outline-none  sm:leading-6 text-black text-sm font-normal font-['Acumin Pro SemiCondensed']">
+            <Listbox.Button className="relative w-full cursor-default rounded-sm bg-wri-gray py-2 pl-3 pr-8 text-left shadow-sm border-b-wri-gold border-b-2 focus:outline-none  sm:leading-6 text-black text-sm font-normal font-['Acumin Pro SemiCondensed']">
               <span className="block truncate text-wri-black">{selected.label}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                 <ChevronDownIcon className="h-4 w-4 text-stone-600" aria-hidden="true" />

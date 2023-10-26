@@ -61,8 +61,9 @@ export default function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const { asPath } = useRouter();
+  const { asPath, query } = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const user = query.user as string;
 
   navigation.forEach((item) => {
     const isPath = asPath.split("/dashboard")[1];
@@ -148,7 +149,7 @@ export default function Layout({
                             return (
                               <li key={item.name} className={` text-center py-6 ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
                                 <a
-                                  href={item.href.includes("default") ? "./" : item.href}
+                                  href={item.href.includes("default") ? "./" : `/dashboard/${user}${item.href}`}
                                   className="flex w-full justify-center items-center gap-x-2"
                                 >
                                   <div className="font-normal text-[1.125rem]">{item.name}</div>
@@ -186,7 +187,7 @@ export default function Layout({
                         return (
                           <li key={item.name} className={` text-center py-6 ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
                             <a
-                              href={item.href.includes("default") ? "./" : item.href}
+                              href={item.href.includes("default") ? "./" : `/dashboard/${user}${item.href}`}
                               className="flex w-full justify-center items-center gap-x-2"
                             >
                               <div className="font-normal text-[1.125rem]">{item.name}</div>
@@ -216,7 +217,7 @@ export default function Layout({
           </div>
 
           <main className="w-full isolate">
-            <div className=" @container w-full overflow-x-auto">{children}</div>
+            <div className=" @container overflow-x-auto w-full ">{children}</div>
           </main>
         </div>
       </div>
