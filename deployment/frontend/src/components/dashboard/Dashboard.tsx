@@ -22,10 +22,10 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="relative max-w-8xl mx-auto w-full py-12">
+    <div className="relative max-w-8xl mx-auto w-full py-12 px-4 sm:px-6 lg:px-8">
       {
         drag.sortable ? (
-          <button className="absolute sm:top-[46%] right-0 sm:-right-6 p-4 rounded-full shadow-wri bg-white z-30"
+          <button className="absolute sm:top-[46%] right-0 p-4 rounded-full shadow-wri bg-white z-30"
             onClick={() => {
               setDrag({
                 sortable: !drag.sortable,
@@ -37,7 +37,7 @@ export default function Dashboard() {
           </button>
         ) : (
 
-          <button className="absolute sm:top-[46%] right-0 sm:-right-6 p-4 rounded-full shadow-wri bg-white z-30"
+          <button className="absolute sm:top-[46%] right-0  p-4 rounded-full shadow-wri bg-white z-30"
             onClick={
               () => {
                 setDrag({
