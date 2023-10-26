@@ -1,8 +1,7 @@
-import Highlights from "@/components/Highlights";
 import { Button } from "@/components/_shared/Button";
-import { CTA } from "@/components/home/CTA";
 import { Hero } from "@/components/home/Hero";
 import { HighlightsCarousel } from "@/components/home/HighlightsCarousel";
+import { HomeFooter } from "@/components/home/HomeFooter";
 import { TopicsCarousel } from "@/components/home/TopicsCarousel";
 import Head from "next/head";
 
@@ -52,7 +51,7 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <CTA />
+      <HomeFooter />
     </>
   );
 }
