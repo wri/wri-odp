@@ -64,11 +64,11 @@ export default function Layout({
   const { asPath } = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-
   navigation.forEach((item) => {
-    const isPath = asPath.split("/dashboard")[2];
-    if (isPath) {
-      item.active = isPath === item.href;
+    const isPath = asPath.split("/dashboard")[1];
+    if (isPath && isPath.split("/").length > 2) {
+      const pathExist = isPath.includes(item.href)
+      item.active = pathExist;
     }
 
   });
@@ -148,7 +148,7 @@ export default function Layout({
                             return (
                               <li key={item.name} className={` text-center py-6 ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
                                 <a
-                                  href={item.href}
+                                  href={item.href.includes("default") ? "./" : item.href}
                                   className="flex w-full justify-center items-center gap-x-2"
                                 >
                                   <div className="font-normal text-[1.125rem]">{item.name}</div>
@@ -172,7 +172,7 @@ export default function Layout({
           <>
             <Disclosure.Panel
               as="div"
-              className="hidden w-[25%] min-w-[25%] lg:z-10 lg:flex lg:flex-col "
+              className="hidden w-[20%] min-w-[20%] lg:z-10 lg:flex lg:flex-col "
             >
               {/* Sidebar component, swap this element with another sidebar if you like */}
               <div className="flex grow flex-col gap-y-5 overflow-y-auto pb-4 h-[100vh] bg-wri-green">
@@ -186,7 +186,7 @@ export default function Layout({
                         return (
                           <li key={item.name} className={` text-center py-6 ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
                             <a
-                              href={item.href}
+                              href={item.href.includes("default") ? "./" : item.href}
                               className="flex w-full justify-center items-center gap-x-2"
                             >
                               <div className="font-normal text-[1.125rem]">{item.name}</div>
@@ -216,7 +216,7 @@ export default function Layout({
           </div>
 
           <main className="w-full isolate">
-            <div className="px-4 sm:px-6 lg:px-8 @container w-full">{children}</div>
+            <div className=" @container w-full">{children}</div>
           </main>
         </div>
       </div>

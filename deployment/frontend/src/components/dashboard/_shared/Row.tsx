@@ -26,8 +26,8 @@ type RowProps = {
 export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, bgColor, className }: RowProps) {
   const [isShowSubRow, setIsShowSubRow] = useState(false)
   return (
-    <div className={`flex flex-col hover:bg-slate-100 ${isShowSubRow ? "bg-slate-100" : " "} ${className ? className : ""} px-2 py-4 group`}>
-      <div className='flex flex-col sm:flex-row items-center'>
+    <div className={`flex flex-col hover:bg-slate-100 ${isShowSubRow ? "bg-slate-100" : " "} ${className ? className : ""} px-2 group`}>
+      <div className='flex flex-col sm:flex-row '>
         <div className=' grow shrink'>
           {rowMain}
         </div>

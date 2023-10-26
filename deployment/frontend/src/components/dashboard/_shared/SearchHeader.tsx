@@ -2,7 +2,7 @@ import React from 'react'
 import TableHeader from './TableHeader'
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 
-function RightNode() {
+function LeftNode() {
   return (
     <div className=' px-2 py-4 gap-x-2 flex flex-row items-center min-w-fit  w-full bg-white'>
       <div className='grow shrink basis-auto'><input type="text" placeholder='Search by keywords' className=' focus:outline-none placeholder:text-[14px] text-[14px] font-light w-full' /></div>
@@ -11,8 +11,8 @@ function RightNode() {
   )
 }
 
-export default function SearchHeader({ leftNode }: { leftNode?: React.ReactNode }) {
+export default function SearchHeader({ RightNode }: { RightNode?: React.ReactNode }) {
   return (
-    <TableHeader rightNode={<RightNode />} leftNode={leftNode} />
+    <TableHeader rightNode={<LeftNode />} leftNode={RightNode} />
   )
 }
