@@ -216,7 +216,7 @@ export default function Layout({
           </div>
 
           <main className="w-full isolate">
-            <div className=" @container w-full">{children}</div>
+            <div className=" @container w-full overflow-x-auto">{children}</div>
           </main>
         </div>
       </div>
