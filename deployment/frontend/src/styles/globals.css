@@ -22,6 +22,10 @@ body, html {
   float: none;
 }
 
+.dataset-tabs .swiper-slide {
+  width: fit-content !important;
+}
+
 .default-container {
   max-width: 90vw;
 }

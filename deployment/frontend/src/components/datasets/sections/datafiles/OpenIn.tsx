@@ -4,7 +4,7 @@ import {
   ArrowTopRightOnSquareIcon,
   ClipboardIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { DatasetTabs } from "../../DatasetTabs";
 import {
   Tooltip,
@@ -12,6 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/_shared/Tooltip";
+import classNames from "@/utils/classnames";
 
 export function OpenInButton() {
   const [open, setOpen] = useState(false);
@@ -19,10 +20,10 @@ export function OpenInButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex aspect-square w-full flex-col items-center justify-center gap-y-2 rounded-sm border-2 border-wri-green bg-white px-10 py-7 shadow transition hover:bg-amber-400"
+        className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
       >
-        <ArrowTopRightOnSquareIcon className="h-9 w-9" />
-        <div className="font-acumin text-sm font-normal text-black">
+        <ArrowTopRightOnSquareIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+        <div className="font-acumin text-xs sm:text-sm font-normal text-black">
           Open In
         </div>
         <div className="h-4 font-acumin text-xs font-normal text-black"></div>
@@ -53,7 +54,22 @@ function OpenInModal({
         </div>
         <Tab.Group>
           <Tab.List as="nav" className="mt-6 flex border-b border-zinc-300">
-            <DatasetTabs tabs={tabs} />
+        {tabs.map((tab) => (
+            <Tab as={Fragment}>
+              {({ selected }: { selected: boolean }) => (
+                <button
+                  className={classNames(
+                    selected
+                      ? "border-blue-800 text-blue-800"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                    "whitespace-nowrap border-b-2 px-6 font-acumin font-semibold transition",
+                  )}
+                >
+                  {tab.name}
+                </button>
+              )}
+            </Tab>
+        ))}
           </Tab.List>
           <Tab.Panels as="div" className="max-h-[18rem] overflow-y-auto">
             <Tab.Panel>

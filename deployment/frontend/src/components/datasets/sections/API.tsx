@@ -6,13 +6,13 @@ const tabs = ["Python", "Javascript", "R", "Curl", "Pandas"];
 
 export function API() {
   return (
-    <Tab.Group as="div" className="pr-4">
+    <Tab.Group as="div">
       <Tab.List
         as="nav"
-        className="-mt-4 flex h-12 w-full items-center bg-neutral-100 font-acumin"
+        className="-mt-4 flex h-12 w-full items-center bg-neutral-100 font-acumin overflow-x-auto"
       >
         {tabs.map((tab) => (
-          <Tab as={Fragment}>
+          <Tab key={tab} as={Fragment}>
             {({ selected }: { selected: boolean }) => (
               <button
                 className={classNames(
@@ -28,7 +28,7 @@ export function API() {
           </Tab>
         ))}
       </Tab.List>
-      <Tab.Panel as="div" className="py-6">
+      <Tab.Panel as="div" className="py-6 overflow-clip">
         <div className="font-acumin text-base font-normal text-zinc-800">
           For Python, first install the `datapackage` library.
         </div>

@@ -7,6 +7,7 @@ import { API } from "@/components/datasets/sections/API";
 import { About } from "@/components/datasets/sections/About";
 import { Contact } from "@/components/datasets/sections/Contact";
 import { DataFiles } from "@/components/datasets/sections/DataFiles";
+import { Members } from "@/components/datasets/sections/Members";
 import { Methodology } from "@/components/datasets/sections/Methodology";
 import { RelatedDatasets } from "@/components/datasets/sections/RelatedDatasets";
 import { Tab } from "@headlessui/react";
@@ -23,6 +24,7 @@ export default function DatasetPage() {
     { name: "Related Datasets" },
     { name: "Contact" },
     { name: "API" },
+    { name: "Members" },
   ];
   return (
     <>
@@ -31,17 +33,35 @@ export default function DatasetPage() {
       <DatasetPageLayout>
         <DatasetHeader />
         <Tab.Group>
-          <Tab.List as="nav" className="mb-4 flex border-b border-zinc-300 max-w-[95%]">
+          <Tab.List as="nav" className="flex w-full gap-x-2 @sm:pr-8 pr-4">
             <DatasetTabs tabs={tabs} />
           </Tab.List>
-          <Tab.Panels>
-            <Tab.Panel><DataFiles /></Tab.Panel>
-            <Tab.Panel><About /></Tab.Panel>
-            <Tab.Panel><Methodology /></Tab.Panel>
-            <Tab.Panel><RelatedDatasets /></Tab.Panel>
-            <Tab.Panel><Contact /></Tab.Panel>
-            <Tab.Panel><API /></Tab.Panel>
-          </Tab.Panels>
+          <div className="mb-4 mr-9 border-b border-zinc-300" />
+          <div className="@sm:pr-8 pr-4">
+            <Tab.Panels>
+              <Tab.Panel>
+                <DataFiles />
+              </Tab.Panel>
+              <Tab.Panel>
+                <About />
+              </Tab.Panel>
+              <Tab.Panel>
+                <Methodology />
+              </Tab.Panel>
+              <Tab.Panel>
+                <RelatedDatasets />
+              </Tab.Panel>
+              <Tab.Panel>
+                <Contact />
+              </Tab.Panel>
+              <Tab.Panel>
+                <API />
+              </Tab.Panel>
+              <Tab.Panel>
+                <Members />
+              </Tab.Panel>
+            </Tab.Panels>
+          </div>
         </Tab.Group>
       </DatasetPageLayout>
     </>

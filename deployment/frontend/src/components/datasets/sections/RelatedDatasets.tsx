@@ -13,7 +13,7 @@ import {
 
 export function RelatedDatasets() {
   return (
-    <div className="flex flex-col gap-y-4 py-2 pr-4 sm:pr-6">
+    <div className="flex flex-col gap-y-4 py-2">
       {[0, 1, 2, 3, 4, 5].map((dataset) => (
         <DatasetCard key={dataset} />
       ))}
