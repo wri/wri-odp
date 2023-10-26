@@ -1,19 +1,17 @@
 #!/bin/bash
 
-# Initialize a file to collect test outputs
-echo "CKAN and Extension Test Results" > test_results.txt
-echo "Test Summary" > test_summary.txt
+ROOT_DIR=$(pwd)
+
+echo "CKAN and Extension Test Results" > "$ROOT_DIR/test_results.txt"
+echo "Test Summary" > "$ROOT_DIR/test_summary.txt"
 
 # Run CKAN Core tests
-# Replace the command below with the one you use for CKAN core tests
 # pytest --ckan-ini=test-core.ini >> test_results.txt
 # if [ $? -eq 0 ]; then
 #     echo "CKAN Core: Passed" >> test_summary.txt
 # else
 #     echo "CKAN Core: Failed" >> test_summary.txt
 # fi
-
-# Loop through each extension directory to run tests
 
 cd src
 
@@ -26,12 +24,13 @@ for dir in ckanext-*; do
 
     cd $dir
 
-    pytest --ckan-ini=test.ini ckanext/${dir#ckanext-}/tests 2>&1 | tee -a ../test_results.txt
+    pytest --ckan-ini=test.ini ckanext/${dir#ckanext-}/tests 2>&1 | tee -a "$ROOT_DIR/test_results.txt"
+    PYTEST_EXIT_CODE=${PIPESTATUS[0]}
 
-    if [ $? -eq 0 ]; then
-      echo "$dir: Passed" >> ../test_summary.txt
+    if [ $PYTEST_EXIT_CODE -eq 0 ]; then
+      echo "$dir: Passed" >> "$ROOT_DIR/test_summary.txt"
     else
-      echo "$dir: Failed" >> ../test_summary.txt
+      echo "$dir: Failed" >> "$ROOT_DIR/test_summary.txt"
     fi
 
     cd ..
@@ -39,5 +38,27 @@ for dir in ckanext-*; do
   fi
 done
 
-# Display summary
-cat test_summary.txt
+cd ..
+
+if [ -d "src_extensions/ckanext-wri" ]; then
+  cd src_extensions/ckanext-wri
+
+  pytest --ckan-ini=test.ini ckanext/wri/tests 2>&1 | tee -a "$ROOT_DIR/test_results.txt"
+  PYTEST_EXIT_CODE=${PIPESTATUS[0]}
+
+  if [ $PYTEST_EXIT_CODE -eq 0 ]; then
+    echo "ckanext-wri: Passed" >> "$ROOT_DIR/test_summary.txt"
+  else
+    echo "ckanext-wri: Failed" >> "$ROOT_DIR/test_summary.txt"
+  fi
+
+  cd ..
+
+fi
+
+cat "$ROOT_DIR/test_summary.txt"
+
+# GitHub Actions failure exit code
+if grep -q "Failed" "$ROOT_DIR/test_summary.txt"; then
+    exit 1
+fi

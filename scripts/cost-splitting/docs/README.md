@@ -30,12 +30,13 @@ Once this is done you will possibly have three things
 
 The code can be seen in 
 
-- https://github.com/wri/wri-odp/blob/main/scripts/cost-splitting/script.py
-- https://github.com/wri/wri-odp/blob/main/scripts/cost-splitting/lib.py
-- https://github.com/wri/wri-odp/blob/main/.github/workflows/cost-splitting-report.yml
+- https://github.com/wri/wri-odp/blob/prod/scripts/cost-splitting/script.py
+- https://github.com/wri/wri-odp/blob/prod/scripts/cost-splitting/lib.py
+- https://github.com/wri/wri-odp/blob/prod/.github/workflows/cost-splitting-report.yml
 
 It will basically 
 
+- Get the name of the bucket which is going to be `ckan-{NAME OF THE BRANCH}-storage`, thats because in our repo the 3 branches(staging, dev, prod) match the 3 environments that we have, so you can run the script by doing it against an specific branch
 - Get a list of all top level folders in the S3 Bucket, assuming that the bucket has a structure similar to this
 ```
 org_1/resources/{resourceId}/filename.csv
@@ -59,4 +60,4 @@ Besides this there are two more caveats
 
 We are testing mostly the logic that decides the percentage costs, we use `moto` whic is a library that allows us to mock S3 Services, we then put two files with the "hello world" content, which takes exactly 11 bytes and then check if those results match what we expect
 
-The test files can be found in https://github.com/wri/wri-odp/blob/main/scripts/cost-splitting/test_script.py
+The test files can be found in https://github.com/wri/wri-odp/blob/prod/scripts/cost-splitting/test_script.py
