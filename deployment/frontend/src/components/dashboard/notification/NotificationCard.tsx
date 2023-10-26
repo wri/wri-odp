@@ -6,7 +6,7 @@ import type { IRowProfile } from '../_shared/RowProfile'
 function Card({ rowProfile }: { rowProfile: IRowProfile }) {
 
   return (
-    <div className='flex gap-x-4 items-center sm:pl-4 py-4'>
+    <div className='flex gap-x-4 items-center sm:pl-6 py-4'>
       <div className='w-2 h-2 rounded-full bg-wri-gold my-auto'></div>
       <div className="flex items-center">
         <input
