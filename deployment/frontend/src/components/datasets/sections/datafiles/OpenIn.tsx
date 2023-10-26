@@ -4,7 +4,7 @@ import {
   ArrowTopRightOnSquareIcon,
   ClipboardIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { DatasetTabs } from "../../DatasetTabs";
 import {
   Tooltip,
@@ -12,6 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/_shared/Tooltip";
+import classNames from "@/utils/classnames";
 
 export function OpenInButton() {
   const [open, setOpen] = useState(false);
@@ -53,7 +54,22 @@ function OpenInModal({
         </div>
         <Tab.Group>
           <Tab.List as="nav" className="mt-6 flex border-b border-zinc-300">
-            <DatasetTabs tabs={tabs} />
+        {tabs.map((tab) => (
+            <Tab as={Fragment}>
+              {({ selected }: { selected: boolean }) => (
+                <button
+                  className={classNames(
+                    selected
+                      ? "border-blue-800 text-blue-800"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                    "whitespace-nowrap border-b-2 px-6 font-acumin font-semibold transition",
+                  )}
+                >
+                  {tab.name}
+                </button>
+              )}
+            </Tab>
+        ))}
           </Tab.List>
           <Tab.Panels as="div" className="max-h-[18rem] overflow-y-auto">
             <Tab.Panel>

@@ -12,7 +12,7 @@ export function API() {
         className="-mt-4 flex h-12 w-full items-center bg-neutral-100 font-acumin overflow-x-auto"
       >
         {tabs.map((tab) => (
-          <Tab as={Fragment}>
+          <Tab key={tab} as={Fragment}>
             {({ selected }: { selected: boolean }) => (
               <button
                 className={classNames(

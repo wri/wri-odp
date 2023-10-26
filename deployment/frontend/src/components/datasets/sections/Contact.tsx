@@ -2,19 +2,19 @@ import Image from "next/image";
 
 const team = [
   {
-    name: "Mr. Someone",
+    name: "Mr. Someone 1",
     img: "/images/placeholders/people/1.avif",
     title: "Creator",
     email: "mrsomeone@gmail.com",
   },
   {
-    name: "Mr. Someone",
+    name: "Mr. Someone 2",
     img: "/images/placeholders/people/2.avif",
     title: "Creator",
     email: "mrsomeone@gmail.com",
   },
   {
-    name: "Mr. Someone",
+    name: "Mr. Someone 3",
     img: "/images/placeholders/people/3.avif",
     title: "Creator",
     email: "mrsomeone@gmail.com",
@@ -26,6 +26,7 @@ export function Contact() {
     <div className="grid grid-cols-2 gap-4">
       {team.map((member) => (
         <TeamMember
+          key ={member.name}
           name={member.name}
           img={member.img}
           title={member.title}
