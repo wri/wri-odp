@@ -19,10 +19,10 @@ export function LearnMoreButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
+        className="flex aspect-square w-full flex-col items-center justify-center rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400 md:gap-y-2"
       >
-        <LightBulbIcon className="w-5 h-5 sm:h-9 sm:w-9" />
-        <div className="font-acumin text-xs sm:text-sm font-normal text-black">
+        <LightBulbIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+        <div className="font-acumin text-xs font-normal text-black sm:text-sm">
           Learn More
         </div>
         <div className="h-4 font-acumin text-xs font-normal text-black"></div>
@@ -54,11 +54,11 @@ function LearnMoreModal({
           sem malesuada magna mollis euismod. Aenean lacinia bibendum nulla sed
           consectetur. Nullam quis risus eget urna mollis ornare vel eu leo.
         </p>
-        <div className="flex gap-x-8">
+        <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-x-1">
             <FingerPrintIcon className="h-4 w-4 text-blue-800" />
             <div>
-              <div className="text-sm font-semibold text-neutral-700">
+              <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
                 Created
               </div>
               <div className="text-sm font-light text-stone-900">
@@ -70,7 +70,7 @@ function LearnMoreModal({
           <div className="flex items-center gap-x-1">
             <ArrowPathIcon className="h-4 w-4 text-blue-800" />
             <div>
-              <div className="text-sm font-semibold text-neutral-700">
+              <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
                 Last Updated
               </div>
               <div className="text-sm font-light text-stone-900">
@@ -82,7 +82,7 @@ function LearnMoreModal({
           <div className="flex items-center gap-x-1">
             <ClockIcon className="h-4 w-4 text-blue-800" />
             <div>
-              <div className="text-sm font-semibold text-neutral-700">
+              <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
                 Temporal Coverage
               </div>
               <div className="text-sm font-light text-stone-900">
@@ -93,7 +93,7 @@ function LearnMoreModal({
           <div className="flex items-center gap-x-1">
             <MapPinIcon className="h-4 w-4 text-blue-800" />
             <div>
-              <div className="text-sm font-semibold text-neutral-700">
+              <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
                 Location
               </div>
               <div className="text-sm font-light text-stone-900">
@@ -103,9 +103,12 @@ function LearnMoreModal({
           </div>
         </div>
         <Tab.Group>
-          <Tab.List as="nav" className="mt-6 flex border-b border-zinc-300">
-            <DatasetTabs tabs={tabs} />
-          </Tab.List>
+          <div>
+            <Tab.List as="nav" className="mt-6 flex w-fit border-b">
+              <DatasetTabs tabs={tabs} />
+            </Tab.List>
+            <div className="w-full border-b border-zinc-300" />
+          </div>
           <Tab.Panels as="div" className="max-h-[18rem] overflow-y-auto">
             <Tab.Panel>
               <div className="font-['Acumin Pro SemiCondensed'] text-justify text-sm font-normal text-black">

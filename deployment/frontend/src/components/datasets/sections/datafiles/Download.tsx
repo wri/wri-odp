@@ -41,7 +41,7 @@ function DownloadModal({
             Please enter your email address so that you receive it via email.
           </div>
         </div>
-        <div className="flex gap-5 pt-6">
+        <div className="flex flex-col sm:flex-row gap-5 pt-6">
           <input
             type="email"
             name="email"
