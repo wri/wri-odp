@@ -25,3 +25,11 @@ body, html {
 .dataset-tabs .swiper-slide {
   width: fit-content !important;
 }
+
+.default-container {
+  max-width: 90vw;
+}
+
+.auto-carousel .swiper-slide {
+  width: fit-content !important;
+}

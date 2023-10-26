@@ -80,28 +80,37 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, _req) {
         try {
-          console.log('Login credentials', credentials)
-          console.log('Ckan URL', env.CKAN_URL)
+          console.log("Login credentials", credentials);
+          console.log("Ckan URL", env.CKAN_URL);
           if (!credentials) return null;
-          const user: CkanResponse<User> = await ky
-            .post(`${env.CKAN_URL}/api/3/action/user_login`, {
-              json: {
+          const userRes = await fetch(
+            `${env.CKAN_URL}/api/3/action/user_login`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
                 id: credentials.username,
                 password: credentials.password,
-              },
-            })
-            .json();
-
-          console.log('Ckan Response to User', user)
+              }),
+            },
+          );
+          const user: CkanResponse<User> = await userRes.json();
+          console.log("Ckan Response to User", user);
           if (user.result.id) {
-            const orgList: CkanResponse<Organization[]> = await ky
-              .post(`${env.CKAN_URL}/api/3/action/organization_list_for_user`, {
-                json: { id: user.result.id },
-                headers: { Authorization: user.result.apikey },
-              })
-              .json();
+            const orgListRes = await fetch(
+              `${env.CKAN_URL}/api/3/action/organization_list_for_user`,
+              {
+                method: "POST",
+                body: JSON.stringify({ id: user.result.id }),
+                headers: { Authorization: user.result.apikey, "Content-Type": "application/json" },
+              },
+            );
+            const orgList: CkanResponse<Organization[]> =
+              await orgListRes.json();
 
-            console.log('Org list', orgList)
+            console.log("Org list", orgList);
             return {
               ...user.result,
               image: "",
@@ -117,7 +126,7 @@ export const authOptions: NextAuthOptions = {
             );
           }
         } catch (e) {
-          console.log("Error", e)
+          console.log("Error", e);
           return Promise.reject(
             "/auth/signin?error=Could%20not%20login%20user%20please%20check%20your%20password%20and%20username",
           );
