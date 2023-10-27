@@ -2,6 +2,10 @@ import React from 'react'
 import { Tab } from '@headlessui/react'
 import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
 import DatasetLCardList from './DatasetLCardList'
+import Favourite from './Favourites'
+import Drafts from './Drafts'
+import ApprovalDataset from './ApprovalDataset'
+import Mydataset from './Mydataset'
 
 const tabs = [
   {
@@ -14,28 +18,28 @@ const tabs = [
   {
     id: "nydatasets",
     content: (
-      <div>activity</div>
+      <Mydataset />
     ),
     title: "My datasets",
   },
   {
     id: "favourites",
     content: (
-      <div>activity</div>
+      <Favourite />
     ),
     title: "My favourites",
   },
   {
     id: "drafts",
     content: (
-      <div>activity</div>
+      <Drafts />
     ),
     title: "Drafts",
   },
   {
     id: "approval",
     content: (
-      <div>activity</div>
+      <ApprovalDataset />
     ),
     title: "Awaiting Approval",
   },

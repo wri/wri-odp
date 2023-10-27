@@ -85,3 +85,34 @@ export default function DatasetRow({ className }: { className?: string }) {
     />
   )
 }
+
+
+export function FavouriteRow({ className }: { className?: string }) {
+  return (
+    <Row
+      className={`pr-2  ${className ? className : ''}`}
+      rowMain={<DatasetCardProfile />}
+      linkButton={{
+        label: "View dataset",
+        link: "#",
+      }}
+      rowSub={<SubCardProfile />}
+      isDropDown
+    />
+  )
+}
+
+export function DraftRow({ className }: { className?: string }) {
+  return (
+    <Row
+      className={`pr-2  ${className ? className : ''}`}
+      rowMain={<DatasetCardProfile />}
+      controlButtons={[
+        { label: "Edit", color: 'bg-wri-gold', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+        { label: "Delete", color: 'bg-red-600', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+      ]}
+      rowSub={<SubCardProfile />}
+      isDropDown
+    />
+  )
+}
