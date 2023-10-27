@@ -5,6 +5,7 @@ import classNames from '@/utils/classnames';
 type RowButton = {
   label?: string;
   icon?: React.ReactNode;
+  color?: string;
   onClick: () => void;
 }
 
@@ -33,14 +34,18 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
         </div>
         <div className='flex gap-x-4 ml-auto h-8 self-center'>
           {(linkButton) ? (
-            <a href={linkButton.link} className={`flex invisible items-center gap-x-2 px-3 py-2 rounded-md  border border-wri-gold font-semibold text-[15px] group-hover:visible `}>
+            <a href={linkButton.link} className={`flex invisible items-center gap-x-2 px-3 py-2 rounded-md  border border-wri-gold bg-white font-semibold text-[15px] group-hover:visible `}>
               <span>{linkButton.label}</span>
               <EyeIcon className="h-6 w-6 text-black " />
             </a>
           ) : ""}
           {(controlButtons) ? controlButtons.map((button, index) => {
             return (
-              <button key={index} onClick={button.onClick} className={`my-auto flex  items-center justify-center invisible group-hover:visible w-8 h-8 rounded-full ${index === 1 ? "bg-wri-gold" : " bg-red-600"} `}>
+              <button
+                key={index}
+                onClick={button.onClick}
+                className={`my-auto flex  items-center justify-center invisible group-hover:visible w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"} `}
+              >
                 {(button.icon)}
               </button>
             )

@@ -11,8 +11,8 @@ function LeftNode() {
   )
 }
 
-export default function SearchHeader({ RightNode }: { RightNode?: React.ReactNode }) {
+export default function SearchHeader({ RightNode, rightStyle, leftStyle }: { RightNode?: React.ReactNode, rightStyle?: string, leftStyle?: string }) {
   return (
-    <TableHeader rightNode={<LeftNode />} leftNode={RightNode} />
+    <TableHeader rightNode={RightNode} leftNode={<LeftNode />} rightStyle={rightStyle} leftstyle={leftStyle} />
   )
 }
