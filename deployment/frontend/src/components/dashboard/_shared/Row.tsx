@@ -20,21 +20,21 @@ type RowProps = {
   isDropDown?: boolean;
   controlButtons?: RowButton[];
   linkButton?: RowLinkButton;
-  bgColor?: boolean
+  groupStyle?: string
   className?: string;
 }
 
-export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, bgColor, className }: RowProps) {
+export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, groupStyle, className }: RowProps) {
   const [isShowSubRow, setIsShowSubRow] = useState(false)
   return (
-    <div className={`flex flex-col hover:bg-slate-100 ${isShowSubRow ? "bg-slate-100" : " "} ${className ? className : ""} group`}>
-      <div className='flex flex-col sm:flex-row '>
+    <div className={`flex flex-col hover:bg-slate-100 ${isShowSubRow ? "bg-slate-100" : " "}  `}>
+      <div className={`flex flex-col sm:flex-row ${className ? className : ""}  ${groupStyle ? groupStyle : "group"}`}>
         <div className=' grow shrink'>
           {rowMain}
         </div>
         <div className='flex gap-x-4 ml-auto h-8 self-center'>
           {(linkButton) ? (
-            <a href={linkButton.link} className={`flex invisible items-center gap-x-2 px-3 py-2 rounded-md  border border-wri-gold bg-white font-semibold text-[15px] group-hover:visible `}>
+            <a href={linkButton.link} className={`flex invisible items-center gap-x-2 px-3 py-2 rounded-md  border border-wri-gold bg-white font-semibold text-[15px] group-hover:visible ${groupStyle ? groupStyle : "group-hover:visible "}  `}>
               <span>{linkButton.label}</span>
               <EyeIcon className="h-6 w-6 text-black " />
             </a>
@@ -44,7 +44,7 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
               <button
                 key={index}
                 onClick={button.onClick}
-                className={`my-auto flex  items-center justify-center invisible group-hover:visible w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"} `}
+                className={`my-auto flex  items-center justify-center invisible ${groupStyle ? groupStyle : "group-hover:visible "}  w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"} `}
               >
                 {(button.icon)}
               </button>
