@@ -67,7 +67,7 @@ export default function TeamCard() {
               className={`pr-2`}
               rowMain={<TeamProfile team={team} />}
               linkButton={{
-                label: "View Team",
+                label: "View team",
                 link: "#",
               }}
               controlButtons={[
