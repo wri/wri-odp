@@ -64,7 +64,7 @@ const teams = [
 function TeamProfile({ team }: { team: IRowProfile }) {
 
   return (
-    <div className='flex py-3 pl-8'>
+    <div className='flex py-3 pl-4 sm:pl-8'>
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} />
     </div>
   )
@@ -83,7 +83,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | undefined }) {
               groupStyle="group/item group-hover/item:visible "
               className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
               rowMain={
-                <div className='flex  pl-5  '>
+                <div className='flex pl-3 sm:pl-5  '>
                   <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team} />
                 </div>
               }
@@ -104,29 +104,31 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | undefined }) {
 
 export default function TopicCard() {
   return (
-    <section className='w-full max-w-8xl '>
-      <SearchHeader leftStyle='pr-2 pl-12' rightStyle='pr-6' />
-      {
-        teams.map((team, index) => {
-          return (
-            <Row
-              key={index}
-              className={`pr-6`}
-              rowMain={<TeamProfile team={team} />}
-              linkButton={{
-                label: "View topic",
-                link: "#",
-              }}
-              controlButtons={[
-                { label: "Edit", color: 'bg-wri-gold', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-                { label: "Delete", color: 'bg-red-600', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-              ]}
-              rowSub={<SubCardProfile teams={team.subtopic} />}
-              isDropDown
-            />
-          )
-        })
-      }
+    <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
+      <SearchHeader leftStyle=' sm:pr-2 sm:pl-12' rightStyle=' px-2 sm:pr-6' />
+      <div className='w-full'>
+        {
+          teams.map((team, index) => {
+            return (
+              <Row
+                key={index}
+                className={`pr-6`}
+                rowMain={<TeamProfile team={team} />}
+                linkButton={{
+                  label: "View topic",
+                  link: "#",
+                }}
+                controlButtons={[
+                  { label: "Edit", color: 'bg-wri-gold', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+                  { label: "Delete", color: 'bg-red-600', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+                ]}
+                rowSub={<SubCardProfile teams={team.subtopic} />}
+                isDropDown
+              />
+            )
+          })
+        }
+      </div>
     </section>
   )
 }

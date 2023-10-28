@@ -138,7 +138,7 @@ export default function Layout({
                     </div>
                   </Transition.Child>
                   {/* Sidebar component, swap this element with another sidebar if you like */}
-                  <div className="flex grow flex-col gap-y-5  bg-wri-green pb-4">
+                  <div className="flex grow flex-col gap-y-5 overflow-y-auto   bg-wri-green pb-4">
                     <nav className="flex flex-1 flex-col ">
                       <ul role="list" className="flex flex-1 flex-col gap-y-2">
                         <li>
@@ -217,7 +217,7 @@ export default function Layout({
           </div>
 
           <main className="w-full isolate">
-            <div className=" @container overflow-x-auto w-full ">{children}</div>
+            <div className=" @container w-full ">{children}</div>
           </main>
         </div>
       </div>

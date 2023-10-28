@@ -6,7 +6,7 @@ import ActivityStreamCard from '../../_shared/ActivityStreamCard'
 
 export default function ActivityList() {
   return (
-    <section className='max-w-8xl  w-full'>
+    <section className='max-w-8xl  w-full flex flex-col gap-y-5 sm:gap-y-0'>
       <ActivitystreamHeader />
 
       {

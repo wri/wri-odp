@@ -4,7 +4,7 @@ import SelectFilter from '../_shared/SelectFilter'
 
 function LeftNode() {
   return (
-    <div className='flex w-full gap-x-4 pl-6'>
+    <div className='flex w-full gap-x-4 pl-6 pr-2 sm:pr-0 pt-2 sm:pt-0'>
       <SelectFilter
         options={[
           { id: 1, label: "All activity" },
@@ -30,6 +30,6 @@ function LeftNode() {
 
 export default function ActivitystreamHeader() {
   return (
-    <TableHeader leftNode={<LeftNode />} />
+    <TableHeader leftNode={<LeftNode />} rightStyle='sm:mt-4' />
   )
 }

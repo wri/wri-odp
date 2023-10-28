@@ -64,9 +64,9 @@ const teams = [
 function TeamProfile({ team }: { team: IRowProfile }) {
 
   return (
-    <div className='flex py-3 pl-8 gap-x-14 '>
+    <div className='flex flex-col sm:flex-row py-3 pl-4 sm:pl-8 gap-x-14 gap-y-6'>
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} />
-      <div className='font-normal text-[14px] text-wri-black self-center ml-auto mr-[46%]'>Members of 2 teams</div>
+      <div className='font-normal text-base sm:text-[14px] text-wri-black sm:self-center sm:ml-auto sm:mr-[20%] lg:mr-[46%]'>Members of 2 teams</div>
     </div>
   )
 }
@@ -84,9 +84,9 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | undefined }) {
               groupStyle="group/item group-hover/item:visible "
               className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
               rowMain={
-                <div className='flex  pl-5  gap-x-14'>
+                <div className='flex flex-col sm:flex-row pl-3 sm:pl-5  gap-x-14 gap-y-4'>
                   <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team} />
-                  <div className='font-normal text-[14px] text-wri-black self-center ml-auto mr-[60%]'>Team Editor</div>
+                  <div className='font-normal text-[14px] text-wri-black sm:self-center sm:ml-auto sm:mr-[40%] lg:mr-[60%]'>Team Editor</div>
                 </div>
               }
               controlButtons={[
@@ -106,29 +106,31 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | undefined }) {
 
 export default function UserCard() {
   return (
-    <section className='w-full max-w-8xl '>
-      <SearchHeader leftStyle='pr-2 pl-12' rightStyle='pr-6' placeholder='Find a user' />
-      {
-        teams.map((team, index) => {
-          return (
-            <Row
-              key={index}
-              className={`pr-6`}
-              rowMain={<TeamProfile team={team} />}
-              linkButton={{
-                label: "View user",
-                link: "#",
-              }}
-              controlButtons={[
-                { label: "Edit", color: 'bg-wri-gold', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-                { label: "Delete", color: 'bg-red-600', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-              ]}
-              rowSub={<SubCardProfile teams={team.subtopic} />}
-              isDropDown
-            />
-          )
-        })
-      }
+    <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
+      <SearchHeader leftStyle='px-2 sm:pr-2 sm:pl-12' rightStyle='px-2 sm:pr-6' placeholder='Find a user' />
+      <div className='w-full'>
+        {
+          teams.map((team, index) => {
+            return (
+              <Row
+                key={index}
+                className={`pr-6`}
+                rowMain={<TeamProfile team={team} />}
+                linkButton={{
+                  label: "View user",
+                  link: "#",
+                }}
+                controlButtons={[
+                  { label: "Edit", color: 'bg-wri-gold', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+                  { label: "Delete", color: 'bg-red-600', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+                ]}
+                rowSub={<SubCardProfile teams={team.subtopic} />}
+                isDropDown
+              />
+            )
+          })
+        }
+      </div>
     </section>
   )
 }

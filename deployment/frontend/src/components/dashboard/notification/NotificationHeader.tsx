@@ -6,7 +6,7 @@ import { Menu, Transition } from "@headlessui/react";
 
 function LeftNode() {
   return (
-    <div className='relative flex flex-row items-center gap-x-3 w-full pl-4 sm:pl-12'>
+    <div className='relative flex flex-row items-center gap-x-3 w-full pl-10 sm:pl-12'>
       <div className="flex h-6 items-center">
         <input
           id="notificatoin"
@@ -65,6 +65,6 @@ function LeftNode() {
 
 export default function NotificationHeader() {
   return (
-    <TableHeader leftNode={<LeftNode />} />
+    <TableHeader leftNode={<LeftNode />} leftstyle='order-last sm:order-first' />
   )
 }

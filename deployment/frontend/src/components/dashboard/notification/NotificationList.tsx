@@ -67,7 +67,7 @@ const notifications = [
 
 export default function NotificationList() {
   return (
-    <section id="notifications" className='max-w-8xl w-full'>
+    <section id="notifications" className='max-w-8xl w-full mt-2'>
       <NotificationHeader />
       <div className=' w-full'>
         {

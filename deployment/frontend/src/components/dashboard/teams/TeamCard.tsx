@@ -46,7 +46,7 @@ const teams = [
 function TeamProfile({ team }: { team: IRowProfile }) {
 
   return (
-    <div className='flex py-3 pl-8'>
+    <div className='flex py-3 pl-4 sm:pl-8'>
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} />
     </div>
   )
@@ -57,8 +57,8 @@ function TeamProfile({ team }: { team: IRowProfile }) {
 
 export default function TeamCard() {
   return (
-    <section className='w-full max-w-8xl '>
-      <SearchHeader leftStyle='pr-2 pl-12' rightStyle='pr-6' />
+    <section className='w-full max-w-8xl flex flex-col gap-y-4 sm:gap-y-0'>
+      <SearchHeader leftStyle=' px-2 sm:pr-2 sm:pl-12' rightStyle='pr-2 sm:pr-6' />
       {
         teams.map((team, index) => {
           return (

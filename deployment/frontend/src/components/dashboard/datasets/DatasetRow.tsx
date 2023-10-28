@@ -36,7 +36,7 @@ const status = [
 
 function DatasetCardProfile() {
   return (
-    <div className='flex flex-col p-1 py-3 rounded-md pl-14'>
+    <div className='flex flex-col p-1 py-3 rounded-md pl-4 sm:pl-14'>
       <p className='font-semibold text-[15px]'>Name of dataset</p>
       <div className='flex font-normal'>
         <ArrowPathIcon className='w-3 h-3  text-[#3654A5] mt-[2px]' />
@@ -52,7 +52,7 @@ function SubCardProfile() {
   return (
     <div>
       <div className='ml-14  w-[90%] outline outline-1 outline-wri-gray'></div>
-      <div className='grid grid-cols-4 grid-rows-2 gap-x-5  pl-14 pr-20 pt-4'>
+      <div className='grid grid-cols-2 grid-rows-4 sm:grid-cols-4 sm:grid-rows-2 gap-x-5 gap-y-2 sm:gap-y-0 px-2 pt-4  sm:pl-14 sm:pr-20 sm:pt-4'>
         {status.map((item, index) => {
           return (
             <div key={index} className='flex flex-col'>

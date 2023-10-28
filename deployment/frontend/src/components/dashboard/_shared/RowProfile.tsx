@@ -11,7 +11,7 @@ export interface IRowProfile {
 
 export default function RowProfile({ imgStyle, isPad, profile }: { imgStyle?: string, isPad?: boolean, profile?: IRowProfile }) {
   return (
-    <div className='flex flex-col sm:flex-row gap-x-4 hover:bg-slate-100  rounded-md'>
+    <div className='flex flex-row gap-x-4 hover:bg-slate-100  rounded-md'>
       <div className='flex gap-x-4'>
         <div className={`relative ${imgStyle ? imgStyle : "w-10 h-10"} `}>
           <Image src={profile?.image ? profile.image : '/images/placeholders/user/userpics.png'} alt='' fill />

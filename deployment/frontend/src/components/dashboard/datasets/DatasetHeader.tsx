@@ -24,6 +24,6 @@ function LeftNode() {
 
 export default function DatasetHeader() {
   return (
-    <SearchHeader RightNode={<LeftNode />} leftStyle='pr-2 pl-12' />
+    <SearchHeader RightNode={<LeftNode />} leftStyle='px-2 sm:pr-2 sm:pl-12' rightStyle='px-2' />
   )
 }
