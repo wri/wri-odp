@@ -6,10 +6,12 @@ import Favourite from './Favourites'
 import Drafts from './Drafts'
 import ApprovalDataset from './ApprovalDataset'
 import Mydataset from './Mydataset'
+import DatasetTabs from './DatasetTabs'
 
 const tabs = [
   {
     id: "datasets",
+    name: "All datasets",
     content: (
       <DatasetLCardList />
     ),
@@ -20,6 +22,7 @@ const tabs = [
     content: (
       <Mydataset />
     ),
+    name: "My datasets",
     title: "My datasets",
   },
   {
@@ -27,6 +30,7 @@ const tabs = [
     content: (
       <Favourite />
     ),
+    name: "My favourites",
     title: "My favourites",
   },
   {
@@ -34,6 +38,7 @@ const tabs = [
     content: (
       <Drafts />
     ),
+    name: "Drafts",
     title: "Drafts",
   },
   {
@@ -41,6 +46,7 @@ const tabs = [
     content: (
       <ApprovalDataset />
     ),
+    name: "Awaiting Approval",
     title: "Awaiting Approval",
   },
   {
@@ -48,6 +54,7 @@ const tabs = [
     content: (
       <div>activity</div>
     ),
+    name: "Add dataset",
     title: "Add dataset",
   }
 ]
@@ -56,28 +63,8 @@ export default function DatasetList() {
   return (
     <section id='teamtab' className='w-full max-w-8xl  font-acumin '>
       <Tab.Group>
-        <Tab.List className="flex max-w-9xl  ">
-          {tabs.map((tab) => (
-            <Tab key={tab.title} className="  text-black font-normal text-base w-[50%]  accent-white">
-              {({ selected }) => (
-                <div
-                  className={`font-normal  px-6 py-4 focus:outline-0  border-b-2  w-full  ${selected ? " border-b-wri-dark-green border-b-2 text-wri-green" : ""
-                    } `}
-                >
-                  {tab.title === 'Add dataset' ? (
-                    <div className='flex'>
-                      <div className='flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]'>
-                        <PlusSmallIcon className='w-3 h-3 text-white' />
-                      </div>
-                      <span>{tab.title}</span>
-                    </div>
-                  ) : (<span>{tab.title}</span>)
-                  }
-
-                </div>
-              )}
-            </Tab>
-          ))}
+        <Tab.List className="flex max-w-8xl  ">
+          <DatasetTabs tabs={tabs} />
         </Tab.List>
         <Tab.Panels className='mt-2'>
           {tabs.map((tab) => (
