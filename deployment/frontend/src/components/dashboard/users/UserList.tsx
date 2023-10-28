@@ -24,7 +24,7 @@ export default function UserList() {
   return (
     <section id='teamtab' className='w-full max-w-8xl  font-acumin '>
       <Tab.Group>
-        <Tab.List className="flex max-w-9xl outline-1 outline outline-wri-gray ">
+        <Tab.List className="flex max-w-9xl outline-1 border-b-2 border-b-wri-gray ">
           {tabs.map((tab) => (
             <Tab key={tab.title} className="  text-black font-normal text-base w-[50%] sm:w-[20%]  accent-white">
               {({ selected }) => (
