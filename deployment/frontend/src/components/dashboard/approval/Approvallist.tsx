@@ -119,7 +119,7 @@ export default function Approvallist() {
       <div className='w-full'>
         {
           approval.map((approvalInfo, index) => (
-            <ApprovalRow key={index} approvalInfo={approvalInfo} className={index % 2 === 0 ? ' bg-[#F9F9F9]' : ''} />
+            <ApprovalRow key={index} approvalInfo={approvalInfo} className={index % 2 === 0 ? ' bg-[#F9F9F9] hover:bg-slate-100' : ''} />
           ))
         }
       </div>
