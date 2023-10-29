@@ -89,7 +89,7 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/run_unit_tests.sh"
         working-directory: ./ckan-backend-dev
-      - name: Run Trivy Vulnerability Scanner 🧪
+      - name: Run Trivy Vulnerability Scanner for CKAN Container 🧪
         uses: aquasecurity/trivy-action@master
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -102,10 +102,16 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-      - name: Upload Trivy scan results to GitHub Code scanning
+      - name: Run CodeQL vulnerability scanner
+        uses: github/codeql-action/analyze@v6
+      - name: Upload Trivy CKAN container scan results to GitHub Code scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: trivy-results.sarif
+      - name: Upload CodeQL scan results to GitHub Code scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: codeql-results.sarif
       - name: Tear down containers
         if: failure() || success()
         run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
