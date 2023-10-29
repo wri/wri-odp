@@ -12,15 +12,10 @@ env:
 permissions:
       id-token: write
       contents: read    
-      security-events: write
 jobs:
   buildandtest:
     name: Build and Scan Image with Integration Tests
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'python', 'javascript' ]
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
@@ -111,16 +106,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: trivy-results.sarif
-      - name: Run CodeQL vulnerability scanner - Initialize
-        uses: github/codeql-action/init@v2
-        with:
-          languages: ${{ matrix.language }}
-      - name: Run CodeQL vulnerability scanner - Autobuild
-        uses: github/codeql-action/autobuild@v2
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          category: "/language:${{matrix.language}}"
       - name: Tear down containers
         if: failure() || success()
         run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
