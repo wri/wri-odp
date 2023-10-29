@@ -12,10 +12,15 @@ env:
 permissions:
       id-token: write
       contents: read    
+      security-events: write
 jobs:
   buildandtest:
     name: Build and Scan Image with Integration Tests
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python', 'javascript' ]
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
@@ -102,16 +107,20 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-      - name: Run CodeQL vulnerability scanner
-        uses: github/codeql-action/analyze@v6
       - name: Upload Trivy CKAN container scan results to GitHub Code scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: trivy-results.sarif
-      - name: Upload CodeQL scan results to GitHub Code scanning
-        uses: github/codeql-action/upload-sarif@v2
+      - name: Run CodeQL vulnerability scanner - Initialize
+        uses: github/codeql-action/init@v2
         with:
-          sarif_file: codeql-results.sarif
+          languages: ${{ matrix.language }}
+      - name: Run CodeQL vulnerability scanner - Autobuild
+        uses: github/codeql-action/autobuild@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{matrix.language}}"
       - name: Tear down containers
         if: failure() || success()
         run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
