@@ -96,11 +96,16 @@ jobs:
           REPOSITORY: ${{ secrets.ECR_CKAN_REPO }}
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
-          format: 'table'
+          format: 'sarif'
+          output: trivy-results.sarif
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+      - name: Upload Trivy scan results to GitHub Code scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: trivy-results.sarif
       - name: Tear down containers
         if: failure() || success()
         run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
