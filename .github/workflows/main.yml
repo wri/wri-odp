@@ -97,15 +97,32 @@ jobs:
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
           format: 'sarif'
-          output: trivy-results.sarif
+          output: ckan-trivy-results.sarif
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-      - name: Upload Trivy CKAN container scan results to GitHub Code scanning
+      - name: Run Trivy Vulnerability Scanner for Frontend Container 🧪
+        uses: aquasecurity/trivy-action@master
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ secrets.ECR_FRONTEND_REPO }}
+        with:
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
+          format: 'sarif'
+          output: frontend-trivy-results.sarif
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+      - name: Upload CKAN container Trivy scan results to GitHub Code scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: trivy-results.sarif
+          sarif_file: ckan-trivy-results.sarif
+      - name: Upload Frontnend container Trivy scan results to GitHub Code scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: frontend-trivy-results.sarif
       - name: Tear down containers
         if: failure() || success()
         run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
