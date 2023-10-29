@@ -122,6 +122,7 @@ jobs:
       - name: Upload Frontnend container Trivy scan results to GitHub Code scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
+          category: frontend_container_trivy_results
           sarif_file: frontend-trivy-results.sarif
       - name: Tear down containers
         if: failure() || success()
