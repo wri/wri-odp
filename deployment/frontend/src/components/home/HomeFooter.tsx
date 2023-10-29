@@ -6,7 +6,7 @@ export function HomeFooter() {
   return (
     <>
       <section className="bg-green-700">
-        <div className="default-container mx-auto flex justify-between py-12">
+        <div className="default-home-container mx-auto flex justify-between py-12">
           <div className="flex flex-col gap-y-1">
             <h4 className="font-acumin text-2xl font-bold text-white">
               Some CTA here? Lorem ipsum dolor. Etiam porta sem malesuada magna.
@@ -18,7 +18,7 @@ export function HomeFooter() {
           <Button>Read More</Button>
         </div>
       </section>
-      <div className="mx-auto flex w-full default-container flex-col pb-16">
+      <div className="mx-auto flex w-full default-home-container flex-col pb-16">
         <div className="flex flex-col items-center gap-y-4 pt-16 font-bold text-wri-black sm:flex-row sm:items-start">
           <div className="mb-6 flex w-full flex-col items-center gap-y-4 sm:mb-0 sm:items-start">
             <p className="text-base font-bold">ABOUT WRI</p>
