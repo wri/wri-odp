@@ -10,7 +10,7 @@ export default function DatasetPageLayout({
     rhs: React.ReactNode
 }) {
     return (
-        <div className="flex flex-wrap lg:flex-nowrap">
+        <div className="flex flex-wrap lg:flex-nowrap lg:max-w-screen">
             <Disclosure defaultOpen>
                 {({ open }) => (
                     <>
@@ -40,7 +40,7 @@ export default function DatasetPageLayout({
                     </>
                 )}
             </Disclosure>
-            <div className="w-full">{rhs}</div>
+            <div className="w-full overflow-x-hidden">{rhs}</div>
         </div>
     )
 }

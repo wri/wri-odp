@@ -2,6 +2,7 @@ import { Tab } from '@headlessui/react'
 import { VisualizationTabs } from './VisualizationTabs'
 import MapView from './MapView'
 import TabularView from './TabularView'
+import ChartView from './ChartView'
 
 export default function Visualizations() {
     const tabs = [
@@ -23,7 +24,9 @@ export default function Visualizations() {
                     <Tab.Panel>
                         <TabularView />
                     </Tab.Panel>
-                    <Tab.Panel></Tab.Panel>
+                    <Tab.Panel>
+                        <ChartView />
+                    </Tab.Panel>
                 </Tab.Panels>
             </Tab.Group>
         </div>
