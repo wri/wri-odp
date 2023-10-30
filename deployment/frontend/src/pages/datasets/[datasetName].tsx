@@ -11,12 +11,16 @@ import { Members } from "@/components/datasets/sections/Members";
 import { Methodology } from "@/components/datasets/sections/Methodology";
 import { RelatedDatasets } from "@/components/datasets/sections/RelatedDatasets";
 import { Tab } from "@headlessui/react";
+import ApprovalRequestCard from "@/components/datasets/ApprovalRequestCard";
+import { useRouter } from "next/router";
 const links = [
   { label: "Explore Data", url: "/search", current: false },
   { label: "Name of dataset", url: "/datasets/dataset_test", current: true },
 ];
 
 export default function DatasetPage() {
+  const { query } = useRouter();
+  const isApprovalRequest = query?.approval === "true";
   const tabs = [
     { name: "Data files" },
     { name: "About" },
@@ -30,6 +34,7 @@ export default function DatasetPage() {
     <>
       <Header />
       <Breadcrumbs links={links} />
+      {isApprovalRequest && (<ApprovalRequestCard />)}
       <DatasetPageLayout>
         <DatasetHeader />
         <Tab.Group>
