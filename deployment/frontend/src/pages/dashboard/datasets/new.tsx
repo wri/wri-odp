@@ -1,6 +1,8 @@
 import { Breadcrumbs } from "@/components/_shared/Breadcrumbs";
 import Header from "@/components/_shared/Header";
+import { CreateDatasetTabs } from "@/components/datasets/new/CreateDatasetTabs";
 import { CustomFieldsForm } from "@/components/datasets/new/metadata/CustomFields";
+import { DescriptionForm } from "@/components/datasets/new/metadata/Description";
 import { MoreDetailsForm } from "@/components/datasets/new/metadata/MoreDetails";
 import { OverviewForm } from "@/components/datasets/new/metadata/Overview";
 import { PointOfContactForm } from "@/components/datasets/new/metadata/PointOfContact";
@@ -15,9 +17,13 @@ export default function NewDatasetPage() {
     <>
       <Header />
       <Breadcrumbs links={links} />
-      <main className="py-16 flex flex-col gap-y-12 justify-start">
-        <h1 className="max-w-[1380px] mx-auto w-full px-4 sm:px-6 xxl:px-0 text-black text-2xl font-semibold font-acumin">Add a dataset</h1>
+      <main className="flex flex-col justify-start gap-y-12 py-16">
+        <h1 className="mx-auto w-full max-w-[1380px] px-4 font-acumin text-2xl font-semibold text-black sm:px-6 xxl:px-0">
+          Add a dataset
+        </h1>
+        <CreateDatasetTabs currentStep={1} />
         <OverviewForm />
+        <DescriptionForm />
         <PointOfContactForm />
         <MoreDetailsForm />
         <CustomFieldsForm />

@@ -1,4 +1,4 @@
-import Select from "../_shared/Select";
+import SimpleSelect from "../datasets/SimpleSelect";
 
 export default function SortBy() {
   return (
@@ -11,11 +11,12 @@ export default function SortBy() {
           <div className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black">
             Show
           </div>
-          <Select
+          <SimpleSelect
+            placeholder="Select"
             options={[
-              { id: 1, label: "1" },
-              { id: 2, label: "2" },
-              { id: 3, label: "3" },
+              { value: '1', label: "1", default: true },
+              { value: '2', label: "2" },
+              { value: '3', label: "3" },
             ]}
           />
         </div>
@@ -23,11 +24,12 @@ export default function SortBy() {
           <div className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black">
             Sort by
           </div>
-          <Select
+          <SimpleSelect
+            placeholder="Sort by"
             options={[
-              { id: 1, label: "Relevance" },
-              { id: 2, label: "Name" },
-              { id: 3, label: "Title" },
+              { value: '1', label: "Relevance", default: true },
+              { value: '2', label: "Name" },
+              { value: '3', label: "Title" },
             ]}
           />
         </div>

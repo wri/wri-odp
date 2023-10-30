@@ -12,7 +12,6 @@ import Strike from "@tiptap/extension-strike";
 import Code from "@tiptap/extension-code";
 import History from "@tiptap/extension-history";
 // Custom
-import content from "./content";
 import * as Icons from "./Icons";
 import { LinkModal } from "./LinkModal";
 import classNames from "@/utils/classnames";
@@ -33,7 +32,6 @@ export function SimpleEditor() {
       Strike,
       Code
     ],
-    content
   }) as Editor;
   const [modalIsOpen, setIsOpen] = useState(false);
   const [url, setUrl] = useState<string>("");
