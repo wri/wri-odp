@@ -21,7 +21,6 @@ export default function NewDatasetPage() {
         <h1 className="mx-auto w-full max-w-[1380px] px-4 font-acumin text-2xl font-semibold text-black sm:px-6 xxl:px-0">
           Add a dataset
         </h1>
-        <CreateDatasetTabs currentStep={1} />
         <OverviewForm />
         <DescriptionForm />
         <PointOfContactForm />
