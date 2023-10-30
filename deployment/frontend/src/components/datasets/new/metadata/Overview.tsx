@@ -2,11 +2,11 @@ import {
   ArrowsPointingInIcon,
   ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
-import { Input } from "../../SimpleInput";
-import SimpleSelect from "../../SimpleSelect";
+import { Input } from "@/components/_shared/SimpleInput";
+import { InputGroup } from "@/components/_shared/InputGroup";
 import { Disclosure, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { InputGroup } from "./InputGroup";
+import SimpleSelect from "@/components/_shared/SimpleSelect";
 
 export function OverviewForm() {
   return (

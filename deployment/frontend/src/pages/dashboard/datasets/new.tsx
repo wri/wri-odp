@@ -1,11 +1,14 @@
 import { Breadcrumbs } from "@/components/_shared/Breadcrumbs";
 import Header from "@/components/_shared/Header";
 import { CreateDatasetTabs } from "@/components/datasets/new/CreateDatasetTabs";
+import { CreateDataFilesSection } from "@/components/datasets/new/datafiles/CreateDatafilesSection";
 import { CustomFieldsForm } from "@/components/datasets/new/metadata/CustomFields";
 import { DescriptionForm } from "@/components/datasets/new/metadata/Description";
 import { MoreDetailsForm } from "@/components/datasets/new/metadata/MoreDetails";
 import { OverviewForm } from "@/components/datasets/new/metadata/Overview";
 import { PointOfContactForm } from "@/components/datasets/new/metadata/PointOfContact";
+import { Tab } from "@headlessui/react";
+import { useState } from "react";
 
 const links = [
   { label: "Dashboard", url: "/dashboard", current: false },
@@ -13,6 +16,7 @@ const links = [
 ];
 
 export default function NewDatasetPage() {
+  const [selectedIndex, setSelectedIndex] = useState(0)
   return (
     <>
       <Header />
@@ -21,11 +25,19 @@ export default function NewDatasetPage() {
         <h1 className="mx-auto w-full max-w-[1380px] px-4 font-acumin text-2xl font-semibold text-black sm:px-6 xxl:px-0">
           Add a dataset
         </h1>
-        <OverviewForm />
-        <DescriptionForm />
-        <PointOfContactForm />
-        <MoreDetailsForm />
-        <CustomFieldsForm />
+        <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
+          <CreateDatasetTabs currentStep={selectedIndex} />
+          <Tab.Panel as="div" className="flex flex-col gap-y-12">
+            <OverviewForm />
+            <DescriptionForm />
+            <PointOfContactForm />
+            <MoreDetailsForm />
+            <CustomFieldsForm />
+          </Tab.Panel>
+          <Tab.Panel as="div" className="flex flex-col gap-y-12">
+            <CreateDataFilesSection />
+          </Tab.Panel>
+        </Tab.Group>
       </main>
     </>
   );

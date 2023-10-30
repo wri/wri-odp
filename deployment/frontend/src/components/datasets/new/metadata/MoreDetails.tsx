@@ -5,9 +5,9 @@ import {
   ExclamationCircleIcon,
   SquaresPlusIcon,
 } from "@heroicons/react/24/outline";
-import { Input } from "../../SimpleInput";
 import { Disclosure, Transition } from "@headlessui/react";
-import { InputGroup } from "./InputGroup";
+import { Input } from "@/components/_shared/SimpleInput";
+import { InputGroup } from "@/components/_shared/InputGroup";
 
 export function MoreDetailsForm() {
   return (

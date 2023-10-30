@@ -13,9 +13,10 @@ interface SimpleSelectProps {
   options: Option[]
   placeholder: string;
   className?: string;
+  maxWidth?: string;
 }
 
-export default function SimpleSelect({ options, placeholder, className }: SimpleSelectProps) {
+export default function SimpleSelect({ options, placeholder, className, maxWidth = "max-w-[28rem]" }: SimpleSelectProps) {
   const _default = options.find((option) => option.default && option.default === true)
   const [selected, setSelected] = useState<Option | null>(_default ?? null)
 
@@ -23,7 +24,7 @@ export default function SimpleSelect({ options, placeholder, className }: Simple
     <Listbox value={selected} onChange={setSelected}>
       {({ open }) => (
         <>
-          <div className="relative w-full max-w-[28rem]">
+          <div className={classNames("relative w-full", maxWidth)}>
             <Listbox.Button className={classNames("relative text-left block w-full rounded-md border-0 px-5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6", className ?? "")}>
               <span className={classNames(selected && selected.label ? "" : "text-zinc-400", "block truncate")}>{selected && selected.label ? selected.label : placeholder}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">

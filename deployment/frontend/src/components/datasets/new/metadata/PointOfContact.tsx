@@ -3,9 +3,9 @@ import {
   ChatBubbleLeftRightIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
-import { Input } from "../../SimpleInput";
+import { Input } from "@/components/_shared/SimpleInput";
+import { InputGroup } from "@/components/_shared/InputGroup";
 import { Disclosure, Transition } from "@headlessui/react";
-import { InputGroup } from "./InputGroup";
 
 export function PointOfContactForm() {
   return (
