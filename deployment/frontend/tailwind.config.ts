@@ -20,6 +20,7 @@ export default {
         "wri-gray": "#eae8e4",
         "wri-dark-green": "#2B7340",
         "wri-light-green": "#BAE1BD",
+        "wri-dark-blue": "#3654A5",
         "wri-light-blue": "#B5D6E8",
         "wri-light-yellow": "#FBE8BE",
         "wri-dark-gray": "#666666"
@@ -36,6 +37,13 @@ export default {
     },
   },
   plugins: [
-    require('@tailwindcss/container-queries')
+    require('@tailwindcss/container-queries'),
+    require("tailwindcss/plugin")(function ({
+      addVariant,
+    }: {
+      addVariant: any;
+    }) {
+      addVariant("not-last", "&:not(:last-child)");
+    }),
   ],
 } satisfies Config;
