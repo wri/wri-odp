@@ -8,6 +8,7 @@ import localFont from "next/font/local";
 import { api } from "@/utils/api";
 
 import "@/styles/globals.css";
+import "@/styles/rte.css";
 
 const acumin = localFont({
   src: [

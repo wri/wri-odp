@@ -1,0 +1,22 @@
+<svg xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" fill="none" version="1.1" id="svg12" sodipodi:docname="step_2.svg" inkscape:version="1.3 (0e150ed6c4, 2023-07-21)" viewBox="-2 19.5 1389 68">
+  <sodipodi:namedview id="namedview12" pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25" inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1" inkscape:zoom="0.97837058" inkscape:cx="693.5" inkscape:cy="53.660648" inkscape:window-width="1920" inkscape:window-height="1011" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1" inkscape:current-layer="svg12"/>
+  <path d="M896 20H1346.77L1387 53.5L1346.77 87H896L928.802 53.2891L896 20Z" fill="#F7F7F7" id="path1"/>
+  <path d="M876.339 20L908 53L876.339 87" stroke="#E9E9E9" id="path4"/>
+  <g filter="url(#filter0_d_5_6673)" id="g5">
+    <path d="M448 20H897.965L935 53L897.965 87H448L478.213 53.2688L448 20Z" fill="white" id="path5"/>
+  </g>
+  <path d="M517.515 57.8125V57.1094L520.155 54.2187C520.465 53.8802 520.72 53.5859 520.921 53.3359C521.121 53.0833 521.27 52.8464 521.366 52.625C521.465 52.401 521.515 52.1667 521.515 51.9219C521.515 51.6406 521.447 51.3971 521.312 51.1914C521.179 50.9857 520.996 50.8268 520.765 50.7148C520.533 50.6029 520.272 50.5469 519.983 50.5469C519.676 50.5469 519.408 50.6107 519.179 50.7383C518.952 50.8633 518.776 51.0391 518.651 51.2656C518.529 51.4922 518.468 51.7578 518.468 52.0625H517.546C517.546 51.5937 517.654 51.1823 517.87 50.8281C518.086 50.474 518.381 50.1979 518.753 50C519.128 49.8021 519.549 49.7031 520.015 49.7031C520.483 49.7031 520.899 49.8021 521.261 50C521.623 50.1979 521.907 50.4648 522.112 50.8008C522.318 51.1367 522.421 51.5104 522.421 51.9219C522.421 52.2161 522.368 52.5039 522.261 52.7852C522.157 53.0638 521.974 53.375 521.714 53.7187C521.456 54.0599 521.098 54.4766 520.64 54.9687L518.843 56.8906V56.9531H522.562V57.8125H517.515Z" fill="white" id="path7"/>
+  <path d="M-2 20H447.776L478 53L447.776 87H-2V20Z" fill="#F7F7F7" id="path8"/>
+  <defs id="defs12">
+    <filter id="filter0_d_5_6673" x="428" y="0" width="527" height="107" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix" id="feFlood10"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" id="feColorMatrix10"/>
+      <feOffset id="feOffset10"/>
+      <feGaussianBlur stdDeviation="10" id="feGaussianBlur10"/>
+      <feComposite in2="hardAlpha" operator="out" id="feComposite10"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.868012 0 0 0 0 0.868012 0 0 0 0 0.868012 0 0 0 0.25 0" id="feColorMatrix11"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_5_6673" id="feBlend11"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_5_6673" result="shape" id="feBlend12"/>
+    </filter>
+  </defs>
+</svg>
