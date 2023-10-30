@@ -1,4 +1,4 @@
-import SimpleSelect from "../datasets/SimpleSelect";
+import SimpleSelect from "../_shared/SimpleSelect";
 
 export default function SortBy() {
   return (
