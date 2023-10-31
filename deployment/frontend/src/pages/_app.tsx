@@ -13,6 +13,7 @@ import localFont from 'next/font/local'
 import { api } from '@/utils/api'
 
 import '@/styles/globals.scss'
+import "@/styles/rte.css";
 
 const acumin = localFont({
     src: [

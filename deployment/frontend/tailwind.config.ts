@@ -11,6 +11,7 @@ export default {
       },
       boxShadow: {
         "wri": "0px 4px 4px 0px rgba(147, 147, 147, 0.25)",
+        "wri-small": "box-shadow: 0px 1px 2px 0px rgba(105, 81, 255, 0.05)",
       },
       colors: {
         white: "#FFFFFF",
@@ -46,5 +47,6 @@ export default {
     }) {
       addVariant("not-last", "&:not(:last-child)");
     }),
+    require('@tailwindcss/forms'),
   ],
 } satisfies Config;

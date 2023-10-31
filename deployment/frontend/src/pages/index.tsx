@@ -12,9 +12,9 @@ export default function Home() {
         <title>WRI - ODP</title>
       </Head>
       <Hero />
-      <main className="default-container gap-x-[4.25rem] mx-auto grid grid-cols-1 py-24 md:grid-cols-5">
+      <main className="default-home-container gap-x-[4.25rem] mx-auto grid grid-cols-1 py-24 md:grid-cols-5">
         <div className="col-span-2">
-          <div className="default-container w-full border-t-[4px] border-stone-900" />
+          <div className="default-home-container w-full border-t-[4px] border-stone-900" />
           <h3 className="pt-1 font-acumin text-2xl font-bold leading-loose text-stone-900">
             About the portal
           </h3>
@@ -42,7 +42,7 @@ export default function Home() {
           </div>
         </div>
         <div className="highlights-carousel relative !ml-auto w-full max-w-[94.5vw]">
-          <div className="default-container w-full border-t-[4px] border-stone-900" />
+          <div className="default-home-container w-full border-t-[4px] border-stone-900" />
           <h3 className="pt-1 font-acumin text-2xl font-bold leading-loose text-stone-900">
             Highlights
           </h3>
