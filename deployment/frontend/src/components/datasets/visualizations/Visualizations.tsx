@@ -3,8 +3,13 @@ import { VisualizationTabs } from './VisualizationTabs'
 import MapView from './MapView'
 import TabularView from './TabularView'
 import ChartView from './ChartView'
+import { Dispatch, SetStateAction } from 'react'
 
-export default function Visualizations() {
+export default function Visualizations({
+    setIsAddLayers: setisAddLayers,
+}: {
+    setIsAddLayers: Dispatch<SetStateAction<boolean>>
+}) {
     const tabs = [
         { name: 'Map View' },
         { name: 'Tabular View' },
@@ -19,7 +24,7 @@ export default function Visualizations() {
                 </Tab.List>
                 <Tab.Panels>
                     <Tab.Panel>
-                        <MapView />
+                        <MapView setIsAddLayers={setisAddLayers} />
                     </Tab.Panel>
                     <Tab.Panel>
                         <TabularView />

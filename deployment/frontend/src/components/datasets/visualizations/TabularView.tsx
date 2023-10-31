@@ -101,7 +101,7 @@ export default ({
         </div>
     ) : (
         <div className={`w-full relative`}>
-            <div className="flex justify-between mx-20 mt-6">
+            <div className="flex justify-between mx-5 lg:mx-20 mt-6">
                 <span className="text-base font-regular leading-5 text-[#3E3E3E] flex items-center">
                     <svg
                         className="mr-2"

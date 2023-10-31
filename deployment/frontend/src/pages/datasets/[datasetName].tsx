@@ -12,12 +12,17 @@ import { Methodology } from '@/components/datasets/sections/Methodology'
 import { RelatedDatasets } from '@/components/datasets/sections/RelatedDatasets'
 import { Tab } from '@headlessui/react'
 import Visualizations from '@/components/datasets/visualizations/Visualizations'
+import { useState } from 'react'
+import AddLayers from '@/components/datasets/add-layers/AddLayers'
+
 const links = [
     { label: 'Explore Data', url: '/search', current: false },
     { label: 'Name of dataset', url: '/datasets/dataset_test', current: true },
 ]
 
 export default function DatasetPage() {
+    const [isAddLayers, setIsAddLayers] = useState(false)
+
     const tabs = [
         { name: 'Data files' },
         { name: 'About' },
@@ -27,51 +32,56 @@ export default function DatasetPage() {
         { name: 'API' },
         { name: 'Members' },
     ]
+
     return (
         <>
             <Header />
             <Breadcrumbs links={links} />
             <DatasetPageLayout
                 lhs={
-                    <>
-                        <DatasetHeader />
-                        <Tab.Group>
-                            <Tab.List
-                                as="nav"
-                                className="flex w-full gap-x-2 @sm:pr-8 pr-4"
-                            >
-                                <DatasetTabs tabs={tabs} />
-                            </Tab.List>
-                            <div className="mb-4 mr-9 border-b border-zinc-300" />
-                            <div className="@sm:pr-8 pr-4">
-                                <Tab.Panels>
-                                    <Tab.Panel>
-                                        <DataFiles />
-                                    </Tab.Panel>
-                                    <Tab.Panel>
-                                        <About />
-                                    </Tab.Panel>
-                                    <Tab.Panel>
-                                        <Methodology />
-                                    </Tab.Panel>
-                                    <Tab.Panel>
-                                        <RelatedDatasets />
-                                    </Tab.Panel>
-                                    <Tab.Panel>
-                                        <Contact />
-                                    </Tab.Panel>
-                                    <Tab.Panel>
-                                        <API />
-                                    </Tab.Panel>
-                                    <Tab.Panel>
-                                        <Members />
-                                    </Tab.Panel>
-                                </Tab.Panels>
-                            </div>
-                        </Tab.Group>
-                    </>
+                    isAddLayers ? (
+                        <AddLayers />
+                    ) : (
+                        <>
+                            <DatasetHeader />
+                            <Tab.Group>
+                                <Tab.List
+                                    as="nav"
+                                    className="flex w-full gap-x-2 @sm:pr-8 pr-4"
+                                >
+                                    <DatasetTabs tabs={tabs} />
+                                </Tab.List>
+                                <div className="mb-4 mr-9 border-b border-zinc-300" />
+                                <div className="@sm:pr-8 pr-4">
+                                    <Tab.Panels>
+                                        <Tab.Panel>
+                                            <DataFiles />
+                                        </Tab.Panel>
+                                        <Tab.Panel>
+                                            <About />
+                                        </Tab.Panel>
+                                        <Tab.Panel>
+                                            <Methodology />
+                                        </Tab.Panel>
+                                        <Tab.Panel>
+                                            <RelatedDatasets />
+                                        </Tab.Panel>
+                                        <Tab.Panel>
+                                            <Contact />
+                                        </Tab.Panel>
+                                        <Tab.Panel>
+                                            <API />
+                                        </Tab.Panel>
+                                        <Tab.Panel>
+                                            <Members />
+                                        </Tab.Panel>
+                                    </Tab.Panels>
+                                </div>
+                            </Tab.Group>
+                        </>
+                    )
                 }
-                rhs={<Visualizations />}
+                rhs={<Visualizations setIsAddLayers={setIsAddLayers} />}
             />
         </>
     )

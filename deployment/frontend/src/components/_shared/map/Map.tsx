@@ -1,5 +1,5 @@
 import { useIsDrawing, useMapState } from '@/utils/storeHooks'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReactMapGL, { type MapRef } from 'react-map-gl'
 import LayerManager from './LayerManager'
 import { useInteractiveLayers } from '@/utils/queryHooks'
@@ -10,7 +10,19 @@ import Controls from './controls/Controls'
 import Basemap from './Basemap'
 import Labels from './Labels'
 
-export default function Map({ layers }: { layers: APILayerSpec[] }) {
+export default function Map({
+    layers,
+    showControls = true,
+    showLegends = true,
+    mapHeight = 'calc(100vh - 63px)',
+    onClickAddLayers = () => {},
+}: {
+    layers: APILayerSpec[]
+    showControls?: boolean
+    showLegends?: boolean
+    mapHeight?: string
+    onClickAddLayers?: () => void
+}) {
     const { setViewState, viewState } = useMapState()
     const mapRef = useRef<MapRef | null>(null)
     const mapTooltipRef = useRef<TooltipRef | null>(null)
@@ -19,8 +31,21 @@ export default function Map({ layers }: { layers: APILayerSpec[] }) {
     const { data: activeLayersIds } = useInteractiveLayers()
     const { isDrawing } = useIsDrawing()
 
+    useEffect(() => {
+        const ro = new ResizeObserver(() => {
+            if (mapRef.current) {
+                mapRef.current.resize()
+            }
+        })
+        const map = document.getElementById('map')
+
+        if (map) ro.observe(map)
+
+        return () => ro.disconnect()
+    }, [])
+
     return (
-        <div ref={mapContainerRef}>
+        <div ref={mapContainerRef} className="h-full" id="map">
             <ReactMapGL
                 ref={(_map) => {
                     if (_map)
@@ -29,7 +54,10 @@ export default function Map({ layers }: { layers: APILayerSpec[] }) {
                 {...viewState}
                 mapStyle="mapbox://styles/resourcewatch/cjzmw480d00z41cp2x81gm90h"
                 mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
-                style={{ height: 'calc(100vh - 63px)', minHeight: '800px' }}
+                style={{
+                    height: mapHeight ?? 'calc(100vh - 63px)',
+                    minHeight: '800px',
+                }}
                 interactiveLayerIds={activeLayersIds ? activeLayersIds : []}
                 onMove={(evt) => setViewState(evt.viewState)}
                 onClick={mapTooltipRef.current?.onClickLayer}
@@ -42,14 +70,24 @@ export default function Map({ layers }: { layers: APILayerSpec[] }) {
                         <LayerManager layers={layers} />
                         <Basemap mapRef={mapRef} />
                         <Labels mapRef={mapRef} />
-                        <Controls
-                            mapRef={mapRef}
-                            mapContainerRef={mapContainerRef}
-                        />
+                        {showControls && (
+                            <>
+                                <Controls
+                                    mapRef={mapRef}
+                                    mapContainerRef={mapContainerRef}
+                                />
+                                <button
+                                    onClick={onClickAddLayers}
+                                    className="absolute bg-[#FFD271] hover:bg-opacity-90 transition-all px-6 py-3 text-base font-semibold top-5 z-20 left-1/2 -translate-x-[50%]"
+                                >
+                                    + Add layers
+                                </button>
+                            </>
+                        )}
 
                         {isDrawing && <Tooltip ref={mapTooltipRef} />}
 
-                        <Legends />
+                        {showLegends && <Legends />}
                     </>
                 )}
             </ReactMapGL>
