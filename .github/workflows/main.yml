@@ -11,7 +11,8 @@ env:
   BRANCH_NAME: dev
 permissions:
       id-token: write
-      contents: read    
+      contents: read
+      security-events: write
 jobs:
   buildandtest:
     name: Build and Scan Image with Integration Tests
