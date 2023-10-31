@@ -7,6 +7,7 @@ import { DescriptionForm } from "@/components/datasets/new/metadata/Description"
 import { MoreDetailsForm } from "@/components/datasets/new/metadata/MoreDetails";
 import { OverviewForm } from "@/components/datasets/new/metadata/Overview";
 import { PointOfContactForm } from "@/components/datasets/new/metadata/PointOfContact";
+import { Preview } from "@/components/datasets/new/preview/Preview";
 import { Tab } from "@headlessui/react";
 import { useState } from "react";
 
@@ -16,7 +17,7 @@ const links = [
 ];
 
 export default function NewDatasetPage() {
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [selectedIndex, setSelectedIndex] = useState(0);
   return (
     <>
       <Header />
@@ -27,16 +28,21 @@ export default function NewDatasetPage() {
         </h1>
         <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
           <CreateDatasetTabs currentStep={selectedIndex} />
-          <Tab.Panel as="div" className="flex flex-col gap-y-12">
-            <OverviewForm />
-            <DescriptionForm />
-            <PointOfContactForm />
-            <MoreDetailsForm />
-            <CustomFieldsForm />
-          </Tab.Panel>
-          <Tab.Panel as="div" className="flex flex-col gap-y-12">
-            <CreateDataFilesSection />
-          </Tab.Panel>
+          <Tab.Panels>
+            <Tab.Panel as="div" className="flex flex-col gap-y-12">
+              <OverviewForm />
+              <DescriptionForm />
+              <PointOfContactForm />
+              <MoreDetailsForm />
+              <CustomFieldsForm />
+            </Tab.Panel>
+            <Tab.Panel as="div" className="flex flex-col gap-y-12">
+              <CreateDataFilesSection />
+            </Tab.Panel>
+            <Tab.Panel as="div" className="flex flex-col gap-y-12">
+              <Preview />
+            </Tab.Panel>
+          </Tab.Panels>
         </Tab.Group>
       </main>
     </>

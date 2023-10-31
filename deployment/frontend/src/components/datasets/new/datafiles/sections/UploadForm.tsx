@@ -1,11 +1,43 @@
 import { InputGroup } from "@/components/_shared/InputGroup";
 import { Input } from "@/components/_shared/SimpleInput";
 import SimpleSelect from "@/components/_shared/SimpleSelect";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/_shared/Table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/_shared/Table";
+import { MinusCircleIcon, PaperClipIcon } from "@heroicons/react/24/outline";
 
-export function UploadForm() {
+export function UploadForm({ removeFile }: { removeFile: () => void }) {
   return (
-    <div className="flex flex-col gap-y-4">
+    <div className="flex flex-col gap-y-4 font-acumin">
+      <div className="flex w-full justify-between bg-slate-100 py-3 px-6">
+        <div className="flex items-center gap-x-2">
+          <PaperClipIcon className="h-6 w-6 text-blue-800" />
+          <span className="text-lg font-light text-black">
+            referencetables.xlsx
+          </span>
+          <span className="text-right font-acumin text-xs font-normal leading-tight text-neutral-500">
+            (3.2 MB)
+          </span>
+        </div>
+        <div className="flex items-center justify-center gap-x-3">
+          <div className="relative h-6 w-6">
+            <img
+              src="/icons/upload_loading.svg"
+              alt=""
+              className="absolute inset-0 animate-spin h-full w-full object-cover"
+            />
+            <span className="text-black absolute left-1.5 top-2 text-[0.475rem] font-medium font-acumin leading-tight">73%</span>
+          </div>
+          <button onClick={() => removeFile()}>
+          <MinusCircleIcon className="h-6 w-6 text-red-500" />
+          </button>
+        </div>
+      </div>
       <InputGroup label="Title" required className="whitespace-nowrap">
         <Input
           placeholder="Some name"
@@ -75,19 +107,30 @@ function PreviewTable() {
     <Table>
       <TableHeader>
         <TableRow className="bg-neutral-50">
-          <TableHead className="text-black text-xs font-semibold font-acumin">Field</TableHead>
-          <TableHead className="text-black text-xs font-semibold font-acumin">Type</TableHead>
-          <TableHead className="text-black text-xs font-semibold font-acumin">Null</TableHead>
-          <TableHead className="text-black text-xs font-semibold font-acumin">Key</TableHead>
-          <TableHead className="text-black text-xs font-semibold font-acumin">Default</TableHead>
+          <TableHead className="font-acumin text-xs font-semibold text-black">
+            Field
+          </TableHead>
+          <TableHead className="font-acumin text-xs font-semibold text-black">
+            Type
+          </TableHead>
+          <TableHead className="font-acumin text-xs font-semibold text-black">
+            Null
+          </TableHead>
+          <TableHead className="font-acumin text-xs font-semibold text-black">
+            Key
+          </TableHead>
+          <TableHead className="font-acumin text-xs font-semibold text-black">
+            Default
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {fields.map((field, index) => (
-          <TableRow key={index} className={index % 2 != 0 ? 'bg-[#FDFDFD] border-0' : 'border-0'}>
-            <TableCell>
-              {field.field}
-            </TableCell>
+          <TableRow
+            key={index}
+            className={index % 2 != 0 ? "border-0 bg-[#FDFDFD]" : "border-0"}
+          >
+            <TableCell>{field.field}</TableCell>
             <TableCell>{field.type}</TableCell>
             <TableCell>{field.null ? "YES" : "NO"}</TableCell>
             <TableCell>{field.key}</TableCell>
@@ -96,5 +139,5 @@ function PreviewTable() {
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }

@@ -20,18 +20,17 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
 
   return (
     <Tab.List
-      as="ol"
+      as="nav"
       className="relative isolate h-full w-[90%] max-w-[82rem] divide-y divide-gray-300 rounded-md md:flex md:divide-y-0"
     >
       {steps.map((step, stepIdx) => (
         <Tab
-          as="li"
+          as="div"
           key={step.name}
           className="relative h-full items-center md:flex md:w-1/3"
         >
           {step.status === "complete" ? (
-            <a
-              href={step.href}
+            <div
               className={classNames("h-16 group flex w-full items-center gap-x-2 px-6", "bg-neutral-100")}
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-white">
@@ -43,11 +42,10 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
               <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-300">
                 {step.name}
               </span>
-            </a>
+            </div>
           ) : step.status === "current" ? (
-            <a
+            <div
               className={classNames("h-16 group flex w-full items-center gap-x-2 px-6", "bg-white shadow-sm")}
-              href={step.href}
               aria-current="step"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-800 text-white">
@@ -56,10 +54,9 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
               <span className="mt-1 text-right font-acumin text-lg font-semibold text-black">
                 {step.name}
               </span>
-            </a>
+            </div>
           ) : (
-            <a
-              href={step.href}
+            <div
               className={classNames("h-16 group flex w-full items-center gap-x-2 px-6", "bg-neutral-100")}
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-white">
@@ -70,7 +67,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
               <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-300">
                 {step.name}
               </span>
-            </a>
+            </div>
           )}
         </Tab>
       ))}
