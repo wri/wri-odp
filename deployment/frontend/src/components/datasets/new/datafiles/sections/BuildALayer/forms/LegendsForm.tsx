@@ -45,12 +45,12 @@ export default function LegendForm({
       >
         <div className="mt-10 flex flex-col gap-y-4">
           <div className="grid grid-cols-12 gap-x-6">
-            <label className="col-span-2 text-right font-acumin text-lg font-normal leading-tight text-black">
+            <label className="lg:col-span-2 col-span-full lg:text-right text-left font-acumin text-lg font-normal leading-tight text-black">
               Type of Legend
             </label>
             <select
               {...register("type")}
-              className="relative col-span-10 block w-full rounded-md border-0 px-5 py-2 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
+              className="relative lg:col-span-10  col-span-full block w-full rounded-md border-0 px-5 py-2 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
             >
               <option value="basic">Basic</option>
               <option value="choropleth">Choropleth</option>
@@ -84,8 +84,8 @@ function ItemsArray({
   return (
     <div className="flex flex-col gap-y-4">
       {fields.map((field, index) => (
-        <div className="grid grid-cols-12 items-center gap-x-6">
-          <label className="col-span-2 text-right font-acumin text-lg font-normal leading-tight text-black">
+        <div className="grid grid-cols-12 items-center gap-x-2 lg:gap-x-6">
+          <label className="lg:col-span-2 col-span-full lg:text-right text-left font-acumin text-lg font-normal leading-tight text-black">
             Item {index + 1}
           </label>
           <input
@@ -99,7 +99,7 @@ function ItemsArray({
             key={field.id}
             {...register(`items.${index}.color`)}
           />
-          <div className="col-span-1">
+          <div className="lg:col-span-1 col-span-2 pl-8 lg:pl-0">
             <button type="button" onClick={() => remove(index)}>
               <MinusCircleIcon className="h-6 w-6 text-red-500" />
             </button>

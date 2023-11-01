@@ -20,7 +20,7 @@ export function Input({
   children,
   className,
   as,
-  maxWidth = "max-w-[28rem]",
+  maxWidth = "w-full max-w-[100%] xxl:max-w-[28rem]",
 }: InputProps) {
   return (
     <div className={classNames("relative w-full rounded-md", maxWidth)}>
@@ -30,7 +30,7 @@ export function Input({
             placeholder={placeholder}
             name={name}
             className={classNames(
-              "block w-full rounded-md border-0 px-5 py-2 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6",
+              "block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6",
               className ?? "",
             )}
           ></textarea>
@@ -41,7 +41,7 @@ export function Input({
             name={name}
             type={type}
             className={classNames(
-              "block w-full rounded-md border-0 px-5 py-2 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6",
+              "block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6",
               className ?? "",
             )}
           ></input>

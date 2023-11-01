@@ -21,7 +21,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
   return (
     <Tab.List
       as="nav"
-      className="relative isolate h-full w-[90%] max-w-[82rem] divide-y divide-gray-300 rounded-md md:flex md:divide-y-0"
+      className="relative isolate h-full w-full md:w-[90%] md:max-w-[82rem] divide-y divide-gray-300 rounded-md md:flex md:divide-y-0"
     >
       {steps.map((step, stepIdx) => (
         <Tab
@@ -55,14 +55,14 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
             <div
               className={classNames(
                 "group relative isolate flex h-16 w-full items-center gap-x-2 px-6",
-                "bg-neutral-100",
-              stepIdx === steps.length - 1 ? "bg-transparent" : ""
+                "md:bg-neutral-100 bg-white shadow md:shadow-none",
+              stepIdx === steps.length - 1 ? "md:bg-transparent" : ""
               )}
               aria-current="step"
             >
               <div
                 className={classNames(
-                  "arrow-wrap absolute inset-0 -z-10 flex w-full",
+                  "hidden arrow-wrap absolute inset-0 -z-10 md:flex w-full",
                   stepIdx !== 0 ? "-ml-9" : "",
                   stepIdx === steps.length - 1 ? "w-[100%+64px]" : "",
                 )}
@@ -74,7 +74,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
                 <div className="arrow-right -z-[9] -ml-[1px] h-16 w-8 bg-white"></div>
               </div>
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-800 text-white">
-                <span className="text-xs">{step.id}</span>
+                <span className="text-xs">{step.id + 1}</span>
               </span>
               <span className="mt-1 text-right font-acumin text-lg font-semibold text-black">
                 {step.name}
@@ -90,7 +90,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
               {stepIdx === steps.length - 1 && (
                 <div
                   className={classNames(
-                    "absolute z-8 flex w-full justify-end",
+                    "absolute z-8 hidden md:flex w-full justify-end",
                   )}
                 >
                   <div className="arrow-left -mr-1 h-16 w-16 bg-white"></div>

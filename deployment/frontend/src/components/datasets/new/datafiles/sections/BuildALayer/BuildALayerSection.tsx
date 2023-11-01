@@ -18,7 +18,7 @@ export function BuildALayer() {
   return (
     <>
       <Steps state={current.toStrings()[0] ?? "setSource"} />
-      <div className="grid grid-cols-2">
+      <div className="grid lg:grid-cols-2">
         <div>
           {current.matches("setSource") && (
             <SourceForm
@@ -66,6 +66,7 @@ export function BuildALayer() {
             style={{
               height: "400px",
               minHeight: "400px",
+              width:"100%",
             }}
             mapStyle="mapbox://styles/mapbox/streets-v9"
             mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
@@ -85,7 +86,36 @@ const steps = [
 
 function Steps({ state }: { state: string }) {
   return (
-    <nav aria-label="Progress" className="w-full">
+    <>
+    <div className="lg:hidden px-4 pt-4 sm:px-6 lg:px-8">
+      <nav className="flex justify-start" aria-label="Progress">
+        <ol role="list" className="space-y-6">
+          {steps.map((step) => (
+            <li key={step.name}>
+              {step.state === state ? (
+                <span className="flex items-start" aria-current="step">
+                  <span className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center" aria-hidden="true">
+                    <span className="absolute h-4 w-4 rounded-full bg-blue-200" />
+                    <span className="relative block h-2 w-2 rounded-full bg-blue-800" />
+                  </span>
+                  <span className="ml-3 text-sm font-medium text-blue-800">{step.name}</span>
+                </span>
+              ) : (
+                <span className="group">
+                  <div className="flex items-start">
+                    <div className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center" aria-hidden="true">
+                      <div className="h-2 w-2 rounded-full bg-gray-300 group-hover:bg-gray-400" />
+                    </div>
+                    <p className="ml-3 text-sm font-medium text-gray-500 group-hover:text-gray-900">{step.name}</p>
+                  </div>
+                </span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </div>
+    <nav aria-label="Progress" className="w-full hidden lg:block">
       <ol role="list" className="flex w-full items-center justify-between">
         {steps.map((step, stepIdx) => (
           <li
@@ -177,5 +207,6 @@ function Steps({ state }: { state: string }) {
         ))}
       </ol>
     </nav>
+    </>
   );
 }

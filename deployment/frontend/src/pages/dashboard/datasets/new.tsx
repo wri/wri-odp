@@ -47,8 +47,8 @@ export default function NewDatasetPage() {
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>
-        <div className={classNames("mx-auto flex w-full max-w-[1380px] justify-between px-4 font-acumin text-2xl font-semibold text-black sm:px-6 xxl:px-0", selectedIndex === 2 ? "max-w-[71rem] px-4 sm:px-6 xxl:px-0" : "")}>
-          <Button variant="muted">Save as Draft</Button>
+        <div className={classNames("flex-col sm:flex-row gap-y-4 mx-auto flex w-full max-w-[1380px] justify-between font-acumin text-2xl font-semibold text-black px-4 xl:px-0", selectedIndex === 2 ? "max-w-[71rem] xxl:px-0" : "")}>
+          <Button variant="muted" className="w-fit">Save as Draft</Button>
           <div className="flex items-center gap-x-2">
             <Button variant="outline">Cancel</Button>
             {selectedIndex !== 2 && (
