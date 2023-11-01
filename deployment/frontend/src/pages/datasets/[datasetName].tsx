@@ -10,13 +10,18 @@ import { DataFiles } from "@/components/datasets/sections/DataFiles";
 import { Members } from "@/components/datasets/sections/Members";
 import { Methodology } from "@/components/datasets/sections/Methodology";
 import { RelatedDatasets } from "@/components/datasets/sections/RelatedDatasets";
+import Issues from "@/components/datasets/sections/Issues";
 import { Tab } from "@headlessui/react";
+import ApprovalRequestCard from "@/components/datasets/ApprovalRequestCard";
+import { useRouter } from "next/router";
 const links = [
   { label: "Explore Data", url: "/search", current: false },
   { label: "Name of dataset", url: "/datasets/dataset_test", current: true },
 ];
 
 export default function DatasetPage() {
+  const { query } = useRouter();
+  const isApprovalRequest = query?.approval === "true";
   const tabs = [
     { name: "Data files" },
     { name: "About" },
@@ -25,11 +30,13 @@ export default function DatasetPage() {
     { name: "Contact" },
     { name: "API" },
     { name: "Members" },
+    { name: "Issues", count: 1 }
   ];
   return (
     <>
       <Header />
       <Breadcrumbs links={links} />
+      {isApprovalRequest && (<ApprovalRequestCard />)}
       <DatasetPageLayout>
         <DatasetHeader />
         <Tab.Group>
@@ -59,6 +66,9 @@ export default function DatasetPage() {
               </Tab.Panel>
               <Tab.Panel>
                 <Members />
+              </Tab.Panel>
+              <Tab.Panel>
+                <Issues />
               </Tab.Panel>
             </Tab.Panels>
           </div>
