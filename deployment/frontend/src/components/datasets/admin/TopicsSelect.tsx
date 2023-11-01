@@ -110,9 +110,8 @@ export function TopicsSelect() {
       .with(2, () => "pl-10")
       .otherwise(() => "pl-14");
     return (
-      <>
+      <div key={topic.value}>
         <CommandItem
-          key={topic.value}
           value={topic.value}
           className={classNames(
             "hover:bg-blue-800 hover:text-white group",
@@ -143,7 +142,7 @@ export function TopicsSelect() {
           topic.children.map((child: Topic) =>
             BuildHierarchy(child, level + 1),
           )}
-      </>
+      </div>
     );
   }
 

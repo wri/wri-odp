@@ -7,7 +7,7 @@ import { InputGroup } from "@/components/_shared/InputGroup";
 import { Disclosure } from "@headlessui/react";
 import SimpleSelect from "@/components/_shared/SimpleSelect";
 import TagsSelect from "../SelectTags";
-import { TopicsSelect } from "../SelectTopics";
+import { TopicsSelect } from "../TopicsSelect";
 import { MetadataAccordion } from "./MetadataAccordion";
 import { TextArea } from "@/components/_shared/SimpleTextArea";
 import { useForm } from "react-hook-form";
@@ -19,7 +19,7 @@ export function OverviewForm() {
     register,
     setValue,
     watch,
-    formState: { errors, dirtyFields },
+    formState: { dirtyFields },
   } = useForm<{ title: string; url: string }>({
     defaultValues: {
       title: "",

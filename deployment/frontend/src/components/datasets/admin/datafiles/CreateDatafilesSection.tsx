@@ -48,7 +48,7 @@ export function CreateDataFilesSection() {
   return (
     <>
       {fields.map((field, index) => (
-        <AddDataFile index={index} field={field} remove={() => remove(index)} />
+        <AddDataFile key={index} index={index} field={field} remove={() => remove(index)} />
       ))}
       <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
         <button
@@ -166,7 +166,7 @@ function AddDataFile({
             <Tab className="hidden"></Tab>
             <Tab>
               {({ selected }) => (
-                <button
+                <span
                   className={classNames(
                     "group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2",
                     selected ? "bg-amber-400" : "",
@@ -181,12 +181,12 @@ function AddDataFile({
                   >
                     Link External File
                   </div>
-                </button>
+                </span>
               )}
             </Tab>
             <Tab>
               {({ selected }) => (
-                <button
+                <span
                   className={classNames(
                     "group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2",
                     selected ? "bg-amber-400" : "",
@@ -201,7 +201,7 @@ function AddDataFile({
                   >
                     Build a layer
                   </div>
-                </button>
+                </span>
               )}
             </Tab>
           </Tab.List>

@@ -311,8 +311,8 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
         {label}
       </dt>
       <div className="flex flex-wrap gap-3">
-        {items.map((item) => (
-          <span className="flex items-center gap-x-2 rounded-[3px] border border-blue-800 bg-white px-2 py-0.5">
+        {items.map((item, index) => (
+          <span key={index} className="flex items-center gap-x-2 rounded-[3px] border border-blue-800 bg-white px-2 py-0.5">
             <span className="font-['Acumin Pro SemiCondensed'] mt-1 text-[15px] font-normal text-zinc-800">
               {item}
             </span>
