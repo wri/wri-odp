@@ -22,7 +22,7 @@ export function CreateTopic() {
           <div className="px-8">
             <div className="grid grid-cols-1 items-start gap-x-24 gap-y-4 py-5 md:grid-cols-2">
               <div className="flex flex-col justify-start gap-y-4">
-                <InputGroup label="Name" required>
+                <InputGroup label="Name" required className="whitespace-nowrap">
                   <Input
                     name="name"
                     maxWidth="100%"
@@ -51,7 +51,7 @@ export function CreateTopic() {
                     </span>
                   </Input>
                 </InputGroup>
-                <InputGroup label="Image" className="justify-start gap-x-[2.7rem]">
+                <InputGroup label="Image" className="justify-start items-start gap-x-[2.7rem]">
                   <div className="col-span-full lg:col-span-2">
                     <div className="w-[11rem]">
                       <UploadButton text="Upload an image" />
@@ -80,7 +80,7 @@ export function CreateTopic() {
                   className="items-start"
                 >
                   <Select
-                    maxWidth="100%"
+                    maxWidth="auto pl-3"
                     options={[{ label: "Parent 1", value: "PARENT_1" }]}
                     placeholder="Select a parent"
                   />
