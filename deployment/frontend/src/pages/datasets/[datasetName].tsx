@@ -10,6 +10,7 @@ import { DataFiles } from "@/components/datasets/sections/DataFiles";
 import { Members } from "@/components/datasets/sections/Members";
 import { Methodology } from "@/components/datasets/sections/Methodology";
 import { RelatedDatasets } from "@/components/datasets/sections/RelatedDatasets";
+import Issues from "@/components/datasets/sections/Issues";
 import { Tab } from "@headlessui/react";
 import ApprovalRequestCard from "@/components/datasets/ApprovalRequestCard";
 import { useRouter } from "next/router";
@@ -29,6 +30,7 @@ export default function DatasetPage() {
     { name: "Contact" },
     { name: "API" },
     { name: "Members" },
+    { name: "Issues", count: 1 }
   ];
   return (
     <>
@@ -64,6 +66,9 @@ export default function DatasetPage() {
               </Tab.Panel>
               <Tab.Panel>
                 <Members />
+              </Tab.Panel>
+              <Tab.Panel>
+                <Issues />
               </Tab.Panel>
             </Tab.Panels>
           </div>

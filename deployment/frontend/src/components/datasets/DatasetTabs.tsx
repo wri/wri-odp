@@ -11,7 +11,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-export function DatasetTabs({ tabs }: { tabs: { name: string }[] }) {
+export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number }[] }) {
   const prevEl = `.nav-prev-button--tabs`;
   const nextEl = `.nav-next-button--tabs`;
   return (
@@ -39,6 +39,11 @@ export function DatasetTabs({ tabs }: { tabs: { name: string }[] }) {
                   )}
                 >
                   {tab.name}
+                  {tab.count && (
+                    <span className=" ml-1 inline-flex items-center px-1.5 py-0.2 rounded-full text-xs font-medium bg-wri-gold text-gray-800">
+                      {tab.count}
+                    </span>
+                  )}
                 </button>
               )}
             </Tab>
