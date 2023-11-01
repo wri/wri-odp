@@ -59,7 +59,7 @@ export default function LegendForm({
           </div>
           <ItemsArray control={control} register={register} />
         </div>
-        <div className="col-span-full flex justify-end space-x-2 py-4">
+        <div className="col-span-full flex justify-end space-x-2">
           <Button variant="outline" onClick={() => onPrev()} type="button">
             Back
           </Button>
