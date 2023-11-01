@@ -2,12 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-body, html {
-	letter-spacing: 0px;
-  accent-color: #32864B;
+body,
+html {
+  letter-spacing: 0px;
+  accent-color: #32864b;
 }
 
-.mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-attrib{
+.mapboxgl-ctrl-bottom-left,
+.mapboxgl-ctrl-attrib {
   display: none;
 }
 
@@ -35,12 +37,24 @@ body, html {
 }
 
 input[type="color"] {
-	-webkit-appearance: none;
-	border: none;
+  -webkit-appearance: none;
+  border: none;
 }
 input[type="color"]::-webkit-color-swatch-wrapper {
-	padding: 0;
+  padding: 0;
 }
 input[type="color"]::-webkit-color-swatch {
-	border: none;
+  border: none;
+}
+
+.arrow-right {
+  clip-path: polygon(0 0, 0% 100%, 100% 50%);
+}
+
+.arrow-left {
+  clip-path: polygon(100% 0, 100% 50%, 100% 100%, 0% 100%, 61% 50%, 0% 0%);
+}
+
+.arrow-wrap {
+  filter: drop-shadow(0px 0px 20px rgba(221, 221, 221, 0.25));
 }

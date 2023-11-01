@@ -5,7 +5,7 @@ import { useState } from "react";
 import { match } from "ts-pattern";
 
 export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
-  console.log(currentStep)
+  console.log(currentStep);
   const steps = [
     { id: 0, name: "Metadata", href: "#" },
     { id: 1, name: "Datafiles", href: "#" },
@@ -27,11 +27,19 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
         <Tab
           as="div"
           key={step.name}
-          className="relative h-full items-center md:flex md:w-1/3"
+          className={classNames(
+            "relative h-full items-center md:flex md:w-1/3",
+            stepIdx === steps.length - 1
+              ? "md:w-[calc(33%-64px)]"
+              : "",
+          )}
         >
           {step.status === "complete" ? (
             <div
-              className={classNames("h-16 group flex w-full items-center gap-x-2 px-6", "bg-neutral-100")}
+              className={classNames(
+                "group relative flex h-16 w-full items-center gap-x-2 px-6",
+                "bg-neutral-100",
+              )}
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-white">
                 <CheckIcon
@@ -45,9 +53,26 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
             </div>
           ) : step.status === "current" ? (
             <div
-              className={classNames("h-16 group flex w-full items-center gap-x-2 px-6", "bg-white shadow-sm")}
+              className={classNames(
+                "group relative isolate flex h-16 w-full items-center gap-x-2 px-6",
+                "bg-neutral-100",
+              stepIdx === steps.length - 1 ? "bg-transparent" : ""
+              )}
               aria-current="step"
             >
+              <div
+                className={classNames(
+                  "arrow-wrap absolute inset-0 -z-10 flex w-full",
+                  stepIdx !== 0 ? "-ml-9" : "",
+                  stepIdx === steps.length - 1 ? "w-[100%+64px]" : "",
+                )}
+              >
+                {stepIdx !== 0 && (
+                  <div className="arrow-left -z-[9] -mr-1 h-16 w-9 bg-white"></div>
+                )}
+                <div className="-z-10 h-16 grow bg-white"></div>
+                <div className="arrow-right -z-[9] -ml-[1px] h-16 w-8 bg-white"></div>
+              </div>
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-800 text-white">
                 <span className="text-xs">{step.id}</span>
               </span>
@@ -57,8 +82,20 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
             </div>
           ) : (
             <div
-              className={classNames("h-16 group flex w-full items-center gap-x-2 px-6", "bg-neutral-100")}
+              className={classNames(
+                "group relative flex h-16 w-full items-center gap-x-2 px-6",
+                "bg-neutral-100",
+              )}
             >
+              {stepIdx === steps.length - 1 && (
+                <div
+                  className={classNames(
+                    "absolute z-8 flex w-full justify-end",
+                  )}
+                >
+                  <div className="arrow-left -mr-1 h-16 w-16 bg-white"></div>
+                </div>
+              )}
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-white">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-white">
                   <span className="text-xs text-stone-300">{step.id}</span>
