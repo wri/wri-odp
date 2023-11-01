@@ -5,7 +5,7 @@ import { useState } from "react";
 import { match } from "ts-pattern";
 
 export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
-  console.log(currentStep)
+  console.log(currentStep);
   const steps = [
     { id: 0, name: "Metadata", href: "#" },
     { id: 1, name: "Datafiles", href: "#" },
@@ -20,19 +20,26 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
 
   return (
     <Tab.List
-      as="ol"
-      className="relative isolate h-full w-[90%] max-w-[82rem] divide-y divide-gray-300 rounded-md md:flex md:divide-y-0"
+      as="nav"
+      className="relative isolate h-full w-full md:w-[90%] md:max-w-[82rem] divide-y divide-gray-300 rounded-md md:flex md:divide-y-0"
     >
       {steps.map((step, stepIdx) => (
         <Tab
-          as="li"
+          as="div"
           key={step.name}
-          className="relative h-full items-center md:flex md:w-1/3"
+          className={classNames(
+            "relative h-full items-center md:flex md:w-1/3",
+            stepIdx === steps.length - 1
+              ? "md:w-[calc(33%-64px)]"
+              : "",
+          )}
         >
           {step.status === "complete" ? (
-            <a
-              href={step.href}
-              className={classNames("h-16 group flex w-full items-center gap-x-2 px-6", "bg-neutral-100")}
+            <div
+              className={classNames(
+                "group relative flex h-16 w-full items-center gap-x-2 px-6",
+                "bg-neutral-100",
+              )}
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-white">
                 <CheckIcon
@@ -43,25 +50,52 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
               <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-300">
                 {step.name}
               </span>
-            </a>
+            </div>
           ) : step.status === "current" ? (
-            <a
-              className={classNames("h-16 group flex w-full items-center gap-x-2 px-6", "bg-white shadow-sm")}
-              href={step.href}
+            <div
+              className={classNames(
+                "group relative isolate flex h-16 w-full items-center gap-x-2 px-6",
+                "md:bg-neutral-100 bg-white shadow md:shadow-none",
+              stepIdx === steps.length - 1 ? "md:bg-transparent" : ""
+              )}
               aria-current="step"
             >
+              <div
+                className={classNames(
+                  "hidden arrow-wrap absolute inset-0 -z-10 md:flex w-full",
+                  stepIdx !== 0 ? "-ml-9" : "",
+                  stepIdx === steps.length - 1 ? "w-[100%+64px]" : "",
+                )}
+              >
+                {stepIdx !== 0 && (
+                  <div className="arrow-left -z-[9] -mr-1 h-16 w-9 bg-white"></div>
+                )}
+                <div className="-z-10 h-16 grow bg-white"></div>
+                <div className="arrow-right -z-[9] -ml-[1px] h-16 w-8 bg-white"></div>
+              </div>
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-800 text-white">
-                <span className="text-xs">{step.id}</span>
+                <span className="text-xs">{step.id + 1}</span>
               </span>
               <span className="mt-1 text-right font-acumin text-lg font-semibold text-black">
                 {step.name}
               </span>
-            </a>
+            </div>
           ) : (
-            <a
-              href={step.href}
-              className={classNames("h-16 group flex w-full items-center gap-x-2 px-6", "bg-neutral-100")}
+            <div
+              className={classNames(
+                "group relative flex h-16 w-full items-center gap-x-2 px-6",
+                "bg-neutral-100",
+              )}
             >
+              {stepIdx === steps.length - 1 && (
+                <div
+                  className={classNames(
+                    "absolute z-8 hidden md:flex w-full justify-end",
+                  )}
+                >
+                  <div className="arrow-left -mr-1 h-16 w-16 bg-white"></div>
+                </div>
+              )}
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-white">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-white">
                   <span className="text-xs text-stone-300">{step.id}</span>
@@ -70,7 +104,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
               <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-300">
                 {step.name}
               </span>
-            </a>
+            </div>
           )}
         </Tab>
       ))}
