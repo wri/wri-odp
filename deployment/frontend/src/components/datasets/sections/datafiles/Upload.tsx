@@ -6,7 +6,7 @@ export interface UploadProps {
   text?: string;
 }
 
-export function UploadButton(props: UploadProps) {
+export default function UploadButton(props: UploadProps) {
   return (
     <>
     <button

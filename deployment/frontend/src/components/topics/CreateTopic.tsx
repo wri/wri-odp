@@ -2,7 +2,7 @@ import Container from "../_shared/Container";
 import { InputGroup } from "../_shared/InputGroup";
 import Select from "../_shared/SimpleSelect";
 import { Input } from "../_shared/SimpleInput";
-import { UploadButton } from "../datasets/sections/datafiles/Upload";
+import UploadButton from "../datasets/sections/datafiles/Upload";
 import { Breadcrumbs } from "../_shared/Breadcrumbs";
 
 const links = [
@@ -75,7 +75,7 @@ export function CreateTopic() {
                   />
                 </InputGroup>
                 <InputGroup
-                  label="Description"
+                  label="Parent"
                   labelClassName="pt-[0.9rem]"
                   className="items-start"
                 >
