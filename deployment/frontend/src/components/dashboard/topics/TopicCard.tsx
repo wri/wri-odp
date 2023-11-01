@@ -64,7 +64,7 @@ const teams = [
 function TeamProfile({ team }: { team: IRowProfile }) {
 
   return (
-    <div className='flex py-3 pl-4 sm:pl-8'>
+    <div className='flex py-5 pl-4 sm:pl-8'>
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} />
     </div>
   )
