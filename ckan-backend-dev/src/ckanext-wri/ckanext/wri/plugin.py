@@ -7,6 +7,7 @@ from ckanext.wri.logic.validators import iso_language_code
 class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IValidators)
+    plugins.implements(plugins.IFacets)
 
     # IConfigurer
 
@@ -21,3 +22,25 @@ class WriPlugin(plugins.SingletonPlugin):
         return {
             "iso_language_code": iso_language_code
         }
+
+    # IFacets
+
+    def dataset_facets(self, facets_dict, package_type):
+        facets_dict['language'] = toolkit._('Language')
+        facets_dict['projects'] = toolkit._('Projects')
+        facets_dict['application'] = toolkit._('Application')
+        facets_dict['temporal_coverage'] = toolkit._('Temporal Coverage')
+        facets_dict['update_frequency'] = toolkit._('Update Frequency')
+        facets_dict['license_id'] = toolkit._('License')
+        facets_dict['visibility_type'] = toolkit._('Visibility')
+        return facets_dict
+        #return {
+        #    "language": toolkit._("Language"),
+        #    "projects": toolkit._("Projects"),
+        #    "application": toolkit._("Application"),
+        #    "temporal_coverage": toolkit._("Temporal Coverage"),
+        #    "update_frequency": toolkit._("Update Frequency"),
+        #    "license_id": toolkit._("License"),
+        #    "visibility_type": toolkit._("Visibility"),
+        #    "featured_dataset": toolkit._("Featured Dataset")
+        #}
