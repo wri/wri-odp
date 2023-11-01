@@ -12,25 +12,25 @@ export default function QuickAction({ drag }: { drag: boolean }) {
         ) : ""
       }
 
-      <p className='font-normal text-[20px] mb-4'>Quick Actions</p>
+      <p className='font-normal text-[20px] mb-4 border-b-[0.3px] border-b-gray-100'>Quick Actions</p>
       <div className='flex flex-col sm:flex-row gap-x-4 gap-y-4 w-full  '>
-        <div className={` rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? "bg-white" : "bg-slate-100"} `}>
+        <div className={`hover:font-semibold font-normal rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? "bg-white" : "bg-slate-100"} `}>
           <ArrowDownOnSquareIcon className='w-8 h-8 text-black' />
-          <div className='font-normal text-base'>Add a dataset</div>
+          <div className='text-base'>Add a dataset</div>
         </div>
-        <div className={` rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? "bg-white" : "bg-slate-100"} `}>
+        <div className={`hover:font-semibold font-normal rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? "bg-white" : "bg-slate-100"} `}>
           <BuildingLibraryIcon className='w-8 h-8 text-black' />
-          <div className='font-normal text-base'>Add a team</div>
+          <div className='text-base'>Add a team</div>
         </div>
       </div>
       <div className='flex flex-col sm:flex-row gap-x-4 gap-y-4'>
-        <div className={` rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? "bg-white" : "bg-slate-100"} `}>
+        <div className={`hover:font-semibold font-normal rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? "bg-white" : "bg-slate-100"} `}>
           <SquaresPlusIcon className='w-8 h-8 text-black' />
-          <div className='font-normal text-base'>Add a topic</div>
+          <div className='text-base'>Add a topic</div>
         </div>
-        <div className={` rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? "bg-white" : "bg-slate-100"} `}>
+        <div className={`hover:font-semibold font-normal rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? "bg-white" : "bg-slate-100"} `}>
           <UsersIcon className='w-8 h-8 text-black' />
-          <div className='font-normal text-base'>Edit account</div>
+          <div className=' text-base '>Edit account</div>
         </div>
       </div>
     </div>

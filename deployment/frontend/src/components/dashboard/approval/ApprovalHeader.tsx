@@ -19,6 +19,6 @@ function LeftNode() {
 
 export default function ApprovalHeader() {
   return (
-    <TableHeader leftNode={<LeftNode />} />
+    <TableHeader leftNode={<LeftNode />} leftstyle='py-2' rightStyle='py-2' />
   )
 }

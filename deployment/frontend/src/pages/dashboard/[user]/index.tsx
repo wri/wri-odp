@@ -16,6 +16,7 @@ export default function index() {
           primary: { title: "Advanced Search", href: "/search" },
           secondary: { title: "Explore Topics", href: "/topics" },
         }}
+        style='mt-0'
       />
     </>
   )

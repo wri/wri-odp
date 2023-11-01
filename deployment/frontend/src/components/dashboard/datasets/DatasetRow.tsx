@@ -70,11 +70,11 @@ function SubCardProfile() {
 export default function DatasetRow({ className }: { className?: string }) {
   return (
     <Row
-      className={`pr-2  ${className ? className : ''}`}
+      className={`pr-2 sm:pr-4 ${className ? className : ''}`}
       rowMain={<DatasetCardProfile />}
       controlButtons={[
-        { label: "Edit", color: 'bg-wri-gold', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-        { label: "Delete", color: 'bg-red-600', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+        { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+        { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
       ]}
       linkButton={{
         label: "View dataset",
@@ -90,7 +90,7 @@ export default function DatasetRow({ className }: { className?: string }) {
 export function FavouriteRow({ className }: { className?: string }) {
   return (
     <Row
-      className={`pr-2  ${className ? className : ''}`}
+      className={`pr-2 sm:pr-4  ${className ? className : ''}`}
       rowMain={<DatasetCardProfile />}
       linkButton={{
         label: "View dataset",
@@ -105,11 +105,11 @@ export function FavouriteRow({ className }: { className?: string }) {
 export function DraftRow({ className }: { className?: string }) {
   return (
     <Row
-      className={`pr-2  ${className ? className : ''}`}
+      className={`pr-2 sm:pr-4 ${className ? className : ''}`}
       rowMain={<DatasetCardProfile />}
       controlButtons={[
-        { label: "Edit", color: 'bg-wri-gold', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-        { label: "Delete", color: 'bg-red-600', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+        { label: "Edit", color: 'bg-wri-gold hover:bg-green-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+        { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
       ]}
       rowSub={<SubCardProfile />}
       isDropDown

@@ -11,7 +11,7 @@ export default function index() {
       <Layout >
         <Approvallist />
       </Layout>
-      <Footer />
+      <Footer style='mt-0' />
     </>
   )
 }

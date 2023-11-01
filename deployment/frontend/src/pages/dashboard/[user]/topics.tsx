@@ -11,7 +11,7 @@ export default function topics() {
       <Layout >
         <TopicList />
       </Layout>
-      <Footer />
+      <Footer style='mt-0' />
     </>
   )
 }

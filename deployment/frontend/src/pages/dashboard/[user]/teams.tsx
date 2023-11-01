@@ -11,7 +11,7 @@ export default function teams() {
       <Layout >
         <TeamList />
       </Layout>
-      <Footer />
+      <Footer style='mt-0' />
     </>
   )
 }

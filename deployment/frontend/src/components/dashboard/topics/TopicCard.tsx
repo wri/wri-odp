@@ -88,8 +88,8 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | undefined }) {
                 </div>
               }
               controlButtons={[
-                { label: "Edit", color: 'bg-wri-gold', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-                { label: "Delete", color: 'bg-red-600', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+                { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-500', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+                { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
               ]}
             />
           )
@@ -119,8 +119,8 @@ export default function TopicCard() {
                   link: "#",
                 }}
                 controlButtons={[
-                  { label: "Edit", color: 'bg-wri-gold', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-                  { label: "Delete", color: 'bg-red-600', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+                  { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+                  { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
                 ]}
                 rowSub={<SubCardProfile teams={team.subtopic} />}
                 isDropDown

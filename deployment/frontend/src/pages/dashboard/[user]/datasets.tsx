@@ -11,7 +11,7 @@ export default function datasets() {
       <Layout >
         <DatasetList />
       </Layout>
-      <Footer />
+      <Footer style='mt-0' />
     </>
   )
 }

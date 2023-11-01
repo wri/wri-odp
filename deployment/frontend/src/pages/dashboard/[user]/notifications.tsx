@@ -11,7 +11,7 @@ export default function Notifications() {
       <Layout >
         <NotificationList />
       </Layout>
-      <Footer />
+      <Footer style='mt-0' />
     </>
   )
 }

@@ -37,11 +37,11 @@ function Card({ approvalInfo }: { approvalInfo: IApprovalRow }) {
 export default function ApprovalRow({ approvalInfo, className }: { approvalInfo: IApprovalRow, className: string }) {
   return (
     <Row
-      className={`sm:pr-2 ${className ? className : ''}`}
+      className={`sm:pr-4 ${className ? className : ''}`}
       rowMain={<Card approvalInfo={approvalInfo} />}
       controlButtons={[
-        { label: "Edit", icon: <CheckIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-        { label: "Delete", icon: <XMarkIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+        { label: "Edit", color: 'bg-wri-green hover:bg-green-500', icon: <CheckIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+        { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <XMarkIcon className='w-4 h-4 text-white' />, onClick: () => { } },
       ]}
       linkButton={{
         label: "Review",

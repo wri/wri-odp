@@ -5,8 +5,8 @@ import Image from 'next/image'
 
 function Notification() {
   return (
-    <div className='flex flex-col sm:flex-row gap-x-4 hover:bg-slate-100 p-1 mb-2 pb-2 rounded-md'>
-      <div className='flex gap-x-4'>
+    <div className='flex flex-col sm:flex-row gap-x-4 hover:bg-slate-100 p-2 px-3 py-4 mb-2 pb-2 rounded-md'>
+      <div className='flex gap-x-3'>
         <div className='w-2 h-2 rounded-full bg-wri-gold my-auto'></div>
         <div className='relative w-10 h-10'>
           <Image src='/images/placeholders/user/userpics.png' alt='' fill />
@@ -29,7 +29,7 @@ export default function Notifications({ drag }: { drag: boolean }) {
           </div>
         ) : ""
       }
-      <div className='flex px-2 mb-4'>
+      <div className='flex px-2 mb-4 border-b-[0.3px] border-b-gray-100'>
         <div className='flex gap-x-2'>
           <p className='font-normal text-[20px]'>Notifications </p>
           <div className='rounded-full my-auto w-4 h-4 bg-wri-gold font-bold text-[11px] flex justify-center items-center'>3</div>

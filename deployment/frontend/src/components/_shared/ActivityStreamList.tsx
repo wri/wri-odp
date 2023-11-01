@@ -1,7 +1,9 @@
 import React from 'react'
 import ActivityStreamCard from './ActivityStreamCard'
 import Pagination from '@/components/_shared/Pagination'
-export const activity = [
+import type { activity as IActivity } from './ActivityStreamCard'
+
+export const activity: IActivity[] = [
   {
     description: "someone updated the dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",

@@ -8,7 +8,7 @@ import { Squares2X2Icon } from '@heroicons/react/24/outline'
 
 function ActivityStreamUser({ activity }: { activity: activity }) {
   return (
-    <div className=' hover:bg-slate-100 p-1 mb-2 pb-2 rounded-md'>
+    <div className=' hover:bg-slate-100 p-2 mb-2 pb-2 rounded-md'>
       <ActivityStreamCard activity={activity} />
     </div>
   )
@@ -23,14 +23,14 @@ export default function UserActivityStreams({ drag }: { drag: boolean }) {
           </div>
         ) : ""
       }
-      <div className='flex px-2 mb-4'>
+      <div className='flex px-2 mb-4 border-b-[0.3px] border-b-gray-100'>
         <p className='font-normal text-[20px]'>Activity Stream</p>
         <div className='ml-auto flex items-center font-semibold text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4' /></div>
       </div>
       {
         activitydata.slice(0, 6).map((items, index) => {
           return (
-            <ActivityStreamUser key={index} activity={items} />
+            <ActivityStreamUser key={index} activity={items as activity} />
           )
         })
       }

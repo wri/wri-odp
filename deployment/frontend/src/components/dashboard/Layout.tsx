@@ -176,7 +176,7 @@ export default function Layout({
               className="hidden w-[20%] min-w-[20%] lg:z-10 lg:flex lg:flex-col "
             >
               {/* Sidebar component, swap this element with another sidebar if you like */}
-              <div className="flex grow flex-col gap-y-5 overflow-y-auto pb-4 h-[100vh] bg-wri-green">
+              <div className="flex grow flex-col gap-y-5  pb-4  bg-wri-green">
                 <nav className="flex flex-1 flex-col ">
                   <ul role="list" className="flex flex-1 flex-col gap-y-2">
                     <li>
@@ -185,13 +185,13 @@ export default function Layout({
                     {
                       navigation.map((item) => {
                         return (
-                          <li key={item.name} className={` text-center py-6 ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
+                          <li key={item.name} className={` text-center py-6 hover:bg-white hover:text-wri-black ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
                             <a
                               href={item.href.includes("default") ? "./" : `/dashboard/${user}${item.href}`}
                               className="flex w-full justify-center items-center gap-x-2"
                             >
                               <div className="font-normal text-[1.125rem]">{item.name}</div>
-                              {item.count ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-4 h-4 rounded-full ">{item.count}</div>) : ""}
+                              {item.count ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">{item.count}</div>) : ""}
                             </a>
                           </li>
                         )
@@ -216,7 +216,7 @@ export default function Layout({
             </button>
           </div>
 
-          <main className="w-full isolate">
+          <main className="w-full isolate mb-8">
             <div className=" @container w-full ">{children}</div>
           </main>
         </div>
