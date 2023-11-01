@@ -118,13 +118,13 @@ export function OverviewForm() {
                       />
                     </InputGroup>
                     <InputGroup label="Temporal Coverage">
-                      <div className="flex w-[28rem] items-center justify-between gap-x-5">
+                      <div className="flex-col sm:flex-row flex xxl:w-[28rem] items-center justify-between gap-5">
                         <Input
                           name="temporal_coverage_start"
                           placeholder="Start"
                           type="date"
                         />
-                        <span>to</span>
+                        <span className="hidden sm:block">to</span>
                         <Input
                           name="temporal_coverage_end"
                           placeholder="End"

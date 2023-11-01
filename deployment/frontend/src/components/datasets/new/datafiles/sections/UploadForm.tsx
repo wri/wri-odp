@@ -14,7 +14,7 @@ import { MinusCircleIcon, PaperClipIcon } from "@heroicons/react/24/outline";
 export function UploadForm({ removeFile }: { removeFile: () => void }) {
   return (
     <div className="flex flex-col gap-y-4 font-acumin">
-      <div className="flex w-full justify-between bg-slate-100 py-3 px-6">
+      <div className="flex w-full justify-between bg-slate-100 px-6 py-3">
         <div className="flex items-center gap-x-2">
           <PaperClipIcon className="h-6 w-6 text-blue-800" />
           <span className="text-lg font-light text-black">
@@ -29,12 +29,14 @@ export function UploadForm({ removeFile }: { removeFile: () => void }) {
             <img
               src="/icons/upload_loading.svg"
               alt=""
-              className="absolute inset-0 animate-spin h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full animate-spin object-cover"
             />
-            <span className="text-black absolute left-1.5 top-2 text-[0.475rem] font-medium font-acumin leading-tight">73%</span>
+            <span className="absolute left-1.5 top-2 font-acumin text-[0.475rem] font-medium leading-tight text-black">
+              73%
+            </span>
           </div>
           <button onClick={() => removeFile()}>
-          <MinusCircleIcon className="h-6 w-6 text-red-500" />
+            <MinusCircleIcon className="h-6 w-6 text-red-500" />
           </button>
         </div>
       </div>

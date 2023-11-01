@@ -21,7 +21,7 @@ import { match } from "ts-pattern";
 export function Preview() {
   return (
     <div className="mx-auto w-full max-w-[71rem] bg-white px-4 font-acumin shadow sm:px-6 xxl:px-0">
-      <div className="p-24">
+      <div className="p-4 sm:p-8 xxl:p-24">
         <h1 className="font-['Acumin Pro SemiCondensed'] text-3xl font-bold leading-tight text-zinc-800">
           Example Name
         </h1>
@@ -34,7 +34,7 @@ export function Preview() {
             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
               Overview
             </h3>
-            <div className="grid grid-cols-2">
+            <div className="grid sm:grid-cols-2">
               <dl className="flex flex-col gap-y-6">
                 <SimpleDescription
                   label="Source"
@@ -156,7 +156,7 @@ export function Preview() {
             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
               Points of Contact
             </h3>
-            <div className="grid grid-cols-2">
+            <div className="grid sm:grid-cols-2">
               <dl className="flex flex-col gap-y-6">
                 <SimpleDescription label="Author Name" text="John Doe" />
                 <SimpleDescription
@@ -177,7 +177,7 @@ export function Preview() {
             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
               More details
             </h3>
-            <div className="grid grid-cols-2">
+            <div className="grid sm:grid-cols-2">
               <dl className="flex flex-col gap-y-6">
                 <SimpleDescription
                   label="Function"
@@ -402,7 +402,7 @@ function Datafile({
             leaveTo="transform scale-95 opacity-0"
           >
             <Disclosure.Panel>
-              <div className="grid grid-cols-2 gap-4 bg-slate-100 p-6">
+              <div className="grid sm:grid-cols-2 gap-4 bg-slate-100 p-6">
                 <SimpleDescription label="Title" text={title} />
                 <SimpleDescription label="Format" text={format} />
                 <div className="col-span-full">

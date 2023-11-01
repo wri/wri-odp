@@ -39,7 +39,7 @@ export function DescriptionForm() {
                 <Disclosure.Panel className="flex flex-col gap-y-8 pt-5 pb-12">
                   <InputGroup
                     label="Short Description"
-                    className="flex-col items-start whitespace-nowrap mb-2"
+                    className="flex-col items-start whitespace-nowrap mb-2 sm:flex-col sm:items-start"
                   >
                     <Input
                       placeholder=""
@@ -52,7 +52,7 @@ export function DescriptionForm() {
                   </InputGroup>
                   <InputGroup
                     label="Full Description"
-                    className="flex-col items-start whitespace-nowrap mb-2 h-[350px]"
+                    className="flex-col items-start whitespace-nowrap mb-2 h-[350px] sm:flex-col sm:items-start"
                   >
                     <SimpleEditor />
                   </InputGroup>

@@ -14,11 +14,11 @@ export function InputGroup({
   return (
     <div
       className={classNames(
-        "flex items-center justify-between gap-x-14",
+        "flex flex-col sm:flex-row justify-between gap-x-14",
         className ?? "",
       )}
     >
-      <span className="max-w-[4.6rem] text-left font-acumin text-lg font-normal leading-tight text-black">
+      <span className="sm:max-w-[5rem] text-left font-acumin text-lg font-normal leading-tight text-black">
         {label} {required && <span className="text-red-500">*</span>}
       </span>
       {children}

@@ -1,15 +1,18 @@
 import { Breadcrumbs } from "@/components/_shared/Breadcrumbs";
+import { Button } from "@/components/_shared/Button";
 import Header from "@/components/_shared/Header";
 import { CreateDatasetTabs } from "@/components/datasets/new/CreateDatasetTabs";
 import { CreateDataFilesSection } from "@/components/datasets/new/datafiles/CreateDatafilesSection";
 import { CustomFieldsForm } from "@/components/datasets/new/metadata/CustomFields";
-import { DescriptionForm } from "@/components/datasets/new/metadata/Description";
+import { DescriptionForm } from "@/components/datasets/new/metadata/DescriptionForm";
 import { MoreDetailsForm } from "@/components/datasets/new/metadata/MoreDetails";
 import { OverviewForm } from "@/components/datasets/new/metadata/Overview";
 import { PointOfContactForm } from "@/components/datasets/new/metadata/PointOfContact";
 import { Preview } from "@/components/datasets/new/preview/Preview";
+import classNames from "@/utils/classnames";
 import { Tab } from "@headlessui/react";
 import { useState } from "react";
+import { match } from "ts-pattern";
 
 const links = [
   { label: "Dashboard", url: "/dashboard", current: false },
@@ -44,6 +47,20 @@ export default function NewDatasetPage() {
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>
+        <div className={classNames("mx-auto flex w-full max-w-[1380px] justify-between px-4 font-acumin text-2xl font-semibold text-black sm:px-6 xxl:px-0", selectedIndex === 2 ? "max-w-[71rem] px-4 sm:px-6 xxl:px-0" : "")}>
+          <Button variant="muted">Save as Draft</Button>
+          <div className="flex items-center gap-x-2">
+            <Button variant="outline">Cancel</Button>
+            {selectedIndex !== 2 && (
+              <Button onClick={() => setSelectedIndex(selectedIndex + 1)}>
+                Next:{" "}
+                {match(selectedIndex)
+                  .with(0, () => "Datafiles")
+                  .otherwise(() => "Preview")}
+              </Button>
+            )}
+          </div>
+        </div>
       </main>
     </>
   );

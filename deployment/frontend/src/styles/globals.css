@@ -33,3 +33,14 @@ body, html {
 .auto-carousel .swiper-slide {
   width: fit-content !important;
 }
+
+input[type="color"] {
+	-webkit-appearance: none;
+	border: none;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+	border: none;
+}
