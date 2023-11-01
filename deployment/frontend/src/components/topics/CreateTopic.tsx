@@ -47,11 +47,11 @@ export function CreateTopic() {
                     className="!pl-[4.8rem]"
                   >
                     <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
-                      /dataset/
+                      /topics/
                     </span>
                   </Input>
                 </InputGroup>
-                <InputGroup label="Image" className="justify-start gap-x-[2.7rem]" required>
+                <InputGroup label="Image" className="justify-start gap-x-[2.7rem]">
                   <div className="col-span-full lg:col-span-2">
                     <div className="w-[11rem]">
                       <UploadButton text="Upload an image" />
