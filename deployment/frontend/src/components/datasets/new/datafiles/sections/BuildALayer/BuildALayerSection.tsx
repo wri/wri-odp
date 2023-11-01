@@ -91,8 +91,8 @@ function Steps({ state }: { state: string }) {
           <li
             key={step.name}
             className={classNames(
-              stepIdx !== steps.length - 1 ? "pr-8 sm:pr-20" : "",
-              "relative w-full",
+              stepIdx !== steps.length - 1 ? "w-full pr-8 sm:pr-20" : "",
+              "relative",
             )}
           >
             {step.state === state ? (
@@ -101,37 +101,73 @@ function Steps({ state }: { state: string }) {
                   className="absolute inset-0 right-0 -z-10 flex items-center justify-end"
                   aria-hidden="true"
                 >
-                  <div className="h-0.5 w-[70%]  bg-blue-800" />
+                  <div className="h-0.5 w-[100%]  bg-blue-800" />
                 </div>
-                <div className="flex items-center gap-x-2">
-                  <span
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-800"
-                    aria-current="step"
+                <div
+                  className={classNames(
+                    "flex w-fit items-center gap-x-2 bg-white",
+                    stepIdx === steps.length - 1 ? "justify-end" : "",
+                  )}
+                >
+                  <div
+                    className={classNames(
+                      stepIdx !== 0 ? "pl-4" : "",
+                      "bg-white",
+                    )}
                   >
-                    <span className="font-acumin text-lg font-normal text-white">
-                      {stepIdx + 1}
+                    <span
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-800"
+                      aria-current="step"
+                    >
+                      <span className="font-acumin text-lg font-normal text-white">
+                        {stepIdx + 1}
+                      </span>
                     </span>
-                  </span>
-                  <span className="bg-white pr-2 font-acumin text-base font-normal text-black">
+                  </div>
+                  <span
+                    className={classNames(
+                      "bg-white font-acumin text-base font-normal text-black",
+                      stepIdx !== steps.length - 1 ? "pr-4" : "",
+                    )}
+                  >
                     {step.name}
                   </span>
                 </div>
               </>
             ) : (
               <>
+                {stepIdx !== steps.length - 1 && (
+                  <div
+                    className="absolute inset-0 right-0 -z-10 flex w-full items-center justify-end"
+                    aria-hidden="true"
+                  >
+                    <div className="h-0.5 w-[100%] bg-neutral-100" />
+                  </div>
+                )}
                 <div
-                  className="absolute inset-0 right-0 -z-10 flex items-center justify-end"
-                  aria-hidden="true"
+                  className={classNames(
+                    "flex w-fit items-center gap-x-2 bg-white",
+                    stepIdx === steps.length - 1 ? "justify-end" : "",
+                  )}
                 >
-                  <div className="h-0.5 w-[70%] bg-neutral-100" />
-                </div>
-                <div className="flex items-center gap-x-2">
-                  <span className="group flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100">
-                    <span className="font-acumin text-lg font-normal text-neutral-400">
-                      {stepIdx + 1}
+                  <div
+                    className={classNames(
+                      stepIdx !== 0 ? "pl-4" : "",
+                      "bg-white",
+                    )}
+                  >
+                    <span className="group flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100">
+                      <span className="font-acumin text-lg font-normal text-neutral-400">
+                        {stepIdx + 1}
+                      </span>
                     </span>
-                  </span>
-                  <span className="bg-white pr-2 font-acumin text-base font-normal text-zinc-400">
+                  </div>
+                  <span
+                    className={classNames(
+                      "bg-white font-acumin text-base font-normal text-zinc-400",
+                      stepIdx !== steps.length - 1 ? "pr-6" : "",
+                    )}
+                  >
                     {step.name}
                   </span>
                 </div>
