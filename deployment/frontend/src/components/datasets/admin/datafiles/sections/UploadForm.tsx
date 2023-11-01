@@ -1,6 +1,7 @@
 import { InputGroup } from "@/components/_shared/InputGroup";
 import { Input } from "@/components/_shared/SimpleInput";
 import SimpleSelect from "@/components/_shared/SimpleSelect";
+import { TextArea } from "@/components/_shared/SimpleTextArea";
 import {
   Table,
   TableBody,
@@ -49,10 +50,9 @@ export function UploadForm({ removeFile }: { removeFile: () => void }) {
         />
       </InputGroup>
       <InputGroup label="Description" className="whitespace-nowrap">
-        <Input
+        <TextArea
           placeholder="Add description"
           name="title"
-          as="textarea"
           type="text"
           maxWidth="max-w-[70rem]"
         />

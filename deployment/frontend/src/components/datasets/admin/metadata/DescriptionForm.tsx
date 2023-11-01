@@ -5,6 +5,7 @@ import { Disclosure, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { SimpleEditor } from "@/components/_shared/RTE/SimpleEditor";
 import { MetadataAccordion } from "./MetadataAccordion";
+import { TextArea } from "@/components/_shared/SimpleTextArea";
 
 export function DescriptionForm() {
   return (
@@ -29,11 +30,10 @@ export function DescriptionForm() {
           }
           className="mb-2 flex-col items-start whitespace-nowrap sm:grid-cols-1 sm:flex-col sm:items-start sm:gap-y-2"
         >
-          <Input
+          <TextArea
             placeholder=""
             name="citation"
             type="text"
-            as="textarea"
             className="h-44 w-full max-w-full"
             maxWidth=""
           />

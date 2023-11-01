@@ -4,6 +4,11 @@ import Select from "../_shared/SimpleSelect";
 import { Input } from "../_shared/SimpleInput";
 import UploadButton from "../datasets/sections/datafiles/Upload";
 import { Breadcrumbs } from "../_shared/Breadcrumbs";
+import SimpleSelect from "../_shared/SimpleSelect";
+import { TextArea } from "../_shared/SimpleTextArea";
+import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { slugify } from "@/utils/slugify";
 
 const links = [
   { label: "Teams", url: "/teams", current: false },
@@ -11,6 +16,20 @@ const links = [
 ];
 
 export default function CreateTeam() {
+  const {
+    register,
+    setValue,
+    watch,
+    formState: { dirtyFields },
+  } = useForm<{ title: string; url: string }>({
+    defaultValues: {
+      title: "",
+      url: "",
+    },
+  });
+  useEffect(() => {
+    if (!dirtyFields["url"]) setValue("url", slugify(watch("title")));
+  }, [watch("title")]);
   return (
     <>
       <Breadcrumbs links={links} />
@@ -19,39 +38,32 @@ export default function CreateTeam() {
           Create a team
         </h1>
         <div className="w-full border-b border-blue-800 shadow">
-          <div className="px-8">
-            <div className="grid grid-cols-1 items-start gap-x-24 gap-y-4 py-5 md:grid-cols-2">
+          <div className="px-2 sm:px-8">
+            <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
               <div className="flex flex-col justify-start gap-y-4">
-                <InputGroup label="Name" required className="whitespace-nowrap gap-x-[3.3rem]">
-                  <Input
-                    name="name"
-                    maxWidth="100%"
-                    placeholder="Name"
-                    type="text"
-                  />
-                </InputGroup>
                 <InputGroup label="Title" required>
                   <Input
-                    name="title"
-                    maxWidth="100%"
-                    placeholder="My dataset"
+                    {...register("title")}
+                    placeholder="My team"
                     type="text"
                   />
                 </InputGroup>
                 <InputGroup label="URL" required>
                   <Input
-                    name="url"
-                    maxWidth="100%"
-                    placeholder="name-of-dataset"
+                    {...register("url")}
+                    placeholder="name-of-team"
                     type="text"
-                    className="!pl-[4.1rem]"
+                    className="pl-[4.6rem] lg:pl-[4rem]"
                   >
                     <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
                       /teams/
                     </span>
                   </Input>
                 </InputGroup>
-                <InputGroup label="Image" className="justify-start items-start gap-x-[2.7rem]">
+                <InputGroup
+                  label="Image"
+                  className="items-start justify-start gap-x-[2.7rem]"
+                >
                   <div className="col-span-full lg:col-span-2">
                     <div className="w-[11rem]">
                       <UploadButton text="Upload an image" />
@@ -65,12 +77,10 @@ export default function CreateTeam() {
                   labelClassName="pt-[0.9rem]"
                   className="items-start"
                 >
-                  <Input
-                    maxWidth="100%"
+                  <TextArea
                     placeholder="Description"
                     name="Description"
                     type="text"
-                    as="textarea"
                     className="h-[8.4rem]"
                   />
                 </InputGroup>
@@ -79,9 +89,8 @@ export default function CreateTeam() {
                   labelClassName="pt-[0.9rem]"
                   className="items-start"
                 >
-                  <Select
+                  <SimpleSelect
                     options={[{ label: "Parent 1", value: "PARENT_1" }]}
-                    maxWidth="auto pl-3"
                     placeholder="Select a parent"
                   />
                 </InputGroup>

@@ -9,8 +9,27 @@ import SimpleSelect from "@/components/_shared/SimpleSelect";
 import TagsSelect from "../SelectTags";
 import { TopicsSelect } from "../SelectTopics";
 import { MetadataAccordion } from "./MetadataAccordion";
+import { TextArea } from "@/components/_shared/SimpleTextArea";
+import { useForm } from "react-hook-form";
+import { slugify } from "@/utils/slugify";
+import { useEffect } from "react";
 
 export function OverviewForm() {
+  const {
+    register,
+    setValue,
+    watch,
+    formState: { errors, dirtyFields },
+  } = useForm<{ title: string; url: string }>({
+    defaultValues: {
+      title: "",
+      url: "",
+    },
+  });
+
+  useEffect(() => {
+    if (!dirtyFields["url"]) setValue("url", slugify(watch("title")))
+  }, [watch("title")])
   return (
     <MetadataAccordion
       label={
@@ -23,14 +42,18 @@ export function OverviewForm() {
       <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
         <div className="flex flex-col justify-start gap-y-4">
           <InputGroup label="Title" required>
-            <Input name="title" placeholder="My dataset" type="text" />
+            <Input
+              {...register("title")}
+              placeholder="My dataset"
+              type="text"
+            />
           </InputGroup>
           <InputGroup label="Url" required>
             <Input
-              name="url"
+              {...register("url")}
               placeholder="name-of-dataset"
               type="text"
-              className="!pl-[5.3rem] lg:pl-[4.8rem]"
+              className="pl-[5.2rem] sm:pl-[5rem] md:pl-[4.9rem] lg:pl-[4.8rem]"
             >
               <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
                 /dataset/
@@ -128,11 +151,10 @@ export function OverviewForm() {
             />
           </InputGroup>
           <InputGroup label="Citation" className="items-start">
-            <Input
+            <TextArea
               placeholder=""
               name="citation"
               type="text"
-              as="textarea"
               className="h-44"
               icon={
                 <ExclamationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
@@ -162,7 +184,7 @@ export function OverviewForm() {
               ]}
             />
           </InputGroup>
-          <div className="space-y-5 h-[48px] flex items-center justify-end">
+          <div className="flex h-[48px] items-center justify-end space-y-5">
             <div className="relative flex justify-end">
               <div className="flex h-6 items-center">
                 <input
@@ -170,17 +192,16 @@ export function OverviewForm() {
                   aria-describedby="comments-description"
                   name="featured_dataset"
                   type="checkbox"
-                  className="h-5 w-5 rounded border-gray-300 shadow text-blue-800 focus:ring-blue-800"
+                  className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
                 />
               </div>
               <div className="ml-3 text-sm leading-6">
                 <label
                   htmlFor="featured_dataset"
-                  className="text-zinc-800 text-lg font-light font-acumin flex items-center gap-x-2"
+                  className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
                 >
-
                   Featured dataset
-                <ExclamationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
+                  <ExclamationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
                 </label>
               </div>
             </div>
