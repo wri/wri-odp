@@ -22,7 +22,7 @@ export default function CreateTeam() {
           <div className="px-8">
             <div className="grid grid-cols-1 items-start gap-x-24 gap-y-4 py-5 md:grid-cols-2">
               <div className="flex flex-col justify-start gap-y-4">
-                <InputGroup label="Name" required className="whitespace-nowrap">
+                <InputGroup label="Name" required className="whitespace-nowrap gap-x-[3.3rem]">
                   <Input
                     name="name"
                     maxWidth="100%"
@@ -44,7 +44,7 @@ export default function CreateTeam() {
                     maxWidth="100%"
                     placeholder="name-of-dataset"
                     type="text"
-                    className="!pl-[4.8rem]"
+                    className="!pl-[4.1rem]"
                   >
                     <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
                       /teams/

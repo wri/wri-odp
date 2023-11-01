@@ -22,7 +22,7 @@ export function CreateTopic() {
           <div className="px-8">
             <div className="grid grid-cols-1 items-start gap-x-24 gap-y-4 py-5 md:grid-cols-2">
               <div className="flex flex-col justify-start gap-y-4">
-                <InputGroup label="Name" required className="whitespace-nowrap">
+                <InputGroup label="Name" required className="whitespace-nowrap gap-x-[3.3rem]">
                   <Input
                     name="name"
                     maxWidth="100%"
