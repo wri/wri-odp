@@ -72,7 +72,7 @@ const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
       providers={providers}
     >
       {parsedLayers &&
-        parsedLayers.map((_layer) => {
+        parsedLayers.map((_layer: any) => {
           return <Layer key={_layer.id} {..._layer} />;
         })}
     </VizzLayerManager>

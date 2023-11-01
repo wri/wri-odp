@@ -6,17 +6,16 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Map } from "mapbox-gl";
+import { Map, MapLayerMouseEvent } from "mapbox-gl";
 import {
   LngLat,
   MapGeoJSONFeature,
-  MapLayerMouseEvent,
 } from "react-map-gl/dist/esm/types";
 import { Popup } from "react-map-gl";
 import { useLayersFromRW } from "@/utils/queryHooks";
 
 export interface TooltipRef {
-  onClickLayer: (e: MapLayerMouseEvent<Map>) => void | undefined;
+  onClickLayer: (e: MapLayerMouseEvent) => void | undefined;
   close: () => void;
 }
 

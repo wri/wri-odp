@@ -22,10 +22,10 @@ export default function Settings({
                 </h2>
                 <div className="flex flex-row flex-wrap gap-y-5">
                     <div className="basis-1/2 pr-2">
-                        <BasemapSelector mapRef={mapRef} />
+                        <BasemapSelector />
                     </div>
                     <div className="basis-1/2 pr-2">
-                        <LabelSelector mapRef={mapRef} />
+                        <LabelSelector />
                     </div>
                     <div className="basis-1/2">
                         <Boundaries mapRef={mapRef} />

@@ -161,7 +161,7 @@ class Layer extends PureComponent<LayerProps> {
 
   remove = (): void => {
     const { layerManager, id, onAfterRemove } = this.props;
-    layerManager.remove(id, (layerModel) => {
+    layerManager.remove(id, (layerModel: any) => {
       if (onAfterRemove) onAfterRemove(layerModel);
     });
   };

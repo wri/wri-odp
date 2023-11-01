@@ -13,7 +13,7 @@ import localFont from 'next/font/local'
 import { api } from '@/utils/api'
 
 import '@/styles/globals.scss'
-import "@/styles/rte.css";
+import '@/styles/rte.css'
 
 const acumin = localFont({
     src: [
@@ -46,9 +46,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
     const newLayersState = new Map()
     if (
+        //@ts-ignore
         pageProps.initialZustandState &&
+        //@ts-ignore
         pageProps.initialZustandState.layersParsed
     ) {
+        //@ts-ignore
         pageProps.initialZustandState.layersParsed?.forEach(
             (layer: [string, LayerState]) => {
                 newLayersState.set(layer[0], layer[1])
@@ -56,13 +59,17 @@ const MyApp: AppType<{ session: Session | null }> = ({
         )
     }
     const createStore = useCreateStore({
+        //@ts-ignore
         ...pageProps.initialZustandState,
         layers: newLayersState,
     })
     const [queryClient] = useState(() => new QueryClient())
     return (
         <QueryClientProvider client={queryClient}>
-            <Hydrate state={pageProps.dehydratedState}>
+            <Hydrate
+                /* @ts-ignore */
+                state={pageProps.dehydratedState}
+            >
                 <Provider createStore={createStore}>
                     <SessionProvider session={session}>
                         <main className={`${acumin.variable} font-sans`}>

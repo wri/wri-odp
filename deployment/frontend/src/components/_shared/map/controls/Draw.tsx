@@ -53,7 +53,7 @@ export default function Draw({
         defaultMode: "draw_polygon",
     };
 
-    const onDrawCreate = useCallback((e) => {
+    const onDrawCreate = useCallback((e: any) => {
         const feature = e.features[0];
         setFeatures(feature);
         drawControlRef.current?.deleteAll();

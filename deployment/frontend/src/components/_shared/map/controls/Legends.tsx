@@ -11,7 +11,9 @@ import {
   LegendItemTypes,
   LegendItemTimeStep,
   Icons,
+  // @ts-ignore
 } from "vizzuality-components";
+  // @ts-ignore
 import { LegendItemTimeline } from "old-vizzuality-components";
 import { type ActiveLayerGroup } from "@/interfaces/state.interface";
 

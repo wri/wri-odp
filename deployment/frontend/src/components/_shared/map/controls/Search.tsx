@@ -28,7 +28,7 @@ export default function Search({
     }, 250)
 
     const handleSearch = useCallback(
-        (locationParams) => {
+        (locationParams: any) => {
             setBounds({
                 ...locationParams,
                 options: { zoom: 2 },
@@ -49,7 +49,9 @@ export default function Search({
             width: mapContainer.offsetWidth,
             height: mapContainer.offsetHeight,
             bounds: [
+                //@ts-ignore
                 [bbox[0], bbox[1]],
+                //@ts-ignore
                 [bbox[2], bbox[3]],
             ],
             ...options,
@@ -68,7 +70,7 @@ export default function Search({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bounds, debouncedOnMapViewportChange, mapContainerRef])
 
-    const onSuggestSelect = (e: Suggest) => {
+    const onSuggestSelect = (e: any) => {
         if (e) {
             const { gmaps, location } = e
             const viewport = gmaps?.geometry && gmaps.geometry.viewport
