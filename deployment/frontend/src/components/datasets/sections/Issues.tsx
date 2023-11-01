@@ -4,15 +4,15 @@ import { MagnifyingGlassIcon, ChatBubbleLeftIcon, ClockIcon } from "@heroicons/r
 export default function Issues() {
   return (
     <section id="issues">
-      <div className="relative py-4">
+      <div className="relative pb-5">
         <input
           className="block w-full rounded-md border-b border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
           placeholder="Find an issue"
         />
-        <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
+        <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[15px] right-4" />
       </div>
       <div className='flex flex-col gap-x-3'>
-        <span className='mb-4'>1 issue</span>
+        <span className='mb-1'>1 issue</span>
         {
           [1].map((_, index) => (
             <IssueCard key={index} />
