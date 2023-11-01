@@ -18,7 +18,7 @@ export default function CreateTeam() {
         <h1 className="mb-[2rem] text-[1.57rem] font-semibold">
           Create a team
         </h1>
-        <div className="w-full border-b">
+        <div className="w-full border-b border-blue-800 shadow">
           <div className="px-8">
             <div className="grid grid-cols-1 items-start gap-x-24 gap-y-4 py-5 md:grid-cols-2">
               <div className="flex flex-col justify-start gap-y-4">
