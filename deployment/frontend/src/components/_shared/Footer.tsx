@@ -7,11 +7,12 @@ export default function Footer({
     primary: { title: "Explore Topics", href: "#" },
     secondary: { title: "Advanced Search", href: "#" },
   },
+  style = "mt-16"
 }) {
   return (
     <section
       id="footer"
-      className="w-full  flex font-acumin flex-col mt-16 pb-16"
+      className={`w-full  flex font-acumin flex-col pb-16 ${style}`}
     >
       <div className=" w-full bg-wri-green">
         <div className=" flex flex-col px-8 xxl:px-0  max-w-8xl mx-auto py-10">
