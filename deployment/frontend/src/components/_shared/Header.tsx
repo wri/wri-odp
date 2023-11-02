@@ -92,7 +92,7 @@ export default function Header() {
               onClick={openModal}
               className="outline-wri-gold outline-1 outline font-bold text-xs tracking-tighter sm:text-base text-black rounded-sm p-2  sm:px-4 sm:py-0 text-center mr-5 sm:mr-0"
             >
-              LOG IN
+              Login 
             </button>
 
           )
