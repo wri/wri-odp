@@ -31,9 +31,9 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
   // const [isHover, setIsHover] = useState(false)
   const enableControlDiv = (isDropDown ?? controlButtons ?? linkButton) ? true : false
   return (
-    <div className={`flex flex-col hover:bg-slate-100 ${isShowSubRow ? "bg-slate-100" : " "}  `}>
+    <div className={`flex flex-col hover:bg-wri-slate ${isShowSubRow ? "bg-wri-slate" : " "}  `}>
       <div
-        className={`flex flex-col sm:flex-row   ${groupStyle ? groupStyle : "group"} ${classNames(isShowSubRow ? "bg-slate-100" : "", className ? className : "")} `} >
+        className={`flex flex-col sm:flex-row   ${groupStyle ? groupStyle : "group"} ${classNames(isShowSubRow ? "bg-wri-slate pr-4" : className ? className : "")} `} >
         <div className=' grow shrink'>
           {rowMain}
         </div>
