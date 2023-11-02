@@ -76,7 +76,7 @@ export default function DatasetPageLayout({
                         >
                             <div
                                 className={classNames(
-                                    'flex h-12 w-12 items-center rounded-full bg-white shadow-lg transition',
+                                    `flex h-12 w-12 items-center rounded-full bg-white shadow-lg transition ${isApprovalRequest ? "translate-y-36 xl:translate-y-12" : ""}`,
                                     open
                                         ? ''
                                         : 'translate-x-[calc(100vw-3rem)] lg:translate-x-[calc(50vw-3rem)]'
