@@ -16,7 +16,7 @@ interface SimpleSelectProps {
   maxWidth?: string;
 }
 
-export default function SimpleSelect({ options, placeholder, className, maxWidth = "max-w-[28rem]" }: SimpleSelectProps) {
+export default function SimpleSelect({ options, placeholder, className, maxWidth = "xl:max-w-[28rem]" }: SimpleSelectProps) {
   const _default = options.find((option) => option.default && option.default === true)
   const [selected, setSelected] = useState<Option | null>(_default ?? null)
 

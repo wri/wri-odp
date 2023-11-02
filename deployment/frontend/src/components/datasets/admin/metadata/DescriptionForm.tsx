@@ -21,21 +21,20 @@ export function DescriptionForm() {
         <InputGroup
           label={
             <div className="flex items-center gap-x-1">
-              <span>Short Description</span>
+              <span>Short Description <span className="text-red-500">*</span></span>
                 <ExclamationCircleIcon
                   className="h-5 w-5 text-neutral-500"
                   aria-hidden="true"
                 />
             </div>
           }
-          className="mb-2 flex-col items-start whitespace-nowrap sm:grid-cols-1 sm:flex-col sm:items-start sm:gap-y-2"
+          className="mb-2 flex-col items-start whitespace-nowrap sm:grid-cols-1 grid-cols-1 sm:flex-col sm:items-start sm:gap-y-2"
         >
           <TextArea
             placeholder=""
             name="citation"
             type="text"
-            className="h-44 w-full max-w-full"
-            maxWidth=""
+            className="h-44 col-span-full"
           />
         </InputGroup>
         <InputGroup

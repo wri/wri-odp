@@ -21,7 +21,7 @@ export function InputGroup({
       )}
     >
       {typeof label === "string" ? (
-      <span className={classNames("col-span-2 text-left font-acumin xxl:text-lg font-normal leading-tight text-black sm:max-w-[5rem]", labelClassName ?? "")}>
+      <span className={classNames("col-span-2 text-left sm:text-end font-acumin xxl:text-lg font-normal leading-tight text-black sm:max-w-[5rem]", labelClassName ?? "")}>
         {label} {required && <span className="text-red-500">*</span>}
       </span>) : <>{label}</> }
       <div className="col-span-6 h-full w-full">{children}</div>
