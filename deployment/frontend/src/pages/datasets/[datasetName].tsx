@@ -14,6 +14,10 @@ import { Tab } from '@headlessui/react'
 import Visualizations from '@/components/datasets/visualizations/Visualizations'
 import { useState } from 'react'
 import AddLayers from '@/components/datasets/add-layers/AddLayers'
+import Issues from "@/components/datasets/sections/Issues";
+import { Tab } from "@headlessui/react";
+import ApprovalRequestCard from "@/components/datasets/ApprovalRequestCard";
+import { useRouter } from "next/router";
 
 const links = [
     { label: 'Explore Data', url: '/search', current: false },
@@ -21,6 +25,9 @@ const links = [
 ]
 
 export default function DatasetPage() {
+    const { query } = useRouter();
+    const isApprovalRequest = query?.approval === "true";
+
     const [isAddLayers, setIsAddLayers] = useState(false)
 
     const tabs = [
@@ -31,6 +38,7 @@ export default function DatasetPage() {
         { name: 'Contact' },
         { name: 'API' },
         { name: 'Members' },
+        { name: "Issues", count: 1 }
     ]
 
     return (
@@ -74,6 +82,9 @@ export default function DatasetPage() {
                                         </Tab.Panel>
                                         <Tab.Panel>
                                             <Members />
+                                        </Tab.Panel>
+                                        <Tab.Panel>
+                                            <Issues />
                                         </Tab.Panel>
                                     </Tab.Panels>
                                 </div>

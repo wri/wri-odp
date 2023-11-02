@@ -2,6 +2,7 @@ import classNames from '@/utils/classnames'
 import { Disclosure } from '@headlessui/react'
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
+import { useRouter } from "next/router";
 
 export default function DatasetPageLayout({
     lhs,
@@ -10,6 +11,8 @@ export default function DatasetPageLayout({
     lhs: React.ReactNode
     rhs: React.ReactNode
 }) {
+    const { query } = useRouter();
+    const isApprovalRequest = query?.approval === "true";
     const [lhsOpen, setLhsOpen] = useState(true)
     const [rhsOpen, setRhsOpen] = useState(true)
 
@@ -32,7 +35,7 @@ export default function DatasetPageLayout({
                         >
                             <div
                                 className={classNames(
-                                    'flex h-12 w-12 items-center rounded-full bg-white shadow-lg transition',
+                                    `flex h-12 w-12 items-center rounded-full bg-white shadow-lg transition ${isApprovalRequest ? "translate-y-36 xl:translate-y-12" : ""}`,
                                     open
                                         ? ''
                                         : '-translate-x-[calc(100vw-3rem)] lg:-translate-x-[calc(50vw-3rem)]'
