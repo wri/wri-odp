@@ -1,6 +1,6 @@
 import classNames from "@/utils/classnames";
 import { Disclosure } from "@headlessui/react";
-import { ArrowRightIcon } from "@heroicons/react/20/solid";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 
 export default function DatasetPageLayout({
@@ -22,7 +22,7 @@ export default function DatasetPageLayout({
                   open ? "" : "-translate-x-[calc(100vw-3rem)] lg:-translate-x-[calc(50vw-3rem)]",
                 )}
               >
-                <ArrowRightIcon
+                <ChevronRightIcon
                   className={classNames(
                     "mx-auto h-6 w-6 text-black transition",
                     open ? "rotate-180 transform" : "",
@@ -32,7 +32,7 @@ export default function DatasetPageLayout({
             </Disclosure.Button>
             <Disclosure.Panel
               as="div"
-              className="max-h-[90vh] overflow-y-scroll overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-1/2 lg:z-10 lg:flex lg:flex-col pl-4 sm:pl-6 py-4 border-r border-gray-200 @container"
+              className="max-h-[90vh] overflow-y-scroll overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-1/2 lg:z-10 lg:flex lg:flex-col px-4 sm:px-6 py-4 border-r border-gray-200 @container"
             >
               {children}
             </Disclosure.Panel>

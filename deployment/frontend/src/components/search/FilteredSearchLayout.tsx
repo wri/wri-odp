@@ -1,9 +1,8 @@
 import { Fragment, useState } from "react";
 import { Dialog, Disclosure, Transition } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Facet from "./Facet";
 import LocationSearch from "./LocationSearch";
-import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/20/solid";
 import classNames from "@/utils/classnames";
 
 export default function FilteredSearchLayout({
@@ -219,7 +218,7 @@ export default function FilteredSearchLayout({
             <>
               <Disclosure.Button className="absolute lg:block hidden left-[calc(25%-1.5rem)] top-[60vh] z-20">
                 <div className={classNames("flex h-12 w-12 items-center rounded-full bg-white shadow-lg transition", open ? "" : "-translate-x-[23.5vw]")}>
-                  <ArrowRightIcon
+                  <ChevronRightIcon
                     className={classNames(
                       "mx-auto h-6 w-6 text-black transition",
                       open ? "rotate-180 transform" : "",

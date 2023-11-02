@@ -10,7 +10,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
+import { PlusSmallIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 
 type TabProps = {
   name: string;
@@ -25,7 +25,7 @@ export default function DatasetTabs({ tabs }: { tabs: TabProps[] }) {
   return (
     <>
       <Swiper
-        className="flex dataset-tabs w-full"
+        className="dataset-tabs flex w-full"
         modules={[Navigation]}
         spaceBetween={0}
         slidesPerView="auto"
@@ -36,22 +36,28 @@ export default function DatasetTabs({ tabs }: { tabs: TabProps[] }) {
       >
         {tabs.map((tab) => (
           <SwiperSlide key={tab.name} className=" max-w-8xl">
-            <Tab key={tab.title} className="  text-black font-normal text-base   accent-white ">
+            <Tab
+              key={tab.title}
+              className="text-base font-normal text-black accent-white"
+            >
               {({ selected }) => (
                 <div
-                  className={`font-normal  px-6 py-4 focus:outline-0  border-b-2  w-full lg:px-12 2xl:px-14 ${selected ? " border-b-wri-dark-green border-b-2 text-wri-green" : ""
-                    } `}
+                  className={`w-full border-b-2 py-4 font-normal focus:outline-0 ${
+                    selected
+                      ? " border-b-2 border-b-wri-dark-green text-wri-green"
+                      : ""
+                  } `}
                 >
-                  {tab.title === 'Add dataset' ? (
-                    <div className='flex'>
-                      <div className='flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]'>
-                        <PlusSmallIcon className='w-3 h-3 text-white' />
+                  {tab.title === "Add dataset" ? (
+                    <div className="flex lg:px-12 2xl:px-14 px-6 sm:px-8 ">
+                      <div className="mr-2  mt-[0.2rem] flex h-4 w-4 items-center  justify-center rounded-full bg-wri-gold">
+                        <PlusSmallIcon className="h-3 w-3 text-white" />
                       </div>
                       <span>{tab.title}</span>
                     </div>
-                  ) : (<span>{tab.title}</span>)
-                  }
-
+                  ) : (
+                    <span className="text-center px-6 sm:px-8 lg:px-12 2xl:px-14 ">{tab.title}</span>
+                  )}
                 </div>
               )}
             </Tab>
@@ -59,14 +65,10 @@ export default function DatasetTabs({ tabs }: { tabs: TabProps[] }) {
         ))}
       </Swiper>
       <button className="nav-prev-button--tabs">
-        <ChevronDoubleLeftIcon
-          className="h-6 w-6 text-black"
-        />
+        <ChevronDoubleLeftIcon className="h-6 w-6 text-black" />
       </button>
       <button className="nav-next-button--tabs">
-        <ChevronDoubleRightIcon
-          className="h-6 w-6 text-black"
-        />
+        <ChevronDoubleRightIcon className="h-6 w-6 text-black" />
       </button>
     </>
   );
