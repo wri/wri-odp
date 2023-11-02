@@ -11,7 +11,7 @@ COPY . .
 
 # You can setup env vars here or via `.env` file
 
-RUN npm ci
+RUN npm ci -f
 RUN npm run build
 EXPOSE 3000
 
