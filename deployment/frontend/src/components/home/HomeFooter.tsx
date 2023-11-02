@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Button } from "../_shared/Button";
-import { EnvelopeIcon } from "@heroicons/react/24/outline";
+import { EnvelopeIcon } from "@heroicons/react/20/solid";
 
 export function HomeFooter() {
   return (
@@ -18,8 +18,8 @@ export function HomeFooter() {
           <Button>Read More</Button>
         </div>
       </section>
-      <div className="mx-auto flex w-full default-home-container flex-col pb-16">
-        <div className="flex flex-col items-center gap-y-4 pt-16 font-bold text-wri-black sm:flex-row sm:items-start">
+      <div className="default-home-container mx-auto flex w-full flex-col pb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 items-center gap-y-8 pt-16 font-bold text-wri-black sm:flex-row sm:items-start">
           <div className="mb-6 flex w-full flex-col items-center gap-y-4 sm:mb-0 sm:items-start">
             <p className="text-base font-bold">ABOUT WRI</p>
             <p className=" font-normal">About us</p>
@@ -38,26 +38,22 @@ export function HomeFooter() {
             <p className=" font-normal">Our Work</p>
             <p className=" font-normal">Our Approach</p>
           </div>
-          <div className="mt-10 flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:w-1/2 sm:items-start ml-auto">
-            <p className="text-base font-bold sm:text-[1.375rem]">
+          <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start xl:min-w-[420px]">
+            <div className="font-acumin text-[22px] font-bold text-gray-800">
               STAY UP TO DATE WITH THE NEWS{" "}
-            </p>
-            <div className="flex w-full flex-col gap-x-2 gap-y-4 lg:flex-row">
-              <div className="flex w-full min-w-fit flex-row items-center gap-x-2 rounded-sm py-2 pl-1 outline  outline-1 lg:w-[337px]">
-                <div className=" my-auto">
-                  <EnvelopeIcon className="h-5 w-5 text-wri-gray" />
-                </div>
-                <div className="shrink grow basis-auto">
-                  <input
-                    type="text"
-                    placeholder="Enter your email address"
-                    className=" w-full text-xs font-normal placeholder:text-xs focus:outline-none"
-                  />
+            </div>
+            <div className="flex w-full flex-col gap-x-2 gap-y-4 lg:flex-row justify-between">
+              <div className="relative grow">
+                <input
+                  type="text"
+                  className="h-11 w-full peer grow rounded border-0 shadow outline-0 ring-0 ring-offset-0"
+                />
+                <div className="absolute pointer-events-none peer-focus:hidden inset-y-0 left-0 flex gap-x-2 items-center pl-3">
+                  <EnvelopeIcon className="h-6 w-5 text-gray-400" />
+                  <span className="text-xs text-gray-400">Enter your email</span>
                 </div>
               </div>
-              <div className="rounded-sm bg-wri-gold px-4 py-2 text-center text-[0.875rem] font-bold  text-wri-black sm:px-6 xxl:w-[139px] 2xl:px-10">
-                SUBSCRIBE
-              </div>
+              <Button>SUBSCRIBE</Button>
             </div>
             <div className="flex flex-row gap-5">
               <div className="relative h-5 w-5 ">

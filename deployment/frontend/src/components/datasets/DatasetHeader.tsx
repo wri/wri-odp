@@ -18,12 +18,14 @@ import Link from "next/link";
 
 export function DatasetHeader() {
   return (
-    <div className="flex w-full flex-col font-acumin pb-10 pr-4 @sm:pr-8">
+    <div className="flex w-full flex-col pb-10 font-acumin">
       <div className="my-4 flex items-center gap-x-3">
-        <Button variant="outline">
-          <ChevronLeftIcon className="mb-1 h-5 w-5" />
-          Go back
-        </Button>
+        <Link href="/search">
+          <Button variant="outline">
+            <ChevronLeftIcon className="mb-1 h-5 w-5" />
+            Go back
+          </Button>
+        </Link>
         <Button>
           Open in GFW
           <ArrowUpRightIcon className="mb-1 h-6 w-6" />
@@ -52,12 +54,12 @@ export function DatasetHeader() {
         <h1 className="text-3xl font-bold text-black">
           Title of the dataset goes here lorem ipsum
         </h1>
-        <p className=" text-base font-light leading-snug text-stone-900 text-justify">
+        <p className=" text-justify text-base font-light leading-snug text-stone-900">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta
           sem malesuada magna mollis euismod. Aenean lacinia bibendum nulla sed
           consectetur. Nullam quis risus eget urna mollis ornare vel eu leo.
         </p>
-        <div className="flex gap-4 py-4 flex-wrap">
+        <div className="flex flex-wrap gap-4 py-4">
           <div className="flex gap-x-1">
             <FingerPrintIcon className="h-5 w-5 text-blue-800" />
             <div>
@@ -106,8 +108,8 @@ export function DatasetHeader() {
           </div>
         </div>
       </div>
-      <div className="flex lg:flex-row flex-col items-center gap-x-3 rounded-sm bg-cyan-700 bg-opacity-10 p-3">
-        <ExclamationTriangleIcon className="h-8 w-8 sm:h-12 sm:w-12 text-yellow-600" />
+      <div className="flex flex-col items-center gap-x-3 rounded-sm bg-cyan-700 bg-opacity-10 p-3 lg:flex-row">
+        <ExclamationTriangleIcon className="h-8 w-8 text-yellow-600 sm:h-12 sm:w-12" />
         <p>
           <span className="font-acumin text-sm font-semibold leading-none text-black">
             Caution:{" "}
@@ -145,7 +147,9 @@ export function DatasetHeader() {
       </div>
       <div className="flex items-center gap-x-1 pt-4">
         <LinkIcon className="h-4 w-4 text-wri-green" />
-        <div className="text-green-700 text-sm font-semibold font-['Acumin Pro SemiCondensed']">Technical Notes</div>
+        <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
+          Technical Notes
+        </div>
       </div>
     </div>
   );

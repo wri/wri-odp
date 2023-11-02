@@ -25,7 +25,7 @@ export default function UserActivityStreams({ drag }: { drag: boolean }) {
       }
       <div className='flex px-2 mb-4 border-b-[0.3px] border-b-gray-100'>
         <p className='font-normal text-[20px]'>Activity Stream</p>
-        <div className='ml-auto flex items-center font-semibold text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4' /></div>
+        <div className='ml-auto flex items-center font-semibold gap-x-1 text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4 mb-1' /></div>
       </div>
       {
         activitydata.slice(0, 6).map((items, index) => {

@@ -27,7 +27,7 @@ export default function Favourites({ drag }: { drag: boolean }) {
       }
       <div className='flex px-2 mb-4 border-b-[0.3px] border-b-gray-100'>
         <p className='font-normal text-[20px]'>My Favourites</p>
-        <div className='ml-auto flex items-center font-semibold text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4' /></div>
+        <div className='ml-auto flex items-center font-semibold gap-x-1 text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4 mb-1' /></div>
       </div>
       {
         [1, 2, 3, 4, 5, 6].map((items) => {

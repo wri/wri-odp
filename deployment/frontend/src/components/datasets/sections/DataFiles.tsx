@@ -125,7 +125,7 @@ function DatafileCard({ datafile }: { datafile: Datafile }) {
                                         open
                                             ? 'rotate-180 transform  transition'
                                             : ''
-                                    } h-5 w-5 text-purple-500`}
+                                    } h-5 w-5 text-stone-900`}
                                 />
                             </Disclosure.Button>
                         </div>

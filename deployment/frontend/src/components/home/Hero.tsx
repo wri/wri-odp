@@ -170,7 +170,7 @@ export function Hero() {
               eiusmod tempor incididunt ut labore et dolore.
             </p>
             <div className="mt-10 flex relative items-start justify-start gap-x-6 w-full max-w-[932px]">
-              <input name="search" placeholder="Search data" className="placeholder:text-white text-white text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white bg-opacity-25 rounded-[3px] border-b-2 border-amber-400" />
+              <input name="search" placeholder="Search data" className="placeholder:text-white text-white text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white bg-opacity-25 rounded-[3px] outline-none ring-0 border-0 focus:ring-0 focus:ring-offset-0 focus:border-amber-400 ring-offset-0 border-b-2 border-amber-400" />
               <MagnifyingGlassIcon className="w-7 h-7 text-white absolute top-[18px] right-4" />
             </div>
           </div>
