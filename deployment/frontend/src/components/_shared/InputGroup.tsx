@@ -3,25 +3,29 @@ import classNames from "@/utils/classnames";
 export function InputGroup({
   label,
   className,
+  labelClassName,
   children,
   required = false,
 }: {
-  label: string;
+  label: string | React.ReactNode;
   className?: string;
+  labelClassName?: string;
   children: React.ReactNode;
   required?: boolean;
 }) {
   return (
     <div
       className={classNames(
-        "flex items-center justify-between gap-x-14",
+        "grid sm:grid-cols-8 justify-between gap-x-14",
         className ?? "",
       )}
     >
-      <span className="max-w-[4.6rem] text-left font-acumin text-lg font-normal leading-tight text-black">
+      {typeof label === "string" ? (
+      <span className={classNames("col-span-2 text-left sm:text-end font-acumin xxl:text-lg font-normal leading-tight text-black sm:max-w-[5rem]", labelClassName ?? "")}>
         {label} {required && <span className="text-red-500">*</span>}
-      </span>
-      {children}
+      </span>) : <>{label}</> }
+      <div className="col-span-6 h-full w-full">{children}</div>
     </div>
   );
 }
+

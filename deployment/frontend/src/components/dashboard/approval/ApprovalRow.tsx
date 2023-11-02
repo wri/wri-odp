@@ -45,7 +45,7 @@ export default function ApprovalRow({ approvalInfo, className }: { approvalInfo:
       ]}
       linkButton={{
         label: "Review",
-        link: "#",
+        link: "/datasets/x?approval=true",
       }}
 
     />
