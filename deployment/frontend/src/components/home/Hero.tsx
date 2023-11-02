@@ -165,7 +165,7 @@ export function Hero() {
               Welcome to the WRI Open Data Catalog. Neque porro quisquam est qui
               dolorem...
             </h1>
-            <p className="font-['Acumin Pro SemiCondensed'] w-[705px] text-[23px] font-light text-neutral-200">
+            <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-[23px] font-light text-neutral-200">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore.
             </p>
