@@ -44,6 +44,7 @@ export default function DatasetPage() {
         <>
             <Header />
             <Breadcrumbs links={links} />
+            {isApprovalRequest && (<ApprovalRequestCard />)}
             <DatasetPageLayout
                 lhs={
                     isAddLayers ? (
