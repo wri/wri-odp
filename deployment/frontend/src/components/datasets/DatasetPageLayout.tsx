@@ -1,6 +1,6 @@
 import classNames from '@/utils/classnames'
 import { Disclosure } from '@headlessui/react'
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/20/solid'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
 import { useRouter } from "next/router";
 
@@ -43,7 +43,7 @@ export default function DatasetPageLayout({
                                         : '-translate-x-[calc(100vw-3rem)] lg:-translate-x-[calc(50vw-3rem)]'
                                 )}
                             >
-                                <ArrowRightIcon
+                                <ChevronRightIcon
                                     className={classNames(
                                         'mx-auto h-6 w-6 text-black transition',
                                         open ? 'rotate-180 transform' : ''
@@ -84,7 +84,7 @@ export default function DatasetPageLayout({
                                         : 'translate-x-[calc(100vw-3rem)] lg:translate-x-[calc(50vw-3rem)]'
                                 )}
                             >
-                                <ArrowLeftIcon
+                                <ChevronLeftIcon
                                     className={classNames(
                                         'mx-auto h-6 w-6 text-black transition',
                                         open ? 'rotate-180 transform' : ''
