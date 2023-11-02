@@ -30,7 +30,9 @@ export default function NewDatasetPage() {
           Add a dataset
         </h1>
         <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
+        <div className="mx-auto w-full 3xl:max-w-[1380px]">
           <CreateDatasetTabs currentStep={selectedIndex} />
+          </div>
           <Tab.Panels>
             <Tab.Panel as="div" className="flex flex-col gap-y-12">
               <OverviewForm />

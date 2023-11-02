@@ -19,7 +19,7 @@ export function MetadataAccordion({
       {({ open }) => (
         <>
           <div className="w-full border-b border-blue-800 bg-white shadow">
-            <div className="px-2 sm:px-8">
+            <div className="px-4 sm:px-8">
               <Disclosure.Button className="col-span-full flex w-full justify-between border-b border-stone-50 py-5">
                 <h3 className="flex w-full items-center gap-x-2 font-acumin text-xl font-semibold text-blue-800">
                   {label}

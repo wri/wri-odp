@@ -36,7 +36,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
           {step.status === "complete" ? (
             <div
               className={classNames(
-                "group relative flex h-16 w-full items-center gap-x-2 px-6 lg:px-8",
+                "group relative flex h-16 w-full items-center gap-x-2 px-6 xxl:px-8",
                 "bg-neutral-100",
               )}
             >
@@ -53,7 +53,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
           ) : step.status === "current" ? (
             <div
               className={classNames(
-                "group relative isolate flex h-16 w-full items-center gap-x-2 px-6 lg:px-8",
+                "group relative isolate flex h-16 w-full items-center gap-x-2 px-6 xxl:px-8",
                 "md:bg-neutral-100 bg-white shadow md:shadow-none",
               stepIdx === steps.length - 1 ? "md:bg-transparent" : ""
               )}
