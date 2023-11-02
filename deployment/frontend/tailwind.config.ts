@@ -26,6 +26,8 @@ export default {
         "wri-light-yellow": "#FBE8BE",
         "wri-light-gray": "#4C4C4C",
         "wri-dark-gray": "#666666",
+        "wri-row-gray": "#F9F9F9",
+        "wri-slate": "#EFF5F7"
       },
       screens: {
         "4xl": "2048px",

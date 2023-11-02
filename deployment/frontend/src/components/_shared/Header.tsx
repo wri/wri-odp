@@ -1,12 +1,24 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import Image from "next/image";
-import { Menu, Transition } from "@headlessui/react";
+import { Menu, Transition, Dialog } from "@headlessui/react";
 import { Bars3Icon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Login from "./Login";
+import UserMenu from "./UserMenu";
 
 export default function Header() {
   const { asPath } = useRouter();
+  const [isOpen, setIsOpen] = useState(false)
+
+  function closeModal() {
+    setIsOpen(false)
+  }
+
+  function openModal() {
+    setIsOpen(true)
+  }
+
 
   const navigation = [
     {
@@ -56,7 +68,7 @@ export default function Header() {
           className="block sm:hidden"
         />
       </Link>
-      <div className=" ml-auto flex mt-auto gap-x-6">
+      <div className=" ml-auto flex mt-auto gap-x-6 ">
         <div className=" hidden sm:flex gap-x-6 font-semibold text-[1.0625rem] text-wri-black">
           {navigation.map((item) => {
             return (
@@ -70,14 +82,56 @@ export default function Header() {
             );
           })}
         </div>
-        <div>
-          <a
-            href=""
-            className="outline-wri-gold outline-1 outline font-bold text-xs tracking-tighter sm:text-base text-black rounded-sm p-2 sm:px-4 sm:py-2 text-center mr-5 sm:mr-0"
-          >
-            LOG IN
-          </a>
-        </div>
+
+        {
+          asPath.startsWith("/dashboard") ? (
+            <UserMenu />
+          ) : (
+            <button
+              type="button"
+              onClick={openModal}
+              className="outline-wri-gold outline-1 outline font-bold text-xs tracking-tighter sm:text-base text-black rounded-sm p-2  sm:px-4 sm:py-0 text-center mr-5 sm:mr-0"
+            >
+              LOG IN
+            </button>
+
+          )
+        }
+
+        <Transition appear show={isOpen} as={Fragment}>
+          <Dialog as="div" className="relative z-50" onClose={closeModal}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black bg-opacity-25" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="w-full sm:max-w-xl transform overflow-hidden rounded-md bg-white p-6 sm:px-20 text-left align-middle shadow-xl transition-all z-50">
+                    <Login />
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </Dialog>
+        </Transition>
+
         <div className="text-right -ml-6 sm:hidden">
           <Menu as="div" className="relative inline-block text-left mt-1 pr-1">
             <div>
@@ -116,6 +170,6 @@ export default function Header() {
           </Menu>
         </div>
       </div>
-    </section>
+    </section >
   );
 }
