@@ -9,14 +9,14 @@ export function Hero() {
     <div className="mx-auto mb-8 mt-10 grid max-w-[1440px] font-acumin lg:mb-16 lg:max-h-[18.5rem] lg:grid-cols-5">
       <div className="relative h-[18.5rem] lg:col-span-2">
         <Image alt="Topic name" fill={true} src="/images/topics/1.png" />
-        <div className="absolute bottom-0 z-10 flex h-[68px] w-56 items-center justify-center rounded-t-[3px] bg-white">
+        <div className="absolute bottom-0 z-10 flex lg:h-[68px] lg:w-56 px-4 py-4 items-center justify-center rounded-t-[3px] bg-white">
           <Button>
-            <ChevronLeftIcon className="mb-1 mr-1 h-6 w-6" />
+            <ChevronLeftIcon className="mb-1 lg:mr-1 h-6 w-6" />
             <span>See all topics</span>
           </Button>
         </div>
       </div>
-      <div className="flex flex-col gap-y-1 px-6 py-6 lg:col-span-3">
+      <div className="flex flex-col gap-y-1 px-4 py-6 lg:col-span-3">
         <div className="text-[33px] font-bold text-black">Topic 1</div>
         <div className="max-w-[578.85px] text-lg font-light text-black">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
