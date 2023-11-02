@@ -1,0 +1,185 @@
+@use "sass:math";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "~vizzuality-components/dist/bundle";
+
+body, html {
+	letter-spacing: 0px;
+  accent-color: #32864B;
+}
+
+.mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-attrib{
+  display: none;
+}
+
+.mapboxgl-ctrl-bottom-right {
+  width: 100%;
+}
+
+.mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
+  width: 100%;
+  max-width: 95%;
+  margin: 10px auto;
+  float: none;
+}
+
+.dataset-tabs .swiper-slide {
+  width: fit-content !important;
+}
+
+.default-home-container {
+  max-width: 90vw;
+}
+
+.auto-carousel .swiper-slide {
+  width: fit-content !important;
+}
+
+input[type="color"] {
+  -webkit-appearance: none;
+  border: none;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+}
+
+.arrow-right {
+  clip-path: polygon(0 0, 0% 100%, 100% 50%);
+}
+
+.arrow-left {
+  clip-path: polygon(100% 0, 100% 50%, 100% 100%, 0% 100%, 61% 50%, 0% 0%);
+}
+
+.arrow-wrap {
+  filter: drop-shadow(0px 0px 20px rgba(221, 221, 221, 0.25));
+}
+
+$space: 5px;
+$black: #000;
+$white: #ffffff;
+$charcoal-grey: #393f44;
+$porcelain: #F4F6F7;
+$light-grey: #cAccd0;
+$ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1.000);
+$animation-time: .16s;
+$font-size-normal: 14px;
+$dark-pink: #c32d7b;
+
+.rw-legend-timeline {
+  margin: 4 0;
+
+  .rc-slider {
+    .rc-slider-mark {
+      min-width: 100%;
+      margin-left: 0;
+      display: flex;
+      justify-content: space-between;
+
+      .rc-slider-mark-text {
+        display: none;
+
+        &:last-child,
+        &:first-child {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+.c-legend-map {
+  position: absolute;
+  bottom: 35px;
+  right: 30px;
+  width: 80%; // Limit the width for mobile devices
+  max-width: 400px;
+  background: white;
+  z-index: 9;
+  border-radius: 4px;
+
+  .legend-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 10px 15px;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+
+  .toggle-legend {
+    position: absolute;
+    right: 0px;
+    width: 40px;
+    height: 32px;
+    top: -28px;
+    border: 0;
+    border-radius: 2px 2px 0 0;
+    background-color: rgba(white, 0.2);
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+    }
+
+    svg {
+      margin-top: 4px;
+      fill: white;
+    }
+  }
+
+  .open-legend {
+    display: flex;
+    flex-flow: column;
+    max-height: 300px;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    // Without an auto height, the legend looks a bit 💩
+    // but we can't animate the height if max-height is
+    // used
+    // I've prefered to remove the animation than having
+    // a legend too tall - Clément
+
+    &.-active {
+      height: auto;
+      opacity: 1;
+      overflow: auto;
+    }
+
+    >.legend-list {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      overflow: auto;
+    }
+  }
+
+  .close-legend {
+    display: none;
+
+    &.-active {
+      display: inherit;
+    }
+
+    .toggle-legend {
+      position: relative;
+      top: auto;
+      padding: 0;
+      width: auto;
+      height: auto;
+      padding: 0;
+      background-color: white;
+
+      svg {
+        margin-top: 0;
+        fill: red;
+      }
+    }
+  }
+}
