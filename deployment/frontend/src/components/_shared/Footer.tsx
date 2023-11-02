@@ -58,7 +58,7 @@ export default function Footer({
             <p className=" font-normal">Our Work</p>
             <p className=" font-normal">Our Approach</p>
           </div>
-          <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start lg:min-w-[420px]">
+          <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start xl:min-w-[420px]">
             <div className="font-acumin text-[22px] font-bold text-gray-800">
               STAY UP TO DATE WITH THE NEWS{" "}
             </div>
