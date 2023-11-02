@@ -16,8 +16,6 @@ export default function DatasetPageLayout({
     const [lhsOpen, setLhsOpen] = useState(true)
     const [rhsOpen, setRhsOpen] = useState(true)
 
-    console.log(lhsOpen, rhsOpen)
-
     return (
         <div className="flex flex-wrap lg:flex-nowrap lg:max-w-screen">
             <Disclosure defaultOpen>
@@ -53,7 +51,7 @@ export default function DatasetPageLayout({
                         </Disclosure.Button>
                         <Disclosure.Panel
                             as="div"
-                            className="lg:max-h-[90vh] overflow-y-scroll overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col px-4 sm:px-6 py-4 border-r border-gray-200 @container"
+                            className="lg:max-h-[100vh] overflow-y-scroll overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col px-4 sm:px-6 py-4 border-r border-gray-200 @container"
                         >
                             {lhs}
                         </Disclosure.Panel>
