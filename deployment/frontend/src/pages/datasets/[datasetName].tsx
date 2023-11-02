@@ -15,7 +15,6 @@ import Visualizations from '@/components/datasets/visualizations/Visualizations'
 import { useState } from 'react'
 import AddLayers from '@/components/datasets/add-layers/AddLayers'
 import Issues from "@/components/datasets/sections/Issues";
-import { Tab } from "@headlessui/react";
 import ApprovalRequestCard from "@/components/datasets/ApprovalRequestCard";
 import { useRouter } from "next/router";
 

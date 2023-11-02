@@ -16,6 +16,8 @@ export default function DatasetPageLayout({
     const [lhsOpen, setLhsOpen] = useState(true)
     const [rhsOpen, setRhsOpen] = useState(true)
 
+    console.log(lhsOpen, rhsOpen)
+
     return (
         <div className="flex flex-wrap lg:flex-nowrap lg:max-w-screen">
             <Disclosure defaultOpen>
@@ -29,7 +31,7 @@ export default function DatasetPageLayout({
                                 rhsOpen && open
                                     ? ''
                                     : !rhsOpen && open
-                                    ? 'hidden'
+                                    ? '!hidden'
                                     : ''
                             }`}
                         >
@@ -70,7 +72,7 @@ export default function DatasetPageLayout({
                                 lhsOpen && open
                                     ? ''
                                     : !lhsOpen && open
-                                    ? 'hidden'
+                                    ? '!hidden'
                                     : ''
                             }`}
                         >
