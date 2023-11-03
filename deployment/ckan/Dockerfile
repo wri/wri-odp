@@ -33,9 +33,10 @@ RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 USER root
 RUN chmod +x ${APP_DIR}/prerun.py
-USER ckan
 
 RUN apk --no-cache add openssl
+
+USER ckan
 
 RUN openssl genpkey -algorithm RSA -out ${APP_DIR}/jwtRS256.key && \
     openssl rsa -in ${APP_DIR}/jwtRS256.key -pubout -outform PEM -out ${APP_DIR}/jwtRS256.key.pub && \

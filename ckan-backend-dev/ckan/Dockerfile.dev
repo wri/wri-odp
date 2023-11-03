@@ -61,7 +61,11 @@ COPY setup/start_ckan_development.sh.override ${APP_DIR}/start_ckan_development.
 RUN chmod +x ${APP_DIR}/start_ckan_development.sh
 RUN chown ckan:ckan ${APP_DIR}/start_ckan_development.sh
 
+USER root
+
 RUN apk --no-cache add openssl
+
+USER ckan
 
 RUN openssl genpkey -algorithm RSA -out ${APP_DIR}/jwtRS256.key && \
     openssl rsa -in ${APP_DIR}/jwtRS256.key -pubout -outform PEM -out ${APP_DIR}/jwtRS256.key.pub && \
