@@ -17,7 +17,6 @@ export const activityStreamRouter = createTRPCRouter({
       })
 
     const data = (await response.json()) as CkanResponse<Activity[]>;
-    console.log("test: ", data)
     const activities = await Promise.all(data.result.map(async (activity: Activity) => {
       let user_data = await getUser({ userId: activity.user_id, apiKey: ctx.session.user.apikey });
       user_data = user_data === undefined ? null : user_data;

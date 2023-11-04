@@ -1,5 +1,47 @@
 import { env } from "@/env.mjs";
 import type { Activity, ActivityDisplay, CkanResponse, User } from "@/schema/ckan.schema";
+import type { Organization, Dataset } from "@portaljs/ckan";
+
+export async function getUserOrganizations({ userId, apiKey }: { userId: string, apiKey: string }): Promise<Organization[] | null> {
+  try {
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list_for_user`,
+      {
+        method: "POST",
+        body: JSON.stringify({ id: userId }),
+        headers: {
+          "Authorization": apiKey,
+          "Content-Type": "application/json"
+        }
+      });
+    const data = (await response.json()) as CkanResponse<Organization[] | null>;
+    const organizations: Organization[] | null = data.success === true ? data.result : null;
+    return organizations
+  }
+  catch (e) {
+    console.error(e);
+    return null
+  }
+}
+
+export async function getUserDataset({ userId, apiKey }: { userId: string, apiKey: string }): Promise<{ datasets: Dataset[]; count: number } | null> {
+  try {
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/package_search?q=creator_user_id:${userId}`,
+      {
+        headers: {
+          "Authorization": apiKey,
+        }
+      });
+    const data = (await response.json()) as CkanResponse<{ results: Dataset[], count: number }>
+    const datasets = data.result.results;
+    const count = data.result.count;
+    return { datasets, count }
+  }
+  catch (e) {
+    console.error(e);
+    return null
+
+  }
+}
 
 export async function getUser({ userId, apiKey }: { userId: string, apiKey: string }): Promise<User | null> {
   try {
