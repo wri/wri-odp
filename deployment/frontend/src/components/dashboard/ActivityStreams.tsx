@@ -4,7 +4,8 @@ import ActivityStreamCard from '../_shared/ActivityStreamCard'
 import type { activity } from '../_shared/ActivityStreamCard'
 import { activity as activitydata } from '../_shared/ActivityStreamList'
 import { Squares2X2Icon } from '@heroicons/react/24/outline'
-
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
 
 function ActivityStreamUser({ activity }: { activity: activity }) {
   return (
@@ -14,6 +15,8 @@ function ActivityStreamUser({ activity }: { activity: activity }) {
   )
 }
 export default function UserActivityStreams({ drag }: { drag: boolean }) {
+  const { data, isLoading } = api.dashboardActivity.listActivityStreamDashboard.useQuery();
+
   return (
     <section id="favourites" className={`p-6 w-full shadow-wri h-full overflow-y-auto ${drag ? "border-dashed border border-wri-black " : ""}`}>
       {
@@ -28,11 +31,16 @@ export default function UserActivityStreams({ drag }: { drag: boolean }) {
         <div className='ml-auto flex items-center font-semibold gap-x-1 text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4 mb-1' /></div>
       </div>
       {
-        activitydata.slice(0, 6).map((items, index) => {
-          return (
-            <ActivityStreamUser key={index} activity={items as activity} />
-          )
-        })
+        isLoading ? (
+          <div className='flex justify-center items-center h-full'>
+            <Spinner className='' />
+          </div>
+        ) :
+          data?.activity.slice(0, 6).map((items, index) => {
+            return (
+              <ActivityStreamUser key={index} activity={items as activity} />
+            )
+          })
       }
     </section>
 
