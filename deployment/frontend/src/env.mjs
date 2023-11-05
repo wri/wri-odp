@@ -22,6 +22,10 @@ export const env = createEnv({
       process.env.VERCEL ? z.string() : z.string().url()
     ),
     CKAN_URL: z.string(),
+    S3_BUCKET_NAME: z.string(),
+    S3_BUCKET_REGION: z.string(),
+    S3_ACCESS_KEY_ID: z.string(),
+    S3_SECRET_KEY_ID: z.string(),
   },
 
   /**
@@ -30,7 +34,7 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_S3_ENDPOINT: z.string(),
   },
 
   /**
@@ -42,7 +46,11 @@ export const env = createEnv({
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     CKAN_URL: process.env.CKAN_URL,
-    // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+    S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
+    S3_SECRET_KEY_ID: process.env.S3_SECRET_KEY_ID,
+    S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
+    S3_BUCKET_REGION: process.env.S3_BUCKET_REGION,
+    NEXT_PUBLIC_S3_ENDPOINT: process.env.NEXT_PUBLIC_S3_ENDPOINT,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
