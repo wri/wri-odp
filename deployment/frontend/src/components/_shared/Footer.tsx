@@ -66,7 +66,7 @@ export default function Footer({
               <div className="relative grow">
                 <input
                   type="text"
-                  className="h-11 w-full peer grow rounded border-0 shadow outline-0 ring-0 ring-offset-0"
+                  className="h-11 w-full peer grow rounded border-0 shadow outline-0 ring-0 ring-offset-0 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 "
                 />
                 <div className="absolute pointer-events-none peer-focus:hidden inset-y-0 left-0 flex gap-x-2 items-center pl-3">
                   <EnvelopeIcon className="h-6 w-5 text-gray-400" />
