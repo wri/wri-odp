@@ -24,7 +24,7 @@ export default function Login() {
             <div className="relative mx-auto w-full rounded-md">
               <input
                 type="text"
-                placeholder="Email Address"
+                placeholder="Username"
                 className="shadow-wri-small peer block w-full rounded-md border-0 px-5 py-3 text-neutral-700 ring-1 ring-inset ring-gray-300 placeholder:text-neutral-700 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
               ></input>
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center pr-3 text-neutral-700 peer-focus:text-[#3654A5]">
@@ -33,7 +33,7 @@ export default function Login() {
             </div>
             <div className="relative mx-auto w-full max-w-[24rem] rounded-md">
               <input
-                type="text"
+                type="password"
                 placeholder="Password"
                 className="shadow-wri-small peer block w-full rounded-md border-0 px-5 py-3 text-neutral-700 ring-1 ring-inset ring-gray-300 placeholder:text-neutral-700 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
               ></input>
@@ -49,9 +49,9 @@ export default function Login() {
               type="button"
               className="rounded-sm bg-wri-gold px-4 py-4 text-[1.125rem] font-semibold text-wri-black"
             >
-            <Link href="/dashboard">
-              Log In
-            </Link></button>
+              <Link href="/dashboard">
+                Log In
+              </Link></button>
           </form>
         </div>
         <div className="mt-8 flex items-center justify-center gap-x-2 text-center">
