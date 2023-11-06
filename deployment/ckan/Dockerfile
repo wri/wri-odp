@@ -1,4 +1,4 @@
-FROM viderum/ckan:v2.10-dev
+FROM v2.10-dev-security-fix
 
 ENV CKAN_INI /srv/app/production.ini
 ENV APP_DIR=/srv/app
