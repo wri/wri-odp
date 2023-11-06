@@ -42,21 +42,20 @@ export default function Footer({
         <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 items-center gap-y-8 pt-16 font-bold text-wri-black sm:flex-row sm:items-start">
           <div className="mb-6 flex w-full flex-col items-center gap-y-4 sm:mb-0 sm:items-start">
             <p className="text-base font-bold">ABOUT WRI</p>
-            <p className=" font-normal">About us</p>
-            <p className=" font-normal">Our Work</p>
-            <p className=" font-normal">Our Approach</p>
+            <a className=" font-normal">About Us</a>
+            <a className=" font-normal">Our Mission</a>
+            <a className=" font-normal">Our Approach</a>
           </div>
           <div className="mb-6 flex w-full flex-col items-center gap-y-4  sm:mb-0 sm:items-start">
             <p className="text-base font-bold">USEFUL LINKS</p>
-            <p className=" font-normal">About us</p>
-            <p className=" font-normal">Our Work</p>
-            <p className=" font-normal">Our Approach</p>
+            <a href="/teams" className=" font-normal">Teams</a>
+            <a className=" font-normal">Request Data</a>
           </div>
           <div className="flex w-full flex-col items-center gap-y-4 sm:items-start">
             <p className="text-base font-bold">GET STARTED</p>
-            <p className=" font-normal">About us</p>
-            <p className=" font-normal">Our Work</p>
-            <p className=" font-normal">Our Approach</p>
+            <a className=" font-normal">Find Data</a>
+            <a className=" font-normal">Publish Data</a>
+            <a className=" font-normal">Get Help</a>
           </div>
           <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start xl:min-w-[420px]">
             <div className="font-acumin text-[22px] font-bold text-gray-800">
