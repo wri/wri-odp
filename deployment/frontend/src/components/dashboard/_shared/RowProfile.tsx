@@ -6,6 +6,7 @@ export interface IRowProfile {
   title?: string;
   description?: string;
   image?: string;
+  image_display_url?: string;
 }
 
 
@@ -14,7 +15,7 @@ export default function RowProfile({ imgStyle, isPad, profile }: { imgStyle?: st
     <div className='flex flex-row gap-x-4 hover:bg-slate-100  rounded-md'>
       <div className='flex gap-x-4'>
         <div className={`relative ${imgStyle ? imgStyle : "w-10 h-10"} `}>
-          <Image src={profile?.image ? profile.image : '/images/placeholders/user/userpics.png'} alt='' className='rounded-md' fill />
+          <Image src={profile?.image_display_url ? profile.image_display_url : '/images/placeholders/user/userpics.png'} alt='' className='rounded-md' fill />
         </div>
       </div>
       <div className={`flex flex-col ${isPad ? "py-3" : ''}`}>
