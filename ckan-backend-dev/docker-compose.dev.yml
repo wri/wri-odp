@@ -34,6 +34,30 @@ services:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
     image: ${CKAN_IMAGE}
 
+      #  frontend:
+      #    build:
+      #      context: ../deployment/frontend/
+      #      dockerfile: Dockerfile
+      #      args:
+      #        - NEXTAUTH_SECRET=secret
+      #        - NEXTAUTH_URL=http://localhost:30000
+      #        - CKAN_URL=http://ckan-dev:5000
+      #        - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      #        - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+      #        - S3_BUCKET_NAME=ckan
+      #        - S3_BUCKET_REGION=us-east-1
+      #        - NEXT_PUBLIC_S3_ENDPOINT=http://ckan-dev:5000
+      #    env_file:
+      #      - .env
+      #    depends_on:
+      #      ckan-dev:
+      #        condition: service_healthy
+      #    ports:
+      #      - "3000-3000"
+      #    restart: unless-stopped
+      #    healthcheck:
+      #      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
+
   datapusher:
     container_name: ${DATAPUSHER_CONTAINER_NAME}
     image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}

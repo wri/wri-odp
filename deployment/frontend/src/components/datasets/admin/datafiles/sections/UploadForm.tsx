@@ -59,6 +59,7 @@ export function UploadForm({ removeFile }: { removeFile: () => void }) {
       </InputGroup>
       <InputGroup label="Format" className="whitespace-nowrap">
         <SimpleSelect
+          name="format"
           placeholder="Select format"
           maxWidth="max-w-[70rem]"
           options={[

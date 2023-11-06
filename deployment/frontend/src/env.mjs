@@ -34,7 +34,6 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    NEXT_PUBLIC_S3_ENDPOINT: z.string(),
   },
 
   /**
@@ -50,7 +49,6 @@ export const env = createEnv({
     S3_SECRET_KEY_ID: process.env.S3_SECRET_KEY_ID,
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
     S3_BUCKET_REGION: process.env.S3_BUCKET_REGION,
-    NEXT_PUBLIC_S3_ENDPOINT: process.env.NEXT_PUBLIC_S3_ENDPOINT,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

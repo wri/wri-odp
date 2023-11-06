@@ -1,5 +1,4 @@
 import { UseFormReturn } from 'react-hook-form'
-import { TeamFormType } from '@/schema/team.schema'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
@@ -10,12 +9,13 @@ import { env } from '@/env.mjs'
 import { api } from '@/utils/api'
 import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
+import { TopicFormType } from '@/schema/topic.schema'
 
-export default function TeamForm({
+export default function TopicForm({
     formObj,
     editing = false,
 }: {
-    formObj: UseFormReturn<TeamFormType>
+    formObj: UseFormReturn<TopicFormType>
     editing?: boolean;
 }) {
     const {
@@ -24,7 +24,7 @@ export default function TeamForm({
         watch,
         formState: { errors, isSubmitting },
     } = formObj
-    const possibleParents = api.teams.getAllTeams.useQuery()
+  const possibleParents = api.topics.getAllTopics.useQuery()
   return (
         <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
             <div className="flex flex-col justify-start gap-y-4">
@@ -45,7 +45,7 @@ export default function TeamForm({
                         className="pl-[4.6rem] lg:pl-[4rem]"
                     >
                         <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
-                            /teams/
+                            /topics/
                         </span>
                     </Input>
                     <ErrorDisplay name="name" errors={errors} />

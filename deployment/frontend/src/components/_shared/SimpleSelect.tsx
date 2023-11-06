@@ -8,6 +8,7 @@ import {
     Path,
     PathValue,
     UseFormReturn,
+    useForm,
 } from 'react-hook-form'
 
 export interface Option<V> {
@@ -21,7 +22,7 @@ interface SimpleSelectProps<T extends FieldValues, V extends Object> {
     placeholder: string
     className?: string
     maxWidth?: string
-    formObj: UseFormReturn<T>
+    formObj?: UseFormReturn<T>
     name: Path<T>
 }
 
@@ -36,7 +37,7 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
     const [selected, setSelected] = useState<Option<V> | null>(
         options.find((option) => option.default) ?? null
     )
-    const { control } = formObj
+    const { control } = formObj ?? useForm()
     return (
         <Controller
             control={control}

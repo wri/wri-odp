@@ -13,15 +13,17 @@ export function ImageUploader({
     onUploadStart,
     text = 'Upload image',
     clearImage,
-  defaultImage,
+    defaultImage,
 }: {
     onUploadSuccess: (result: UploadResult) => void
     onUploadStart?: () => void
     clearImage?: () => void
     text?: string
-    defaultImage?: string
+    defaultImage?: string | null
 }) {
-    const [uploadedImage, setUploadedImage] = useState<string | null>(defaultImage ?? null)
+    const [uploadedImage, setUploadedImage] = useState<string | null>(
+        defaultImage ?? null
+    )
     const [uploading, setIsUploading] = useState(false)
     const uploadInputRef = useRef<HTMLInputElement>(null)
     const uppy = React.useMemo(() => {
@@ -33,7 +35,7 @@ export function ImageUploader({
         }).use(AwsS3, {
             id: 'AwsS3',
             getUploadParameters: (file: UppyFile) =>
-                getUploadParameters(file, 'images'),
+                getUploadParameters(file, 'storage/uploads/group'),
         })
         return uppy
     }, [])
@@ -46,7 +48,6 @@ export function ImageUploader({
             }
 
             if (result.failed.length > 0) {
-                console.error('Errors:')
                 result.failed.forEach((file) => {
                     console.error(file.error)
                 })
@@ -134,19 +135,20 @@ export function ImageUploader({
                 )}
             </button>
             {clearImage && uploadedImage && !uploading && (
-        <div className='w-full flex justify-end'>
-                <Button
-                    variant="destructive"
-          className='w-fit my-2'
-          size="sm"
-                    onClick={() => {
-                        clearImage()
-                        setUploadedImage(null)
-                    }}
-                >
-                    <MinusCircleIcon className="h-5 w-5 text-white mr-2" /> Remove
-                    Image
-                </Button></div>
+                <div className="w-full flex justify-end">
+                    <Button
+                        variant="destructive"
+                        className="w-fit my-2"
+                        size="sm"
+                        onClick={() => {
+                            clearImage()
+                            setUploadedImage(null)
+                        }}
+                    >
+                        <MinusCircleIcon className="h-5 w-5 text-white mr-2" />{' '}
+                        Remove Image
+                    </Button>
+                </div>
             )}
         </>
     )

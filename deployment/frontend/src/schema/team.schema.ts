@@ -10,6 +10,7 @@ export const TeamSchema = z.object({
       "The name cant have spaces nor the dot(.) character, it needs to be URL Compatible"
     ),
   title: z.string(),
+  image_display_url: z.string().optional().nullable(),
   image_url: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   parent: z.preprocess((val) => {

@@ -1,12 +1,12 @@
 import Header from "@/components/_shared/Header";
-import { CreateTopic } from "@/components/topics/CreateTopic";
+import CreateTopicForm from "@/components/dashboard/topics/forms/CreateTopicForm";
 
-export default function TeamsPage() {
+export default function CreateTopicPage() {
 
   return (
     <>
       <Header />
-      <CreateTopic/>
+      <CreateTopicForm />
     </>
   );
 }
