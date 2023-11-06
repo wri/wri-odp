@@ -5,6 +5,7 @@ import {
   LockClosedIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Login() {
   return (
@@ -45,11 +46,12 @@ export default function Login() {
               Forgot password?
             </div>
             <button
-              type="submit"
+              type="button"
               className="rounded-sm bg-wri-gold px-4 py-4 text-[1.125rem] font-semibold text-wri-black"
             >
+            <Link href="/dashboard">
               Log In
-            </button>
+            </Link></button>
           </form>
         </div>
         <div className="mt-8 flex items-center justify-center gap-x-2 text-center">

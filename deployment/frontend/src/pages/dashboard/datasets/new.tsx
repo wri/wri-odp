@@ -16,6 +16,7 @@ import { match } from "ts-pattern";
 
 const links = [
   { label: "Dashboard", url: "/dashboard", current: false },
+  { label: "Datasets", url: "/dashboard/datasets", current: false },
   { label: "Add a Dataset", url: "/dashboard/datasets/new", current: true },
 ];
 

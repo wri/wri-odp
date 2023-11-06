@@ -1,6 +1,5 @@
 import React from 'react'
 import { Tab } from '@headlessui/react'
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
 import DatasetLCardList from './DatasetLCardList'
 import Favourite from './Favourites'
 import Drafts from './Drafts'
@@ -49,14 +48,6 @@ const tabs = [
     name: "Awaiting Approval",
     title: "Awaiting Approval",
   },
-  {
-    id: "adddataset",
-    content: (
-      <div>activity</div>
-    ),
-    name: "Add dataset",
-    title: "Add dataset",
-  }
 ]
 
 export default function DatasetList() {
