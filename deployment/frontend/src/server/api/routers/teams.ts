@@ -78,6 +78,7 @@ export const teamRouter = createTRPCRouter({
                     ...input,
                     groups: input.parent ? [{ name: input.parent }] : [],
                 })
+                console.log(user)
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_create`,
                     {
