@@ -1,18 +1,31 @@
 import React from 'react'
 import SearchHeader from '../_shared/SearchHeader'
 import { DraftRow } from './DatasetRow'
+import { api } from '@/utils/api'
+import Spinner from '@/components/_shared/Spinner';
 
 export default function Drafts() {
+  const { data, isLoading } = api.dataset.getDraftDataset.useQuery()
+
+  if (isLoading) {
+    return (
+      <div className='flex justify-center items-center h-screen'>
+        <Spinner className="mx-auto my-2" />
+      </div>
+    )
+  }
+
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
       <SearchHeader leftStyle='px-2 sm:pr-2 sm:pl-12' />
       <div className='w-full'>
         {
-          [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((items, index) => {
-            return (
-              <DraftRow key={index} className={index % 2 === 0 ? ' bg-wri-row-gray hover:bg-wri-slate' : ''} />
-            )
-          })
+          data?.datasets.length === 0 ? <div className='flex justify-center items-center h-screen'>No data</div> :
+            data?.datasets.map((items, index) => {
+              return (
+                <DraftRow key={index} dataset={items} className={index % 2 === 0 ? ' bg-wri-row-gray hover:bg-wri-slate' : ''} />
+              )
+            })
         }
       </div>
     </section>

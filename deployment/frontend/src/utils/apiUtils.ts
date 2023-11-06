@@ -1,7 +1,25 @@
 import { env } from "@/env.mjs";
-import type { Activity, ActivityDisplay, CkanResponse, User } from "@/schema/ckan.schema";
-import type { Organization, Dataset } from "@portaljs/ckan";
+import type { Activity, ActivityDisplay, CkanResponse, User, WriDataset } from "@/schema/ckan.schema";
+import type { Organization } from "@portaljs/ckan";
 
+
+export async function getAllDatasetFq({ apiKey, fq }: { apiKey: string, fq: string }): Promise<WriDataset[] | null> {
+  try {
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/package_search?q=${fq}`,
+      {
+        headers: {
+          "Authorization": apiKey,
+        }
+      });
+    const data = (await response.json()) as CkanResponse<{ results: WriDataset[], count: number }>;
+    const datasets = data.success === true ? data.result.results : null;
+    return datasets
+  }
+  catch (e) {
+    console.error(e);
+    return null
+  }
+}
 export async function getUserOrganizations({ userId, apiKey }: { userId: string, apiKey: string }): Promise<Organization[] | null> {
   try {
     const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list_for_user`,
@@ -23,7 +41,7 @@ export async function getUserOrganizations({ userId, apiKey }: { userId: string,
   }
 }
 
-export async function getUserDataset({ userId, apiKey }: { userId: string, apiKey: string }): Promise<{ datasets: Dataset[]; count: number } | null> {
+export async function getUserDataset({ userId, apiKey }: { userId: string, apiKey: string }): Promise<{ datasets: WriDataset[]; count: number } | null> {
   try {
     const response = await fetch(`${env.CKAN_URL}/api/3/action/package_search?q=creator_user_id:${userId}`,
       {
@@ -31,7 +49,7 @@ export async function getUserDataset({ userId, apiKey }: { userId: string, apiKe
           "Authorization": apiKey,
         }
       });
-    const data = (await response.json()) as CkanResponse<{ results: Dataset[], count: number }>
+    const data = (await response.json()) as CkanResponse<{ results: WriDataset[], count: number }>
     const datasets = data.result.results;
     const count = data.result.count;
     return { datasets, count }

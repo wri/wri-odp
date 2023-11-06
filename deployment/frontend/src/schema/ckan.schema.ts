@@ -1,3 +1,4 @@
+import type { Dataset } from "@portaljs/ckan";
 export interface CkanResponse<T> {
   help: string;
   success: boolean;
@@ -36,4 +37,23 @@ export interface ActivityDisplay {
   description: string,
   time: string,
   icon: string
+}
+
+export interface WriDataset extends Dataset {
+  summary?: string;
+  technical_notes?: string;
+  temporal_coverage?: string;
+  update_frequency?: string;
+  visibility_type?: string;
+  short_description?: string;
+  projects?: string[];
+  reason_for_adding?: string;
+  featured_dataset?: boolean;
+  application?: string;
+  cautions?: string;
+  citation?: string;
+  function?: string;
+  isopen?: boolean;
+  learn_more?: string;
+  restrictions?: string;
 }

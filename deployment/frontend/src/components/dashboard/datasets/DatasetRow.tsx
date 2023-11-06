@@ -2,53 +2,60 @@ import React from 'react'
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import Row from '../_shared/Row'
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import type { WriDataset } from '@/schema/ckan.schema';
+import { formatDate } from '@/utils/general';
 
-const status = [
-  {
-    title: "Status",
-    description: "RDI Approved"
-  },
-  {
-    title: "Type of Dataset",
-    description: "XYZ type"
-  },
-  {
-    title: "Coverage",
-    description: "2019 - 2023"
-  },
-  {
-    title: "Short description",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-  },
-  {
-    title: "Technical Notes",
-    description: "https://source/to/original/data"
-  },
-  {
-    title: "Team",
-    description: "Land and Carbon Lab"
-  },
-  {
-    title: "Region",
-    description: "Sub-regional"
-  }
-]
 
-function DatasetCardProfile() {
+function subFields(dataset: WriDataset) {
+  return [
+    {
+      title: "Status",
+      description: "RDI Approved"
+    },
+    {
+      title: "Type of Dataset",
+      description: dataset?.type
+    },
+    {
+      title: "Coverage",
+      description: dataset?.temporal_coverage
+    },
+    {
+      title: "Short description",
+      description: dataset?.short_description
+    },
+    {
+      title: "Technical Notes",
+      description: dataset?.technical_notes
+    },
+    {
+      title: "Team",
+      description: dataset?.organization?.title
+    },
+    {
+      title: "Region",
+      description: "Sub-regional"
+    }
+  ]
+}
+
+function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
+  const created = dataset?.metadata_created ? dataset.metadata_created : ''
   return (
     <div className='flex flex-col p-1 py-3 rounded-md pl-4 sm:pl-14'>
-      <p className='font-semibold text-[15px]'>Name of dataset</p>
+      <p className='font-semibold text-[15px]'>{dataset?.title ?? dataset?.name}</p>
       <div className='flex font-normal'>
         <ArrowPathIcon className='w-3 h-3  text-[#3654A5] mt-[2px]' />
         <div className='ml-1 w-fit h-[12px] text-[12px] text-[#666666]'>
-          20 Sept 2022
+          {formatDate(created)}
         </div>
       </div>
     </div>
   )
 }
 
-function SubCardProfile() {
+function SubCardProfile({ dataset }: { dataset: WriDataset }) {
+  const status = subFields(dataset)
   return (
     <div>
       <div className='ml-14  w-[90%] outline outline-1 outline-wri-gray'></div>
@@ -67,11 +74,11 @@ function SubCardProfile() {
   )
 }
 
-export default function DatasetRow({ className }: { className?: string }) {
+export default function DatasetRow({ className, dataset }: { className?: string, dataset: WriDataset }) {
   return (
     <Row
       className={`pr-2 sm:pr-4 ${className ? className : ''}`}
-      rowMain={<DatasetCardProfile />}
+      rowMain={<DatasetCardProfile dataset={dataset} />}
       controlButtons={[
         { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
         { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
@@ -80,38 +87,38 @@ export default function DatasetRow({ className }: { className?: string }) {
         label: "View dataset",
         link: "#",
       }}
-      rowSub={<SubCardProfile />}
+      rowSub={<SubCardProfile dataset={dataset} />}
       isDropDown
     />
   )
 }
 
 
-export function FavouriteRow({ className }: { className?: string }) {
+export function FavouriteRow({ className, dataset }: { className?: string, dataset: WriDataset }) {
   return (
     <Row
       className={`pr-2 sm:pr-4  ${className ? className : ''}`}
-      rowMain={<DatasetCardProfile />}
+      rowMain={<DatasetCardProfile dataset={dataset} />}
       linkButton={{
         label: "View dataset",
         link: "#",
       }}
-      rowSub={<SubCardProfile />}
+      rowSub={<SubCardProfile dataset={dataset} />}
       isDropDown
     />
   )
 }
 
-export function DraftRow({ className }: { className?: string }) {
+export function DraftRow({ className, dataset }: { className?: string, dataset: WriDataset }) {
   return (
     <Row
       className={`pr-2 sm:pr-4 ${className ? className : ''}`}
-      rowMain={<DatasetCardProfile />}
+      rowMain={<DatasetCardProfile dataset={dataset} />}
       controlButtons={[
         { label: "Edit", color: 'bg-wri-gold hover:bg-green-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
         { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
       ]}
-      rowSub={<SubCardProfile />}
+      rowSub={<SubCardProfile dataset={dataset} />}
       isDropDown
     />
   )
