@@ -71,7 +71,7 @@ export default function Footer({
                   <input
                     type="text"
                     placeholder="Enter your email address"
-                    className=" focus:outline-none placeholder:text-xs text-xs font-normal w-full"
+                    className=" focus:outline-none placeholder:text-xs text-xs font-normal w-full border-none"
                   />
                 </div>
               </div>

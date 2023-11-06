@@ -100,12 +100,13 @@ export const authOptions: NextAuthOptions = {
                             }),
                         }
                     )
-                    const user: CkanResponse<User> = await userRes.json()
-                    console.log('Ckan Response to User', user)
+                    const user: CkanResponse<
+                        User & { frontend_token: string }
+                    > = await userRes.json()
 
                     if (user.result.errors) {
                         // TODO: error from the response should be sent to the client, but it's not working
-                        throw new Error('Failed to sign in')
+                        throw new Error(user.result.error_summary.auth)
                     }
 
                     if (user.result.id) {
@@ -115,7 +116,7 @@ export const authOptions: NextAuthOptions = {
                                 method: 'POST',
                                 body: JSON.stringify({ id: user.result.id }),
                                 headers: {
-                                    Authorization: user.result.apikey,
+                                    Authorization: user.result.frontend_token,
                                     'Content-Type': 'application/json',
                                 },
                             }
@@ -127,22 +128,18 @@ export const authOptions: NextAuthOptions = {
                         return {
                             ...user.result,
                             image: '',
-                            apikey: user.result.apikey,
+                            apikey: user.result.frontend_token,
                             teams: orgList.result.map((org) => ({
                                 name: org.name,
                                 id: org.id,
                             })),
                         }
                     } else {
-                        return Promise.reject(
-                            '/auth/signin?error=Could%20not%20login%20user%20please%20check%20your%20password%20and%20username'
-                        )
+                        throw 'An unexpected error occurred while signing in. Please, try again.'
                     }
                 } catch (e) {
                     console.log('Error', e)
-                    return Promise.reject(
-                        '/auth/signin?error=Could%20not%20login%20user%20please%20check%20your%20password%20and%20username'
-                    )
+                    throw e
                 }
             },
         }),

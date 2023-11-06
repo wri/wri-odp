@@ -9,10 +9,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import Login from '../_shared/Login'
+import { useSession } from 'next-auth/react'
+import UserMenu from '../_shared/UserMenu'
 
 export function Hero() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
+    const session = useSession()
+    console.log(session)
 
     const { asPath } = useRouter()
     const navigation = [
@@ -68,12 +72,16 @@ export function Hero() {
                     </div>
                     <div className="flex gap-x-2 lg:hidden">
                         <div>
-                            <button
-                                onClick={() => setIsOpen(true)}
-                                className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
-                            >
-                                Login
-                            </button>
+                            {session.status == 'authenticated' ? (
+                                <UserMenu colors="dark" />
+                            ) : (
+                                <button
+                                    onClick={() => setIsOpen(true)}
+                                    className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
+                                >
+                                    Login
+                                </button>
+                            )}
                         </div>
                         <button
                             type="button"
@@ -95,12 +103,16 @@ export function Hero() {
                             </Link>
                         ))}
                         <div>
-                            <button
-                                onClick={() => setIsOpen(true)}
-                                className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
-                            >
-                                Login
-                            </button>
+                            {session.status == 'authenticated' ? (
+                                <UserMenu colors="light" />
+                            ) : (
+                                <button
+                                    onClick={() => setIsOpen(true)}
+                                    className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
+                                >
+                                    Login
+                                </button>
+                            )}
                         </div>
                     </div>
                 </nav>
