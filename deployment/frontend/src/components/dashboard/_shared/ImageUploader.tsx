@@ -7,6 +7,7 @@ import { getUploadParameters } from '@/utils/uppyFunctions'
 import { ArrowUpTrayIcon } from '@heroicons/react/24/outline'
 import { MinusCircleIcon } from '@heroicons/react/20/solid'
 import { Button } from '@/components/_shared/Button'
+import { api } from '@/utils/api'
 
 export function ImageUploader({
     onUploadSuccess,
@@ -21,9 +22,8 @@ export function ImageUploader({
     text?: string
     defaultImage?: string | null
 }) {
-    const [uploadedImage, setUploadedImage] = useState<string | null>(
-        defaultImage ?? null
-    )
+    const [key, setKey] = useState<string | null>(null)
+    const presignedGetUrl = api.uploads.getPresignedUrl.useQuery({key: key as string}, {enabled: !!key})
     const [uploading, setIsUploading] = useState(false)
     const uploadInputRef = useRef<HTMLInputElement>(null)
     const uppy = React.useMemo(() => {
@@ -44,7 +44,10 @@ export function ImageUploader({
         uppy.upload().then((result) => {
             setIsUploading(false)
             if (result && result.successful[0]) {
-                setUploadedImage(result.successful[0].uploadURL)
+                let paths = new URL(result.successful[0].uploadURL).pathname.substring(1).split('/')
+                const key = paths.slice(0, paths.length).join('/')
+                console.log(key)
+                setKey(key)
             }
 
             if (result.failed.length > 0) {
@@ -82,10 +85,10 @@ export function ImageUploader({
                 disabled={uploading}
                 className="isolate relative w-full flex aspect-square flex-col group items-center justify-center md:gap-y-2 rounded-[0.188rem] border-2 border-b-amber-400 bg-white shadow transition hover:bg-amber-400"
             >
-                {!uploading && uploadedImage && (
+                {!uploading && presignedGetUrl.data && (
                     <>
                         <img
-                            src={uploadedImage}
+                            src={presignedGetUrl.data}
                             alt=""
                             className="absolute inset-0 z-9 h-full w-full object-cover"
                         />
@@ -134,7 +137,7 @@ export function ImageUploader({
                     </>
                 )}
             </button>
-            {clearImage && uploadedImage && !uploading && (
+            {clearImage && presignedGetUrl.data && !uploading && (
                 <div className="w-full flex justify-end">
                     <Button
                         variant="destructive"
@@ -142,7 +145,7 @@ export function ImageUploader({
                         size="sm"
                         onClick={() => {
                             clearImage()
-                            setUploadedImage(null)
+                            setKey(null)
                         }}
                     >
                         <MinusCircleIcon className="h-5 w-5 text-white mr-2" />{' '}

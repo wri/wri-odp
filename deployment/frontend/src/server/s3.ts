@@ -8,7 +8,7 @@ const s3 = new S3Client({
     secretAccessKey: env.S3_SECRET_KEY_ID,
   },
   forcePathStyle: env.S3_ACCESS_KEY_ID === "minioadmin" ? true : false,
-  endpoint: env.S3_ACCESS_KEY_ID === "minioadmin" ? "http://localhost:9000/" : undefined
+  endpoint: env.S3_ACCESS_KEY_ID === "minioadmin" ? "http://minio:9000" : undefined
 });
 
 export default s3; 

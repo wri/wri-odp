@@ -5,6 +5,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "@/env.mjs";
 import s3 from "@/server/s3";
+import { slugify } from "@/utils/slugify";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -15,7 +16,7 @@ export default async function handler(
     s3,
     new PutObjectCommand({
       Bucket: env.S3_BUCKET_NAME,
-      Key: filePath ? `${filePath}/${filename}` : `resources/${fileHash}/${filename}`,
+      Key: filePath ? `${filePath}/${slugify(filename)}` : `resources/${fileHash}/${filename}`,
       ContentType: contentType as string,
     }),
     { expiresIn: 3600 }
