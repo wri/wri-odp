@@ -1,7 +1,23 @@
 import { env } from "@/env.mjs";
-import type { Activity, ActivityDisplay, CkanResponse, User, WriDataset } from "@/schema/ckan.schema";
-import type { Organization } from "@portaljs/ckan";
+import type { Activity, ActivityDisplay, CkanResponse, User, WriDataset, WriOrganization } from "@/schema/ckan.schema";
 
+export async function getOrgDetails({ orgId, apiKey }: { orgId: string, apiKey: string }): Promise<WriOrganization | null> {
+  try {
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_show?id=${orgId}`,
+      {
+        headers: {
+          "Authorization": apiKey,
+        }
+      });
+    const data = (await response.json()) as CkanResponse<WriOrganization | null>;
+    const organization: WriOrganization | null = data.success === true ? data.result : null;
+    return organization
+  }
+  catch (e) {
+    console.error(e);
+    return null
+  }
+}
 
 export async function getAllDatasetFq({ apiKey, fq }: { apiKey: string, fq: string }): Promise<WriDataset[] | null> {
   try {
@@ -20,9 +36,9 @@ export async function getAllDatasetFq({ apiKey, fq }: { apiKey: string, fq: stri
     return null
   }
 }
-export async function getUserOrganizations({ userId, apiKey }: { userId: string, apiKey: string }): Promise<Organization[] | null> {
+export async function getUserOrganizations({ userId, apiKey }: { userId: string, apiKey: string }): Promise<WriOrganization[] | null> {
   try {
-    const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list_for_user`,
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list_for_user?all_fields=true`,
       {
         method: "POST",
         body: JSON.stringify({ id: userId }),
@@ -31,8 +47,8 @@ export async function getUserOrganizations({ userId, apiKey }: { userId: string,
           "Content-Type": "application/json"
         }
       });
-    const data = (await response.json()) as CkanResponse<Organization[] | null>;
-    const organizations: Organization[] | null = data.success === true ? data.result : null;
+    const data = (await response.json()) as CkanResponse<WriOrganization[] | null>;
+    const organizations: WriOrganization[] | null = data.success === true ? data.result : null;
     return organizations
   }
   catch (e) {
