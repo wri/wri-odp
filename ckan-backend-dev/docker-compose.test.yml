@@ -37,6 +37,7 @@ services:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
 
   frontend:
+    container_name: wri-frontend
     build:
       context: ../deployment/frontend/
       args:
