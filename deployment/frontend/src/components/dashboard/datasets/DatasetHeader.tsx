@@ -1,6 +1,8 @@
 import React from 'react'
 import SearchHeader from '../_shared/SearchHeader'
 import SelectFilter from '../_shared/SelectFilter'
+import { WriDataset } from '@/schema/ckan.schema'
+import type { SearchInput } from '@/schema/search.schema'
 
 function LeftNode() {
   return (
@@ -22,8 +24,8 @@ function LeftNode() {
 
 }
 
-export default function DatasetHeader() {
+export default function DatasetHeader({ setQuery, query, Pagination }: { setQuery: React.Dispatch<React.SetStateAction<SearchInput>>, query: SearchInput, Pagination?: React.ReactNode }) {
   return (
-    <SearchHeader RightNode={<LeftNode />} leftStyle='px-2 sm:pr-2 sm:pl-12' rightStyle='px-2 sm:pr-4' />
+    <SearchHeader setQuery={setQuery} query={query} RightNode={<LeftNode />} leftStyle='px-2 sm:pr-2 sm:pl-12' rightStyle='px-2 sm:pr-4' Pagination={Pagination} />
   )
 }

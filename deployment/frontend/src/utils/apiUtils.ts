@@ -3,6 +3,7 @@ import type {
   Activity, ActivityDisplay, CkanResponse, User, WriDataset, WriOrganization, GroupTree
 } from "@/schema/ckan.schema";
 import type { Group } from "@portaljs/ckan";
+import type { SearchInput } from "@/schema/search.schema";
 
 
 export async function getGroups({ apiKey }: { apiKey: string }): Promise<GroupTree[]> {
@@ -118,21 +119,22 @@ export async function getOrgDetails({ orgId, apiKey }: { orgId: string, apiKey: 
   }
 }
 
-export async function getAllDatasetFq({ apiKey, fq }: { apiKey: string, fq: string }): Promise<WriDataset[] | null> {
+export async function getAllDatasetFq({ apiKey, fq, query }: { apiKey: string, fq: string, query: SearchInput }): Promise<{ datasets: WriDataset[], count: number }> {
   try {
-    const response = await fetch(`${env.CKAN_URL}/api/3/action/package_search?q=${fq}`,
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/package_search?q=${query.search}&fq=(${fq})&start=${query.page?.start}&rows=${query.page?.rows}`,
       {
         headers: {
           "Authorization": apiKey,
         }
       });
     const data = (await response.json()) as CkanResponse<{ results: WriDataset[], count: number }>;
-    const datasets = data.success === true ? data.result.results : null;
-    return datasets
+    const datasets = data.success === true ? data.result.results : [];
+    const count = data.success === true ? data.result.count : 0;
+    return { datasets, count }
   }
   catch (e) {
     console.error(e);
-    return null
+    return { datasets: [], count: 0 }
   }
 }
 export async function getUserOrganizations({ userId, apiKey }: { userId: string, apiKey: string }): Promise<WriOrganization[] | null> {
