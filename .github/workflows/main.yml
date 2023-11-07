@@ -70,6 +70,14 @@ jobs:
           node-version: 18
           runTests: false
           working-directory: ./integration-tests
+      - name: Cypress Install and CKAN setup
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 120
+          node-version: 18
+          runTests: false
+          working-directory: ./e2e-tests
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Run Integration tests 🧪
@@ -80,9 +88,6 @@ jobs:
       - name: Run frontend tests 🧪
         uses: cypress-io/github-action@v6
         with:
-          wait-on: 'http://localhost:3000'
-          wait-on-timeout: 120
-          node-version: 18
           command: npm run test
           working-directory: ./e2e-tests
       - name: Copy run_unit_tests.sh
