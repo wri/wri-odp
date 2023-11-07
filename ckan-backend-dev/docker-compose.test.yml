@@ -47,12 +47,8 @@ services:
         - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
         - S3_BUCKET_NAME=ckan
         - S3_BUCKET_REGION=us-east-1
-    depends_on:
-      ckan-dev:
-        condition: service_healthy
     ports:
       - "0.0.0.0:3000:3000"
-    restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
 
