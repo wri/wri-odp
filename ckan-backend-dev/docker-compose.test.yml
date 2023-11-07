@@ -40,18 +40,10 @@ services:
     container_name: wri-frontend
     build:
       context: ../deployment/frontend/
-      args:
-        - NEXTAUTH_SECRET=secret
-        - NEXTAUTH_URL=http://localhost:3000
-        - CKAN_URL=http://localhost:5000
-        - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
-        - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
-        - S3_BUCKET_NAME=ckan
-        - S3_BUCKET_REGION=us-east-1
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
-      - CKAN_URL=http://localhost:5000
+      - CKAN_URL=http://ckan-dev:5000
       - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
       - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
       - S3_BUCKET_NAME=ckan
@@ -60,6 +52,13 @@ services:
       - "0.0.0.0:3000:3000"
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
+
+  datapusher:
+    container_name: ${DATAPUSHER_CONTAINER_NAME}
+    image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}
