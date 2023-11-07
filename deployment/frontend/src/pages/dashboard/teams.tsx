@@ -1,17 +1,19 @@
 import React from 'react'
 import Header from '@/components/_shared/Header'
 import Layout from "@/components/dashboard/Layout";
-import DatasetList from '@/components/dashboard/datasets/DatasetList';
+import TeamList from '@/components/dashboard/teams/TeamList';
 import Footer from "@/components/_shared/Footer";
 
-export default function DatasetListPage() {
+export default function teams() {
   return (
     <>
       <Header />
       <Layout >
-        <DatasetList />
+        <TeamList />
       </Layout>
       <Footer style='mt-0' />
     </>
   )
 }
+
+
