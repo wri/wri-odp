@@ -1,4 +1,4 @@
-import type { Dataset, Group, Organization } from "@portaljs/ckan";
+import type { Dataset, Group, Organization, User as CkanUser } from "@portaljs/ckan";
 export interface CkanResponse<T> {
   help: string;
   success: boolean;
@@ -60,4 +60,9 @@ export interface WriDataset extends Dataset {
 
 export interface WriOrganization extends Organization {
   groups?: Group[];
+  users?: WriUser[];
+}
+
+export interface WriUser extends CkanUser {
+  capacity?: string;
 }

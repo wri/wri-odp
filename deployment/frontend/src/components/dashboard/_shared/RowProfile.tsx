@@ -7,6 +7,7 @@ export interface IRowProfile {
   description?: string;
   image?: string;
   image_display_url?: string;
+  name?: string;
 }
 
 
@@ -19,7 +20,7 @@ export default function RowProfile({ imgStyle, isPad, profile }: { imgStyle?: st
         </div>
       </div>
       <div className={`flex flex-col ${isPad ? "py-3" : ''}`}>
-        <p className='font-normal text-base'>{profile?.title ? profile.title : "sent you a request for approval"}</p>
+        <p className='font-normal text-base'>{profile?.title || profile?.name ? profile.title || profile.name : "sent you a request for approval"}</p>
         {profile?.description ? (<span className='text-[#666666] font-tight text-[12px] '>{profile.description}</span>) : ""}
       </div>
     </div>

@@ -103,6 +103,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | undefined }) {
 
 
 export default function TopicCard() {
+
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
       <SearchHeader leftStyle=' sm:pr-2 sm:pl-12' rightStyle=' px-2 sm:pr-6' />

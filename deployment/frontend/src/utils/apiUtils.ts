@@ -1,5 +1,64 @@
 import { env } from "@/env.mjs";
 import type { Activity, ActivityDisplay, CkanResponse, User, WriDataset, WriOrganization } from "@/schema/ckan.schema";
+import type { Group } from "@portaljs/ckan";
+
+
+export async function getAllUsers({ apiKey }: { apiKey: string }): Promise<User[]> {
+  try {
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/user_list?all_fields=True`,
+      {
+        headers: {
+          "Authorization": apiKey,
+        }
+      });
+    const data = (await response.json()) as CkanResponse<User[]>;
+    const users: User[] | null = data.success === true ? data.result : [];
+    return users
+  }
+  catch (e) {
+    console.error(e);
+    return []
+  }
+}
+
+export async function getAllOrganizations({ apiKey }: { apiKey: string }): Promise<WriOrganization[] | null> {
+  try {
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list?all_fields=True`,
+      {
+        headers: {
+          "Authorization": apiKey,
+        }
+      });
+    const data = (await response.json()) as CkanResponse<WriOrganization[] | null>;
+    const organizations: WriOrganization[] | null = data.success === true ? data.result : null;
+    return organizations
+  }
+  catch (e) {
+    console.error(e);
+    return null
+  }
+}
+
+export async function getUserGroups({ userId, apiKey }: { userId: string, apiKey: string }): Promise<Group[] | null> {
+  try {
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/group_list?all_fields=true`,
+      {
+        method: "POST",
+        body: JSON.stringify({ id: userId }),
+        headers: {
+          "Authorization": apiKey,
+          "Content-Type": "application/json"
+        }
+      });
+    const data = (await response.json()) as CkanResponse<Group[] | null>;
+    const groups: Group[] | null = data.success === true ? data.result : null;
+    return groups
+  }
+  catch (e) {
+    console.error(e);
+    return null
+  }
+}
 
 export async function getOrgDetails({ orgId, apiKey }: { orgId: string, apiKey: string }): Promise<WriOrganization | null> {
   try {

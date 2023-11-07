@@ -4,6 +4,7 @@ import { activityStreamRouter } from "@/server/api/routers/activityStream";
 import { UserRouter } from "@/server/api/routers/User";
 import { DatasetRouter } from "./routers/dataset";
 import { OrganizationRouter } from "./routers/organization";
+import { TopicRouter } from "./routers/topics";
 
 /**
  * This is the primary router for your server.
@@ -15,7 +16,8 @@ export const appRouter = createTRPCRouter({
   dashboardActivity: activityStreamRouter,
   user: UserRouter,
   dataset: DatasetRouter,
-  organization: OrganizationRouter
+  organization: OrganizationRouter,
+  topic: TopicRouter
 });
 
 // export type definition of API
