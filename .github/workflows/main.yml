@@ -63,7 +63,9 @@ jobs:
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
       - name: Print Container names
-        run: docker ps
+        run: docker ps -a
+      - name: Print logs
+        run: docker logs wri-frontend
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
