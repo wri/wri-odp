@@ -38,6 +38,7 @@ services:
 
   frontend:
     build:
+      container_name: wri-frontend
       context: ../deployment/frontend/
       args:
         - NEXTAUTH_SECRET=secret
