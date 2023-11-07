@@ -26,6 +26,7 @@ export const teamRouter = createTRPCRouter({
                 const user = ctx.session.user
                 const body = JSON.stringify({
                     ...input,
+                    image_display_url: input.image_url ? `${env.CKAN_URL}/uploads/group/${input.image_url}` : null,
                     groups: input.parent ? [{ name: input.parent }] : [],
                 })
                 const teamRes = await fetch(
@@ -76,6 +77,7 @@ export const teamRouter = createTRPCRouter({
                 const user = ctx.session.user
                 const body = JSON.stringify({
                     ...input,
+                    image_display_url: input.image_url ? `${env.CKAN_URL}/uploads/group/${input.image_url}` : null,
                     groups: input.parent ? [{ name: input.parent }] : [],
                 })
                 console.log(user)

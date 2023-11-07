@@ -23,9 +23,9 @@ export function ImageUploader({
     defaultImage?: string | null
 }) {
     const [key, setKey] = useState<string | null>(null)
-    const presignedGetUrl = api.uploads.getPresignedUrl.useQuery({key: key as string}, {enabled: !!key})
     const [uploading, setIsUploading] = useState(false)
     const uploadInputRef = useRef<HTMLInputElement>(null)
+    const presignedGetUrl = api.uploads.getPresignedUrl.useQuery({key: key as string}, {enabled: !!key})
     const uppy = React.useMemo(() => {
         const uppy = new Uppy({
             autoProceed: true,
@@ -46,7 +46,6 @@ export function ImageUploader({
             if (result && result.successful[0]) {
                 let paths = new URL(result.successful[0].uploadURL).pathname.substring(1).split('/')
                 const key = paths.slice(0, paths.length).join('/')
-                console.log(key)
                 setKey(key)
             }
 
@@ -77,6 +76,8 @@ export function ImageUploader({
         if (onUploadStart) onUploadStart()
     })
 
+    console.log('Key', key)
+    console.log('Presigned URL', presignedGetUrl.data)
     return (
         <>
             <button
@@ -85,6 +86,16 @@ export function ImageUploader({
                 disabled={uploading}
                 className="isolate relative w-full flex aspect-square flex-col group items-center justify-center md:gap-y-2 rounded-[0.188rem] border-2 border-b-amber-400 bg-white shadow transition hover:bg-amber-400"
             >
+                {!uploading && !key && defaultImage && (
+                    <>
+                        <img
+                            src={defaultImage}
+                            alt=""
+                            className="absolute inset-0 z-9 h-full w-full object-cover"
+                        />
+                        <div className="bg-white bg-opacity-0 transition group-hover:bg-opacity-90 absolute inset-0 group:z-10 h-full w-full object-cover" />
+                    </>
+                )}
                 {!uploading && presignedGetUrl.data && (
                     <>
                         <img

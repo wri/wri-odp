@@ -16,7 +16,7 @@ export default async function handler(
     s3,
     new PutObjectCommand({
       Bucket: env.S3_BUCKET_NAME,
-      Key: filePath ? `${filePath}/${slugify(filename)}` : `resources/${fileHash}/${filename}`,
+      Key: filePath ? `${filePath}/${filename}` : `resources/${fileHash}/${filename}`,
       ContentType: contentType as string,
     }),
     { expiresIn: 3600 }

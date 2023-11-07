@@ -56,27 +56,19 @@ export default function TeamForm({
                 >
                     <div className="col-span-full lg:col-span-2">
                         <div className="w-[11rem]">
-                            {!isSubmitting && (
                                 <ImageUploader
                                     clearImage={() => setValue('image_url', '')}
-                                    defaultImage={watch('image_url')}
+                                    defaultImage={watch('image_display_url')}
                                     onUploadSuccess={(
                                         response: UploadResult
                                     ) => {
-                                        const url = response.successful[0]
-                                            ?.uploadURL
-                                            ? new URL(
-                                                  response.successful[0]
-                                                      ?.uploadURL
-                                              ).pathname
-                                            : null
+                                        const url = response.successful[0]?.name ?? null
                                         setValue(
                                             'image_url',
-                                            `${env.NEXT_PUBLIC_S3_ENDPOINT}${url}`
+                                            url
                                         )
                                     }}
                                 />
-                            )}
                         </div>
                     </div>
                 </InputGroup>

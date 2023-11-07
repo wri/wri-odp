@@ -29,7 +29,6 @@ export default function EditTeamForm({ team }: { team: TeamFormType }) {
     const editTeam = api.teams.editTeam.useMutation({
         onSuccess: async ({ name }) => {
             notify(`Successfully edited the ${name} organization`, 'success')
-            formObj.reset()
         },
         onError: (error) => setErrorMessage(error.message),
     })

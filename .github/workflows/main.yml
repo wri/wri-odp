@@ -73,6 +73,11 @@ jobs:
         with:
           command: node test.js
           working-directory: ./integration-tests
+      - name: Run frontend tests 🧪
+        uses: cypress-io/github-action@v6
+        with:
+          command: npm run test
+          working-directory: ./e2e-tests
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev

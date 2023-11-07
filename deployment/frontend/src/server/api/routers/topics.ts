@@ -56,7 +56,7 @@ export const topicRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const user = ctx.session.user
             const topicRes = await fetch(
-                `${env.CKAN_URL}/api/action/topic_show?id=${input.id}`,
+                `${env.CKAN_URL}/api/action/group_show?id=${input.id}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
