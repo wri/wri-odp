@@ -66,3 +66,11 @@ export interface WriOrganization extends Organization {
 export interface WriUser extends CkanUser {
   capacity?: string;
 }
+
+export interface GroupTree {
+  id: string;
+  name: string;
+  highlighted: boolean;
+  children: GroupTree[];
+  image_display_url?: string;
+}

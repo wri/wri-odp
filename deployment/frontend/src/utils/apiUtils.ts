@@ -1,7 +1,47 @@
 import { env } from "@/env.mjs";
-import type { Activity, ActivityDisplay, CkanResponse, User, WriDataset, WriOrganization } from "@/schema/ckan.schema";
+import type {
+  Activity, ActivityDisplay, CkanResponse, User, WriDataset, WriOrganization, GroupTree
+} from "@/schema/ckan.schema";
 import type { Group } from "@portaljs/ckan";
 
+
+export async function getGroups({ apiKey }: { apiKey: string }): Promise<GroupTree[]> {
+  try {
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/group_tree?all_fields=True`,
+      {
+        headers: {
+          "Authorization": apiKey,
+        }
+      });
+    const data = (await response.json()) as CkanResponse<GroupTree[]>;
+    const groups: GroupTree[] = data.success === true ? data.result : [];
+    return groups
+  }
+  catch (e) {
+    console.error(e);
+    return []
+  }
+
+}
+
+export async function getGroup({ apiKey, id }: { apiKey: string, id: string }): Promise<Group | Record<string, string>> {
+  try {
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/group_show?id=${id}`,
+      {
+        headers: {
+          "Authorization": apiKey,
+        }
+      });
+    const data = (await response.json()) as CkanResponse<Group>;
+    const groups: Group | Record<string, string> = data.success === true ? data.result : {};
+    return groups
+  }
+  catch (e) {
+    console.error(e);
+    return {}
+  }
+
+}
 
 export async function getAllUsers({ apiKey }: { apiKey: string }): Promise<User[]> {
   try {
