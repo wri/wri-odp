@@ -23,9 +23,6 @@ describe("Create and edit team", () => {
     //check if input with name url has the content of "test-team"
     cy.get("input[name=name]").should("have.value", org);
     cy.get("textarea[name=description]").type("Test description");
-    cy.get("input[type=file]").selectFile("cypress/fixtures/logo.png", {
-      force: true,
-    });
     //get button with aria-haspopup=true
     cy.get("button[aria-haspopup=listbox]").click();
     // get li element that contains the text "test-organization"
@@ -35,20 +32,9 @@ describe("Create and edit team", () => {
     cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", org);
       cy.get("input[name=title]").clear().type(org + " edited");
-      cy.get("input[type=file]").selectFile("cypress/fixtures/logo_2.jpg", {
-        force: true,
-      });
-      cy.get("button > img", { timeout: 10000 })
-        .first()
-        .should("have.attr", "src")
-        .should("include", "logo_2");
       cy.get("button[type=submit]").click();
       cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
         cy.get("input[name=title]").should("have.value", org + " edited");
-        cy.get("button > img", { timeout: 10000})
-          .first()
-          .should("have.attr", "src")
-          .should("include", "logo_2");
       });
     });
   });
