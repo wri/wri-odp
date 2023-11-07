@@ -41,8 +41,8 @@ services:
       context: ../deployment/frontend/
       args:
         - NEXTAUTH_SECRET=secret
-        - NEXTAUTH_URL=http://localhost:30000
-        - CKAN_URL=http://ckan-dev:5000
+        - NEXTAUTH_URL=http://localhost:3000
+        - CKAN_URL=http://localhost:5000
         - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
         - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
         - S3_BUCKET_NAME=ckan
@@ -51,7 +51,7 @@ services:
       ckan-dev:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "0.0.0.0:3000:3000"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
