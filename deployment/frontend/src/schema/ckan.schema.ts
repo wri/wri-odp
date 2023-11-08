@@ -36,7 +36,8 @@ export interface Activity {
 export interface ActivityDisplay {
   description: string,
   time: string,
-  icon: string
+  icon: string,
+  action: string,
 }
 
 export interface WriDataset extends Dataset {

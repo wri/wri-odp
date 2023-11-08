@@ -6,6 +6,7 @@ export const searchSchema = z.object({
     start: z.number(),
     rows: z.number(),
   }).default({ start: 0, rows: 50 }),
+  fq: z.record(z.string()).optional(),
 });
 
 export type SearchInput = z.infer<typeof searchSchema>;

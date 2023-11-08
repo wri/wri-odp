@@ -12,7 +12,20 @@ export const DatasetRouter = createTRPCRouter({
     .input(searchSchema)
     .query(async ({ input, ctx }) => {
       const organizations = await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey });
-      const orgsFq = `organization:(${organizations?.map(org => org.name).join(" OR ")})`;
+      let orgsFq = `organization:(${organizations?.map(org => org.name).join(" OR ")})`;
+      const fq = []
+      if (input.fq) {
+        for (const key of Object.keys(input.fq)) {
+          if (key === "organization") {
+            orgsFq = `organization:(${input.fq[key]})`;
+            continue;
+          }
+          fq.push(`${key}:(${input.fq[key]})`)
+        }
+        const filter = fq.join("+");
+        if (filter) orgsFq = `${orgsFq}+${filter}`;
+
+      }
       const dataset = (await getAllDatasetFq({ apiKey: ctx.session.user.apikey, fq: orgsFq, query: input }))!;
       return {
         datasets: dataset.datasets,

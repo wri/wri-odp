@@ -22,3 +22,25 @@ export function searchArrayForKeyword<T>(
   }
   return results;
 }
+
+export function filterObjects<T, U>(array: T[], filterObject: U): T[] {
+  return array.filter((item) => {
+    return Object.keys(filterObject).some((key) => {
+      const filterValue = filterObject[key];
+      const itemValue = item[key];
+      return filterValue === itemValue;
+    });
+  });
+}
+
+export function getKeyValues<T, K extends keyof T>(array: T[], key: K, index: K): { id: string; label: T[K] | string }[] {
+  let o = array.map((item, i) => ({
+    id: item[index],
+    label: item[key],
+  }));
+
+  o = [{ id: "None", label: "All" }, ...o]
+  return o
+
+}
+

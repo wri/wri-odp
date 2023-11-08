@@ -215,7 +215,7 @@ export function activityDetails(activity: Activity): ActivityDisplay {
   }
   const description = `${activitProperties[action]} the ${object} ${title}`;
   const time = timeAgo(activity.timestamp);
-  return { description, time, icon: action };
+  return { description, time, icon: action, action };
 }
 
 
