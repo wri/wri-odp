@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import DatasetHeader from './DatasetHeader'
 import DatasetRow from './DatasetRow'
 import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner';
-import type { WriDataset } from '@/schema/ckan.schema';
-import { SearchInput } from '@/schema/search.schema';
+import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
 
 export default function DatasetLCardList() {
