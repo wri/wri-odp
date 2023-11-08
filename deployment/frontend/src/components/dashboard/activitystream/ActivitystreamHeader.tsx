@@ -28,8 +28,8 @@ function LeftNode() {
 
 }
 
-export default function ActivitystreamHeader() {
+export default function ActivitystreamHeader({ Pagination }: { Pagination?: React.ReactNode }) {
   return (
-    <TableHeader leftNode={<LeftNode />} rightStyle='sm:mt-4' />
+    <TableHeader leftNode={<LeftNode />} rightStyle='sm:mt-4' Pagination={Pagination} />
   )
 }

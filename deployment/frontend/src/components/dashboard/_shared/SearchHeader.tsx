@@ -15,7 +15,7 @@ function LeftNode({ placeholder, setQuery, query }:
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (inputRef.current) {
-      const updateQuery: SearchInput = { page: query.page, search: inputRef.current.value }
+      const updateQuery: SearchInput = { page: { ...query.page, start: 0 }, search: inputRef.current.value }
       setQuery && setQuery(updateQuery)
     }
   }
