@@ -176,6 +176,7 @@ export function Hero() {
                     src="/images/bg_hero_homepage.avif"
                     alt=""
                     className="absolute inset-0 -z-10 h-full w-full object-cover"
+
                 />
                 <div className="bg-black bg-opacity-50 absolute inset-0 -z-[9] h-full w-full object-cover" />
                 <div className="default-home-container mx-auto py-32 sm:py-48 lg:py-56">
@@ -200,7 +201,7 @@ export function Hero() {
                     </div>
                 </div>
             </div>
-
+        
             <Transition appear show={isOpen} as={Fragment}>
                 <Dialog
                     as="div"

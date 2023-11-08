@@ -1,6 +1,7 @@
 import React from 'react'
 import { ArrowPathIcon, ArrowRightIcon, Squares2X2Icon } from '@heroicons/react/24/outline'
 import Image from 'next/image'
+import Link from 'next/link'
 
 
 function Notification() {
@@ -34,7 +35,7 @@ export default function Notifications({ drag }: { drag: boolean }) {
           <p className='font-normal text-[20px]'>Notifications </p>
           <div className='rounded-full my-auto w-4 h-4 bg-wri-gold font-bold text-[11px] flex justify-center items-center'>3</div>
         </div>
-        <div className='ml-auto flex items-center font-semibold text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4' /></div>
+        <Link href="/dashboard/notifications" className='ml-auto flex items-center font-semibold gap-x-1 text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4 mb-1' /></Link>
       </div>
       {
         [1, 2, 3, 4, 5, 6].map((items) => {

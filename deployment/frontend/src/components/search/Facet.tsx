@@ -29,7 +29,7 @@ export default function Facet({
             <ChevronDownIcon
               className={`${
                 open ? "rotate-180 transform  transition" : ""
-              } h-5 w-5 text-purple-500`}
+              } h-5 w-5 text-black`}
             />
           </Disclosure.Button>
           <Transition
@@ -53,7 +53,7 @@ export default function Facet({
                           id={`person-${option.value}`}
                           name={`person-${option.value}`}
                           type="checkbox"
-                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                          className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
                         />
                       </div>
                       <div className="min-w-0 flex-1 text-sm leading-6">

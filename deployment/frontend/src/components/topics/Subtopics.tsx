@@ -57,7 +57,7 @@ export default function Subtopics() {
       className=" mx-auto mt-8 flex  max-w-[1380px] flex-col gap-y-6 px-4 font-acumin sm:px-6 lg:mt-16 xxl:px-0"
     >
       <h1 className="font-['Acumin Pro SemiCondensed'] truncate whitespace-normal text-2xl font-semibold text-black">
-        Subtopics
+        Subtopics ({subtopics.length})
       </h1>
       <div className="relative">
         <div className="peer">

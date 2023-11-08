@@ -7,6 +7,7 @@ import CarouselNavButton from "../_shared/CarouselNavButton";
 import SubtopicCard from "../topics/SubtopicCard";
 import Image from "next/image";
 import { AutoCarousel } from "../_shared/AutoCarousel";
+import Link from "next/link";
 
 const topics = [
   {
@@ -94,7 +95,7 @@ export interface TopicProps {
 
 function TopicCard({ topic }: { topic: TopicProps }) {
   return (
-    <div className="flex w-full flex-col gap-1 pr-4 font-acumin">
+    <Link href="/topics/x" className="flex w-full flex-col gap-1 pr-4 font-acumin">
       <div className="relative aspect-square h-72 w-full">
         <Image src={`${topic.img}`} alt="higlight" fill />
       </div>
@@ -104,7 +105,7 @@ function TopicCard({ topic }: { topic: TopicProps }) {
       <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700">
         163 Datasets
       </p>
-    </div>
+    </Link>
   );
 }
 

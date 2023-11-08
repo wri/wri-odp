@@ -55,12 +55,12 @@ export default function DatasetPage() {
                             <Tab.Group>
                                 <Tab.List
                                     as="nav"
-                                    className="flex w-full gap-x-2 @sm:pr-8 pr-4"
+                                    className="flex w-full gap-x-2 border-b border-zinc-300"
                                 >
                                     <DatasetTabs tabs={tabs} />
                                 </Tab.List>
-                                <div className="mb-4 mr-9 border-b border-zinc-300" />
-                                <div className="@sm:pr-8 pr-4">
+                                <div className="mb-4 mr-9" />
+                                <div>
                                     <Tab.Panels>
                                         <Tab.Panel>
                                             <DataFiles />

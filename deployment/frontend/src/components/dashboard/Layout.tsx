@@ -67,7 +67,7 @@ export default function Layout({
 
   navigation.forEach((item) => {
     const isPath = asPath.split("/dashboard")[1];
-    if (isPath && isPath.split("/").length > 2) {
+    if (isPath && isPath.split("/").length > 1) {
       const pathExist = isPath.includes(item.href)
       item.active = pathExist;
     }
@@ -147,9 +147,9 @@ export default function Layout({
                         {
                           navigation.map((item) => {
                             return (
-                              <li key={item.name} className={` text-center py-6 ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
+                              <li key={item.name} className={`text-center py-6 ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
                                 <a
-                                  href={item.href.includes("default") ? "./" : `/dashboard/${user}${item.href}`}
+                                  href={item.href.includes("default") ? "./" : `/dashboard${item.href}`}
                                   className="flex w-full justify-center items-center gap-x-2"
                                 >
                                   <div className="font-normal text-[1.125rem]">{item.name}</div>
@@ -187,7 +187,7 @@ export default function Layout({
                         return (
                           <li key={item.name} className={` text-center py-6 hover:bg-white hover:text-wri-black ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
                             <a
-                              href={item.href.includes("default") ? "./" : `/dashboard/${user}${item.href}`}
+                              href={item.href.includes("default") ? "./" : `/dashboard${item.href}`}
                               className="flex w-full justify-center items-center gap-x-2"
                             >
                               <div className="font-normal text-[1.125rem]">{item.name}</div>

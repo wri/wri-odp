@@ -1,4 +1,4 @@
-FROM viderum/ckan:v2.10-dev
+FROM viderum/ckan:v2.10-dev-security-fix
 
 ENV CKAN_INI /srv/app/production.ini
 ENV APP_DIR=/srv/app
@@ -9,8 +9,8 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
-    # We're using the v2.10 branch of ckanext-auth, but I'm adding a commit to force a rebuild of the image. This can be removed once ckanext-auth is approved
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@e45cccf43abbdf9d9069047e646b3e42307e81e1#egg=ckanext-auth'
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@auth-object-return-token#egg=ckanext-auth' && \
+    pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy'
 
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 USER root
@@ -27,11 +27,23 @@ RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 in
 #        fi ; \
 #    done
 
-ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth envvars
+ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form envvars
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 USER root
 RUN chmod +x ${APP_DIR}/prerun.py
+
+RUN apk --no-cache add openssl
+
 USER ckan
+
+RUN openssl genpkey -algorithm RSA -out ${APP_DIR}/jwtRS256.key && \
+    openssl rsa -in ${APP_DIR}/jwtRS256.key -pubout -outform PEM -out ${APP_DIR}/jwtRS256.key.pub && \
+    chown ckan:ckan ${APP_DIR}/jwtRS256.key && \
+    chown ckan:ckan ${APP_DIR}/jwtRS256.key.pub
+
+RUN ckan config-tool ${CKAN_INI} "api_token.jwt.algorithm = RS256" && \
+    ckan config-tool ${CKAN_INI} "api_token.jwt.encode.secret = file:${APP_DIR}/jwtRS256.key" && \
+    ckan config-tool ${CKAN_INI} "api_token.jwt.decode.secret = file:${APP_DIR}/jwtRS256.key.pub"
