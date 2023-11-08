@@ -14,7 +14,7 @@ export function searchArrayForKeyword<T>(
   const results: T[] = [];
   for (const obj of arr) {
     for (const key in obj) {
-      if (typeof obj[key] === 'string' && obj[key].includes(keyword)) {
+      if (typeof obj[key] === 'string' && (obj[key] as string).includes(keyword)) {
         results.push(obj);
         break;
       }
@@ -23,20 +23,24 @@ export function searchArrayForKeyword<T>(
   return results;
 }
 
-export function filterObjects<T, U>(array: T[], filterObject: U): T[] {
+export function filterObjects<T>(array: T[], filterObject: Record<string, string>): T[] {
   return array.filter((item) => {
+
     return Object.keys(filterObject).some((key) => {
       const filterValue = filterObject[key];
-      const itemValue = item[key];
+      const itemValue = (item as Record<string, string>)[key];
       return filterValue === itemValue;
     });
   });
 }
 
-export function getKeyValues<T, K extends keyof T>(array: T[], key: K, index: K): { id: string; label: T[K] | string }[] {
-  let o = array.map((item, i) => ({
-    id: item[index],
-    label: item[key],
+export function getKeyValues<T, K extends keyof T>(array: T[], key: K, index: K): { id: string; label: string }[] {
+  let o: {
+    id: string;
+    label: string;
+  }[] = array.map((item, i) => ({
+    id: item[index] as string,
+    label: item[key] as string,
   }));
 
   o = [{ id: "None", label: "All" }, ...o]
@@ -44,15 +48,15 @@ export function getKeyValues<T, K extends keyof T>(array: T[], key: K, index: K)
 
 }
 
-export function getKeyValues2<T, K extends keyof T>(array: T[], key: K, index: K | string): { id: string; label: T[K] | string }[] {
-  const keyValueMap = new Map<T[K], string>();
-  const result: { id: string; label: T[K] | string }[] = [];
+export function getKeyValues2<T, K extends keyof T>(array: T[], key: K, index: K): { id: string; label: T[K] | string }[] {
+  const keyValueMap = new Map<string, string>();
+  const result: { id: string; label: string }[] = [];
 
   array.forEach((item, i) => {
     const keyValue = item[key];
-    if (!keyValueMap.has(keyValue)) {
-      keyValueMap.set(keyValue, `${item[index]}`);
-      result.push({ id: `${item[index]}`, label: item[key] });
+    if (!keyValueMap.has(keyValue as string)) {
+      keyValueMap.set(keyValue as string, item[index] as string);
+      result.push({ id: item[index] as string, label: item[key] as string });
     }
   });
 

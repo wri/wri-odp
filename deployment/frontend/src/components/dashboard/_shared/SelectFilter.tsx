@@ -5,12 +5,12 @@ import classNames from '@/utils/classnames';
 import type { SearchInput } from '@/schema/search.schema';
 
 interface Option {
-  id: number;
+  id: string;
   label: string;
 }
 
 export default function SelectFilter({ options, setQuery, query, filtername }: { options: { id: string; label: string | undefined; }[], filtername: string, setQuery: React.Dispatch<React.SetStateAction<SearchInput>>, query: SearchInput }) {
-  const [selected, setSelected] = useState(options[0] ? options[0] : { id: 0, label: '' })
+  const [selected, setSelected] = useState(options[0] ? options[0] : { id: '0', label: '' })
 
   const handleSelect = (option: Option) => {
     setSelected(option)
