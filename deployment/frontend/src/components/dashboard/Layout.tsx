@@ -5,7 +5,7 @@ import UserProfile from "./UserProfile";
 import { useRouter } from "next/router";
 
 
-const navigation = [
+const routes = [
   {
     name: "Dashboard",
     href: "default",
@@ -61,17 +61,16 @@ export default function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const { asPath, query } = useRouter();
+  const { asPath } = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const user = query.user as string;
 
-  navigation.forEach((item) => {
+  const navigation = routes.map((item) => {
     const isPath = asPath.split("/dashboard")[1];
     if (isPath && isPath.split("/").length > 1) {
       const pathExist = isPath.includes(item.href)
-      item.active = pathExist;
+      return {...item, active: pathExist}
     }
-
+    return item
   });
 
   return (

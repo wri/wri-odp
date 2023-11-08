@@ -60,8 +60,14 @@ jobs:
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+          MINIO_ROOT_USER: 'minioadmin'
+          MINIO_ROOT_PASSWORD: 'minioadmin'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
+      - name: Print Container names
+        run: docker ps -a
+      - name: Print logs
+        run: docker logs wri-frontend
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
@@ -70,6 +76,14 @@ jobs:
           node-version: 18
           runTests: false
           working-directory: ./integration-tests
+      - name: Cypress Install and Frontend setup
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 120
+          node-version: 18
+          runTests: false
+          working-directory: ./e2e-tests
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Run Integration tests 🧪
@@ -77,6 +91,11 @@ jobs:
         with:
           command: node test.js
           working-directory: ./integration-tests
+      - name: Run frontend tests 🧪
+        uses: cypress-io/github-action@v6
+        with:
+          command: npm run test
+          working-directory: ./e2e-tests
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev

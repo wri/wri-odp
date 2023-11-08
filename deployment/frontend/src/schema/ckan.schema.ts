@@ -2,6 +2,10 @@ import type { Dataset, Group, Organization, User as CkanUser } from "@portaljs/c
 export interface CkanResponse<T> {
   help: string;
   success: boolean;
+  error?: {
+    __type: string;
+    message: string;
+  };
   result: T;
 }
 
