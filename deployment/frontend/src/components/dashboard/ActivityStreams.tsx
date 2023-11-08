@@ -6,6 +6,8 @@ import { activity as activitydata } from '../_shared/ActivityStreamList'
 import { Squares2X2Icon } from '@heroicons/react/24/outline'
 import { api } from '@/utils/api';
 import Spinner from '@/components/_shared/Spinner';
+import Link from 'next/link'
+
 
 function ActivityStreamUser({ activity }: { activity: activity }) {
   return (
@@ -28,7 +30,7 @@ export default function UserActivityStreams({ drag }: { drag: boolean }) {
       }
       <div className='flex px-2 mb-4 border-b-[0.3px] border-b-gray-100'>
         <p className='font-normal text-[20px]'>Activity Stream</p>
-        <div className='ml-auto flex items-center font-semibold gap-x-1 text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4 mb-1' /></div>
+        <Link href="/dashboard/activity-stream" className='ml-auto flex items-center font-semibold gap-x-1 text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4 mb-1' /></Link>
       </div>
       {
         isLoading ? (

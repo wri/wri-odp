@@ -1,17 +1,18 @@
 import React from 'react'
 import Header from '@/components/_shared/Header'
 import Layout from "@/components/dashboard/Layout";
-import ActivityList from '@/components/dashboard/activitystream/ActivityList';
+import UserList from '@/components/dashboard/users/UserList';
 import Footer from "@/components/_shared/Footer";
 
-export default function activityStream() {
+export default function topics() {
   return (
     <>
       <Header />
       <Layout >
-        <ActivityList />
+        <UserList />
       </Layout>
       <Footer style='mt-0' />
     </>
   )
 }
+

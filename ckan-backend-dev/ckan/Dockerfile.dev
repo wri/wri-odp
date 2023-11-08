@@ -27,7 +27,8 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@auth-object-return-token#egg=ckanext-auth'
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@auth-object-return-token#egg=ckanext-auth' && \
+    pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy'
 
 # Update ckanext-s3filestore test.ini with minio credentials
 RUN sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \
@@ -61,11 +62,7 @@ COPY setup/start_ckan_development.sh.override ${APP_DIR}/start_ckan_development.
 RUN chmod +x ${APP_DIR}/start_ckan_development.sh
 RUN chown ckan:ckan ${APP_DIR}/start_ckan_development.sh
 
-USER root
-
 RUN apk --no-cache add openssl
-
-USER ckan
 
 RUN openssl genpkey -algorithm RSA -out ${APP_DIR}/jwtRS256.key && \
     openssl rsa -in ${APP_DIR}/jwtRS256.key -pubout -outform PEM -out ${APP_DIR}/jwtRS256.key.pub && \

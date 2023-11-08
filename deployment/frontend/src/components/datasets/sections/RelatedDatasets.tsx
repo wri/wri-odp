@@ -16,6 +16,7 @@ import {
 import { useState } from 'react'
 import { colors } from './DataFiles'
 import Map from '@/components/_shared/map/Map'
+import Link from 'next/link'
 
 export function RelatedDatasets() {
     return (
@@ -41,7 +42,7 @@ export default function DatasetCard() {
     }))
 
     return (
-        <div className="font-acumin gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100">
+        <Link href="/datasets/x" className="font-acumin gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100">
             <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green">
                 LAND AND CARBON LAB
             </p>
@@ -230,7 +231,7 @@ export default function DatasetCard() {
                     </div>
                 </div>
             </Modal>
-        </div>
+        </Link>
     )
 }
 

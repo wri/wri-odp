@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { Dialog } from "@headlessui/react";
+import { Fragment, useState } from "react";
+import { Menu, Transition, Dialog } from "@headlessui/react";
 import { Bars3Icon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import Login from "../_shared/Login";
 
 export function Hero() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -34,7 +35,50 @@ export function Hero() {
     item.active = asPath.startsWith(item.href);
   });
 
+  const [isOpen, setIsOpen] = useState(false)
+
+  function closeModal() {
+    setIsOpen(false)
+  }
+
+  function openModal() {
+    setIsOpen(true)
+  }
   return (
+    <>
+        <Transition appear show={isOpen} as={Fragment}>
+          <Dialog as="div" className="relative z-50" onClose={closeModal}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black bg-opacity-25" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="w-full sm:max-w-xl transform overflow-hidden rounded-md bg-white p-6 sm:px-20 text-left align-middle shadow-xl transition-all z-50">
+                    <Login />
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </Dialog>
+        </Transition>
     <div className="bg-gray-900">
       <header className="absolute inset-x-0 top-0 z-50">
         <nav
@@ -61,12 +105,12 @@ export function Hero() {
           </div>
           <div className="flex gap-x-2 lg:hidden">
             <div>
-              <Link
-                href="/auth/signin"
+              <button
+                onClick={() => openModal()}
                 className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
               >
                 LOGIN
-              </Link>
+              </button>
             </div>
             <button
               type="button"
@@ -88,12 +132,12 @@ export function Hero() {
               </Link>
             ))}
             <div>
-              <Link
-                href="/auth/signin"
+              <button
+                  onClick={() => openModal()}
                 className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
               >
                 LOGIN
-              </Link>
+              </button>
             </div>
           </div>
         </nav>
@@ -177,5 +221,6 @@ export function Hero() {
         </div>
       </div>
     </div>
+    </>
   );
 }
