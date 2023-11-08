@@ -44,7 +44,6 @@ export const authRouter = createTRPCRouter({
                     )
                     .json()
 
-      console.log(input)
                 const userUpdate: CkanResponse<User> = await ky
                     .post(`${env.CKAN_URL}/api/3/action/user_update`, {
                         json: {
