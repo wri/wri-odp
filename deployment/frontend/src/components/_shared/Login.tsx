@@ -25,6 +25,7 @@ import {
 } from '@/schema/auth.schema'
 import { ErrorAlert } from './Alerts'
 import { api } from '@/utils/api'
+import notify from '@/utils/notify'
 
 export default function Login({
     onSignIn = () => {},
@@ -103,6 +104,7 @@ function SignInForm({
                                 // TODO: we should get the error from the response
                                 setErrorMessage(signInStatus.error)
                             } else {
+                                notify("Sign in successful")
                                 onSignIn ? onSignIn() : router.reload()
                             }
                         })(data)

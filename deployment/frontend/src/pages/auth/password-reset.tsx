@@ -21,6 +21,7 @@ import { NextSeo } from 'next-seo'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { LockClosedIcon } from '@heroicons/react/24/outline'
 import Image from 'next/image'
+import notify from '@/utils/notify'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const session = await getServerAuthSession(context)
@@ -62,6 +63,7 @@ export default function ResetUserPage({
     user: { id: string; reset_key: string }
 }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const [isResetSuccessful, setIsResetSuccessful] = useState(false)
     const {
         register,
         handleSubmit,
@@ -76,11 +78,17 @@ export default function ResetUserPage({
 
     const resetPassword = api.auth.resetPassword.useMutation({
         onSuccess: async () => {
-            await signIn('credentials', {
-                callbackUrl: '/dashboard/datasets',
-                username: watch('id'),
-                password: watch('password'),
-            })
+            notify('Your password has been reset')
+            setIsResetSuccessful(true)
+            setTimeout(
+                () =>
+                    signIn('credentials', {
+                        callbackUrl: '/dashboard/datasets',
+                        username: watch('id'),
+                        password: watch('password'),
+                    }),
+                3000
+            )
         },
         onError: (error) => setErrorMessage(error.message),
     })
@@ -106,14 +114,14 @@ export default function ResetUserPage({
                         type="hidden"
                         defaultValue={csrfToken}
                     />
-                  <div className='flex justify-center w-full mb-10'>
-                    <div className="relative mx-auto h-12 w-44 sm:h-20 sm:w-56">
-                        <Image
-                            src="/images/WRI_logo_4c.png"
-                            alt="Picture of the author"
-                            fill
-                        />
-                    </div>
+                    <div className="flex justify-center w-full mb-10">
+                        <div className="relative mx-auto h-12 w-44 sm:h-20 sm:w-56">
+                            <Image
+                                src="/images/WRI_logo_4c.png"
+                                alt="Picture of the author"
+                                fill
+                            />
+                        </div>
                     </div>
                     <h3 className="font-semibold text-[1.75rem] text-center">
                         Reset your password
@@ -152,12 +160,14 @@ export default function ResetUserPage({
                         />
                     ) : null}
                     <button
-                        disabled={resetPassword.isLoading}
+                        disabled={isResetSuccessful || resetPassword.isLoading}
                         type="submit"
                         className="bg-wri-gold text-wri-black font-semibold text-[1.125rem] rounded-sm px-4 py-4"
                     >
                         {resetPassword.isLoading
                             ? 'Updating password...'
+                            : isResetSuccessful
+                            ? 'Redirecting...'
                             : 'Reset password'}
                     </button>
                 </form>
