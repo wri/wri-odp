@@ -9,9 +9,11 @@ import notify from '@/utils/notify'
 import { api } from '@/utils/api'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import TopicForm from './TopicForm'
+import { useRouter } from 'next/router'
 
 export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const router = useRouter()
     const links = [
         { label: 'Topics', url: '/dashboard/topics', current: false },
         {
@@ -29,6 +31,7 @@ export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
     const editTopic = api.topics.editTopic.useMutation({
         onSuccess: async ({ name }) => {
             notify(`Successfully edited the ${name} organization`, 'success')
+            router.push('/dashboard/topics')
             formObj.reset()
         },
         onError: (error) => setErrorMessage(error.message),

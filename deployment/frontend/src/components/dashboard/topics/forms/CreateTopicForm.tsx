@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
+import { useRouter } from 'next/router'
 
 const links = [
     { label: 'Topics', url: '/dashboard/teams', current: false },
@@ -18,6 +19,7 @@ const links = [
 
 export default function CreateTopicForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const router = useRouter()
     const formObj = useForm<TopicFormType>({
         resolver: zodResolver(TopicSchema),
     })
@@ -25,6 +27,7 @@ export default function CreateTopicForm() {
     const createTopic = api.topics.createTopic.useMutation({
         onSuccess: async ({ name }) => {
             notify(`Successfully created the ${name} topic`, 'success')
+            router.push('/dashboard/topics')
             formObj.reset()
         },
         onError: (error) => setErrorMessage(error.message),

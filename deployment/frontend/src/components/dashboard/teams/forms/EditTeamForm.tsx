@@ -9,9 +9,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import notify from '@/utils/notify'
 import { api } from '@/utils/api'
 import { ErrorAlert } from '@/components/_shared/Alerts'
+import { useRouter } from 'next/router'
 
 export default function EditTeamForm({ team }: { team: TeamFormType }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const router = useRouter()
     const links = [
         { label: 'Teams', url: '/dashboard/teams', current: false },
         {
@@ -29,6 +31,7 @@ export default function EditTeamForm({ team }: { team: TeamFormType }) {
     const editTeam = api.teams.editTeam.useMutation({
         onSuccess: async ({ name }) => {
             notify(`Successfully edited the ${name} organization`, 'success')
+            router.push('/dashboard/teams')
         },
         onError: (error) => setErrorMessage(error.message),
     })

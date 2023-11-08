@@ -10,14 +10,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
+import { useRouter } from 'next/router'
 
 const links = [
-    { label: 'Teams', url: '/dashboard/x/teams', current: false },
+    { label: 'Teams', url: '/dashboard/teams', current: false },
     { label: 'Create a team', url: '/teams/new', current: true },
 ]
 
 export default function CreateTeamForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const router = useRouter()
     const formObj = useForm<TeamFormType>({
         resolver: zodResolver(TeamSchema),
     })
@@ -25,6 +27,7 @@ export default function CreateTeamForm() {
     const createTeam = api.teams.createTeam.useMutation({
         onSuccess: async ({ name }) => {
             notify(`Successfully created the ${name} organization`, 'success')
+            router.push('/dashboard/teams')
             formObj.reset()
         },
         onError: (error) => setErrorMessage(error.message),
