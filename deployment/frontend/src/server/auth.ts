@@ -43,13 +43,6 @@ declare module 'next-auth' {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
-    pages: {
-        signIn: '/',
-        signOut: '/',
-        error: '/',
-        verifyRequest: '/',
-        newUser: '/',
-    },
     callbacks: {
         jwt({ token, user }) {
             if (user) {
@@ -70,9 +63,9 @@ export const authOptions: NextAuthOptions = {
             }
         },
     },
-    /*pages: {
-    signIn: "/auth/signin",
-  },*/
+    pages: {
+        signIn: '/auth/signin',
+    },
     providers: [
         CredentialsProvider({
             // The name to display on the sign in form (e.g. "Sign in with...")
@@ -91,8 +84,6 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials, _req) {
                 try {
-                    console.log('Login credentials', credentials)
-                    console.log('Ckan URL', env.CKAN_URL)
                     if (!credentials) return null
                     const userRes = await fetch(
                         `${env.CKAN_URL}/api/3/action/user_login`,
@@ -108,14 +99,8 @@ export const authOptions: NextAuthOptions = {
                         }
                     )
                     const user: CkanResponse<
-                        User & { frontend_token: string }
+                        User & { frontend_token?: string }
                     > = await userRes.json()
-
-                    if (user.result.errors) {
-                        // TODO: error from the response should be sent to the client, but it's not working
-                        throw new Error(user.result.error_summary.auth)
-                    }
-
                     if (user.result.id) {
                         const orgListRes = await fetch(
                             `${env.CKAN_URL}/api/3/action/organization_list_for_user`,
@@ -123,7 +108,7 @@ export const authOptions: NextAuthOptions = {
                                 method: 'POST',
                                 body: JSON.stringify({ id: user.result.id }),
                                 headers: {
-                                    Authorization: user.result.frontend_token,
+                                    Authorization: user.result.apikey,
                                     'Content-Type': 'application/json',
                                 },
                             }
@@ -131,22 +116,24 @@ export const authOptions: NextAuthOptions = {
                         const orgList: CkanResponse<Organization[]> =
                             await orgListRes.json()
 
-                        console.log('Org list', orgList)
                         return {
                             ...user.result,
                             image: '',
-                            apikey: user.result.frontend_token,
+                            apikey: user.result.frontend_token ?? '',
                             teams: orgList.result.map((org) => ({
-                                name: org?.name ?? '',
-                                id: org?.id ?? '',
+                                name: org.name,
+                                id: org.id,
                             })),
                         }
                     } else {
-                        throw 'An unexpected error occurred while signing in. Please, try again.'
+                        return Promise.reject(
+                            '/auth/signin?error=Could%20not%20login%20user%20please%20check%20your%20password%20and%20username'
+                        )
                     }
                 } catch (e) {
-                    console.log('Error', e)
-                    throw e
+                    return Promise.reject(
+                        '/auth/signin?error=Could%20not%20login%20user%20please%20check%20your%20password%20and%20username'
+                    )
                 }
             },
         }),
