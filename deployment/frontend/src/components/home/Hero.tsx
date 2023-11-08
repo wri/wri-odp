@@ -16,7 +16,6 @@ export function Hero() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
     const session = useSession()
-    console.log(session)
 
     const { asPath } = useRouter()
     const navigation = [
@@ -232,7 +231,7 @@ export function Hero() {
                                 leaveTo="opacity-0 scale-95"
                             >
                                 <Dialog.Panel className="w-full sm:max-w-xl transform overflow-hidden rounded-md bg-white p-6 sm:px-20 text-left align-middle shadow-xl transition-all z-50">
-                                    <Login />
+                                    <Login onSignIn={() => setIsOpen(false)} />
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>

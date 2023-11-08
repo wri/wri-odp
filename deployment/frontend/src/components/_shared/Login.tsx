@@ -18,14 +18,19 @@ import { getCsrfToken, signIn } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
 import {
-    ResetPasswordFormType,
-    ResetPasswordSchema,
+    RequestResetPasswordFormType,
+    RequestResetPasswordSchema,
     SignInFormType,
     SignInSchema,
 } from '@/schema/auth.schema'
 import { ErrorAlert } from './Alerts'
+import { api } from '@/utils/api'
 
-export default function Login({ onSignIn }: { onSignIn: () => void }) {
+export default function Login({
+    onSignIn = () => {},
+}: {
+    onSignIn?: () => void
+}) {
     const [isPasswordReset, setIsPasswordReset] = useState(false)
 
     return (
@@ -37,7 +42,9 @@ export default function Login({ onSignIn }: { onSignIn: () => void }) {
                         setIsPasswordReset={setIsPasswordReset}
                     />
                 ) : (
-                    <ResetPasswordForm />
+                    <ResetPasswordForm
+                        setIsPasswordReset={setIsPasswordReset}
+                    />
                 )}
             </div>
         </section>
@@ -173,17 +180,25 @@ function ResetPasswordForm({
 }: {
     setIsPasswordReset: Dispatch<SetStateAction<boolean>>
 }) {
-    const router = useRouter()
     const [errorMessage, setErrorMessage] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
+    const [result, setResult] = useState('')
 
     const {
         register,
         handleSubmit,
         watch,
         formState: { errors },
-    } = useForm<ResetPasswordFormType>({
-        resolver: zodResolver(ResetPasswordSchema),
+    } = useForm<RequestResetPasswordFormType>({
+        resolver: zodResolver(RequestResetPasswordSchema),
+    })
+
+    const requestPasswordReset = api.auth.requestPasswordReset.useMutation({
+        onSuccess: (data) => {
+            setResult(data.result)
+        },
+        onError: (e) => {
+            setErrorMessage(e.message)
+        },
     })
 
     const error = errorMessage || errors.email?.message
@@ -200,21 +215,9 @@ function ResetPasswordForm({
                     className="flex flex-col gap-y-4"
                     onSubmit={(data) => {
                         setErrorMessage('')
+                        setResult('')
                         handleSubmit(async (data) => {
-                            setIsLoading(true)
-                            const signInStatus = await signIn('credentials', {
-                                callbackUrl: '/dashboard',
-                                redirect: false,
-                                ...data,
-                            })
-
-                            setIsLoading(false)
-                            if (signInStatus?.error) {
-                                // TODO: we should get the error from the response
-                                setErrorMessage(signInStatus.error)
-                            } else {
-                                // onSignIn ? onSignIn() : router.reload()
-                            }
+                            requestPasswordReset.mutate(data)
                         })(data)
                     }}
                 >
@@ -231,42 +234,39 @@ function ResetPasswordForm({
                             <EnvelopeIcon className="w-4 h-4 text-[#3654A5]" />
                         </div>
                     </div>
-                    
-                    {error ? (
-                        <ErrorAlert text={error} title="Sign in failed" />
-                    ) : null}
+
                     <button
                         className="font-light text-[0.875rem] text-wri-black text-right -mt-2"
                         type="button"
                         onClick={(e) => {
                             e.preventDefault()
-                            setIsPasswordReset(true)
+                            setIsPasswordReset(false)
                             return false
                         }}
                     >
-                        Forgot password?
+                        Go back to sign in
                     </button>
+
+                    {result ? (
+                        <p className="text-center text-green-600">{result}</p>
+                    ) : null}
+
+                    {error ? (
+                        <ErrorAlert
+                            text={error}
+                            title="Password reset failed"
+                        />
+                    ) : null}
                     <button
-                        disabled={isLoading}
+                        disabled={requestPasswordReset.isLoading}
                         type="submit"
                         className="bg-wri-gold text-wri-black font-semibold text-[1.125rem] rounded-sm px-4 py-4"
                     >
-                        {isLoading ? 'Signing in...' : 'Log In'}
+                        {requestPasswordReset.isLoading
+                            ? 'Resetting password...'
+                            : 'Send password reset link'}
                     </button>
                 </form>
-            </div>
-            <div className="mt-8 text-center flex justify-center items-center gap-x-2">
-                <div className="font-light text-[0.875rem] border border-1 border-wri-gray w-20 h-0" />
-                <div className="text-wri-black ">or</div>
-                <div className="font-light text-[0.875rem] border border-1 border-wri-gray w-20 h-0" />
-            </div>
-            <div className="flex  mt-8 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 ">
-                <div className="w-4 h-4 relative my-auto">
-                    <Image src="/images/wri_logo.png" alt="comment" fill />
-                </div>
-                <div className="ml-2 w-fit font-semibold text-base text-wri-black ">
-                    Sign In with your WRI Credentials
-                </div>
             </div>
         </>
     )

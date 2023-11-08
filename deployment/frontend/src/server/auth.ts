@@ -43,6 +43,13 @@ declare module 'next-auth' {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
+    pages: {
+        signIn: '/',
+        signOut: '/',
+        error: '/',
+        verifyRequest: '/',
+        newUser: '/',
+    },
     callbacks: {
         jwt({ token, user }) {
             if (user) {
@@ -130,8 +137,8 @@ export const authOptions: NextAuthOptions = {
                             image: '',
                             apikey: user.result.frontend_token,
                             teams: orgList.result.map((org) => ({
-                                name: org.name,
-                                id: org.id,
+                                name: org?.name ?? '',
+                                id: org?.id ?? '',
                             })),
                         }
                     } else {
