@@ -116,7 +116,7 @@ export default function ResetUserPage({
                     </div>
                     </div>
                     <h3 className="font-semibold text-[1.75rem] text-center">
-                        Update your password
+                        Reset your password
                     </h3>
                     <div className=" rounded-md px-4 group py-3 gap-x-2 flex pr-8 flex-row items-center min-w-fit  w-full bg-white border-[1px] border-wri-gray-200">
                         <div className="grow shrink basis-auto">
@@ -158,7 +158,7 @@ export default function ResetUserPage({
                     >
                         {resetPassword.isLoading
                             ? 'Updating password...'
-                            : 'Update password'}
+                            : 'Reset password'}
                     </button>
                 </form>
             </div>

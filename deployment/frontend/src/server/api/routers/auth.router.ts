@@ -59,7 +59,7 @@ export const authRouter = createTRPCRouter({
             } catch (e) {
                 console.log(e)
                 throw new Error(
-                    'Failed to update password. Try again in a few seconds. If the error persists, please contact the system administrator.'
+                    'Failed to reset password. Try again in a few seconds. If the error persists, please contact the system administrator.'
                 )
             }
         }),
