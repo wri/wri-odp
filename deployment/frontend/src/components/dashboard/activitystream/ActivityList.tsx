@@ -12,7 +12,7 @@ export default function ActivityList() {
 
   return (
     <section className='max-w-8xl  w-full flex flex-col gap-y-5 sm:gap-y-0'>
-      <ActivitystreamHeader Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
+      <ActivitystreamHeader setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
 
       {
         isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> :

@@ -8,6 +8,7 @@ import type { Activity, ActivityDisplay, CkanResponse, User } from "@/schema/cka
 import { getUser, activityDetails } from "@/utils/apiUtils";
 import { searchArrayForKeyword } from "@/utils/general";
 import { searchSchema } from "@/schema/search.schema";
+import { filterObjects } from "@/utils/general";
 
 export const activityStreamRouter = createTRPCRouter({
   listActivityStreamDashboard: protectedProcedure
@@ -33,6 +34,11 @@ export const activityStreamRouter = createTRPCRouter({
       if (input.search) {
         result = searchArrayForKeyword<ActivityDisplay>(activities, input.search);
       }
+
+      if (input.fq) {
+        result = filterObjects(activities, input.fq);
+      }
+
       return {
         activity: result.slice(input.page.start, input.page.start + input.page.rows),
         count: result.length,

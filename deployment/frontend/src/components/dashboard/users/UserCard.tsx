@@ -98,7 +98,6 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
   const UserProfile = user as IUser
   if (UserProfile?.orgnumber === 0) return (<></>)
 
-  if (UserProfile?.orgs?.length) console.log("LENGTH: ", UserProfile?.orgs)
   return (
     <div className='flex flex-col pt-2'>
       {

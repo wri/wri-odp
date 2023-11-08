@@ -44,3 +44,18 @@ export function getKeyValues<T, K extends keyof T>(array: T[], key: K, index: K)
 
 }
 
+export function getKeyValues2<T, K extends keyof T>(array: T[], key: K, index: K | string): { id: string; label: T[K] | string }[] {
+  const keyValueMap = new Map<T[K], string>();
+  const result: { id: string; label: T[K] | string }[] = [];
+
+  array.forEach((item, i) => {
+    const keyValue = item[key];
+    if (!keyValueMap.has(keyValue)) {
+      keyValueMap.set(keyValue, `${item[index]}`);
+      result.push({ id: `${item[index]}`, label: item[key] });
+    }
+  });
+
+  result.unshift({ id: "None", label: "All" });
+  return result;
+}
