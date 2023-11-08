@@ -1,20 +1,25 @@
 import React from 'react'
-import type { GetServerSideProps } from "next";
 import Header from '@/components/_shared/Header'
 import Layout from "@/components/dashboard/Layout";
-import ActivityList from '@/components/dashboard/activitystream/ActivityList';
+import Dashboard from '@/components/dashboard/Dashboard';
 import Footer from "@/components/_shared/Footer";
-import { getServerAuthSession } from "../../../server/auth";
+import { getServerAuthSession } from "../../server/auth";
+import type { GetServerSideProps } from "next";
 
-export default function ActivityStream() {
-
+export default function index() {
   return (
     <>
       <Header />
       <Layout >
-        <ActivityList />
+        <Dashboard />
       </Layout>
-      <Footer style='mt-0' />
+      <Footer
+        links={{
+          primary: { title: "Advanced Search", href: "/search" },
+          secondary: { title: "Explore Topics", href: "/topics" },
+        }}
+        style='mt-0'
+      />
     </>
   )
 }
@@ -37,4 +42,3 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   };
 };
-
