@@ -5,6 +5,7 @@ import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { useState } from 'react'
 import { Provider, useCreateStore } from '@/utils/store'
 import { type LayerState } from '@/interfaces/state.interface'
+import "react-toastify/dist/ReactToastify.css";
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
@@ -14,6 +15,7 @@ import { api } from '@/utils/api'
 
 import '@/styles/globals.scss'
 import '@/styles/rte.css'
+import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 
 const acumin = localFont({
     src: [
@@ -72,6 +74,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
             >
                 <Provider createStore={createStore}>
                     <SessionProvider session={session}>
+                        <ReactToastContainer />
                         <main className={`${acumin.variable} font-sans`}>
                             <Component {...pageProps} />
                         </main>

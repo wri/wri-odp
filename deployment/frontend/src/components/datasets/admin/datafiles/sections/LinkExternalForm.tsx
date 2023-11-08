@@ -33,6 +33,7 @@ export function LinkExternalForm() {
       <InputGroup label="Format" className="whitespace-nowrap">
         <SimpleSelect
           placeholder="Select format"
+          name="format"
           maxWidth="max-w-[70rem]"
           options={[
             { value: "csv", label: "CSV" },
