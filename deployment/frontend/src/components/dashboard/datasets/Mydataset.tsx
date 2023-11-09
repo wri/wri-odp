@@ -14,7 +14,7 @@ export default function Mydataset() {
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
       <SearchHeader leftStyle='px-2 sm:pr-2 sm:pl-12' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
-      <div className='w-full'>
+      <div className='w-full' id="mydatasetlist">
         {
           isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
             data?.datasets.length === 0 ? <div className='flex justify-center items-center h-screen'>No data</div> :

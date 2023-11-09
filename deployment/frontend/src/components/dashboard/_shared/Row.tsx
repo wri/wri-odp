@@ -57,7 +57,7 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
           }) : ""}
 
           {(isDropDown) ? (
-            <button className={`flex items-center gap-x-2 px-2 py-1 rounded-md`}
+            <button id="rowshow" className={`flex items-center gap-x-2 px-2 py-1 rounded-md`}
               onClick={() => setIsShowSubRow(!isShowSubRow)}
             >
               {isShowSubRow ? (<ChevronUpIcon className=' w-4 h-4 text-black' />) : (<ChevronDownIcon className=' w-4 h-4 text-black' />)}

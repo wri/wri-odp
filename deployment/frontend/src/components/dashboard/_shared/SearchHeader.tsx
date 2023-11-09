@@ -23,7 +23,7 @@ function LeftNode({ placeholder, setQuery, query }:
   return (
     <form onSubmit={(e) => handleSubmit(e)} className='w-full'>
       <div className=' px-2 py-4 gap-x-2 flex flex-row items-center min-w-fit  w-full bg-white'>
-        <div className='grow shrink basis-auto'><input type="text" ref={inputRef} placeholder={`${placeholder ? placeholder : "Search by keywords"}`} className=' focus:outline-none outline-none border-none focus:border-none focus:ring-0 focus:ring-offset-0 placeholder:text-[14px] text-[14px] font-light w-full' /></div>
+        <div className='grow shrink basis-auto'><input type="search" ref={inputRef} placeholder={`${placeholder ? placeholder : "Search by keywords"}`} className=' focus:outline-none outline-none border-none focus:border-none focus:ring-0 focus:ring-offset-0 placeholder:text-[14px] text-[14px] font-light w-full' /></div>
         <button
           type='submit'
           className=' my-auto'>

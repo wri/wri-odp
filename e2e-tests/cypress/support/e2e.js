@@ -213,7 +213,6 @@ Cypress.Commands.add('createDatasetAPI', (organization, name, isSubscribable) =>
       owner_org: organization,
       name: name,
       author: "datopian",
-      url: "Source not specified",
       license_id : "notspecified",
       tags: [{"display_name": "subscriable", "name": "subscriable"}]
     },
