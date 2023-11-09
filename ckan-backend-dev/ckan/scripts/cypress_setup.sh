@@ -18,3 +18,5 @@ cp ../../../integration-tests/cypress.json.example ../../../integration-tests/cy
 # Replace the token placeholder with the generated token
 sed -i "s/CKAN_API_TOKEN/$token/g" ../../../integration-tests/cypress.json
 sed -i "s/CKAN_API_TOKEN/$token/g" ../../../e2e-tests/cypress.config.js
+
+docker exec -i ckan-wri /bin/bash -c "export SYS_ADMIN_API_KEY=$token"
