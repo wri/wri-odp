@@ -19,4 +19,4 @@ cp ../../../integration-tests/cypress.json.example ../../../integration-tests/cy
 sed -i "s/CKAN_API_TOKEN/$token/g" ../../../integration-tests/cypress.json
 sed -i "s/CKAN_API_TOKEN/$token/g" ../../../e2e-tests/cypress.config.js
 
-docker exec -i ckan-wri /bin/bash -c "export SYS_ADMIN_API_KEY=$token"
+docker exec -i wri-frontend /bin/bash -c "export SYS_ADMIN_API_KEY=$token"
