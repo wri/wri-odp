@@ -10,26 +10,19 @@ import TagsSelect from "../SelectTags";
 import { TopicsSelect } from "../TopicsSelect";
 import { MetadataAccordion } from "./MetadataAccordion";
 import { TextArea } from "@/components/_shared/SimpleTextArea";
-import { useForm } from "react-hook-form";
-import { slugify } from "@/utils/slugify";
-import { useEffect } from "react";
+import { UseFormReturn, useForm } from "react-hook-form";
+import { DatasetFormType } from "@/schema/dataset.schema";
 
-export function OverviewForm() {
+export function OverviewForm({
+  formObj
+}: { formObj: UseFormReturn<DatasetFormType>}) {
   const {
     register,
     setValue,
     watch,
     formState: { dirtyFields },
-  } = useForm<{ title: string; url: string }>({
-    defaultValues: {
-      title: "",
-      url: "",
-    },
-  });
+  } = formObj
 
-  useEffect(() => {
-    if (!dirtyFields["url"]) setValue("url", slugify(watch("title")))
-  }, [watch("title")])
   return (
     <MetadataAccordion
       label={
@@ -50,7 +43,7 @@ export function OverviewForm() {
           </InputGroup>
           <InputGroup label="Url" required>
             <Input
-              {...register("url")}
+              {...register("name")}
               placeholder="name-of-dataset"
               type="text"
               className="pl-[5.2rem] sm:pl-[5rem] md:pl-[4.9rem] lg:pl-[4.8rem]"
