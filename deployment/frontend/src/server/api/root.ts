@@ -6,6 +6,7 @@ import { OrganizationRouter } from "./routers/organization";
 import { TopicRouter } from "./routers/topics";
 import { teamRouter } from './routers/teams'
 import { uploadsRouter } from './routers/uploads'
+import { authRouter } from './routers/auth.router'
 
 /**
  * This is the primary router for your server.
@@ -14,6 +15,7 @@ import { uploadsRouter } from './routers/uploads'
  */
 export const appRouter = createTRPCRouter({
   dashboardActivity: activityStreamRouter,
+  auth: authRouter,
   user: UserRouter,
   dataset: DatasetRouter,
   organization: OrganizationRouter,
