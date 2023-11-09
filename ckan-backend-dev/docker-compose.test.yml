@@ -52,7 +52,7 @@ services:
       - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
       - S3_BUCKET_NAME=ckan
       - S3_BUCKET_REGION=us-east-1
-      - SYS_ADMIN_API_KEY=${CKAN__DATAPUSHER__API_TOKEN}
+      - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
     ports:
       - "0.0.0.0:3000:3000"
     healthcheck:
