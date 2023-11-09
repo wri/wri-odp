@@ -3,6 +3,8 @@ import Header from '@/components/_shared/Header'
 import Layout from "@/components/dashboard/Layout";
 import Dashboard from '@/components/dashboard/Dashboard';
 import Footer from "@/components/_shared/Footer";
+import { getServerAuthSession } from "../../server/auth";
+import type { GetServerSideProps } from "next";
 
 export default function index() {
   return (
@@ -21,3 +23,22 @@ export default function index() {
     </>
   )
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerAuthSession(context);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      session,
+    },
+  };
+};
