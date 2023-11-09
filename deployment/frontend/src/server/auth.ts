@@ -111,9 +111,9 @@ export const authOptions: NextAuthOptions = {
                         User & { frontend_token: string }
                     > = await userRes.json()
 
-                    if (user.result.errors) {
+                    if ((user.result as any).errors) {
                         // TODO: error from the response should be sent to the client, but it's not working
-                        throw new Error(user.result.error_summary.auth)
+                        throw new Error((user.result as any).error_summary.auth)
                     }
 
                     if (user.result.id) {

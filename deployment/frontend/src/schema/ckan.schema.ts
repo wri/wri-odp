@@ -15,7 +15,7 @@ export interface CkanResponse<T> {
         __type: string
         message: string
     }
-    result: Either<T, { errors: any; error_summary: any }>
+    result: T
 }
 
 export interface User {
