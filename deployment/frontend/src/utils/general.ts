@@ -35,7 +35,7 @@ export function filterObjects<T>(array: T[], filterObject: Record<string, string
 }
 
 export function getKeyValues<T, K extends keyof T>(array: T[], key: K, index: K): { id: string; label: string }[] {
-  let o: {
+  const o: {
     id: string;
     label: string;
   }[] = array.map((item, i) => ({
@@ -43,7 +43,6 @@ export function getKeyValues<T, K extends keyof T>(array: T[], key: K, index: K)
     label: item[key] as string,
   }));
 
-  o = [{ id: "None", label: "All" }, ...o]
   return o
 
 }
@@ -59,7 +58,5 @@ export function getKeyValues2<T, K extends keyof T>(array: T[], key: K, index: K
       result.push({ id: item[index] as string, label: item[key] as string });
     }
   });
-
-  result.unshift({ id: "None", label: "All" });
   return result;
 }

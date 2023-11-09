@@ -42,9 +42,9 @@ function LeftNode({ setQuery, query }: { setQuery: React.Dispatch<React.SetState
   return (
     <div className='flex  gap-x-3'>
       <SelectFilter
-        options={getKeyValues(team?.organizations as IOrg[], "title", "name")} filtername="organization" setQuery={setQuery} query={query} />
+        options={[{ id: "None", label: "All teams" }].concat(getKeyValues(team?.organizations as IOrg[], "title", "name"))} filtername="organization" setQuery={setQuery} query={query} />
       <SelectFilter
-        options={getKeyValues(topics?.topics as GroupTree[], "name", "name")} setQuery={setQuery} query={query} filtername='group' />
+        options={[{ id: "None", label: "All topics" }].concat(getKeyValues(topics?.topics as GroupTree[], "name", "name"))} setQuery={setQuery} query={query} filtername='group' />
     </div>
   )
 
