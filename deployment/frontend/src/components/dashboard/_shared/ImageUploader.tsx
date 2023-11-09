@@ -46,6 +46,7 @@ export function ImageUploader({
             if (result && result.successful[0]) {
                 let paths = new URL(result.successful[0].uploadURL).pathname.substring(1).split('/')
                 const key = paths.slice(0, paths.length).join('/')
+                uppy.setState({...uppy.getState(), files: []});
                 setKey(key)
             }
 

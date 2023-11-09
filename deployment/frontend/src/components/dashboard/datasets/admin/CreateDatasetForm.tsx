@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { match } from 'ts-pattern'
 
-export default function NewDatasetForm() {
+export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [selectedIndex, setSelectedIndex] = useState(0)
 
@@ -59,7 +59,7 @@ export default function NewDatasetForm() {
                         <DescriptionForm formObj={formObj} />
                         <PointOfContactForm />
                         <MoreDetailsForm />
-                        <CustomFieldsForm />
+                        <CustomFieldsForm formObj={formObj}/>
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <CreateDataFilesSection />

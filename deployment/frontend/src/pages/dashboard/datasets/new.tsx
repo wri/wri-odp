@@ -1,11 +1,6 @@
 import { Breadcrumbs } from "@/components/_shared/Breadcrumbs";
-import { Button } from "@/components/_shared/Button";
 import Header from "@/components/_shared/Header";
-import NewDatasetForm from "@/components/dashboard/datasets/admin/NewDatasetForm";
-import classNames from "@/utils/classnames";
-import { Tab } from "@headlessui/react";
-import { useState } from "react";
-import { match } from "ts-pattern";
+import CreateDatasetForm from "@/components/dashboard/datasets/admin/CreateDatasetForm";
 
 const links = [
   { label: "Dashboard", url: "/dashboard", current: false },
@@ -22,7 +17,7 @@ export default function NewDatasetPage() {
         <h1 className="mx-auto w-full max-w-[1380px] px-4 font-acumin text-2xl font-semibold text-black sm:px-6 xxl:px-0">
           Add a dataset
         </h1>
-        <NewDatasetForm />
+        <CreateDatasetForm />
       </main>
     </>
   );

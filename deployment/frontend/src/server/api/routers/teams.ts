@@ -6,6 +6,7 @@ import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 export const teamRouter = createTRPCRouter({
     getAllTeams: protectedProcedure.query(async ({ ctx }) => {
+        console.log(env.CKAN_URL)
         const user = ctx.session.user
         const teamRes = await fetch(
             `${env.CKAN_URL}/api/action/organization_list?all_fields=True`,
