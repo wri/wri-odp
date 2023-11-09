@@ -16,7 +16,7 @@ type IOrg = {
 function LeftNode({ setQuery, query }: { setQuery: React.Dispatch<React.SetStateAction<SearchInput>>, query: SearchInput }) {
   const [queryN, setQueryN] = useState<SearchInput>({ search: '', page: { start: 0, rows: 100 } })
   const { data: team, isLoading: isLoadingTeam } = api.organization.getUsersOrganizations.useQuery(queryN)
-  const { data: topics, isLoading: isLoadingTopics } = api.topic.getUsersTopics.useQuery(queryN)
+  const { data: topics, isLoading: isLoadingTopics } = api.topics.getUsersTopics.useQuery(queryN)
 
   if (isLoadingTeam || isLoadingTopics) return (
     <div className='flex  gap-x-3'>

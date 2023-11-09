@@ -53,7 +53,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | undefined }) {
 
 export default function TopicCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
-  const { data, isLoading } = api.topic.getUsersTopics.useQuery(query)
+  const { data, isLoading } = api.topics.getUsersTopics.useQuery(query)
 
 
 

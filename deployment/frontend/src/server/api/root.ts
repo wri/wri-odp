@@ -17,7 +17,7 @@ export const appRouter = createTRPCRouter({
   user: UserRouter,
   dataset: DatasetRouter,
   organization: OrganizationRouter,
-  topic: TopicRouter,
+  topics: TopicRouter,
   uploads: uploadsRouter,
   teams: teamRouter
 });
