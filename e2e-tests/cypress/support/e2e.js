@@ -38,7 +38,7 @@ const apiUrl = (path) => {
 
 Cypress.Commands.add("login", (username, password) => {
   cy.session([username, password], () => {
-    cy.visit({ url: "/" });
+    cy.visit("/");
     cy.get("#nav-login-button").click();
     cy.get("#login-modal").as("login-modal");
 
@@ -46,6 +46,8 @@ Cypress.Commands.add("login", (username, password) => {
     cy.get("@login-modal").get('input[name="password"]').type(password);
 
     cy.get("button#login-button").click({ force: true });
+
+    cy.get("#nav-user-menu").should("be.visible");
   });
 });
 
