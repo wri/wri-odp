@@ -8,12 +8,15 @@ import { api } from '@/utils/api';
 import Spinner from '@/components/_shared/Spinner';
 import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
+import type { GroupTree } from '@/schema/ckan.schema';
 
 
-function TeamProfile({ team }: { team: IRowProfile }) {
-
+function TeamProfile({ team }: { team: GroupTree }) {
+  const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
+  const teamProfile = team as IRowProfile
+  teamProfile.description = description
   return (
-    <div className='flex py-5 pl-4 sm:pl-8'>
+    <div className='flex py-5 pl-4 sm:pl-8' >
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} />
     </div>
   )
