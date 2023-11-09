@@ -4,7 +4,7 @@
   "pageLoadTimeout": 120000,
   "video": false,
   "env": {
-    "FRONTEND_URL": "",
+    "FRONTEND_URL": "http://localhost:3000",
     "API_KEY": "CKAN_API_TOKEN",
     "CKAN_USERNAME": "ckan_admin",
     "CKAN_PASSWORD": "test1234",

@@ -4,7 +4,7 @@ import Layout from "@/components/dashboard/Layout";
 import DatasetList from '@/components/dashboard/datasets/DatasetList';
 import Footer from "@/components/_shared/Footer";
 
-export default function datasets() {
+export default function DatasetListPage() {
   return (
     <>
       <Header />
@@ -15,4 +15,5 @@ export default function datasets() {
     </>
   )
 }
+
 

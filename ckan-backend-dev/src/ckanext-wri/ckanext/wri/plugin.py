@@ -1,6 +1,7 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 
+import ckanext.wri.logic.action as action
 from ckanext.wri.logic.validators import iso_language_code
 from ckanext.wri.logic.action.get import package_search
 
@@ -43,5 +44,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def get_actions(self):
         return {
-            'package_search': package_search
+            'package_search': package_search,
+            'password_reset': action.password_reset
+
         }

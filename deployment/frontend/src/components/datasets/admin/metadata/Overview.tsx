@@ -70,6 +70,7 @@ export function OverviewForm() {
           </InputGroup>
           <InputGroup label="Language">
             <SimpleSelect
+              name="language"
               placeholder="Language"
               options={[
                 { value: "eng", label: "English" },
@@ -80,6 +81,7 @@ export function OverviewForm() {
           </InputGroup>
           <InputGroup label="Team">
             <SimpleSelect
+              name="owner_team"
               placeholder="Name of team"
               options={[
                 { value: "team_1", label: "Team 1" },
@@ -142,6 +144,7 @@ export function OverviewForm() {
           </InputGroup>
           <InputGroup label="Update Frequency">
             <SimpleSelect
+              name="update_frequency"
               placeholder="Select update frequency"
               options={[
                 { value: "monthly", label: "Monthly", default: true },
@@ -164,6 +167,7 @@ export function OverviewForm() {
           <InputGroup label="Visbility" required>
             <SimpleSelect
               placeholder="Select visiblity"
+              name="visibility"
               options={[
                 { value: "public", label: "Public" },
                 { value: "private", label: "Private", default: true },
@@ -173,6 +177,7 @@ export function OverviewForm() {
           <InputGroup label="License">
             <SimpleSelect
               placeholder="Select license"
+              name="license"
               options={[
                 {
                   value: "creative_commons",

@@ -13,6 +13,7 @@ export default function SortBy() {
           </div>
           <SimpleSelect
             placeholder="Select"
+            name="show"
             options={[
               { value: '1', label: "1", default: true },
               { value: '2', label: "2" },
@@ -25,6 +26,7 @@ export default function SortBy() {
             Sort by
           </div>
           <SimpleSelect
+            name="sort_by"
             placeholder="Sort by"
             options={[
               { value: '1', label: "Relevance", default: true },
