@@ -1,73 +1,280 @@
-import React from "react";
+import React, {
+    Dispatch,
+    FormEvent,
+    SetStateAction,
+    useEffect,
+    useState,
+} from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+
 import {
-  ExclamationCircleIcon,
-  EnvelopeIcon,
-  LockClosedIcon,
-} from "@heroicons/react/24/outline";
-import Image from "next/image";
-import Link from "next/link";
+    ExclamationCircleIcon,
+    EnvelopeIcon,
+    LockClosedIcon,
+    UserIcon,
+    InformationCircleIcon,
+} from '@heroicons/react/24/outline'
+import Image from 'next/image'
+import { getCsrfToken, signIn } from 'next-auth/react'
+import { useRouter } from 'next/router'
+import { useForm } from 'react-hook-form'
+import {
+    RequestResetPasswordFormType,
+    RequestResetPasswordSchema,
+    SignInFormType,
+    SignInSchema,
+} from '@/schema/auth.schema'
+import { ErrorAlert } from './Alerts'
+import { api } from '@/utils/api'
+import notify from '@/utils/notify'
 
-export default function Login() {
-  return (
-    <section id="login-modal" className=" mb-4 font-acumin max-w-[24rem] mx-auto">
-      <div className="mt-2 flex flex-col">
-        <div className=" text-center">
-          <ExclamationCircleIcon className="mx-auto mb-2 h-5 w-5" />
-          <p className=" font-wri-black text-[0.813rem] font-light">
-            Registration Not Available Yet! <b>Login for WRI Members Only.</b>{" "}
-            You Can Still Use All Portal Features.
-          </p>
-          <h3 className="mt-8 text-[1.75rem] font-semibold">Log In</h3>
-        </div>
-        <div className="mt-4">
-          <form action="" className="flex flex-col gap-y-4">
-            <div className="relative mx-auto w-full rounded-md">
-              <input
-                type="text"
-                placeholder="Username"
-                className="shadow-wri-small peer block w-full rounded-md border-0 px-5 py-3 text-neutral-700 ring-1 ring-inset ring-gray-300 placeholder:text-neutral-700 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
-              ></input>
-              <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center pr-3 text-neutral-700 peer-focus:text-[#3654A5]">
-                <EnvelopeIcon className="h-5 w-5 " />
-              </div>
-            </div>
-            <div className="relative mx-auto w-full max-w-[24rem] rounded-md">
-              <input
-                type="password"
-                placeholder="Password"
-                className="shadow-wri-small peer block w-full rounded-md border-0 px-5 py-3 text-neutral-700 ring-1 ring-inset ring-gray-300 placeholder:text-neutral-700 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
-              ></input>
-              <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center pr-3 text-neutral-700 peer-focus:text-[#3654A5]">
-                <LockClosedIcon className="h-5 w-5 " />
-              </div>
-            </div>
+export default function Login({
+    onSignIn = () => {},
+}: {
+    onSignIn?: () => void
+}) {
+    const [isPasswordReset, setIsPasswordReset] = useState(false)
 
-            <div className="-mt-2 text-right text-[0.875rem] font-light text-wri-black">
-              Forgot password?
+    return (
+        <section id="login-modal" className=" font-acumin mb-4">
+            <div className="mt-2 flex flex-col">
+                {!isPasswordReset ? (
+                    <SignInForm
+                        onSignIn={onSignIn}
+                        setIsPasswordReset={setIsPasswordReset}
+                    />
+                ) : (
+                    <ResetPasswordForm
+                        setIsPasswordReset={setIsPasswordReset}
+                    />
+                )}
             </div>
-            <button
-              type="button"
-              className="rounded-sm bg-wri-gold px-4 py-4 text-[1.125rem] font-semibold text-wri-black"
-            >
-              <Link href="/dashboard">
-                Log In
-              </Link></button>
-          </form>
-        </div>
-        <div className="mt-8 flex items-center justify-center gap-x-2 text-center">
-          <div className="border-1 h-0 w-20 border border-wri-gray text-[0.875rem] font-light" />
-          <div className="text-wri-black ">or</div>
-          <div className="border-1 h-0 w-20 border border-wri-gray text-[0.875rem] font-light" />
-        </div>
-        <div className="mt-8  flex justify-center rounded-sm py-4 outline outline-1 outline-wri-gold ">
-          <div className="relative my-auto h-4 w-4">
-            <Image src="/images/wri_logo.png" alt="comment" fill />
-          </div>
-          <div className="ml-2 w-fit text-base font-semibold text-wri-black ">
-            Sign In with your WRI Credentials
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+        </section>
+    )
+}
+
+function SignInForm({
+    onSignIn,
+    setIsPasswordReset,
+}: {
+    onSignIn: () => void
+    setIsPasswordReset: Dispatch<SetStateAction<boolean>>
+}) {
+    const router = useRouter()
+    const [errorMessage, setErrorMessage] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = useForm<SignInFormType & { confirm: string }>({
+        resolver: zodResolver(SignInSchema),
+    })
+
+    const error =
+        errorMessage || errors.username?.message || errors.password?.message
+
+    return (
+        <>
+            <div className=" text-center">
+                <InformationCircleIcon className="w-5 h-5 mx-auto mb-2" />
+                <p className=" font-light font-wri-black text-[0.813rem]">
+                    Registration Not Available Yet!{' '}
+                    <b>Login for WRI Members Only.</b> You Can Still Use All
+                    Portal Features.
+                </p>
+                <h3 className="mt-8 font-semibold text-[1.75rem]">Log In</h3>
+            </div>
+            <div className="mt-4">
+                <form
+                    className="flex flex-col gap-y-4"
+                    onSubmit={(data) => {
+                        setErrorMessage('')
+                        handleSubmit(async (data) => {
+                            setIsLoading(true)
+                            const signInStatus = await signIn('credentials', {
+                                callbackUrl: '/dashboard',
+                                redirect: false,
+                                ...data,
+                            })
+
+                            setIsLoading(false)
+                            if (signInStatus?.error) {
+                                // TODO: we should get the error from the response
+                                console.log(signInStatus)
+                                setErrorMessage(signInStatus.error)
+                            } else {
+                                notify("Sign in successful")
+                                onSignIn ? onSignIn() : router.reload()
+                            }
+                        })(data)
+                    }}
+                >
+                    <div className=" rounded-md px-4 group py-3 gap-x-2 flex pr-8 flex-row items-center min-w-fit  w-full bg-white border-[1px] border-wri-gray-200">
+                        <div className="grow shrink basis-auto">
+                            <input
+                                type="text"
+                                placeholder="Username"
+                                className=" focus:outline-none  placeholder:text-xs placeholder:font-light placeholder:text-[#353535] text-xs font-light w-full !border-none"
+                                {...register('username')}
+                            />
+                        </div>
+                        <div className=" my-auto">
+                            <UserIcon className="w-4 h-4 text-[#3654A5]" />
+                        </div>
+                    </div>
+
+                    <div className=" rounded-md px-4 group py-3 gap-x-2 flex pr-8 flex-row items-center min-w-fit  w-full bg-white border-[1px] border-wri-gray-200">
+                        <div className="grow shrink basis-auto">
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                className=" focus:outline-none placeholder:text-xs placeholder:font-light placeholder:text-[#353535] text-xs font-light w-full !border-none"
+                                {...register('password')}
+                            />
+                        </div>
+                        <div className=" my-auto">
+                            <LockClosedIcon className="w-4 h-4 text-[#3654A5]" />
+                        </div>
+                    </div>
+                    {error ? (
+                        <ErrorAlert text={error} title="Sign in failed" />
+                    ) : null}
+                    <button
+                        className="font-light text-[0.875rem] text-wri-black text-right -mt-2"
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault()
+                            setIsPasswordReset(true)
+                            return false
+                        }}
+                        id="forgot-password-button"
+                    >
+                        Forgot password?
+                    </button>
+                    <button
+                        disabled={isLoading}
+                        type="submit"
+                        className="bg-wri-gold text-wri-black font-semibold text-[1.125rem] rounded-sm px-4 py-4"
+                        id="login-button"
+                    >
+                        {isLoading ? 'Signing in...' : 'Log In'}
+                    </button>
+                </form>
+            </div>
+            <div className="mt-8 text-center flex justify-center items-center gap-x-2">
+                <div className="font-light text-[0.875rem] border border-1 border-wri-gray w-20 h-0" />
+                <div className="text-wri-black ">or</div>
+                <div className="font-light text-[0.875rem] border border-1 border-wri-gray w-20 h-0" />
+            </div>
+            <div className="flex  mt-8 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 ">
+                <div className="w-4 h-4 relative my-auto">
+                    <Image src="/images/wri_logo.png" alt="comment" fill />
+                </div>
+                <div className="ml-2 w-fit font-semibold text-base text-wri-black ">
+                    Sign In with your WRI Credentials
+                </div>
+            </div>
+        </>
+    )
+}
+
+function ResetPasswordForm({
+    setIsPasswordReset,
+}: {
+    setIsPasswordReset: Dispatch<SetStateAction<boolean>>
+}) {
+    const [errorMessage, setErrorMessage] = useState('')
+    const [result, setResult] = useState('')
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = useForm<RequestResetPasswordFormType>({
+        resolver: zodResolver(RequestResetPasswordSchema),
+    })
+
+    const requestPasswordReset = api.auth.requestPasswordReset.useMutation({
+        onSuccess: (data) => {
+            setResult(data.result)
+        },
+        onError: (e) => {
+            setErrorMessage(e.message)
+        },
+    })
+
+    const error = errorMessage || errors.email?.message
+
+    return (
+        <>
+            <div className=" text-center">
+                <h3 className="mt-8 font-semibold text-[1.75rem]">
+                    Password Reset
+                </h3>
+            </div>
+            <div className="mt-4">
+                <form
+                    className="flex flex-col gap-y-4"
+                    onSubmit={(data) => {
+                        setErrorMessage('')
+                        setResult('')
+                        handleSubmit(async (data) => {
+                            requestPasswordReset.mutate(data)
+                        })(data)
+                    }}
+                >
+                    <div className=" rounded-md px-4 group py-3 gap-x-2 flex pr-8 flex-row items-center min-w-fit  w-full bg-white border-[1px] border-wri-gray-200">
+                        <div className="grow shrink basis-auto">
+                            <input
+                                type="text"
+                                placeholder="Email"
+                                className=" focus:outline-none  placeholder:text-xs placeholder:font-light placeholder:text-[#353535] text-xs font-light w-full !border-none"
+                                {...register('email')}
+                            />
+                        </div>
+                        <div className=" my-auto">
+                            <EnvelopeIcon className="w-4 h-4 text-[#3654A5]" />
+                        </div>
+                    </div>
+
+                    <button
+                        className="font-light text-[0.875rem] text-wri-black text-right -mt-2"
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault()
+                            setIsPasswordReset(false)
+                            return false
+                        }}
+                    >
+                        Go back to sign in
+                    </button>
+
+                    {result ? (
+                        <p className="text-center text-green-600">{result}</p>
+                    ) : null}
+
+                    {error ? (
+                        <ErrorAlert
+                            text={error}
+                            title="Password reset failed"
+                        />
+                    ) : null}
+                    <button
+                        disabled={requestPasswordReset.isLoading}
+                        type="submit"
+                        className="bg-wri-gold text-wri-black font-semibold text-[1.125rem] rounded-sm px-4 py-4"
+                        id="request-reset-button"
+                    >
+                        {requestPasswordReset.isLoading
+                            ? 'Resetting password...'
+                            : 'Send password reset link'}
+                    </button>
+                </form>
+            </div>
+        </>
+    )
 }
