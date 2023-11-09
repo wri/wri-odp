@@ -40,7 +40,7 @@ describe("Dashboard Test", () => {
   it("Should test activity stream", () => {
     cy.visit('/dashboard/activity-stream')
     cy.contains(`${ckanUserName} created the package ${datasetName}`);
-    cy.get('[id="headlessui-listbox-button-:R1irkm:"]').click();
+    cy.get('[id^="headlessui-listbox-button"]').click();
     cy.contains('[role="option"]', 'new').click();
     cy.contains(`${ckanUserName} created the package ${datasetName}`);
   })
