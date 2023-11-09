@@ -6,6 +6,15 @@ assets.addSpecs(".", ["ckan-classic-auth", "ckan-classic-api"]);
 
 cypress
   .run(assets.options)
-  .then(console.log)
-  .catch(console.error)
-  .finally(() => assets.cleanUp());
+  .then((results) => {
+    if (results.totalFailed > 0) {
+      process.exit(1);
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  })
+  .finally(() => {
+    assets.cleanUp();
+  });

@@ -3,12 +3,16 @@ on:
   push:
     branches:
       - dev
+  pull_request:
+    branches:
+      - dev
 env:
   PROJECT_NAME: wri-odp
   BRANCH_NAME: dev
 permissions:
       id-token: write
-      contents: read    
+      contents: read
+      security-events: write
 jobs:
   buildandtest:
     name: Build and Scan Image with Integration Tests
@@ -28,19 +32,34 @@ jobs:
           mask-password: 'true'
       - name: Add CKAN url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
-      - name: Build and push image to ECR
+      - name: Build and push CKAN image to ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ckan-dev-ecr
+          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ckan-deployment/ckan
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
+          docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
+          docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
+      - name: Build and push Frontend image to ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
+          --build-arg NEXTAUTH_SECRET=${{ secrets.DEV_FRONTEND_NEXTAUTH_SECRET }} \
+          --build-arg NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
+          --build-arg CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
+          deployment/frontend
+          docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Set up Docker Containers
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+          MINIO_ROOT_USER: 'minioadmin'
+          MINIO_ROOT_PASSWORD: 'minioadmin'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
-        working-directory: ./ckan-backend-dev        
+        working-directory: ./ckan-backend-dev
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
@@ -49,6 +68,14 @@ jobs:
           node-version: 18
           runTests: false
           working-directory: ./integration-tests
+      - name: Cypress Install and Frontend setup
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 120
+          node-version: 18
+          runTests: false
+          working-directory: ./e2e-tests
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Run Integration tests 🧪
@@ -56,6 +83,11 @@ jobs:
         with:
           command: node test.js
           working-directory: ./integration-tests
+      - name: Run frontend tests 🧪
+        uses: cypress-io/github-action@v6
+        with:
+          command: npm run test
+          working-directory: ./e2e-tests
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev
@@ -65,27 +97,49 @@ jobs:
         working-directory: ./ckan-backend-dev
       - name: Fix s3filestore test.ini for minio
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
         working-directory: ./ckan-backend-dev
       - name: Run Unit Tests 🧪
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/ckan-dev-ecr:${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/run_unit_tests.sh"
         working-directory: ./ckan-backend-dev
-      - name: Run Trivy Vulnerability Scanner 🧪
+      - name: Run Trivy Vulnerability Scanner for CKAN Container 🧪
         uses: aquasecurity/trivy-action@master
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ckan-dev-ecr
+          REPOSITORY: ${{ secrets.ECR_CKAN_REPO }}
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
-          format: 'table'
+          format: 'sarif'
+          output: ckan-trivy-results.sarif
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-          
+      - name: Run Trivy Vulnerability Scanner for Frontend Container 🧪
+        uses: aquasecurity/trivy-action@master
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ secrets.ECR_FRONTEND_REPO }}
+        with:
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
+          format: 'sarif'
+          output: frontend-trivy-results.sarif
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+      - name: Upload CKAN container Trivy scan results to GitHub Code scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ckan-trivy-results.sarif
+      - name: Upload Frontnend container Trivy scan results to GitHub Code scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          category: frontend_container_trivy_results
+          sarif_file: frontend-trivy-results.sarif
       - name: Tear down containers
         if: failure() || success()
         run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
@@ -96,6 +150,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - buildandtest
+    if: github.event_name != 'pull_request'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -112,10 +167,12 @@ jobs:
       - name: Run Templater and update values.yaml
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ckan-dev-ecr
+          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
+          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
           IMAGE_TAG: ${{ github.sha }}
         run: |    
-          cd ckan-deployment
+          cd deployment
           curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
           bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
       - name: Configure Kubeconfig
@@ -132,4 +189,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: install
       - name: 'Deploy using Helm Upgrade'
-        run: helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./ckan-deployment/helm-templates -f ./ckan-deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait
+        run: |
+          set -e
+          helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./deployment/helm-templates -f ./deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait

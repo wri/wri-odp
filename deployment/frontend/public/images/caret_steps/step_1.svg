@@ -1,0 +1,33 @@
+<svg xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" fill="none" version="1.1" id="svg14" sodipodi:docname="step_1.svg" inkscape:version="1.3 (0e150ed6c4, 2023-07-21)" viewBox="20 19.85 1395 68">
+  <sodipodi:namedview id="namedview14" pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25" inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1" inkscape:zoom="0.9741565" inkscape:cx="633.88172" inkscape:cy="66.211127" inkscape:window-width="1920" inkscape:window-height="1011" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1" inkscape:current-layer="svg14"/>
+  <path d="m 922,20.346161 h 452.61 l 40.39,33.5 -40.39,33.5 H 922 l 32.935,-33.7109 z" fill="#f7f7f7" id="path1"/>
+  <path d="m 472,20.346161 h 451.812 l 37.188,33 -37.188,34 H 472 l 30.338,-33.7312 z" fill="#f7f7f7" id="path2"/>
+  <g filter="url(#filter0_d_5_6556)" id="g3" transform="translate(22,-0.65383899)">
+    <path d="M 876.339,21 908,54 876.339,88" stroke="#e9e9e9" id="path3"/>
+  </g>
+  <g filter="url(#filter1_d_5_6556)" id="g6" transform="translate(22,-0.65383899)">
+    <path d="M -2,21 H 452.034 L 483,54.5 452.034,88 H -2 Z" fill="#ffffff" id="path6"/>
+  </g>
+  <defs id="defs14">
+    <filter id="filter0_d_5_6556" x="855.974" y="0.65383899" width="72.714401" height="107.687" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix" id="feFlood10"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" id="feColorMatrix10"/>
+      <feOffset id="feOffset10"/>
+      <feGaussianBlur stdDeviation="10" id="feGaussianBlur10"/>
+      <feComposite in2="hardAlpha" operator="out" id="feComposite10"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.868012 0 0 0 0 0.868012 0 0 0 0 0.868012 0 0 0 0.25 0" id="feColorMatrix11"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_5_6556" id="feBlend11"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_5_6556" result="shape" id="feBlend12"/>
+    </filter>
+    <filter id="filter1_d_5_6556" x="-22" y="1" width="525" height="107" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix" id="feFlood12"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" id="feColorMatrix12"/>
+      <feOffset id="feOffset12"/>
+      <feGaussianBlur stdDeviation="10" id="feGaussianBlur12"/>
+      <feComposite in2="hardAlpha" operator="out" id="feComposite12"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.868012 0 0 0 0 0.868012 0 0 0 0 0.868012 0 0 0 0.25 0" id="feColorMatrix13"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_5_6556" id="feBlend13"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_5_6556" result="shape" id="feBlend14"/>
+    </filter>
+  </defs>
+</svg>
