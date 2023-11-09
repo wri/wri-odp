@@ -1,12 +1,14 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 
+import ckanext.wri.logic.action as action
 from ckanext.wri.logic.validators import iso_language_code
 
 
 class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IValidators)
+    plugins.implements(plugins.IActions)
 
     # IConfigurer
 
@@ -21,3 +23,12 @@ class WriPlugin(plugins.SingletonPlugin):
         return {
             "iso_language_code": iso_language_code
         }
+
+    # IActions
+
+    def get_actions(self):
+        return {
+            "password_reset": action.password_reset
+
+        }
+
