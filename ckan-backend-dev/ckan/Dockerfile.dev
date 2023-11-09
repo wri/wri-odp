@@ -1,5 +1,4 @@
-FROM viderum/ckan:v2.10-dev
-
+FROM viderum/ckan:v2.10-dev-security-fix
 
 # Set up environment variables
 ENV APP_DIR=/srv/app
