@@ -12,6 +12,7 @@ import {
     EnvelopeIcon,
     LockClosedIcon,
     UserIcon,
+    InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 import Image from 'next/image'
 import { getCsrfToken, signIn } from 'next-auth/react'
@@ -78,7 +79,7 @@ function SignInForm({
     return (
         <>
             <div className=" text-center">
-                <ExclamationCircleIcon className="w-5 h-5 mx-auto mb-2" />
+                <InformationCircleIcon className="w-5 h-5 mx-auto mb-2" />
                 <p className=" font-light font-wri-black text-[0.813rem]">
                     Registration Not Available Yet!{' '}
                     <b>Login for WRI Members Only.</b> You Can Still Use All
@@ -102,6 +103,7 @@ function SignInForm({
                             setIsLoading(false)
                             if (signInStatus?.error) {
                                 // TODO: we should get the error from the response
+                                console.log(signInStatus)
                                 setErrorMessage(signInStatus.error)
                             } else {
                                 notify("Sign in successful")
@@ -148,6 +150,7 @@ function SignInForm({
                             setIsPasswordReset(true)
                             return false
                         }}
+                        id="forgot-password-button"
                     >
                         Forgot password?
                     </button>
@@ -155,6 +158,7 @@ function SignInForm({
                         disabled={isLoading}
                         type="submit"
                         className="bg-wri-gold text-wri-black font-semibold text-[1.125rem] rounded-sm px-4 py-4"
+                        id="login-button"
                     >
                         {isLoading ? 'Signing in...' : 'Log In'}
                     </button>
@@ -263,6 +267,7 @@ function ResetPasswordForm({
                         disabled={requestPasswordReset.isLoading}
                         type="submit"
                         className="bg-wri-gold text-wri-black font-semibold text-[1.125rem] rounded-sm px-4 py-4"
+                        id="request-reset-button"
                     >
                         {requestPasswordReset.isLoading
                             ? 'Resetting password...'

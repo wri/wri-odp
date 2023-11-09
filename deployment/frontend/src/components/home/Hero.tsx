@@ -72,11 +72,12 @@ export function Hero() {
                     <div className="flex gap-x-2 lg:hidden">
                         <div>
                             {session.status == 'authenticated' ? (
-                                <UserMenu colors="dark" />
+                                <UserMenu colors="light" />
                             ) : (
                                 <button
                                     onClick={() => setIsOpen(true)}
                                     className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
+                                    id="nav-login-button"
                                 >
                                     Login
                                 </button>

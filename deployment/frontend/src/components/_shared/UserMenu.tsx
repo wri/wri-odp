@@ -29,7 +29,7 @@ export default function UserMenu({
     const session = useSession()
 
     return (
-        <div className="text-right -ml-6 sm:ml-0 font-acumin">
+        <div className="text-right -ml-6 sm:ml-0 font-acumin" id="nav-user-menu">
             <Menu
                 as="div"
                 className="relative inline-block text-left  pr-1 z-50"
@@ -37,8 +37,8 @@ export default function UserMenu({
                 <div>
                     <Menu.Button>
                         <div className="flex ">
-                            <UserCircleIcon className={`text-black h-5 w-5 mr-2 ${colors == "light" ? "text-white" : ""}`} />
-                            <div className={`font-normal text-[1.1251rem] border-b-2 border-b-wri-gold ${colors == "light" ? "text-white" : ""}`}>
+                            <UserCircleIcon className={`text-black h-5 w-5 mr-2 ${colors == "light" ? "!text-white" : ""}`} />
+                            <div className={`font-normal text-[1.1251rem] border-b-2 border-b-wri-gold ${colors == "light" ? "!text-white" : ""}`}>
                                 {session.data?.user.name}
                             </div>
                         </div>
