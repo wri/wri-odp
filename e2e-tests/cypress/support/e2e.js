@@ -219,33 +219,29 @@ Cypress.Commands.add("deleteOrganizationAPI", (name) => {
   });
 });
 
-Cypress.Commands.add(
-  "createDatasetAPI",
-  (organization, name, isSubscribable) => {
-    const request = cy.request({
-      method: "POST",
-      url: apiUrl("package_create"),
-      headers: headers,
-      body: {
-        owner_org: organization,
-        name: name,
-        author: "datopian",
-        url: "Source not specified",
-        license_id: "notspecified",
-        tags: [{ display_name: "subscriable", name: "subscriable" }],
-      },
-    });
+Cypress.Commands.add('createDatasetAPI', (organization, name, isSubscribable) => {
+  const request = cy.request({
+    method: 'POST',
+    url: apiUrl('package_create'),
+    headers: headers,
+    body: {
+      owner_org: organization,
+      name: name,
+      author: "datopian",
+      license_id : "notspecified",
+      tags: [{"display_name": "subscriable", "name": "subscriable"}]
+    },
+  })
 
-    if (!isSubscribable) {
-      request.then((response) => {
-        const datasetId = response.body.result.id;
-        cy.request({
-          method: "POST",
-          url: dataSubscriptionApiUrl(`nonsubscribable_datasets/${datasetId}`),
-          headers: headers,
-        });
-      });
-    }
+  if (!isSubscribable) {
+    request.then((response) => {
+      const datasetId = response.body.result.id
+      cy.request({
+        method: 'POST',
+        url: dataSubscriptionApiUrl(`nonsubscribable_datasets/${datasetId}`),
+        headers: headers,
+      })
+    })
   }
 );
 

@@ -2,17 +2,35 @@ import { Fragment, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import classNames from '@/utils/classnames';
+import type { SearchInput } from '@/schema/search.schema';
 
 interface Option {
-  id: number;
+  id: string;
   label: string;
 }
 
-export default function SelectFilter({ options }: { options: Option[] }) {
-  const [selected, setSelected] = useState(options[0] ? options[0] : { id: 0, label: '' })
+export default function SelectFilter({ options, setQuery, query, filtername }: { options: { id: string; label: string | undefined; }[], filtername: string, setQuery: React.Dispatch<React.SetStateAction<SearchInput>>, query: SearchInput }) {
+  const [selected, setSelected] = useState(options[0] ? options[0] : { id: '0', label: '' })
+
+  const handleSelect = (option: Option) => {
+    setSelected(option)
+    if (option.id === "None") {
+      const updateQuery: SearchInput = {
+        page: { ...query?.page, start: 0 },
+        search: query.search,
+      }
+      setQuery && setQuery(updateQuery)
+    }
+    else {
+      const updateQuery: SearchInput = {
+        page: { ...query?.page, start: 0 }, search: query.search, fq: { ...query.fq, [filtername]: option.label === "All" ? '' : option.id }
+      }
+      setQuery && setQuery(updateQuery)
+    }
+  }
 
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox value={selected} onChange={handleSelect}>
       {({ open }) => (
         <>
           <div className="relative w-32 sm:w-48 ">

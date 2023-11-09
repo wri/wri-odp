@@ -1,6 +1,10 @@
-import { createTRPCRouter } from '@/server/api/trpc'
+import { createTRPCRouter } from "@/server/api/trpc";
+import { activityStreamRouter } from "@/server/api/routers/activityStream";
+import { UserRouter } from "@/server/api/routers/User";
+import { DatasetRouter } from "./routers/dataset";
+import { OrganizationRouter } from "./routers/organization";
+import { TopicRouter } from "./routers/topics";
 import { teamRouter } from './routers/teams'
-import { topicRouter } from './routers/topics'
 import { uploadsRouter } from './routers/uploads'
 import { authRouter } from './routers/auth.router'
 
@@ -10,11 +14,15 @@ import { authRouter } from './routers/auth.router'
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-    auth: authRouter,
-    teams: teamRouter,
-    topics: topicRouter,
-    uploads: uploadsRouter,
-})
+  dashboardActivity: activityStreamRouter,
+  auth: authRouter,
+  user: UserRouter,
+  dataset: DatasetRouter,
+  organization: OrganizationRouter,
+  topics: TopicRouter,
+  uploads: uploadsRouter,
+  teams: teamRouter
+});
 
 // export type definition of API
 export type AppRouter = typeof appRouter
