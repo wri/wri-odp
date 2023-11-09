@@ -243,7 +243,7 @@ Cypress.Commands.add('createDatasetAPI', (organization, name, isSubscribable) =>
       })
     })
   }
-);
+})
 
 Cypress.Commands.add("createResourceAPI", (dataset, resource) => {
   const request = cy.request({
