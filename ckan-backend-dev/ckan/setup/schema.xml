@@ -191,6 +191,7 @@ attribute with the form `ckan-X.Y` -->
     <field name="cautions" type="text" indexed="true" stored="true"/>
     <field name="summary" type="text" indexed="true" stored="true"/>
     <fiend name="featured_dataset" type="boolean" indexed="true" stored="true"/>
+    <field name="wri_data" type="boolean" indexed="true" stored="true"/>
 </fields>
 
 <uniqueKey>index_id</uniqueKey>

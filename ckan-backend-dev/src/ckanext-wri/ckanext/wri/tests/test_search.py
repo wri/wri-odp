@@ -92,7 +92,7 @@ def test_search_queries():
 
             assert result[0]['name'] == dataset['name']
 
-        elif field == 'featured_dataset':
+        elif field == 'featured_dataset' or field == 'wri_data':
             result = get_action('package_search')(
                 context=context,
                 data_dict={'q': f'{field}:{dataset[field]}'}
@@ -119,7 +119,7 @@ def test_search_queries():
             if len(result) > 0:
                 assert result[0]['name'] != dataset['name']
 
-        elif field == 'featured_dataset':
+        elif field == 'featured_dataset' or field == 'wri_data':
             result = get_action('package_search')(
                 context=context,
                 data_dict={'q': f'{field}:false'}

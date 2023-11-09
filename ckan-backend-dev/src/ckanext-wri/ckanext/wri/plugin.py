@@ -35,6 +35,8 @@ class WriPlugin(plugins.SingletonPlugin):
         facets_dict['update_frequency'] = toolkit._('Update Frequency')
         facets_dict['license_id'] = toolkit._('License')
         facets_dict['visibility_type'] = toolkit._('Visibility')
+        facets_dict['featured_dataset'] = toolkit._('Featured Dataset')
+        facets_dict['wri_data'] = toolkit._('WRI Data')
         return facets_dict
 
     # IActions
