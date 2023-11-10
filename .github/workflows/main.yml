@@ -99,6 +99,12 @@ jobs:
         with:
           command: npm run test
           working-directory: ./e2e-tests
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore   
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev
