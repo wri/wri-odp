@@ -89,7 +89,7 @@ export function OverviewForm({
                             formObj={formObj}
                             name="language"
                             placeholder="Language"
-                            initialValue={watch('language') ?? null}    
+                            initialValue={watch('language') ?? null}
                             options={[
                                 { value: 'eng', label: 'English' },
                                 { value: 'fr', label: 'French' },
@@ -223,18 +223,18 @@ export function OverviewForm({
                         <div className="flex flex-col items-center justify-between gap-5 lg:flex-row xxl:w-[28rem]">
                             <Input
                                 {...register('temporalCoverageStart', {
-                                    valueAsDate: true,
+                                    valueAsNumber: true,
                                 })}
-                                placeholder="Start"
-                                type="date"
+                                placeholder="Start year"
+                                type="number"
                             />
                             <span className="hidden xxl:block">to</span>
                             <Input
                                 {...register('temporalCoverageEnd', {
-                                    valueAsDate: true,
+                                    valueAsNumber: true,
                                 })}
-                                placeholder="End"
-                                type="date"
+                                placeholder="End year"
+                                type="number"
                             />
                         </div>
                         <ErrorDisplay
@@ -337,7 +337,7 @@ export function OverviewForm({
                                 defaultImage={watch('signedUrl') ?? null}
                                 onPresignedUrlSuccess={(url: string) => {
                                     setValue('signedUrl', url)
-                                }} 
+                                }}
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
                                         response.successful[0]?.name ?? null

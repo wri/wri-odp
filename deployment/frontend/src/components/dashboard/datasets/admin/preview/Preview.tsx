@@ -19,6 +19,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { match } from 'ts-pattern'
 import { UseFormReturn } from 'react-hook-form'
 import { DatasetFormType } from '@/schema/dataset.schema'
+import { formatDate } from '@/utils/formatDate'
 
 export function Preview({
     formObj,
@@ -82,7 +83,7 @@ export function Preview({
                                     text={
                                         watch('temporalCoverageStart') ||
                                         watch('temporalCoverageEnd')
-                                            ? 'test'
+                                            ? `${watch('temporalCoverageStart')} - ${watch('temporalCoverageEnd')}` 
                                             : '_'
                                     }
                                 />

@@ -30,8 +30,8 @@ export const DatasetSchema = z.object({
     technicalNotes: z.string().url(),
     tags: z.array(z.string()),
     topics: z.array(z.string()),
-    temporalCoverageStart: z.date().optional().nullable(),
-    temporalCoverageEnd: z.date().optional().nullable(),
+    temporalCoverageStart: z.number().optional().nullable(),
+    temporalCoverageEnd: z.number().optional().nullable(),
     updateFrequency: z
         .object({
             value: z.enum(['monthly', 'quarterly', 'yearly', 'daily']),
