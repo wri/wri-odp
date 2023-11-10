@@ -56,12 +56,12 @@ jobs:
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
-        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
+        run: |
+          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d \
+          ckan-dev datapusher db solr redis minio minio-setup
         working-directory: ./ckan-backend-dev
       - name: Print Container names
         run: docker ps -a
-      - name: Print logs
-        run: docker logs wri-frontend
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
@@ -70,6 +70,16 @@ jobs:
           node-version: 18
           runTests: false
           working-directory: ./integration-tests
+      - name: Create sysadmin API for Authorization
+        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
+      - name: Set up Frontend Docker Container
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+        run: |
+          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d \
+          frontend
+      - name: Print Container names
+        run: docker ps -a
       - name: Print frontend logs
         run: docker logs wri-frontend
       - name: Cypress Install and Frontend setup
@@ -80,8 +90,6 @@ jobs:
           node-version: 18
           runTests: false
           working-directory: ./e2e-tests
-      - name: Create sysadmin API for Authorization
-        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Run Integration tests 🧪
         uses: cypress-io/github-action@v6
         with:
