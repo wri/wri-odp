@@ -24,6 +24,7 @@ interface SimpleSelectProps<T extends FieldValues, V extends Object> {
     maxWidth?: string
     formObj?: UseFormReturn<T>
     name: Path<T>
+    initialValue?: Option<V> | null
 }
 
 export default function SimpleSelect<T extends FieldValues, V extends Object>({
@@ -33,21 +34,17 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
     maxWidth = 'xl:max-w-[28rem]',
     formObj,
     name,
+    initialValue,
 }: SimpleSelectProps<T, V>) {
-    const [selected, setSelected] = useState<Option<V> | null>(
-        options.find((option) => option.default) ?? null
-    )
     const { control } = formObj ?? useForm()
     return (
         <Controller
             control={control}
             name={name}
-            defaultValue={options.find((option) => option.default)}
-            render={({ field: { onChange } }) => (
+            render={({ field: { onChange: setSelected, value: selected } }) => (
                 <Listbox
                     value={selected}
                     onChange={(e) => {
-                        onChange(e)
                         setSelected(e)
                     }}
                 >

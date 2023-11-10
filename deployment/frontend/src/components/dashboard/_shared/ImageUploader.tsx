@@ -11,12 +11,14 @@ import { api } from '@/utils/api'
 
 export function ImageUploader({
     onUploadSuccess,
+    onPresignedUrlSuccess,
     onUploadStart,
     text = 'Upload image',
     clearImage,
     defaultImage,
 }: {
     onUploadSuccess: (result: UploadResult) => void
+    onPresignedUrlSuccess?: (response: string) => void
     onUploadStart?: () => void
     clearImage?: () => void
     text?: string
@@ -25,7 +27,15 @@ export function ImageUploader({
     const [key, setKey] = useState<string | null>(null)
     const [uploading, setIsUploading] = useState(false)
     const uploadInputRef = useRef<HTMLInputElement>(null)
-    const presignedGetUrl = api.uploads.getPresignedUrl.useQuery({key: key as string}, {enabled: !!key})
+    const presignedGetUrl = api.uploads.getPresignedUrl.useQuery(
+        { key: key as string },
+        {
+            enabled: !!key,
+            onSuccess: (data) => {
+                if (onPresignedUrlSuccess) onPresignedUrlSuccess(data)
+            },
+        }
+    )
     const uppy = React.useMemo(() => {
         const uppy = new Uppy({
             autoProceed: true,
@@ -44,11 +54,14 @@ export function ImageUploader({
         uppy.upload().then((result) => {
             setIsUploading(false)
             if (result && result.successful[0]) {
-                let paths = new URL(result.successful[0].uploadURL).pathname.substring(1).split('/')
+                let paths = new URL(result.successful[0].uploadURL).pathname
+                    .substring(1)
+                    .split('/')
                 const key = paths.slice(0, paths.length).join('/')
-                uppy.setState({...uppy.getState(), files: []});
+                uppy.setState({ ...uppy.getState(), files: [] })
                 setKey(key)
-                if (uploadInputRef && uploadInputRef.current) uploadInputRef.current.value = ''
+                if (uploadInputRef && uploadInputRef.current)
+                    uploadInputRef.current.value = ''
             }
 
             if (result.failed.length > 0) {

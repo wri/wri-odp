@@ -20,6 +20,7 @@ import { api } from '@/utils/api'
 import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
 import classNames from '@/utils/classnames'
+import { env } from '@/env.mjs'
 
 export function OverviewForm({
     formObj,
@@ -37,7 +38,6 @@ export function OverviewForm({
     const possibleTags = api.tags.getAllTags.useQuery()
     const topicHierarchy = api.topics.getTopicsHierarchy.useQuery()
 
-    console.log(watch())
     return (
         <MetadataAccordion
             defaultOpen={true}
@@ -89,6 +89,7 @@ export function OverviewForm({
                             formObj={formObj}
                             name="language"
                             placeholder="Language"
+                            initialValue={watch('language') ?? null}    
                             options={[
                                 { value: 'eng', label: 'English' },
                                 { value: 'fr', label: 'French' },
@@ -117,11 +118,10 @@ export function OverviewForm({
                                     <SimpleSelect
                                         formObj={formObj}
                                         name="team"
+                                        initialValue={watch('team') ?? null}
                                         options={data.map((team) => ({
                                             label: team.title ?? team.name,
                                             value: team.name,
-                                            default:
-                                                watch('team') === team.name,
                                         }))}
                                         placeholder="Select a team"
                                     />
@@ -255,7 +255,6 @@ export function OverviewForm({
                                 {
                                     value: 'monthly',
                                     label: 'Monthly',
-                                    default: true,
                                 },
                                 { value: 'weekly', label: 'Weekly' },
                                 { value: 'yearly', label: 'Yearly' },
@@ -285,7 +284,6 @@ export function OverviewForm({
                                 {
                                     value: 'private',
                                     label: 'Private',
-                                    default: true,
                                 },
                             ]}
                         />
@@ -299,7 +297,6 @@ export function OverviewForm({
                                 {
                                     value: 'creative_commons',
                                     label: 'Creative Commons',
-                                    default: true,
                                 },
                                 { value: 'gnu', label: 'GNU' },
                                 { value: 'openbsd', label: 'OpenBSD' },
@@ -337,7 +334,10 @@ export function OverviewForm({
                         >
                             <ImageUploader
                                 clearImage={() => setValue('featuredImage', '')}
-                                defaultImage={watch('featuredImage')}
+                                defaultImage={watch('signedUrl') ?? null}
+                                onPresignedUrlSuccess={(url: string) => {
+                                    setValue('signedUrl', url)
+                                }} 
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
                                         response.successful[0]?.name ?? null

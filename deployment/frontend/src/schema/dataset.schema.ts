@@ -13,8 +13,18 @@ export const DatasetSchema = z.object({
     title: z.string(),
     name: z.string(),
     source: z.string().url().optional().nullable(),
-    language: z.string().optional().nullable(),
-    team: z.string(),
+    language: z
+        .object({
+            value: z.string(),
+            label: z.string(),
+        })
+        .optional(),
+    team: z
+        .object({
+            value: z.string(),
+            label: z.string(),
+        })
+        .optional(),
     projects: z.string().optional().nullable(),
     applications: z.string().optional().nullable(),
     technicalNotes: z.string().url(),
@@ -46,7 +56,8 @@ export const DatasetSchema = z.object({
     shortDescription: z.string().optional().nullable(),
     longDescription: z.string().optional().nullable(),
     featured: z.boolean().optional().nullable(),
-    featuredImage: z.string().url().optional().nullable(),
+    featuredImage: z.string().optional().nullable(),
+    signedUrl: z.string().url().optional().nullable(),
     authorName: z.string(),
     authorEmail: z.string().email(),
     maintainerName: z.string(),

@@ -49,11 +49,11 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="Language"
-                                    text={watch('language') ?? '_'}
+                                    text={watch('language')?.label ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="Team"
-                                    text="Land and Carbon Lab"
+                                    text={watch('team')?.label ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="Projects"

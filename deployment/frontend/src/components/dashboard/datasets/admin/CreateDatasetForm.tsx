@@ -25,14 +25,26 @@ export default function CreateDatasetForm() {
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
         defaultValues: {
+            updateFrequency: {
+                value: 'monthly',
+                label: 'Monthly',
+            },
+            visibility: {
+                value: 'private',
+                label: 'Private',
+            },
             title: '',
             name: '',
+            license: {
+                value: 'creative_commons',
+                label: 'Creative Commons',
+            },
             resources: [
                 {
                     title: '',
                     type: 'empty',
-                }
-            ]
+                },
+            ],
         },
     })
 
@@ -47,12 +59,12 @@ export default function CreateDatasetForm() {
     }, [watch('title')])
 
     return (
-        <>
+        <form onSubmit={formObj.handleSubmit((data) => console.log(data))}>
             <Tab.Group
                 selectedIndex={selectedIndex}
                 onChange={setSelectedIndex}
             >
-                <div className="mx-auto w-full 3xl:max-w-[1380px]">
+                <div className="mx-auto w-full mb-5 3xl:max-w-[1380px]">
                     <CreateDatasetTabs currentStep={selectedIndex} />
                 </div>
                 {errorMessage && (
@@ -78,7 +90,7 @@ export default function CreateDatasetForm() {
             </Tab.Group>
             <div
                 className={classNames(
-                    'flex-col sm:flex-row gap-y-4 mx-auto flex w-full max-w-[1380px] justify-between font-acumin text-2xl font-semibold text-black px-4 xl:px-0',
+                    'flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] justify-between font-acumin text-2xl font-semibold text-black px-4 xl:px-0',
                     selectedIndex === 2 ? 'max-w-[71rem] xxl:px-0' : ''
                 )}
             >
@@ -86,7 +98,14 @@ export default function CreateDatasetForm() {
                     Save as Draft
                 </Button>
                 <div className="flex items-center gap-x-2">
-                    <Button variant="outline">Cancel</Button>
+                    {selectedIndex !== 0 && (
+                        <Button
+                            variant="outline"
+                            onClick={() => setSelectedIndex(selectedIndex - 1)}
+                        >
+                            Back
+                        </Button>
+                    )}
                     {selectedIndex !== 2 && (
                         <Button
                             onClick={() => setSelectedIndex(selectedIndex + 1)}
@@ -99,6 +118,6 @@ export default function CreateDatasetForm() {
                     )}
                 </div>
             </div>
-        </>
+        </form>
     )
 }
