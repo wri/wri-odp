@@ -70,11 +70,13 @@ jobs:
           node-version: 18
           runTests: false
           working-directory: ./integration-tests
+      - name: Print frontend logs
+        run: docker logs wri-frontend
       - name: Cypress Install and Frontend setup
         uses: cypress-io/github-action@v6
         with:
           wait-on: 'http://localhost:3000'
-          wait-on-timeout: 120
+          wait-on-timeout: 60
           node-version: 18
           runTests: false
           working-directory: ./e2e-tests
