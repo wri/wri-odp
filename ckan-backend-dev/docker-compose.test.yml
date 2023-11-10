@@ -49,7 +49,7 @@ services:
     depends_on:
       - ckan-dev
     env_file:
-      - ".env.frontend.example"
+      - ".env.example"
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
 
