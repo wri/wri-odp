@@ -23,7 +23,6 @@ export const authRouter = createTRPCRouter({
                         }),
                     })
                 ).json()
-
                 return userUpdate
             } catch (e) {
                 console.log(e)
