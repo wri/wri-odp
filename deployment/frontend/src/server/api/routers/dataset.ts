@@ -6,6 +6,7 @@ import {
 import { env } from "@/env.mjs";
 import { getUserOrganizations, getAllDatasetFq } from "@/utils/apiUtils";
 import { searchSchema } from "@/schema/search.schema";
+import type { CkanResponse } from "@/schema/ckan.schema";
 
 export const DatasetRouter = createTRPCRouter({
   getAllDataset: protectedProcedure
@@ -59,5 +60,19 @@ export const DatasetRouter = createTRPCRouter({
         count: dataset.count
       }
     }),
-
+  deleteDataset: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ input, ctx }) => {
+      const response = await fetch(`${env.CKAN_URL}/api/3/action/package_delete`, {
+        method: "POST",
+        body: JSON.stringify({ id: input }),
+        headers: {
+          "Authorization": ctx.session.user.apikey,
+          "Content-Type": "application/json"
+        }
+      });
+      const data = (await response.json()) as CkanResponse<null>;
+      if (!data.success && data.error) throw Error(data.error.message)
+      return data
+    })
 });

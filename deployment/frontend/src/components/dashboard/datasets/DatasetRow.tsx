@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import Row from '../_shared/Row'
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { WriDataset } from '@/schema/ckan.schema';
 import { formatDate } from '@/utils/general';
+import Modal from '@/components/_shared/Modal';
+import { api } from '@/utils/api'
+import notify from '@/utils/notify'
+import Spinner from '@/components/_shared/Spinner';
 
 
 function subFields(dataset: WriDataset) {
@@ -75,23 +79,89 @@ function SubCardProfile({ dataset }: { dataset: WriDataset }) {
 }
 
 export default function DatasetRow({ className, dataset }: { className?: string, dataset: WriDataset }) {
+  const utils = api.useUtils()
+  const [open, setOpen] = useState(false)
+  const datasetDelete = api.dataset.deleteDataset.useMutation({
+    onSuccess: async (data) => {
+      setOpen(false)
+      await utils.dataset.getAllDataset.invalidate({ search: '', page: { start: 0, rows: 5 } })
+      notify(`Dataset delete is successful`, 'success')
+
+    },
+  })
   return (
-    <Row
-      className={`pr-2 sm:pr-4 ${className ? className : ''}`}
-      rowMain={<DatasetCardProfile dataset={dataset} />}
-      controlButtons={[
-        { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-        { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-      ]}
-      linkButton={{
-        label: "View dataset",
-        link: "#",
-      }}
-      rowSub={<SubCardProfile dataset={dataset} />}
-      isDropDown
-    />
+    <>
+      <Row
+        className={`pr-2 sm:pr-4 ${className ? className : ''}`}
+        rowMain={<DatasetCardProfile dataset={dataset} />}
+        controlButtons={[
+          { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+          { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => setOpen(true) },
+        ]}
+        linkButton={{
+          label: "View dataset",
+          link: "#",
+        }}
+        rowSub={<SubCardProfile dataset={dataset} />}
+        isDropDown
+      />
+
+      <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
+        <h3 className='w-full text-center my-auto'>Delete Dataset: {dataset.name}</h3>
+        <button
+          className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+          onClick={() => {
+            datasetDelete.mutate(dataset.id)
+          }}
+        >{datasetDelete.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{datasetDelete.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
+      </Modal>
+    </>
+
   )
 }
+
+export function MyDatasetRow({ className, dataset }: { className?: string, dataset: WriDataset }) {
+  const utils = api.useUtils()
+  const [open, setOpen] = useState(false)
+  const datasetDelete = api.dataset.deleteDataset.useMutation({
+    onSuccess: async (data) => {
+      setOpen(false)
+      await utils.dataset.getMyDataset.invalidate({ search: '', page: { start: 0, rows: 2 } })
+      notify(`Dataset delete is successful`, 'success')
+
+    },
+  })
+  return (
+    <>
+      <Row
+        className={`pr-2 sm:pr-4 ${className ? className : ''}`}
+        rowMain={<DatasetCardProfile dataset={dataset} />}
+        controlButtons={[
+          { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+          { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => setOpen(true) },
+        ]}
+        linkButton={{
+          label: "View dataset",
+          link: "#",
+        }}
+        rowSub={<SubCardProfile dataset={dataset} />}
+        isDropDown
+      />
+
+      <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
+        <h3 className='w-full text-center my-auto'>Delete Dataset: {dataset.name}</h3>
+        <button
+          className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+          onClick={() => {
+            datasetDelete.mutate(dataset.id)
+          }}
+        >{datasetDelete.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{datasetDelete.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
+      </Modal>
+    </>
+
+  )
+}
+
 
 
 export function FavouriteRow({ className, dataset }: { className?: string, dataset: WriDataset }) {
@@ -110,16 +180,37 @@ export function FavouriteRow({ className, dataset }: { className?: string, datas
 }
 
 export function DraftRow({ className, dataset }: { className?: string, dataset: WriDataset }) {
+  const utils = api.useUtils()
+  const [open, setOpen] = useState(false)
+  const datasetDelete = api.dataset.deleteDataset.useMutation({
+    onSuccess: async (data) => {
+      setOpen(false)
+      await utils.dataset.getDraftDataset.invalidate({ search: '', page: { start: 0, rows: 2 } })
+      notify(`Dataset delete is successful`, 'success')
+
+    },
+  })
   return (
-    <Row
-      className={`pr-2 sm:pr-4 ${className ? className : ''}`}
-      rowMain={<DatasetCardProfile dataset={dataset} />}
-      controlButtons={[
-        { label: "Edit", color: 'bg-wri-gold hover:bg-green-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-        { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-      ]}
-      rowSub={<SubCardProfile dataset={dataset} />}
-      isDropDown
-    />
+    <>
+      <Row
+        className={`pr-2 sm:pr-4 ${className ? className : ''}`}
+        rowMain={<DatasetCardProfile dataset={dataset} />}
+        controlButtons={[
+          { label: "Edit", color: 'bg-wri-gold hover:bg-green-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+          { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => setOpen(true) },
+        ]}
+        rowSub={<SubCardProfile dataset={dataset} />}
+        isDropDown
+      />
+      <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
+        <h3 className='w-full text-center my-auto'>Delete Dataset: {dataset.name}</h3>
+        <button
+          className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+          onClick={() => {
+            datasetDelete.mutate(dataset.id)
+          }}
+        >{datasetDelete.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{datasetDelete.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
+      </Modal>
+    </>
   )
 }
