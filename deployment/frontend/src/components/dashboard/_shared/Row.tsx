@@ -2,12 +2,17 @@ import React, { useState } from 'react'
 import { EyeIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { Transition } from '@headlessui/react'
 import classNames from '@/utils/classnames';
+import { Tooltip } from 'react-tooltip'
 
 type RowButton = {
   label?: string;
   icon?: React.ReactNode;
   color?: string;
   onClick: () => void;
+  tooltip?: {
+    id: string;
+    content: string;
+  }
 }
 
 type RowLinkButton = {
@@ -46,13 +51,20 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
           ) : ""}
           {(controlButtons) ? controlButtons.map((button, index) => {
             return (
-              <button
-                key={index}
-                onClick={button.onClick}
-                className={`my-auto flex sm:invisible  items-center justify-center  ${groupStyle ? groupStyle : "group-hover:visible "}  w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"}`}
-              >
-                {(button.icon)}
-              </button>
+              <>
+                <button
+                  data-tooltip-id={button?.tooltip ? button?.tooltip.id : "tooltip-id"}
+                  data-tooltip-content={button?.tooltip ? button?.tooltip.content : "tooltip-content"}
+                  data-tooltip-place="top"
+                  key={index}
+                  onClick={button.onClick}
+                  className={`my-auto flex sm:invisible  items-center justify-center  ${groupStyle ? groupStyle : "group-hover:visible "}  w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"}`}
+                >
+                  {(button.icon)}
+                </button>
+                <Tooltip id={button?.tooltip ? button?.tooltip.id : "tooltip-id"} />
+              </>
+
             )
           }) : ""}
 

@@ -9,7 +9,6 @@ import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner';
 
-
 function subFields(dataset: WriDataset) {
   return [
     {
@@ -95,8 +94,24 @@ export default function DatasetRow({ className, dataset }: { className?: string,
         className={`pr-2 sm:pr-4 ${className ? className : ''}`}
         rowMain={<DatasetCardProfile dataset={dataset} />}
         controlButtons={[
-          { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-          { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => setOpen(true) },
+          {
+            label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400',
+            icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
+            tooltip: {
+              id: "edit-tooltip",
+              content: "Edit dataset"
+            },
+            onClick: () => { }
+          },
+          {
+            label: "Delete", color: 'bg-red-600 hover:bg-red-500',
+            icon: <TrashIcon className='w-4 h-4 text-white' />,
+            tooltip: {
+              id: "delete-tooltip",
+              content: "Delete dataset"
+            },
+            onClick: () => setOpen(true)
+          },
         ]}
         linkButton={{
           label: "View dataset",
@@ -137,8 +152,24 @@ export function MyDatasetRow({ className, dataset }: { className?: string, datas
         className={`pr-2 sm:pr-4 ${className ? className : ''}`}
         rowMain={<DatasetCardProfile dataset={dataset} />}
         controlButtons={[
-          { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-          { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => setOpen(true) },
+          {
+            label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400',
+            icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
+            tooltip: {
+              id: "edit-tooltip",
+              content: "Edit dataset"
+            },
+            onClick: () => { }
+          },
+          {
+            label: "Delete", color: 'bg-red-600 hover:bg-red-500',
+            icon: <TrashIcon data-tooltip-place="top" className='w-4 h-4 text-white' />,
+            tooltip: {
+              id: "delete-tooltip",
+              content: "Delete dataset"
+            },
+            onClick: () => setOpen(true)
+          },
         ]}
         linkButton={{
           label: "View dataset",
@@ -196,8 +227,24 @@ export function DraftRow({ className, dataset }: { className?: string, dataset: 
         className={`pr-2 sm:pr-4 ${className ? className : ''}`}
         rowMain={<DatasetCardProfile dataset={dataset} />}
         controlButtons={[
-          { label: "Edit", color: 'bg-wri-gold hover:bg-green-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-          { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => setOpen(true) },
+          {
+            label: "Edit", color: 'bg-wri-gold hover:bg-green-400',
+            icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
+            tooltip: {
+              id: "edit-tooltip",
+              content: "Edit dataset"
+            },
+            onClick: () => { }
+          },
+          {
+            label: "Delete", color: 'bg-red-600 hover:bg-red-500',
+            icon: <TrashIcon className='w-4 h-4 text-white' />,
+            tooltip: {
+              id: "delete-tooltip",
+              content: "Delete dataset"
+            },
+            onClick: () => setOpen(true)
+          },
         ]}
         rowSub={<SubCardProfile dataset={dataset} />}
         isDropDown
