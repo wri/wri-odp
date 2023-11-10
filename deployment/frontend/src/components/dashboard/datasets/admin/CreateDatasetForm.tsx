@@ -23,6 +23,7 @@ export default function CreateDatasetForm() {
 
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
+        mode: 'onBlur',
         defaultValues: {
             title: '',
             name: '',
@@ -32,13 +33,14 @@ export default function CreateDatasetForm() {
     const {
         setValue,
         watch,
-        formState: { dirtyFields },
+        formState: { dirtyFields, errors },
     } = formObj
 
     useEffect(() => {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])
 
+    console.log(errors)
     return (
         <>
             <Tab.Group
@@ -55,11 +57,11 @@ export default function CreateDatasetForm() {
                 )}
                 <Tab.Panels>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
-                        <OverviewForm formObj={formObj} />
+                        <OverviewForm formObj={formObj}/>
                         <DescriptionForm formObj={formObj} />
-                        <PointOfContactForm />
-                        <MoreDetailsForm />
-                        <CustomFieldsForm formObj={formObj}/>
+                        <PointOfContactForm formObj={formObj}/>
+                        <MoreDetailsForm formObj={formObj}/>
+                        <CustomFieldsForm formObj={formObj} />
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <CreateDataFilesSection />

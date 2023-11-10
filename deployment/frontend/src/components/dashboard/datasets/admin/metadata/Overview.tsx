@@ -1,9 +1,10 @@
 import {
     ArrowsPointingInIcon,
     ExclamationCircleIcon,
+    InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 import { Input } from '@/components/_shared/SimpleInput'
-import { InputGroup } from '@/components/_shared/InputGroup'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { Disclosure } from '@headlessui/react'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import TagsSelect from '../SelectTags'
@@ -14,6 +15,10 @@ import { UseFormReturn, useForm } from 'react-hook-form'
 import { DatasetFormType } from '@/schema/dataset.schema'
 import { ImageUploader } from '@/components/dashboard/_shared/ImageUploader'
 import { UploadResult } from '@uppy/core'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { api } from '@/utils/api'
+import { P, match } from 'ts-pattern'
+import Spinner from '@/components/_shared/Spinner'
 
 export function OverviewForm({
     formObj,
@@ -24,11 +29,15 @@ export function OverviewForm({
         register,
         setValue,
         watch,
-        formState: { dirtyFields },
+        formState: { dirtyFields, errors },
     } = formObj
 
+    const possibleOwners = api.teams.getAllTeams.useQuery()
+
+    console.log(errors)
     return (
         <MetadataAccordion
+            defaultOpen={true}
             label={
                 <>
                     <ArrowsPointingInIcon className="h-7 w-7" />
@@ -44,6 +53,7 @@ export function OverviewForm({
                             placeholder="My dataset"
                             type="text"
                         />
+                        <ErrorDisplay name="title" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Url" required>
                         <Input
@@ -56,19 +66,24 @@ export function OverviewForm({
                                 /dataset/
                             </span>
                         </Input>
+                        <ErrorDisplay name="name" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Source">
                         <Input
-                            name="source"
+                            {...register('source')}
                             placeholder="ex. https://source/to/original/data"
                             type="text"
                             icon={
-                                <ExclamationCircleIcon className="h-4 w-4 text-gray-300" />
+                                <DefaultTooltip content="Placeholder">
+                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                </DefaultTooltip>
                             }
                         />
+                        <ErrorDisplay name="source" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Language">
                         <SimpleSelect
+                            formObj={formObj}
                             name="language"
                             placeholder="Language"
                             options={[
@@ -79,26 +94,54 @@ export function OverviewForm({
                         />
                     </InputGroup>
                     <InputGroup label="Team">
-                        <SimpleSelect
-                            name="owner_team"
-                            placeholder="Name of team"
-                            options={[
-                                { value: 'team_1', label: 'Team 1' },
-                                { value: 'team_2', label: 'Team 2' },
-                                { value: 'team_3', label: 'Team 3' },
-                            ]}
-                        />
+                        {match(possibleOwners)
+                            .with({ isLoading: true }, () => (
+                                <span className="flex items-center text-sm gap-x-2">
+                                    <Spinner />{' '}
+                                    <span className="mt-1">
+                                        Loading teams...
+                                    </span>
+                                </span>
+                            ))
+                            .with({ isError: true }, () => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading teams, please refresh the page
+                                </span>
+                            ))
+                            .with(
+                                { isSuccess: true, data: P.select() },
+                                (data) => (
+                                    <SimpleSelect
+                                        formObj={formObj}
+                                        name="team"
+                                        options={data.map((team) => ({
+                                            label: team.title ?? team.name,
+                                            value: team.name,
+                                            default:
+                                                watch('team') === team.name,
+                                        }))}
+                                        placeholder="Select a team"
+                                    />
+                                )
+                            )
+                            .otherwise(() => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading parents, please refresh the
+                                    page
+                                </span>
+                            ))}
+                        <ErrorDisplay name="parent" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Projects">
                         <Input
-                            name="projects"
+                            {...register('projects')}
                             placeholder="ex. Ecosystem Service Mapping"
                             type="text"
                         />
                     </InputGroup>
                     <InputGroup label="Application">
                         <Input
-                            name="application"
+                            {...register('applications')}
                             placeholder="ex. Global Forest Watch"
                             type="text"
                         />
@@ -108,42 +151,50 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup label="Technical Notes" required>
                         <Input
-                            name="technical_notes"
+                            {...register('technicalNotes')}
                             placeholder="https://source/to/original/data"
                             type="text"
                         />
+                        <ErrorDisplay name="technicalNotes" errors={errors} />
                     </InputGroup>
                 </div>
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup label="Tags">
                         <TagsSelect
-                            placeholder="Select tags"
-                            className="flex h-[7rem] flex-col"
-                            options={[
-                                { value: 'tag_1', label: 'Tag 1' },
-                                { value: 'tag_2', label: 'Tag 2' },
-                                { value: 'tag_3', label: 'Tag 3' },
-                            ]}
+                            tags={['tag_1', 'tag_2', 'tag_3', 'tag_4']}
                         />
                     </InputGroup>
                     <InputGroup label="Temporal Coverage">
                         <div className="flex flex-col items-center justify-between gap-5 lg:flex-row xxl:w-[28rem]">
                             <Input
-                                name="temporal_coverage_start"
+                                {...register('temporalCoverageStart', {
+                                    valueAsDate: true,
+                                })}
                                 placeholder="Start"
                                 type="date"
                             />
                             <span className="hidden xxl:block">to</span>
                             <Input
-                                name="temporal_coverage_end"
+                                {...register('temporalCoverageEnd', {
+                                    valueAsDate: true,
+                                })}
                                 placeholder="End"
                                 type="date"
                             />
                         </div>
+                        <ErrorDisplay
+                            name="temporalCoverageStart"
+                            errors={errors}
+                        />
+                        <ErrorDisplay
+                            name="temporalCoverageEnd"
+                            errors={errors}
+                        />
                     </InputGroup>
                     <InputGroup label="Update Frequency">
                         <SimpleSelect
-                            name="update_frequency"
+                            formObj={formObj}
+                            name="updateFrequency"
                             placeholder="Select update frequency"
                             options={[
                                 {
@@ -159,11 +210,13 @@ export function OverviewForm({
                     <InputGroup label="Citation" className="items-start">
                         <TextArea
                             placeholder=""
-                            name="citation"
                             type="text"
+                            {...register('citation')}
                             className="h-44"
                             icon={
-                                <ExclamationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
+                                <DefaultTooltip content="Placeholder">
+                                    <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
+                                </DefaultTooltip>
                             }
                         />
                     </InputGroup>
@@ -171,6 +224,7 @@ export function OverviewForm({
                         <SimpleSelect
                             placeholder="Select visiblity"
                             name="visibility"
+                            formObj={formObj}
                             options={[
                                 { value: 'public', label: 'Public' },
                                 {
@@ -185,6 +239,7 @@ export function OverviewForm({
                         <SimpleSelect
                             placeholder="Select license"
                             name="license"
+                            formObj={formObj}
                             options={[
                                 {
                                     value: 'creative_commons',
@@ -213,7 +268,9 @@ export function OverviewForm({
                                     className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
                                 >
                                     Featured dataset
-                                    <ExclamationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
+                                    <DefaultTooltip content="Setting this to true will show the dataset in the feature list both on the homepage and in the search page">
+                                        <InformationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
+                                    </DefaultTooltip>
                                 </label>
                             </div>
                         </div>

@@ -6,7 +6,6 @@ import { TextArea } from '@/components/_shared/SimpleTextArea'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { ImageUploader } from '../../_shared/ImageUploader'
 import { UploadResult } from '@uppy/core'
-import { env } from '@/env.mjs'
 import { api } from '@/utils/api'
 import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
@@ -24,7 +23,7 @@ export default function TeamForm({
         watch,
         formState: { errors, isSubmitting },
     } = formObj
-    const possibleParents = api.teams.getAllTeams.useQuery()
+  const possibleParents = api.teams.getAllTeams.useQuery()
   return (
         <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
             <div className="flex flex-col justify-start gap-y-4">
