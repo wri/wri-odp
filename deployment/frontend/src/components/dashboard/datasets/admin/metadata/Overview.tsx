@@ -19,6 +19,7 @@ import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { api } from '@/utils/api'
 import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
+import classNames from '@/utils/classnames'
 
 export function OverviewForm({
     formObj,
@@ -36,8 +37,7 @@ export function OverviewForm({
     const possibleTags = api.tags.getAllTags.useQuery()
     const topicHierarchy = api.topics.getTopicsHierarchy.useQuery()
 
-  
-  console.log(watch())
+    console.log(watch())
     return (
         <MetadataAccordion
             defaultOpen={true}
@@ -324,23 +324,22 @@ export function OverviewForm({
                                 </label>
                             </div>
                         </div>
-                        {watch('featured') && (
-                            <div className="max-w-[16rem] w-full">
-                                <ImageUploader
-                                    clearImage={() =>
-                                        setValue('featuredImage', '')
-                                    }
-                                    defaultImage={watch('featuredImage')}
-                                    onUploadSuccess={(
-                                        response: UploadResult
-                                    ) => {
-                                        const url =
-                                            response.successful[0]?.name ?? null
-                                        setValue('featuredImage', url)
-                                    }}
-                                />
-                            </div>
-                        )}
+                        <div
+                            className={classNames(
+                                'max-w-[16rem] w-full',
+                                watch('featured') ? 'block' : 'hidden'
+                            )}
+                        >
+                            <ImageUploader
+                                clearImage={() => setValue('featuredImage', '')}
+                                defaultImage={watch('featuredImage')}
+                                onUploadSuccess={(response: UploadResult) => {
+                                    const url =
+                                        response.successful[0]?.name ?? null
+                                    setValue('featuredImage', url)
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
             </Disclosure.Panel>

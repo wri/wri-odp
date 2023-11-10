@@ -30,7 +30,7 @@ export function ImageUploader({
         const uppy = new Uppy({
             autoProceed: true,
             restrictions: {
-                maxNumberOfFiles: 100,
+                maxNumberOfFiles: 1,
             },
         }).use(AwsS3, {
             id: 'AwsS3',
@@ -48,6 +48,7 @@ export function ImageUploader({
                 const key = paths.slice(0, paths.length).join('/')
                 uppy.setState({...uppy.getState(), files: []});
                 setKey(key)
+                if (uploadInputRef && uploadInputRef.current) uploadInputRef.current.value = ''
             }
 
             if (result.failed.length > 0) {

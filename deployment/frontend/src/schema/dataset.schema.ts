@@ -1,5 +1,14 @@
 import z from 'zod'
 
+export const ResourceSchema = z.object({
+    description: z.string().optional(),
+    url: z.string().url().optional(),
+    format: z.string().optional(),
+    size: z.number().optional(),
+    title: z.string(),
+    type: z.enum(['link', 'upload', 'layer', 'empty']),
+})
+
 export const DatasetSchema = z.object({
     title: z.string(),
     name: z.string(),
@@ -53,6 +62,8 @@ export const DatasetSchema = z.object({
             value: z.string(),
         })
     ),
+    resources: z.array(ResourceSchema),
 })
 
 export type DatasetFormType = z.infer<typeof DatasetSchema>
+export type ResourceFormType = z.infer<typeof ResourceSchema>

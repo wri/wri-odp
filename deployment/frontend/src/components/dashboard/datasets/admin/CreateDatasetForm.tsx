@@ -27,6 +27,12 @@ export default function CreateDatasetForm() {
         defaultValues: {
             title: '',
             name: '',
+            resources: [
+                {
+                    title: '',
+                    type: 'empty',
+                }
+            ]
         },
     })
 
@@ -56,17 +62,17 @@ export default function CreateDatasetForm() {
                 )}
                 <Tab.Panels>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
-                        <OverviewForm formObj={formObj}/>
+                        <OverviewForm formObj={formObj} />
                         <DescriptionForm formObj={formObj} />
-                        <PointOfContactForm formObj={formObj}/>
-                        <MoreDetailsForm formObj={formObj}/>
+                        <PointOfContactForm formObj={formObj} />
+                        <MoreDetailsForm formObj={formObj} />
                         <CustomFieldsForm formObj={formObj} />
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
-                        <CreateDataFilesSection />
+                        <CreateDataFilesSection formObj={formObj} />
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
-                        <Preview formObj={formObj}/>
+                        <Preview formObj={formObj} />
                     </Tab.Panel>
                 </Tab.Panels>
             </Tab.Group>

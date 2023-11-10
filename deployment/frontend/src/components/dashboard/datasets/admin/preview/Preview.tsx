@@ -125,7 +125,7 @@ export function Preview({
                                     <div
                                         dangerouslySetInnerHTML={{
                                             __html:
-                                                watch('longDescription') ?? '',
+                                                watch('longDescription') ?? '_',
                                         }}
                                     ></div>
                                 </FullDescription>
@@ -299,7 +299,7 @@ function SimpleDescription({ label, text }: { label: string; text: string }) {
                 {label}
             </dt>
             <dd className="font-['Acumin Pro SemiCondensed'] text-lg font-normal leading-tight text-stone-500">
-                {text}
+                {text !== '' ? text : '_'}
             </dd>
         </div>
     )

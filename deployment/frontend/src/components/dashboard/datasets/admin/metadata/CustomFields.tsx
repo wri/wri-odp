@@ -69,7 +69,7 @@ export function CustomFieldsForm({
                 </>
             }
         >
-            <Disclosure.Panel className="py-5">
+            <Disclosure.Panel className="py-5 flex flex-col gap-y-4">
                 {fields.map((field, index) => (
                     <CustomField
                         key={field.id}
