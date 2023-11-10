@@ -51,14 +51,11 @@ jobs:
           --build-arg NEXTAUTH_SECRET=${{ secrets.DEV_FRONTEND_NEXTAUTH_SECRET }} \
           --build-arg NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
           --build-arg CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
-          --build-arg SYS_ADMIN_API_KEY=${{ secrets.SYS_ADMIN_API_KEY }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
-          MINIO_ROOT_USER: 'minioadmin'
-          MINIO_ROOT_PASSWORD: 'minioadmin'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and CKAN setup
