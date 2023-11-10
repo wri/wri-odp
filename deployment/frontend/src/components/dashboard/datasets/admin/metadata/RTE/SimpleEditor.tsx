@@ -30,16 +30,15 @@ interface ControlleRTEEditorProps<T extends FieldValues> {
 }
 
 export function SimpleEditor<T extends FieldValues>({formObj, name, defaultValue}: ControlleRTEEditorProps<T>) {
-    const {control} = formObj
+    const {control, watch } = formObj
     return (
         <Controller
             control={control}
             name={name}
-            defaultValue={defaultValue}
             render={({ field: { onChange, value } }) => (
                 <TipTapEditor
                     value={value}
-                    initialContent={defaultValue}
+                    initialContent={watch(name) ?? ''}
                     onChange={(value) => {
                         onChange(value)
                     }}
@@ -59,6 +58,7 @@ function TipTapEditor({
             const value = editor.getHTML()
             onChange(value)
         },
+        content: initialContent ?? '',
         extensions: [
             Document,
             History,
@@ -75,15 +75,10 @@ function TipTapEditor({
         ],
     }) as Editor
 
-    useEffect(() => {
-        editor?.commands.setContent(initialContent as string)
-    }, [initialContent, editor])
-
     const [modalIsOpen, setIsOpen] = useState(false)
     const [url, setUrl] = useState<string>('')
 
     const openModal = useCallback(() => {
-        console.log(editor.chain().focus())
         setUrl(editor.getAttributes('link').href)
         setIsOpen(true)
     }, [editor])
@@ -137,7 +132,7 @@ function TipTapEditor({
     }
 
     return (
-        <div className="editor">
+        <div className="editor flex flex-col h-full min-h-[350px]">
             <div className="menu">
                 <button
                     className="menu-button"
@@ -220,7 +215,7 @@ function TipTapEditor({
                 </button>
             </BubbleMenu>
 
-            <EditorContent editor={editor} />
+            <EditorContent className='h-full grow flex flex-col' editor={editor} />
 
             <LinkModal
                 url={url}

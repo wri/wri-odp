@@ -40,7 +40,6 @@ export default function CreateDatasetForm() {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])
 
-    console.log(errors)
     return (
         <>
             <Tab.Group
@@ -67,7 +66,7 @@ export default function CreateDatasetForm() {
                         <CreateDataFilesSection />
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
-                        <Preview />
+                        <Preview formObj={formObj}/>
                     </Tab.Panel>
                 </Tab.Panels>
             </Tab.Group>

@@ -77,8 +77,6 @@ export function ImageUploader({
         if (onUploadStart) onUploadStart()
     })
 
-    console.log('Key', key)
-    console.log('Presigned URL', presignedGetUrl.data)
     return (
         <>
             <button

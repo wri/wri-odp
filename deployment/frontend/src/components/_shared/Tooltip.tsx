@@ -33,7 +33,8 @@ const DefaultTooltip = ({
 }) => (
     <TooltipProvider delayDuration={100}>
         <Tooltip>
-            <TooltipTrigger>{children}</TooltipTrigger>
+            <TooltipTrigger asChild>
+          {children}</TooltipTrigger>
             <TooltipContent className='bg-white'>
                 <p>{content}</p>
             </TooltipContent>

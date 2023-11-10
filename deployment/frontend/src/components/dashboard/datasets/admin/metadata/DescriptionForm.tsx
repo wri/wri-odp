@@ -60,7 +60,7 @@ export function DescriptionForm({
                             </DefaultTooltip>
                         </div>
                     }
-                    className="mb-2 flex h-[350px] flex-col items-start whitespace-nowrap sm:flex-col"
+                    className="mb-2 flex min-h-[350px] flex-col items-start whitespace-nowrap sm:flex-col"
                 >
                     <SimpleEditor
                         formObj={formObj}

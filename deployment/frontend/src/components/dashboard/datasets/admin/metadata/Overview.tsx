@@ -7,7 +7,7 @@ import { Input } from '@/components/_shared/SimpleInput'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { Disclosure } from '@headlessui/react'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
-import TagsSelect from '../SelectTags'
+import TagsSelect from '../TagsSelect'
 import { TopicsSelect } from '../TopicsSelect'
 import { MetadataAccordion } from './MetadataAccordion'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
@@ -29,12 +29,15 @@ export function OverviewForm({
         register,
         setValue,
         watch,
-        formState: { dirtyFields, errors },
+        formState: { errors },
     } = formObj
 
     const possibleOwners = api.teams.getAllTeams.useQuery()
+    const possibleTags = api.tags.getAllTags.useQuery()
+    const topicHierarchy = api.topics.getTopicsHierarchy.useQuery()
 
-    console.log(errors)
+  
+  console.log(watch())
     return (
         <MetadataAccordion
             defaultOpen={true}
@@ -147,7 +150,31 @@ export function OverviewForm({
                         />
                     </InputGroup>
                     <InputGroup label="Topics">
-                        <TopicsSelect />
+                        {match(topicHierarchy)
+                            .with({ isLoading: true }, () => (
+                                <span className="flex items-center text-sm gap-x-2">
+                                    <Spinner />{' '}
+                                    <span className="mt-1">
+                                        Loading topics...
+                                    </span>
+                                </span>
+                            ))
+                            .with({ isError: true }, () => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading topics, please refresh the
+                                    page
+                                </span>
+                            ))
+                            .with(
+                                { isSuccess: true, data: P.select() },
+                                (data) => <TopicsSelect topicHierarchy={data} />
+                            )
+                            .otherwise(() => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading topics, please refresh the
+                                    page
+                                </span>
+                            ))}
                     </InputGroup>
                     <InputGroup label="Technical Notes" required>
                         <Input
@@ -160,9 +187,32 @@ export function OverviewForm({
                 </div>
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup label="Tags">
-                        <TagsSelect
-                            tags={['tag_1', 'tag_2', 'tag_3', 'tag_4']}
-                        />
+                        {match(possibleTags)
+                            .with({ isLoading: true }, () => (
+                                <span className="flex items-center text-sm gap-x-2">
+                                    <Spinner />{' '}
+                                    <span className="mt-1">
+                                        Loading tags...
+                                    </span>
+                                </span>
+                            ))
+                            .with({ isError: true }, () => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading tags, please refresh the page
+                                </span>
+                            ))
+                            .with(
+                                { isSuccess: true, data: P.select() },
+                                (data) => (
+                                    <TagsSelect formObj={formObj} tags={data} />
+                                )
+                            )
+                            .otherwise(() => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading parents, please refresh the
+                                    page
+                                </span>
+                            ))}
                     </InputGroup>
                     <InputGroup label="Temporal Coverage">
                         <div className="flex flex-col items-center justify-between gap-5 lg:flex-row xxl:w-[28rem]">
@@ -251,7 +301,7 @@ export function OverviewForm({
                             ]}
                         />
                     </InputGroup>
-                    <div className="flex h-[48px] items-center justify-end space-y-5">
+                    <div className="flex items-end flex-col justify-end space-y-5">
                         <div className="relative flex justify-end">
                             <div className="flex h-6 items-center">
                                 <input
@@ -275,15 +325,21 @@ export function OverviewForm({
                             </div>
                         </div>
                         {watch('featured') && (
-                            <ImageUploader
-                                clearImage={() => setValue('featuredImage', '')}
-                                defaultImage={watch('featuredImage')}
-                                onUploadSuccess={(response: UploadResult) => {
-                                    const url =
-                                        response.successful[0]?.name ?? null
-                                    setValue('featuredImage', url)
-                                }}
-                            />
+                            <div className="max-w-[16rem] w-full">
+                                <ImageUploader
+                                    clearImage={() =>
+                                        setValue('featuredImage', '')
+                                    }
+                                    defaultImage={watch('featuredImage')}
+                                    onUploadSuccess={(
+                                        response: UploadResult
+                                    ) => {
+                                        const url =
+                                            response.successful[0]?.name ?? null
+                                        setValue('featuredImage', url)
+                                    }}
+                                />
+                            </div>
                         )}
                     </div>
                 </div>

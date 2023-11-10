@@ -7,6 +7,7 @@ import { TopicRouter } from "./routers/topics";
 import { teamRouter } from './routers/teams'
 import { uploadsRouter } from './routers/uploads'
 import { authRouter } from './routers/auth.router'
+import { tagsRouter } from "./routers/tags";
 
 /**
  * This is the primary router for your server.
@@ -21,7 +22,8 @@ export const appRouter = createTRPCRouter({
   organization: OrganizationRouter,
   topics: TopicRouter,
   uploads: uploadsRouter,
-  teams: teamRouter
+  teams: teamRouter,
+  tags: tagsRouter
 });
 
 // export type definition of API
