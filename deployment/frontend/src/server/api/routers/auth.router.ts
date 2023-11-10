@@ -6,20 +6,23 @@ import {
 } from '@/schema/auth.schema'
 import { CkanResponse } from '@/schema/ckan.schema'
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
-import ky from 'ky'
 
 export const authRouter = createTRPCRouter({
     requestPasswordReset: publicProcedure
         .input(RequestResetPasswordSchema)
         .mutation(async ({ input }) => {
             try {
-                const userUpdate: CkanResponse<string> = await ky
-                    .post(`${env.CKAN_URL}/api/3/action/password_reset`, {
-                        json: {
-                            email: input.email,
+                const userUpdate: CkanResponse<string> = await (
+                    await fetch(`${env.CKAN_URL}/api/3/action/password_reset`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
                         },
+                        body: JSON.stringify({
+                            email: input.email,
+                        }),
                     })
-                    .json()
+                ).json()
 
                 return userUpdate
             } catch (e) {
@@ -33,26 +36,40 @@ export const authRouter = createTRPCRouter({
         .input(ResetPasswordSchema)
         .mutation(async ({ input }) => {
             try {
-                const userShow: CkanResponse<User> = await ky
-                    .post(
-                        `${env.CKAN_URL}/api/3/action/user_show?id=${input.id}`,
+                const userShow: CkanResponse<User> = await (
+                    await fetch(
+                        `${env.CKAN_URL}/api/action/user_show?id=${input.id}`,
                         {
+                            method: 'GET',
                             headers: {
-                                Authorization: env.SYS_ADMIN_API_KEY,
+                                'Content-Type': 'application/json',
+                                Authorization: `${env.SYS_ADMIN_API_KEY}`,
                             },
                         }
                     )
-                    .json()
+                ).json()
 
-                const userUpdate: CkanResponse<User> = await ky
-                    .post(`${env.CKAN_URL}/api/3/action/user_update`, {
-                        json: {
+                if (userShow.error) {
+                    throw userShow.error
+                }
+
+                const userUpdate: CkanResponse<User> = await (
+                    await fetch(`${env.CKAN_URL}/api/3/action/user_update`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
                             ...userShow.result,
                             password: input.password,
                             reset_key: input.reset_key,
-                        },
+                        }),
                     })
-                    .json()
+                ).json()
+
+                if (userUpdate.error) {
+                    throw userUpdate.error
+                }
 
                 return userUpdate
             } catch (e) {
