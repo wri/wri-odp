@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 import {
     Command,
@@ -24,27 +24,89 @@ import { match, P } from 'ts-pattern'
 import { Button } from '@/components/_shared/Button'
 import { TopicHierarchy } from '@/interfaces/topic.interface'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { Controller, UseFormReturn } from 'react-hook-form'
+import { DatasetFormType } from '@/schema/dataset.schema'
 
 export function TopicsSelect({
     topicHierarchy,
+    formObj,
 }: {
     topicHierarchy: TopicHierarchy[]
+    formObj: UseFormReturn<DatasetFormType>
+}) {
+    const { control } = formObj
+    return (
+        <Controller
+            control={control}
+            name="topics"
+            defaultValue={[]}
+            render={({ field: { onChange, value } }) => (
+                <TopicsInner
+                    onChange={onChange}
+                    value={value}
+                    topicHierarchy={topicHierarchy}
+                />
+            )}
+        />
+    )
+}
+export function TopicsInner({
+    topicHierarchy,
+    onChange,
+    value,
+}: {
+    topicHierarchy: TopicHierarchy[]
+    onChange: (value: string[]) => void
+    value: string[]
 }) {
     const [open, setOpen] = useState(false)
-    const [value, setValue] = useState<string[]>([])
+    const [query, setQuery] = useState('')
     const ref = useRef<HTMLButtonElement>(null)
+    const possiblePaths = useMemo(() => {
+        const possiblePaths = new Map()
+        function GetPaths(topic: TopicHierarchy, parent?: TopicHierarchy) {
+            if (!parent) possiblePaths.set(topic.name, [topic.name])
+            else
+                possiblePaths.set(topic.name, [
+                    ...possiblePaths.get(parent.name),
+                    topic.name,
+                ])
+            topic.children.forEach((child) => GetPaths(child, topic))
+        }
+        topicHierarchy.forEach((topic) => GetPaths(topic))
+        return possiblePaths
+    }, [JSON.stringify(topicHierarchy)])
 
-    function FlattenTopic(topic: TopicHierarchy): string[] {
+    function FlattenTopic(
+        topic: TopicHierarchy
+    ): { title: string; name: string }[] {
         return match(topic)
-            .with({ name: P.select('name'), children: [] }, () => [topic.name])
+            .with({ name: P.select('name'), children: [] }, () => [
+                {
+                    title: topic.title,
+                    name: topic.name,
+                },
+            ])
             .with({ name: P.select('name'), children: P.array() }, () => [
-                topic.name,
+                { title: topic.title, name: topic.name },
                 ...topic.children.flatMap(FlattenTopic),
             ])
             .otherwise(() => [])
     }
 
     const flattenedTopicHierarchy = topicHierarchy.flatMap(FlattenTopic)
+
+    const filteredTopics =
+        query.length === 0
+            ? flattenedTopicHierarchy
+            : flattenedTopicHierarchy
+                  .map((item) => {
+                      const included = item.title
+                          .toLowerCase()
+                          .includes(query.toLowerCase())
+                      return included ? possiblePaths.get(item.name) : []
+                  })
+                  .flat()
 
     function BuildHierarchy(
         topic: TopicHierarchy,
@@ -58,13 +120,17 @@ export function TopicsSelect({
         return (
             <div key={topic.name}>
                 <CommandItem
-                    value={topic.title}
+                    value={topic.name}
                     className={classNames(
                         'hover:bg-blue-800 hover:text-white group',
-                        paddingLeft
+                        paddingLeft,
+                        filteredTopics.some((item) => item === topic.name)
+                            ? 'flex'
+                            : 'hidden',
+                        query.length === 0 ? 'flex' : ''
                     )}
                     onSelect={() => {
-                        setValue([...value, topic.name])
+                        onChange([...value, topic.name])
                         setOpen(false)
                     }}
                 >
@@ -122,7 +188,7 @@ export function TopicsSelect({
                                                 <XMarkIcon
                                                     onClick={(e) => {
                                                         e.stopPropagation()
-                                                        setValue(
+                                                        onChange(
                                                             value.filter(
                                                                 (topic) =>
                                                                     topic !==
@@ -146,7 +212,7 @@ export function TopicsSelect({
                 style={{ width: ref.current?.offsetWidth ?? 'auto' }}
                 className="w-full md:w-[28rem] lg:w-[20rem] xl:w-[28rem] bg-white p-0"
             >
-                <Command>
+                <Command shouldFilter={false}>
                     <div className="flex items-center justify-between px-3 pb-1 pt-3">
                         <span className="font-acumin text-base font-semibold text-black">
                             Topics
@@ -154,21 +220,37 @@ export function TopicsSelect({
                         <div className="flex items-center gap-x-3">
                             <button
                                 onClick={() =>
-                                    setValue(flattenedTopicHierarchy)
+                                    onChange(
+                                        query.length === 0
+                                            ? flattenedTopicHierarchy.map(
+                                                  (item) => item.name
+                                              )
+                                            : [
+                                                  ...new Set(
+                                                      filteredTopics.concat(
+                                                          value
+                                                      )
+                                                  ),
+                                              ]
+                                    )
                                 }
                                 className="font-acumin text-xs font-normal text-zinc-800 underline"
                             >
                                 Select All
                             </button>
                             <button
-                                onClick={() => setValue([])}
+                                onClick={() => onChange([])}
                                 className="font-acumin text-xs font-normal text-zinc-800 underline"
                             >
                                 Clear
                             </button>
                         </div>
                     </div>
-                    <CommandInput placeholder="Search framework..." />
+                    <CommandInput
+                        value={query}
+                        onValueChange={setQuery}
+                        placeholder="Search framework..."
+                    />
                     <CommandEmpty>No framework found.</CommandEmpty>
                     <div className="pr-3">
                         <CommandGroup className="max-h-[300px] overflow-y-auto">

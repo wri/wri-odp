@@ -61,12 +61,7 @@ export function Preview({
                                 />
                                 <ListOfItems
                                     label="Topics"
-                                    items={[
-                                        'Climate',
-                                        'Energy',
-                                        'Governance',
-                                        'Action',
-                                    ]}
+                                    items={watch('topics') ?? []}
                                 />
                                 <SimpleDescription
                                     label="Technical Notes"

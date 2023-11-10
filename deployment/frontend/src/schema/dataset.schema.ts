@@ -19,6 +19,7 @@ export const DatasetSchema = z.object({
     applications: z.string().optional().nullable(),
     technicalNotes: z.string().url(),
     tags: z.array(z.string()),
+    topics: z.array(z.string()),
     temporalCoverageStart: z.date().optional().nullable(),
     temporalCoverageEnd: z.date().optional().nullable(),
     updateFrequency: z

@@ -167,7 +167,12 @@ export function OverviewForm({
                             ))
                             .with(
                                 { isSuccess: true, data: P.select() },
-                                (data) => <TopicsSelect topicHierarchy={data} />
+                                (data) => (
+                                    <TopicsSelect
+                                        topicHierarchy={data}
+                                        formObj={formObj}
+                                    />
+                                )
                             )
                             .otherwise(() => (
                                 <span className="flex items-center text-sm text-red-600">
