@@ -7,6 +7,7 @@ import { env } from "@/env.mjs";
 import { getUser, getUserOrganizations, getUserDataset, getOrgDetails, getAllOrganizations, getAllUsers } from "@/utils/apiUtils";
 import { searchArrayForKeyword } from "@/utils/general";
 import { searchSchema } from "@/schema/search.schema";
+import type { CkanResponse } from "@/schema/ckan.schema";
 
 export const UserRouter = createTRPCRouter({
   getDashboardUser: protectedProcedure.query(async ({ ctx }) => {
@@ -40,6 +41,7 @@ export const UserRouter = createTRPCRouter({
 
       type IUsers = {
         title?: string;
+        id: string;
         description?: string;
         orgnumber?: number;
         image_display_url?: string;
@@ -61,6 +63,7 @@ export const UserRouter = createTRPCRouter({
           if (user?.name && userOrg) {
             const userDetails = {
               title: user?.name,
+              id: user.id,
               description: user?.email,
               capacity: userOrg?.capacity ? userOrg?.capacity : "member",
               image_display_url: user?.image_url,
@@ -81,6 +84,7 @@ export const UserRouter = createTRPCRouter({
           if (userTemp.length > 0) {
             allUsers.push({
               title: user?.name,
+              id: user.id!,
               description: user?.email,
               orgnumber: userTemp?.length,
               image_display_url: user?.image_url,
@@ -90,6 +94,7 @@ export const UserRouter = createTRPCRouter({
           else {
             allUsers.push({
               title: user?.name,
+              id: user.id!,
               description: user?.email,
               orgnumber: 0,
               image_display_url: user?.image_url,
@@ -108,5 +113,20 @@ export const UserRouter = createTRPCRouter({
         count: result.length,
       }
     }),
+  deleteUser: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ input, ctx }) => {
+      const response = await fetch(`${env.CKAN_URL}/api/3/action/user_delete`, {
+        method: "POST",
+        body: JSON.stringify({ id: input }),
+        headers: {
+          "Authorization": ctx.session.user.apikey,
+          "Content-Type": "application/json"
+        }
+      });
+      const data = (await response.json()) as CkanResponse<null>;
+      if (!data.success && data.error) throw Error(data.error.message)
+      return data
+    })
 
 });

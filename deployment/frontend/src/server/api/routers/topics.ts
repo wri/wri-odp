@@ -139,6 +139,21 @@ export const TopicRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
+    deleteTopic: protectedProcedure
+        .input(z.string())
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/group_delete`, {
+                method: "POST",
+                body: JSON.stringify({ id: input }),
+                headers: {
+                    "Authorization": ctx.session.user.apikey,
+                    "Content-Type": "application/json"
+                }
+            });
+            const data = (await response.json()) as CkanResponse<null>;
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
+        })
 
 });
 

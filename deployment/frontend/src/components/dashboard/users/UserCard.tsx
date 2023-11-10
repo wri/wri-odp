@@ -8,6 +8,8 @@ import { api } from '@/utils/api';
 import Spinner from '@/components/_shared/Spinner';
 import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
+import notify from '@/utils/notify'
+import Modal from '@/components/_shared/Modal';
 
 type IUser = {
   title?: string;
@@ -131,6 +133,14 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
 export default function UserCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
   const { data, isLoading } = api.user.getAllUsers.useQuery(query)
+  const [open, setOpen] = useState(false)
+  const datasetUser = api.user.deleteUser.useMutation({
+    onSuccess: (data) => {
+      setOpen(false)
+      notify(`User delete is successful`, 'success')
+
+    },
+  })
 
 
   return (
@@ -141,21 +151,49 @@ export default function UserCard() {
           isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
             data?.users.map((user, index) => {
               return (
-                <Row
-                  key={index}
-                  className={`pr-6`}
-                  rowMain={<TeamProfile user={user as IUser} />}
-                  linkButton={{
-                    label: "View user",
-                    link: "#",
-                  }}
-                  controlButtons={[
-                    { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-500', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-                    { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-                  ]}
-                  rowSub={<SubCardProfile user={user} />}
-                  isDropDown
-                />
+                <>
+                  <Row
+                    key={index}
+                    className={`pr-6`}
+                    rowMain={<TeamProfile user={user as IUser} />}
+                    linkButton={{
+                      label: "View user",
+                      link: "#",
+                    }}
+                    controlButtons={[
+                      {
+                        label: "Edit",
+                        color: 'bg-wri-gold hover:bg-yellow-500',
+                        icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
+                        tooltip: {
+                          id: "edit-tooltip",
+                          content: "Edit user"
+                        },
+                        onClick: () => { }
+                      },
+                      {
+                        label: "Delete", color: 'bg-red-600 hover:bg-red-500',
+                        icon: <TrashIcon className='w-4 h-4 text-white' />,
+                        tooltip: {
+                          id: "delete-tooltip",
+                          content: "Delete user"
+                        },
+                        onClick: () => setOpen(true)
+                      },
+                    ]}
+                    rowSub={<SubCardProfile user={user} />}
+                    isDropDown
+                  />
+                  <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
+                    <h3 className='w-full text-center my-auto'>Delete Dataset: {user.title}</h3>
+                    <button
+                      className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+                      onClick={() => {
+                        datasetUser.mutate(user.id)
+                      }}
+                    >{datasetUser.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{datasetUser.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
+                  </Modal>
+                </>
               )
             })
           )
