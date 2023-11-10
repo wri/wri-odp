@@ -105,9 +105,8 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: cypress/screenshots
+          path: /home/runner/work/wri-odp/wri-odp/e2e-tests/cypress/screenshots
           if-no-files-found: ignore 
-          working-directory: ./e2e-tests  
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev
