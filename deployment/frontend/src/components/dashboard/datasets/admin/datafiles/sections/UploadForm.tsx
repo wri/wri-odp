@@ -133,11 +133,11 @@ function PreviewTable() {
             key={index}
             className={index % 2 != 0 ? "border-0 bg-[#FDFDFD]" : "border-0"}
           >
-            <TableCell>{field.field}</TableCell>
-            <TableCell>{field.type}</TableCell>
-            <TableCell>{field.null ? "YES" : "NO"}</TableCell>
-            <TableCell>{field.key}</TableCell>
-            <TableCell>{field.default}</TableCell>
+            <TableCell><input defaultValue={field.field} type="text" className="p-0 border-0 ring-0 ring-offset-0"/></TableCell>
+            <TableCell><input defaultValue={field.type} type="text" className="p-0 border-0 ring-0 ring-offset-0"/></TableCell>
+            <TableCell><select defaultValue={field.key}className="p-0 border-0 ring-0 ring-offset-0 appearance-none bg-none"><option value="YES">YES</option><option value="NO">NO</option></select></TableCell>
+            <TableCell><input defaultValue={field.key} type="text" className="p-0 border-0 ring-0 ring-offset-0"/></TableCell>
+            <TableCell><input defaultValue={field.default} type="text" className="p-0 border-0 ring-0 ring-offset-0"/></TableCell>
           </TableRow>
         ))}
       </TableBody>
