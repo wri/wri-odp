@@ -50,7 +50,7 @@ export function MoreDetailsForm({
                     >
                         <TextArea
                             placeholder="Due to new funding for research"
-                            {...register('reasonsForAdding')}
+                            {...register('reason_for_adding')}
                             type="text"
                             className="h-28"
                         />
@@ -58,7 +58,7 @@ export function MoreDetailsForm({
                     <InputGroup label="Learn more" className="items-start">
                         <TextArea
                             placeholder="Please visit our website for more information: LINK TO WEBSITE"
-                            {...register('learnMore')}
+                            {...register('learn_more')}
                             type="text"
                             className="h-28"
                         />

@@ -75,6 +75,7 @@ function AddDataFile({
 }) {
     const { setValue, watch } = formObj
     const datafile = watch(`resources.${index}`)
+    console.log(datafile)
     return (
         <DataFileAccordion
             icon={<FolderPlusIcon className="h-7 w-7" />}
@@ -135,91 +136,104 @@ function AddDataFile({
                 </div>
             }
         >
-            <Tab.Group>
-                {datafile.type !== 'upload' && (
-                    <Tab.List
-                        as="div"
-                        className="grid max-w-[35rem] grid-cols-2 sm:grid-cols-3 gap-3 py-4 "
+            <Tab.Group
+                selectedIndex={match(datafile.type)
+                    .with('empty', () => 0)
+                    .with('upload', () => 1)
+                    .with('link', () => 2)
+                    .with('layer', () => 3)
+                    .otherwise(() => 0)}
+            >
+                <Tab.List
+                    as="div"
+                    className="grid max-w-[35rem] grid-cols-2 sm:grid-cols-3 gap-3 py-4 "
+                >
+                    <Tab className="hidden"></Tab>
+                    <Tab
+                        onClick={() =>
+                            setValue(`resources.${index}.type`, 'upload')
+                        }
+                        className={classNames(
+                            'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                            datafile.type === 'upload' ? 'hidden' : ''
+                        )}
                     >
-                        <button
-                            onClick={() =>
-                                setValue(`resources.${index}.type`, 'upload')
-                            }
+                        <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                        <div
                             className={classNames(
-                                'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
                             )}
                         >
-                            <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                            <div
+                            Upload a file
+                        </div>
+                    </Tab>
+                    <Tab
+                        onClick={() =>
+                            setValue(`resources.${index}.type`, 'link')
+                        }
+                    >
+                        {({ selected }) => (
+                            <span
                                 className={classNames(
-                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                    'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                    selected ? 'bg-amber-400' : '',
+                                    datafile.type === 'upload' ? 'hidden' : ''
                                 )}
                             >
-                                Upload a file
-                            </div>
-                        </button>
-                        <Tab className="hidden"></Tab>
-                        <Tab>
-                            {({ selected }) => (
-                                <span
+                                <LinkIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                <div
                                     className={classNames(
-                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                        selected ? 'bg-amber-400' : ''
+                                        'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                        selected ? 'font-bold' : ''
                                     )}
                                 >
-                                    <LinkIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                    <div
-                                        className={classNames(
-                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
-                                            selected ? 'font-bold' : ''
-                                        )}
-                                    >
-                                        Link External File
-                                    </div>
-                                </span>
-                            )}
-                        </Tab>
-                        <Tab>
-                            {({ selected }) => (
-                                <span
+                                    Link External File
+                                </div>
+                            </span>
+                        )}
+                    </Tab>
+                    <Tab
+                        onClick={() =>
+                            setValue(`resources.${index}.type`, 'layer')
+                        }
+                    >
+                        {({ selected }) => (
+                            <span
+                                className={classNames(
+                                    'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                    selected ? 'bg-amber-400' : '',
+                                    datafile.type === 'upload' ? 'hidden' : ''
+                                )}
+                            >
+                                <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                <div
                                     className={classNames(
-                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                        selected ? 'bg-amber-400' : ''
+                                        'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                        selected ? 'font-bold' : ''
                                     )}
                                 >
-                                    <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                    <div
-                                        className={classNames(
-                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
-                                            selected ? 'font-bold' : ''
-                                        )}
-                                    >
-                                        Build a layer
-                                    </div>
-                                </span>
-                            )}
-                        </Tab>
-                    </Tab.List>
-                )}
-                {datafile.type === 'upload' ? (
-                    <div className="mt-2">
+                                    Build a layer
+                                </div>
+                            </span>
+                        )}
+                    </Tab>
+                </Tab.List>
+                <Tab.Panels as="div" className="mt-2">
+                    <Tab.Panel className="hidden"></Tab.Panel>
+                    <Tab.Panel>
                         <UploadForm
                             removeFile={() =>
                                 setValue(`resources.${index}.type`, 'empty')
                             }
                         />
-                    </div>
-                ) : (
-                    <Tab.Panels as="div" className="mt-2">
-                        <Tab.Panel className="hidden"></Tab.Panel>
-                        <Tab.Panel>
-                            <LinkExternalForm formObj={formObj} index={index}/>
-                        </Tab.Panel>
-                        <Tab.Panel>
-                            <BuildALayer />
-                        </Tab.Panel>
-                    </Tab.Panels>
-                )}
+                    </Tab.Panel>
+                    <Tab.Panel>
+                        <LinkExternalForm formObj={formObj} index={index} />
+                    </Tab.Panel>
+                    <Tab.Panel>
+                        <BuildALayer />
+                    </Tab.Panel>
+                </Tab.Panels>
             </Tab.Group>
         </DataFileAccordion>
     )

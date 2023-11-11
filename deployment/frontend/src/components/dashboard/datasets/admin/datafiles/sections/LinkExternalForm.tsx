@@ -1,4 +1,4 @@
-import { InputGroup } from "@/components/_shared/InputGroup";
+import { ErrorDisplay, InputGroup } from "@/components/_shared/InputGroup";
 import { Input } from "@/components/_shared/SimpleInput";
 import SimpleSelect from "@/components/_shared/SimpleSelect";
 import { TextArea } from "@/components/_shared/SimpleTextArea";
@@ -12,7 +12,7 @@ export function LinkExternalForm({
     formObj: UseFormReturn<DatasetFormType>
     index: number;
   }) {
-  const { register } = formObj
+  const { register, formState: { errors } } = formObj
   return (
     <div className="flex flex-col gap-y-4">
       <InputGroup label="Link" required className="whitespace-nowrap">
@@ -22,6 +22,7 @@ export function LinkExternalForm({
           type="text"
           maxWidth="max-w-[70rem]"
         />
+          <ErrorDisplay name={`resources.${index}.url`} errors={errors} />
       </InputGroup>
       <InputGroup label="Title" required className="whitespace-nowrap">
         <Input

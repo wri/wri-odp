@@ -28,14 +28,14 @@ function CustomField({
                 <InputGroup label="Custom Field">
                     <Input
                         placeholder=""
-                        {...register(`customFields.${index}.name`)}
+                        {...register(`extras.${index}.key`)}
                         type="text"
                     />
                 </InputGroup>
                 <InputGroup label="Value">
                     <Input
                         placeholder=""
-                        {...register(`customFields.${index}.value`)}
+                        {...register(`extras.${index}.value`)}
                         type="text"
                     />
                 </InputGroup>
@@ -58,7 +58,7 @@ export function CustomFieldsForm({
     const { control, register } = formObj
     const { fields, append, remove } = useFieldArray({
         control,
-        name: 'customFields',
+        name: 'extras',
     })
     return (
         <MetadataAccordion
@@ -82,7 +82,7 @@ export function CustomFieldsForm({
                     <button
                         onClick={() =>
                             append({
-                                name: '',
+                                key: '',
                                 value: '',
                             })
                         }

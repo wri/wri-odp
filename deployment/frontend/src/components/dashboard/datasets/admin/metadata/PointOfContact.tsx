@@ -32,37 +32,37 @@ export function PointOfContactForm({
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup label="Author Name" required>
                         <Input
-                            {...register('authorName')}
+                            {...register('author')}
                             placeholder="Example Man"
                             type="text"
                         />
-                        <ErrorDisplay name="authorName" errors={errors} />
+                        <ErrorDisplay name="author" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Author Email" required>
                         <Input
-                            {...register('authorEmail')}
+                            {...register('author_email')}
                             placeholder="Global Forest Watch"
                             type="email"
                         ></Input>
-                        <ErrorDisplay name="authorEmail" errors={errors} />
+                        <ErrorDisplay name="author_email" errors={errors} />
                     </InputGroup>
                 </div>
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup label="Maintainer Name" required>
                         <Input
-                            {...register('maintainerName')}
+                            {...register('maintainer')}
                             placeholder="Another name"
                             type="text"
                         />
-                        <ErrorDisplay name="maintainerName" errors={errors} />
+                        <ErrorDisplay name="maintainer" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Maintainer Email" required>
                         <Input
-                            {...register('maintainerEmail')}
+                            {...register('maintainer_email')}
                             placeholder="anotheremail@gmail.com"
                             type="email"
                         ></Input>
-                        <ErrorDisplay name="maintainerEmail" errors={errors} />
+                        <ErrorDisplay name="maintainer_email" errors={errors} />
                     </InputGroup>
                 </div>
             </Disclosure.Panel>

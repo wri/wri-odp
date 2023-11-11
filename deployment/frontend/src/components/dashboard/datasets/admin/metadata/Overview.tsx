@@ -183,11 +183,11 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup label="Technical Notes" required>
                         <Input
-                            {...register('technicalNotes')}
+                            {...register('technical_notes')}
                             placeholder="https://source/to/original/data"
                             type="text"
                         />
-                        <ErrorDisplay name="technicalNotes" errors={errors} />
+                        <ErrorDisplay name="technical_notes" errors={errors} />
                     </InputGroup>
                 </div>
                 <div className="flex flex-col justify-start gap-y-4">
@@ -249,15 +249,35 @@ export function OverviewForm({
                     <InputGroup label="Update Frequency">
                         <SimpleSelect
                             formObj={formObj}
-                            name="updateFrequency"
+                            name="update_frequency"
                             placeholder="Select update frequency"
                             options={[
+                                {
+                                    value: 'biannually',
+                                    label: 'Biannually',
+                                },
+                                {
+                                    value: 'quarterly',
+                                    label: 'Quarterly',
+                                },
+                                {
+                                    value: 'daily',
+                                    label: 'Daily',
+                                },
+                                {
+                                    value: 'hourly',
+                                    label: 'Hourly',
+                                },
+                                {
+                                    value: 'as_need',
+                                    label: 'As needed',
+                                },
                                 {
                                     value: 'monthly',
                                     label: 'Monthly',
                                 },
                                 { value: 'weekly', label: 'Weekly' },
-                                { value: 'yearly', label: 'Yearly' },
+                                { value: 'annually', label: 'Annually' },
                             ]}
                         />
                     </InputGroup>
@@ -277,10 +297,11 @@ export function OverviewForm({
                     <InputGroup label="Visbility" required>
                         <SimpleSelect
                             placeholder="Select visiblity"
-                            name="visibility"
+                            name="visibility_type"
                             formObj={formObj}
                             options={[
                                 { value: 'public', label: 'Public' },
+                                { value: 'draft', label: 'Draft' },
                                 {
                                     value: 'private',
                                     label: 'Private',
@@ -309,7 +330,7 @@ export function OverviewForm({
                                 <input
                                     id="featured_dataset"
                                     aria-describedby="comments-description"
-                                    {...register('featured')}
+                                    {...register('featured_dataset')}
                                     type="checkbox"
                                     className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
                                 />
@@ -329,7 +350,7 @@ export function OverviewForm({
                         <div
                             className={classNames(
                                 'max-w-[16rem] w-full',
-                                watch('featured') ? 'block' : 'hidden'
+                                watch('featured_dataset') ? 'block' : 'hidden'
                             )}
                         >
                             <ImageUploader

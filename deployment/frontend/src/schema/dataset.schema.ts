@@ -3,7 +3,12 @@ import z from 'zod'
 export const ResourceSchema = z.object({
     description: z.string().optional(),
     url: z.string().url().optional(),
-    format: z.string().optional(),
+    format: z
+        .object({
+            value: z.string(),
+            label: z.string(),
+        })
+        .optional(),
     size: z.number().optional(),
     title: z.string(),
     type: z.enum(['link', 'upload', 'layer', 'empty']),
@@ -23,26 +28,25 @@ export const DatasetSchema = z.object({
         .object({
             value: z.string(),
             label: z.string(),
-        })
-        .optional(),
+        }),
     projects: z.string().optional().nullable(),
     applications: z.string().optional().nullable(),
-    technicalNotes: z.string().url(),
+    technical_notes: z.string().url(),
     tags: z.array(z.string()),
     topics: z.array(z.string()),
     temporalCoverageStart: z.number().optional().nullable(),
     temporalCoverageEnd: z.number().optional().nullable(),
-    updateFrequency: z
+    update_frequency: z
         .object({
-            value: z.enum(['monthly', 'quarterly', 'yearly', 'daily']),
+            value: z.enum(['anually', 'bianually', 'weekly', 'as_needed', 'hourly', 'monthly', 'quarterly','daily']),
             label: z.string(),
         })
         .optional()
         .nullable(),
     citation: z.string().optional().nullable(),
-    visibility: z
+    visibility_type: z
         .object({
-            value: z.string(),
+            value: z.enum(['public', 'private', 'draft']),
             label: z.string(),
         })
         .optional()
@@ -53,24 +57,24 @@ export const DatasetSchema = z.object({
             label: z.string(),
         })
         .optional(),
-    shortDescription: z.string().optional().nullable(),
-    longDescription: z.string().optional().nullable(),
-    featured: z.boolean().optional().nullable(),
+    short_description: z.string().optional().nullable(),
+    notes: z.string().optional().nullable(),
+    featured_dataset: z.boolean().optional().nullable(),
     featuredImage: z.string().optional().nullable(),
     signedUrl: z.string().url().optional().nullable(),
-    authorName: z.string(),
-    authorEmail: z.string().email(),
-    maintainerName: z.string(),
-    maintainerEmail: z.string().email(),
+    author: z.string(),
+    author_email: z.string().email(),
+    maintainer: z.string(),
+    maintainer_email: z.string().email(),
     function: z.string().optional().nullable(),
     restrictions: z.string().optional().nullable(),
-    reasonsForAdding: z.string().optional().nullable(),
-    learnMore: z.string().optional().nullable(),
+    reason_for_adding: z.string().optional().nullable(),
+    learn_more: z.string().url().optional().nullable(),
     cautions: z.string().optional().nullable(),
     summary: z.string().optional().nullable(),
-    customFields: z.array(
+    extras: z.array(
         z.object({
-            name: z.string(),
+            key: z.string(),
             value: z.string(),
         })
     ),

@@ -44,7 +44,7 @@ export function DescriptionForm({
                     <TextArea
                         placeholder=""
                         type="text"
-                        {...register('shortDescription')}
+                        {...register('short_description')}
                         className="h-44 col-span-full"
                     />
                 </InputGroup>
@@ -64,7 +64,7 @@ export function DescriptionForm({
                 >
                     <SimpleEditor
                         formObj={formObj}
-                        name="longDescription"
+                        name="notes"
                         defaultValue=""
                     />
                 </InputGroup>

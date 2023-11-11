@@ -1,5 +1,5 @@
 import { ErrorAlert } from '@/components/_shared/Alerts'
-import { Button } from '@/components/_shared/Button'
+import { Button, LoaderButton } from '@/components/_shared/Button'
 import { CreateDatasetTabs } from '@/components/dashboard/datasets/admin/CreateDatasetTabs'
 import { CreateDataFilesSection } from '@/components/dashboard/datasets/admin/datafiles/CreateDatafilesSection'
 import { CustomFieldsForm } from '@/components/dashboard/datasets/admin/metadata/CustomFields'
@@ -9,10 +9,13 @@ import { OverviewForm } from '@/components/dashboard/datasets/admin/metadata/Ove
 import { PointOfContactForm } from '@/components/dashboard/datasets/admin/metadata/PointOfContact'
 import { Preview } from '@/components/dashboard/datasets/admin/preview/Preview'
 import { DatasetFormType, DatasetSchema } from '@/schema/dataset.schema'
+import { api } from '@/utils/api'
 import classNames from '@/utils/classnames'
+import notify from '@/utils/notify'
 import { slugify } from '@/utils/slugify'
 import { Tab } from '@headlessui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { match } from 'ts-pattern'
@@ -20,16 +23,17 @@ import { match } from 'ts-pattern'
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [selectedIndex, setSelectedIndex] = useState(0)
+    const router = useRouter()
 
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
         defaultValues: {
-            updateFrequency: {
+            update_frequency: {
                 value: 'monthly',
                 label: 'Monthly',
             },
-            visibility: {
+            visibility_type: {
                 value: 'private',
                 label: 'Private',
             },
@@ -48,6 +52,15 @@ export default function CreateDatasetForm() {
         },
     })
 
+    const createDataset = api.dataset.createDataset.useMutation({
+        onSuccess: async ({ name }) => {
+            notify(`Successfully created the ${name} dataset`, 'success')
+            router.push('/dashboard/datasets')
+            formObj.reset()
+        },
+        onError: (error) => setErrorMessage(error.message),
+    })
+
     const {
         setValue,
         watch,
@@ -58,8 +71,14 @@ export default function CreateDatasetForm() {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])
 
+    console.log(errors)
     return (
-        <form onSubmit={formObj.handleSubmit((data) => console.log(data))}>
+        <form
+            onSubmit={formObj.handleSubmit((data) => {
+                console.log(data)
+                createDataset.mutate(data)
+            })}
+        >
             <Tab.Group
                 selectedIndex={selectedIndex}
                 onChange={setSelectedIndex}
@@ -94,12 +113,13 @@ export default function CreateDatasetForm() {
                     selectedIndex === 2 ? 'max-w-[71rem] xxl:px-0' : ''
                 )}
             >
-                <Button variant="muted" className="w-fit">
+                <Button variant="muted" type="button" className="w-fit">
                     Save as Draft
                 </Button>
                 <div className="flex items-center gap-x-2">
                     {selectedIndex !== 0 && (
                         <Button
+                            type="button"
                             variant="outline"
                             onClick={() => setSelectedIndex(selectedIndex - 1)}
                         >
@@ -108,6 +128,7 @@ export default function CreateDatasetForm() {
                     )}
                     {selectedIndex !== 2 && (
                         <Button
+                            type="button"
                             onClick={() => setSelectedIndex(selectedIndex + 1)}
                         >
                             Next:{' '}
@@ -115,6 +136,14 @@ export default function CreateDatasetForm() {
                                 .with(0, () => 'Datafiles')
                                 .otherwise(() => 'Preview')}
                         </Button>
+                    )}
+                    {selectedIndex === 2 && (
+                        <LoaderButton
+                            loading={createDataset.isLoading}
+                            type="submit"
+                        >
+                            Save
+                        </LoaderButton>
                     )}
                 </div>
             </div>

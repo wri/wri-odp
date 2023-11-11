@@ -66,11 +66,11 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="Technical Notes"
-                                    text={watch('technicalNotes') ?? '_'}
+                                    text={watch('technical_notes') ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="Featured Dataset"
-                                    text={watch('featured') ? 'Yes' : 'No'}
+                                    text={watch('featured_dataset') ? 'Yes' : 'No'}
                                 />
                             </dl>
                             <dl className="flex flex-col gap-y-6">
@@ -89,7 +89,7 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="Update Frequency"
-                                    text={watch('updateFrequency')?.label ?? '_'}
+                                    text={watch('update_frequency')?.label ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="Citation"
@@ -97,7 +97,7 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="Visibility"
-                                    text={watch('visibility')?.label ?? '_'}
+                                    text={watch('visibility_type')?.label ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="License"
@@ -106,8 +106,8 @@ export function Preview({
                             </dl>
                         </div>
                     </div>
-                    {(watch('longDescription') ||
-                        watch('shortDescription')) && (
+                    {(watch('notes') ||
+                        watch('short_description')) && (
                         <div className="border-b border-stone-50 py-8">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
                                 Description
@@ -115,23 +115,23 @@ export function Preview({
                             <dl className="flex flex-col gap-y-6">
                                 <SimpleDescription
                                     label="Short Description"
-                                    text={watch('shortDescription') ?? '_'}
+                                    text={watch('short_description') ?? '_'}
                                 />
                                 <FullDescription label="Full Description">
                                     <div
                                         dangerouslySetInnerHTML={{
                                             __html:
-                                                watch('longDescription') ?? '_',
+                                                watch('notes') ?? '_',
                                         }}
                                     ></div>
                                 </FullDescription>
                             </dl>
                         </div>
                     )}
-                    {(watch('authorName') ||
-                        watch('authorEmail') ||
-                        watch('maintainerName') ||
-                        watch('maintainerEmail')) && (
+                    {(watch('author') ||
+                        watch('author_email') ||
+                        watch('maintainer') ||
+                        watch('maintainer_email')) && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
                                 Points of Contact
@@ -140,21 +140,21 @@ export function Preview({
                                 <dl className="flex flex-col gap-y-6">
                                     <SimpleDescription
                                         label="Author Name"
-                                        text={watch('authorEmail') ?? '_'}
+                                        text={watch('author') ?? '_'}
                                     />
                                     <SimpleDescription
                                         label="Author Email"
-                                        text={watch('authorEmail') ?? '_'}
+                                        text={watch('author_email') ?? '_'}
                                     />
                                 </dl>
                                 <dl className="flex flex-col gap-y-6">
                                     <SimpleDescription
                                         label="Maintainer Name"
-                                        text={watch('maintainerName') ?? '_'}
+                                        text={watch('maintainer') ?? '_'}
                                     />
                                     <SimpleDescription
                                         label="Maintainer Email"
-                                        text={watch('maintainerEmail') ?? '_'}
+                                        text={watch('maintainer_email') ?? '_'}
                                     />
                                 </dl>
                             </div>
@@ -162,8 +162,8 @@ export function Preview({
                     )}
                     {(watch('function') ||
                         watch('restrictions') ||
-                        watch('learnMore') ||
-                        watch('reasonsForAdding') ||
+                        watch('learn_more') ||
+                        watch('reason_for_adding') ||
                         watch('summary') ||
                         watch('cautions')) && (
                         <div className="border-b border-stone-50 py-8 pb-6">
@@ -182,11 +182,11 @@ export function Preview({
                                     />
                                     <SimpleDescription
                                         label="Reasons for adding"
-                                        text={watch('reasonsForAdding') ?? '_'}
+                                        text={watch('reason_for_adding') ?? '_'}
                                     />
                                     <SimpleDescription
                                         label="Learn More"
-                                        text={watch('learnMore') ?? '_'}
+                                        text={watch('learn_more') ?? '_'}
                                     />
                                 </dl>
                                 <dl className="flex flex-col gap-y-6">
