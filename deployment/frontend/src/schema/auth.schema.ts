@@ -8,7 +8,7 @@ export const SignInSchema = z.object({
 export type SignInFormType = z.infer<typeof SignInSchema>
 
 export const RequestResetPasswordSchema = z.object({
-    email: z.string().email(),
+    email: z.string().email(), 
 })
 
 export type RequestResetPasswordFormType = z.infer<
