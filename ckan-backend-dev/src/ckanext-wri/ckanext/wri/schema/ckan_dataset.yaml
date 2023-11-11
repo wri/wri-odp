@@ -6,6 +6,12 @@ about_url: http://github.com/ckan/ckanext-scheming
 
 dataset_fields:
 
+- field_name: wri_data
+  label: WRI Data
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
 - field_name: title
   label: Title
   preset: title
