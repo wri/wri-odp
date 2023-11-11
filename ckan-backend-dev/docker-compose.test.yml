@@ -48,12 +48,8 @@ services:
       - "0.0.0.0:3000:3000"
     depends_on:
       - ckan-dev
-    command: >
-      bash -c "export SYS_ADMIN_API_KEY=\$(docker exec ckan-wri ckan -c production.ini user token add ckan_admin cypress | awk '/API Token created:/ {getline; print $1}' | tr -d '\n' | tr -d '\r');
-      echo \$SYS_ADMIN_API_KEY;
-      npm run start"
     env_file:
-      - ".env.frontend.example"
+      - ".env.example"
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
 
