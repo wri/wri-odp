@@ -52,6 +52,7 @@ export default function CreateDatasetForm() {
                     resourceId: uuidv4(),
                     title: '',
                     type: 'empty',
+                    dataDictionary: []
                 },
             ],
         },

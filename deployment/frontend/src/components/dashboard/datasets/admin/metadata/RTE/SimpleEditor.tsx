@@ -16,6 +16,7 @@ import * as Icons from './Icons'
 import { LinkModal } from './LinkModal'
 import classNames from '@/utils/classnames'
 import { Controller, FieldValues, Path, PathValue, UseFormReturn } from 'react-hook-form'
+import { Button } from '@/components/_shared/Button'
 
 interface TEditorProps {
     value: string
@@ -135,21 +136,21 @@ function TipTapEditor({
         <div className="editor flex flex-col h-full min-h-[350px]">
             <div className="menu">
                 <button
-                    className="menu-button"
+                    className="menu-button hover:bg-neutral-50"
                     onClick={() => editor.chain().focus().undo().run()}
                     disabled={!editor.can().undo()}
                 >
                     <Icons.RotateLeft />
                 </button>
                 <button
-                    className="menu-button"
+                    className="menu-button hover:bg-neutral-50"
                     onClick={() => editor.chain().focus().redo().run()}
                     disabled={!editor.can().redo()}
                 >
                     <Icons.RotateRight />
                 </button>
                 <button
-                    className={classNames('menu-button', {
+                    className={classNames('menu-button hover:bg-neutral-50', {
                         'is-active': editor.isActive('link'),
                     })}
                     onClick={openModal}
@@ -157,7 +158,7 @@ function TipTapEditor({
                     <Icons.Link />
                 </button>
                 <button
-                    className={classNames('menu-button', {
+                    className={classNames('menu-button hover:text-blue-800', {
                         'is-active': editor.isActive('bold'),
                     })}
                     onClick={toggleBold}
@@ -207,12 +208,12 @@ function TipTapEditor({
                     return from === to && editor.isActive('link')
                 }}
             >
-                <button className="button" onClick={openModal}>
+                <Button size="sm" variant="outline" className='bg-white' onClick={openModal}>
                     Edit
-                </button>
-                <button className="button-remove" onClick={removeLink}>
+                </Button>
+                <Button size="sm" variant="destructive" onClick={removeLink}>
                     Remove
-                </button>
+                </Button>
             </BubbleMenu>
 
             <EditorContent className='h-full grow flex flex-col' editor={editor} />
