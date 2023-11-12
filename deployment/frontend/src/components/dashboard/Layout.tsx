@@ -3,56 +3,65 @@ import { Dialog, Disclosure, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import UserProfile from "./UserProfile";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react"
 
 
-const routes = [
+let routes = [
   {
     name: "Dashboard",
     href: "default",
     active: true,
-    count: 0
+    count: 0,
+    isSysAdmin: false
   },
   {
     name: "Notifications",
     href: "/notifications",
     active: false,
-    count: 3
+    count: 3,
+    isSysAdmin: false
   },
   {
     name: "Requests for approval",
     href: "/approval-request",
     active: false,
-    count: 1
+    count: 1,
+    isSysAdmin: true
   },
   {
     name: "Activity Stream",
     href: "/activity-stream",
     active: false,
-    count: 0
+    count: 0,
+    isSysAdmin: false
   },
   {
     name: "Datasets",
     href: "/datasets",
     active: false,
-    count: 0
+    count: 0,
+    isSysAdmin: false
   },
   {
     name: "Teams",
     href: "/teams",
     active: false,
-    count: 0
+    count: 0,
+    isSysAdmin: false
   },
   {
     name: "Topics",
     href: "/topics",
     active: false,
-    count: 0
+    count: 0,
+    isSysAdmin: false
   },
   {
     name: "Users",
     href: "/users",
     active: false,
-    count: 0
+    count: 0,
+    isSysAdmin: false
   }
 ]
 
@@ -63,12 +72,18 @@ export default function Layout({
 }) {
   const { asPath } = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { data: session } = useSession()
+
+  if (!session?.user.sysadmin) {
+    routes = routes.filter((item) => !item.isSysAdmin)
+  }
+
 
   const navigation = routes.map((item) => {
     const isPath = asPath.split("/dashboard")[1];
     if (isPath && isPath.split("/").length > 1) {
       const pathExist = isPath.includes(item.href)
-      return {...item, active: pathExist}
+      return { ...item, active: pathExist }
     }
     return item
   });

@@ -3,6 +3,7 @@ import { EyeIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/out
 import { Transition } from '@headlessui/react'
 import classNames from '@/utils/classnames';
 import { Tooltip } from 'react-tooltip'
+import { useSession } from "next-auth/react"
 
 type RowButton = {
   label?: string;
@@ -28,10 +29,12 @@ type RowProps = {
   linkButton?: RowLinkButton;
   groupStyle?: string
   className?: string;
+  authorized?: boolean;
 }
 
-export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, groupStyle, className }: RowProps) {
+export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, groupStyle, className, authorized }: RowProps) {
   const [isShowSubRow, setIsShowSubRow] = useState(false)
+  const { data: session } = useSession()
   // state event to change hover effect on desktop to click effect on mobile
   // const [isHover, setIsHover] = useState(false)
   const enableControlDiv = (isDropDown ?? controlButtons ?? linkButton) ? true : false
@@ -49,7 +52,7 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
               <EyeIcon className="h-6 w-6 text-black " />
             </a>
           ) : ""}
-          {(controlButtons) ? controlButtons.map((button, index) => {
+          {(controlButtons) && (session?.user.sysadmin ?? authorized) ? controlButtons.map((button, index) => {
             return (
               <>
                 <button
