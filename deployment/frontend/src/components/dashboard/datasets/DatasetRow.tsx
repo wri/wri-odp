@@ -122,8 +122,9 @@ export default function DatasetRow({ className, dataset }: { className?: string,
       />
 
       <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-        <h3 className='w-full text-center my-auto'>Delete Dataset: {dataset.name}</h3>
+        <h3 className='w-full text-center my-auto'>Delete Dataset: {dataset.title}</h3>
         <button
+          id={dataset.name}
           className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
           onClick={() => {
             datasetDelete.mutate(dataset.id)
@@ -149,6 +150,7 @@ export function MyDatasetRow({ className, dataset }: { className?: string, datas
   return (
     <>
       <Row
+        authorized={true}
         className={`pr-2 sm:pr-4 ${className ? className : ''}`}
         rowMain={<DatasetCardProfile dataset={dataset} />}
         controlButtons={[
@@ -180,8 +182,9 @@ export function MyDatasetRow({ className, dataset }: { className?: string, datas
       />
 
       <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-        <h3 className='w-full text-center my-auto'>Delete Dataset: {dataset.name}</h3>
+        <h3 className='w-full text-center my-auto'>Delete Dataset: {dataset.title}</h3>
         <button
+          id={dataset.name}
           className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
           onClick={() => {
             datasetDelete.mutate(dataset.id)
@@ -224,6 +227,7 @@ export function DraftRow({ className, dataset }: { className?: string, dataset: 
   return (
     <>
       <Row
+        authorized={true}
         className={`pr-2 sm:pr-4 ${className ? className : ''}`}
         rowMain={<DatasetCardProfile dataset={dataset} />}
         controlButtons={[
@@ -250,8 +254,9 @@ export function DraftRow({ className, dataset }: { className?: string, dataset: 
         isDropDown
       />
       <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-        <h3 className='w-full text-center my-auto'>Delete Dataset: {dataset.name}</h3>
+        <h3 className='w-full text-center my-auto'>Delete Dataset: {dataset.title}</h3>
         <button
+          id={dataset.name}
           className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
           onClick={() => {
             datasetDelete.mutate(dataset.id)

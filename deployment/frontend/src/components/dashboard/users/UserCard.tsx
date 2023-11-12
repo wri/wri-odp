@@ -108,7 +108,7 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
             <Row
               key={index}
               groupStyle="group/item group-hover/item:visible "
-              className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
+              className={`pr-6 border-b-[1px] border-wri-gray `}
               rowMain={
                 <div className='flex flex-col sm:flex-row pl-3 sm:pl-5  gap-x-14 gap-y-4'>
                   <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} />
@@ -132,13 +132,13 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
 
 export default function UserCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
-  const { data, isLoading } = api.user.getAllUsers.useQuery(query)
+  const { data, isLoading, refetch } = api.user.getAllUsers.useQuery(query)
   const [open, setOpen] = useState(false)
   const datasetUser = api.user.deleteUser.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setOpen(false)
+      await refetch();
       notify(`User delete is successful`, 'success')
-
     },
   })
 

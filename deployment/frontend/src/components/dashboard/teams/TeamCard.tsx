@@ -63,11 +63,12 @@ function TeamProfile({ team }: { team: IRowProfile }) {
 
 export default function TeamCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 5 } })
-  const { data, isLoading } = api.organization.getUsersOrganizations.useQuery(query)
+  const { data, isLoading, refetch } = api.organization.getUsersOrganizations.useQuery(query)
   const [open, setOpen] = useState(false)
   const deleteTeam = api.teams.deleteTeam.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setOpen(false)
+      await refetch();
       notify(`Team delete is successful`, 'success')
     }
   })

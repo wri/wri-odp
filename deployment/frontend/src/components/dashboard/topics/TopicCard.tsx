@@ -25,10 +25,12 @@ function TeamProfile({ team }: { team: GroupTree }) {
 }
 
 function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefined }) {
+  const utils = api.useUtils()
   const [open, setOpen] = useState(false)
   const deleteTopic = api.topics.deleteTopic.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setOpen(false)
+      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 2 } })
       notify(`Team delete is successful`, 'success')
     }
   })
@@ -95,11 +97,12 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
 
 export default function TopicCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
-  const { data, isLoading } = api.topics.getUsersTopics.useQuery(query)
+  const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
   const [open, setOpen] = useState(false)
   const deleteTopic = api.topics.deleteTopic.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setOpen(false)
+      await refetch();
       notify(`Team delete is successful`, 'success')
     }
   })

@@ -4,7 +4,7 @@ import {
   protectedProcedure
 } from "@/server/api/trpc";
 import { env } from "@/env.mjs";
-import { getUserOrganizations, getAllDatasetFq } from "@/utils/apiUtils";
+import { getUserOrganizations, getAllDatasetFq, getUserGroups } from "@/utils/apiUtils";
 import { searchSchema } from "@/schema/search.schema";
 import type { CkanResponse } from "@/schema/ckan.schema";
 
@@ -13,14 +13,15 @@ export const DatasetRouter = createTRPCRouter({
     .input(searchSchema)
     .query(async ({ input, ctx }) => {
       const organizations = await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey });
+      const groups = await getUserGroups({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey });
       let orgsFq = `organization:(${organizations?.map(org => org.name).join(" OR ")})`;
+      if (groups) {
+        orgsFq = `${orgsFq}+group:(${groups.map(group => group.name).join(" OR ")})`
+      }
       const fq = []
       if (input.fq) {
+        orgsFq = "";
         for (const key of Object.keys(input.fq)) {
-          if (key === "organization") {
-            orgsFq = `organization:(${input.fq[key]})`;
-            continue;
-          }
           fq.push(`${key}:(${input.fq[key]})`)
         }
         const filter = fq.join("+");
