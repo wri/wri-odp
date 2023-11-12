@@ -70,7 +70,9 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="Featured Dataset"
-                                    text={watch('featured_dataset') ? 'Yes' : 'No'}
+                                    text={
+                                        watch('featured_dataset') ? 'Yes' : 'No'
+                                    }
                                 />
                             </dl>
                             <dl className="flex flex-col gap-y-6">
@@ -83,13 +85,19 @@ export function Preview({
                                     text={
                                         watch('temporalCoverageStart') ||
                                         watch('temporalCoverageEnd')
-                                            ? `${watch('temporalCoverageStart')} - ${watch('temporalCoverageEnd')}` 
+                                            ? `${watch(
+                                                  'temporalCoverageStart'
+                                              )} - ${watch(
+                                                  'temporalCoverageEnd'
+                                              )}`
                                             : '_'
                                     }
                                 />
                                 <SimpleDescription
                                     label="Update Frequency"
-                                    text={watch('update_frequency')?.label ?? '_'}
+                                    text={
+                                        watch('update_frequency')?.label ?? '_'
+                                    }
                                 />
                                 <SimpleDescription
                                     label="Citation"
@@ -97,7 +105,9 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="Visibility"
-                                    text={watch('visibility_type')?.label ?? '_'}
+                                    text={
+                                        watch('visibility_type')?.label ?? '_'
+                                    }
                                 />
                                 <SimpleDescription
                                     label="License"
@@ -106,8 +116,7 @@ export function Preview({
                             </dl>
                         </div>
                     </div>
-                    {(watch('notes') ||
-                        watch('short_description')) && (
+                    {(watch('notes') || watch('short_description')) && (
                         <div className="border-b border-stone-50 py-8">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
                                 Description
@@ -120,8 +129,7 @@ export function Preview({
                                 <FullDescription label="Full Description">
                                     <div
                                         dangerouslySetInnerHTML={{
-                                            __html:
-                                                watch('notes') ?? '_',
+                                            __html: watch('notes') ?? '_',
                                         }}
                                     ></div>
                                 </FullDescription>
@@ -207,27 +215,15 @@ export function Preview({
                             Data files
                         </h3>
                         <div>
-                            <Datafile
-                                name="referencetables.xlsx"
-                                title="Reference Tables"
-                                type="upload"
-                                format="XLSX"
-                                description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea."
-                            />
-                            <Datafile
-                                name="https://source/to/original/data"
-                                title="Reference Tables"
-                                type="link"
-                                format="XLSX"
-                                description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea."
-                            />
-                            <Datafile
-                                name="https://source/to/original/data"
-                                title="Reference Tables"
-                                type="layer"
-                                format="XLSX"
-                                description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea."
-                            />
+                            {watch('resources').map((resource) => (
+                                <Datafile
+                                    name={resource.name ?? '-'}
+                                    title={resource.title ?? '-'}
+                                    type={resource.type ?? '-'}
+                                    format={resource.format ?? '-'}
+                                    description={resource.description ?? '-'}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>

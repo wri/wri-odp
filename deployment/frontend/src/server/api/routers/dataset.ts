@@ -29,6 +29,8 @@ export const DatasetRouter = createTRPCRouter({
                         format: resource.format?.value ?? '',
                         id: resource.resourceId,
                         url_type: resource.type,
+                        tableschema: resource.dataDictionary ?? '',
+                        dataDictionary: null,
                         url:
                             resource.type === 'upload'
                                 ? `${env.CKAN_URL}/dataset/${input.id}/resource/${resource.resourceId}/${resource.name}`
