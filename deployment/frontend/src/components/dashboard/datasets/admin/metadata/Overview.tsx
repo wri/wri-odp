@@ -91,7 +91,7 @@ export function OverviewForm({
                             placeholder="Language"
                             initialValue={watch('language') ?? null}
                             options={[
-                                { value: 'eng', label: 'English' },
+                                { value: 'en', label: 'English' },
                                 { value: 'fr', label: 'French' },
                                 { value: 'pt', label: 'Portuguese' },
                             ]}
@@ -122,6 +122,7 @@ export function OverviewForm({
                                         options={data.map((team) => ({
                                             label: team.title ?? team.name,
                                             value: team.name,
+                                            id: team.id,
                                         }))}
                                         placeholder="Select a team"
                                     />

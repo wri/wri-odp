@@ -19,6 +19,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { match } from 'ts-pattern'
+import { v4 as uuidv4 } from 'uuid';
+
+const datasetId = uuidv4()
 
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -29,6 +32,7 @@ export default function CreateDatasetForm() {
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
         defaultValues: {
+            id: datasetId,
             update_frequency: {
                 value: 'monthly',
                 label: 'Monthly',
@@ -45,6 +49,7 @@ export default function CreateDatasetForm() {
             },
             resources: [
                 {
+                    resourceId: uuidv4(),
                     title: '',
                     type: 'empty',
                 },
@@ -58,7 +63,9 @@ export default function CreateDatasetForm() {
             router.push('/dashboard/datasets')
             formObj.reset()
         },
-        onError: (error) => setErrorMessage(error.message),
+        onError: (error) => {
+        setErrorMessage(error.message)
+    },
     })
 
     const {
@@ -67,11 +74,13 @@ export default function CreateDatasetForm() {
         formState: { dirtyFields, errors },
     } = formObj
 
+    console.log(errors)
+
     useEffect(() => {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])
 
-    console.log(errors)
+
     return (
         <form
             onSubmit={formObj.handleSubmit((data) => {
@@ -86,11 +95,6 @@ export default function CreateDatasetForm() {
                 <div className="mx-auto w-full mb-5 3xl:max-w-[1380px]">
                     <CreateDatasetTabs currentStep={selectedIndex} />
                 </div>
-                {errorMessage && (
-                    <div className="py-4">
-                        <ErrorAlert text={errorMessage} />
-                    </div>
-                )}
                 <Tab.Panels>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <OverviewForm formObj={formObj} />
@@ -147,6 +151,11 @@ export default function CreateDatasetForm() {
                     )}
                 </div>
             </div>
+                {errorMessage && (
+                    <div className="py-4">
+                        <ErrorAlert text={errorMessage} />
+                    </div>
+                )}
         </form>
     )
 }

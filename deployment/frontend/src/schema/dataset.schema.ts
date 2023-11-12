@@ -2,21 +2,34 @@ import z from 'zod'
 
 export const ResourceSchema = z.object({
     description: z.string().optional(),
+    resourceId: z.string().uuid(),
     url: z.string().url().optional(),
+    name: z.string().optional(),
+    key: z.string().optional(),
     format: z
         .object({
             value: z.string(),
             label: z.string(),
         })
-        .optional(),
+        .optional()
+        .nullable(),
     size: z.number().optional(),
     title: z.string(),
+    fileBlob: z.any(),
     type: z.enum(['link', 'upload', 'layer', 'empty']),
+    dataDictionary: z.array(z.object({
+        field: z.string(),
+        type: z.string(),
+        null: z.string(),
+        key: z.string(),
+        default: z.string(),
+    })),
 })
 
 export const DatasetSchema = z.object({
-    title: z.string(),
-    name: z.string(),
+    id: z.string().uuid(),
+    title: z.string().min(1, { message: 'Title is required' }),
+    name: z.string().min(1, { message: 'Name is required' }),
     source: z.string().url().optional().nullable(),
     language: z
         .object({
@@ -24,11 +37,11 @@ export const DatasetSchema = z.object({
             label: z.string(),
         })
         .optional(),
-    team: z
-        .object({
-            value: z.string(),
-            label: z.string(),
-        }),
+    team: z.object({
+        value: z.string(),
+        label: z.string(),
+        id: z.string(),
+    }),
     projects: z.string().optional().nullable(),
     applications: z.string().optional().nullable(),
     technical_notes: z.string().url(),
@@ -38,7 +51,16 @@ export const DatasetSchema = z.object({
     temporalCoverageEnd: z.number().optional().nullable(),
     update_frequency: z
         .object({
-            value: z.enum(['anually', 'bianually', 'weekly', 'as_needed', 'hourly', 'monthly', 'quarterly','daily']),
+            value: z.enum([
+                'anually',
+                'bianually',
+                'weekly',
+                'as_needed',
+                'hourly',
+                'monthly',
+                'quarterly',
+                'daily',
+            ]),
             label: z.string(),
         })
         .optional()

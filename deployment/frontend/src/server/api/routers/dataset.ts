@@ -14,19 +14,31 @@ export const DatasetRouter = createTRPCRouter({
                 const user = ctx.session.user
                 const body = JSON.stringify({
                     ...input,
-                    tags: input.tags ? input.tags.map((tag) => ({ name: tag})) : [],
-                    groups: input.topics ? input.topics.map((topic) => ({ name: topic})) : [],
+                    tags: input.tags
+                        ? input.tags.map((tag) => ({ name: tag }))
+                        : [],
+                    groups: input.topics
+                        ? input.topics.map((topic) => ({ name: topic }))
+                        : [],
                     language: input.language?.value ?? '',
                     owner_org: input.team.value,
                     update_frequency: input.update_frequency?.value ?? '',
                     visibility_type: input.visibility_type?.value ?? '',
-                    resources: input.resources.map((resource) => ({...resource, format: resource.format?.value ?? ''})),
+                    resources: input.resources.map((resource) => ({
+                        ...resource,
+                        format: resource.format?.value ?? '',
+                        id: resource.resourceId,
+                        url_type: resource.type,
+                        url:
+                            resource.type === 'upload'
+                                ? `${env.CKAN_URL}/dataset/${input.id}/resource/${resource.resourceId}/${resource.name}`
+                                : resource.url,
+                    })),
                     temporal_coverage:
                         input.temporalCoverageStart && input.temporalCoverageEnd
                             ? `[${input.temporalCoverageStart},${input.temporalCoverageEnd}]`
                             : null,
                 })
-                console.log('Input', input)
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
                     {
@@ -39,7 +51,10 @@ export const DatasetRouter = createTRPCRouter({
                     }
                 )
                 const dataset: CkanResponse<Dataset> = await datasetRes.json()
-                if (!dataset.success && dataset.error) throw Error(dataset.error.message)
+                if (!dataset.success && dataset.error) {
+                    if (dataset.error.message) throw Error(dataset.error.message)
+                    throw Error(JSON.stringify(dataset.error))
+                }
                 return dataset.result
             } catch (e) {
                 let error =
