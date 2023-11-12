@@ -40,6 +40,12 @@ class WriPlugin(plugins.SingletonPlugin):
         facets_dict['wri_data'] = toolkit._('WRI Data')
         return facets_dict
 
+    def group_facets(self, facets_dict, group_type, package_type):
+        return facets_dict
+
+    def organization_facets(self, facets_dict, organization_type, package_type):
+        return facets_dict
+
     # IActions
 
     def get_actions(self):

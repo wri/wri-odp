@@ -7,7 +7,7 @@ import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
 
 export default function DatasetLCardList() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 5 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 5 }, _isUserSearch: true })
   const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
 
   return (
