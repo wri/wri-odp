@@ -228,8 +228,8 @@ Cypress.Commands.add('createDatasetAPI', (organization, name, isSubscribable) =>
       owner_org: organization,
       name: name,
       author: "datopian",
-      license_id : "notspecified",
-      tags: [{"display_name": "subscriable", "name": "subscriable"}]
+      license_id: "notspecified",
+      tags: [{ "display_name": "subscriable", "name": "subscriable" }]
     },
   })
 
@@ -397,4 +397,17 @@ Cypress.Commands.add("iframe", { prevSubject: "element" }, ($iframe) => {
   return Cypress.Promise((resolve) =>
     $iframe.on("load", () => resolve(findBody()))
   );
+});
+
+Cypress.Commands.add("createUserApi", (name, email, password) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("user_create"),
+    headers: headers,
+    body: {
+      name: name,
+      email: email,
+      password: password,
+    },
+  });
 });

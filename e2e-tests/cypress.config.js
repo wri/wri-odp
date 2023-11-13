@@ -10,6 +10,7 @@ export default defineConfig({
     API_KEY: 'CKAN_API_TOKEN',
     ORG_NAME_SUFFIX: '-organization-test',
     DATASET_NAME_SUFFIX: '-dataset-test',
+    GROUP_SUFFIX: '-group-test',
   },
   e2e: {
     baseUrl: 'http://localhost:3000',

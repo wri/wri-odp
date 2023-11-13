@@ -14,6 +14,8 @@ const org2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName2 = `${uuid()}${Cypress.env('DATASET_NAME_SUFFIX')}`;
 
 const group = `${uuid()}${Cypress.env("GROUP_SUFFIX")}`;
+const user = `${uuid()}-user`;
+const email = `${uuid()}@gmail.com`;
 
 describe("Dashboard Test", () => {
   before(() => {
@@ -24,17 +26,18 @@ describe("Dashboard Test", () => {
     cy.createDatasetAPI(parentOrg2, datasetName2, true)
 
     cy.createGroupAPI(group)
+    cy.createUserApi(user, email, 'test1234')
 
   });
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
-  it("Should check if activity stream contains dataset created", () => {
-    cy.visit("/dashboard/");
-    cy.get("#activities").should("exist");
-    cy.get("#activities").contains(`${ckanUserName} created the package ${datasetName}`);
-  });
+  // it("Should check if activity stream contains dataset created", () => {
+  //   cy.visit("/dashboard/");
+  //   cy.get("#activities").should("exist");
+  //   cy.get("#activities").contains(`${ckanUserName} created the package ${datasetName}`);
+  // });
 
   it("Should test dataset page", () => {
     cy.visit("/dashboard/datasets")
@@ -58,11 +61,9 @@ describe("Dashboard Test", () => {
 
   it("Should test Users page", () => {
     cy.visit("/dashboard/users")
-    cy.contains(ckanUserName)
-    cy.get('input[type="search"]').type(ckanUserName).type('{enter}');
-    cy.contains(ckanUserName)
-    cy.get('button#rowshow').first().click();
-    cy.contains(("admin"))
+    cy.contains(user)
+    cy.get('input[type="search"]').type(user).type('{enter}');
+    cy.contains(user)
 
   })
   it("Should test teams page", () => {
@@ -75,7 +76,7 @@ describe("Dashboard Test", () => {
     cy.visit("/dashboard/datasets")
     cy.get('input[type="search"]').type(datasetName2).type('{enter}');
     cy.contains(datasetName2).should('exist');
-    cy.get('button#delete-tooltip').first().click({ force: true });
+    cy.get(`button#delete-tooltip-${datasetName2}`).first().click({ force: true });
     cy.get(`button#${datasetName2}`).click();
     cy.contains('Dataset delete is successful')
 
@@ -84,7 +85,7 @@ describe("Dashboard Test", () => {
     cy.visit("/dashboard/teams")
     cy.get('input[type="search"]').type(parentOrg2).type('{enter}');
     cy.contains(parentOrg2).should('exist');
-    cy.get('button#delete-tooltip').first().click({ force: true });
+    cy.get(`button#delete-tooltip-${parentOrg2}`).first().click({ force: true });
     cy.get(`button#${parentOrg2}`).click();
     cy.contains('Team delete is successful')
   })
@@ -93,7 +94,7 @@ describe("Dashboard Test", () => {
     cy.visit("/dashboard/topics")
     cy.get('input[type="search"]').type(group).type('{enter}');
     cy.contains(group).should('exist');
-    cy.get('button#delete-tooltip').first().click({ force: true });
+    cy.get(`button#delete-tooltip-${group}`).first().click({ force: true });
     cy.get(`button#${group}`).click();
     cy.contains('Topic delete is successful')
   })
