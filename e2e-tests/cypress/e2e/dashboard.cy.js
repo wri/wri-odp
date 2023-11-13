@@ -33,12 +33,6 @@ describe("Dashboard Test", () => {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
-  // it("Should check if activity stream contains dataset created", () => {
-  //   cy.visit("/dashboard/");
-  //   cy.get("#activities").should("exist");
-  //   cy.get("#activities").contains(`${ckanUserName} created the package ${datasetName}`);
-  // });
-
   it("Should test dataset page", () => {
     cy.visit("/dashboard/datasets")
     cy.get('#alldataset').should('exist');
