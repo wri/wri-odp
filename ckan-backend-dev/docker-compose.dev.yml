@@ -46,7 +46,7 @@ services:
         - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
         - S3_BUCKET_NAME=ckan
         - S3_BUCKET_REGION=us-east-1
-        - SYS_ADMIN_API_KEY=${CKAN__DATAPUSHER__API_TOKEN}
+        - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
@@ -55,7 +55,7 @@ services:
       - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
       - S3_BUCKET_NAME=ckan
       - S3_BUCKET_REGION=us-east-1
-      - SYS_ADMIN_API_KEY=${CKAN__DATAPUSHER__API_TOKEN}
+      - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
     ports:
       - "0.0.0.0:3000:3000"
     healthcheck:
@@ -95,7 +95,10 @@ services:
     image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
     volumes:
       - solr_data:/var/solr
+      - ./ckan/setup/schema.xml:/opt/solr/server/solr/configsets/ckan/conf/managed-schema
     restart: unless-stopped
+    ports:
+      - "8983:8983"
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8983/solr/"]
 

@@ -3,11 +3,13 @@ import ckan.plugins.toolkit as toolkit
 
 import ckanext.wri.logic.action as action
 from ckanext.wri.logic.validators import iso_language_code
+from ckanext.wri.logic.action.get import package_search
 
 
 class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IValidators)
+    plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IActions)
 
     # IConfigurer
@@ -24,11 +26,25 @@ class WriPlugin(plugins.SingletonPlugin):
             "iso_language_code": iso_language_code
         }
 
+    # IFacets
+
+    def dataset_facets(self, facets_dict, package_type):
+        facets_dict['language'] = toolkit._('Language')
+        facets_dict['projects'] = toolkit._('Projects')
+        facets_dict['application'] = toolkit._('Application')
+        facets_dict['temporal_coverage'] = toolkit._('Temporal Coverage')
+        facets_dict['update_frequency'] = toolkit._('Update Frequency')
+        facets_dict['license_id'] = toolkit._('License')
+        facets_dict['visibility_type'] = toolkit._('Visibility')
+        facets_dict['featured_dataset'] = toolkit._('Featured Dataset')
+        facets_dict['wri_data'] = toolkit._('WRI Data')
+        return facets_dict
+
     # IActions
 
     def get_actions(self):
         return {
-            "password_reset": action.password_reset
+            'package_search': package_search,
+            'password_reset': action.password_reset
 
         }
-
