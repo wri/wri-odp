@@ -25,6 +25,7 @@ interface SimpleSelectProps<T extends FieldValues, V extends Object> {
     formObj?: UseFormReturn<T>
     name: Path<T>
     initialValue?: Option<V> | null
+  id?: string
 }
 
 export default function SimpleSelect<T extends FieldValues, V extends Object>({
@@ -34,6 +35,7 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
     maxWidth = 'xl:max-w-[28rem]',
     formObj,
     name,
+  id,
     initialValue,
 }: SimpleSelectProps<T, V>) {
     const { control } = formObj ?? useForm()
@@ -57,6 +59,7 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                 )}
                             >
                                 <Listbox.Button
+                  id={id}
                                     className={classNames(
                                         'relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6',
                                         className ?? ''

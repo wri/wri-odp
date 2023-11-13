@@ -39,7 +39,7 @@ export async function parseCsv(file: File): Promise<any> {
         Papa.parse(file, {
             download: false,
             header: false,
-            dynamicTyping: true,
+            dynamicTyping: false,
             skipEmptyLines: true,
             transform: (value: string): string => {
                 return value.trim()

@@ -5,6 +5,7 @@ import { searchSchema } from '@/schema/search.schema'
 import { DatasetSchema } from '@/schema/dataset.schema'
 import { Dataset } from '@portaljs/ckan'
 import { CkanResponse } from '@/schema/ckan.schema'
+import { License } from '@/interfaces/licenses.interface'
 
 export const DatasetRouter = createTRPCRouter({
     createDataset: protectedProcedure
@@ -21,15 +22,21 @@ export const DatasetRouter = createTRPCRouter({
                         ? input.topics.map((topic) => ({ name: topic }))
                         : [],
                     language: input.language?.value ?? '',
-                    owner_org: input.team.value,
+                    owner_org: input.team ? input.team.value : '',
                     update_frequency: input.update_frequency?.value ?? '',
+                    featured_image:
+                        input.featured_image && input.featured_dataset
+                            ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
+                            : null,
                     visibility_type: input.visibility_type?.value ?? '',
                     resources: input.resources.map((resource) => ({
                         ...resource,
                         format: resource.format?.value ?? '',
                         id: resource.resourceId,
                         url_type: resource.type,
-                        tableschema: resource.dataDictionary ?? '',
+                        schema: resource.dataDictionary
+                            ? { schema: resource.dataDictionary }
+                            : '{}',
                         dataDictionary: null,
                         url:
                             resource.type === 'upload'
@@ -54,7 +61,8 @@ export const DatasetRouter = createTRPCRouter({
                 )
                 const dataset: CkanResponse<Dataset> = await datasetRes.json()
                 if (!dataset.success && dataset.error) {
-                    if (dataset.error.message) throw Error(dataset.error.message)
+                    if (dataset.error.message)
+                        throw Error(dataset.error.message)
                     throw Error(JSON.stringify(dataset.error))
                 }
                 return dataset.result
@@ -110,6 +118,24 @@ export const DatasetRouter = createTRPCRouter({
                 count: dataset.count,
             }
         }),
+    getLicenses: protectedProcedure.query(async ({ input, ctx }) => {
+        const user = ctx.session.user
+        const licensesRes = await fetch(
+            `${env.CKAN_URL}/api/action/license_list`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${user.apikey}`,
+                },
+            }
+        )
+        const licenses: CkanResponse<License[]> = await licensesRes.json()
+        if (!licenses.success && licenses.error) {
+            if (licenses.error.message) throw Error(licenses.error.message)
+            throw Error(JSON.stringify(licenses.error))
+        }
+        return licenses.result
+    }),
     getFavoriteDataset: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {

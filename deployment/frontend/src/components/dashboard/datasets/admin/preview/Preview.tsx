@@ -18,8 +18,12 @@ import {
 import { useLayoutEffect, useRef, useState } from 'react'
 import { match } from 'ts-pattern'
 import { UseFormReturn } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import {
+    DataDictionaryFormType,
+    DatasetFormType,
+} from '@/schema/dataset.schema'
 import { formatDate } from '@/utils/formatDate'
+import { convertBytes } from '@/utils/convertBytes'
 
 export function Preview({
     formObj,
@@ -210,22 +214,31 @@ export function Preview({
                             </div>
                         </div>
                     )}
-                    <div className="border-b border-stone-50 py-8 pb-6">
-                        <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
-                            Data files
-                        </h3>
-                        <div>
-                            {watch('resources').map((resource) => (
-                                <Datafile
-                                    name={resource.name ?? '-'}
-                                    title={resource.title ?? '-'}
-                                    type={resource.type ?? '-'}
-                                    format={resource.format ?? '-'}
-                                    description={resource.description ?? '-'}
-                                />
-                            ))}
+                    {watch('resources') && watch('resources').length > 0 && (
+                        <div className="border-b border-stone-50 py-8 pb-6">
+                            <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
+                                Data files
+                            </h3>
+                            <div>
+                                {watch('resources').map((resource) => (
+                                    <Datafile
+                                        key={resource.resourceId}
+                                        name={resource.name ?? resource.url ?? '-'}
+                                        title={resource.title ?? '-'}
+                                        type={resource.type ?? 'empty'}
+                                        format={resource.format?.label ?? '-'}
+                                        size={resource.size ?? null}
+                                        description={
+                                            resource.description ?? '-'
+                                        }
+                                        dataDictionary={
+                                            resource.dataDictionary ?? []
+                                        }
+                                    />
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -320,11 +333,13 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
 }
 
 interface DatafilePreviewProps {
-    type: 'link' | 'upload' | 'layer'
+    type: 'link' | 'upload' | 'layer' | 'empty'
     name: string
     title: string
     format: string
     description: string
+    size: number | null
+    dataDictionary: DataDictionaryFormType
 }
 
 function Datafile({
@@ -333,6 +348,8 @@ function Datafile({
     title,
     format,
     description,
+    size,
+    dataDictionary,
 }: DatafilePreviewProps) {
     return (
         <Disclosure>
@@ -359,7 +376,9 @@ function Datafile({
                                                 {name}
                                             </span>
                                             <span className="text-right font-acumin text-xs font-normal leading-tight text-neutral-500">
-                                                (3.2 MB)
+                                                {size
+                                                    ? convertBytes(size)
+                                                    : '-'}
                                             </span>
                                         </>
                                     ))
@@ -371,6 +390,7 @@ function Datafile({
                                             </span>
                                         </>
                                     ))
+                                    .with('empty', () => <></>)
                                     .otherwise(() => (
                                         <>
                                             <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
@@ -409,11 +429,14 @@ function Datafile({
                                         text={description}
                                     />
                                 </div>
-                                {type === 'upload' && (
-                                    <div className="col-span-full">
-                                        <PreviewTable />
-                                    </div>
-                                )}
+                                {type === 'upload' &&
+                                    dataDictionary.length > 0 && (
+                                        <div className="col-span-full">
+                                            <PreviewTable
+                                                dataDictionary={dataDictionary}
+                                            />
+                                        </div>
+                                    )}
                             </div>
                         </Disclosure.Panel>
                     </Transition>
@@ -423,38 +446,11 @@ function Datafile({
     )
 }
 
-const fields = [
-    {
-        field: 'id',
-        type: 'int(1)',
-        null: false,
-        key: 'MUL',
-        default: 'NULL',
-    },
-    {
-        field: 'id',
-        type: 'int(1)',
-        null: false,
-        key: 'MUL',
-        default: 'NULL',
-    },
-    {
-        field: 'id',
-        type: 'int(1)',
-        null: false,
-        key: 'MUL',
-        default: 'NULL',
-    },
-    {
-        field: 'id',
-        type: 'int(1)',
-        null: false,
-        key: 'MUL',
-        default: 'NULL',
-    },
-]
-
-function PreviewTable() {
+function PreviewTable({
+    dataDictionary,
+}: {
+    dataDictionary: DataDictionaryFormType
+}) {
     return (
         <Table>
             <TableHeader>
@@ -477,7 +473,7 @@ function PreviewTable() {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {fields.map((field, index) => (
+                {dataDictionary.map((field, index) => (
                     <TableRow
                         key={index}
                         className={

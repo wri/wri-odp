@@ -15,7 +15,7 @@ export default function TeamForm({
     editing = false,
 }: {
     formObj: UseFormReturn<TeamFormType>
-    editing?: boolean;
+    editing?: boolean
 }) {
     const {
         register,
@@ -23,8 +23,8 @@ export default function TeamForm({
         watch,
         formState: { errors, isSubmitting },
     } = formObj
-  const possibleParents = api.teams.getAllTeams.useQuery()
-  return (
+    const possibleParents = api.teams.getAllTeams.useQuery()
+    return (
         <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
             <div className="flex flex-col justify-start gap-y-4">
                 <InputGroup label="Title" required>
@@ -55,19 +55,19 @@ export default function TeamForm({
                 >
                     <div className="col-span-full lg:col-span-2">
                         <div className="w-[11rem]">
-                                <ImageUploader
-                                    clearImage={() => setValue('image_url', '')}
-                                    defaultImage={watch('image_display_url')}
-                                    onUploadSuccess={(
-                                        response: UploadResult
-                                    ) => {
-                                        const url = response.successful[0]?.name ?? null
-                                        setValue(
-                                            'image_url',
-                                            url
-                                        )
-                                    }}
-                                />
+                            <ImageUploader
+                                clearImage={() => setValue('image_url', '')}
+                                defaultImage={watch('image_display_url')}
+                                onUploadSuccess={(response: UploadResult) => {
+                                    const url =
+                                        response.successful[0]?.uploadURL ??
+                                        null
+                                    if (url) {
+                                        const _url = url.split('/').pop()
+                                        setValue('image_url', _url)
+                                    }
+                                }}
+                            />
                         </div>
                     </div>
                 </InputGroup>
@@ -94,7 +94,8 @@ export default function TeamForm({
                     {match(possibleParents)
                         .with({ isLoading: true }, () => (
                             <span className="flex items-center text-sm gap-x-2">
-                                <Spinner /> <span className='mt-1'>Loading parents...</span>
+                                <Spinner />{' '}
+                                <span className="mt-1">Loading parents...</span>
                             </span>
                         ))
                         .with({ isError: true }, () => (
@@ -106,11 +107,11 @@ export default function TeamForm({
                             <SimpleSelect
                                 formObj={formObj}
                                 name="parent"
-                                options={data.map((team) => ({
+                                options={[{ label: 'No parent', value: '' }, ...data.map((team) => ({
                                     label: team.title ?? team.name,
                                     value: team.name,
-                                    default: watch('parent') === team.name
-                                }))}
+                                    default: watch('parent') === team.name,
+                                }))]}
                                 placeholder="Select a parent"
                             />
                         ))

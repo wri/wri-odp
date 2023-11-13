@@ -11,31 +11,40 @@ import {
 import { Button } from '@/components/_shared/Button'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { DatasetFormType } from '@/schema/dataset.schema'
-import { Controller, UseFormReturn } from 'react-hook-form'
+import { Controller, Path, UseFormReturn } from 'react-hook-form'
 
-interface TagProps {
-    tags: string[]
+interface MulTextProps {
+    options?: string[]
     formObj: UseFormReturn<DatasetFormType>
+    name: Path<DatasetFormType>
+    title: string
+    tooltip?: string
 }
 
-export default function TagsSelect({ tags, formObj }: TagProps) {
+export default function MulText({
+    options = [],
+    formObj,
+    name,
+    title,
+    tooltip = 'Remove item',
+}: MulTextProps) {
     const { control } = formObj
     const [open, setOpen] = useState(false)
     const ref = useRef<HTMLButtonElement>(null)
     const [selected, setSelected] = useState<string[]>([])
     const [query, setQuery] = useState('')
 
-    const filteredTags =
+    const filteredOptions =
         query === ''
-            ? tags
-            : tags.filter((item) => {
+            ? options
+            : options.filter((item) => {
                   return item.toLowerCase().includes(query.toLowerCase())
               })
 
     return (
         <Controller
             control={control}
-            name="tags"
+            name={name}
             defaultValue={[]}
             render={({ field: { onChange, value } }) => (
                 <Popover open={open} onOpenChange={setOpen}>
@@ -50,35 +59,41 @@ export default function TagsSelect({ tags, formObj }: TagProps) {
                             <div className="flex w-full items-start justify-between">
                                 {value.length === 0 ? (
                                     <span className="font-acumin text-base font-light text-zinc-400">
-                                        Tags
+                                        {title}
                                     </span>
                                 ) : (
                                     <div className="flex flex-wrap gap-2">
-                                        {value.map((item, index) => (
-                                            <span
-                                                key={index}
-                                                className="flex items-center gap-x-2 rounded-[3px] border border-blue-800 hover:bg-neutral-50 transition bg-white px-2 py-0.5"
-                                            >
-                                                <span className="font-['Acumin Pro SemiCondensed'] text-[15px] font-normal text-zinc-800">
-                                                    {item}
-                                                </span>
-                                                <DefaultTooltip content="Remove tag">
-                                                    <XMarkIcon
-                                                        onClick={(e) => {
-                                                            e.stopPropagation()
-                                                            onChange(
-                                                                value.filter(
-                                                                    (tag) =>
-                                                                        tag !==
-                                                                        item
+                                        {value.map(
+                                            (item: string, index: number) => (
+                                                <span
+                                                    key={index}
+                                                    className="flex items-center gap-x-2 rounded-[3px] border border-blue-800 hover:bg-neutral-50 transition bg-white px-2 py-0.5"
+                                                >
+                                                    <span className="font-['Acumin Pro SemiCondensed'] text-[15px] font-normal text-zinc-800">
+                                                        {item}
+                                                    </span>
+                                                    <DefaultTooltip
+                                                        content={tooltip}
+                                                    >
+                                                        <XMarkIcon
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                onChange(
+                                                                    value.filter(
+                                                                        (
+                                                                            option: string
+                                                                        ) =>
+                                                                            option !==
+                                                                            item
+                                                                    )
                                                                 )
-                                                            )
-                                                        }}
-                                                        className="mt-0.5 h-3 w-3 cursor-pointer text-red-600"
-                                                    />
-                                                </DefaultTooltip>
-                                            </span>
-                                        ))}
+                                                            }}
+                                                            className="mt-0.5 h-3 w-3 cursor-pointer text-red-600"
+                                                        />
+                                                    </DefaultTooltip>
+                                                </span>
+                                            )
+                                        )}
                                     </div>
                                 )}
                                 <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -97,10 +112,11 @@ export default function TagsSelect({ tags, formObj }: TagProps) {
                             multiple
                         >
                             <span className="font-acumin text-base font-semibold text-black">
-                                Tags
+                                {title}
                             </span>
                             <div className="relative isolate">
                                 <Combobox.Input
+                                    id={`${name}SearchInput`}
                                     onChange={(event) =>
                                         setQuery(event.target.value)
                                     }
@@ -126,9 +142,9 @@ export default function TagsSelect({ tags, formObj }: TagProps) {
                                         Create "{query}"
                                     </Combobox.Option>
                                 )}
-                                {filteredTags.map((tag: string) => (
+                                {filteredOptions.map((option: string) => (
                                     <Combobox.Option
-                                        key={tag}
+                                        key={option}
                                         className={({ active }) =>
                                             classNames(
                                                 active
@@ -137,7 +153,7 @@ export default function TagsSelect({ tags, formObj }: TagProps) {
                                                 'relative group cursor-default select-none py-2 pl-3 pr-9'
                                             )
                                         }
-                                        value={tag}
+                                        value={option}
                                     >
                                         {({ selected }) => (
                                             <>
@@ -150,7 +166,7 @@ export default function TagsSelect({ tags, formObj }: TagProps) {
                                                                 : 'opacity-0'
                                                         )}
                                                     />
-                                                    {tag}
+                                                    {option}
                                                 </span>
                                             </>
                                         )}

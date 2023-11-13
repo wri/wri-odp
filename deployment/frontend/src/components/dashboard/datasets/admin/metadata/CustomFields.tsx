@@ -80,6 +80,7 @@ export function CustomFieldsForm({
                 ))}
                 <div className="w-full flex justify-end">
                     <button
+                        type="button"
                         onClick={() =>
                             append({
                                 key: '',

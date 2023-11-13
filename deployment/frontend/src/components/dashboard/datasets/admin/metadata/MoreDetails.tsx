@@ -10,6 +10,7 @@ import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { UseFormReturn } from 'react-hook-form'
 import { DatasetFormType } from '@/schema/dataset.schema'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { Input } from '@/components/_shared/SimpleInput'
 
 export function MoreDetailsForm({
     formObj,
@@ -26,8 +27,15 @@ export function MoreDetailsForm({
                 </>
             }
         >
-            <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-24 py-5 md:grid-cols-2">
+            <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-24 py-5">
                 <div className="flex flex-col justify-start gap-y-4">
+                    <InputGroup label="Learn more" className="items-start">
+                        <Input
+                            placeholder="Please visit our website for more information: LINK TO WEBSITE"
+                            {...register('learn_more')}
+                            type="text"
+                        />
+                    </InputGroup>
                     <InputGroup label="Function" className="items-start">
                         <TextArea
                             placeholder="This data serves X porpuse"
@@ -55,37 +63,27 @@ export function MoreDetailsForm({
                             className="h-28"
                         />
                     </InputGroup>
-                    <InputGroup label="Learn more" className="items-start">
-                        <TextArea
-                            placeholder="Please visit our website for more information: LINK TO WEBSITE"
-                            {...register('learn_more')}
-                            type="text"
-                            className="h-28"
-                        />
-                    </InputGroup>
-                </div>
-                <div className="flex flex-col justify-start gap-y-4">
-                    <InputGroup label="Cautions" className="items-start">
-                        <TextArea
-                            placeholder=""
-                            {...register('cautions')}
-                            type="text"
-                            className="h-64"
-                            icon={
-                                <DefaultTooltip content="Placeholder">
-                                    <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
-                                </DefaultTooltip>
-                            }
-                        />
-                    </InputGroup>
-                    <InputGroup label="Summary" className="items-start">
-                        <TextArea
-                            placeholder="My short summary of this data"
-                            type="text"
-                            {...register('summary')}
-                            className="h-64"
-                        />
-                    </InputGroup>
+                <InputGroup label="Cautions" className="items-start">
+                    <TextArea
+                        placeholder=""
+                        {...register('cautions')}
+                        type="text"
+                        className="h-64"
+                        icon={
+                            <DefaultTooltip content="Placeholder">
+                                <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
+                            </DefaultTooltip>
+                        }
+                    />
+                </InputGroup>
+                <InputGroup label="Summary" className="items-start">
+                    <TextArea
+                        placeholder="My short summary of this data"
+                        type="text"
+                        {...register('summary')}
+                        className="h-64"
+                    />
+                </InputGroup>
                 </div>
             </Disclosure.Panel>
         </MetadataAccordion>

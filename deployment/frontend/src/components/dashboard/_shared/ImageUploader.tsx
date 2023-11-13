@@ -109,7 +109,7 @@ export function ImageUploader({
                         <div className="bg-white bg-opacity-0 transition group-hover:bg-opacity-90 absolute inset-0 group:z-10 h-full w-full object-cover" />
                     </>
                 )}
-                {!uploading && presignedGetUrl.data && (
+                {!uploading && key && presignedGetUrl.data && (
                     <>
                         <img
                             src={presignedGetUrl.data}
@@ -124,7 +124,7 @@ export function ImageUploader({
                     onChange={(e) => onInputChange(e)}
                     type="file"
                     className="hidden"
-                    accept="image/png, image/jpeg"
+                    accept="image/png, image/jpeg image/svg"
                 />
                 {uploading ? (
                     <>

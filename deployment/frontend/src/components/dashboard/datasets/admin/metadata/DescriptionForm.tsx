@@ -1,5 +1,5 @@
 import { Bars4Icon, InformationCircleIcon } from '@heroicons/react/24/outline'
-import { InputGroup } from '@/components/_shared/InputGroup'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { Disclosure } from '@headlessui/react'
 import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
 import { MetadataAccordion } from './MetadataAccordion'
@@ -13,9 +13,13 @@ export function DescriptionForm({
 }: {
     formObj: UseFormReturn<DatasetFormType>
 }) {
-    const { register } = formObj
+    const {
+        register,
+        formState: { errors },
+    } = formObj
     return (
         <MetadataAccordion
+            defaultOpen
             label={
                 <>
                     <Bars4Icon className="h-7 w-7" />
@@ -47,6 +51,7 @@ export function DescriptionForm({
                         {...register('short_description')}
                         className="h-44 col-span-full"
                     />
+                    <ErrorDisplay name="short_description" errors={errors} />
                 </InputGroup>
                 <InputGroup
                     label={

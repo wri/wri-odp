@@ -107,8 +107,10 @@ export const TopicRouter = createTRPCRouter({
                     }
                 )
                 const topic: CkanResponse<Group> = await topicRes.json()
-                if (!topic.success && topic.error)
-                    throw Error(topic.error.message)
+                if (!topic.success && topic.error) {
+                    if (topic.error.message) throw Error(topic.error.message)
+                    throw Error(JSON.stringify(topic.error))
+                }
                 return topic.result
             } catch (e) {
                 let error =
@@ -138,6 +140,31 @@ export const TopicRouter = createTRPCRouter({
                 parent: topic.result.groups[0]?.name ?? null,
             }
         }),
+    deleteTopic: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/group_delete`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                    body: JSON.stringify({ id: input.id }),
+                }
+            )
+            const topic: CkanResponse<Topic> = await topicRes.json()
+            if (!topic.success && topic.error) {
+                if (topic.error.message) throw Error(topic.error.message)
+                throw Error(JSON.stringify(topic.error))
+            }
+            console.log(topic)
+            return {
+                ...topic.result,
+            }
+        }),
     createTopic: protectedProcedure
         .input(TopicSchema)
         .mutation(async ({ ctx, input }) => {
@@ -159,8 +186,10 @@ export const TopicRouter = createTRPCRouter({
                     }
                 )
                 const topic: CkanResponse<Group> = await topicRes.json()
-                if (!topic.success && topic.error)
-                    throw Error(topic.error.message)
+                if (!topic.success && topic.error) {
+                    if (topic.error.message) throw Error(topic.error.message)
+                    throw Error(JSON.stringify(topic.error))
+                }
                 return topic.result
             } catch (e) {
                 let error =

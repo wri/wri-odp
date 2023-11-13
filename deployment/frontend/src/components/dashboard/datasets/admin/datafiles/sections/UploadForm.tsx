@@ -1,4 +1,4 @@
-import { InputGroup } from '@/components/_shared/InputGroup'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
@@ -67,6 +67,7 @@ export function UploadForm({
                     type="text"
                     maxWidth="max-w-[70rem]"
                 />
+                <ErrorDisplay name={`resources.${index}.title`} errors={errors} />
             </InputGroup>
             <InputGroup label="Description" className="whitespace-nowrap">
                 <TextArea
@@ -78,6 +79,7 @@ export function UploadForm({
             </InputGroup>
             <InputGroup label="Format" className="whitespace-nowrap">
                 <SimpleSelect
+                    formObj={formObj}
                     placeholder="Select format"
                     name={`resources.${index}.format`}
                     maxWidth="max-w-[70rem]"
@@ -110,7 +112,7 @@ function PreviewTable({
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: `resources.${resourceIndex}.dataDictionary`, // unique name for your Field Array
     })
-    console.log('Fields', fields) 
+    if (fields.length === 0) return <></>
     return (
         <Table>
             <TableHeader>

@@ -7,7 +7,6 @@ import { Input } from '@/components/_shared/SimpleInput'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { Disclosure } from '@headlessui/react'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
-import TagsSelect from '../TagsSelect'
 import { TopicsSelect } from '../TopicsSelect'
 import { MetadataAccordion } from './MetadataAccordion'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
@@ -21,6 +20,7 @@ import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
 import classNames from '@/utils/classnames'
 import { env } from '@/env.mjs'
+import MulText from '../MulText'
 
 export function OverviewForm({
     formObj,
@@ -37,6 +37,7 @@ export function OverviewForm({
     const possibleOwners = api.teams.getAllTeams.useQuery()
     const possibleTags = api.tags.getAllTags.useQuery()
     const topicHierarchy = api.topics.getTopicsHierarchy.useQuery()
+    const possibleLicenses = api.dataset.getLicenses.useQuery()
 
     return (
         <MetadataAccordion
@@ -86,6 +87,7 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup label="Language">
                         <SimpleSelect
+                            id="language"
                             formObj={formObj}
                             name="language"
                             placeholder="Language"
@@ -118,6 +120,7 @@ export function OverviewForm({
                                     <SimpleSelect
                                         formObj={formObj}
                                         name="team"
+                                        id="team"
                                         initialValue={watch('team') ?? null}
                                         options={data.map((team) => ({
                                             label: team.title ?? team.name,
@@ -137,10 +140,11 @@ export function OverviewForm({
                         <ErrorDisplay name="parent" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Projects">
-                        <Input
-                            {...register('projects')}
-                            placeholder="ex. Ecosystem Service Mapping"
-                            type="text"
+                        <MulText
+                            name="projects"
+                            formObj={formObj}
+                            title="Projects"
+                            tooltip="Remove project"
                         />
                     </InputGroup>
                     <InputGroup label="Application">
@@ -210,7 +214,13 @@ export function OverviewForm({
                             .with(
                                 { isSuccess: true, data: P.select() },
                                 (data) => (
-                                    <TagsSelect formObj={formObj} tags={data} />
+                                    <MulText
+                                        name="tags"
+                                        formObj={formObj}
+                                        options={data}
+                                        title="Tags"
+                                        tooltip="Remove tag"
+                                    />
                                 )
                             )
                             .otherwise(() => (
@@ -251,6 +261,7 @@ export function OverviewForm({
                         <SimpleSelect
                             formObj={formObj}
                             name="update_frequency"
+                            id="update_frequency"
                             placeholder="Select update frequency"
                             options={[
                                 {
@@ -295,14 +306,15 @@ export function OverviewForm({
                             }
                         />
                     </InputGroup>
-                    <InputGroup label="Visbility" required>
+                    <InputGroup label="Visibility" required>
                         <SimpleSelect
                             placeholder="Select visiblity"
                             name="visibility_type"
+                            id="visibility_type"
                             formObj={formObj}
                             options={[
                                 { value: 'public', label: 'Public' },
-                                { value: 'draft', label: 'Draft' },
+                                { value: 'internal', label: 'Internal Use' },
                                 {
                                     value: 'private',
                                     label: 'Private',
@@ -311,20 +323,46 @@ export function OverviewForm({
                         />
                     </InputGroup>
                     <InputGroup label="License">
-                        <SimpleSelect
-                            placeholder="Select license"
-                            name="license"
-                            formObj={formObj}
-                            options={[
-                                {
-                                    value: 'creative_commons',
-                                    label: 'Creative Commons',
-                                },
-                                { value: 'gnu', label: 'GNU' },
-                                { value: 'openbsd', label: 'OpenBSD' },
-                            ]}
-                        />
+                        {match(possibleLicenses)
+                            .with({ isLoading: true }, () => (
+                                <span className="flex items-center text-sm gap-x-2">
+                                    <Spinner />{' '}
+                                    <span className="mt-1">
+                                        Loading licenses...
+                                    </span>
+                                </span>
+                            ))
+                            .with({ isError: true }, () => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading licenses, please refresh the
+                                    page
+                                </span>
+                            ))
+                            .with(
+                                { isSuccess: true, data: P.select() },
+                                (data) => (
+                                    <SimpleSelect
+                                        name="license"
+                                        id="license"
+                                        formObj={formObj}
+                                        initialValue={watch('license') ?? null}
+                                        options={data.map((license) => ({
+                                            label: license.title,
+                                            value: license.id,
+                                        }))}
+                                        placeholder="Select a license"
+                                    />
+                                )
+                            )
+                            .otherwise(() => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading licenses, please refresh the
+                                    page
+                                </span>
+                            ))}
+                        <ErrorDisplay name="license" errors={errors} />
                     </InputGroup>
+
                     <div className="flex items-end flex-col justify-end space-y-5">
                         <div className="relative flex justify-end">
                             <div className="flex h-6 items-center">
@@ -355,7 +393,10 @@ export function OverviewForm({
                             )}
                         >
                             <ImageUploader
-                                clearImage={() => setValue('featuredImage', '')}
+                                clearImage={() => {
+                                    setValue('featured_image', '')
+                                    setValue('signedUrl', '')
+                                }}
                                 defaultImage={watch('signedUrl') ?? null}
                                 onPresignedUrlSuccess={(url: string) => {
                                     setValue('signedUrl', url)
@@ -363,7 +404,7 @@ export function OverviewForm({
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
                                         response.successful[0]?.name ?? null
-                                    setValue('featuredImage', url)
+                                    setValue('featured_image', url)
                                 }}
                             />
                         </div>

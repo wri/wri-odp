@@ -21,6 +21,7 @@ export function PointOfContactForm({
     } = formObj
     return (
         <MetadataAccordion
+            defaultOpen
             label={
                 <>
                     <ChatBubbleLeftRightIcon className="h-7 w-7" />

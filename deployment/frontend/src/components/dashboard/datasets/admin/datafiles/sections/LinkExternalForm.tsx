@@ -31,6 +31,7 @@ export function LinkExternalForm({
           type="text"
           maxWidth="max-w-[70rem]"
         />
+        <ErrorDisplay name={`resources.${index}.title`} errors={errors} />
       </InputGroup>
       <InputGroup label="Description" className="whitespace-nowrap">
         <TextArea

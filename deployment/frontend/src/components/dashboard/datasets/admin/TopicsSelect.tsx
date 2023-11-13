@@ -166,6 +166,7 @@ export function TopicsInner({
                 <Button
                     variant="outline"
                     role="combobox"
+          id="topicsButton"
                     ref={ref}
                     aria-expanded={open}
                     className="relative flex h-auto min-h-[7rem] w-full flex-row items-start justify-between rounded-md border-0 px-5 py-3 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 hover:bg-white focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"

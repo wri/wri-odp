@@ -32,6 +32,8 @@ jobs:
           mask-password: 'true'
       - name: Add CKAN url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+      - name: Add Minio url to hosts
+        run: sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
       - name: Build and push CKAN image to ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}

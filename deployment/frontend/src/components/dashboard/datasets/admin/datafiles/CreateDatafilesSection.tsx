@@ -90,14 +90,16 @@ function AddDataFile({
         watch(`resources.${index}.fileBlob`),
         (data) => {
             if (data) {
-                const dataDictionary = data.map((item: Field, index: number) => ({
-                    id: index,
-                    field: item.name,
-                    type: item.type,
-                    null: 'YES',
-                    key: 'MUL',
-                    default: 'NULL',
-                }))
+                const dataDictionary = data.map(
+                    (item: Field, index: number) => ({
+                        id: index,
+                        field: item.name,
+                        type: item.type,
+                        null: 'YES',
+                        key: 'MUL',
+                        default: 'NULL',
+                    })
+                )
                 setValue(`resources.${index}.dataDictionary`, dataDictionary)
             }
         },
@@ -115,8 +117,10 @@ function AddDataFile({
             getUploadParameters: (file: UppyFile) =>
                 getUploadParameters(
                     file,
-                    watch('team') && watch('team').value
-                        ? `${watch('team').id}/resources/${datafile.resourceId}`
+                    watch('team') && watch('team')?.value
+                        ? `${watch('team')?.id}/resources/${
+                              datafile.resourceId
+                          }`
                         : `resources/${datafile.resourceId}`
                 ),
         })
@@ -129,7 +133,8 @@ function AddDataFile({
                 let paths = new URL(result.successful[0].uploadURL).pathname
                     .substring(1)
                     .split('/')
-                const name = result.successful[0].name
+                const url = result.successful[0]?.uploadURL ?? null
+                const name = url ? url.split('/').pop() : ''
                 const format = result.successful[0].extension
                 const size = result.successful[0].size
                 const key = paths.slice(0, paths.length).join('/')
@@ -252,11 +257,15 @@ function AddDataFile({
                 >
                     <Tab.List
                         as="div"
-                        className="grid max-w-[35rem] grid-cols-2 sm:grid-cols-3 gap-3 py-4 "
+                        className={classNames(
+                            'grid max-w-[35rem] grid-cols-2 sm:grid-cols-3 gap-3 py-4',
+                            datafile.type === 'upload' ? 'hidden' : ''
+                        )}
                     >
-                        <Tab className="hidden"></Tab>
+                        <Tab className="hidden" id="tabEmpty"></Tab>
                         <Tab
                             onClick={() => uploadInputRef.current?.click()}
+                            id="tabUpload"
                             className={classNames(
                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
                                 datafile.type === 'upload' ? 'hidden' : ''
@@ -272,6 +281,7 @@ function AddDataFile({
                             </div>
                         </Tab>
                         <Tab
+                            id="tabLink"
                             onClick={() =>
                                 setValue(`resources.${index}.type`, 'link')
                             }
@@ -299,6 +309,7 @@ function AddDataFile({
                             )}
                         </Tab>
                         <Tab
+                            id="tabLayer"
                             onClick={() =>
                                 setValue(`resources.${index}.type`, 'layer')
                             }
@@ -338,7 +349,7 @@ function AddDataFile({
                                         resourceId: uuidv4(),
                                         title: '',
                                         type: 'empty',
-                                        dataDictionary: []
+                                        dataDictionary: [],
                                     })
                                 }
                             />

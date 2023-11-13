@@ -19,11 +19,10 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { match } from 'ts-pattern'
-import { v4 as uuidv4 } from 'uuid';
-
-const datasetId = uuidv4()
+import { v4 as uuidv4 } from 'uuid'
 
 export default function CreateDatasetForm() {
+    const datasetId = uuidv4()
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [selectedIndex, setSelectedIndex] = useState(0)
     const router = useRouter()
@@ -33,6 +32,11 @@ export default function CreateDatasetForm() {
         mode: 'onBlur',
         defaultValues: {
             id: datasetId,
+            team: {
+                value: '',
+                label: '',
+                id: '',
+            },
             update_frequency: {
                 value: 'monthly',
                 label: 'Monthly',
@@ -41,18 +45,28 @@ export default function CreateDatasetForm() {
                 value: 'private',
                 label: 'Private',
             },
+            language: {
+                value: '',
+                label: '',
+            },
             title: '',
             name: '',
+            temporalCoverageEnd: null,
+            temporalCoverageStart: null,
             license: {
-                value: 'creative_commons',
-                label: 'Creative Commons',
+                value: 'notspecified',
+                label: 'License not specified',
             },
             resources: [
                 {
                     resourceId: uuidv4(),
-                    title: '',
+                    title: 'Example title',
                     type: 'empty',
-                    dataDictionary: []
+                    format: {
+                        value: '',
+                        label: '',
+                    },
+                    dataDictionary: [],
                 },
             ],
         },
@@ -65,27 +79,25 @@ export default function CreateDatasetForm() {
             formObj.reset()
         },
         onError: (error) => {
-        setErrorMessage(error.message)
-    },
+            setErrorMessage(error.message)
+        },
     })
 
     const {
         setValue,
         watch,
+        trigger,
         formState: { dirtyFields, errors },
     } = formObj
 
     console.log(errors)
-
     useEffect(() => {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])
 
-
     return (
         <form
             onSubmit={formObj.handleSubmit((data) => {
-                console.log(data)
                 createDataset.mutate(data)
             })}
         >
@@ -114,11 +126,33 @@ export default function CreateDatasetForm() {
             </Tab.Group>
             <div
                 className={classNames(
+                    'w-full mx-auto sm:px-6 xxl:px-0 max-w-[1380px]',
+                    selectedIndex === 2 ? 'max-w-[71rem]' : ''
+                )}
+            >
+                {errorMessage && (
+                    <div className="py-4">
+                        <ErrorAlert text={errorMessage} />
+                    </div>
+                )}
+            </div>
+            <div
+                className={classNames(
                     'flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] justify-between font-acumin text-2xl font-semibold text-black px-4 xl:px-0',
                     selectedIndex === 2 ? 'max-w-[71rem] xxl:px-0' : ''
                 )}
             >
-                <Button variant="muted" type="button" className="w-fit">
+                <Button
+                    onClick={formObj.handleSubmit((data) => {
+                        createDataset.mutate({
+                            ...data,
+                            visibility_type: { value: 'draft', label: 'Draft' },
+                        })
+                    })}
+                    variant="muted"
+                    type="button"
+                    className="w-fit"
+                >
                     Save as Draft
                 </Button>
                 <div className="flex items-center gap-x-2">
@@ -134,7 +168,11 @@ export default function CreateDatasetForm() {
                     {selectedIndex !== 2 && (
                         <Button
                             type="button"
-                            onClick={() => setSelectedIndex(selectedIndex + 1)}
+                            onClick={async () => {
+                                const ok = await trigger()
+                                if (!ok) return
+                                setSelectedIndex(selectedIndex + 1)
+                            }}
                         >
                             Next:{' '}
                             {match(selectedIndex)
@@ -152,11 +190,6 @@ export default function CreateDatasetForm() {
                     )}
                 </div>
             </div>
-                {errorMessage && (
-                    <div className="py-4">
-                        <ErrorAlert text={errorMessage} />
-                    </div>
-                )}
         </form>
     )
 }
