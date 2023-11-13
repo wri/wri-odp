@@ -30,6 +30,7 @@ type RowProps = {
   groupStyle?: string
   className?: string;
   authorized?: boolean;
+  key?: string | number;
 }
 
 export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, groupStyle, className, authorized }: RowProps) {
@@ -54,12 +55,12 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
           ) : ""}
           {(controlButtons) && (session?.user.sysadmin ?? authorized) ? controlButtons.map((button, index) => {
             return (
-              <>
+              <React.Fragment key={index}>
                 <button
                   data-tooltip-id={button?.tooltip ? button?.tooltip.id : "tooltip-id"}
                   data-tooltip-content={button?.tooltip ? button?.tooltip.content : "tooltip-content"}
                   data-tooltip-place="top"
-                  key={index}
+                  key={button?.tooltip ? button?.tooltip.id : `tooltip-id-${index}`}
                   id={button?.tooltip ? button?.tooltip.id : "tooltip-id"}
                   onClick={button.onClick}
                   className={`my-auto flex sm:invisible  items-center justify-center  ${groupStyle ? groupStyle : "group-hover:visible "}  w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"}`}
@@ -67,7 +68,7 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
                   {(button.icon)}
                 </button>
                 <Tooltip id={button?.tooltip ? button?.tooltip.id : "tooltip-id"} />
-              </>
+              </React.Fragment>
 
             )
           }) : ""}
