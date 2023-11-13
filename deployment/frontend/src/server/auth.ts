@@ -8,7 +8,6 @@ import {
 } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { env } from '@/env.mjs'
-import ky from 'ky'
 import type { CkanResponse } from '@/schema/ckan.schema'
 import { Organization } from '@portaljs/ckan'
 

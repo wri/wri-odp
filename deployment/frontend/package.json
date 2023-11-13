@@ -56,7 +56,6 @@
     "cmdk": "^0.2.0",
     "crypto-hash": "^3.0.0",
     "js-deep-equals": "^2.1.1",
-    "ky": "^1.0.1",
     "mapbox-gl": "^2.15.0",
     "next": "^13.5.4",
     "next-auth": "^4.23.0",

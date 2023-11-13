@@ -62,7 +62,7 @@ export async function getAllUsers({ apiKey }: { apiKey: string }): Promise<User[
   }
 }
 
-export async function getAllOrganizations({ apiKey }: { apiKey: string }): Promise<WriOrganization[] | null> {
+export async function getAllOrganizations({ apiKey }: { apiKey: string }): Promise<WriOrganization[]> {
   try {
     const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list?all_fields=True`,
       {
@@ -70,13 +70,13 @@ export async function getAllOrganizations({ apiKey }: { apiKey: string }): Promi
           "Authorization": apiKey,
         }
       });
-    const data = (await response.json()) as CkanResponse<WriOrganization[] | null>;
-    const organizations: WriOrganization[] | null = data.success === true ? data.result : null;
+    const data = (await response.json()) as CkanResponse<WriOrganization[]>;
+    const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
     return organizations
   }
   catch (e) {
     console.error(e);
-    return null
+    return []
   }
 }
 
@@ -137,24 +137,25 @@ export async function getAllDatasetFq({ apiKey, fq, query }: { apiKey: string, f
     return { datasets: [], count: 0 }
   }
 }
-export async function getUserOrganizations({ userId, apiKey }: { userId: string, apiKey: string }): Promise<WriOrganization[] | null> {
+export async function getUserOrganizations({ userId, apiKey }: { userId: string, apiKey: string }): Promise<WriOrganization[]> {
   try {
     const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list_for_user?all_fields=true`,
       {
         method: "POST",
         body: JSON.stringify({ id: userId }),
         headers: {
-          "Authorization": apiKey,
+          "Authorization": `${apiKey}`,
           "Content-Type": "application/json"
         }
       });
-    const data = (await response.json()) as CkanResponse<WriOrganization[] | null>;
-    const organizations: WriOrganization[] | null = data.success === true ? data.result : null;
+
+    const data = (await response.json()) as CkanResponse<WriOrganization[]>;
+    const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
     return organizations
   }
   catch (e) {
     console.error(e);
-    return null
+    return []
   }
 }
 
@@ -215,7 +216,7 @@ export function activityDetails(activity: Activity): ActivityDisplay {
   }
   const description = `${activitProperties[action]} the ${object} ${title}`;
   const time = timeAgo(activity.timestamp);
-  return { description, time, icon: action, action };
+  return { description, time, icon: action, action, timestamp: activity.timestamp };
 }
 
 
