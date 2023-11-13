@@ -35,12 +35,12 @@ export const activityStreamRouter = createTRPCRouter({
         result = searchArrayForKeyword<ActivityDisplay>(activities, input.search);
       }
 
-      if (input.fq) {
+      if (input.fq && activities) {
         result = filterObjects(activities, input.fq);
       }
 
       return {
-        activity: result.slice(input.page.start, input.page.start + input.page.rows),
+        activity: result ? result.slice(input.page.start, input.page.start + input.page.rows) : [],
         count: result.length,
       };
     }),

@@ -15,14 +15,16 @@ export default function ActivityList() {
       <ActivitystreamHeader setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
 
       {
-        isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> :
-          data?.activity.map((items, index) => {
-            return (
-              <div className=' hover:bg-slate-100 pl-6 p-1 mb-2 pb-2 rounded-md' key={index}>
-                <ActivityStreamCard activity={items} />
-              </div>
-            )
-          })
+        isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
+          data?.activity === undefined || data?.activity.length === 0 ? <div className='flex justify-center items-center h-screen'>No data</div> :
+            data?.activity.map((items, index) => {
+              return (
+                <div className=' hover:bg-slate-100 pl-6 p-1 mb-2 pb-2 rounded-md' key={index}>
+                  <ActivityStreamCard activity={items} />
+                </div>
+              )
+            })
+        )
       }
     </section>
   )

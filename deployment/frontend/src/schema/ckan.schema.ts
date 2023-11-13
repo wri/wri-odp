@@ -1,21 +1,21 @@
 import type { Dataset, Group, Organization, User as CkanUser } from "@portaljs/ckan";
 
 type Only<T, U> = {
-    [P in keyof T]: T[P]
+  [P in keyof T]: T[P]
 } & {
     [P in keyof U]?: never
-}
+  }
 
 type Either<T, U> = Only<T, U> | Only<U, T>
 
 export interface CkanResponse<T> {
-    help: string
-    success: boolean
-    error?: {
-        __type: string
-        message: string
-    }
-    result: T
+  help: string
+  success: boolean
+  error?: {
+    __type: string
+    message: string
+  }
+  result: T
 }
 
 export interface User {
@@ -51,6 +51,7 @@ export interface ActivityDisplay {
   time: string,
   icon: string,
   action: string,
+  timestamp: string,
 }
 
 export interface WriDataset extends Dataset {
