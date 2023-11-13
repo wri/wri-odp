@@ -4,7 +4,7 @@ import {
     SquaresPlusIcon,
 } from '@heroicons/react/24/outline'
 import { Disclosure } from '@headlessui/react'
-import { InputGroup } from '@/components/_shared/InputGroup'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { MetadataAccordion } from './MetadataAccordion'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { UseFormReturn } from 'react-hook-form'
@@ -17,7 +17,7 @@ export function MoreDetailsForm({
 }: {
     formObj: UseFormReturn<DatasetFormType>
 }) {
-    const { register } = formObj
+    const { register, formState: { errors } } = formObj
     return (
         <MetadataAccordion
             label={
@@ -35,6 +35,7 @@ export function MoreDetailsForm({
                             {...register('learn_more')}
                             type="text"
                         />
+                        <ErrorDisplay name="learn_more" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Function" className="items-start">
                         <TextArea
