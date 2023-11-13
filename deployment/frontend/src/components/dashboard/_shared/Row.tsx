@@ -30,7 +30,6 @@ type RowProps = {
   groupStyle?: string
   className?: string;
   authorized?: boolean;
-  key?: string | number;
 }
 
 export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, groupStyle, className, authorized }: RowProps) {
