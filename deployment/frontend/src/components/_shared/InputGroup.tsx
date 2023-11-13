@@ -35,7 +35,7 @@ export function InputGroup({
             ) : (
                 <>{label}</>
             )}
-            <div className="col-span-6 h-full w-full">{children}</div>
+            <div className="col-span-6 h-full grow w-full">{children}</div>
         </div>
     )
 }

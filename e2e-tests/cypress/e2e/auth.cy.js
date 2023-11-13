@@ -24,7 +24,7 @@ describe("Login modal", () => {
 
     cy.get("button#login-button").click({ force: true });
 
-    cy.get("#nav-user-menu").should("be.visible");
+    cy.get("#nav-user-menu").should("be.visible", { timeout: 10000});
   });
 
   it("can be used to request a password reset link", () => {

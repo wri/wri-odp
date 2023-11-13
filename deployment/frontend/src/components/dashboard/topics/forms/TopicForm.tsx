@@ -104,11 +104,14 @@ export default function TopicForm({
                             <SimpleSelect
                                 formObj={formObj}
                                 name="parent"
-                                options={data.map((team) => ({
-                                    label: team.title ?? team.name,
-                                    value: team.name,
-                                    default: watch('parent') === team.name,
-                                }))}
+                                options={[
+                                    { label: 'No parent', value: '' },
+                                    ...data.map((team) => ({
+                                        label: team.title ?? team.name,
+                                        value: team.name,
+                                        default: watch('parent') === team.name,
+                                    })),
+                                ]}
                                 placeholder="Select a parent"
                             />
                         ))

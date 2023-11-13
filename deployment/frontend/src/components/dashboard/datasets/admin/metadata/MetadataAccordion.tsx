@@ -1,18 +1,20 @@
-import { ArrowsPointingInIcon } from "@heroicons/react/24/outline";
 import { Disclosure, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 interface MetadataAccordion {
   label: React.ReactNode;
   children: React.ReactNode;
+  defaultOpen?: boolean;
 }
 
 export function MetadataAccordion({
   label,
   children,
+  defaultOpen = false,
 }: MetadataAccordion) {
   return (
     <Disclosure
+      defaultOpen={defaultOpen}
       as="div"
       className="mx-auto w-full max-w-[1380px] sm:px-6 xxl:px-0"
     >

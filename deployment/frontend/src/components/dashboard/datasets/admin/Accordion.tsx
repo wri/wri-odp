@@ -9,11 +9,13 @@ interface AccordionProps {
   children: React.ReactNode;
   icon: React.ReactNode;
   className?: string;
+  defaultOpen?: boolean;
 }
 
-export function Accordion({title, children, icon, className}: AccordionProps) {
+export function Accordion({title, children, icon, className, defaultOpen = false}: AccordionProps) {
   return (
     <Disclosure
+      defaultOpen={defaultOpen}
       as="div"
       className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0"
     >

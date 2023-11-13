@@ -29,10 +29,18 @@ export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
     })
 
     const editTopic = api.topics.editTopic.useMutation({
-        onSuccess: async ({ name }) => {
-            notify(`Successfully edited the ${name} organization`, 'success')
+        onSuccess: async ({ title, name }) => {
+            notify(`Successfully edited the ${title ?? name} topic`, 'success')
             router.push('/dashboard/topics')
             formObj.reset()
+        },
+        onError: (error) => setErrorMessage(error.message),
+    })
+
+    const deleteTopic = api.topics.deleteTopic.useMutation({
+        onSuccess: async ({ name, title }) => {
+            notify(`Successfully deleted the ${title ?? name} topic`, 'error')
+            router.push('/dashboard/topics')
         },
         onError: (error) => setErrorMessage(error.message),
     })
@@ -41,9 +49,18 @@ export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
         <>
             <Breadcrumbs links={links} />
             <Container className="mb-20 font-acumin">
-                <h1 className="mb-[2rem] text-[1.57rem] font-semibold">
-                    Edit Topic
-                </h1>
+                <div className="flex justify-between">
+                    <h1 className="mb-[2rem] text-[1.57rem] font-semibold">
+                        Edit Topic
+                    </h1>
+                    <LoaderButton
+                        variant="destructive"
+                        loading={deleteTopic.isLoading}
+                        onClick={() => deleteTopic.mutate({ id: topic.name })}
+                    >
+                        Delete topic
+                    </LoaderButton>
+                </div>
 
                 <form
                     onSubmit={formObj.handleSubmit((data) => {

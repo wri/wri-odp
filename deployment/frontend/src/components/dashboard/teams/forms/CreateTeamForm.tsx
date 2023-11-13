@@ -14,7 +14,7 @@ import { useRouter } from 'next/router'
 
 const links = [
     { label: 'Teams', url: '/dashboard/teams', current: false },
-    { label: 'Create a team', url: '/teams/new', current: true },
+    { label: 'Create a team', url: '/dashboard/teams/new', current: true },
 ]
 
 export default function CreateTeamForm() {
@@ -25,8 +25,8 @@ export default function CreateTeamForm() {
     })
 
     const createTeam = api.teams.createTeam.useMutation({
-        onSuccess: async ({ name }) => {
-            notify(`Successfully created the ${name} organization`, 'success')
+        onSuccess: async ({ name, title }) => {
+            notify(`Successfully created the ${title ?? name} team`, 'success')
             router.push('/dashboard/teams')
             formObj.reset()
         },
