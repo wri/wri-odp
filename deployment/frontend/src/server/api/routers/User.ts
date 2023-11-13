@@ -56,6 +56,7 @@ export const UserRouter = createTRPCRouter({
       }
       const allUsers: IUsers[] = [];
       for (const user of users) {
+        if (user.id === ctx.session.user.id) continue;
         const userTemp = []
         const userOrgDetails = []
         for (const org of orgDetails) {
