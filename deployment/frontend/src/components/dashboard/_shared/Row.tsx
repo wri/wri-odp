@@ -60,6 +60,7 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
                   data-tooltip-content={button?.tooltip ? button?.tooltip.content : "tooltip-content"}
                   data-tooltip-place="top"
                   key={index}
+                  id={button?.tooltip ? button?.tooltip.id : "tooltip-id"}
                   onClick={button.onClick}
                   className={`my-auto flex sm:invisible  items-center justify-center  ${groupStyle ? groupStyle : "group-hover:visible "}  w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"}`}
                 >

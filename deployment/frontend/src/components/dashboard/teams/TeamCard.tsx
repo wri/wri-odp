@@ -116,6 +116,7 @@ export default function TeamCard() {
                     <h3 className='w-full text-center my-auto'>Delete Dataset: {team.name}</h3>
                     <button
                       className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+                      id={team.name}
                       onClick={() => {
                         deleteTeam.mutate(team.name!)
                       }}

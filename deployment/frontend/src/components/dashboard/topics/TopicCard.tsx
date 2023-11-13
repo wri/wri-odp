@@ -31,7 +31,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
     onSuccess: async (data) => {
       setOpen(false)
       await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 2 } })
-      notify(`Team delete is successful`, 'success')
+      notify(`Topic delete is successful`, 'success')
     }
   })
 
@@ -78,6 +78,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                 <h3 className='w-full text-center my-auto'>Delete Dataset: {team.name}</h3>
                 <button
                   className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+                  id={team.name}
                   onClick={() => {
                     deleteTopic.mutate((team as GroupTree).id)
                   }}
@@ -103,7 +104,7 @@ export default function TopicCard() {
     onSuccess: async (data) => {
       setOpen(false)
       await refetch();
-      notify(`Team delete is successful`, 'success')
+      notify(`Topic delete is successful`, 'success')
     }
   })
 
@@ -154,6 +155,7 @@ export default function TopicCard() {
                     <h3 className='w-full text-center my-auto'>Delete Dataset: {topic.name}</h3>
                     <button
                       className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+                      id={topic.name}
                       onClick={() => {
                         deleteTopic.mutate(topic.id)
                       }}

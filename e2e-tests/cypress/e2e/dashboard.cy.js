@@ -9,10 +9,21 @@ const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env('DATASET_NAME_SUFFIX')}`;
 
+const parentOrg2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const org2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const datasetName2 = `${uuid()}${Cypress.env('DATASET_NAME_SUFFIX')}`;
+
+const group = `${uuid()}${Cypress.env("GROUP_SUFFIX")}`;
+
 describe("Dashboard Test", () => {
   before(() => {
     cy.createOrganizationAPI(parentOrg);
     cy.createDatasetAPI(parentOrg, datasetName, true)
+
+    cy.createOrganizationAPI(parentOrg2);
+    cy.createDatasetAPI(parentOrg2, datasetName2, true)
+
+    cy.createGroupAPI(group)
 
   });
   beforeEach(function () {
@@ -58,6 +69,33 @@ describe("Dashboard Test", () => {
     cy.visit("dashboard/teams")
     cy.get('input[type="search"]').type(parentOrg).type('{enter}');
     cy.contains(parentOrg)
+  })
+
+  it("should delete dataset", () => {
+    cy.visit("/dashboard/datasets")
+    cy.get('input[type="search"]').type(datasetName2).type('{enter}');
+    cy.contains(datasetName2).should('exist');
+    cy.get('button#delete-tooltip').first().click({ force: true });
+    cy.get(`button#${datasetName2}`).click();
+    cy.contains('Dataset delete is successful')
+
+  })
+  it("should delete Team", () => {
+    cy.visit("/dashboard/teams")
+    cy.get('input[type="search"]').type(parentOrg2).type('{enter}');
+    cy.contains(parentOrg2).should('exist');
+    cy.get('button#delete-tooltip').first().click({ force: true });
+    cy.get(`button#${parentOrg2}`).click();
+    cy.contains('Team delete is successful')
+  })
+
+  it("should delete topic", () => {
+    cy.visit("/dashboard/topics")
+    cy.get('input[type="search"]').type(group).type('{enter}');
+    cy.contains(group).should('exist');
+    cy.get('button#delete-tooltip').first().click({ force: true });
+    cy.get(`button#${group}`).click();
+    cy.contains('Topic delete is successful')
   })
 
   after(() => {

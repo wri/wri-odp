@@ -188,6 +188,7 @@ export default function UserCard() {
                     <h3 className='w-full text-center my-auto'>Delete Dataset: {user.title}</h3>
                     <button
                       className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+                      id={user.title}
                       onClick={() => {
                         datasetUser.mutate(user.id)
                       }}
