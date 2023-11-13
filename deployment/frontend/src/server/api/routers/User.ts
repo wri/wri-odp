@@ -128,6 +128,25 @@ export const UserRouter = createTRPCRouter({
       const data = (await response.json()) as CkanResponse<null>;
       if (!data.success && data.error) throw Error(data.error.message)
       return data
+    }),
+
+  deleteMember: protectedProcedure
+    .input(z.object({
+      orgId: z.string(),
+      username: z.string()
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_member_delete`, {
+        method: "POST",
+        body: JSON.stringify({ id: input.orgId, username: input.username }),
+        headers: {
+          "Authorization": ctx.session.user.apikey,
+          "Content-Type": "application/json"
+        }
+      });
+      const data = (await response.json()) as CkanResponse<null>;
+      if (!data.success && data.error) throw Error(data.error.message)
+      return data
     })
 
 });

@@ -113,7 +113,7 @@ export default function TeamCard() {
                     ]}
                   />
                   <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-                    <h3 className='w-full text-center my-auto'>Delete Dataset: {team.name}</h3>
+                    <h3 className='w-full text-center my-auto'>Delete Teams: {team.name}</h3>
                     <button
                       className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
                       id={team.name}
