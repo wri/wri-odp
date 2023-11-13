@@ -12,12 +12,13 @@ export const DatasetRouter = createTRPCRouter({
   getAllDataset: protectedProcedure
     .input(searchSchema)
     .query(async ({ input, ctx }) => {
-      const organizations = await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey });
-      const groups = await getUserGroups({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey });
-      let orgsFq = `organization:(${organizations?.map(org => org.name).join(" OR ")})`;
-      if (groups) {
-        orgsFq = `${orgsFq}+group:(${groups.map(group => group.name).join(" OR ")})`
-      }
+      // const organizations = await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey });
+      // const groups = await getUserGroups({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey });
+      // let orgsFq = `organization:(${organizations?.map(org => org.name).join(" OR ")})`;
+      // if (groups) {
+      //   orgsFq = `${orgsFq} +groups:(${groups.map(group => group.name).join(" OR ")})`
+      // }
+      let orgsFq = `" "`;
       const fq = []
       if (input.fq) {
         orgsFq = "";
