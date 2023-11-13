@@ -197,7 +197,7 @@ export default function UserCard() {
               onClick={() => {
                 datasetUser.mutate(selectedUser.id)
               }}
-            >{datasetUser.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{datasetUser.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
+            >{datasetUser.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{datasetUser.isError ? "Something went wrong Try again" : "I want to delete this user"} </button>
           </Modal>)
         }
       </div>

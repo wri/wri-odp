@@ -27,13 +27,19 @@ function TeamProfile({ team }: { team: GroupTree }) {
 function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefined }) {
   const utils = api.useUtils()
   const [open, setOpen] = useState(false)
+  const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
   const deleteTopic = api.topics.deleteTopic.useMutation({
     onSuccess: async (data) => {
-      setOpen(false)
       await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 2 } })
+      setOpen(false)
       notify(`Topic delete is successful`, 'success')
     }
   })
+
+  const handleOpenModal = (topic: GroupTree) => {
+    setSelectedTopic(topic)
+    setOpen(true)
+  }
 
   if (!teams || teams.length === 0) return (<></>)
   return (
@@ -57,7 +63,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                     color: 'bg-wri-gold hover:bg-yellow-500',
                     icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
                     tooltip: {
-                      id: "edit-tooltip",
+                      id: `edit-tooltip-${team.name}`,
                       content: "Edit topic"
                     },
                     onClick: () => { }
@@ -67,28 +73,31 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                     color: 'bg-red-600 hover:bg-red-500',
                     icon: <TrashIcon className='w-4 h-4 text-white' />,
                     tooltip: {
-                      id: "delete-tooltip",
+                      id: `delete-tooltip-${team.name}`,
                       content: "Delete topic"
                     },
-                    onClick: () => setOpen(true)
+                    onClick: () => handleOpenModal(team as GroupTree)
                   },
                 ]}
               />
-              <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-                <h3 className='w-full text-center my-auto'>Delete Topic: {team.name}</h3>
-                <button
-                  className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
-                  id={team.name}
-                  onClick={() => {
-                    deleteTopic.mutate((team as GroupTree).id)
-                  }}
-                >{deleteTopic.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTopic.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
-              </Modal>
             </>
 
           )
         })
       }
+      {selectedTopic && (
+        <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
+          <h3 className='w-full text-center my-auto'>Delete Topic: {selectedTopic.name}</h3>
+          <button
+            className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+            id={selectedTopic.name}
+            onClick={() => {
+              deleteTopic.mutate(selectedTopic.id)
+            }}
+            disabled={deleteTopic.isSuccess}
+          >{deleteTopic.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTopic.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
+        </Modal>
+      )}
     </div>
   )
 }
@@ -100,13 +109,20 @@ export default function TopicCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
   const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
   const [open, setOpen] = useState(false)
+  const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
   const deleteTopic = api.topics.deleteTopic.useMutation({
     onSuccess: async (data) => {
-      setOpen(false)
       await refetch();
+      setOpen(false)
       notify(`Topic delete is successful`, 'success')
     }
   })
+
+  const handleOpenModal = (topic: GroupTree) => {
+    setSelectedTopic(topic)
+    setOpen(true)
+  }
+
 
 
   return (
@@ -117,7 +133,7 @@ export default function TopicCard() {
           isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
             data?.topics.map((topic, index) => {
               return (
-                <>
+                <div key={topic.name}>
                   <Row
                     key={index}
                     className={`pr-6`}
@@ -132,7 +148,7 @@ export default function TopicCard() {
                         color: 'bg-wri-gold hover:bg-yellow-400',
                         icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
                         tooltip: {
-                          id: "edit-tooltip",
+                          id: `edit-tooltip-${topic.name}`,
                           content: "Edit topic"
                         },
                         onClick: () => { }
@@ -142,31 +158,35 @@ export default function TopicCard() {
                         color: 'bg-red-600 hover:bg-red-500',
                         icon: <TrashIcon className='w-4 h-4 text-white' />,
                         tooltip: {
-                          id: "delete-tooltip",
+                          id: `delete-tooltip-${topic.name}`,
                           content: "Delete topic"
                         },
-                        onClick: () => setOpen(true)
+                        onClick: () => handleOpenModal(topic)
                       },
                     ]}
                     rowSub={<SubCardProfile teams={topic.children} />}
                     isDropDown
                   />
-                  <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-                    <h3 className='w-full text-center my-auto'>Delete Dataset: {topic.name}</h3>
-                    <button
-                      className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
-                      id={topic.name}
-                      onClick={() => {
-                        deleteTopic.mutate(topic.id)
-                      }}
-                    >{deleteTopic.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTopic.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
-                  </Modal>
-                </>
+                </div>
 
               )
             })
           )
         }
+
+        {selectedTopic && (
+          <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
+            <h3 className='w-full text-center my-auto'>Delete Topic: {selectedTopic.name}</h3>
+            <button
+              className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+              id={selectedTopic.name}
+              onClick={() => {
+                deleteTopic.mutate(selectedTopic.id)
+              }}
+              disabled={deleteTopic.isSuccess}
+            >{deleteTopic.isLoading ?? isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTopic.isError ? "Something went wrong Try again" : "I want to delete this topic"} </button>
+          </Modal>
+        )}
       </div>
     </section>
   )

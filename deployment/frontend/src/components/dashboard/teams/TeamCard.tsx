@@ -11,43 +11,12 @@ import Pagination from '../_shared/Pagination';
 import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal';
 
-const teams = [
-  {
-    title: "Land and Carbon",
-    image: "/images/placeholders/teams/lc.png",
-    num_datasets: 32,
-    description: '23 Members | 32 Datasets'
-  },
-  {
-    title: "International Offices",
-    image: "/images/placeholders/teams/io.png",
-    num_datasets: 32,
-    description: '23 Members | 32 Datasets'
-  },
-  {
-    title: "Global Offices",
-    image: "/images/placeholders/teams/go.png",
-    description: '23 Members | 32 Datasets'
-  },
-  {
-    title: "Land and Carbon",
-    image: "/images/placeholders/teams/lc.png",
-    num_datasets: 32,
-    description: '23 Members | 32 Datasets'
-  },
-  {
-    title: "International Offices",
-    image: "/images/placeholders/teams/io.png",
-    num_datasets: 32,
-    description: '23 Members | 32 Datasets'
-  },
-  {
-    title: "Global Offices",
-    image: "/images/placeholders/teams/go.png",
-    description: '23 Members | 32 Datasets'
-  }
-
-];
+type IOrg = {
+  title: string | undefined;
+  name: string | undefined;
+  image_display_url: string | undefined;
+  description: string;
+}
 
 function TeamProfile({ team }: { team: IRowProfile }) {
 
@@ -64,14 +33,20 @@ function TeamProfile({ team }: { team: IRowProfile }) {
 export default function TeamCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 5 } })
   const { data, isLoading, refetch } = api.organization.getUsersOrganizations.useQuery(query)
+  const [selectedTeam, setSelectedTeam] = useState<IOrg | null>(null);
   const [open, setOpen] = useState(false)
   const deleteTeam = api.teams.deleteTeam.useMutation({
     onSuccess: async (data) => {
-      setOpen(false)
       await refetch();
+      setOpen(false)
       notify(`Team delete is successful`, 'success')
     }
   })
+
+  const handleOpenModal = (user: IOrg) => {
+    setSelectedTeam(user);
+    setOpen(true);
+  };
 
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-4 sm:gap-y-0'>
@@ -81,7 +56,7 @@ export default function TeamCard() {
           data?.organizations.length === 0 ? <div className='flex justify-center items-center h-screen'>No Organization</div> :
             data?.organizations.map((team, index) => {
               return (
-                <>
+                <div key={team.name}>
                   <Row
                     key={index}
                     className={`pr-2`}
@@ -96,7 +71,7 @@ export default function TeamCard() {
                         color: 'bg-wri-gold hover:bg-yellow-400',
                         icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
                         tooltip: {
-                          id: "edit-tooltip",
+                          id: `edit-tooltip-${team.name}`,
                           content: "Edit team"
                         },
                         onClick: () => { }
@@ -105,28 +80,31 @@ export default function TeamCard() {
                         label: "Delete", color: 'bg-red-600 hover:bg-red-500',
                         icon: <TrashIcon className='w-4 h-4 text-white' />,
                         tooltip: {
-                          id: "delete-tooltip",
+                          id: `delete-tooltip-${team.name}`,
                           content: "Delete team"
                         },
-                        onClick: () => setOpen(true)
+                        onClick: () => handleOpenModal(team)
                       },
                     ]}
                   />
-                  <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-                    <h3 className='w-full text-center my-auto'>Delete Teams: {team.name}</h3>
-                    <button
-                      className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
-                      id={team.name}
-                      onClick={() => {
-                        deleteTeam.mutate(team.name!)
-                      }}
-                    >{deleteTeam.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTeam.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
-                  </Modal>
-                </>
+
+                </div>
 
               )
             })
       }
+      {selectedTeam && (
+        <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
+          <h3 className='w-full text-center my-auto'>Delete Teams: {selectedTeam.name}</h3>
+          <button
+            className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+            id={selectedTeam.name}
+            onClick={() => {
+              deleteTeam.mutate(selectedTeam.name!)
+            }}
+          >{deleteTeam.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTeam.isError ? "Something went wrong Try again" : "I want to delete this team"} </button>
+        </Modal>
+      )}
     </section>
   )
 }
