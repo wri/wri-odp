@@ -31,5 +31,3 @@ def password_reset(context: Context, data_dict: [str, any]):
     except mailer.MailerException as e:
         log.exception(e)
         return "Password reset link sent to email address"
-
-    
