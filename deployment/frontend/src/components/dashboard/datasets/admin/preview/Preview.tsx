@@ -62,7 +62,7 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="Projects"
-                                    text={watch('projects') ?? '_'}
+                                    text={watch('projects') ? watch('projects').join(', ') : '_'}
                                 />
                                 <ListOfItems
                                     label="Topics"
