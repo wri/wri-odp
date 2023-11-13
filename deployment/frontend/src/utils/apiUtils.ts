@@ -171,11 +171,13 @@ export async function getAllDatasetFq({
     fq,
     query,
     facetFields = [],
+    sortBy = '',
 }: {
     apiKey: string
     fq: string
     query: SearchInput
     facetFields?: string[]
+    sortBy?: string
 }): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets }> {
     try {
         let url = `${env.CKAN_URL}/api/3/action/package_search?q=${query.search}`
@@ -188,7 +190,9 @@ export async function getAllDatasetFq({
             url += `&facet.field=["${facetFields.join('","')}"]`
         }
 
-        console.log(query)
+        if (sortBy) {
+            url += `&sort=${sortBy}`
+        }
 
         const response = await fetch(
             `${url}&start=${query.page?.start}&rows=${query.page?.rows}`,
@@ -211,9 +215,7 @@ export async function getAllDatasetFq({
         const datasets = data.success === true ? data.result.results : []
         const count = data.success === true ? data.result.count : 0
         const searchFacets =
-            data.success === true ? data.result?.search_facets : []
-
-      console.log(data)
+            data.success === true ? data.result?.search_facets : {}
 
         return { datasets, count, searchFacets }
     } catch (e) {

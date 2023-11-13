@@ -28,7 +28,6 @@ export const DatasetRouter = createTRPCRouter({
 
             const fqArray = []
             if (input.fq) {
-                console.log(input.fq)
                 for (const key of Object.keys(input.fq)) {
                     if (key === 'organization') {
                         orgsFq = `organization:(${input.fq[key]})`
@@ -37,8 +36,6 @@ export const DatasetRouter = createTRPCRouter({
                     fqArray.push(`${key}:(${input.fq[key]})`)
                 }
                 const filter = fqArray.join('+')
-
-                console.log(orgsFq, filter)
 
                 if (filter && orgsFq) fq = `${orgsFq}+${filter}`
                 else if (filter) {
@@ -55,6 +52,7 @@ export const DatasetRouter = createTRPCRouter({
                 fq: fq,
                 query: input,
                 facetFields: input.facetFields,
+                sortBy: input.sortBy
             }))!
 
             return {

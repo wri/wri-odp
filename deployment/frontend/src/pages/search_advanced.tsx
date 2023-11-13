@@ -20,7 +20,8 @@ export default function SearchPage() {
      */
     const [query, setQuery] = useState<SearchInput>({
         search: '',
-        page: { start: 0, rows: 5 },
+        page: { start: 0, rows: 10 },
+        sortBy: "relevance asc"
     })
 
     const [filters, setFilters] = useState<Filter[]>([])
@@ -32,13 +33,15 @@ export default function SearchPage() {
      *
      */
     useEffect(() => {
-        const keys = [...new Set(filters.map((f) => f.key))]
+        const keys = [...new Set(filters.map((f) => f.key))].filter(
+            (key) => key != 'search'
+        )
 
         const fq: any = {}
 
         keys.forEach((key) => {
             const keyFilters = filters.filter((f) => f.key == key)
-            const keyFq = keyFilters.map((kf) => kf.value).join(' OR ')
+            const keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             fq[key as string] = keyFq
         })
 
@@ -46,6 +49,7 @@ export default function SearchPage() {
             return {
                 ...prev,
                 fq,
+                search: filters.find((e) => e?.key == 'search')?.value ?? '',
             }
         })
     }, [filters])
@@ -53,19 +57,19 @@ export default function SearchPage() {
     return (
         <>
             <Header />
-            <Search setQuery={setQuery} />
+            <Search filters={filters} setFilters={setFilters} />
             <FilteredSearchLayout setFilters={setFilters} filters={filters}>
-                <SortBy />
+                <SortBy count={data?.count ?? 0} setQuery={setQuery} />
                 <FiltersSelected filters={filters} setFilters={setFilters} />
                 <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
                     {data?.datasets.map((dataset, number) => (
                         <DatasetHorizontalCard
-                            key={`dataset-card-${number}`}
+                            key={`dataset-card-${dataset.name}`}
                             dataset={dataset}
                         />
                     ))}
                 </div>
-                <Pagination />
+                <Pagination setQuery={setQuery} query={query} data={data} />
             </FilteredSearchLayout>
             <Footer />
         </>

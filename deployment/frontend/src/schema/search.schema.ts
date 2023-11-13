@@ -10,8 +10,8 @@ export const searchSchema = z.object({
         .default({ start: 0, rows: 50 }),
     fq: z.record(z.string()).optional(),
     facetFields: z.array(z.string()).optional(),
-    _isUserSearch: z.boolean().default(false).optional()
+    sortBy: z.string().default("relevance asc").optional(),
+    _isUserSearch: z.boolean().default(false).optional(),
 })
 
 export type SearchInput = z.infer<typeof searchSchema>
-

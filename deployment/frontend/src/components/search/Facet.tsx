@@ -28,7 +28,7 @@ export default function Facet({
     const getUpdatedOptionsState = () => {
         return options.reduce((a, v) => {
             const checked = filters.find(
-                (f) => f.key == fqKey && f.value == v.value
+                (f) => f?.key == fqKey && f?.value == v.value
             )
 
             return {

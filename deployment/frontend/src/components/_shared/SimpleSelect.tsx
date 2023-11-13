@@ -33,7 +33,8 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
     maxWidth = 'xl:max-w-[28rem]',
     formObj,
     name,
-}: SimpleSelectProps<T, V>) {
+    onChange: _onChange = (val) => {},
+}: SimpleSelectProps<T, V> & { onChange?: (val: any) => void }) {
     const [selected, setSelected] = useState<Option<V> | null>(
         options.find((option) => option.default) ?? null
     )
@@ -48,6 +49,9 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                     value={selected}
                     onChange={(e) => {
                         onChange(e)
+                        if (_onChange && e != null) {
+                            _onChange(e.value)
+                        }
                         setSelected(e)
                     }}
                 >

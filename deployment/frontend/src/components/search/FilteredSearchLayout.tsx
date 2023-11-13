@@ -40,7 +40,7 @@ export default function FilteredSearchLayout({
         { key: 'resolution', title: 'Resolution' },
         { key: 'temporal_coverage', title: 'Temporal Coverage' },
         { key: 'update_frequency', title: 'Update Frequency' },
-        { key: 'format', title: 'Format' },
+        { key: 'res_format', title: 'Format' },
         { key: 'license_id', title: 'License' },
         { key: 'language', title: 'Language' },
         { key: 'wri_data', title: 'WRI Data' },
