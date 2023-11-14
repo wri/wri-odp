@@ -1,47 +1,76 @@
-import { z } from "zod";
-import {
-    createTRPCRouter,
-    protectedProcedure
-} from "@/server/api/trpc";
-import { env } from "@/env.mjs";
-import { getGroups, getGroup } from "@/utils/apiUtils";
-import { searchSchema } from "@/schema/search.schema";
-import type { GroupTree } from "@/schema/ckan.schema";
-import { searchArrayForKeyword } from "@/utils/general";
+import { z } from 'zod'
+import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
+import { env } from '@/env.mjs'
+import { getGroups, getGroup } from '@/utils/apiUtils'
+import { searchSchema } from '@/schema/search.schema'
+import type { GroupTree } from '@/schema/ckan.schema'
+import { searchArrayForKeyword } from '@/utils/general'
 import { CkanResponse } from '@/schema/ckan.schema'
 import { Group } from '@portaljs/ckan'
-import Topic from '@/interfaces/topic.interface'
+import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 
 import { TopicSchema } from '@/schema/topic.schema'
-
 
 export const TopicRouter = createTRPCRouter({
     getUsersTopics: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const groupTree = await getGroups({ apiKey: ctx.session.user.apikey });
-            const groupDetails = await Promise.all(groupTree.map(async (group) => {
-                const groupDetails = await getGroup({ apiKey: ctx.session.user.apikey, id: group.id });
-                const rgroup = {
-                    ...group,
-                    image_display_url: groupDetails?.image_display_url
-                }
-                rgroup.children.map(async (child) => {
-                    const childDetails = await getGroup({ apiKey: ctx.session.user.apikey, id: child.id });
-                    child.image_display_url = childDetails?.image_display_url
-                    return child
+            const groupTree = await getGroups({
+                apiKey: ctx.session.user.apikey,
+            })
+            const groupDetails = await Promise.all(
+                groupTree.map(async (group) => {
+                    const groupDetails = await getGroup({
+                        apiKey: ctx.session.user.apikey,
+                        id: group.id,
+                    })
+                    const rgroup = {
+                        ...group,
+                        image_display_url: groupDetails?.image_display_url,
+                    }
+                    rgroup.children.map(async (child) => {
+                        const childDetails = await getGroup({
+                            apiKey: ctx.session.user.apikey,
+                            id: child.id,
+                        })
+                        child.image_display_url =
+                            childDetails?.image_display_url
+                        return child
+                    })
+                    return group
                 })
-                return group
-            }));
-            let result = groupDetails;
+            )
+            let result = groupDetails
             if (input.search) {
-                result = searchArrayForKeyword<GroupTree>(groupDetails, input.search);
+                result = searchArrayForKeyword<GroupTree>(
+                    groupDetails,
+                    input.search
+                )
             }
             return {
-                topics: result.slice(input.page.start, input.page.start + input.page.rows),
+                topics: result.slice(
+                    input.page.start,
+                    input.page.start + input.page.rows
+                ),
                 count: result.length,
             }
         }),
+    getTopicsHierarchy: protectedProcedure.query(async ({ ctx }) => {
+        const user = ctx.session.user
+        const topicHierarchyRes = await fetch(
+            `${env.CKAN_URL}/api/action/group_tree`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${user.apikey}`,
+                },
+            }
+        )
+        const tree: CkanResponse<TopicHierarchy[]> =
+            await topicHierarchyRes.json()
+        if (!tree.success && tree.error) throw Error(tree.error.message)
+        return tree.result
+    }),
     getAllTopics: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.session.user
         const topicRes = await fetch(
@@ -78,7 +107,10 @@ export const TopicRouter = createTRPCRouter({
                     }
                 )
                 const topic: CkanResponse<Group> = await topicRes.json()
-                if (!topic.success && topic.error) throw Error(topic.error.message)
+                if (!topic.success && topic.error) {
+                    if (topic.error.message) throw Error(topic.error.message)
+                    throw Error(JSON.stringify(topic.error))
+                }
                 return topic.result
             } catch (e) {
                 let error =
@@ -100,13 +132,37 @@ export const TopicRouter = createTRPCRouter({
                     },
                 }
             )
-            const topic: CkanResponse<
-                Topic & { groups: Topic[] }
-            > = await topicRes.json()
+            const topic: CkanResponse<Topic & { groups: Topic[] }> =
+                await topicRes.json()
             if (!topic.success && topic.error) throw Error(topic.error.message)
             return {
                 ...topic.result,
                 parent: topic.result.groups[0]?.name ?? null,
+            }
+        }),
+    deleteTopic: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/group_delete`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                    body: JSON.stringify({ id: input.id }),
+                }
+            )
+            const topic: CkanResponse<Topic> = await topicRes.json()
+            if (!topic.success && topic.error) {
+                if (topic.error.message) throw Error(topic.error.message)
+                throw Error(JSON.stringify(topic.error))
+            }
+            console.log(topic)
+            return {
+                ...topic.result,
             }
         }),
     createTopic: protectedProcedure
@@ -130,7 +186,10 @@ export const TopicRouter = createTRPCRouter({
                     }
                 )
                 const topic: CkanResponse<Group> = await topicRes.json()
-                if (!topic.success && topic.error) throw Error(topic.error.message)
+                if (!topic.success && topic.error) {
+                    if (topic.error.message) throw Error(topic.error.message)
+                    throw Error(JSON.stringify(topic.error))
+                }
                 return topic.result
             } catch (e) {
                 let error =
@@ -139,7 +198,7 @@ export const TopicRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
-    deleteTopic: protectedProcedure
+    deleteDashBoardTopic: protectedProcedure
         .input(z.string())
         .mutation(async ({ input, ctx }) => {
             const response = await fetch(`${env.CKAN_URL}/api/3/action/group_delete`, {
@@ -156,4 +215,3 @@ export const TopicRouter = createTRPCRouter({
         })
 
 });
-

@@ -13,9 +13,14 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
 
-COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
+
 USER root
+
+COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
+COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 RUN chown -R ckan:ckan ${APP_DIR}/src/ckanext-wri
+RUN chmod +x ${APP_DIR}/prerun.py
+
 USER ckan
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
@@ -32,19 +37,4 @@ ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_vi
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 
-COPY setup/prerun.py.override ${APP_DIR}/prerun.py
-USER root
-RUN chmod +x ${APP_DIR}/prerun.py
-
-RUN apk --no-cache add openssl
-
 USER ckan
-
-RUN openssl genpkey -algorithm RSA -out ${APP_DIR}/jwtRS256.key && \
-    openssl rsa -in ${APP_DIR}/jwtRS256.key -pubout -outform PEM -out ${APP_DIR}/jwtRS256.key.pub && \
-    chown ckan:ckan ${APP_DIR}/jwtRS256.key && \
-    chown ckan:ckan ${APP_DIR}/jwtRS256.key.pub
-
-RUN ckan config-tool ${CKAN_INI} "api_token.jwt.algorithm = RS256" && \
-    ckan config-tool ${CKAN_INI} "api_token.jwt.encode.secret = file:${APP_DIR}/jwtRS256.key" && \
-    ckan config-tool ${CKAN_INI} "api_token.jwt.decode.secret = file:${APP_DIR}/jwtRS256.key.pub"

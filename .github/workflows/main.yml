@@ -32,6 +32,8 @@ jobs:
           mask-password: 'true'
       - name: Add CKAN url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+      - name: Add Minio url to hosts
+        run: sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
       - name: Add Frontend url to hosts
         run: sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
       - name: Build and push CKAN image to ECR
@@ -62,8 +64,6 @@ jobs:
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d \
           ckan-dev datapusher db solr redis minio minio-setup
         working-directory: ./ckan-backend-dev
-      - name: Print Container names
-        run: docker ps -a
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
@@ -79,10 +79,6 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
-      - name: Print Container names
-        run: docker ps -a
-      - name: Print frontend logs
-        run: docker logs wri-frontend
       - name: Cypress Install and Frontend setup
         uses: cypress-io/github-action@v6
         with:
@@ -154,7 +150,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ckan-trivy-results.sarif
-      - name: Upload Frontnend container Trivy scan results to GitHub Code scanning
+      - name: Upload Frontend container Trivy scan results to GitHub Code scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
           category: frontend_container_trivy_results

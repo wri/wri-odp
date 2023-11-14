@@ -29,8 +29,16 @@ export default function EditTeamForm({ team }: { team: TeamFormType }) {
     })
 
     const editTeam = api.teams.editTeam.useMutation({
-        onSuccess: async ({ name }) => {
-            notify(`Successfully edited the ${name} organization`, 'success')
+        onSuccess: async ({ name, title }) => {
+            notify(`Successfully edited the ${title ?? name} team`, 'success')
+            router.push('/dashboard/teams')
+        },
+        onError: (error) => setErrorMessage(error.message),
+    })
+
+    const deleteTeam = api.teams.deleteTeam.useMutation({
+        onSuccess: async ({ name, title }) => {
+            notify(`Successfully deleted the ${title ?? name} team`, 'error')
             router.push('/dashboard/teams')
         },
         onError: (error) => setErrorMessage(error.message),
@@ -40,9 +48,18 @@ export default function EditTeamForm({ team }: { team: TeamFormType }) {
         <>
             <Breadcrumbs links={links} />
             <Container className="mb-20 font-acumin">
-                <h1 className="mb-[2rem] text-[1.57rem] font-semibold">
-                    Edit team
-                </h1>
+                <div className="flex justify-between">
+                    <h1 className="mb-[2rem] text-[1.57rem] font-semibold">
+                        Edit team
+                    </h1>
+                    <LoaderButton
+                        variant="destructive"
+                        loading={deleteTeam.isLoading}
+                        onClick={() => deleteTeam.mutate({ id: team.name })}
+                    >
+                        Delete Team
+                    </LoaderButton>
+                </div>
 
                 <form
                     onSubmit={formObj.handleSubmit((data) => {

@@ -25,8 +25,8 @@ export default function CreateTopicForm() {
     })
 
     const createTopic = api.topics.createTopic.useMutation({
-        onSuccess: async ({ name }) => {
-            notify(`Successfully created the ${name} topic`, 'success')
+        onSuccess: async ({ name, title }) => {
+            notify(`Successfully created the ${title ?? name} topic`, 'success')
             router.push('/dashboard/topics')
             formObj.reset()
         },
