@@ -57,15 +57,13 @@ export default function TeamForm({
                         <div className="w-[11rem]">
                             <ImageUploader
                                 clearImage={() => setValue('image_url', '')}
-                                defaultImage={watch('image_display_url')}
+                                defaultImage={watch('image_url') && watch('image_display_url')}
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
                                         response.successful[0]?.uploadURL ??
                                         null
-                                    if (url) {
-                                        const _url = url.split('/').pop()
-                                        setValue('image_url', _url)
-                                    }
+                                    const name = url ? url.split('/').pop() : ''
+                                    setValue('image_url', name)
                                 }}
                             />
                         </div>

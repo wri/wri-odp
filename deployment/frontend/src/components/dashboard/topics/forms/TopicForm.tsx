@@ -58,11 +58,13 @@ export default function TopicForm({
                         <div className="w-[11rem]">
                             <ImageUploader
                                 clearImage={() => setValue('image_url', '')}
-                                defaultImage={watch('image_display_url')}
+                                defaultImage={watch('image_url') && watch('image_display_url')}
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
-                                        response.successful[0]?.name ?? null
-                                    setValue('image_url', url)
+                                        response.successful[0]?.uploadURL ??
+                                        null
+                                    const name = url ? url.split('/').pop() : ''
+                                    setValue('image_url', name)
                                 }}
                             />
                         </div>

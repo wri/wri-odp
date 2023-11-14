@@ -118,7 +118,7 @@ function AddDataFile({
                 getUploadParameters(
                     file,
                     watch('team') && watch('team')?.value
-                        ? `${watch('team')?.id}/resources/${
+                        ? `${watch('team')?.id}/ckan/resources/${
                               datafile.resourceId
                           }`
                         : `resources/${datafile.resourceId}`

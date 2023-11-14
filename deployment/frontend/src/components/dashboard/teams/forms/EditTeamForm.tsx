@@ -34,16 +34,16 @@ export default function EditTeamForm({ team }: { team: TeamFormType }) {
 
     const editTeam = api.teams.editTeam.useMutation({
         onSuccess: async ({ name, title }) => {
-            notify(`Successfully deleted the ${title ? title : name ?? ''} team`, 'error')
+            notify(`Successfully edited the ${title ?? name} team`, 'success')
             router.push('/dashboard/teams')
         },
         onError: (error) => setErrorMessage(error.message),
     })
 
     const deleteTeam = api.teams.deleteTeam.useMutation({
-        onSuccess: async ({ name, title }) => {
+        onSuccess: async () => {
             setDeleteOpen(false)
-            notify(`Successfully deleted the ${title ?? name} team`, 'error')
+            notify(`Successfully deleted the ${team.title ?? team.name} team`, 'error')
             router.push('/dashboard/teams')
         },
         onError: (error) => {

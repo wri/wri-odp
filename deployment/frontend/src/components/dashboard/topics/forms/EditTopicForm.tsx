@@ -44,8 +44,8 @@ export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
     })
 
     const deleteTopic = api.topics.deleteTopic.useMutation({
-        onSuccess: async ({ name, title }) => {
-            notify(`Successfully deleted the ${title ? title : name ?? ''} topic`, 'error')
+        onSuccess: async () => {
+            notify(`Successfully deleted the ${topic.title ?? topic.name} team`, 'error')
             setDeleteOpen(false)
             router.push('/dashboard/topics')
         },

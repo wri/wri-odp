@@ -161,9 +161,10 @@ export function ImageUploader({
                     </>
                 )}
             </button>
-            {clearImage && presignedGetUrl.data && !uploading && (
+            {clearImage && (presignedGetUrl.data || defaultImage) && !uploading && (
                 <div className="w-full flex justify-end">
                     <Button
+                        type="button"
                         variant="destructive"
                         className="w-fit my-2"
                         size="sm"
