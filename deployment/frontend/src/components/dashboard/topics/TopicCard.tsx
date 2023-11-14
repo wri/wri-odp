@@ -28,7 +28,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
   const utils = api.useUtils()
   const [open, setOpen] = useState(false)
   const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
-  const deleteTopic = api.topics.deleteTopic.useMutation({
+  const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
     onSuccess: async (data) => {
       await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 2 } })
       setOpen(false)
@@ -110,7 +110,7 @@ export default function TopicCard() {
   const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
   const [open, setOpen] = useState(false)
   const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
-  const deleteTopic = api.topics.deleteTopic.useMutation({
+  const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
     onSuccess: async (data) => {
       await refetch();
       setOpen(false)
