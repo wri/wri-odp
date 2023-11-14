@@ -84,7 +84,7 @@ export const TopicRouter = createTRPCRouter({
         )
         const topics: CkanResponse<Group[]> = await topicRes.json()
         if (!topics.success && topics.error) throw Error(topics.error.message)
-        return topics.result
+        return topics.result.filter((topic) => topic.state === 'active')
     }),
     editTopic: protectedProcedure
         .input(TopicSchema)

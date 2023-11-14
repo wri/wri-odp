@@ -18,7 +18,11 @@ export const teamRouter = createTRPCRouter({
             }
         )
         const teams: CkanResponse<Organization[]> = await teamRes.json()
-        return teams.result
+                if (!teams.success && teams.error) {
+                    if (teams.error.message) throw Error(teams.error.message)
+                    throw Error(JSON.stringify(teams.error))
+                }
+        return teams.result.filter((team) => team.state === 'active')
     }),
     editTeam: protectedProcedure
         .input(TeamSchema)
