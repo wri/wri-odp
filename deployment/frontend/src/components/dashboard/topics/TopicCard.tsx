@@ -11,6 +11,7 @@ import Pagination from '../_shared/Pagination';
 import type { GroupTree } from '@/schema/ckan.schema';
 import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal';
+import { useRouter } from 'next/router'
 
 
 function TeamProfile({ team }: { team: GroupTree }) {
@@ -28,6 +29,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
   const utils = api.useUtils()
   const [open, setOpen] = useState(false)
   const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
+  const router = useRouter()
   const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
     onSuccess: async (data) => {
       await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 2 } })
@@ -66,7 +68,9 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                       id: `edit-tooltip-${team.name}`,
                       content: "Edit topic"
                     },
-                    onClick: () => { }
+                    onClick: () => {
+                      router.push(`/dashboard/topics/${team.name}/edit`)
+                    }
                   },
                   {
                     label: "Delete",
@@ -109,6 +113,7 @@ export default function TopicCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
   const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
   const [open, setOpen] = useState(false)
+  const router = useRouter()
   const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
   const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
     onSuccess: async (data) => {
@@ -151,7 +156,9 @@ export default function TopicCard() {
                           id: `edit-tooltip-${topic.name}`,
                           content: "Edit topic"
                         },
-                        onClick: () => { }
+                        onClick: () => {
+                          router.push(`/dashboard/topics/${topic.name}/edit`)
+                        }
                       },
                       {
                         label: "Delete",

@@ -10,6 +10,7 @@ import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
 import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal';
+import { useRouter } from 'next/router'
 
 type IOrg = {
   title: string | undefined;
@@ -35,6 +36,7 @@ export default function TeamCard() {
   const { data, isLoading, refetch } = api.organization.getUsersOrganizations.useQuery(query)
   const [selectedTeam, setSelectedTeam] = useState<IOrg | null>(null);
   const [open, setOpen] = useState(false)
+  const router = useRouter()
   const deleteTeam = api.teams.deleteDashboardTeam.useMutation({
     onSuccess: async (data) => {
       await refetch();
@@ -74,7 +76,10 @@ export default function TeamCard() {
                           id: `edit-tooltip-${team.name}`,
                           content: "Edit team"
                         },
-                        onClick: () => { }
+                        onClick: () => {
+                          // on click go to /teams/:teamName
+                          router.push(`/dashboard/teams/${team.name}/edit`)
+                        }
                       },
                       {
                         label: "Delete", color: 'bg-red-600 hover:bg-red-500',

@@ -4,7 +4,6 @@ import { HighlightsCarousel } from "@/components/home/HighlightsCarousel";
 import { HomeFooter } from "@/components/home/HomeFooter";
 import { TopicsCarousel } from "@/components/home/TopicsCarousel";
 import Head from "next/head";
-import 'react-tooltip/dist/react-tooltip.css'
 
 export default function Home() {
   return (

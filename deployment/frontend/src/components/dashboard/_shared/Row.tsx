@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { EyeIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { Transition } from '@headlessui/react'
 import classNames from '@/utils/classnames';
-import { Tooltip } from 'react-tooltip'
 import { useSession } from "next-auth/react"
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 type RowButton = {
   label?: string;
@@ -55,18 +55,16 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
           {(controlButtons) && (session?.user.sysadmin ?? authorized) ? controlButtons.map((button, index) => {
             return (
               <React.Fragment key={index}>
-                <button
-                  data-tooltip-id={button?.tooltip ? button?.tooltip.id : "tooltip-id"}
-                  data-tooltip-content={button?.tooltip ? button?.tooltip.content : "tooltip-content"}
-                  data-tooltip-place="top"
-                  key={button?.tooltip ? button?.tooltip.id : `tooltip-id-${index}`}
-                  id={button?.tooltip ? button?.tooltip.id : "tooltip-id"}
-                  onClick={button.onClick}
-                  className={`my-auto flex sm:invisible  items-center justify-center  ${groupStyle ? groupStyle : "group-hover:visible "}  w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"}`}
-                >
-                  {(button.icon)}
-                </button>
-                <Tooltip id={button?.tooltip ? button?.tooltip.id : "tooltip-id"} />
+                <DefaultTooltip content={button?.tooltip ? button?.tooltip.content : "tooltip-content"}>
+                  <button
+                    key={button?.tooltip ? button?.tooltip.id : `tooltip-id-${index}`}
+                    id={button?.tooltip ? button?.tooltip.id : "tooltip-id"}
+                    onClick={button.onClick}
+                    className={`my-auto flex sm:invisible  items-center justify-center  ${groupStyle ? groupStyle : "group-hover:visible "}  w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"}`}
+                  >
+                    {(button.icon)}
+                  </button>
+                </DefaultTooltip>
               </React.Fragment>
 
             )
