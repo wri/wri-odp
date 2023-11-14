@@ -38,10 +38,7 @@ export const DatasetRouter = createTRPCRouter({
                             ? { schema: resource.dataDictionary }
                             : '{}',
                         dataDictionary: null,
-                        url:
-                            resource.type === 'upload'
-                                ? `${env.CKAN_URL}/dataset/${input.id}/resource/${resource.resourceId}/${resource.name}`
-                                : resource.url,
+                        url: resource.url ?? resource.name,
                     })),
                     temporal_coverage:
                         input.temporalCoverageStart && input.temporalCoverageEnd
