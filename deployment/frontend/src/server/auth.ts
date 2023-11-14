@@ -24,6 +24,7 @@ declare module 'next-auth' {
             email: string
             username: string
             apikey: string
+            sysadmin: boolean
             teams: { name: string; id: string }[]
         }
     }
@@ -32,6 +33,7 @@ declare module 'next-auth' {
         email: string
         username: string
         apikey: string
+        sysadmin: boolean
         teams: { name: string; id: string }[]
     }
 }
@@ -54,6 +56,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.apikey = user.apikey
                 token.teams = user.teams
+                token.sysadmin = user.sysadmin
             }
             return token
         },
@@ -64,6 +67,7 @@ export const authOptions: NextAuthOptions = {
                     ...session.user,
                     apikey: token.apikey ? token.apikey : '',
                     teams: token.teams ? token.teams : { name: '', id: '' },
+                    sysadmin: token.sysadmin,
                     id: token.sub,
                 },
             }
@@ -135,6 +139,7 @@ export const authOptions: NextAuthOptions = {
                             ...user.result,
                             image: '',
                             apikey: user.result.frontend_token,
+                            sysadmin: user.result.sysadmin,
                             teams: orgList.result.map((org) => ({
                                 name: org?.name ?? '',
                                 id: org?.id ?? '',

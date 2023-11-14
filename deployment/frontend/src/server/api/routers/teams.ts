@@ -144,4 +144,19 @@ export const teamRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
+    deleteDashboardTeam: protectedProcedure
+        .input(z.string())
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_delete`, {
+                method: "POST",
+                body: JSON.stringify({ id: input }),
+                headers: {
+                    "Authorization": ctx.session.user.apikey,
+                    "Content-Type": "application/json"
+                }
+            });
+            const data = (await response.json()) as CkanResponse<null>;
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
+        })
 })

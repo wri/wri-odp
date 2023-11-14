@@ -67,3 +67,18 @@ Each user row contains dropdown to display list of teams user belongs to
 
 ![](./users.png)
 
+
+
+### Delete Entities
+
+Each entities ( Dataset, Team, Topics and Users), have thesame delete approach
+
+here is how you delete a Dataset has an authorized user
+
+- Place your mouse over the dataset you want to delete to see the delete button
+
+![](./delete1.png)
+
+- click the the confirm delete button
+
+![](delete2.png)

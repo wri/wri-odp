@@ -9,6 +9,9 @@ import Spinner from '@/components/_shared/Spinner';
 import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
 import type { GroupTree } from '@/schema/ckan.schema';
+import notify from '@/utils/notify'
+import Modal from '@/components/_shared/Modal';
+import { useRouter } from 'next/router'
 
 
 function TeamProfile({ team }: { team: GroupTree }) {
@@ -22,7 +25,23 @@ function TeamProfile({ team }: { team: GroupTree }) {
   )
 }
 
-function SubCardProfile({ teams }: { teams: IRowProfile[] | undefined }) {
+function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefined }) {
+  const utils = api.useUtils()
+  const [open, setOpen] = useState(false)
+  const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
+  const router = useRouter()
+  const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
+    onSuccess: async (data) => {
+      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 2 } })
+      setOpen(false)
+      notify(`Topic delete is successful`, 'success')
+    }
+  })
+
+  const handleOpenModal = (topic: GroupTree) => {
+    setSelectedTopic(topic)
+    setOpen(true)
+  }
 
   if (!teams || teams.length === 0) return (<></>)
   return (
@@ -30,23 +49,59 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | undefined }) {
       {
         teams.map((team, index) => {
           return (
-            <Row
-              key={index}
-              groupStyle="group/item group-hover/item:visible "
-              className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
-              rowMain={
-                <div className='flex pl-3 sm:pl-5  '>
-                  <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team} />
-                </div>
-              }
-              controlButtons={[
-                { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-500', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-                { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-              ]}
-            />
+            <>
+              <Row
+                key={index}
+                groupStyle="group/item group-hover/item:visible "
+                className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
+                rowMain={
+                  <div className='flex pl-3 sm:pl-5  '>
+                    <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} />
+                  </div>
+                }
+                controlButtons={[
+                  {
+                    label: "Edit",
+                    color: 'bg-wri-gold hover:bg-yellow-500',
+                    icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
+                    tooltip: {
+                      id: `edit-tooltip-${team.name}`,
+                      content: "Edit topic"
+                    },
+                    onClick: () => {
+                      router.push(`/dashboard/topics/${team.name}/edit`)
+                    }
+                  },
+                  {
+                    label: "Delete",
+                    color: 'bg-red-600 hover:bg-red-500',
+                    icon: <TrashIcon className='w-4 h-4 text-white' />,
+                    tooltip: {
+                      id: `delete-tooltip-${team.name}`,
+                      content: "Delete topic"
+                    },
+                    onClick: () => handleOpenModal(team as GroupTree)
+                  },
+                ]}
+              />
+            </>
+
           )
         })
       }
+      {selectedTopic && (
+        <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
+          <h3 className='w-full text-center my-auto'>Delete Topic: {selectedTopic.name}</h3>
+          <button
+            className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+            id={selectedTopic.name}
+            onClick={() => {
+              deleteTopic.mutate(selectedTopic.id)
+            }}
+            disabled={deleteTopic.isSuccess}
+          >{deleteTopic.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTopic.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
+        </Modal>
+      )}
     </div>
   )
 }
@@ -56,7 +111,22 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | undefined }) {
 
 export default function TopicCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
-  const { data, isLoading } = api.topics.getUsersTopics.useQuery(query)
+  const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
+  const [open, setOpen] = useState(false)
+  const router = useRouter()
+  const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
+  const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
+    onSuccess: async (data) => {
+      await refetch();
+      setOpen(false)
+      notify(`Topic delete is successful`, 'success')
+    }
+  })
+
+  const handleOpenModal = (topic: GroupTree) => {
+    setSelectedTopic(topic)
+    setOpen(true)
+  }
 
 
 
@@ -66,27 +136,64 @@ export default function TopicCard() {
       <div className='w-full'>
         {
           isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
-            data?.topics.map((team, index) => {
+            data?.topics.map((topic, index) => {
               return (
-                <Row
-                  key={index}
-                  className={`pr-6`}
-                  rowMain={<TeamProfile team={team} />}
-                  linkButton={{
-                    label: "View topic",
-                    link: "#",
-                  }}
-                  controlButtons={[
-                    { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-                    { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-                  ]}
-                  rowSub={<SubCardProfile teams={team.children} />}
-                  isDropDown
-                />
+                <div key={topic.name}>
+                  <Row
+                    key={index}
+                    className={`pr-6`}
+                    rowMain={<TeamProfile team={topic} />}
+                    linkButton={{
+                      label: "View topic",
+                      link: "#",
+                    }}
+                    controlButtons={[
+                      {
+                        label: "Edit",
+                        color: 'bg-wri-gold hover:bg-yellow-400',
+                        icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
+                        tooltip: {
+                          id: `edit-tooltip-${topic.name}`,
+                          content: "Edit topic"
+                        },
+                        onClick: () => {
+                          router.push(`/dashboard/topics/${topic.name}/edit`)
+                        }
+                      },
+                      {
+                        label: "Delete",
+                        color: 'bg-red-600 hover:bg-red-500',
+                        icon: <TrashIcon className='w-4 h-4 text-white' />,
+                        tooltip: {
+                          id: `delete-tooltip-${topic.name}`,
+                          content: "Delete topic"
+                        },
+                        onClick: () => handleOpenModal(topic)
+                      },
+                    ]}
+                    rowSub={<SubCardProfile teams={topic.children} />}
+                    isDropDown
+                  />
+                </div>
+
               )
             })
           )
         }
+
+        {selectedTopic && (
+          <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
+            <h3 className='w-full text-center my-auto'>Delete Topic: {selectedTopic.name}</h3>
+            <button
+              className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
+              id={selectedTopic.name}
+              onClick={() => {
+                deleteTopic.mutate(selectedTopic.id)
+              }}
+              disabled={deleteTopic.isSuccess}
+            >{deleteTopic.isLoading ?? isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTopic.isError ? "Something went wrong Try again" : "I want to delete this topic"} </button>
+          </Modal>
+        )}
       </div>
     </section>
   )

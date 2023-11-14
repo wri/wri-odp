@@ -5,7 +5,6 @@ import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { WriDataset } from '@/schema/ckan.schema';
 import { formatDate } from '@/utils/general';
 
-
 function subFields(dataset: WriDataset) {
   return [
     {
@@ -74,14 +73,30 @@ function SubCardProfile({ dataset }: { dataset: WriDataset }) {
   )
 }
 
-export default function DatasetRow({ className, dataset }: { className?: string, dataset: WriDataset }) {
+export default function DatasetRow({ className, dataset, handleOpenModal }: { className?: string, dataset: WriDataset, handleOpenModal: (dataset: WriDataset) => void }) {
   return (
     <Row
       className={`pr-2 sm:pr-4 ${className ? className : ''}`}
       rowMain={<DatasetCardProfile dataset={dataset} />}
       controlButtons={[
-        { label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-        { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+        {
+          label: "Edit", color: 'bg-wri-gold hover:bg-yellow-400',
+          icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
+          tooltip: {
+            id: `edit-tooltip-${dataset.name}`,
+            content: "Edit dataset"
+          },
+          onClick: () => { }
+        },
+        {
+          label: "Delete", color: 'bg-red-600 hover:bg-red-500',
+          icon: <TrashIcon className='w-4 h-4 text-white' />,
+          tooltip: {
+            id: `delete-tooltip-${dataset.name}`,
+            content: "Delete dataset"
+          },
+          onClick: () => handleOpenModal(dataset)
+        },
       ]}
       linkButton={{
         label: "View dataset",
@@ -109,17 +124,35 @@ export function FavouriteRow({ className, dataset }: { className?: string, datas
   )
 }
 
-export function DraftRow({ className, dataset }: { className?: string, dataset: WriDataset }) {
+export function DraftRow({ className, dataset, handleOpenModal }: { className?: string, dataset: WriDataset, handleOpenModal: (dataset: WriDataset) => void }) {
   return (
     <Row
+      authorized={true}
       className={`pr-2 sm:pr-4 ${className ? className : ''}`}
       rowMain={<DatasetCardProfile dataset={dataset} />}
       controlButtons={[
-        { label: "Edit", color: 'bg-wri-gold hover:bg-green-400', icon: <PencilSquareIcon className='w-4 h-4 text-white' />, onClick: () => { } },
-        { label: "Delete", color: 'bg-red-600 hover:bg-red-500', icon: <TrashIcon className='w-4 h-4 text-white' />, onClick: () => { } },
+        {
+          label: "Edit", color: 'bg-wri-gold hover:bg-green-400',
+          icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
+          tooltip: {
+            id: `delete-tooltip-${dataset.name}`,
+            content: "Edit dataset"
+          },
+          onClick: () => { }
+        },
+        {
+          label: "Delete", color: 'bg-red-600 hover:bg-red-500',
+          icon: <TrashIcon className='w-4 h-4 text-white' />,
+          tooltip: {
+            id: `delete-tooltip-${dataset.name}`,
+            content: "Delete dataset"
+          },
+          onClick: () => handleOpenModal(dataset)
+        },
       ]}
       rowSub={<SubCardProfile dataset={dataset} />}
       isDropDown
     />
+
   )
 }

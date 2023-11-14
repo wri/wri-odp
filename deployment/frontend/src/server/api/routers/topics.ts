@@ -26,7 +26,7 @@ export const TopicRouter = createTRPCRouter({
                     })
                     const rgroup = {
                         ...group,
-                        image_display_url: groupDetails?.image_display_url,
+                        image_display_url: groupDetails?.image_display_url ? groupDetails?.image_display_url : '/images/placeholders/topics/topicsdefault.png',
                     }
                     rgroup.children.map(async (child) => {
                         const childDetails = await getGroup({
@@ -34,10 +34,10 @@ export const TopicRouter = createTRPCRouter({
                             id: child.id,
                         })
                         child.image_display_url =
-                            childDetails?.image_display_url
+                            childDetails?.image_display_url ? childDetails?.image_display_url : '/images/placeholders/topics/topicsdefault.png'
                         return child
                     })
-                    return group
+                    return rgroup
                 })
             )
             let result = groupDetails
@@ -198,4 +198,20 @@ export const TopicRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
-})
+    deleteDashBoardTopic: protectedProcedure
+        .input(z.string())
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/group_delete`, {
+                method: "POST",
+                body: JSON.stringify({ id: input }),
+                headers: {
+                    "Authorization": ctx.session.user.apikey,
+                    "Content-Type": "application/json"
+                }
+            });
+            const data = (await response.json()) as CkanResponse<null>;
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
+        })
+
+});

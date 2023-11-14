@@ -2,12 +2,18 @@ import React, { useState } from 'react'
 import { EyeIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { Transition } from '@headlessui/react'
 import classNames from '@/utils/classnames';
+import { useSession } from "next-auth/react"
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 type RowButton = {
   label?: string;
   icon?: React.ReactNode;
   color?: string;
   onClick: () => void;
+  tooltip?: {
+    id: string;
+    content: string;
+  }
 }
 
 type RowLinkButton = {
@@ -23,10 +29,12 @@ type RowProps = {
   linkButton?: RowLinkButton;
   groupStyle?: string
   className?: string;
+  authorized?: boolean;
 }
 
-export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, groupStyle, className }: RowProps) {
+export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, groupStyle, className, authorized }: RowProps) {
   const [isShowSubRow, setIsShowSubRow] = useState(false)
+  const { data: session } = useSession()
   // state event to change hover effect on desktop to click effect on mobile
   // const [isHover, setIsHover] = useState(false)
   const enableControlDiv = (isDropDown ?? controlButtons ?? linkButton) ? true : false
@@ -44,15 +52,21 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
               <EyeIcon className="h-6 w-6 text-black " />
             </a>
           ) : ""}
-          {(controlButtons) ? controlButtons.map((button, index) => {
+          {(controlButtons) && (session?.user.sysadmin ?? authorized) ? controlButtons.map((button, index) => {
             return (
-              <button
-                key={index}
-                onClick={button.onClick}
-                className={`my-auto flex sm:invisible  items-center justify-center  ${groupStyle ? groupStyle : "group-hover:visible "}  w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"}`}
-              >
-                {(button.icon)}
-              </button>
+              <React.Fragment key={index}>
+                <DefaultTooltip content={button?.tooltip ? button?.tooltip.content : "tooltip-content"}>
+                  <button
+                    key={button?.tooltip ? button?.tooltip.id : `tooltip-id-${index}`}
+                    id={button?.tooltip ? button?.tooltip.id : "tooltip-id"}
+                    onClick={button.onClick}
+                    className={`my-auto flex sm:invisible  items-center justify-center  ${groupStyle ? groupStyle : "group-hover:visible "}  w-8 h-8 rounded-full  ${button?.color ? button.color : index == 1 ? "bg-wri-gold" : " bg-red-600"}`}
+                  >
+                    {(button.icon)}
+                  </button>
+                </DefaultTooltip>
+              </React.Fragment>
+
             )
           }) : ""}
 
