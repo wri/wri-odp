@@ -22,7 +22,6 @@ import { match } from 'ts-pattern'
 import { v4 as uuidv4 } from 'uuid'
 
 export default function CreateDatasetForm() {
-    const datasetId = uuidv4()
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [selectedIndex, setSelectedIndex] = useState(0)
     const router = useRouter()
@@ -31,7 +30,6 @@ export default function CreateDatasetForm() {
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
         defaultValues: {
-            id: datasetId,
             team: {
                 value: '',
                 label: '',

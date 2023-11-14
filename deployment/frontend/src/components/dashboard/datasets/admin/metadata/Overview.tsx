@@ -39,6 +39,8 @@ export function OverviewForm({
     const topicHierarchy = api.topics.getTopicsHierarchy.useQuery()
     const possibleLicenses = api.dataset.getLicenses.useQuery()
 
+    console.log(errors)
+    console.log(watch('team'))
     return (
         <MetadataAccordion
             defaultOpen={true}
@@ -137,7 +139,7 @@ export function OverviewForm({
                                     page
                                 </span>
                             ))}
-                        <ErrorDisplay name="parent" errors={errors} />
+                        <ErrorDisplay name="team" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Projects">
                         <MulText

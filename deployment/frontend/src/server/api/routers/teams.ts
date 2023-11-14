@@ -9,7 +9,7 @@ export const teamRouter = createTRPCRouter({
         console.log(env.CKAN_URL)
         const user = ctx.session.user
         const teamRes = await fetch(
-            `${env.CKAN_URL}/api/action/organization_list?all_fields=True`,
+            `${env.CKAN_URL}/api/action/organization_list_for_user?all_fields=True`,
             {
                 headers: {
                     'Content-Type': 'application/json',

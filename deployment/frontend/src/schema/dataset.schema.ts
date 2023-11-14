@@ -16,7 +16,7 @@ export const DataDictionarySchema = z.array(
 export const ResourceSchema = z.object({
     description: z.string().optional(),
     resourceId: z.string().uuid(),
-    url: z.string().min(2, { message: 'URL is required'}).url().optional(),
+    url: z.string().min(2, { message: 'URL is required' }).url().optional(),
     name: z.string().optional(),
     key: z.string().optional(),
     format: z
@@ -34,7 +34,6 @@ export const ResourceSchema = z.object({
 })
 
 export const DatasetSchema = z.object({
-    id: z.string().uuid(),
     title: z.string().min(1, { message: 'Title is required' }),
     name: z.string().min(1, { message: 'Name is required' }),
     source: z.string().optional().nullable().or(emptyStringToUndefined),
@@ -44,11 +43,15 @@ export const DatasetSchema = z.object({
             label: z.string(),
         })
         .optional(),
-    team: z.object({
-        value: z.string(),
-        label: z.string(),
-        id: z.string(),
-    }).optional(),
+    team: z
+        .object({
+            value: z.string(),
+            label: z.string(),
+            id: z.string(),
+        })
+        .refine((val) => val.value !== '', {
+            message: 'Team is required',
+        }),
     projects: z.array(z.string()),
     applications: z.string().optional().nullable(),
     technical_notes: z.string().url(),
@@ -86,7 +89,9 @@ export const DatasetSchema = z.object({
             label: z.string(),
         })
         .optional(),
-    short_description: z.string().min(1, { message: 'Description is required' }),
+    short_description: z
+        .string()
+        .min(1, { message: 'Description is required' }),
     notes: z.string().optional().nullable(),
     featured_dataset: z.boolean().optional().nullable(),
     featured_image: z.string().optional().nullable(),
