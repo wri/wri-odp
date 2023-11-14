@@ -23,3 +23,7 @@ You can edit a team by going to `/dashboard/teams/{team url}/edit` or by clickin
 Once you go there you can change all the fields that were defined in the new team except the `url` which needs to stay the same for integrity of the system sake
 
 ![Edit team page](./edit.png)
+
+In this edit page you can also delete by clicking on the "Delete Button" which should open up a modal for confirmation
+
+![Delete team modal](./delete.png)
