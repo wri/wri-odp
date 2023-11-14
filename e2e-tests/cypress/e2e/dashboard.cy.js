@@ -55,9 +55,9 @@ describe("Dashboard Test", () => {
 
   it("Should test Users page", () => {
     cy.visit("/dashboard/users")
-    cy.contains(user)
     cy.get('input[type="search"]').type(user).type('{enter}');
     cy.contains(user)
+    cy.get(`button#delete-tooltip-${user}`).first().click({ force: true });
 
   })
   it("Should test teams page", () => {
