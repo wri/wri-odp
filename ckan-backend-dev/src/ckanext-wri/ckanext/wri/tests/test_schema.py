@@ -31,7 +31,8 @@ def test_package_create():
         "groups": [{"id": group_dict["id"]}],
         "technical_notes": "http://example.com/technical_notes.pdf",
         "tag_string": "economy,mental health,government",
-        "temporal_coverage": "2007-2021",
+        "temporal_coverage_start": "2007",
+        "temporal_coverage_end": "2011",
         "update_frequency": "annually",
         "citation": "Citation information",
         "visibility_type": "draft",
@@ -78,7 +79,8 @@ def test_package_create():
     assert all(
         tag["name"] in tag_string for tag in result["tags"]
     )
-    assert result["temporal_coverage"] == dataset["temporal_coverage"]
+    assert result["temporal_coverage_start"] == dataset["temporal_coverage_start"]
+    assert result["temporal_coverage_end"] == dataset["temporal_coverage_end"]
     assert result["update_frequency"] == dataset["update_frequency"]
     assert result["citation"] == dataset["citation"]
     assert result["visibility_type"] == dataset["visibility_type"]

@@ -20,7 +20,7 @@ export default function FiltersSelected({
                         <button
                             onClick={() => {
                                 setFilters((prev) => {
-                                    const newFilters = [ ...prev ]
+                                    const newFilters = [...prev]
                                     newFilters.splice(
                                         newFilters.findIndex(
                                             (of) =>
@@ -37,14 +37,16 @@ export default function FiltersSelected({
                     </div>
                 ))}
             </div>
-            <button
-                onClick={() => {
-                    setFilters([])
-                }}
-                className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-            >
-                Clear all filters
-            </button>
+            {filters.length ? (
+                <button
+                    onClick={() => {
+                        setFilters([])
+                    }}
+                    className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                >
+                    Clear all filters
+                </button>
+            ) : null}
         </div>
     )
 }

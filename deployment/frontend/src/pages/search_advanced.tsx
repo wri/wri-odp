@@ -3,6 +3,7 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import Footer from '@/components/_shared/Footer'
 import Header from '@/components/_shared/Header'
 import Pagination from '@/components/_shared/Pagination'
+import Spinner from '@/components/_shared/Spinner'
 import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard'
 import FilteredSearchLayout from '@/components/search/FilteredSearchLayout'
 import FiltersSelected from '@/components/search/FiltersSelected'
@@ -11,20 +12,41 @@ import { Filter } from '@/interfaces/search.interface'
 import { SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-export default function SearchPage() {
+export function getServerSideProps({ query }: { query: any }) {
+    const initialFilters = query.search
+        ? JSON.parse(query.search as string)
+        : []
+    const initialPage = query.page
+        ? JSON.parse(query.page as string)
+        : { start: 0, rows: 10 }
+    const initialSortBy = query.sort_by
+        ? JSON.parse(query.sort_by as string)
+        : 'relevance asc'
+
+    return { props: { initialFilters, initialPage, initialSortBy } }
+}
+
+export default function SearchPage({
+    initialFilters,
+    initialPage,
+    initialSortBy,
+}: any) {
+    const router = useRouter()
+
     /**
      * Query used to show results
      *
      */
     const [query, setQuery] = useState<SearchInput>({
         search: '',
-        page: { start: 0, rows: 10 },
-        sortBy: "relevance asc"
+        page: initialPage,
+        sortBy: initialSortBy,
     })
 
-    const [filters, setFilters] = useState<Filter[]>([])
+    const [filters, setFilters] = useState<Filter[]>(initialFilters)
 
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
 
@@ -40,9 +62,26 @@ export default function SearchPage() {
         const fq: any = {}
 
         keys.forEach((key) => {
+            let keyFq
+
             const keyFilters = filters.filter((f) => f.key == key)
-            const keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
-            fq[key as string] = keyFq
+            if ((key as string) == 'temporal_coverage_start') {
+                if (keyFilters.length > 0) {
+                    const temporalCoverageStart = keyFilters[0]
+
+                    keyFq = `[${temporalCoverageStart?.value} TO *]`
+                }
+            } else if ((key as string) == 'temporal_coverage_end') {
+                if (keyFilters.length > 0) {
+                    const temporalCoverageEnd = keyFilters[0]
+
+                    keyFq = `[${temporalCoverageEnd?.value} TO *]`
+                }
+            } else {
+                keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
+            }
+
+            if (keyFq) fq[key as string] = keyFq
         })
 
         setQuery((prev) => {
@@ -54,12 +93,37 @@ export default function SearchPage() {
         })
     }, [filters])
 
+    /*
+     * Update URL query params when page or filters change
+     *
+     */
+    useEffect(() => {
+        router.push(
+            {
+                pathname: router.pathname,
+                query: {
+                    search: JSON.stringify(filters),
+                    page: JSON.stringify(query.page),
+                    sort_by: JSON.stringify(query.sortBy),
+                },
+            },
+            undefined,
+            {
+                shallow: true,
+            }
+        )
+    }, [filters, query.page, query.sortBy])
+
     return (
         <>
             <Header />
             <Search filters={filters} setFilters={setFilters} />
             <FilteredSearchLayout setFilters={setFilters} filters={filters}>
-                <SortBy count={data?.count ?? 0} setQuery={setQuery} />
+                <SortBy
+                    count={data?.count ?? 0}
+                    setQuery={setQuery}
+                    query={query}
+                />
                 <FiltersSelected filters={filters} setFilters={setFilters} />
                 <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
                     {data?.datasets.map((dataset, number) => (
@@ -68,8 +132,13 @@ export default function SearchPage() {
                             dataset={dataset}
                         />
                     ))}
+                    {isLoading && (
+                        <div className="mx-auto">
+                            <Spinner />
+                        </div>
+                    )}
                 </div>
-                <Pagination setQuery={setQuery} query={query} data={data} />
+                {<Pagination setQuery={setQuery} query={query} data={data} />}
             </FilteredSearchLayout>
             <Footer />
         </>

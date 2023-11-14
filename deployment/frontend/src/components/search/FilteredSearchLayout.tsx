@@ -12,6 +12,8 @@ import { Filter, Facets as SearchFacet } from '@/interfaces/search.interface'
 import { SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
 import { useSession } from 'next-auth/react'
+import TemporalCoverageFacet from './TemporalCoverageFacet'
+import Spinner from '../_shared/Spinner'
 
 export default function FilteredSearchLayout({
     children,
@@ -35,24 +37,19 @@ export default function FilteredSearchLayout({
         { key: 'application', title: 'Application' },
         { key: 'projects', title: 'Projects' },
         { key: 'organization', title: 'Team' },
-        { key: 'group', title: 'Group' },
+        { key: 'groups', title: 'Topics' },
         { key: 'tags', title: 'Tags' },
-        { key: 'resolution', title: 'Resolution' },
-        { key: 'temporal_coverage', title: 'Temporal Coverage' },
+        {
+            key: 'temporal_coverage',
+            title: 'Temporal Coverage',
+        },
         { key: 'update_frequency', title: 'Update Frequency' },
         { key: 'res_format', title: 'Format' },
         { key: 'license_id', title: 'License' },
         { key: 'language', title: 'Language' },
         { key: 'wri_data', title: 'WRI Data' },
+        { key: 'visibility_type', title: 'Visibility' },
     ]
-
-    /*
-     * Some facets are only for signed in users
-     *
-     */
-    if (session.status == 'authenticated') {
-        facetFields.push({ key: 'visibility_type', title: 'Visibility' })
-    }
 
     const [facetsQuery] = useState<SearchInput>({
         search: '',
@@ -67,6 +64,10 @@ export default function FilteredSearchLayout({
 
     if (searchFacets) {
         for (let key in searchFacets) {
+            /*
+             * Boolean fields look better with Yes and No options
+             *
+             */
             if (['featured_dataset', 'wri_data'].includes(key)) {
                 const items =
                     searchFacets[key]?.items.map((i) => ({
@@ -157,17 +158,56 @@ export default function FilteredSearchLayout({
                                                 <li>
                                                     <ul role="list">
                                                         <LocationSearch />
-                                                        <Facet
-                                                            text="Team"
-                                                            options={
-                                                                searchFacets?.organization?.items.map(
-                                                                    (o) => ({
-                                                                        label: o.display_name,
-                                                                        value: o.name,
-                                                                    })
-                                                                ) || []
-                                                            }
-                                                        />
+                                                        {!isLoadingFacets &&
+                                                            facetFields.map(
+                                                                (ff) =>
+                                                                    ff.key !=
+                                                                    'temporal_coverage' ? (
+                                                                        <Facet
+                                                                            text={
+                                                                                ff.title
+                                                                            }
+                                                                            options={
+                                                                                searchFacets &&
+                                                                                searchFacets[
+                                                                                    ff
+                                                                                        .key
+                                                                                ]
+                                                                                    ? searchFacets[
+                                                                                          ff
+                                                                                              .key
+                                                                                      ]?.items.map(
+                                                                                          (
+                                                                                              o
+                                                                                          ) => ({
+                                                                                              label: o.display_name,
+                                                                                              value: o.name,
+                                                                                          })
+                                                                                      ) ||
+                                                                                      []
+                                                                                    : []
+                                                                            }
+                                                                            fqKey={
+                                                                                ff.key
+                                                                            }
+                                                                            setFilters={
+                                                                                setFilters
+                                                                            }
+                                                                            filters={
+                                                                                filters
+                                                                            }
+                                                                        />
+                                                                    ) : (
+                                                                        <TemporalCoverageFacet
+                                                                            filters={
+                                                                                filters
+                                                                            }
+                                                                            setFilters={
+                                                                                setFilters
+                                                                            }
+                                                                        />
+                                                                    )
+                                                            )}
                                                     </ul>
                                                 </li>
                                             </ul>
@@ -217,33 +257,55 @@ export default function FilteredSearchLayout({
                                             <li>
                                                 <ul role="list">
                                                     <LocationSearch />
-                                                    {facetFields.map((ff) => (
-                                                        <Facet
-                                                            text={ff.title}
-                                                            options={
-                                                                searchFacets &&
-                                                                searchFacets[
-                                                                    ff.key
-                                                                ]
-                                                                    ? searchFacets[
-                                                                          ff.key
-                                                                      ]?.items.map(
-                                                                          (
-                                                                              o
-                                                                          ) => ({
-                                                                              label: o.display_name,
-                                                                              value: o.name,
-                                                                          })
-                                                                      ) || []
-                                                                    : []
-                                                            }
-                                                            fqKey={ff.key}
-                                                            setFilters={
-                                                                setFilters
-                                                            }
-                                                            filters={filters}
-                                                        />
-                                                    ))}
+                                                    {!isLoadingFacets &&
+                                                        facetFields.map((ff) =>
+                                                            ff.key !=
+                                                            'temporal_coverage' ? (
+                                                                <Facet
+                                                                    text={
+                                                                        ff.title
+                                                                    }
+                                                                    options={
+                                                                        searchFacets &&
+                                                                        searchFacets[
+                                                                            ff
+                                                                                .key
+                                                                        ]
+                                                                            ? searchFacets[
+                                                                                  ff
+                                                                                      .key
+                                                                              ]?.items.map(
+                                                                                  (
+                                                                                      o
+                                                                                  ) => ({
+                                                                                      label: o.display_name,
+                                                                                      value: o.name,
+                                                                                  })
+                                                                              ) ||
+                                                                              []
+                                                                            : []
+                                                                    }
+                                                                    fqKey={
+                                                                        ff.key
+                                                                    }
+                                                                    setFilters={
+                                                                        setFilters
+                                                                    }
+                                                                    filters={
+                                                                        filters
+                                                                    }
+                                                                />
+                                                            ) : (
+                                                                <TemporalCoverageFacet
+                                                                    filters={
+                                                                        filters
+                                                                    }
+                                                                    setFilters={
+                                                                        setFilters
+                                                                    }
+                                                                />
+                                                            )
+                                                        )}
                                                 </ul>
                                             </li>
                                         </ul>

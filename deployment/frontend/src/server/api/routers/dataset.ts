@@ -9,17 +9,17 @@ import { getUserOrganizations, getAllDatasetFq } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 
 export const DatasetRouter = createTRPCRouter({
-    getAllDataset: protectedProcedure
+    getAllDataset: publicProcedure 
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             const isUserSearch = input._isUserSearch
 
             let fq = ''
             let orgsFq = ''
-            if (isUserSearch) {
+            if (isUserSearch && ctx.session) {
                 const organizations = await getUserOrganizations({
-                    userId: ctx.session.user.id,
-                    apiKey: ctx.session.user.apikey,
+                    userId: ctx.session?.user.id,
+                    apiKey: ctx.session?.user.apikey,
                 })
                 orgsFq = `organization:(${organizations
                     ?.map((org) => org.name)
@@ -48,7 +48,7 @@ export const DatasetRouter = createTRPCRouter({
             }
 
             const dataset = (await getAllDatasetFq({
-                apiKey: ctx.session.user.apikey,
+                apiKey: ctx.session?.user.apikey ?? "",
                 fq: fq,
                 query: input,
                 facetFields: input.facetFields,

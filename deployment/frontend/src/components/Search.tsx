@@ -33,6 +33,7 @@ export default function Search({
 
     const { handleSubmit, register, reset } = useForm<searchFormType>({
         resolver: zodResolver(searchSchema),
+        defaultValues: { search: '' },
     })
 
     useEffect(() => {
@@ -120,7 +121,11 @@ export default function Search({
                                 <MagnifyingGlassIcon className="h-5 w-5 text-wri-black" />
                             </button>
                         ) : (
-                            <button onClick={() => reset()}>
+                            <button
+                                onClick={(e) => {
+                                    reset()
+                                }}
+                            >
                                 <XMarkIcon className="h-5 w-5 text-wri-black" />
                             </button>
                         )}
