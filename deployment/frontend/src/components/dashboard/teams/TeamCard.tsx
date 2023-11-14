@@ -35,7 +35,7 @@ export default function TeamCard() {
   const { data, isLoading, refetch } = api.organization.getUsersOrganizations.useQuery(query)
   const [selectedTeam, setSelectedTeam] = useState<IOrg | null>(null);
   const [open, setOpen] = useState(false)
-  const deleteTeam = api.teams.deleteTeam.useMutation({
+  const deleteTeam = api.teams.deleteDashboardTeam.useMutation({
     onSuccess: async (data) => {
       await refetch();
       setOpen(false)

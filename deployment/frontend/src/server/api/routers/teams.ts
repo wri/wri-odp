@@ -140,7 +140,7 @@ export const teamRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
-    deleteTeam: protectedProcedure
+    deleteDashboardTeam: protectedProcedure
         .input(z.string())
         .mutation(async ({ input, ctx }) => {
             const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_delete`, {
