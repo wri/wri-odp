@@ -87,7 +87,7 @@ export const UserRouter = createTRPCRouter({
               id: user.id!,
               description: user?.email,
               orgnumber: userTemp?.length,
-              image_display_url: user?.image_url,
+              image_display_url: user?.image_url ? user?.image_url : '/images/placeholders/user/userdefault.png',
               orgs: userOrgDetails
             })
           }
@@ -97,7 +97,7 @@ export const UserRouter = createTRPCRouter({
               id: user.id!,
               description: user?.email,
               orgnumber: 0,
-              image_display_url: user?.image_url,
+              image_display_url: user?.image_url ? user?.image_url : '/images/placeholders/user/userdefault.png',
               orgs: []
             })
           }

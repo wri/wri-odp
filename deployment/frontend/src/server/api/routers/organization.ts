@@ -23,7 +23,7 @@ export const OrganizationRouter = createTRPCRouter({
         return {
           title: orgTitle,
           name: orgName,
-          image_display_url: orgImage,
+          image_display_url: orgImage ? orgImage : '/images/placeholders/teams/teamdefault.png',
           description: `${userCount} Member(s) | ${packageCount} Datasets`
         }
       }));
@@ -31,7 +31,7 @@ export const OrganizationRouter = createTRPCRouter({
       type IOrg = {
         title: string | undefined;
         name: string | undefined;
-        image_display_url: string | undefined;
+        image_display_url: string;
         description: string;
       }
       let result = org;

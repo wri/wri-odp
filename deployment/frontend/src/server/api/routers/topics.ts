@@ -26,7 +26,7 @@ export const TopicRouter = createTRPCRouter({
                     })
                     const rgroup = {
                         ...group,
-                        image_display_url: groupDetails?.image_display_url,
+                        image_display_url: groupDetails?.image_display_url ? groupDetails?.image_display_url : '/images/placeholders/topics/topicsdefault.png',
                     }
                     rgroup.children.map(async (child) => {
                         const childDetails = await getGroup({
@@ -34,10 +34,10 @@ export const TopicRouter = createTRPCRouter({
                             id: child.id,
                         })
                         child.image_display_url =
-                            childDetails?.image_display_url
+                            childDetails?.image_display_url ? childDetails?.image_display_url : '/images/placeholders/topics/topicsdefault.png'
                         return child
                     })
-                    return group
+                    return rgroup
                 })
             )
             let result = groupDetails
