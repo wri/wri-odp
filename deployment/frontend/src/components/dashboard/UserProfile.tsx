@@ -5,7 +5,6 @@ import Spinner from '../_shared/Spinner';
 
 export default function UserProfile() {
   const { data, isLoading } = api.user.getDashboardUser.useQuery();
-  console.log("USER: ", data)
   if (isLoading) return (
     <div className='w-full flex flex-col justify-center items-center font-acumin gap-y-2 text-white pb-6 pt-10'>
       <Spinner />

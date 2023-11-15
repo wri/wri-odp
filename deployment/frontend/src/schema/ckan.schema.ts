@@ -55,7 +55,7 @@ export interface ActivityDisplay {
 }
 
 export interface WriDataset extends Dataset {
-  summary?: string;
+  methodology?: string;
   technical_notes?: string;
   temporal_coverage_start: string;
   temporal_coverage_end: string;

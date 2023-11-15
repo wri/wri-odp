@@ -89,12 +89,12 @@ export function MoreDetailsForm({
                         />
                     </InputGroup>
                     <InputGroup
-                        label="Summary"
+                        label="Methodology"
                         className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
                     >
                         <SimpleEditor
                             formObj={formObj}
-                            name="summary"
+                            name="methodology"
                             className="min-h-[320px]"
                             defaultValue=""
                         />

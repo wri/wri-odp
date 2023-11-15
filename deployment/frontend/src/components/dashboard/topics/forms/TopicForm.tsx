@@ -100,9 +100,9 @@ export default function TopicForm({
                                 <span className="mt-1">Loading parents...</span>
                             </span>
                         ))
-                        .with({ isError: true }, () => (
+                        .with({ isError: true, errors: P.select() }, (errors) => (
                             <span className="flex items-center text-sm text-red-600">
-                                Error loading parents, please refresh the page
+                                Error({JSON.stringify(errors)}) loading parents, please refresh the page
                             </span>
                         ))
                         .with({ isSuccess: true, data: P.select() }, (data) => (

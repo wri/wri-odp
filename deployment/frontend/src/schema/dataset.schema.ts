@@ -76,8 +76,8 @@ export const DatasetSchema = z
         update_frequency: z
             .object({
                 value: z.enum([
-                    'anually',
-                    'bianually',
+                    'annually',
+                    'biannually',
                     'weekly',
                     'as_needed',
                     'hourly',
@@ -124,7 +124,7 @@ export const DatasetSchema = z
             .nullable()
             .or(emptyStringToUndefined),
         cautions: z.string().optional().nullable(),
-        summary: z.string().optional().nullable(),
+        methodology: z.string().optional().nullable(),
         extras: z.array(
             z.object({
                 key: z.string(),

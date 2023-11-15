@@ -27,20 +27,24 @@ TooltipContent.displayName = TooltipPrimitive.Content.displayName
 const DefaultTooltip = ({
     children,
     content,
+    disabled = false,
 }: {
     children: React.ReactNode
-    content: string
-}) => (
-    <TooltipProvider delayDuration={100}>
-        <Tooltip>
-            <TooltipTrigger asChild>
-          {children}</TooltipTrigger>
-            <TooltipContent className='bg-white'>
-                <p>{content}</p>
-            </TooltipContent>
-        </Tooltip>
-    </TooltipProvider>
-)
+    content: React.ReactNode | string
+    disabled?: boolean
+}) => {
+    if (disabled) return <>{children}</>
+    return (
+        <TooltipProvider delayDuration={100}>
+            <Tooltip>
+                <TooltipTrigger asChild>{children}</TooltipTrigger>
+                <TooltipContent className="bg-white">
+                    <p>{content}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    )
+}
 export {
     DefaultTooltip,
     Tooltip,
