@@ -39,8 +39,6 @@ export function OverviewForm({
     const topicHierarchy = api.topics.getTopicsHierarchy.useQuery()
     const possibleLicenses = api.dataset.getLicenses.useQuery()
 
-    console.log(errors)
-    console.log(watch('team'))
     return (
         <MetadataAccordion
             defaultOpen={true}
@@ -189,7 +187,7 @@ export function OverviewForm({
                                 </span>
                             ))}
                     </InputGroup>
-                    <InputGroup label="Technical Notes" required>
+                    <InputGroup label="Technical Notes" required={watch('visibility_type').value === 'public'}>
                         <Input
                             {...register('technical_notes')}
                             placeholder="https://source/to/original/data"

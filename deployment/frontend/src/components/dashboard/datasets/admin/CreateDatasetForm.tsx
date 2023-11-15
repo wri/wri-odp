@@ -72,10 +72,21 @@ export default function CreateDatasetForm() {
     })
 
     const createDataset = api.dataset.createDataset.useMutation({
-        onSuccess: async ({ name }) => {
-            notify(`Successfully created the ${name} dataset`, 'success')
-            router.push('/dashboard/datasets')
-            formObj.reset()
+        onSuccess: async ({ title, name, visibility_type }) => {
+            if (visibility_type !== 'draft') {
+                notify(
+                    `Successfully created the "${title ?? name}" dataset`,
+                    'success'
+                )
+                router.push('/dashboard/datasets')
+                formObj.reset()
+            }
+            notify(
+                `Successfully created the draft for the "${
+                    title ?? name
+                }" dataset`,
+                'success'
+            )
         },
         onError: (error) => {
             setErrorMessage(error.message)
@@ -113,8 +124,8 @@ export default function CreateDatasetForm() {
                         <DescriptionForm formObj={formObj} />
                         <PointOfContactForm formObj={formObj} />
                         <MoreDetailsForm formObj={formObj} />
-                        <CustomFieldsForm formObj={formObj} />
                         <OpenInForm formObj={formObj} />
+                        <CustomFieldsForm formObj={formObj} />
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <CreateDataFilesSection formObj={formObj} />
