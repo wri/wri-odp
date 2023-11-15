@@ -11,7 +11,7 @@ import Modal from '@/components/_shared/Modal';
 
 
 export default function Mydataset() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.dataset.getMyDataset.useQuery(query)
   const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
   const [open, setOpen] = useState(false)

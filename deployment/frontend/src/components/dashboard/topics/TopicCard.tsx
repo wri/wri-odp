@@ -32,7 +32,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
   const router = useRouter()
   const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
     onSuccess: async (data) => {
-      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 2 } })
+      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 10 } })
       setOpen(false)
       notify(`Topic delete is successful`, 'success')
     }
@@ -110,7 +110,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
 
 
 export default function TopicCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
   const [open, setOpen] = useState(false)
   const router = useRouter()

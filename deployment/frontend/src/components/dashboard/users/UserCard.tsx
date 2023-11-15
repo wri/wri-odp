@@ -46,7 +46,7 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
   const [selectedTeam, setSelectedTeam] = useState<{ name?: string } | null>(null);
   const removeMember = api.user.deleteMember.useMutation({
     onSuccess: async (data) => {
-      await utils.user.getAllUsers.invalidate({ search: '', page: { start: 0, rows: 2 } })
+      await utils.user.getAllUsers.invalidate({ search: '', page: { start: 0, rows: 10 } })
       setOpen(false)
       notify(`Member removed successful`, 'success')
     },
@@ -125,7 +125,7 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
 
 
 export default function UserCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.user.getAllUsers.useQuery(query)
   const [open, setOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
