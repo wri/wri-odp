@@ -28,7 +28,6 @@ const facets = [
   "License",
   "Language",
   "WRI Data",
-  "Visibility",
 ];
 
 describe("Search page", () => {
