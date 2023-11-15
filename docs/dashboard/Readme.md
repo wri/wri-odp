@@ -9,6 +9,21 @@ The left sidebar contains the login user details and accessible list of pages
 
 ![](./profile.png)
 
+Also contains Main content section
+
+![](./dashboard.png)
+
+The `Quick action` container contains button that easily link to creating some of the entities.
+
+And the `see all ->` on other container leads to the main page of that container
+
+The setting button once clicked enables the container to be rearranged using drag and drop action
+
+![](./drag.png)
+
+and once then with re-arrangement click the check button to save the arrangment for your next visit.
+
+
 
 ## Dashboard dataset Page `/dashboard/datasets`
 
@@ -32,6 +47,10 @@ List all actions , like delete, update and creation of dataset, Teams and topics
 ![](./activitypage.png)
 
 contains filter by activity type  and pagination
+
+![](./activityfilter2.png)
+
+contains filter by time and days
 
 ![](./activityfilter.png)
 
@@ -82,3 +101,7 @@ here is how you delete a Dataset has an authorized user
 - click the the confirm delete button
 
 ![](delete2.png)
+
+- remove user from an organization: click on the delete button in the user drop down to remove user from an organization
+
+![](./removeuser.png)
