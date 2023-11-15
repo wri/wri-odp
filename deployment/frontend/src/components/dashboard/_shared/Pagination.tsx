@@ -13,7 +13,7 @@ export default function Pagination({ setQuery, query, isLoading, count }: {
   const handlePageChange = (page: number) => {
 
     if (setQuery && query && (page >= 0 && page < count!)) {
-      const updateQuery: SearchInput = { page: { ...query.page, start: page }, search: query.search }
+      const updateQuery: SearchInput = { ...query, page: { ...query.page, start: page }, search: query.search }
       setQuery(updateQuery)
     }
   }

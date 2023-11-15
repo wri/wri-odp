@@ -207,6 +207,7 @@ export function activityDetails(activity: Activity): ActivityDisplay {
   const activityType = activity.activity_type?.split(" ");
   const action = activityType[0]!;
   let object = activityType[1]!;
+  const actionType = activityType.join("_");
   let title = "";
   const GroupObject: Record<string, string> = {
     "group": "topic",
@@ -221,7 +222,7 @@ export function activityDetails(activity: Activity): ActivityDisplay {
   }
   const description = `${activitProperties[action]} the ${object} ${title}`;
   const time = timeAgo(activity.timestamp);
-  return { description, time, icon: action, action, timestamp: activity.timestamp };
+  return { description, time, icon: action, action, timestamp: activity.timestamp, actionType: actionType };
 }
 
 
