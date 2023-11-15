@@ -48,8 +48,11 @@ export default function FilteredSearchLayout({
         { key: 'license_id', title: 'License' },
         { key: 'language', title: 'Language' },
         { key: 'wri_data', title: 'WRI Data' },
-        { key: 'visibility_type', title: 'Visibility' },
     ]
+
+    if (session.status == 'authenticated') {
+        facetFields.push({ key: 'visibility_type', title: 'Visibility' })
+    }
 
     const [facetsQuery] = useState<SearchInput>({
         search: '',

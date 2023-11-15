@@ -14,6 +14,7 @@ import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 export function getServerSideProps({ query }: { query: any }) {
     const initialFilters = query.search
@@ -35,6 +36,7 @@ export default function SearchPage({
     initialSortBy,
 }: any) {
     const router = useRouter()
+    const session = useSession()
 
     /**
      * Query used to show results
@@ -118,28 +120,44 @@ export default function SearchPage({
         <>
             <Header />
             <Search filters={filters} setFilters={setFilters} />
-            <FilteredSearchLayout setFilters={setFilters} filters={filters}>
-                <SortBy
-                    count={data?.count ?? 0}
-                    setQuery={setQuery}
-                    query={query}
-                />
-                <FiltersSelected filters={filters} setFilters={setFilters} />
-                <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
-                    {data?.datasets.map((dataset, number) => (
-                        <DatasetHorizontalCard
-                            key={`dataset-card-${dataset.name}`}
-                            dataset={dataset}
-                        />
-                    ))}
-                    {isLoading && (
-                        <div className="mx-auto">
-                            <Spinner />
-                        </div>
-                    )}
+            {session.status == 'loading' && (
+                <div className="flex w-full justify-center mt-20">
+                    <Spinner />
                 </div>
-                {<Pagination setQuery={setQuery} query={query} data={data} />}
-            </FilteredSearchLayout>
+            )}
+            {session.status != 'loading' && (
+                <FilteredSearchLayout setFilters={setFilters} filters={filters}>
+                    <SortBy
+                        count={data?.count ?? 0}
+                        setQuery={setQuery}
+                        query={query}
+                    />
+                    <FiltersSelected
+                        filters={filters}
+                        setFilters={setFilters}
+                    />
+                    <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
+                        {data?.datasets.map((dataset, number) => (
+                            <DatasetHorizontalCard
+                                key={`dataset-card-${dataset.name}`}
+                                dataset={dataset}
+                            />
+                        ))}
+                        {isLoading && (
+                            <div className="mx-auto">
+                                <Spinner />
+                            </div>
+                        )}
+                    </div>
+                    {
+                        <Pagination
+                            setQuery={setQuery}
+                            query={query}
+                            data={data}
+                        />
+                    }
+                </FilteredSearchLayout>
+            )}
             <Footer />
         </>
     )
