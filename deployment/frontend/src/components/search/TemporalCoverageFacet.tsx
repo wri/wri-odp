@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import {Input} from '../_shared/SimpleInput'
+import { Input } from '../_shared/SimpleInput'
 
 export default function TemporalCoverageFacet({
     setFilters,
@@ -18,7 +18,7 @@ export default function TemporalCoverageFacet({
     const getUpdatedState = () => {
         return ['temporal_coverage_start', 'temporal_coverage_end'].reduce(
             (a, v) => {
-                const value = filters.find((f) => f?.key == v)
+                const value = filters.find((f) => f?.key == v)?.value ?? ''
 
                 return {
                     ...a,
@@ -29,9 +29,10 @@ export default function TemporalCoverageFacet({
         )
     }
 
-    const [optionsState, setOptionsState] = useState<{ [k: string]: number }>(
-        getUpdatedState()
-    )
+    const [optionsState, setOptionsState] = useState<{
+        temporal_coverage_start?: string
+        temporal_coverage_end?: string
+    }>(getUpdatedState())
 
     useEffect(() => {
         setOptionsState(getUpdatedState())
@@ -86,6 +87,16 @@ export default function TemporalCoverageFacet({
                                                 className="h-8 w-28 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
                                                 defaultValue={
                                                     optionsState.temporal_coverage_start
+                                                }
+                                                value={
+                                                    optionsState.temporal_coverage_start
+                                                }
+                                                onChange={(e) =>
+                                                    setOptionsState((prev) => ({
+                                                        ...prev,
+                                                        temporal_coverage_start:
+                                                            e.target.value,
+                                                    }))
                                                 }
                                                 onKeyDown={(e: any) => {
                                                     if (e.key == 'Enter') {
@@ -179,6 +190,16 @@ export default function TemporalCoverageFacet({
                                                     optionsState.temporal_coverage_end
                                                 }
                                                 className="h-8 w-28 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
+                                                value={
+                                                    optionsState.temporal_coverage_end
+                                                }
+                                                onChange={(e) =>
+                                                    setOptionsState((prev) => ({
+                                                        ...prev,
+                                                        temporal_coverage_end:
+                                                            e.target.value,
+                                                    }))
+                                                }
                                                 onKeyDown={(e: any) => {
                                                     if (e.key == 'Enter') {
                                                         setFilters((prev) => {
