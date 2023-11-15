@@ -26,7 +26,8 @@ export default function FiltersSelected({
                                             (of) =>
                                                 f.key == of.key &&
                                                 of.value == f.value
-                                        )
+                                        ),
+                                        1
                                     )
                                     return newFilters
                                 })

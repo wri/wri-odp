@@ -135,7 +135,7 @@ export default function Facet({
                                                     htmlFor={`facet-${fqKey}-${option.value}`}
                                                     className="select-none font-medium text-gray-900"
                                                 >
-                                                    {option.label}
+                                                    {option.label ?? option.value}
                                                 </label>
                                             </div>
                                         </div>

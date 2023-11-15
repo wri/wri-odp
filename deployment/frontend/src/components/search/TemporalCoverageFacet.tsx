@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import {Input} from '../_shared/SimpleInput'
 
 export default function TemporalCoverageFacet({
     setFilters,
@@ -76,7 +77,7 @@ export default function TemporalCoverageFacet({
                                             </label>
                                         </div>
                                         <div className="mr-3 flex h-6 items-center">
-                                            <input
+                                            <Input
                                                 id={`facet-temporal_coverage-start}`}
                                                 placeholder='E.g. "2010"'
                                                 type="number"
@@ -168,7 +169,7 @@ export default function TemporalCoverageFacet({
                                             </label>
                                         </div>
                                         <div className="mr-3 flex h-6 items-center">
-                                            <input
+                                            <Input
                                                 id={`facet-temporal_coverage-end}`}
                                                 type="number"
                                                 min="0"

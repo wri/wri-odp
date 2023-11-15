@@ -24,8 +24,9 @@ export default function DatasetHorizontalCard({
 }: {
     dataset: WriDataset
 }) {
-    const formats = [...new Set(dataset.resources.map((r) => r.format))]
-    console.log(dataset)
+    const formats = [
+        ...new Set(dataset.resources.map((r) => r.format).filter((f) => f)),
+    ]
 
     return (
         <Link href="/datasets/x">

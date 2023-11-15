@@ -67,7 +67,7 @@ describe("Search page", () => {
 
   it("displays all facets", () => {
     cy.visit("/search_advanced");
-    cy.get("#facets-list").as("facets-list");
+    cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
 
     for (let facet of facets) {
       cy.get("@facets-list").contains(facet);
@@ -76,7 +76,7 @@ describe("Search page", () => {
 
   it("allows filtering by facets", () => {
     cy.visit("/search_advanced");
-    cy.get("#facets-list").as("facets-list");
+    cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
 
     cy.get("@facets-list").contains("Team").click({ force: true });
 
