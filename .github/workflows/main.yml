@@ -11,7 +11,8 @@ env:
   BRANCH_NAME: staging
 permissions:
       id-token: write
-      contents: read    
+      contents: read
+      security-events: write
 jobs:
   buildandtest:
     name: Build and Scan Image with Integration Tests
@@ -31,6 +32,10 @@ jobs:
           mask-password: 'true'
       - name: Add CKAN url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+      - name: Add Minio url to hosts
+        run: sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
+      - name: Add Frontend url to hosts
+        run: sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
       - name: Build and push CKAN image to ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -55,7 +60,9 @@ jobs:
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
-        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
+        run: |
+          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d \
+          ckan-dev datapusher db solr redis minio minio-setup
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
@@ -67,11 +74,35 @@ jobs:
           working-directory: ./integration-tests
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
+      - name: Set up Frontend Docker Container
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
+        working-directory: ./ckan-backend-dev
+      - name: Cypress Install and Frontend setup
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 60
+          node-version: 18
+          runTests: false
+          working-directory: ./e2e-tests
       - name: Run Integration tests 🧪
         uses: cypress-io/github-action@v6
         with:
           command: node test.js
           working-directory: ./integration-tests
+      - name: Run frontend tests 🧪
+        uses: cypress-io/github-action@v6
+        with:
+          command: npm run test
+          working-directory: ./e2e-tests
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: /home/runner/work/wri-odp/wri-odp/e2e-tests/cypress/screenshots
+          if-no-files-found: ignore 
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev
@@ -89,18 +120,41 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/run_unit_tests.sh"
         working-directory: ./ckan-backend-dev
-      - name: Run Trivy Vulnerability Scanner 🧪
+      - name: Run Trivy Vulnerability Scanner for CKAN Container 🧪
         uses: aquasecurity/trivy-action@master
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_CKAN_REPO }}
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
-          format: 'table'
+          format: 'sarif'
+          output: ckan-trivy-results.sarif
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+      - name: Run Trivy Vulnerability Scanner for Frontend Container 🧪
+        uses: aquasecurity/trivy-action@master
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ secrets.ECR_FRONTEND_REPO }}
+        with:
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
+          format: 'sarif'
+          output: frontend-trivy-results.sarif
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+      - name: Upload CKAN container Trivy scan results to GitHub Code scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ckan-trivy-results.sarif
+      - name: Upload Frontend container Trivy scan results to GitHub Code scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          category: frontend_container_trivy_results
+          sarif_file: frontend-trivy-results.sarif
       - name: Tear down containers
         if: failure() || success()
         run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans

@@ -29,7 +29,7 @@ ckan:
       CKAN__SITE_TITLE: WRI Staging
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
-      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth envvars
+      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
       CKAN__AUTH__CREATE_UNOWNED_DATASET: "True"
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_ADMIN_COLLABORATORS: "True"
@@ -38,6 +38,7 @@ ckan:
       CKAN___SCHEMING__ORGANIZATION_SCHEMAS: ckanext.scheming:custom_org_with_address.json
       CKAN___SCHEMING__GROUP_SCHEMAS: ckanext.scheming:custom_group_with_status.json
       CKAN___SCHEMING__PRESETS: ckanext.wri.schema:presets.json
+      CKANEXT__AUTH__INCLUDE_FRONTEND_LOGIN_TOKEN: "True"
     hpa:
       enable: true
       minReplicas: 2

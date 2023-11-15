@@ -1,0 +1,19 @@
+{
+  "name": "wri-integration-tests",
+  "version": "1.0.0",
+  "description": "Integration tests for WRI",
+  "main": "test.js",
+  "type": "module",
+  "scripts": {
+    "open": "cypress open",
+    "test": "cypress run"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^13.5.0"
+  },
+  "dependencies": {
+    "cypress-file-upload": "^5.0.8"
+  }
+}

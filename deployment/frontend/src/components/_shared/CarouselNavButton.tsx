@@ -1,5 +1,5 @@
 
-import { ArrowRightIcon, ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const sizes = {
   small: 'w-[30px] h-[30px]',
@@ -15,8 +15,8 @@ const CarouselNavButton: React.FC<{
       <button
         className={`bg-white shadow ${sizes[size ?? 'medium']} rounded-full flex justify-center items-center`}
       >
-        <ArrowRightIcon className={`w-8 h-8 text-wri-black font-light ${orientation === "right" ? "block" : "hidden"}`} />
-        <ArrowLeftIcon className={`w-8 h-8 text-wri-black font-light ${orientation === "left" ? "block" : "hidden"}`} />
+        <ChevronRightIcon className={`w-8 h-8 text-wri-black font-light ${orientation === "right" ? "block" : "hidden"}`} />
+        <ChevronLeftIcon className={`w-8 h-8 text-wri-black font-light ${orientation === "left" ? "block" : "hidden"}`} />
       </button>
     </>
   );

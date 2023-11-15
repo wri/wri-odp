@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { ChartBarIcon, GlobeAltIcon, TableCellsIcon } from "@heroicons/react/20/solid";
+import Link from "next/link";
 
 export interface HiglightProps {
   title: string;
@@ -17,7 +18,7 @@ export default function HighlightCard({
   highlight: HiglightProps;
 }) {
   return (
-    <div className="flex w-full flex-col font-acumin">
+    <Link href="/datasets/x" className="flex w-full flex-col font-acumin">
       <div className="relative h-56 w-full 2xl:h-64">
         <Image src={`${highlight.img}`} alt="higlight" fill />
       </div>
@@ -56,6 +57,6 @@ export default function HighlightCard({
           <TableCellsIcon className="h-5 w-5 text-green-600" />
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

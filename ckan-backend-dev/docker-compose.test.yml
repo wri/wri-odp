@@ -36,6 +36,23 @@ services:
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
 
+  frontend:
+    container_name: wri-frontend
+    build:
+      context: ../deployment/frontend/
+      args:
+        - NEXTAUTH_SECRET=secret
+        - NEXTAUTH_URL=http://localhost:3000
+        - CKAN_URL=http://ckan-dev:5000
+    ports:
+      - "0.0.0.0:3000:3000"
+    depends_on:
+      - ckan-dev
+    env_file:
+      - ".env.example"
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
+
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}
     build:
@@ -61,6 +78,7 @@ services:
     image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
     volumes:
       - solr_data:/var/solr
+      - ./ckan/setup/schema.xml:/opt/solr/server/solr/configsets/ckan/conf/managed-schema
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8983/solr/"]

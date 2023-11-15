@@ -1,17 +1,19 @@
 import React from "react";
 import { EnvelopeIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
+import { Button } from "./Button";
 
 export default function Footer({
   links = {
     primary: { title: "Explore Topics", href: "#" },
     secondary: { title: "Advanced Search", href: "#" },
   },
+  style = "mt-16"
 }) {
   return (
     <section
       id="footer"
-      className="w-full  flex font-acumin flex-col mt-16 pb-16"
+      className={`w-full  flex font-acumin flex-col pb-16 ${style}`}
     >
       <div className=" w-full bg-wri-green">
         <div className=" flex flex-col px-8 xxl:px-0  max-w-8xl mx-auto py-10">
@@ -36,73 +38,68 @@ export default function Footer({
           </div>
         </div>
       </div>
-
-      <div className="flex flex-col w-full px-8 xxl:px-0  max-w-8xl mx-auto">
-        <div className=" pt-16 lg:pl-10 flex flex-col items-center sm:items-start sm:flex-row gap-y-4 sm:gap-x-4 font-bold text-wri-black">
-          <div className="w-full sm:w-1/5 flex flex-col items-center sm:items-start gap-y-4 mb-6 sm:mb-0">
+<div className="default-home-container mx-auto flex w-full flex-col pb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 items-center gap-y-8 pt-16 font-bold text-wri-black sm:flex-row sm:items-start">
+          <div className="mb-6 flex w-full flex-col items-center gap-y-4 sm:mb-0 sm:items-start">
             <p className="text-base font-bold">ABOUT WRI</p>
-            <p className=" font-normal">About us</p>
-            <p className=" font-normal">Our Work</p>
-            <p className=" font-normal">Our Approach</p>
+            <a href="/about" className=" font-normal">About us</a>
+            <a href="/our-mission" className=" font-normal">Our Mission</a>
+            <a href="/our-approach" className=" font-normal">Our Approach</a>
           </div>
-          <div className="w-full sm:w-1/5 flex flex-col items-center sm:items-start  gap-y-4 mb-6 sm:mb-0">
+          <div className="mb-6 flex w-full flex-col items-center gap-y-4  sm:mb-0 sm:items-start">
             <p className="text-base font-bold">USEFUL LINKS</p>
-            <p className=" font-normal">About us</p>
-            <p className=" font-normal">Our Work</p>
-            <p className=" font-normal">Our Approach</p>
+            <a href="/" className=" font-normal">Home</a>
+            <a href="/teams" className=" font-normal">Teams</a>
+            <a href="/topics" className=" font-normal">Topics</a>
           </div>
-          <div className="w-full sm:w-1/5 flex flex-col items-center sm:items-start gap-y-4">
+          <div className="flex w-full flex-col items-center gap-y-4 sm:items-start">
             <p className="text-base font-bold">GET STARTED</p>
-            <p className=" font-normal">About us</p>
-            <p className=" font-normal">Our Work</p>
-            <p className=" font-normal">Our Approach</p>
+            <a href="/search" className=" font-normal">Find Data</a>
+            <a href="/publish-data" className=" font-normal">Publish Data</a>
+            <a href="/get-help" className=" font-normal">Get Help</a>
           </div>
-          <div className="w-full sm:w-1/2 flex flex-col items-center sm:items-start gap-y-4 shrink xl:ml-20 mt-10 sm:mt-0">
-            <p className="font-bold text-base sm:text-[1.375rem]">
+          <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start xl:min-w-[420px]">
+            <div className="font-acumin text-[22px] font-bold text-gray-800">
               STAY UP TO DATE WITH THE NEWS{" "}
-            </p>
-            <div className="flex flex-col lg:flex-row gap-y-4 gap-x-2 w-full ">
-              <div className="outline outline-1 rounded-sm pl-1 py-2 gap-x-2 flex flex-row items-center min-w-fit  w-full lg:w-[337px]">
-                <div className=" my-auto">
-                  <EnvelopeIcon className="w-5 h-5 text-wri-gray" />
-                </div>
-                <div className="grow shrink basis-auto">
-                  <input
-                    type="text"
-                    placeholder="Enter your email address"
-                    className=" focus:outline-none placeholder:text-xs text-xs font-normal w-full"
-                  />
+            </div>
+            <div className="flex w-full flex-col gap-x-2 gap-y-4 lg:flex-row justify-between">
+              <div className="relative grow">
+                <input
+                  type="text"
+                  className="h-11 w-full peer grow rounded border-0 shadow outline-0 ring-0 ring-offset-0 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 "
+                />
+                <div className="absolute pointer-events-none peer-focus:hidden inset-y-0 left-0 flex gap-x-2 items-center pl-3">
+                  <EnvelopeIcon className="h-6 w-5 text-gray-400" />
+                  <span className="text-xs text-gray-400">Enter your email</span>
                 </div>
               </div>
-              <div className="px-4 py-2 sm:px-6 2xl:px-10 bg-wri-gold text-wri-black font-bold  text-[0.875rem] xxl:w-[139px] rounded-sm text-center">
-                SUBSCRIBE
-              </div>
+              <Button>SUBSCRIBE</Button>
             </div>
             <div className="flex flex-row gap-5">
-              <div className="w-5 h-5 relative ">
+              <div className="relative h-5 w-5 ">
                 <Image src="/icons/fb.svg" alt="" fill />
               </div>
-              <div className="w-5 h-5 relative ">
+              <div className="relative h-5 w-5 ">
                 <Image src="/icons/x.svg" alt={""} fill />
               </div>
-              <div className="w-5 h-5 relative ">
+              <div className="relative h-5 w-5 ">
                 <Image src="/icons/linkedin.svg" alt={""} fill />
               </div>
-              <div className="w-5 h-5 relative ">
+              <div className="relative h-5 w-5 ">
                 <Image src="/icons/mail.svg" alt={""} fill />
               </div>
             </div>
           </div>
         </div>
-        <div className=" w-full mx-auto pt-16 lg:pl-10  flex flex-col sm:flex-row  gap-y-8 sm:gap-y-4 items sm:items-start">
-          <div className=" w-52 h-16 sm:w-56 sm:h-20 relative mx-auto sm:ml-0">
+        <div className="items mx-auto flex w-full flex-col gap-y-8 pt-16 sm:flex-row sm:gap-y-4">
+          <div className=" relative mx-auto h-16 w-52 sm:ml-0 sm:h-20 sm:w-56">
             <Image
               src="/images/WRI_logo_4c.png"
               alt="Picture of the author"
               fill
             />
           </div>
-          <div className="mx-auto sm:ml-auto sm:mr-0 xxl:mr-14  w-fit flex  items-end gap-x-1 font-normal text-base mt-auto">
+          <div className="mt-auto flex items-end gap-x-1  text-base font-normal sm:ml-auto">
             <span>
               Powered by{" "}
               <a href="#" className=" text-wri-green">
@@ -110,12 +107,13 @@ export default function Footer({
               </a>{" "}
               from
             </span>
-            <div className=" w-24 h-6 relative">
+            <div className=" relative h-6 w-24">
               <Image src="/images/datopian.png" alt="" fill></Image>
             </div>
           </div>
         </div>
       </div>
+
     </section>
   );
 }
