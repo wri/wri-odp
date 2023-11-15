@@ -21,7 +21,7 @@ export default function Pagination({ setQuery, query, isLoading, count }: {
   return (
     <div className='flex font-acumin gap-x-2 items-center self-end'>
       {isLoading ? <Spinner className="mx-auto my-2" /> :
-        <div className=' text-gray-300 font-light text-sm'>{`${query.page.start}-${query.page.rows > count! ? count : (query.page.start + query.page.rows)} of ${count}`}</div>}
+        <div className=' text-gray-300 font-light text-sm'>{`${query.page.start === 0 ? 0 : Math.floor(query.page.start / query.page.rows)} of ${Math.round(count! / query.page.rows)}`}</div>}
 
       <button
         onClick={() => handlePageChange(query.page.start - query.page.rows)}

@@ -10,7 +10,7 @@ import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal';
 
 export default function DatasetLCardList() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 5 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.dataset.getAllDataset.useQuery(query)
   const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
   const [open, setOpen] = useState(false)

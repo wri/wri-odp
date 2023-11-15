@@ -2,10 +2,24 @@ import React from 'react'
 import Image from 'next/image'
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
+import { TrashIcon, PencilIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+
 export interface activity {
   description: string,
   time: string,
   icon: string
+}
+
+function Icons({ activityAction }: { activityAction: string }) {
+  if (activityAction === 'changed') {
+    return <PencilIcon className='w-4 h-4 text-blue-500' />
+  }
+  if (activityAction === 'new') {
+    return <PlusCircleIcon className='w-4 h-4 text-green-500' />
+  }
+  if (activityAction === 'deleted') {
+    return <TrashIcon className='w-4 h-4 text-red-500' />
+  }
 }
 
 export default function ActivityStreamCard({ activity }: { activity: activity }) {
@@ -19,7 +33,7 @@ export default function ActivityStreamCard({ activity }: { activity: activity })
       <DefaultTooltip content={activity.icon}>
         <div className='bg-white p-2 flex justify-center items-center rounded-full w-fit h-fit mt-2 shadow'>
           <div className='relative w-[20px] h-[18px]  sm:w-[16px] sm:y-[16px] '>
-            <Image src={`/icons/${iconMap[activity.icon]}.svg`} alt="update" fill />
+            <Icons activityAction={activity.icon} />
           </div>
         </div>
       </DefaultTooltip>
