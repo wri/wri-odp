@@ -100,7 +100,7 @@ export default function CreateDatasetForm() {
         formState: { dirtyFields, errors },
     } = formObj
 
-    console.log(errors)
+    console.log('Errors', errors)
     useEffect(() => {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])

@@ -282,7 +282,7 @@ export function OverviewForm({
                                     label: 'Hourly',
                                 },
                                 {
-                                    value: 'as_need',
+                                    value: 'as_needed',
                                     label: 'As needed',
                                 },
                                 {
@@ -293,6 +293,7 @@ export function OverviewForm({
                                 { value: 'annually', label: 'Annually' },
                             ]}
                         />
+                        <ErrorDisplay name="update_frequency" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Citation" className="items-start">
                         <TextArea
