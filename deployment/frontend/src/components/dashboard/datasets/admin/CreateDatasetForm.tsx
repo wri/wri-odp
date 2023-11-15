@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { match } from 'ts-pattern'
 import { v4 as uuidv4 } from 'uuid'
+import { OpenInForm } from './metadata/OpenIn'
 
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -113,6 +114,7 @@ export default function CreateDatasetForm() {
                         <PointOfContactForm formObj={formObj} />
                         <MoreDetailsForm formObj={formObj} />
                         <CustomFieldsForm formObj={formObj} />
+                        <OpenInForm formObj={formObj} />
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <CreateDataFilesSection formObj={formObj} />

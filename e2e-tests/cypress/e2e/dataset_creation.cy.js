@@ -54,12 +54,11 @@ describe("Create dataset", () => {
     cy.get("input[name=maintainer]").type("Luccas");
     cy.get("input[name=maintainer_email]").type("luccasmmg@gmail.com");
     cy.contains("More Details").click()
-    cy.get("textarea[name=function]").type("test");
-    cy.get("textarea[name=restrictions]").type("test");
-    cy.get("textarea[name=reason_for_adding]").type("test");
+    cy.get(".tiptap.ProseMirror").eq(1).type("RICH TEXT EDITOR")
+    cy.get(".tiptap.ProseMirror").eq(2).type("RICH TEXT EDITOR")
+    cy.get(".tiptap.ProseMirror").eq(3).type("RICH TEXT EDITOR")
     cy.get("input[name=learn_more]").type("https://google.com");
-    cy.get("textarea[name=cautions]").type("test");
-    cy.get("textarea[name=summary]").type("test");
+    cy.get(".tiptap.ProseMirror").eq(4).type("RICH TEXT EDITOR")
     cy.contains("Custom Fields").click()
     cy.get('button').contains("Add a custom field").click()
     cy.get('input[name="extras.0.key"]').type("Test");
@@ -67,6 +66,13 @@ describe("Create dataset", () => {
     cy.get('button').contains("Add a custom field").click()
     cy.get('input[name="extras.1.key"]').type("Test 2");
     cy.get('input[name="extras.1.value"]').type("Test 2");
+    cy.contains("Open In").click()
+    cy.get('button').contains("Add a open-in field").click()
+    cy.get('input[name="open_in.0.title"]').type("Test");
+    cy.get('input[name="open_in.0.url"]').type("https://google.com");
+    cy.get('button').contains("Add a open-in field").click()
+    cy.get('input[name="open_in.1.title"]').type("Test");
+    cy.get('input[name="open_in.1.url"]').type("https://google.com");
     cy.contains("Next: Datafiles").click()
     cy.get("input[type=file]").selectFile("cypress/fixtures/sample_csv.csv", {
       force: true,

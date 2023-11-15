@@ -54,6 +54,10 @@ export function UploadForm({
                                 className="absolute inset-0 h-full w-full animate-spin object-cover"
                             />
                         )}
+                        <span
+                            className="absolute left-1.5 top-2 font-acumin text-[0.475rem] font-medium leading-tight text-black"
+                            id={`${datafile.resourceId}_upload_progress`}
+                        ></span>
                     </div>
                     <button onClick={() => removeFile()}>
                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
@@ -67,7 +71,10 @@ export function UploadForm({
                     type="text"
                     maxWidth="max-w-[70rem]"
                 />
-                <ErrorDisplay name={`resources.${index}.title`} errors={errors} />
+                <ErrorDisplay
+                    name={`resources.${index}.title`}
+                    errors={errors}
+                />
             </InputGroup>
             <InputGroup label="Description" className="whitespace-nowrap">
                 <TextArea

@@ -24,7 +24,7 @@ export function LinkModal(props: IProps) {
         ...rest
     } = props
     return (
-        <Modal open={isOpen} setOpen={closeModal}>
+        <Modal open={isOpen} setOpen={closeModal} className='max-w-lg'>
             <div className="p-6">
                 <div className="border-b border-zinc-100 pb-5">
                     <div className="font-acumin text-3xl font-normal text-black">

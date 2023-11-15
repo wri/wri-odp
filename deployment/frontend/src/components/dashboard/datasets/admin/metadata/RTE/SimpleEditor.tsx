@@ -15,29 +15,43 @@ import History from '@tiptap/extension-history'
 import * as Icons from './Icons'
 import { LinkModal } from './LinkModal'
 import classNames from '@/utils/classnames'
-import { Controller, FieldValues, Path, PathValue, UseFormReturn } from 'react-hook-form'
+import {
+    Controller,
+    FieldValues,
+    Path,
+    PathValue,
+    UseFormReturn,
+} from 'react-hook-form'
 import { Button } from '@/components/_shared/Button'
 
 interface TEditorProps {
     value: string
     onChange(body: string): void
     initialContent?: string | null
+    className: string
 }
 
 interface ControlleRTEEditorProps<T extends FieldValues> {
     formObj: UseFormReturn<T>
     name: Path<T>
     defaultValue?: PathValue<T, Path<T>>
+    className?: string
 }
 
-export function SimpleEditor<T extends FieldValues>({formObj, name, defaultValue}: ControlleRTEEditorProps<T>) {
-    const {control, watch } = formObj
+export function SimpleEditor<T extends FieldValues>({
+    formObj,
+    name,
+    defaultValue,
+    className,
+}: ControlleRTEEditorProps<T>) {
+    const { control, watch } = formObj
     return (
         <Controller
             control={control}
             name={name}
             render={({ field: { onChange, value } }) => (
                 <TipTapEditor
+                    className={className ?? ''}
                     value={value}
                     initialContent={watch(name) ?? ''}
                     onChange={(value) => {
@@ -53,6 +67,7 @@ function TipTapEditor({
     value,
     onChange,
     initialContent,
+    className,
 }: TEditorProps) {
     const editor = useEditor({
         onUpdate({ editor }) {
@@ -133,9 +148,15 @@ function TipTapEditor({
     }
 
     return (
-        <div className="editor flex flex-col h-full min-h-[350px]">
+        <div
+            className={classNames(
+                'editor flex flex-col h-full min-h-[350px]',
+                className
+            )}
+        >
             <div className="menu">
                 <button
+                    type="button"
                     className="menu-button hover:bg-neutral-50"
                     onClick={() => editor.chain().focus().undo().run()}
                     disabled={!editor.can().undo()}
@@ -143,6 +164,7 @@ function TipTapEditor({
                     <Icons.RotateLeft />
                 </button>
                 <button
+                    type="button"
                     className="menu-button hover:bg-neutral-50"
                     onClick={() => editor.chain().focus().redo().run()}
                     disabled={!editor.can().redo()}
@@ -150,6 +172,7 @@ function TipTapEditor({
                     <Icons.RotateRight />
                 </button>
                 <button
+                    type="button"
                     className={classNames('menu-button hover:bg-neutral-50', {
                         'is-active': editor.isActive('link'),
                     })}
@@ -158,6 +181,7 @@ function TipTapEditor({
                     <Icons.Link />
                 </button>
                 <button
+                    type="button"
                     className={classNames('menu-button hover:text-blue-800', {
                         'is-active': editor.isActive('bold'),
                     })}
@@ -166,6 +190,7 @@ function TipTapEditor({
                     <Icons.Bold />
                 </button>
                 <button
+                    type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('underline'),
                     })}
@@ -174,6 +199,7 @@ function TipTapEditor({
                     <Icons.Underline />
                 </button>
                 <button
+                    type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('intalic'),
                     })}
@@ -182,6 +208,7 @@ function TipTapEditor({
                     <Icons.Italic />
                 </button>
                 <button
+                    type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('strike'),
                     })}
@@ -190,6 +217,7 @@ function TipTapEditor({
                     <Icons.Strikethrough />
                 </button>
                 <button
+                    type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('code'),
                     })}
@@ -208,15 +236,29 @@ function TipTapEditor({
                     return from === to && editor.isActive('link')
                 }}
             >
-                <Button size="sm" variant="outline" className='bg-white' onClick={openModal}>
+                <Button
+                    size="sm"
+                    variant="outline"
+                    type="button"
+                    className="bg-white"
+                    onClick={openModal}
+                >
                     Edit
                 </Button>
-                <Button size="sm" variant="destructive" onClick={removeLink}>
+                <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={removeLink}
+                    type="button"
+                >
                     Remove
                 </Button>
             </BubbleMenu>
 
-            <EditorContent className='h-full grow flex flex-col' editor={editor} />
+            <EditorContent
+                className="h-full grow flex flex-col"
+                editor={editor}
+            />
 
             <LinkModal
                 url={url}

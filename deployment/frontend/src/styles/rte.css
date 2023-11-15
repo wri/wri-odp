@@ -69,9 +69,7 @@ body {
 .editor {
   position: relative;
   height: 100%;
-
   width: 100%;
-  margin-bottom: 48px;
 }
 
 .editor > div:not(.menu) {

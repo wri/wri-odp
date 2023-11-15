@@ -178,6 +178,10 @@ dataset_fields:
   form_snippet: markdown.html
   form_placeholder: eg. A short summary of the dataset
 
+- field_name: open_in
+  label: Open In
+  preset: json_object
+
 resource_fields:
 
 - field_name: url

@@ -25,6 +25,7 @@ export const DatasetRouter = createTRPCRouter({
                     groups: input.topics
                         ? input.topics.map((topic) => ({ name: topic }))
                         : [],
+                    open_in: input.open_in ? { ...input.open_in } : '',
                     language: input.language?.value ?? '',
                     owner_org: input.team ? input.team.value : '',
                     update_frequency: input.update_frequency?.value ?? '',

@@ -57,7 +57,10 @@ export default function TeamForm({
                         <div className="w-[11rem]">
                             <ImageUploader
                                 clearImage={() => setValue('image_url', '')}
-                                defaultImage={watch('image_url') && watch('image_display_url')}
+                                defaultImage={
+                                    watch('image_url') &&
+                                    watch('image_display_url')
+                                }
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
                                         response.successful[0]?.uploadURL ??
@@ -105,11 +108,20 @@ export default function TeamForm({
                             <SimpleSelect
                                 formObj={formObj}
                                 name="parent"
-                                options={[{ label: 'No parent', value: '' }, ...data.map((team) => ({
-                                    label: team.title ?? team.name,
-                                    value: team.name,
-                                    default: watch('parent') === team.name,
-                                }))]}
+                                options={[
+                                    { label: 'No parent', value: '' },
+                                    ...data
+                                        .filter(
+                                            (team) =>
+                                                team.name !== watch('name')
+                                        )
+                                        .map((team) => ({
+                                            label: team.title ?? team.name,
+                                            value: team.name,
+                                            default:
+                                                watch('parent') === team.name,
+                                        })),
+                                ]}
                                 placeholder="Select a parent"
                             />
                         ))
