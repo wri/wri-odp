@@ -1,11 +1,15 @@
 import Facet from '@/components/search/Facet'
 import FiltersSelected from '@/components/search/FiltersSelected'
 import LocationSearch from '@/components/search/LocationSearch'
+import {Filter} from '@/interfaces/search.interface'
+import {useState} from 'react'
 
 export default function FiltersPanel() {
+    const [filters, setFilters] = useState<Filter[]>([])
+
     return (
         <div className='mt-6 pr-6'>
-            <FiltersSelected />
+            <FiltersSelected filters={filters} setFilters={setFilters} />
             <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white pb-4 mt-4">
                 <nav className="flex flex-1 flex-col">
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -13,6 +17,9 @@ export default function FiltersPanel() {
                             <ul role="list">
                                 <LocationSearch />
                                 <Facet
+                                    filters={filters}
+                                    setFilters={setFilters}
+                                    fqKey='facet'
                                     text="Resolution"
                                     options={[
                                         {
@@ -30,6 +37,9 @@ export default function FiltersPanel() {
                                     ]}
                                 />
                                 <Facet
+                                    filters={filters}
+                                    setFilters={setFilters}
+                                    fqKey='facet'
                                     text="Topic"
                                     options={[
                                         {
@@ -47,6 +57,9 @@ export default function FiltersPanel() {
                                     ]}
                                 />
                                 <Facet
+                                    filters={filters}
+                                    setFilters={setFilters}
+                                    fqKey='facet'
                                     text="Team"
                                     options={[
                                         {
@@ -64,6 +77,9 @@ export default function FiltersPanel() {
                                     ]}
                                 />
                                 <Facet
+                                    filters={filters}
+                                    setFilters={setFilters}
+                                    fqKey='facet'
                                     text="Temporal coverage"
                                     options={[
                                         {
@@ -81,6 +97,9 @@ export default function FiltersPanel() {
                                     ]}
                                 />
                                 <Facet
+                                    filters={filters}
+                                    setFilters={setFilters}
+                                    fqKey='facet'
                                     text="License"
                                     options={[
                                         {
@@ -98,6 +117,9 @@ export default function FiltersPanel() {
                                     ]}
                                 />
                                 <Facet
+                                    filters={filters}
+                                    setFilters={setFilters}
+                                    fqKey='facet'
                                     text="Format"
                                     options={[
                                         {
@@ -115,6 +137,9 @@ export default function FiltersPanel() {
                                     ]}
                                 />
                                 <Facet
+                                    filters={filters}
+                                    setFilters={setFilters}
+                                    fqKey='facet'
                                     text="Tags"
                                     options={[
                                         {

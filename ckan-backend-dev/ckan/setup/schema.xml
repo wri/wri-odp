@@ -179,7 +179,8 @@ attribute with the form `ckan-X.Y` -->
     <field name="projects" type="text" indexed="true" stored="true" multiValued="true"/>
     <field name="application" type="string" indexed="true" stored="true"/>
     <field name="technical_notes" type="string" indexed="true" stored="true"/>
-    <field name="temporal_coverage" type="string" indexed="true" stored="true"/>
+    <field name="temporal_coverage_start" type="int" indexed="true" stored="true"/>
+    <field name="temporal_coverage_end" type="int" indexed="true" stored="true"/>
     <field name="update_frequency" type="string" indexed="true" stored="true"/>
     <field name="citation" type="text" indexed="true" stored="true"/>
     <field name="visibility_type" type="string" indexed="true" stored="true"/>

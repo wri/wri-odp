@@ -32,7 +32,8 @@ class WriPlugin(plugins.SingletonPlugin):
         facets_dict['language'] = toolkit._('Language')
         facets_dict['projects'] = toolkit._('Projects')
         facets_dict['application'] = toolkit._('Application')
-        facets_dict['temporal_coverage'] = toolkit._('Temporal Coverage')
+        facets_dict['temporal_coverage_start'] = toolkit._('Temporal Coverage Start')
+        facets_dict['temporal_coverage_end'] = toolkit._('Temporal Coverage End')
         facets_dict['update_frequency'] = toolkit._('Update Frequency')
         facets_dict['license_id'] = toolkit._('License')
         facets_dict['visibility_type'] = toolkit._('Visibility')
@@ -45,7 +46,6 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def organization_facets(self, facets_dict, organization_type, package_type):
         return facets_dict
-
 
     # IActions
 

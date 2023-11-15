@@ -1,7 +1,8 @@
-import { z } from "zod";
+import { z } from 'zod'
 import {
     createTRPCRouter,
-    protectedProcedure
+    protectedProcedure,
+    publicProcedure
 } from "@/server/api/trpc";
 import { env } from "@/env.mjs";
 import { getUserOrganizations, getAllDatasetFq, getUserGroups } from "@/utils/apiUtils";
@@ -75,34 +76,56 @@ export const DatasetRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
-    getAllDataset: protectedProcedure
+    getAllDataset: publicProcedure 
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const organizations = await getUserOrganizations({
-                userId: ctx.session.user.id,
-                apiKey: ctx.session.user.apikey,
-            })
-            let orgsFq = `" "`;
-            const fq = []
+            const isUserSearch = input._isUserSearch
+
+            let fq = ''
+            let orgsFq = ''
+            if (isUserSearch && ctx.session) {
+                const organizations = await getUserOrganizations({
+                    userId: ctx.session?.user.id,
+                    apiKey: ctx.session?.user.apikey,
+                })
+                orgsFq = `organization:(${organizations
+                    ?.map((org) => org.name)
+                    .join(' OR ')})`
+            }
+
+            const fqArray = []
             if (input.fq) {
                 for (const key of Object.keys(input.fq)) {
                     if (key === 'organization') {
                         orgsFq = `organization:(${input.fq[key]})`
                         continue
                     }
-                    fq.push(`${key}:(${input.fq[key]})`)
+                    fqArray.push(`${key}:(${input.fq[key]})`)
                 }
-                const filter = fq.join('+')
-                if (filter) orgsFq = `${orgsFq}+${filter}`
+                const filter = fqArray.join('+')
+
+                if (filter && orgsFq) fq = `${orgsFq}+${filter}`
+                else if (filter) {
+                    fq = filter
+                } else {
+                    fq = orgsFq
+                }
+            } else {
+                fq = orgsFq
             }
+
             const dataset = (await getAllDatasetFq({
-                apiKey: ctx.session.user.apikey,
-                fq: orgsFq,
+                apiKey: ctx.session?.user.apikey ?? "",
+                fq: fq,
                 query: input,
+                facetFields: input.facetFields,
+                sortBy: input.sortBy
             }))!
+
             return {
                 datasets: dataset.datasets,
                 count: dataset.count,
+                searchFacets: dataset.searchFacets,
             }
         }),
     getMyDataset: protectedProcedure
@@ -174,4 +197,3 @@ export const DatasetRouter = createTRPCRouter({
             return data
         })
 });
-

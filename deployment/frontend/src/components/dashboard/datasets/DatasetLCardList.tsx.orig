@@ -10,7 +10,11 @@ import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal';
 
 export default function DatasetLCardList() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 }, _isUserSearch: true })
+<<<<<<< HEAD
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 5 }, _isUserSearch: true })
+  const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
+=======
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 5 } })
   const { data, isLoading, refetch } = api.dataset.getAllDataset.useQuery(query)
   const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
   const [open, setOpen] = useState(false)
@@ -26,6 +30,7 @@ export default function DatasetLCardList() {
     setSelectDataset(dataset)
     setOpen(true);
   }
+>>>>>>> 2743c7324d6107fadea866c4814284f6f8661353
 
   return (
     <section className='w-full max-w-sm sm:max-w-8xl flex  flex-col gap-y-20 sm:gap-y-0'>

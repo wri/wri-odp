@@ -152,6 +152,28 @@ Cypress.Commands.add("purgeDataset", (datasetName) => {
   });
 });
 
+Cypress.Commands.add("purgeGroup", (datasetName) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("group_purge"),
+    headers: headers,
+    body: {
+      id: datasetName,
+    },
+  });
+});
+
+Cypress.Commands.add("purgeOrganization", (datasetName) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("organization_purge"),
+    headers: headers,
+    body: {
+      id: datasetName,
+    },
+  });
+});
+
 Cypress.Commands.add("createOrganization", () => {
   const organizationName = getRandomOrganizationName();
   cy.get(".nav > :nth-child(2) > a").first().click();
@@ -219,7 +241,7 @@ Cypress.Commands.add("deleteOrganizationAPI", (name) => {
   });
 });
 
-Cypress.Commands.add('createDatasetAPI', (organization, name, isSubscribable) => {
+Cypress.Commands.add('createDatasetAPI', (organization, name, isSubscribable, otherFields) => {
   const request = cy.request({
     method: 'POST',
     url: apiUrl('package_create'),
@@ -228,8 +250,9 @@ Cypress.Commands.add('createDatasetAPI', (organization, name, isSubscribable) =>
       owner_org: organization,
       name: name,
       author: "datopian",
-      license_id: "notspecified",
-      tags: [{ "display_name": "subscriable", "name": "subscriable" }]
+      license_id : "notspecified",
+      tags: [{"display_name": "subscriable", "name": "subscriable"}],
+      ...otherFields
     },
   })
 
