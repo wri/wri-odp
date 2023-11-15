@@ -48,8 +48,11 @@ export default function FilteredSearchLayout({
         { key: 'license_id', title: 'License' },
         { key: 'language', title: 'Language' },
         { key: 'wri_data', title: 'WRI Data' },
-        { key: 'visibility_type', title: 'Visibility' },
     ]
+
+    if (session.status == 'authenticated') {
+        facetFields.push({ key: 'visibility_type', title: 'Visibility' })
+    }
 
     const [facetsQuery] = useState<SearchInput>({
         search: '',
@@ -149,7 +152,10 @@ export default function FilteredSearchLayout({
                                         </div>
                                     </Transition.Child>
                                     {/* Sidebar component, swap this element with another sidebar if you like */}
-                                    <div id="facets-list" className="flex grow flex-col gap-y-5 overflow-y-auto bg-white pb-4">
+                                    <div
+                                        id="facets-list"
+                                        className="flex grow flex-col gap-y-5 overflow-y-auto bg-white pb-4"
+                                    >
                                         <nav className="flex flex-1 flex-col">
                                             <ul
                                                 role="list"
@@ -176,14 +182,23 @@ export default function FilteredSearchLayout({
                                                                                     ? searchFacets[
                                                                                           ff
                                                                                               .key
-                                                                                      ]?.items.map(
-                                                                                          (
-                                                                                              o
-                                                                                          ) => ({
-                                                                                              label: o.display_name,
-                                                                                              value: o.name,
-                                                                                          })
-                                                                                      ) ||
+                                                                                      ]?.items
+                                                                                          .filter(
+                                                                                              (
+                                                                                                  o
+                                                                                              ) =>
+                                                                                                  o.name
+                                                                                          )
+                                                                                          .map(
+                                                                                              (
+                                                                                                  o
+                                                                                              ) => ({
+                                                                                                  label:
+                                                                                                      o.display_name ??
+                                                                                                      o.name,
+                                                                                                  value: o.name,
+                                                                                              })
+                                                                                          ) ||
                                                                                       []
                                                                                     : []
                                                                             }
@@ -248,7 +263,10 @@ export default function FilteredSearchLayout({
                                 className="hidden w-[25%] min-w-[25%] lg:z-10 lg:flex lg:flex-col"
                             >
                                 {/* Sidebar component, swap this element with another sidebar if you like */}
-                                <div id="facets-list" className="flex grow flex-col gap-y-5 overflow-y-auto pb-4">
+                                <div
+                                    id="facets-list"
+                                    className="flex grow flex-col gap-y-5 overflow-y-auto pb-4"
+                                >
                                     <nav className="flex flex-1 flex-col">
                                         <ul
                                             role="list"
@@ -274,14 +292,23 @@ export default function FilteredSearchLayout({
                                                                             ? searchFacets[
                                                                                   ff
                                                                                       .key
-                                                                              ]?.items.map(
-                                                                                  (
-                                                                                      o
-                                                                                  ) => ({
-                                                                                      label: o.display_name,
-                                                                                      value: o.name,
-                                                                                  })
-                                                                              ) ||
+                                                                              ]?.items
+                                                                                  .filter(
+                                                                                      (
+                                                                                          o
+                                                                                      ) =>
+                                                                                          o.name
+                                                                                  )
+                                                                                  .map(
+                                                                                      (
+                                                                                          o
+                                                                                      ) => ({
+                                                                                          label:
+                                                                                              o.display_name ??
+                                                                                              o.name,
+                                                                                          value: o.name,
+                                                                                      })
+                                                                                  ) ||
                                                                               []
                                                                             : []
                                                                     }

@@ -1,6 +1,7 @@
 import { WriDataset } from '@/schema/ckan.schema'
 import {
     ChartBarIcon,
+    ExclamationCircleIcon,
     ExclamationTriangleIcon,
     GlobeAltIcon,
     TableCellsIcon,
@@ -105,7 +106,9 @@ export default function DatasetHorizontalCard({
                     <div className="mt-4 flex justify-start gap-x-3">
                         <div
                             className={`flex justify-start gap-x-3 ${
-                                dataset.cautions ? 'border-r border-black' : ''
+                                dataset.cautions || !dataset.technical_notes
+                                    ? 'border-r border-black'
+                                    : ''
                             } pr-3`}
                         >
                             <div className="rounded-full bg-stone-100 p-1">
@@ -127,6 +130,23 @@ export default function DatasetHorizontalCard({
                                         </TooltipTrigger>
                                         <TooltipContent className="bg-neutral-200">
                                             <p>Dataset contains cautions</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                        )}
+                        {!dataset.technical_notes && (
+                            <div className="rounded-full bg-stone-100 p-1 w-7 h-7">
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <ExclamationCircleIcon className="h-5 w-5 text-red-600" />
+                                        </TooltipTrigger>
+                                        <TooltipContent className="bg-neutral-200">
+                                            <p>
+                                                This dataset is not approved by
+                                                RDI
+                                            </p>
                                         </TooltipContent>
                                     </Tooltip>
                                 </TooltipProvider>
