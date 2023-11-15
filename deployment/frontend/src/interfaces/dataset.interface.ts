@@ -1,6 +1,4 @@
-import { Activity } from "./activity.interface";
-import { Group } from "./group.interface";
-import { Organization } from "./organization.interface";
+import { Activity, Group, Organization } from "@portaljs/ckan";
 
 export interface Dataset {
   author?: string;
