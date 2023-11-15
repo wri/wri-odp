@@ -2,12 +2,16 @@ import { z } from 'zod'
 import {
     createTRPCRouter,
     protectedProcedure,
-    publicProcedure
-} from "@/server/api/trpc";
-import { env } from "@/env.mjs";
-import { getUserOrganizations, getAllDatasetFq, getUserGroups } from "@/utils/apiUtils";
-import { searchSchema } from "@/schema/search.schema";
-import type { CkanResponse } from "@/schema/ckan.schema";
+    publicProcedure,
+} from '@/server/api/trpc'
+import { env } from '@/env.mjs'
+import {
+    getUserOrganizations,
+    getAllDatasetFq,
+    getUserGroups,
+} from '@/utils/apiUtils'
+import { searchSchema } from '@/schema/search.schema'
+import type { CkanResponse } from '@/schema/ckan.schema'
 import { DatasetSchema } from '@/schema/dataset.schema'
 import type { Dataset } from '@/interfaces/dataset.interface'
 import type { License } from '@/interfaces/licenses.interface'
@@ -76,7 +80,7 @@ export const DatasetRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
-    getAllDataset: publicProcedure 
+    getAllDataset: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             const isUserSearch = input._isUserSearch
@@ -95,9 +99,23 @@ export const DatasetRouter = createTRPCRouter({
 
             const fqArray = []
             if (input.fq) {
+                let temporalCoverageFqList = []
                 for (const key of Object.keys(input.fq)) {
                     if (key === 'organization') {
                         orgsFq = `organization:(${input.fq[key]})`
+                        continue
+                    }
+                    if (
+                        [
+                            'temporal_coverage_start',
+                            'temporal_coverage_end',
+                        ].includes(key)
+                    ) {
+                        /*
+                         * Temporal coverage has to behave as a range
+                         * so it's handled differently
+                         */
+                        temporalCoverageFqList.push(`${key}:(${input.fq[key]})`)
                         continue
                     }
                     fqArray.push(`${key}:(${input.fq[key]})`)
@@ -110,16 +128,21 @@ export const DatasetRouter = createTRPCRouter({
                 } else {
                     fq = orgsFq
                 }
+
+                if (temporalCoverageFqList.length)
+                    fq += `+(${temporalCoverageFqList
+                        .map((f) => `(${f})`)
+                        .join(' OR ')})`
             } else {
                 fq = orgsFq
             }
 
             const dataset = (await getAllDatasetFq({
-                apiKey: ctx.session?.user.apikey ?? "",
+                apiKey: ctx.session?.user.apikey ?? '',
                 fq: fq,
                 query: input,
                 facetFields: input.facetFields,
-                sortBy: input.sortBy
+                sortBy: input.sortBy,
             }))!
 
             return {
@@ -162,10 +185,14 @@ export const DatasetRouter = createTRPCRouter({
     getDraftDataset: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const dataset = (await getAllDatasetFq({ apiKey: ctx.session.user.apikey, fq: `state:draft`, query: input }))!;
+            const dataset = (await getAllDatasetFq({
+                apiKey: ctx.session.user.apikey,
+                fq: `state:draft`,
+                query: input,
+            }))!
             return {
                 datasets: dataset.datasets,
-                count: dataset.count
+                count: dataset.count,
             }
         }),
     getFavoriteDataset: protectedProcedure
@@ -184,16 +211,19 @@ export const DatasetRouter = createTRPCRouter({
     deleteDataset: protectedProcedure
         .input(z.string())
         .mutation(async ({ input, ctx }) => {
-            const response = await fetch(`${env.CKAN_URL}/api/3/action/package_delete`, {
-                method: "POST",
-                body: JSON.stringify({ id: input }),
-                headers: {
-                    "Authorization": ctx.session.user.apikey,
-                    "Content-Type": "application/json"
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/package_delete`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ id: input }),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
                 }
-            });
-            const data = (await response.json()) as CkanResponse<null>;
+            )
+            const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(data.error.message)
             return data
-        })
-});
+        }),
+})

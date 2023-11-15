@@ -70,14 +70,22 @@ export default function SearchPage({
             if ((key as string) == 'temporal_coverage_start') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageStart = keyFilters[0]
+                    const temporalCoverageEnd = filters.find(
+                        (f) => f.key == 'temporal_coverage_end'
+                    )?.value
 
-                    keyFq = `[${temporalCoverageStart?.value} TO *]`
+                    keyFq = `[${temporalCoverageStart?.value} TO ${
+                        temporalCoverageEnd ?? '*'
+                    }]`
                 }
             } else if ((key as string) == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageEnd = keyFilters[0]
+                    const temporalCoverageStart = filters.find(
+                        (f) => f.key == 'temporal_coverage_start'
+                    )?.value
 
-                    keyFq = `[${temporalCoverageEnd?.value} TO *]`
+                    keyFq = `[${temporalCoverageStart ?? "*"} TO ${temporalCoverageEnd?.value}]`
                 }
             } else {
                 keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
