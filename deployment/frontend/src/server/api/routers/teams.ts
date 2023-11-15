@@ -23,8 +23,8 @@ export const teamRouter = createTRPCRouter({
         const teams: CkanResponse<Organization[]> = await teamRes.json()
         if (!teams.success && teams.error) {
             if (teams.error.message)
-                throw Error(replaceNames(teams.error.message))
-            throw Error(replaceNames(JSON.stringify(teams.error)))
+                throw Error(replaceNames(teams.error.message, true))
+            throw Error(replaceNames(JSON.stringify(teams.error), true))
         }
         return teams.result.filter((team) => team.state === 'active')
     }),
@@ -57,15 +57,15 @@ export const teamRouter = createTRPCRouter({
                 const team: CkanResponse<Organization> = await teamRes.json()
                 if (!team.success && team.error) {
                     if (team.error.message)
-                        throw Error(replaceNames(team.error.message))
-                    throw Error(replaceNames(JSON.stringify(team.error)))
+                        throw Error(replaceNames(team.error.message, true))
+                    throw Error(replaceNames(JSON.stringify(team.error), true))
                 }
                 return team.result
             } catch (e) {
                 let error =
                     'Something went wrong please contact the system administrator'
                 if (e instanceof Error) error = e.message
-                throw Error(replaceNames(error))
+                throw Error(replaceNames(error, true))
             }
         }),
     getTeam: protectedProcedure
@@ -109,8 +109,8 @@ export const teamRouter = createTRPCRouter({
             > = await teamRes.json()
             if (!team.success && team.error) {
                 if (team.error.message)
-                    throw Error(replaceNames(team.error.message))
-                throw Error(replaceNames(JSON.stringify(team.error)))
+                    throw Error(replaceNames(team.error.message, true))
+                throw Error(replaceNames(JSON.stringify(team.error), true))
             }
             return {
                 ...team.result,
@@ -145,15 +145,15 @@ export const teamRouter = createTRPCRouter({
                 const team: CkanResponse<Organization> = await teamRes.json()
                 if (!team.success && team.error) {
                     if (team.error.message)
-                        throw Error(replaceNames(team.error.message))
-                    throw Error(replaceNames(JSON.stringify(team.error)))
+                        throw Error(replaceNames(team.error.message, true))
+                    throw Error(replaceNames(JSON.stringify(team.error), true))
                 }
                 return team.result
             } catch (e) {
                 let error =
                     'Something went wrong please contact the system administrator'
                 if (e instanceof Error) error = e.message
-                throw Error(replaceNames(error))
+                throw Error(replaceNames(error, true))
             }
         }),
     deleteDashboardTeam: protectedProcedure
@@ -172,7 +172,7 @@ export const teamRouter = createTRPCRouter({
             )
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error)
-                throw Error(replaceNames(data.error.message))
+                throw Error(replaceNames(data.error.message, true))
             return data
         }),
 })
