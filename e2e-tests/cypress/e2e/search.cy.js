@@ -87,7 +87,7 @@ describe("Search page", () => {
 
   it("allows filtering by search query", () => {
     cy.visit("/search_advanced");
-    cy.get('[name="search"]').type(datasets[0]);
+    cy.get('[name="search"]').type(datasets[0] ?? "test");
 
     cy.contains("results", { timeout: 10000 });
   });
