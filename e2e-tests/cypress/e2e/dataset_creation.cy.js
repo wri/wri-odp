@@ -37,10 +37,7 @@ describe("Create dataset", () => {
     cy.get("#tagsSearchInput").type("Tag 1{enter}").clear();
     cy.get("#tagsSearchInput").type("Tag 2{enter}").clear();
     cy.get("#tagsSearchInput").type("Tag 3{enter}").clear();
-    cy.get("button").contains('Projects').click();
-    cy.get("#projectsSearchInput").type("Project 1{enter}").clear();
-    cy.get("#projectsSearchInput").type("Project 2{enter}").clear();
-    cy.get("#projectsSearchInput").type("Project 3{enter}").clear();
+    cy.get("input[name=project]").type("Project 1");
     cy.get("input[name=technical_notes]").type("https://google.com");
     cy.get("input[name=temporalCoverageStart]").type(1998);
     cy.get("input[name=temporalCoverageEnd]").type(2023);

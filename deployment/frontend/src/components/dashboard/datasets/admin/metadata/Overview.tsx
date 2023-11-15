@@ -139,12 +139,11 @@ export function OverviewForm({
                             ))}
                         <ErrorDisplay name="team" errors={errors} />
                     </InputGroup>
-                    <InputGroup label="Projects">
-                        <MulText
-                            name="projects"
-                            formObj={formObj}
-                            title="Projects"
-                            tooltip="Remove project"
+                    <InputGroup label="Project">
+                        <Input
+                            {...register('project')}
+                            placeholder="ex. Climate Initiative"
+                            type="text"
                         />
                     </InputGroup>
                     <InputGroup label="Application">

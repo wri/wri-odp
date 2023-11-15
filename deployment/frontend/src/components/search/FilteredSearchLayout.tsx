@@ -35,7 +35,7 @@ export default function FilteredSearchLayout({
     const facetFields = [
         { key: 'featured_dataset', title: 'Featured' },
         { key: 'application', title: 'Application' },
-        { key: 'projects', title: 'Projects' },
+        { key: 'project', title: 'Project' },
         { key: 'organization', title: 'Team' },
         { key: 'groups', title: 'Topics' },
         { key: 'tags', title: 'Tags' },

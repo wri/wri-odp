@@ -18,7 +18,7 @@ const facets = [
   "Location",
   "Featured",
   "Application",
-  "Projects",
+  "Project",
   "Team",
   "Topics",
   "Tags",
