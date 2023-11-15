@@ -74,7 +74,7 @@ export const TopicRouter = createTRPCRouter({
     getAllTopics: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.session.user
         const topicRes = await fetch(
-            `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+            user.sysadmin ? `${env.CKAN_URL}/api/action/group_list?all_fields=True` : `${env.CKAN_URL}/api/action/group_list_for_user?all_fields=True`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ export const TopicRouter = createTRPCRouter({
                 const user = ctx.session.user
                 const body = JSON.stringify({
                     ...input,
-                    groups: input.parent ? [{ name: input.parent }] : [],
+                    groups: input.parent && input.parent !== '' ? [{ name: input.parent }] : [],
                 })
                 const topicRes = await fetch(
                     `${env.CKAN_URL}/api/action/group_update`,
@@ -172,7 +172,7 @@ export const TopicRouter = createTRPCRouter({
                 const user = ctx.session.user
                 const body = JSON.stringify({
                     ...input,
-                    groups: input.parent ? [{ name: input.parent }] : [],
+                    groups: input.parent && input.parent !== '' ? [{ name: input.parent }] : [],
                 })
                 const topicRes = await fetch(
                     `${env.CKAN_URL}/api/action/group_create`,

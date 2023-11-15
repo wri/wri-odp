@@ -6,7 +6,6 @@ import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 export const teamRouter = createTRPCRouter({
     getAllTeams: protectedProcedure.query(async ({ ctx }) => {
-        console.log(env.CKAN_URL)
         const user = ctx.session.user
         const teamRes = await fetch(
             user.sysadmin ? `${env.CKAN_URL}/api/action/organization_list?all_fields=True` : `${env.CKAN_URL}/api/action/organization_list_for_user?all_fields=True`,
@@ -34,7 +33,7 @@ export const teamRouter = createTRPCRouter({
                     image_display_url: input.image_url
                         ? `${env.CKAN_URL}/uploads/group/${input.image_url}`
                         : null,
-                    groups: input.parent ? [{ name: input.parent }] : [],
+                    groups: input.parent && input.parent !== '' ? [{ name: input.parent }] : [],
                 })
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_update`,
@@ -117,9 +116,8 @@ export const teamRouter = createTRPCRouter({
                     image_display_url: input.image_url
                         ? `${env.CKAN_URL}/uploads/group/${input.image_url}`
                         : null,
-                    groups: input.parent ? [{ name: input.parent }] : [],
+                    groups: input.parent && input.parent !== '' ? [{ name: input.parent }] : [],
                 })
-                console.log(user)
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_create`,
                     {

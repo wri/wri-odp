@@ -52,7 +52,7 @@ export function ErrorDisplay({
             errors={errors}
             name={name}
             render={({ message }) => (
-                <p className="col-span-full text-justify text-xs text-red-600">{message}</p>
+                <p className="col-span-full text-justify text-sm text-red-600">{message}</p>
             )}
         />
     )

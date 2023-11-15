@@ -58,7 +58,10 @@ export default function TopicForm({
                         <div className="w-[11rem]">
                             <ImageUploader
                                 clearImage={() => setValue('image_url', '')}
-                                defaultImage={watch('image_url') && watch('image_display_url')}
+                                defaultImage={
+                                    watch('image_url') &&
+                                    watch('image_display_url')
+                                }
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
                                         response.successful[0]?.uploadURL ??
@@ -108,11 +111,17 @@ export default function TopicForm({
                                 name="parent"
                                 options={[
                                     { label: 'No parent', value: '' },
-                                    ...data.map((team) => ({
-                                        label: team.title ?? team.name,
-                                        value: team.name,
-                                        default: watch('parent') === team.name,
-                                    })),
+                                    ...data
+                                        .filter(
+                                            (topic) =>
+                                                topic.name !== watch('name')
+                                        )
+                                        .map((topic) => ({
+                                            label: topic.title ?? topic.name,
+                                            value: topic.name,
+                                            default:
+                                                watch('parent') === topic.name,
+                                        })),
                                 ]}
                                 placeholder="Select a parent"
                             />

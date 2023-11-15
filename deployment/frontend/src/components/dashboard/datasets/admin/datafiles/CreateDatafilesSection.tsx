@@ -158,6 +158,17 @@ function AddDataFile({
         })
     }
 
+    uppy.on('progress', (progress) => {
+        if (typeof window !== 'undefined') {
+            const progressBar = document.getElementById(
+                `${datafile.resourceId}_upload_progress`
+            )
+            if (progressBar) {
+                progressBar.textContent = progress + '%'
+            }
+        }
+    })
+
     uppy.on('upload', (_result) => {
         setValue(`resources.${index}.type`, 'upload')
     })

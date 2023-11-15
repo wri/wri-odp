@@ -11,13 +11,17 @@ import { UseFormReturn } from 'react-hook-form'
 import { DatasetFormType } from '@/schema/dataset.schema'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { Input } from '@/components/_shared/SimpleInput'
+import { SimpleEditor } from './RTE/SimpleEditor'
 
 export function MoreDetailsForm({
     formObj,
 }: {
     formObj: UseFormReturn<DatasetFormType>
 }) {
-    const { register, formState: { errors } } = formObj
+    const {
+        register,
+        formState: { errors },
+    } = formObj
     return (
         <MetadataAccordion
             label={
@@ -29,7 +33,10 @@ export function MoreDetailsForm({
         >
             <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-24 py-5">
                 <div className="flex flex-col justify-start gap-y-4">
-                    <InputGroup label="Learn more" className="items-start">
+                    <InputGroup
+                        label="Learn more"
+                        className="mb-2 flex flex-col items-start whitespace-nowrap sm:flex-col"
+                    >
                         <Input
                             placeholder="Please visit our website for more information: LINK TO WEBSITE"
                             {...register('learn_more')}
@@ -37,54 +44,61 @@ export function MoreDetailsForm({
                         />
                         <ErrorDisplay name="learn_more" errors={errors} />
                     </InputGroup>
-                    <InputGroup label="Function" className="items-start">
-                        <TextArea
-                            placeholder="This data serves X porpuse"
-                            {...register('function')}
-                            type="text"
-                            className="h-28"
+                    <InputGroup
+                        label="Function"
+                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                    >
+                        <SimpleEditor
+                            formObj={formObj}
+                            name="function"
+                            className="min-h-[320px]"
+                            defaultValue=""
                         />
                     </InputGroup>
-                    <InputGroup label="Restrictions" className="items-start">
-                        <TextArea
-                            placeholder="Data can only be used without alteration"
-                            {...register('restrictions')}
-                            type="text"
-                            className="h-28"
+                    <InputGroup
+                        label="Restrictions"
+                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                    >
+                        <SimpleEditor
+                            formObj={formObj}
+                            name="restrictions"
+                            className="min-h-[320px]"
+                            defaultValue=""
                         />
                     </InputGroup>
                     <InputGroup
                         label="Reason for adding"
-                        className="items-start"
+                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
                     >
-                        <TextArea
-                            placeholder="Due to new funding for research"
-                            {...register('reason_for_adding')}
-                            type="text"
-                            className="h-28"
+                        <SimpleEditor
+                            formObj={formObj}
+                            name="reason_for_adding"
+                            className="min-h-[320px]"
+                            defaultValue=""
                         />
                     </InputGroup>
-                <InputGroup label="Cautions" className="items-start">
-                    <TextArea
-                        placeholder=""
-                        {...register('cautions')}
-                        type="text"
-                        className="h-64"
-                        icon={
-                            <DefaultTooltip content="Placeholder">
-                                <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
-                            </DefaultTooltip>
-                        }
-                    />
-                </InputGroup>
-                <InputGroup label="Summary" className="items-start">
-                    <TextArea
-                        placeholder="My short summary of this data"
-                        type="text"
-                        {...register('summary')}
-                        className="h-64"
-                    />
-                </InputGroup>
+                    <InputGroup
+                        label="Cautions"
+                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                    >
+                        <SimpleEditor
+                            formObj={formObj}
+                            name="cautions"
+                            className="min-h-[320px]"
+                            defaultValue=""
+                        />
+                    </InputGroup>
+                    <InputGroup
+                        label="Summary"
+                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                    >
+                        <SimpleEditor
+                            formObj={formObj}
+                            name="summary"
+                            className="min-h-[320px]"
+                            defaultValue=""
+                        />
+                    </InputGroup>
                 </div>
             </Disclosure.Panel>
         </MetadataAccordion>
