@@ -2,30 +2,37 @@ import React, { Fragment } from 'react'
 import TableHeader from '../_shared/TableHeader'
 import { TrashIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline'
 import { Menu, Transition } from "@headlessui/react";
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 
 function LeftNode() {
   return (
     <div className='relative flex flex-row items-center gap-x-3 w-full pl-10 sm:pl-12'>
       <div className="flex h-6 items-center">
-        <input
-          id="notificatoin"
-          aria-describedby="notifications-checkbox"
-          name="notifications"
-          type="checkbox"
-          className="h-4 w-4  rounded  bg-white "
-        />
+        <DefaultTooltip content='Select all'>
+          <input
+            id="notificatoin"
+            aria-describedby="notifications-checkbox"
+            name="notifications"
+            type="checkbox"
+            className="h-4 w-4  rounded  bg-white "
+          />
+        </DefaultTooltip>
       </div>
       <div>
-        <TrashIcon className="w-4 h-4 text-red-500" />
+        <DefaultTooltip content='delete'>
+          <TrashIcon className="w-4 h-4 text-red-500" />
+        </DefaultTooltip>
       </div>
       <div className=''>
         <Menu as="div" className="relative inline-block text-left  pr-1 z-50">
           <div>
             <Menu.Button>
               <div className="h-full mt-2">
+                <DefaultTooltip content='read actions'>
+                  <EllipsisVerticalIcon className="w-4 h-4 text-black" />
+                </DefaultTooltip>
 
-                <EllipsisVerticalIcon className="w-4 h-4 text-black" />
               </div>
             </Menu.Button>
           </div>

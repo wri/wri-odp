@@ -421,3 +421,16 @@ Cypress.Commands.add("iframe", { prevSubject: "element" }, ($iframe) => {
     $iframe.on("load", () => resolve(findBody()))
   );
 });
+
+Cypress.Commands.add("createUserApi", (name, email, password) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("user_create"),
+    headers: headers,
+    body: {
+      name: name,
+      email: email,
+      password: password,
+    },
+  });
+});

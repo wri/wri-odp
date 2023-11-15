@@ -11,12 +11,14 @@ import { api } from '@/utils/api'
 
 export function ImageUploader({
     onUploadSuccess,
+    onPresignedUrlSuccess,
     onUploadStart,
     text = 'Upload image',
     clearImage,
     defaultImage,
 }: {
     onUploadSuccess: (result: UploadResult) => void
+    onPresignedUrlSuccess?: (response: string) => void
     onUploadStart?: () => void
     clearImage?: () => void
     text?: string
@@ -25,12 +27,20 @@ export function ImageUploader({
     const [key, setKey] = useState<string | null>(null)
     const [uploading, setIsUploading] = useState(false)
     const uploadInputRef = useRef<HTMLInputElement>(null)
-    const presignedGetUrl = api.uploads.getPresignedUrl.useQuery({key: key as string}, {enabled: !!key})
+    const presignedGetUrl = api.uploads.getPresignedUrl.useQuery(
+        { key: key as string },
+        {
+            enabled: !!key,
+            onSuccess: (data) => {
+                if (onPresignedUrlSuccess) onPresignedUrlSuccess(data)
+            },
+        }
+    )
     const uppy = React.useMemo(() => {
         const uppy = new Uppy({
             autoProceed: true,
             restrictions: {
-                maxNumberOfFiles: 100,
+                maxNumberOfFiles: 1,
             },
         }).use(AwsS3, {
             id: 'AwsS3',
@@ -44,9 +54,14 @@ export function ImageUploader({
         uppy.upload().then((result) => {
             setIsUploading(false)
             if (result && result.successful[0]) {
-                let paths = new URL(result.successful[0].uploadURL).pathname.substring(1).split('/')
+                let paths = new URL(result.successful[0].uploadURL).pathname
+                    .substring(1)
+                    .split('/')
                 const key = paths.slice(0, paths.length).join('/')
+                uppy.setState({ ...uppy.getState(), files: [] })
                 setKey(key)
+                if (uploadInputRef && uploadInputRef.current)
+                    uploadInputRef.current.value = ''
             }
 
             if (result.failed.length > 0) {
@@ -76,8 +91,6 @@ export function ImageUploader({
         if (onUploadStart) onUploadStart()
     })
 
-    console.log('Key', key)
-    console.log('Presigned URL', presignedGetUrl.data)
     return (
         <>
             <button
@@ -96,7 +109,7 @@ export function ImageUploader({
                         <div className="bg-white bg-opacity-0 transition group-hover:bg-opacity-90 absolute inset-0 group:z-10 h-full w-full object-cover" />
                     </>
                 )}
-                {!uploading && presignedGetUrl.data && (
+                {!uploading && key && presignedGetUrl.data && (
                     <>
                         <img
                             src={presignedGetUrl.data}
@@ -111,7 +124,7 @@ export function ImageUploader({
                     onChange={(e) => onInputChange(e)}
                     type="file"
                     className="hidden"
-                    accept="image/png, image/jpeg"
+                    accept="image/png, image/jpeg image/svg"
                 />
                 {uploading ? (
                     <>
@@ -148,9 +161,10 @@ export function ImageUploader({
                     </>
                 )}
             </button>
-            {clearImage && presignedGetUrl.data && !uploading && (
+            {clearImage && (presignedGetUrl.data || defaultImage) && !uploading && (
                 <div className="w-full flex justify-end">
                     <Button
+                        type="button"
                         variant="destructive"
                         className="w-fit my-2"
                         size="sm"

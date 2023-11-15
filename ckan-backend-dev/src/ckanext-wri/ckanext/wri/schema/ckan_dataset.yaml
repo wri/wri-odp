@@ -113,6 +113,10 @@ dataset_fields:
   output_validators: boolean_validator
   preset: checkbox
 
+- field_name: featured_image
+  label: Featured Image
+  validators: ignore_missing
+
 - field_name: short_description
   label: Short Description
   form_snippet: markdown.html
@@ -196,3 +200,7 @@ resource_fields:
 - field_name: format
   label: Format
   preset: resource_format_autocomplete
+
+- field_name: schema
+  label: Schema
+  preset: json_object

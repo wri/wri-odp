@@ -24,7 +24,8 @@ declare module 'next-auth' {
             email: string
             username: string
             apikey: string
-            teams: { name: string; id: string }[]
+            sysadmin: boolean
+            //teams: { name: string; id: string }[]
         }
     }
 
@@ -32,7 +33,8 @@ declare module 'next-auth' {
         email: string
         username: string
         apikey: string
-        teams: { name: string; id: string }[]
+        sysadmin: boolean
+        //teams: { name: string; id: string }[]
     }
 }
 
@@ -53,7 +55,8 @@ export const authOptions: NextAuthOptions = {
         jwt({ token, user }) {
             if (user) {
                 token.apikey = user.apikey
-                token.teams = user.teams
+                // token.teams = user.teams
+                token.sysadmin = user.sysadmin
             }
             return token
         },
@@ -63,7 +66,8 @@ export const authOptions: NextAuthOptions = {
                 user: {
                     ...session.user,
                     apikey: token.apikey ? token.apikey : '',
-                    teams: token.teams ? token.teams : { name: '', id: '' },
+                    // teams: token.teams ? token.teams : { name: '', id: '' },
+                    sysadmin: token?.sysadmin,
                     id: token.sub,
                 },
             }
@@ -135,10 +139,11 @@ export const authOptions: NextAuthOptions = {
                             ...user.result,
                             image: '',
                             apikey: user.result.frontend_token,
-                            teams: orgList.result.map((org) => ({
+                            sysadmin: user.result?.sysadmin,
+                            /*teams: orgList.result.map((org) => ({
                                 name: org?.name ?? '',
                                 id: org?.id ?? '',
-                            })),
+                            })),*/
                         }
                     } else {
                         throw 'An unexpected error occurred while signing in. Please, try again.'

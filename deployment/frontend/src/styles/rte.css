@@ -1,3 +1,25 @@
+:root {
+  --color-pink: #ee415f;
+  --color-green: #58ce97;
+  --color-orange: #fc7d4a;
+  --color-red: #d14758;
+  --color-pale-pink: #ef6e85;
+  --color-coral: #f3907e;
+  --color-peach: #ecb38d;
+  --color-aqua: #a0ded0;
+  --color-pale-aqua: #c0ebe1;
+  --color-lightest-blue: #f8fcff;
+  --color-blue: #4c88e9;
+  --color-black: #242e39;
+  --color-gray-1: #3b424b;
+  --color-gray-2: #68707d;
+  --color-gray-3: #949fab;
+  --color-gray-4: #c7cdd4;
+  --color-gray-5: #edf1f6;
+  --color-gray-6: #f7f9fb;
+  --color-white: #fff;
+}
+
 html {
   box-sizing: border-box;
 }
@@ -20,7 +42,7 @@ body {
 }
 
 .editor a {
-  color: var(--color-pink);
+  color: #1e40af;
 }
 
 .editor p {
@@ -73,7 +95,7 @@ body {
 
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
-  background-color: var(--color-white);
+  border-top: solid 1px var(--color-gray-5);
   color: var(--color-gray-2);
 }
 
@@ -176,9 +198,13 @@ body {
   margin-top: 4px;
   height: 100%;
   padding: 8px 8px 48px 8px;
-
+  flex-grow: 1;
   border-radius: 0.375rem;
   border: 1px solid #d7d7d7;
+}
+
+.ProseMirror a {
+  text-decoration: underline;
 }
 
 .editor-mini .ProseMirror {
@@ -186,7 +212,7 @@ body {
 }
 
 .ProseMirror-focused {
-  border-color: var(--color-black);
+  border-color: #1e40af;
   outline: none;
 }
 
