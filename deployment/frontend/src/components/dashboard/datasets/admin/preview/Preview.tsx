@@ -62,7 +62,11 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="Projects"
-                                    text={watch('projects') ? watch('projects').join(', ') : '_'}
+                                    text={
+                                        watch('projects')
+                                            ? watch('projects').join(', ')
+                                            : '_'
+                                    }
                                 />
                                 <ListOfItems
                                     label="Topics"
@@ -182,34 +186,54 @@ export function Preview({
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
                                 More details
                             </h3>
-                            <div className="grid sm:grid-cols-2">
+                            <div className="grid">
                                 <dl className="flex flex-col gap-y-6">
-                                    <SimpleDescription
-                                        label="Function"
-                                        text={watch('function') ?? '_'}
-                                    />
-                                    <SimpleDescription
-                                        label="Restrictions"
-                                        text={watch('restrictions') ?? '_'}
-                                    />
-                                    <SimpleDescription
-                                        label="Reasons for adding"
-                                        text={watch('reason_for_adding') ?? '_'}
-                                    />
                                     <SimpleDescription
                                         label="Learn More"
                                         text={watch('learn_more') ?? '_'}
                                     />
-                                </dl>
-                                <dl className="flex flex-col gap-y-6">
-                                    <SimpleDescription
-                                        label="Cautions"
-                                        text={watch('cautions') ?? '_'}
-                                    />
-                                    <SimpleDescription
-                                        label="Summary"
-                                        text={watch('summary') ?? '_'}
-                                    />
+                                    <FullDescription label="Function">
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html:
+                                                    watch('function') ?? '_',
+                                            }}
+                                        ></div>
+                                    </FullDescription>
+                                    <FullDescription label="Rstrictions">
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html:
+                                                    watch('restrictions') ??
+                                                    '_',
+                                            }}
+                                        ></div>
+                                    </FullDescription>
+                                    <FullDescription label="Reasons for adding">
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html:
+                                                    watch(
+                                                        'reason_for_adding'
+                                                    ) ?? '_',
+                                            }}
+                                        ></div>
+                                    </FullDescription>
+                                    <FullDescription label="Cautions">
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html:
+                                                    watch('cautions') ?? '_',
+                                            }}
+                                        ></div>
+                                    </FullDescription>
+                                    <FullDescription label="Summary">
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: watch('summary') ?? '_',
+                                            }}
+                                        ></div>
+                                    </FullDescription>
                                 </dl>
                             </div>
                         </div>
@@ -223,7 +247,9 @@ export function Preview({
                                 {watch('resources').map((resource) => (
                                     <Datafile
                                         key={resource.resourceId}
-                                        name={resource.name ?? resource.url ?? '-'}
+                                        name={
+                                            resource.name ?? resource.url ?? '-'
+                                        }
                                         title={resource.title ?? '-'}
                                         type={resource.type ?? 'empty'}
                                         format={resource.format?.label ?? '-'}
