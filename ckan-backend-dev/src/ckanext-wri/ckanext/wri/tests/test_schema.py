@@ -49,7 +49,7 @@ def test_package_create():
         "reason_for_adding": "This data is being added because...",
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
-        "summary": "A short summary of the dataset"
+        "methodology": "A short methodology of the dataset"
     }
 
     try:
@@ -97,7 +97,7 @@ def test_package_create():
     assert result["reason_for_adding"] == dataset["reason_for_adding"]
     assert result["learn_more"] == dataset["learn_more"]
     assert result["cautions"] == dataset["cautions"]
-    assert result["summary"] == dataset["summary"]
+    assert result["methodology"] == dataset["methodology"]
 
     invalid_urls = ["invalid_url_1", "invalid_url_2", "invalid_url_3"]
 

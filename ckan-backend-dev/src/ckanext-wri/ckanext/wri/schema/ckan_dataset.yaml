@@ -182,10 +182,10 @@ dataset_fields:
   form_snippet: markdown.html
   form_placeholder: eg. This data should be used with caution because...
 
-- field_name: summary
-  label: Summary
+- field_name: methodology
+  label: Methodology
   form_snippet: markdown.html
-  form_placeholder: eg. A short summary of the dataset
+  form_placeholder: eg. A short methodology of the dataset
 
 - field_name: open_in
   label: Open In

@@ -32,7 +32,7 @@ function TeamProfile({ team }: { team: IRowProfile }) {
 
 
 export default function TeamCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 5 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.organization.getUsersOrganizations.useQuery(query)
   const [selectedTeam, setSelectedTeam] = useState<IOrg | null>(null);
   const [open, setOpen] = useState(false)

@@ -124,7 +124,7 @@ export function ImageUploader({
                     onChange={(e) => onInputChange(e)}
                     type="file"
                     className="hidden"
-                    accept="image/png, image/jpeg image/svg"
+                    accept="image/png image/jpeg image/svg"
                 />
                 {uploading ? (
                     <>

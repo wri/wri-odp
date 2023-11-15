@@ -9,7 +9,7 @@ import { getUserOrganizations, getAllDatasetFq, getUserGroups } from "@/utils/ap
 import { searchSchema } from "@/schema/search.schema";
 import type { CkanResponse } from "@/schema/ckan.schema";
 import { DatasetSchema } from '@/schema/dataset.schema'
-import type { Dataset } from '@portaljs/ckan'
+import type { Dataset } from '@/interfaces/dataset.interface'
 import type { License } from '@/interfaces/licenses.interface'
 
 export const DatasetRouter = createTRPCRouter({

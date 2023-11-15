@@ -302,17 +302,23 @@ export function activityDetails(activity: Activity): ActivityDisplay {
 
   const activityType = activity.activity_type?.split(" ");
   const action = activityType[0]!;
-  const object = activityType[1]!;
+  let object = activityType[1]!;
+  const actionType = activityType.join("_");
   let title = "";
+  const GroupObject: Record<string, string> = {
+    "group": "topic",
+    "organization": "team"
+  }
   if (object === "package") {
     title = activity.data?.package?.title ?? "";
   }
   else {
     title = activity.data?.group?.title ?? "";
+    object = GroupObject[object]!;
   }
   const description = `${activitProperties[action]} the ${object} ${title}`;
   const time = timeAgo(activity.timestamp);
-  return { description, time, icon: action, action, timestamp: activity.timestamp };
+  return { description, time, icon: action, action, timestamp: activity.timestamp, actionType: actionType };
 }
 
 export function timeAgo(timestamp: string): string {

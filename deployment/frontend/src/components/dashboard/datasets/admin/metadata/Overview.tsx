@@ -39,8 +39,6 @@ export function OverviewForm({
     const topicHierarchy = api.topics.getTopicsHierarchy.useQuery()
     const possibleLicenses = api.dataset.getLicenses.useQuery()
 
-    console.log(errors)
-    console.log(watch('team'))
     return (
         <MetadataAccordion
             defaultOpen={true}
@@ -176,7 +174,8 @@ export function OverviewForm({
                                 { isSuccess: true, data: P.select() },
                                 (data) => (
                                     <TopicsSelect
-                                        topicHierarchy={data}
+                                        userTopics={data.userTopics}
+                                        topicHierarchy={data.hierarchy}
                                         formObj={formObj}
                                     />
                                 )
@@ -188,7 +187,7 @@ export function OverviewForm({
                                 </span>
                             ))}
                     </InputGroup>
-                    <InputGroup label="Technical Notes" required>
+                    <InputGroup label="Technical Notes" required={watch('visibility_type').value === 'public'}>
                         <Input
                             {...register('technical_notes')}
                             placeholder="https://source/to/original/data"
@@ -283,7 +282,7 @@ export function OverviewForm({
                                     label: 'Hourly',
                                 },
                                 {
-                                    value: 'as_need',
+                                    value: 'as_needed',
                                     label: 'As needed',
                                 },
                                 {
@@ -294,6 +293,7 @@ export function OverviewForm({
                                 { value: 'annually', label: 'Annually' },
                             ]}
                         />
+                        <ErrorDisplay name="update_frequency" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Citation" className="items-start">
                         <TextArea

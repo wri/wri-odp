@@ -7,7 +7,7 @@ import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
 
 export default function Favourite() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading } = api.dataset.getFavoriteDataset.useQuery(query)
 
   if (isLoading) {

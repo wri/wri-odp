@@ -49,7 +49,7 @@ def test_search_queries():
         'reason_for_adding': 'This data is being added because...',
         'learn_more': 'https://example.com/learn_more.pdf',
         'cautions': 'This data should be used with caution because...',
-        'summary': 'A short summary of the dataset'
+        'methodology': 'A short methodology of the dataset'
     }
 
     try:
@@ -74,7 +74,7 @@ def test_search_queries():
         'featured_dataset', 'short_description',
         'function', 'restrictions',
         'reason_for_adding', 'learn_more',
-        'cautions', 'summary'
+        'cautions', 'methodology'
     ]
 
     # Test that correct queries return the dataset

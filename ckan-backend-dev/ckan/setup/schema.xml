@@ -190,7 +190,7 @@ attribute with the form `ckan-X.Y` -->
     <field name="reason_for_adding" type="text" indexed="true" stored="true"/>
     <field name="learn_more" type="string" indexed="true" stored="true"/>
     <field name="cautions" type="text" indexed="true" stored="true"/>
-    <field name="summary" type="text" indexed="true" stored="true"/>
+    <field name="methodology" type="text" indexed="true" stored="true"/>
     <fiend name="featured_dataset" type="boolean" indexed="true" stored="true"/>
     <field name="wri_data" type="boolean" indexed="true" stored="true"/>
 </fields>

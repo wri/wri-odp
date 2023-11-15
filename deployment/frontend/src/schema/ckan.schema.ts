@@ -47,15 +47,16 @@ export interface Activity {
 }
 
 export interface ActivityDisplay {
-  description: string,
-  time: string,
-  icon: string,
-  action: string,
-  timestamp: string,
+  description: string;
+  time: string;
+  icon: string;
+  action: string;
+  timestamp: string;
+  actionType: string;
 }
 
 export interface WriDataset extends Dataset {
-  summary?: string;
+  methodology?: string;
   technical_notes?: string;
   temporal_coverage_start: string;
   temporal_coverage_end: string;
