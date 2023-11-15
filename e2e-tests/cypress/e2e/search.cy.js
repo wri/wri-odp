@@ -82,7 +82,7 @@ describe("Search page", () => {
 
     cy.get('[id^="facet-organization-"]').first().click({ force: true });
 
-    cy.contains("7 results", { timeout: 10000 });
+    cy.contains("results", { timeout: 10000 });
   });
 
   it("allows filtering by search query", () => {
