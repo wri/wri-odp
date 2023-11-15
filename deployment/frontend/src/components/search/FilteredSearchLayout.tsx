@@ -149,7 +149,7 @@ export default function FilteredSearchLayout({
                                         </div>
                                     </Transition.Child>
                                     {/* Sidebar component, swap this element with another sidebar if you like */}
-                                    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white pb-4">
+                                    <div id="facets-list" className="flex grow flex-col gap-y-5 overflow-y-auto bg-white pb-4">
                                         <nav className="flex flex-1 flex-col">
                                             <ul
                                                 role="list"
@@ -248,7 +248,7 @@ export default function FilteredSearchLayout({
                                 className="hidden w-[25%] min-w-[25%] lg:z-10 lg:flex lg:flex-col"
                             >
                                 {/* Sidebar component, swap this element with another sidebar if you like */}
-                                <div className="flex grow flex-col gap-y-5 overflow-y-auto pb-4">
+                                <div id="facets-list" className="flex grow flex-col gap-y-5 overflow-y-auto pb-4">
                                     <nav className="flex flex-1 flex-col">
                                         <ul
                                             role="list"
