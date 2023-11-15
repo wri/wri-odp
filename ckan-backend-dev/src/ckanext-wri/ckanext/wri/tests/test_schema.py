@@ -26,7 +26,7 @@ def test_package_create():
         "url": "http://example.com/dataset.json",
         "language": "en",
         "owner_org": organization_dict["id"],
-        "projects": ["wri", "gfw"],
+        "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
         "application": "rw",
         "groups": [{"id": group_dict["id"]}],
         "technical_notes": "http://example.com/technical_notes.pdf",
@@ -72,7 +72,7 @@ def test_package_create():
     assert result["url"] == dataset["url"]
     assert result["language"] == dataset["language"]
     assert result["owner_org"] == organization_dict["id"]
-    assert result["projects"] == dataset["projects"]
+    assert result["project"] == dataset["project"]
     assert result["application"] == dataset["application"]
     assert result["groups"][0]["name"] == group_dict["name"]
     assert result["technical_notes"] == dataset["technical_notes"]
