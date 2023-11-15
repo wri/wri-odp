@@ -56,7 +56,7 @@ describe("Search page", () => {
         application: i < 7 ? "Application 1" : "Application 2",
         tags: i < 7 ? [{ name: "tags 1" }] : [{ name: "tags 2" }],
         temporal_coverage_start: i < 7 ? 2005 : 2010,
-        temporal_coverage_end: i < 7 ? 20010 : 2012,
+        temporal_coverage_end: i < 7 ? 2010 : 2012,
         update_frequency: i < 7 ? "annually" : "daily",
         language: i < 7 ? "en" : "pt",
         wri_data: i < 7 ? true : false,
