@@ -4,11 +4,15 @@ import { CkanResponse } from '@/schema/ckan.schema'
 import { Organization } from '@portaljs/ckan'
 import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
+import { replaceNames } from '@/utils/replaceNames'
+
 export const teamRouter = createTRPCRouter({
     getAllTeams: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.session.user
         const teamRes = await fetch(
-            user.sysadmin ? `${env.CKAN_URL}/api/action/organization_list?all_fields=True` : `${env.CKAN_URL}/api/action/organization_list_for_user?all_fields=True`,
+            user.sysadmin
+                ? `${env.CKAN_URL}/api/action/organization_list?all_fields=True`
+                : `${env.CKAN_URL}/api/action/organization_list_for_user?all_fields=True`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -17,10 +21,11 @@ export const teamRouter = createTRPCRouter({
             }
         )
         const teams: CkanResponse<Organization[]> = await teamRes.json()
-                if (!teams.success && teams.error) {
-                    if (teams.error.message) throw Error(teams.error.message)
-                    throw Error(JSON.stringify(teams.error))
-                }
+        if (!teams.success && teams.error) {
+            if (teams.error.message)
+                throw Error(replaceNames(teams.error.message))
+            throw Error(replaceNames(JSON.stringify(teams.error)))
+        }
         return teams.result.filter((team) => team.state === 'active')
     }),
     editTeam: protectedProcedure
@@ -33,7 +38,10 @@ export const teamRouter = createTRPCRouter({
                     image_display_url: input.image_url
                         ? `${env.CKAN_URL}/uploads/group/${input.image_url}`
                         : null,
-                    groups: input.parent && input.parent !== '' ? [{ name: input.parent }] : [],
+                    groups:
+                        input.parent && input.parent !== ''
+                            ? [{ name: input.parent }]
+                            : [],
                 })
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_update`,
@@ -48,15 +56,16 @@ export const teamRouter = createTRPCRouter({
                 )
                 const team: CkanResponse<Organization> = await teamRes.json()
                 if (!team.success && team.error) {
-                    if (team.error.message) throw Error(team.error.message)
-                    throw Error(JSON.stringify(team.error))
+                    if (team.error.message)
+                        throw Error(replaceNames(team.error.message))
+                    throw Error(replaceNames(JSON.stringify(team.error)))
                 }
                 return team.result
             } catch (e) {
                 let error =
                     'Something went wrong please contact the system administrator'
                 if (e instanceof Error) error = e.message
-                throw Error(error)
+                throw Error(replaceNames(error))
             }
         }),
     getTeam: protectedProcedure
@@ -99,8 +108,9 @@ export const teamRouter = createTRPCRouter({
                 Organization & { groups: Organization[] }
             > = await teamRes.json()
             if (!team.success && team.error) {
-                if (team.error.message) throw Error(team.error.message)
-                throw Error(JSON.stringify(team.error))
+                if (team.error.message)
+                    throw Error(replaceNames(team.error.message))
+                throw Error(replaceNames(JSON.stringify(team.error)))
             }
             return {
                 ...team.result,
@@ -116,7 +126,10 @@ export const teamRouter = createTRPCRouter({
                     image_display_url: input.image_url
                         ? `${env.CKAN_URL}/uploads/group/${input.image_url}`
                         : null,
-                    groups: input.parent && input.parent !== '' ? [{ name: input.parent }] : [],
+                    groups:
+                        input.parent && input.parent !== ''
+                            ? [{ name: input.parent }]
+                            : [],
                 })
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_create`,
@@ -131,30 +144,35 @@ export const teamRouter = createTRPCRouter({
                 )
                 const team: CkanResponse<Organization> = await teamRes.json()
                 if (!team.success && team.error) {
-                    if (team.error.message) throw Error(team.error.message)
-                    throw Error(JSON.stringify(team.error))
+                    if (team.error.message)
+                        throw Error(replaceNames(team.error.message))
+                    throw Error(replaceNames(JSON.stringify(team.error)))
                 }
                 return team.result
             } catch (e) {
                 let error =
                     'Something went wrong please contact the system administrator'
                 if (e instanceof Error) error = e.message
-                throw Error(error)
+                throw Error(replaceNames(error))
             }
         }),
     deleteDashboardTeam: protectedProcedure
         .input(z.string())
         .mutation(async ({ input, ctx }) => {
-            const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_delete`, {
-                method: "POST",
-                body: JSON.stringify({ id: input }),
-                headers: {
-                    "Authorization": ctx.session.user.apikey,
-                    "Content-Type": "application/json"
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/organization_delete`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ id: input }),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
                 }
-            });
-            const data = (await response.json()) as CkanResponse<null>;
-            if (!data.success && data.error) throw Error(data.error.message)
+            )
+            const data = (await response.json()) as CkanResponse<null>
+            if (!data.success && data.error)
+                throw Error(replaceNames(data.error.message))
             return data
-        })
+        }),
 })

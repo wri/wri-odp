@@ -180,7 +180,7 @@ export function Preview({
                         watch('restrictions') ||
                         watch('learn_more') ||
                         watch('reason_for_adding') ||
-                        watch('summary') ||
+                        watch('methodology') ||
                         watch('cautions')) && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
@@ -227,10 +227,10 @@ export function Preview({
                                             }}
                                         ></div>
                                     </FullDescription>
-                                    <FullDescription label="Summary">
+                                    <FullDescription label="Methodology">
                                         <div
                                             dangerouslySetInnerHTML={{
-                                                __html: watch('summary') ?? '_',
+                                                __html: watch('methodology') ?? '_',
                                             }}
                                         ></div>
                                     </FullDescription>

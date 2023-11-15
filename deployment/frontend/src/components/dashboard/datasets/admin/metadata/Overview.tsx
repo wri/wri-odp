@@ -176,7 +176,8 @@ export function OverviewForm({
                                 { isSuccess: true, data: P.select() },
                                 (data) => (
                                     <TopicsSelect
-                                        topicHierarchy={data}
+                                        userTopics={data.userTopics}
+                                        topicHierarchy={data.hierarchy}
                                         formObj={formObj}
                                     />
                                 )

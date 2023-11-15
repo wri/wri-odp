@@ -124,7 +124,7 @@ export const DatasetSchema = z
             .nullable()
             .or(emptyStringToUndefined),
         cautions: z.string().optional().nullable(),
-        summary: z.string().optional().nullable(),
+        methodology: z.string().optional().nullable(),
         extras: z.array(
             z.object({
                 key: z.string(),
