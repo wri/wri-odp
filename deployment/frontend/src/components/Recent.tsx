@@ -3,6 +3,7 @@ import Carousel from './Carousel';
 import { SwiperSlide } from 'swiper/react';
 import CarouselNavButton from './_shared/CarouselNavButton';
 import React from 'react'
+import Link from "next/link";
 const recents = [
   {
     title: "Title of the dataset goes here lorem ipsum.",
@@ -73,7 +74,7 @@ const recents = [
 export default function Recent({ title }: { title: string }) {
   const identifier = title.toLowerCase().replace(' ', '-')
   return (
-    <section id="highlights" className=' px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin gap-y-6 mt-16'>
+    <Link href="/datasets/x" id="highlights" className=' px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin gap-y-6 mt-16'>
       <h1 className='font-bold text-[2rem] ml-2'>{title}</h1>
       <div className='relative '>
         <div className='peer'>
@@ -96,7 +97,7 @@ export default function Recent({ title }: { title: string }) {
           <CarouselNavButton orientation="right" />
         </div>
       </div>
-    </section>
+    </Link>
   )
 }
 

@@ -11,8 +11,8 @@ COPY . .
 
 # You can setup env vars here or via `.env` file
 
-RUN npm ci
-RUN npm run build
+RUN npm ci -f
+RUN SKIP_ENV_VALIDATION=1 npm run build
 EXPOSE 3000
 
 # For staging/production please use `yarn start` command.

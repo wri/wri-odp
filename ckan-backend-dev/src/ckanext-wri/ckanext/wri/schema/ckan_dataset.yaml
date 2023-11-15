@@ -6,6 +6,12 @@ about_url: http://github.com/ckan/ckanext-scheming
 
 dataset_fields:
 
+- field_name: wri_data
+  label: WRI Data
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
 - field_name: title
   label: Title
   preset: title
@@ -49,9 +55,13 @@ dataset_fields:
   preset: tag_string_autocomplete
   form_placeholder: eg. economy, mental health, government
 
-- field_name: temporal_coverage
-  label: Temporal Coverage
-  form_placeholder: eg. 2010/2011
+- field_name: temporal_coverage_start
+  label: Temporal Coverage Start
+  form_placeholder: eg. 2010
+
+- field_name: temporal_coverage_end
+  label: Temporal Coverage End
+  form_placeholder: eg. 2011
 
 - field_name: update_frequency
   label: Update Frequency
@@ -102,6 +112,10 @@ dataset_fields:
   validators: boolean_validator
   output_validators: boolean_validator
   preset: checkbox
+
+- field_name: featured_image
+  label: Featured Image
+  validators: ignore_missing
 
 - field_name: short_description
   label: Short Description
@@ -168,6 +182,10 @@ dataset_fields:
   form_snippet: markdown.html
   form_placeholder: eg. A short summary of the dataset
 
+- field_name: open_in
+  label: Open In
+  preset: json_object
+
 resource_fields:
 
 - field_name: url
@@ -186,3 +204,7 @@ resource_fields:
 - field_name: format
   label: Format
   preset: resource_format_autocomplete
+
+- field_name: schema
+  label: Schema
+  preset: json_object

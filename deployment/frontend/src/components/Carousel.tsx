@@ -5,15 +5,11 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Swiper } from 'swiper/react';
 import { Navigation } from "swiper/modules";
-import { SwiperOptions } from 'swiper/types';
 
 type CarouselProps = {
   children: React.ReactNode;
   identifier: string;
-  breakpoints?: {
-    [width: number]: SwiperOptions;
-    [ratio: string]: SwiperOptions;
-  };
+  breakpoints?: any;
 }
 
 export default function Carousel({ children, identifier, breakpoints }: CarouselProps) {
@@ -25,7 +21,7 @@ export default function Carousel({ children, identifier, breakpoints }: Carousel
       <Swiper
         modules={[Navigation]}
         spaceBetween={identifier.includes("recent") ? 18 : 40}
-        breakpoints={breakpoints ? breakpoints : {
+        breakpoints={breakpoints ?? {
           1: {
             slidesPerView: 1,
             slidesPerGroup: 1,
