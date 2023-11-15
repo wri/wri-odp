@@ -55,9 +55,13 @@ dataset_fields:
   preset: tag_string_autocomplete
   form_placeholder: eg. economy, mental health, government
 
-- field_name: temporal_coverage
-  label: Temporal Coverage
-  form_placeholder: eg. 2010/2011
+- field_name: temporal_coverage_start
+  label: Temporal Coverage Start
+  form_placeholder: eg. 2010
+
+- field_name: temporal_coverage_end
+  label: Temporal Coverage End
+  form_placeholder: eg. 2011
 
 - field_name: update_frequency
   label: Update Frequency

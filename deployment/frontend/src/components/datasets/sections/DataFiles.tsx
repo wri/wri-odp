@@ -18,7 +18,7 @@ const datafilesMock = [
     { format: 'TIFF', name: 'Name of the file', canShow: true, showing: true },
     { format: 'CSV', name: 'Name of the file', canShow: false, showing: false },
     {
-        format: 'GeoJSON',
+        format: 'GEOJSON',
         name: 'Name of the file',
         canShow: true,
         showing: false,
@@ -58,9 +58,16 @@ export function DataFiles() {
 }
 
 export const colors: Record<string, string> = {
+    // NOTE: colors may have to be tweaked
     TIFF: 'bg-wri-light-green',
     CSV: 'bg-wri-light-yellow',
-    GeoJSON: 'bg-wri-light-blue',
+    GEOJSON: 'bg-wri-light-blue',
+    HTML: 'bg-wri-gold',
+    PDF: 'bg-wri-light-gray',
+    XLS: 'wri-green',
+    XLSX: 'wri-darl-blue',
+    API: 'wri-gray',
+    ZIP: 'wri-slate',
 }
 
 interface Datafile {
