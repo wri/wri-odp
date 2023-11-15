@@ -16,8 +16,12 @@ function subFields(dataset: WriDataset) {
       description: dataset?.type
     },
     {
-      title: "Coverage",
-      description: dataset?.temporal_coverage
+      title: "Coverage Start",
+      description: dataset?.temporal_coverage_start
+    },
+    {
+      title: "Coverage End",
+      description: dataset?.temporal_coverage_end
     },
     {
       title: "Short description",
