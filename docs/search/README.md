@@ -13,7 +13,7 @@ With this feature, it's possible to filter datasets by the following facets:
 - Location
 - Featured (Yes or No)
 - Application
-- Projects
+- Project
 - Team
 - Topics
 - Tags
@@ -37,7 +37,7 @@ Note that it's also possible to search by keyword, which will match a variety of
 - Formats
 - License
 - Language
-- Projects
+- Project
 - Application
 - Temporal Coverage
 - Update Frequency

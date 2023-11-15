@@ -53,7 +53,7 @@ export const DatasetSchema = z
             .refine((val) => val.value !== '', {
                 message: 'Team is required',
             }),
-        projects: z.array(z.string()),
+        project: z.string().optional().nullable().or(emptyStringToUndefined),
         applications: z.string().optional().nullable(),
         technical_notes: z
             .string()

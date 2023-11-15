@@ -2,7 +2,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 
 import ckanext.wri.logic.action as action
-from ckanext.wri.logic.validators import iso_language_code
+import ckanext.wri.logic.validators as wri_validators
 from ckanext.wri.logic.action.get import package_search
 
 
@@ -23,14 +23,15 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def get_validators(self):
         return {
-            "iso_language_code": iso_language_code
+            "iso_language_code": wri_validators.iso_language_code,
+            "year_validator": wri_validators.year_validator
         }
 
     # IFacets
 
     def dataset_facets(self, facets_dict, package_type):
         facets_dict['language'] = toolkit._('Language')
-        facets_dict['projects'] = toolkit._('Projects')
+        facets_dict['project'] = toolkit._('Project')
         facets_dict['application'] = toolkit._('Application')
         facets_dict['temporal_coverage_start'] = toolkit._('Temporal Coverage Start')
         facets_dict['temporal_coverage_end'] = toolkit._('Temporal Coverage End')

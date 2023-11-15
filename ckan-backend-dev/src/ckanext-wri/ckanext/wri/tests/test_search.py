@@ -26,7 +26,7 @@ def test_search_queries():
         'url': 'http://example.com/dataset.json',
         'language': 'en',
         'owner_org': organization_dict['id'],
-        'projects': ['wri', 'gfw'],
+        'project': 'American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)',
         'application': 'rw app',
         'groups': [{'id': group_dict['id']}],
         'technical_notes': 'http://example.com/technical_notes.pdf',
@@ -66,7 +66,7 @@ def test_search_queries():
     )
 
     fields_to_test = [
-        'language', 'projects',
+        'language', 'project',
         'application', 'technical_notes',
         # 'temporal_coverage_start', 'temporal_coverage_end', 
         'update_frequency',
@@ -79,22 +79,7 @@ def test_search_queries():
 
     # Test that correct queries return the dataset
     for field in fields_to_test:
-        if field == 'projects':
-            result = get_action('package_search')(
-                context=context,
-                data_dict={'q': f'{field}:"{dataset[field][0]}"'}
-            )['results']
-
-            assert result[0]['name'] == dataset['name']
-
-            result = get_action('package_search')(
-                context=context,
-                data_dict={'q': f'{field}:"{dataset[field][1]}"'}
-            )['results']
-
-            assert result[0]['name'] == dataset['name']
-
-        elif field == 'featured_dataset' or field == 'wri_data':
+        if field == 'featured_dataset' or field == 'wri_data':
             result = get_action('package_search')(
                 context=context,
                 data_dict={'q': f'{field}:{dataset[field]}'}
@@ -112,16 +97,7 @@ def test_search_queries():
 
     # Test that incorrect queries do not return the dataset
     for field in fields_to_test:
-        if field == 'projects':
-            result = get_action('package_search')(
-                context=context,
-                data_dict={'q': f'{field}:"not a project"'}
-            )['results']
-
-            if len(result) > 0:
-                assert result[0]['name'] != dataset['name']
-
-        elif field == 'featured_dataset' or field == 'wri_data':
+        if field == 'featured_dataset' or field == 'wri_data':
             result = get_action('package_search')(
                 context=context,
                 data_dict={'q': f'{field}:false'}

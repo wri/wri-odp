@@ -31,18 +31,20 @@ dataset_fields:
 
 - field_name: language
   label: Language
+  form_placeholder: eg. en
   validators: iso_language_code
 
 - field_name: owner_org
   label: Team
   preset: dataset_organization
 
-- field_name: projects
-  label: Projects
-  preset: multiple_text
+- field_name: project
+  label: Project
+  form_placeholder: eg. Project Name
 
 - field_name: application
   label: Application
+  form_placeholder: eg. Application Name
 
 - field_name: technical_notes
   label: Technical Notes
@@ -58,10 +60,12 @@ dataset_fields:
 - field_name: temporal_coverage_start
   label: Temporal Coverage Start
   form_placeholder: eg. 2010
+  validators: ignore_missing year_validator
 
 - field_name: temporal_coverage_end
   label: Temporal Coverage End
   form_placeholder: eg. 2011
+  validators: ignore_missing year_validator
 
 - field_name: update_frequency
   label: Update Frequency
@@ -115,6 +119,7 @@ dataset_fields:
 
 - field_name: featured_image
   label: Featured Image
+  form_placeholder: eg. http://example.com/featured_image.png
   validators: ignore_missing
 
 - field_name: short_description
@@ -184,6 +189,7 @@ dataset_fields:
 
 - field_name: open_in
   label: Open In
+  form_placeholder: 'eg. {"title": "External site", "url": "http://example.com"}'
   preset: json_object
 
 resource_fields:

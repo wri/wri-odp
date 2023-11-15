@@ -63,7 +63,7 @@ export interface WriDataset extends Dataset {
   update_frequency?: string;
   visibility_type?: string;
   short_description?: string;
-  projects?: string[];
+  project?: string;
   reason_for_adding?: string;
   featured_dataset?: boolean;
   application?: string;
