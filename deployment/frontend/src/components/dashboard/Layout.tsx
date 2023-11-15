@@ -4,6 +4,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import UserProfile from "./UserProfile";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react"
+import Link from "next/link";
 
 
 let routes = [
@@ -162,13 +163,13 @@ export default function Layout({
                           navigation.map((item) => {
                             return (
                               <li key={item.name} className={`text-center py-6 ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
-                                <a
+                                <Link
                                   href={item.href.includes("default") ? "./" : `/dashboard${item.href}`}
                                   className="flex w-full justify-center items-center gap-x-2"
                                 >
                                   <div className="font-normal text-[1.125rem]">{item.name}</div>
                                   {item.count ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-4 h-4 rounded-full ">{item.count}</div>) : ""}
-                                </a>
+                                </Link>
                               </li>
                             )
                           })
@@ -200,13 +201,13 @@ export default function Layout({
                       navigation.map((item) => {
                         return (
                           <li key={item.name} className={` text-center py-6 hover:bg-white hover:text-wri-black ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
-                            <a
+                            <Link
                               href={item.href.includes("default") ? "./" : `/dashboard${item.href}`}
                               className="flex w-full justify-center items-center gap-x-2"
                             >
                               <div className="font-normal text-[1.125rem]">{item.name}</div>
                               {item.count ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">{item.count}</div>) : ""}
-                            </a>
+                            </Link>
                           </li>
                         )
                       })
