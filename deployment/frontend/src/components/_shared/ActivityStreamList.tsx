@@ -7,47 +7,57 @@ export const activity: IActivity[] = [
   {
     description: "someone updated the dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
-    icon: "update"
+    icon: "update",
+    actionType: "changed_package"
+
   },
   {
     description: "someone edited the dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
-    icon: "edit"
+    icon: "edit",
+    actionType: "changed_package"
   },
   {
     description: "someone added the dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
-    icon: "add"
+    icon: "add",
+    actionType: "new_package"
   },
   {
     description: "someone updated the dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
-    icon: "update"
+    icon: "update",
+    actionType: "changed_package"
   },
   {
     description: "someone edited the dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
-    icon: "edit"
+    icon: "edit",
+    actionType: "changed_package"
   },
   {
     description: "someone added the dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
-    icon: "add"
+    icon: "add",
+    actionType: "new_package"
   },
   {
-    description: "someone updated the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone deleted the dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
-    icon: "update"
+    icon: "update",
+    actionType: "deleted_package"
   },
   {
-    description: "someone edited the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone deleted the dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
-    icon: "edit"
+    icon: "edit",
+    actionType: "deleted_package"
   },
   {
     description: "someone added the dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
-    icon: "add"
+    icon: "add",
+    actionType: "new_package"
   },
 
 ]
