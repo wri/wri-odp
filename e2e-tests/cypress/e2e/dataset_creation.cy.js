@@ -26,6 +26,8 @@ describe("Create dataset", () => {
     cy.get("input[name=source]").type("https://google.com");
     cy.get("#language").click();
     cy.get("li").contains('English').click();
+    cy.get("#visibility_type").click();
+    cy.get("li").contains('Public').click();
     cy.get("#team").click();
     cy.get("li").contains(org).click();
     cy.get("input[name=applications]").type("GFW");
@@ -56,16 +58,7 @@ describe("Create dataset", () => {
     cy.contains("More Details").click()
     cy.get(".tiptap.ProseMirror").eq(1).type("RICH TEXT EDITOR")
     cy.get(".tiptap.ProseMirror").eq(2).type("RICH TEXT EDITOR")
-    cy.get(".tiptap.ProseMirror").eq(3).type("RICH TEXT EDITOR")
     cy.get("input[name=learn_more]").type("https://google.com");
-    cy.get(".tiptap.ProseMirror").eq(4).type("RICH TEXT EDITOR")
-    cy.contains("Custom Fields").click()
-    cy.get('button').contains("Add a custom field").click()
-    cy.get('input[name="extras.0.key"]').type("Test");
-    cy.get('input[name="extras.0.value"]').type("Test");
-    cy.get('button').contains("Add a custom field").click()
-    cy.get('input[name="extras.1.key"]').type("Test 2");
-    cy.get('input[name="extras.1.value"]').type("Test 2");
     cy.contains("Open In").click()
     cy.get('button').contains("Add a open-in field").click()
     cy.get('input[name="open_in.0.title"]').type("Test");
@@ -73,18 +66,26 @@ describe("Create dataset", () => {
     cy.get('button').contains("Add a open-in field").click()
     cy.get('input[name="open_in.1.title"]').type("Test");
     cy.get('input[name="open_in.1.url"]').type("https://google.com");
+    cy.contains("Custom Fields").click()
+    cy.get('button').contains("Add a custom field").click()
+    cy.get('input[name="extras.0.key"]').type("Test");
+    cy.get('input[name="extras.0.value"]').type("Test");
+    cy.get('button').contains("Add a custom field").click()
+    cy.get('input[name="extras.1.key"]').type("Test 2");
+    cy.get('input[name="extras.1.value"]').type("Test 2");
     cy.contains("Next: Datafiles").click()
     cy.get("input[type=file]").selectFile("cypress/fixtures/sample_csv.csv", {
       force: true,
     });
     cy.contains("Next: Preview").click()
-    cy.contains("Save").click()
-    cy.contains(`Successfully created the ${dataset} dataset`)
+    //get button of type submit
+    cy.get('button[type="submit"]').click()
+    cy.contains(`Successfully created the "${dataset}" dataset`, { timeout: 15000})
   });
 
   after(() => {
     cy.deleteOrganizationAPI(org);
     cy.deleteGroupAPI(topic);
-    //cy.deleteDatasetAPI(dataset)
+    cy.deleteDatasetAPI(dataset)
   });
 });

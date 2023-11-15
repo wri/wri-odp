@@ -73,6 +73,7 @@ export default function CreateDatasetForm() {
 
     const createDataset = api.dataset.createDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
+            console.log('visibility type', visibility_type)
             if (visibility_type !== 'draft') {
                 notify(
                     `Successfully created the "${title ?? name}" dataset`,
@@ -80,13 +81,14 @@ export default function CreateDatasetForm() {
                 )
                 router.push('/dashboard/datasets')
                 formObj.reset()
+            } else {
+                notify(
+                    `Successfully created the draft for the "${
+                        title ?? name
+                    }" dataset`,
+                    'success'
+                )
             }
-            notify(
-                `Successfully created the draft for the "${
-                    title ?? name
-                }" dataset`,
-                'success'
-            )
         },
         onError: (error) => {
             setErrorMessage(error.message)
