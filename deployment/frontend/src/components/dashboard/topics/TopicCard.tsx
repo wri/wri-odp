@@ -12,6 +12,9 @@ import type { GroupTree } from '@/schema/ckan.schema';
 import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal';
 import { useRouter } from 'next/router'
+import { LoaderButton, Button } from '@/components/_shared/Button'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Dialog } from '@headlessui/react'
 
 
 function TeamProfile({ team }: { team: GroupTree }) {
@@ -34,7 +37,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
     onSuccess: async (data) => {
       await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 10 } })
       setOpen(false)
-      notify(`Topic delete is successful`, 'success')
+      notify(`Successfully deleted the ${selectedTopic?.name} topic`, 'error')
     }
   })
 
@@ -89,19 +92,53 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
           )
         })
       }
-      {selectedTopic && (
-        <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-          <h3 className='w-full text-center my-auto'>Delete Topic: {selectedTopic.name}</h3>
-          <button
-            className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
-            id={selectedTopic.name}
-            onClick={() => {
-              deleteTopic.mutate(selectedTopic.id)
-            }}
-            disabled={deleteTopic.isSuccess}
-          >{deleteTopic.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTopic.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
-        </Modal>
-      )}
+      {
+        selectedTopic && (
+          <Modal
+            open={open}
+            setOpen={setOpen}
+            className="sm:w-full sm:max-w-lg"
+          >
+            <div className="sm:flex sm:items-start">
+              <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <ExclamationTriangleIcon
+                  className="h-6 w-6 text-red-600"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                <Dialog.Title
+                  as="h3"
+                  className="text-base font-semibold leading-6 text-gray-900"
+                >
+                  Delete Topic
+                </Dialog.Title>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500">
+                    Are you sure you want to delete this topic?
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+              <LoaderButton
+                variant="destructive"
+                loading={deleteTopic.isLoading}
+                onClick={() => deleteTopic.mutate(selectedTopic.id)}
+              >
+                Delete Topic
+              </LoaderButton>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </Modal>
+        )
+      }
     </div>
   )
 }
@@ -119,7 +156,7 @@ export default function TopicCard() {
     onSuccess: async (data) => {
       await refetch();
       setOpen(false)
-      notify(`Topic delete is successful`, 'success')
+      notify(`Successfully deleted the ${selectedTopic?.name} topic`, 'error')
     }
   })
 
@@ -181,19 +218,54 @@ export default function TopicCard() {
           )
         }
 
-        {selectedTopic && (
-          <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-            <h3 className='w-full text-center my-auto'>Delete Topic: {selectedTopic.name}</h3>
-            <button
-              className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
-              id={selectedTopic.name}
-              onClick={() => {
-                deleteTopic.mutate(selectedTopic.id)
-              }}
-              disabled={deleteTopic.isSuccess}
-            >{deleteTopic.isLoading ?? isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTopic.isError ? "Something went wrong Try again" : "I want to delete this topic"} </button>
-          </Modal>
-        )}
+        {
+          selectedTopic && (
+            <Modal
+              open={open}
+              setOpen={setOpen}
+              className="sm:w-full sm:max-w-lg"
+            >
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <ExclamationTriangleIcon
+                    className="h-6 w-6 text-red-600"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-base font-semibold leading-6 text-gray-900"
+                  >
+                    Delete Topic
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Are you sure you want to delete this topic?
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                <LoaderButton
+                  variant="destructive"
+                  loading={deleteTopic.isLoading}
+                  onClick={() => deleteTopic.mutate(selectedTopic.id)}
+                >
+                  Delete Topic
+                </LoaderButton>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </Modal>
+          )
+        }
+
       </div>
     </section>
   )
