@@ -21,9 +21,6 @@ COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 RUN chown -R ckan:ckan ${APP_DIR}/src/ckanext-wri
 RUN chmod +x ${APP_DIR}/prerun.py
 
-USER ckan
-RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
-
 COPY patches ${APP_DIR}/patches
 RUN apk --no-cache add patch
 RUN for d in $APP_DIR/patches/*; do \
@@ -33,6 +30,9 @@ RUN for d in $APP_DIR/patches/*; do \
             done ; \
         fi ; \
     done
+
+USER ckan
+RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
 ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
 
