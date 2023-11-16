@@ -12,14 +12,50 @@ import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
 import { Facets } from '@/interfaces/search.interface'
 
+
+export async function searchHierarchy({ apiKey, q, group_type }: { apiKey: string, q: string, group_type: string }): Promise<GroupTree[]> {
+    try {
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/${group_type == "group" ? "group_list" : "organization_list"}?q=${q}&all_fields=True`, {
+            headers: {
+                "Authorization": apiKey,
+            }
+        });
+        const data = (await response.json()) as CkanResponse<GroupTree[]>;
+
+        const groups: GroupTree[] | [] = data.success === true ? data.result : [];
+
+        const groupTree: GroupTree[] = await Promise.all(groups.map(async (group) => {
+            const g = await fetch(`${env.CKAN_URL}/api/3/action/group_tree_section?id=${group.id}&type=${group_type}&all_fields=True`, {
+                headers: {
+                    "Authorization": apiKey,
+                }
+            });
+            const d = (await g.json()) as CkanResponse<GroupTree>;
+            if (d.success === true) {
+                return d.result
+            } else {
+                return {} as GroupTree
+            }
+        }));
+        return groupTree
+
+    }
+    catch (e) {
+        console.log(e)
+        throw new Error(e as string)
+    }
+}
+
 export async function getGroups({
     apiKey,
+    group_type = "group"
 }: {
-    apiKey: string
+    apiKey: string,
+    group_type?: string
 }): Promise<GroupTree[]> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/group_tree?all_fields=True`,
+            `${env.CKAN_URL}/api/3/action/group_tree?all_fields=True&type=${group_type}`,
             {
                 headers: {
                     Authorization: apiKey,
@@ -85,21 +121,21 @@ export async function getAllUsers({
 }
 
 export async function getAllOrganizations({ apiKey }: { apiKey: string }): Promise<WriOrganization[]> {
-  try {
-    const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list?all_fields=True`,
-      {
-        headers: {
-          "Authorization": apiKey,
-        }
-      });
-    const data = (await response.json()) as CkanResponse<WriOrganization[]>;
-    const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
-    return organizations
-  }
-  catch (e) {
-    console.error(e);
-    return []
-  }
+    try {
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list?all_fields=True`,
+            {
+                headers: {
+                    "Authorization": apiKey,
+                }
+            });
+        const data = (await response.json()) as CkanResponse<WriOrganization[]>;
+        const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
+        return organizations
+    }
+    catch (e) {
+        console.error(e);
+        return []
+    }
 }
 
 export async function getUserGroups({
@@ -194,7 +230,7 @@ export async function getAllDatasetFq({
                 },
             }
         )
-    
+
         const data = (await response.json()) as CkanResponse<{
             results: WriDataset[]
             count: number
@@ -218,25 +254,25 @@ export async function getAllDatasetFq({
 }
 
 export async function getUserOrganizations({ userId, apiKey }: { userId: string, apiKey: string }): Promise<WriOrganization[]> {
-  try {
-    const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list_for_user?all_fields=true`,
-      {
-        method: "POST",
-        body: JSON.stringify({ id: userId }),
-        headers: {
-          "Authorization": `${apiKey}`,
-          "Content-Type": "application/json"
-        }
-      });
+    try {
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list_for_user?all_fields=true`,
+            {
+                method: "POST",
+                body: JSON.stringify({ id: userId }),
+                headers: {
+                    "Authorization": `${apiKey}`,
+                    "Content-Type": "application/json"
+                }
+            });
 
-    const data = (await response.json()) as CkanResponse<WriOrganization[]>;
-    const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
-    return organizations
-  }
-  catch (e) {
-    console.error(e);
-    return []
-  }
+        const data = (await response.json()) as CkanResponse<WriOrganization[]>;
+        const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
+        return organizations
+    }
+    catch (e) {
+        console.error(e);
+        return []
+    }
 }
 
 export async function getUserDataset({
@@ -300,25 +336,25 @@ export function activityDetails(activity: Activity): ActivityDisplay {
         deleted: 'deleted',
     }
 
-  const activityType = activity.activity_type?.split(" ");
-  const action = activityType[0]!;
-  let object = activityType[1]!;
-  const actionType = activityType.join("_");
-  let title = "";
-  const GroupObject: Record<string, string> = {
-    "group": "topic",
-    "organization": "team"
-  }
-  if (object === "package") {
-    title = activity.data?.package?.title ?? "";
-  }
-  else {
-    title = activity.data?.group?.title ?? "";
-    object = GroupObject[object]!;
-  }
-  const description = `${activitProperties[action]} the ${object} ${title}`;
-  const time = timeAgo(activity.timestamp);
-  return { description, time, icon: action, action, timestamp: activity.timestamp, actionType: actionType };
+    const activityType = activity.activity_type?.split(" ");
+    const action = activityType[0]!;
+    let object = activityType[1]!;
+    const actionType = activityType.join("_");
+    let title = "";
+    const GroupObject: Record<string, string> = {
+        "group": "topic",
+        "organization": "team"
+    }
+    if (object === "package") {
+        title = activity.data?.package?.title ?? "";
+    }
+    else {
+        title = activity.data?.group?.title ?? "";
+        object = GroupObject[object]!;
+    }
+    const description = `${activitProperties[action]} the ${object} ${title}`;
+    const time = timeAgo(activity.timestamp);
+    return { description, time, icon: action, action, timestamp: activity.timestamp, actionType: actionType };
 }
 
 export function timeAgo(timestamp: string): string {

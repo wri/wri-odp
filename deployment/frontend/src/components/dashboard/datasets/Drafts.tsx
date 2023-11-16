@@ -8,6 +8,9 @@ import Pagination from '../_shared/Pagination';
 import type { WriDataset } from '@/schema/ckan.schema';
 import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal';
+import { LoaderButton, Button } from '@/components/_shared/Button'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Dialog } from '@headlessui/react'
 
 export default function Drafts() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
@@ -18,7 +21,7 @@ export default function Drafts() {
     onSuccess: async (data) => {
       await refetch();
       setOpen(false)
-      notify(`Dataset delete is successful`, 'success')
+      notify(`Successfully deleted the ${selectDataset?.title ?? selectDataset?.name} dataset`, 'error')
     },
   })
 
@@ -47,18 +50,51 @@ export default function Drafts() {
               )
             })
         }
+
         {
           selectDataset && (
-            <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-              <h3 className='w-full text-center my-auto'>Delete Dataset: {selectDataset.title}</h3>
-              <button
-                id={selectDataset.name}
-                className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
-                onClick={() => {
-                  datasetDelete.mutate(selectDataset.id)
-                }}
-                disabled={datasetDelete.isSuccess}
-              >{datasetDelete.isLoading ?? isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{datasetDelete.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
+            <Modal
+              open={open}
+              setOpen={setOpen}
+              className="sm:w-full sm:max-w-lg"
+            >
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <ExclamationTriangleIcon
+                    className="h-6 w-6 text-red-600"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-base font-semibold leading-6 text-gray-900"
+                  >
+                    Delete Dataset
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Are you sure you want to delete this dataset?
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                <LoaderButton
+                  variant="destructive"
+                  loading={datasetDelete.isLoading}
+                  onClick={() => datasetDelete.mutate(selectDataset.id)}
+                >
+                  Delete Dataset
+                </LoaderButton>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
             </Modal>
           )
         }
