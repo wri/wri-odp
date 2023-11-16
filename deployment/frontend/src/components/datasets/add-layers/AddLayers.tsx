@@ -11,7 +11,7 @@ export default function AddLayers() {
         <Tab.Group>
             <Tab.List as="nav" className="flex w-full gap-x-2 @sm:pr-8 pr-4">
                 {addLayerTabs.map((tab) => (
-                    <Tab as={Fragment}>
+                    <Tab as="div">
                         {({ selected }: { selected: boolean }) => (
                             <button
                                 className={classNames(

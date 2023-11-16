@@ -248,7 +248,7 @@ export function Preview({
                                         }
                                         title={resource.title ?? '-'}
                                         type={resource.type ?? 'empty'}
-                                        format={resource.format?.label ?? '-'}
+                                        format={resource.format ?? '-'}
                                         size={resource.size ?? null}
                                         description={
                                             resource.description ?? '-'

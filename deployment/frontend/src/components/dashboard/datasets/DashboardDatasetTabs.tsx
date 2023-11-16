@@ -20,7 +20,7 @@ type TabProps = {
     content: JSX.Element
 }
 
-export default function DatasetTabs({ tabs }: { tabs: TabProps[] }) {
+export default function DashboardDatasetTabs({ tabs }: { tabs: TabProps[] }) {
     const prevEl = `.nav-prev-button--tabs`
     const nextEl = `.nav-next-button--tabs`
     return (
@@ -38,6 +38,7 @@ export default function DatasetTabs({ tabs }: { tabs: TabProps[] }) {
                 {tabs.map((tab) => (
                     <SwiperSlide key={tab.name} className=" max-w-8xl">
                         <Tab
+                            as="div"
                             key={tab.title}
                             className="text-base font-normal text-black accent-white"
                         >

@@ -14,20 +14,55 @@ import { Tab } from '@headlessui/react'
 import Visualizations from '@/components/datasets/visualizations/Visualizations'
 import { useState } from 'react'
 import AddLayers from '@/components/datasets/add-layers/AddLayers'
-import Issues from "@/components/datasets/sections/Issues";
-import ApprovalRequestCard from "@/components/datasets/ApprovalRequestCard";
-import { useRouter } from "next/router";
+import Issues from '@/components/datasets/sections/Issues'
+import ApprovalRequestCard from '@/components/datasets/ApprovalRequestCard'
+import { useRouter } from 'next/router'
+import { api } from '@/utils/api'
+import { ErrorAlert } from '@/components/_shared/Alerts'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import { appRouter } from '@/server/api/root'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import superjson from 'superjson'
+import Spinner from '@/components/_shared/Spinner'
+import { Button } from '@/components/_shared/Button'
+import Link from 'next/link' 
 
 const links = [
     { label: 'Explore Data', url: '/search', current: false },
     { label: 'Name of dataset', url: '/datasets/dataset_test', current: true },
 ]
 
-export default function DatasetPage() {
-    const { query } = useRouter();
-    const isApprovalRequest = query?.approval === "true";
+export async function getServerSideProps(
+    context: GetServerSidePropsContext<{ datasetName: string }>
+) {
+    const helpers = createServerSideHelpers({
+        router: appRouter,
+        ctx: { session: null },
+        transformer: superjson,
+    })
+    const datasetName = context.params?.datasetName as string
+    await helpers.dataset.getOneDataset.prefetch({ id: datasetName })
 
+    return {
+        props: {
+            trpcState: helpers.dehydrate(),
+            datasetName,
+        },
+    }
+}
+
+export default function DatasetPage(
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
+    const { datasetName } = props
+    const { query } = useRouter()
+    const isApprovalRequest = query?.approval === 'true'
     const [isAddLayers, setIsAddLayers] = useState(false)
+    const {
+        data: datasetData,
+        error: datasetError,
+        isLoading,
+    } = api.dataset.getOneDataset.useQuery({ id: datasetName }, { retry: 0 })
 
     const tabs = [
         { name: 'Data files' },
@@ -37,14 +72,26 @@ export default function DatasetPage() {
         { name: 'Contact' },
         { name: 'API' },
         { name: 'Members' },
-        { name: "Issues", count: 1 }
+        { name: 'Issues', count: 1 },
     ]
+
+    if (isLoading && !datasetData) {
+        return (
+            <>
+                <Header />
+                <Breadcrumbs links={links} />
+                <div className="flex flex-col items-center justify-center w-full h-[90vh]">
+                    <Spinner /> Loading
+                </div>
+            </>
+        )
+    }
 
     return (
         <>
             <Header />
             <Breadcrumbs links={links} />
-            {isApprovalRequest && (<ApprovalRequestCard />)}
+            {isApprovalRequest && <ApprovalRequestCard />}
             <DatasetPageLayout
                 lhs={
                     isAddLayers ? (
@@ -52,7 +99,7 @@ export default function DatasetPage() {
                     ) : (
                         <>
                             <DatasetHeader />
-                            <Tab.Group>
+                            <Tab.Group as="div">
                                 <Tab.List
                                     as="nav"
                                     className="flex w-full gap-x-2 border-b border-zinc-300"
@@ -61,29 +108,29 @@ export default function DatasetPage() {
                                 </Tab.List>
                                 <div className="mb-4 mr-9" />
                                 <div>
-                                    <Tab.Panels>
-                                        <Tab.Panel>
+                                    <Tab.Panels as="div">
+                                        <Tab.Panel as="div">
                                             <DataFiles />
                                         </Tab.Panel>
-                                        <Tab.Panel>
+                                        <Tab.Panel as="div">
                                             <About />
                                         </Tab.Panel>
-                                        <Tab.Panel>
+                                        <Tab.Panel as="div">
                                             <Methodology />
                                         </Tab.Panel>
-                                        <Tab.Panel>
+                                        <Tab.Panel as="div">
                                             <RelatedDatasets />
                                         </Tab.Panel>
-                                        <Tab.Panel>
+                                        <Tab.Panel as="div">
                                             <Contact />
                                         </Tab.Panel>
-                                        <Tab.Panel>
+                                        <Tab.Panel as="div">
                                             <API />
                                         </Tab.Panel>
-                                        <Tab.Panel>
+                                        <Tab.Panel as="div">
                                             <Members />
                                         </Tab.Panel>
-                                        <Tab.Panel>
+                                        <Tab.Panel as="div">
                                             <Issues />
                                         </Tab.Panel>
                                     </Tab.Panels>

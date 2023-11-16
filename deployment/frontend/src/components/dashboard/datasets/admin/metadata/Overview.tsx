@@ -122,11 +122,11 @@ export function OverviewForm({
                                         name="team"
                                         id="team"
                                         initialValue={watch('team') ?? null}
-                                        options={data.map((team) => ({
+                                        options={[{label: 'No team', value: '', id: ''}, ...data.map((team) => ({
                                             label: team.title ?? team.name,
                                             value: team.name,
                                             id: team.id,
-                                        }))}
+                                        }))]}
                                         placeholder="Select a team"
                                     />
                                 )
