@@ -12,7 +12,6 @@ const config = {
     ignoreDuringBuilds: true,
   },
   reactStrictMode: true,
-  output: "standalone",
 
 
   /**
