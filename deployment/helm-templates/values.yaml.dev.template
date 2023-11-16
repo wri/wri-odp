@@ -27,13 +27,11 @@ ckan:
       CKAN__CORS__ORIGIN_ALLOW_ALL: "True"
       CKAN__HARVEST__MQ__TYPE: redis
       CKAN__LOCALE_DEFAULT: en
-      CKAN___GROUP_AND_ORGANIZATION_LIST_MAX: 100
       CKAN__RESOURCE_PROXY__MAX_FILE_SIZE: "100000000"
       CKAN__SITE_TITLE: x demo
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
       CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
-      CKAN__AUTH__ROLES_THAT_CASCADE_TO_SUB_GROUPS: admin editor
       CKAN__AUTH__CREATE_UNOWNED_DATASET: "True"
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_ADMIN_COLLABORATORS: "True"
