@@ -19,13 +19,7 @@ export const ResourceSchema = z.object({
     url: z.string().min(2, { message: 'URL is required' }).url().optional(),
     name: z.string().optional(),
     key: z.string().optional(),
-    format: z
-        .object({
-            value: z.string(),
-            label: z.string(),
-        })
-        .optional()
-        .nullable(),
+    format: z.string().optional().nullable(),
     size: z.number().optional(),
     title: z.string().min(1, { message: 'Title is required' }),
     fileBlob: z.any(),
@@ -44,15 +38,11 @@ export const DatasetSchema = z
                 label: z.string(),
             })
             .optional(),
-        team: z
-            .object({
-                value: z.string(),
-                label: z.string(),
-                id: z.string(),
-            })
-            .refine((val) => val.value !== '', {
-                message: 'Team is required',
-            }),
+        team: z.object({
+            value: z.string(),
+            label: z.string(),
+            id: z.string(),
+        }),
         project: z.string().optional().nullable().or(emptyStringToUndefined),
         applications: z.string().optional().nullable(),
         technical_notes: z

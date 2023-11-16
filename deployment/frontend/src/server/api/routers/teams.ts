@@ -9,24 +9,37 @@ import { replaceNames } from '@/utils/replaceNames'
 export const teamRouter = createTRPCRouter({
     getAllTeams: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.session.user
-        const teamRes = await fetch(
-            user.sysadmin
-                ? `${env.CKAN_URL}/api/action/organization_list?all_fields=True`
-                : `${env.CKAN_URL}/api/action/organization_list_for_user?all_fields=True`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${user.apikey}`,
-                },
-            }
+        const teamsList = await Promise.all(
+            [0, 1, 2, 3, 4, 5].map(async (i) => {
+                const teamRes = await fetch(
+                    user.sysadmin
+                        ? `${
+                              env.CKAN_URL
+                          }/api/action/organization_list?all_fields=True&limit=${
+                              (i + 1) * 25
+                          }&offset=${i * 25}`
+                        : `${
+                              env.CKAN_URL
+                          }/api/action/organization_list_for_user?all_fields=True&limit=${
+                              (i + 1) * 25
+                          }&offset=${i * 25}`,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${user.apikey}`,
+                        },
+                    }
+                )
+                const teams: CkanResponse<Organization[]> = await teamRes.json()
+                if (!teams.success && teams.error) {
+                    if (teams.error.message)
+                        throw Error(replaceNames(teams.error.message, true))
+                    throw Error(replaceNames(JSON.stringify(teams.error), true))
+                }
+                return teams.result.filter((team) => team.state === 'active')
+            })
         )
-        const teams: CkanResponse<Organization[]> = await teamRes.json()
-        if (!teams.success && teams.error) {
-            if (teams.error.message)
-                throw Error(replaceNames(teams.error.message, true))
-            throw Error(replaceNames(JSON.stringify(teams.error), true))
-        }
-        return teams.result.filter((team) => team.state === 'active')
+        return teamsList.flat()
     }),
     editTeam: protectedProcedure
         .input(TeamSchema)

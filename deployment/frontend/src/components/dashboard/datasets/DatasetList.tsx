@@ -5,7 +5,7 @@ import Favourite from './Favourites'
 import Drafts from './Drafts'
 import ApprovalDataset from './ApprovalDataset'
 import Mydataset from './Mydataset'
-import DatasetTabs from './DatasetTabs'
+import DashboardDatasetTabs from './DashboardDatasetTabs'
 
 const tabs = [
   {
@@ -55,7 +55,7 @@ export default function DatasetList() {
     <section id='teamtab' className='w-full max-w-8xl  font-acumin '>
       <Tab.Group>
         <Tab.List className="flex max-w-8xl  ">
-          <DatasetTabs tabs={tabs} />
+          <DashboardDatasetTabs tabs={tabs} />
         </Tab.List>
         <Tab.Panels className='mt-2'>
           {tabs.map((tab) => (

@@ -12,6 +12,8 @@ const config = {
     ignoreDuringBuilds: true,
   },
   reactStrictMode: true,
+  output: "standalone",
+
 
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
