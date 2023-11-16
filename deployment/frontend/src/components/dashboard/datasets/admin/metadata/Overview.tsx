@@ -404,8 +404,10 @@ export function OverviewForm({
                                 }}
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
-                                        response.successful[0]?.name ?? null
-                                    setValue('featured_image', url)
+                                        response.successful[0]?.uploadURL ??
+                                        null
+                                    const name = url ? url.split('/').pop() : ''
+                                    setValue('featured_image', name)
                                 }}
                             />
                         </div>
