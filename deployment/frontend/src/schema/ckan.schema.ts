@@ -89,5 +89,6 @@ export interface GroupTree {
   name: string;
   highlighted: boolean;
   children: GroupTree[];
+  title?: string;
   image_display_url?: string;
 }

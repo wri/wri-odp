@@ -4,43 +4,33 @@ import {
   protectedProcedure
 } from "@/server/api/trpc";
 import { env } from "@/env.mjs";
-import { getUserOrganizations, getOrgDetails } from "@/utils/apiUtils";
+import { getGroups, searchHierarchy } from "@/utils/apiUtils";
 import { searchArrayForKeyword } from "@/utils/general";
 import { searchSchema } from "@/schema/search.schema";
+import type { GroupTree } from '@/schema/ckan.schema'
 
 export const OrganizationRouter = createTRPCRouter({
   getUsersOrganizations: protectedProcedure
     .input(searchSchema)
     .query(async ({ input, ctx }) => {
-      const organizations = (await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey }))!;
-      const org = await Promise.all(organizations.map(async (org) => {
-        const orgDetails = await getOrgDetails({ orgId: org.id, apiKey: ctx.session.user.apikey });
-        const packageCount = orgDetails?.package_count;
-        const userCount = orgDetails?.users?.length ?? 0;
-        const orgTitle = orgDetails?.title;
-        const orgName = orgDetails?.name;
-        const orgImage = orgDetails?.image_display_url;
-        return {
-          title: orgTitle,
-          name: orgName,
-          image_display_url: orgImage ? orgImage : '/images/placeholders/teams/teamdefault.png',
-          description: `${userCount} Member(s) | ${packageCount} Datasets`
-        }
-      }));
+      let groupTree: GroupTree[] = []
 
-      type IOrg = {
-        title: string | undefined;
-        name: string | undefined;
-        image_display_url: string;
-        description: string;
-      }
-      let result = org;
       if (input.search) {
-        result = searchArrayForKeyword<IOrg>(org, input.search);
+        groupTree = await searchHierarchy({ apiKey: ctx.session.user.apikey, q: input.search, group_type: 'organization' })
+      }
+      else {
+        groupTree = await getGroups({
+          apiKey: ctx.session.user.apikey,
+          group_type: "organization"
+        })
       }
 
+      const result = groupTree
       return {
-        organizations: result.slice(input.page.start, input.page.start + input.page.rows),
+        organizations: result.slice(
+          input.page.start,
+          input.page.start + input.page.rows
+        ),
         count: result.length,
       }
     }),

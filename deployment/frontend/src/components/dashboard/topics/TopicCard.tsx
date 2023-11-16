@@ -23,7 +23,7 @@ function TopicProfile({ team }: { team: GroupTree }) {
   TopicProfile.description = description
   return (
     <div className='flex py-5 pl-2' >
-      <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} defaultImg='/images/placeholders/topics/topicsdefault.png' />
+      <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] ' isPad profile={team} defaultImg='/images/placeholders/topics/topicsdefault.png' />
     </div>
   )
 }

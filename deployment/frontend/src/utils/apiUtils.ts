@@ -15,7 +15,7 @@ import { Facets } from '@/interfaces/search.interface'
 
 export async function searchHierarchy({ apiKey, q, group_type }: { apiKey: string, q: string, group_type: string }): Promise<GroupTree[]> {
     try {
-        const response = await fetch(`${env.CKAN_URL}/api/3/action/group_list?q=${q}&type=${group_type}&all_fields=True`, {
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/${group_type == "group" ? "group_list" : "organization_list"}?q=${q}&all_fields=True`, {
             headers: {
                 "Authorization": apiKey,
             }
@@ -48,12 +48,14 @@ export async function searchHierarchy({ apiKey, q, group_type }: { apiKey: strin
 
 export async function getGroups({
     apiKey,
+    group_type = "group"
 }: {
-    apiKey: string
+    apiKey: string,
+    group_type?: string
 }): Promise<GroupTree[]> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/group_tree?all_fields=True`,
+            `${env.CKAN_URL}/api/3/action/group_tree?all_fields=True&type=${group_type}`,
             {
                 headers: {
                     Authorization: apiKey,
