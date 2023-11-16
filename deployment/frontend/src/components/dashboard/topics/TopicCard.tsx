@@ -315,6 +315,7 @@ export default function TopicCard() {
                   variant="destructive"
                   loading={deleteTopic.isLoading}
                   onClick={() => deleteTopic.mutate(selectedTopic.id)}
+                  id={selectedTopic.name}
                 >
                   Delete Topic
                 </LoaderButton>

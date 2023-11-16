@@ -262,6 +262,7 @@ export default function UserCard() {
                   variant="destructive"
                   loading={datasetUser.isLoading}
                   onClick={() => datasetUser.mutate(selectedUser.id)}
+                  id={selectedUser.title}
                 >
                   Delete User
                 </LoaderButton>

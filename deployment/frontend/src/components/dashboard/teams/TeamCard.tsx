@@ -92,7 +92,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                           icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
                           tooltip: {
                             id: `edit-tooltip-${team.name}`,
-                            content: "Edit topic"
+                            content: "Edit team"
                           },
                           onClick: () => {
                             router.push(`/dashboard/teams/${team.name}/edit`)
@@ -104,7 +104,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                           icon: <TrashIcon className='w-4 h-4 text-white' />,
                           tooltip: {
                             id: `delete-tooltip-${team.name}`,
-                            content: "Delete topic"
+                            content: "Delete team"
                           },
                           onClick: () => handleOpenModal(team as GroupTree)
                         },
@@ -137,7 +137,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                           icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
                           tooltip: {
                             id: `edit-tooltip-${team.name}`,
-                            content: "Edit topic"
+                            content: "Edit team"
                           },
                           onClick: () => {
                             router.push(`/dashboard/teams/${team.name}/edit`)
@@ -149,7 +149,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                           icon: <TrashIcon className='w-4 h-4 text-white' />,
                           tooltip: {
                             id: `delete-tooltip-${team.name}`,
-                            content: "Delete topic"
+                            content: "Delete team"
                           },
                           onClick: () => handleOpenModal(team as GroupTree)
                         },
@@ -318,6 +318,7 @@ export default function TeamCard() {
                 variant="destructive"
                 loading={deleteTeam.isLoading}
                 onClick={() => deleteTeam.mutate(selectedTeam.name!)}
+                id={selectedTeam.name}
               >
                 Delete Team
               </LoaderButton>

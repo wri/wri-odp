@@ -78,6 +78,7 @@ export default function DatasetLCardList() {
                   variant="destructive"
                   loading={datasetDelete.isLoading}
                   onClick={() => datasetDelete.mutate(selectDataset.id)}
+                  id={selectDataset.name}
                 >
                   Delete Dataset
                 </LoaderButton>
