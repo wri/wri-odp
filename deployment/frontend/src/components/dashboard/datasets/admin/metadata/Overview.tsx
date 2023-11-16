@@ -410,6 +410,7 @@ export function OverviewForm({
                                     setValue('featured_image', name)
                                 }}
                             />
+                            <ErrorDisplay name="featured_image" errors={errors} />
                         </div>
                     </div>
                 </div>
