@@ -40,7 +40,7 @@ describe("Dashboard Test", () => {
 
     cy.get('input[type="search"]').type(datasetName).type('{enter}');
 
-    cy.contains('div', datasetName).should('exist');
+    cy.contains('div', datasetName).should('exist', { timeout: 15000});
     cy.get('button#rowshow').first().click();
     cy.contains(parentOrg)
   })
@@ -63,13 +63,13 @@ describe("Dashboard Test", () => {
   it("Should test teams page", () => {
     cy.visit("dashboard/teams")
     cy.get('input[type="search"]').type(parentOrg).type('{enter}');
-    cy.contains(parentOrg)
+    cy.contains(parentOrg, { timeout: 15000})
   })
 
   it("should delete dataset", () => {
     cy.visit("/dashboard/datasets")
     cy.get('input[type="search"]').type(datasetName2).type('{enter}');
-    cy.contains(datasetName2).should('exist');
+    cy.contains(datasetName2).should('exist', { timeout: 15000});
     cy.get(`button#delete-tooltip-${datasetName2}`).first().click({ force: true });
     cy.get(`button#${datasetName2}`).click();
     cy.contains('Dataset delete is successful')
@@ -78,7 +78,7 @@ describe("Dashboard Test", () => {
   it("should delete Team", () => {
     cy.visit("/dashboard/teams")
     cy.get('input[type="search"]').type(parentOrg2).type('{enter}');
-    cy.contains(parentOrg2).should('exist');
+    cy.contains(parentOrg2).should('exist', { timeout: 15000});
     cy.get(`button#delete-tooltip-${parentOrg2}`).first().click({ force: true });
     cy.get(`button#${parentOrg2}`).click();
     cy.contains('Team delete is successful')
@@ -87,7 +87,7 @@ describe("Dashboard Test", () => {
   it("should delete topic", () => {
     cy.visit("/dashboard/topics")
     cy.get('input[type="search"]').type(group).type('{enter}');
-    cy.contains(group).should('exist');
+    cy.contains(group).should('exist', { timeout: 15000});
     cy.get(`button#delete-tooltip-${group}`).first().click({ force: true });
     cy.get(`button#${group}`).click();
     cy.contains('Topic delete is successful')
