@@ -122,11 +122,18 @@ export function OverviewForm({
                                         name="team"
                                         id="team"
                                         initialValue={watch('team') ?? null}
-                                        options={[{label: 'No team', value: '', id: ''}, ...data.map((team) => ({
-                                            label: team.title ?? team.name,
-                                            value: team.name,
-                                            id: team.id,
-                                        }))]}
+                                        options={[
+                                            {
+                                                label: 'No team',
+                                                value: '',
+                                                id: '',
+                                            },
+                                            ...data.map((team) => ({
+                                                label: team.title ?? team.name,
+                                                value: team.name,
+                                                id: team.id,
+                                            })),
+                                        ]}
                                         placeholder="Select a team"
                                     />
                                 )
@@ -186,7 +193,10 @@ export function OverviewForm({
                                 </span>
                             ))}
                     </InputGroup>
-                    <InputGroup label="Technical Notes" required={watch('visibility_type').value === 'public'}>
+                    <InputGroup
+                        label="Technical Notes"
+                        required={watch('visibility_type').value === 'public'}
+                    >
                         <Input
                             {...register('technical_notes')}
                             placeholder="https://source/to/original/data"
@@ -404,8 +414,10 @@ export function OverviewForm({
                                 }}
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
-                                        response.successful[0]?.name ?? null
-                                    setValue('featured_image', url)
+                                        response.successful[0]?.uploadURL ??
+                                        null
+                                    const name = url ? url.split('/').pop() : ''
+                                    setValue('featured_image', name)
                                 }}
                             />
                         </div>
