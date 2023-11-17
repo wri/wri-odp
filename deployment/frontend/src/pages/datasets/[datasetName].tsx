@@ -25,6 +25,8 @@ import superjson from 'superjson'
 import Spinner from '@/components/_shared/Spinner'
 import { Index } from 'flexsearch'
 import { useSession } from 'next-auth/react'
+import { Button } from '@/components/_shared/Button'
+import { NextSeo } from 'next-seo'
 
 const links = [
     { label: 'Explore Data', url: '/search', current: false },
@@ -148,6 +150,9 @@ export default function DatasetPage(
 
     return (
         <>
+            <NextSeo
+                title={`${datasetData?.title ?? datasetData?.name} - Datasets`}
+            />
             <Header />
             <Breadcrumbs links={links} />
             {isApprovalRequest && <ApprovalRequestCard />}

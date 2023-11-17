@@ -5,10 +5,12 @@ import Dashboard from '@/components/dashboard/Dashboard';
 import Footer from "@/components/_shared/Footer";
 import { getServerAuthSession } from "../../server/auth";
 import type { GetServerSideProps } from "next";
+import {NextSeo} from 'next-seo';
 
 export default function index() {
   return (
     <>
+      <NextSeo title={`Dashboard`} />
       <Header />
       <Layout >
         <Dashboard />

@@ -131,6 +131,17 @@ export const DatasetSchema = z
     })
     .refine(
         (obj) => {
+            if (!obj.featured_dataset) return true
+            if (obj.featured_dataset && !obj.featured_image) return false
+            return true
+        },
+        {
+            message: 'An image is required for featured datasets',
+            path: ['featured_image'],
+        }
+    )
+    .refine(
+        (obj) => {
             if (obj.visibility_type.value !== 'public') return true
             if (!obj.technical_notes) return false
             return true

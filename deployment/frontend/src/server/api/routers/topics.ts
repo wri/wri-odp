@@ -1,12 +1,12 @@
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { getGroups, getGroup } from '@/utils/apiUtils'
+import { getGroups, getGroup, searchHierarchy } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type { GroupTree } from '@/schema/ckan.schema'
 import { searchArrayForKeyword } from '@/utils/general'
-import { CkanResponse } from '@/schema/ckan.schema'
-import { Group } from '@portaljs/ckan'
+import type { CkanResponse } from '@/schema/ckan.schema'
+import type { Group } from '@portaljs/ckan'
 import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 
 import { TopicSchema } from '@/schema/topic.schema'
@@ -16,42 +16,23 @@ export const TopicRouter = createTRPCRouter({
     getUsersTopics: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const groupTree = await getGroups({
-                apiKey: ctx.session.user.apikey,
-            })
-            const groupDetails = await Promise.all(
-                groupTree.map(async (group) => {
-                    const groupDetails = await getGroup({
-                        apiKey: ctx.session.user.apikey,
-                        id: group.id,
-                    })
-                    const rgroup = {
-                        ...group,
-                        image_display_url: groupDetails?.image_display_url
-                            ? groupDetails?.image_display_url
-                            : '/images/placeholders/topics/topicsdefault.png',
-                    }
-                    rgroup.children.map(async (child) => {
-                        const childDetails = await getGroup({
-                            apiKey: ctx.session.user.apikey,
-                            id: child.id,
-                        })
-                        child.image_display_url =
-                            childDetails?.image_display_url
-                                ? childDetails?.image_display_url
-                                : '/images/placeholders/topics/topicsdefault.png'
-                        return child
-                    })
-                    return rgroup
-                })
-            )
-            let result = groupDetails
+            let groupTree: GroupTree[] = []
+
             if (input.search) {
-                result = searchArrayForKeyword<GroupTree>(
-                    groupDetails,
-                    input.search
-                )
+                groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, q: input.search, group_type: 'group' })
             }
+            else {
+                if (ctx.session.user.sysadmin) {
+                    groupTree = await getGroups({
+                        apiKey: ctx.session.user.apikey,
+                    })
+                }
+                else {
+                    groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, q: '', group_type: 'group' })
+                }
+            }
+
+            const result = groupTree
             return {
                 topics: result.slice(
                     input.page.start,

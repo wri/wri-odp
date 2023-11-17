@@ -10,6 +10,10 @@ import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
 import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal';
+import { LoaderButton, Button } from '@/components/_shared/Button'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Dialog } from '@headlessui/react'
+
 
 type IUser = {
   title?: string;
@@ -23,6 +27,7 @@ type IUser = {
     capacity?: string;
     image_display_url?: string;
     name?: string;
+    userCapacity?: string;
   }[]
 }
 
@@ -48,7 +53,7 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
     onSuccess: async (data) => {
       await utils.user.getAllUsers.invalidate({ search: '', page: { start: 0, rows: 10 } })
       setOpen(false)
-      notify(`Member removed successful`, 'success')
+      notify(`Successfully deleted user from ${selectedTeam?.name} team`, 'error')
     },
   })
 
@@ -67,9 +72,10 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
           return (
             <div key={team.name}>
               <Row
+                authorized={team.userCapacity?.toLowerCase() === 'admin' ? true : false}
                 key={index}
                 groupStyle="group/item group-hover/item:visible "
-                className={`pr-6 border-b-[1px] border-wri-gray `}
+                className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                 rowMain={
                   <div className='flex flex-col sm:flex-row pl-3 sm:pl-5  gap-x-14 gap-y-4'>
                     <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} />
@@ -103,20 +109,56 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
           )
         })
       }
-      {selectedTeam && (
-        <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-          <h3 className='w-full text-center my-auto'>Remove member: {UserProfile.title}</h3>
-          <button
-            className='w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
-            onClick={() => {
-              removeMember.mutate({ username: UserProfile.id, orgId: selectedTeam.name! });
-            }}
+
+      {
+        selectedTeam && (
+          <Modal
+            open={open}
+            setOpen={setOpen}
+            className="sm:w-full sm:max-w-lg"
           >
-            {removeMember.isLoading ? <Spinner className='w-4 mr-4' /> : ''}
-            {removeMember.isError ? 'Something went wrong. Try again' : 'I want to remove this Member'}
-          </button>
-        </Modal>
-      )}
+            <div className="sm:flex sm:items-start">
+              <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <ExclamationTriangleIcon
+                  className="h-6 w-6 text-red-600"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                <Dialog.Title
+                  as="h3"
+                  className="text-base font-semibold leading-6 text-gray-900"
+                >
+                  Delete Member
+                </Dialog.Title>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500">
+                    Are you sure you want to delete this member?
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+              <LoaderButton
+                variant="destructive"
+                loading={removeMember.isLoading}
+                onClick={() => removeMember.mutate({ username: UserProfile.id, orgId: selectedTeam.name! })}
+              >
+                Delete Member
+              </LoaderButton>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </Modal>
+        )
+      }
+
+
     </div>
   )
 }
@@ -133,7 +175,7 @@ export default function UserCard() {
     onSuccess: async (data) => {
       await refetch();
       setOpen(false)
-      notify(`User delete is successful`, 'success')
+      notify(`Successfully deleted the ${selectedUser?.title} user`, 'error')
     },
   })
 
@@ -144,7 +186,8 @@ export default function UserCard() {
 
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
-      <SearchHeader leftStyle='px-2 sm:pr-2 sm:pl-12' rightStyle='px-2 sm:pr-6' placeholder='Find a user' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
+      <SearchHeader leftStyle='px-2 sm:pr-2 sm:pl-12' rightStyle='px-2 sm:pr-6' placeholder='Find a user' setQuery={setQuery} query={query}
+        Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
       <div className='w-full'>
         {
           isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
@@ -188,18 +231,56 @@ export default function UserCard() {
             })
           )
         }
-        {selectedUser && (
-          <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4" key={selectedUser.id}>
-            <h3 className='w-full text-center my-auto'>Delete Dataset: {selectedUser.title}</h3>
-            <button
-              className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
-              id={selectedUser.title}
-              onClick={() => {
-                datasetUser.mutate(selectedUser.id)
-              }}
-            >{datasetUser.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{datasetUser.isError ? "Something went wrong Try again" : "I want to delete this user"} </button>
-          </Modal>)
+
+        {
+          selectedUser && (
+            <Modal
+              open={open}
+              setOpen={setOpen}
+              className="sm:w-full sm:max-w-lg"
+            >
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <ExclamationTriangleIcon
+                    className="h-6 w-6 text-red-600"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-base font-semibold leading-6 text-gray-900"
+                  >
+                    Delete User
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Are you sure you want to delete this user?
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                <LoaderButton
+                  variant="destructive"
+                  loading={datasetUser.isLoading}
+                  onClick={() => datasetUser.mutate(selectedUser.id)}
+                  id={selectedUser.title}
+                >
+                  Delete User
+                </LoaderButton>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </Modal>
+          )
         }
+
       </div>
     </section>
   )

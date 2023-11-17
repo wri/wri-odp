@@ -152,24 +152,24 @@ Cypress.Commands.add("purgeDataset", (datasetName) => {
   });
 });
 
-Cypress.Commands.add("purgeGroup", (datasetName) => {
+Cypress.Commands.add("purgeGroup", (groupName) => {
   const request = cy.request({
     method: "POST",
     url: apiUrl("group_purge"),
     headers: headers,
     body: {
-      id: datasetName,
+      id: groupName,
     },
   });
 });
 
-Cypress.Commands.add("purgeOrganization", (datasetName) => {
+Cypress.Commands.add("purgeOrganization", (orgName) => {
   const request = cy.request({
     method: "POST",
     url: apiUrl("organization_purge"),
     headers: headers,
     body: {
-      id: datasetName,
+      id: orgName,
     },
   });
 });

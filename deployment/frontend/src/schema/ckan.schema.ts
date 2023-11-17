@@ -1,11 +1,17 @@
 import { Dataset } from '@/interfaces/dataset.interface'
-import type { Group, Organization, User as CkanUser } from '@portaljs/ckan'
+import type {
+    Group,
+    Organization,
+    User as CkanUser,
+} from '@portaljs/ckan'
 
 type Only<T, U> = {
     [P in keyof T]: T[P]
 } & {
-    [P in keyof U]?: never
-}
+        [P in keyof U]?: never
+    }
+
+type Either<T, U> = Only<T, U> | Only<U, T>
 
 type Either<T, U> = Only<T, U> | Only<U, T>
 
@@ -67,6 +73,7 @@ export interface WriDataset extends Dataset {
     project?: string
     reason_for_adding?: string
     featured_dataset?: boolean
+    featured_image?: string
     application?: string
     cautions?: string
     citation?: string
@@ -83,8 +90,9 @@ export interface OpenIn {
 }
 
 export interface WriOrganization extends Organization {
-    groups?: Group[]
-    users?: WriUser[]
+    groups?: Group[];
+    users?: WriUser[];
+    capacity?: string;
 }
 
 export interface WriUser extends CkanUser {
@@ -93,11 +101,12 @@ export interface WriUser extends CkanUser {
 }
 
 export interface GroupTree {
-    id: string
-    name: string
-    highlighted: boolean
-    children: GroupTree[]
-    image_display_url: string
+    id: string;
+    name: string;
+    highlighted: boolean;
+    children: GroupTree[];
+    title?: string;
+    image_display_url?: string;
 }
 
 export interface Collaborator {
@@ -134,3 +143,4 @@ export interface Comment {
     abuse_status: string
     user: WriUser
 }
+
