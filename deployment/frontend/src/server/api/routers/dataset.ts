@@ -244,6 +244,19 @@ export const DatasetRouter = createTRPCRouter({
                 count: dataset.count,
             }
         }),
+    getFeaturedDatasets: publicProcedure
+        .input(searchSchema)
+        .query(async ({ input, ctx }) => {
+            const dataset = (await getAllDatasetFq({
+                apiKey: ctx?.session?.user.apikey ?? '',
+                fq: `featured_dataset:true`,
+                query: input,
+            }))!
+            return {
+                datasets: dataset.datasets,
+                count: dataset.count,
+            }
+        }),
     deleteDataset: protectedProcedure
         .input(z.string())
         .mutation(async ({ input, ctx }) => {

@@ -31,13 +31,19 @@ export default function Search({
     const searchSchema = z.object({ search: z.string() })
     type searchFormType = z.infer<typeof searchSchema>
 
-    const { handleSubmit, register, reset } = useForm<searchFormType>({
+    const { handleSubmit, register, reset, watch } = useForm<searchFormType>({
         resolver: zodResolver(searchSchema),
-        defaultValues: { search: '' },
+        defaultValues: {
+            search: filters?.find((f) => f.key == 'search')?.value ?? '',
+        },
     })
 
     useEffect(() => {
         setIsSearch(getIsSearching())
+
+        if (watch('search') != filters.find((f) => f.key == 'search')?.value) {
+            reset({ search: '' })
+        }
     }, [filters])
 
     return (
@@ -75,38 +81,44 @@ export default function Search({
             <div className="mx-auto my-auto flex w-full max-w-[1380px] space-x-4 px-4 font-acumin sm:px-6 xxl:px-0">
                 <form
                     onSubmit={handleSubmit((data) => {
-                        setFilters((prev) => {
-                            const newFilters = [...prev]
-                            const searchFilter = newFilters.find(
-                                (filter) => filter.key == 'search'
-                            )
+                        if (
+                            watch('search') !=
+                            filters.find((f) => f.key == 'search')?.value
+                        ) {
+                            setFilters((prev) => {
+                                const newFilters = [...prev]
+                                const searchFilter = newFilters.find(
+                                    (filter) => filter.key == 'search'
+                                )
 
-                            if (searchFilter) {
-                                if (data.search) {
-                                    searchFilter.value = data.search
-                                    searchFilter.label = data.search
+                                if (searchFilter) {
+                                    if (data.search) {
+                                        searchFilter.value = data.search
+                                        searchFilter.label = data.search
+                                        setIsSearch(true)
+                                    } else {
+                                        newFilters.splice(
+                                            newFilters.findIndex(
+                                                (filter) =>
+                                                    filter.key == 'search'
+                                            ),
+                                            1
+                                        )
+                                        setIsSearch(false)
+                                    }
+                                } else if (data.search) {
+                                    newFilters.push({
+                                        title: 'Search',
+                                        key: 'search',
+                                        label: data.search,
+                                        value: data.search,
+                                    })
                                     setIsSearch(true)
-                                } else {
-                                    newFilters.splice(
-                                        newFilters.findIndex(
-                                            (filter) => filter.key == 'search'
-                                        ),
-                                        1
-                                    )
-                                    setIsSearch(false)
                                 }
-                            } else if (data.search) {
-                                newFilters.push({
-                                    title: 'Search',
-                                    key: 'search',
-                                    label: data.search,
-                                    value: data.search,
-                                })
-                                setIsSearch(true)
-                            }
 
-                            return newFilters
-                        })
+                                return newFilters
+                            })
+                        }
                     })}
                     className="relative flex w-full max-w-[819px] items-start justify-start gap-x-6 pl-8 px-4"
                 >
@@ -116,14 +128,30 @@ export default function Search({
                         {...register('search')}
                     />
                     <div className="absolute right-8 top-[1rem]">
-                        {!isSearch ? (
+                        {!isSearch ||
+                        watch('search') !=
+                            filters?.find((f) => f.key == 'search')?.value ? (
                             <button type="submit">
                                 <MagnifyingGlassIcon className="h-5 w-5 text-wri-black" />
                             </button>
                         ) : (
                             <button
                                 onClick={(e) => {
-                                    reset()
+                                    e.preventDefault()
+                                    setFilters((prev) => {
+                                        const newFilters = [...prev]
+                                        newFilters.splice(
+                                            newFilters.findIndex(
+                                                (filter) =>
+                                                    filter.key == 'search'
+                                            ),
+                                            1
+                                        )
+                                        return newFilters
+                                    })
+                                    setIsSearch(false)
+
+                                    reset({ search: '' })
                                 }}
                             >
                                 <XMarkIcon className="h-5 w-5 text-wri-black" />

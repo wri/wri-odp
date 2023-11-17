@@ -12,8 +12,6 @@ const orgs = [];
 const groups = [];
 const datasets = [];
 
-const headers = { Authorization: Cypress.env("API_KEY") };
-
 const facets = [
   "Location",
   "Featured",
@@ -30,7 +28,7 @@ const facets = [
   "WRI Data",
 ];
 
-describe("Search page", () => {
+describe("Explore data page", () => {
   before(() => {
     // Create orgs
     [...new Array(2).keys()].map((k) => {
@@ -59,36 +57,35 @@ describe("Search page", () => {
         update_frequency: i < 7 ? "annually" : "daily",
         language: i < 7 ? "en" : "pt",
         wri_data: i < 7 ? true : false,
+        featured_dataset: true,
       });
       datasets.push(name);
     });
   });
 
-  it("displays all facets", () => {
-    cy.visit("/search_advanced");
-    cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
-
-    for (let facet of facets) {
-      cy.get("@facets-list").contains(facet);
-    }
+  it("displays featured datasets", () => {
+    cy.visit("/search");
+    cy.contains("Highlights");
   });
 
-  it("allows filtering by facets", () => {
-    cy.visit("/search_advanced");
-    cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
-
-    cy.get("@facets-list").contains("Team").click({ force: true });
-
-    cy.get('[id^="facet-organization-"]').first().click({ force: true });
-
-    cy.contains("results", { timeout: 10000 });
+  it("displays recently created datasets", () => {
+    cy.visit("/search");
+    cy.contains("Recently added" );
   });
 
-  it("allows filtering by search query", () => {
-    cy.visit("/search_advanced");
-    cy.get('[name="search"]').type(datasets[0] ?? "test");
+  it("displays recently added datasets", () => {
+    cy.visit("/search");
+    cy.contains("Recently updated");
+  });
 
-    cy.contains("results", { timeout: 10000 });
+  it("allow searches", () => {
+    cy.visit("/search");
+    cy.get('[name="search"]').type(datasets[0] + "{enter}" ?? "test");
+
+    cy.url().should("include", "search_advanced");
+    cy.contains("results", { timeout: 40000 });
+    cy.contains(`Search: ${datasets[0]}`, { timeout: 40000 });
+    cy.contains(`${datasets[0]}`, { timeout: 40000 });
   });
 
   after(() => {
