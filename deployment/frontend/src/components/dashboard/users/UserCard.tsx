@@ -27,6 +27,7 @@ type IUser = {
     capacity?: string;
     image_display_url?: string;
     name?: string;
+    userCapacity?: string;
   }[]
 }
 
@@ -71,9 +72,10 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
           return (
             <div key={team.name}>
               <Row
+                authorized={team.userCapacity?.toLowerCase() === 'admin' ? true : false}
                 key={index}
                 groupStyle="group/item group-hover/item:visible "
-                className={`pr-6 border-b-[1px] border-wri-gray `}
+                className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                 rowMain={
                   <div className='flex flex-col sm:flex-row pl-3 sm:pl-5  gap-x-14 gap-y-4'>
                     <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} />

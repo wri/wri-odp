@@ -13,7 +13,16 @@ import type { SearchInput } from '@/schema/search.schema'
 import { Facets } from '@/interfaces/search.interface'
 
 
-export async function searchHierarchy({ isSysadmin, apiKey, q, group_type }: { isSysadmin: boolean, apiKey: string, q: string, group_type: string }): Promise<GroupTree[]> {
+export async function searchHierarchy(
+    { isSysadmin,
+        apiKey,
+        q,
+        group_type
+    }:
+        {
+            isSysadmin: boolean,
+            apiKey: string, q: string, group_type: string
+        }): Promise<GroupTree[]> {
     try {
         let response: Response;
         let groups: GroupTree[] | [] = [];

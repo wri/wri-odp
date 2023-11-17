@@ -78,6 +78,7 @@ export interface WriDataset extends Dataset {
 export interface WriOrganization extends Organization {
   groups?: Group[];
   users?: WriUser[];
+  capacity?: string;
 }
 
 export interface WriUser extends CkanUser {

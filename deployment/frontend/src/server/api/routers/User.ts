@@ -32,12 +32,71 @@ export const UserRouter = createTRPCRouter({
   getAllUsers: protectedProcedure
     .input(searchSchema)
     .query(async ({ input, ctx }) => {
-      const orgs = (await getAllOrganizations({ apiKey: ctx.session.user.apikey }))!;
-      const orgDetails = await Promise.all(orgs.map(async (org) => {
-        const orgDetails = (await getOrgDetails({ orgId: org.id, apiKey: ctx.session.user.apikey }))!;
-        return orgDetails;
-      }));
-      const users = await getAllUsers({ apiKey: ctx.session.user.apikey });
+
+      type IUser = {
+        title?: string;
+        id: string;
+        description?: string;
+        capacity?: string;
+        image_display_url?: string;
+        org?: string;
+        orgId?: string;
+        orgimage?: string;
+        orgtitle?: string;
+        userCapacity?: string;
+      };
+
+      let getAllUsersOrgFlat: IUser[] = [];
+      if (ctx.session.user.sysadmin) {
+
+        const orgs = (await getAllOrganizations({ apiKey: ctx.session.user.apikey }))!;
+        const orgDetails = await Promise.all(orgs.map(async (org) => {
+          const orgDetails = (await getOrgDetails({ orgId: org.id, apiKey: ctx.session.user.apikey }))!;
+          const users = orgDetails.users?.map((user) => {
+            return {
+              title: user.name,
+              id: user.id,
+              description: user.email,
+              capacity: user.capacity,
+              image_display_url: user.image_url,
+              org: orgDetails.name,
+              orgId: orgDetails.id,
+              orgimage: orgDetails.image_display_url,
+              orgtitle: orgDetails.title,
+              userCapacity: org.capacity
+            }
+
+          });
+
+          return users;
+        }));
+        getAllUsersOrgFlat = orgDetails.flat() as IUser[];
+      }
+      else {
+        const userOrg = (await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey }))!;
+        const getAllUsersOrg = await Promise.all(userOrg.map(async (org) => {
+          const orgDetails = (await getOrgDetails({ orgId: org.id, apiKey: ctx.session.user.apikey }))!;
+          const users = orgDetails.users?.map((user) => {
+            return {
+              title: user.name,
+              id: user.id,
+              description: user.email,
+              capacity: user.capacity,
+              image_display_url: user.image_url,
+              org: orgDetails.name,
+              orgId: orgDetails.id,
+              orgimage: orgDetails.image_display_url,
+              orgtitle: orgDetails.title,
+              userCapacity: org.capacity
+            }
+
+          });
+
+          return users;
+        }));
+
+        getAllUsersOrgFlat = getAllUsersOrg.flat() as IUser[];
+      }
 
       type IUsers = {
         title?: string;
@@ -51,58 +110,68 @@ export const UserRouter = createTRPCRouter({
           capacity?: string;
           image_display_url?: string;
           name?: string;
+          userCapacity?: string;
         }[]
 
       }
-      const allUsers: IUsers[] = [];
-      for (const user of users) {
-        const userTemp = []
-        const userOrgDetails = []
-        for (const org of orgDetails) {
-          const userOrg = org.users?.find((userorg) => userorg.id === user.id);
-          if (user?.name && userOrg) {
-            const userDetails = {
-              title: user?.name,
-              id: user.id,
-              description: user?.email,
-              capacity: userOrg?.capacity ? userOrg?.capacity : "member",
-              image_display_url: user?.image_url,
-              org: org.name,
-              orgId: org.id
-            }
-            userOrgDetails.push({
-              title: org.title,
-              capacity: userOrg?.capacity ? userOrg?.capacity : "member",
-              image_display_url: org.image_display_url,
-              name: org.name
+      const userMap = new Map<string, IUsers>();
+      getAllUsersOrgFlat.forEach((user) => {
+        const {
+          title,
+          id,
+          description,
+          capacity,
+          image_display_url,
+          org,
+          orgId,
+          orgimage,
+          orgtitle,
+          userCapacity } = user;
+        const key = title ?? id;
 
-            })
-            userTemp.push(userDetails);
+        if (userMap.has(key)) {
+          const existingUser = userMap.get(key)!;
+          existingUser.orgnumber = (existingUser.orgnumber ?? 1) + 1;
+
+          if (org && orgId) {
+            existingUser.orgs = [
+              ...(existingUser.orgs ?? []),
+              {
+                title: orgtitle ?? '',
+                capacity: capacity ?? '',
+                image_display_url: orgimage ?? '',
+                name: org || '',
+                userCapacity: userCapacity ?? ''
+              },
+            ];
           }
+
+          userMap.set(key, existingUser);
+        } else {
+          const newUser: IUsers = {
+            title,
+            id,
+            description,
+            image_display_url,
+            orgnumber: 1,
+            orgs: org
+              ? [
+                {
+                  title: orgtitle ?? '',
+                  capacity: capacity ?? '',
+                  image_display_url: orgimage ?? '',
+                  name: org || '',
+                  userCapacity: userCapacity ?? ''
+                },
+              ]
+              : [],
+          };
+
+          userMap.set(key, newUser);
         }
-        if (user?.name) {
-          if (userTemp.length > 0) {
-            allUsers.push({
-              title: user?.name,
-              id: user.id!,
-              description: user?.email,
-              orgnumber: userTemp?.length,
-              image_display_url: user?.image_url ? user?.image_url : '/images/placeholders/user/userdefault.png',
-              orgs: userOrgDetails
-            })
-          }
-          else {
-            allUsers.push({
-              title: user?.name,
-              id: user.id!,
-              description: user?.email,
-              orgnumber: 0,
-              image_display_url: user?.image_url ? user?.image_url : '/images/placeholders/user/userdefault.png',
-              orgs: []
-            })
-          }
-        }
-      }
+      });
+
+      const allUsers = Array.from(userMap.values());
       let result = allUsers;
       if (input.search) {
         result = searchArrayForKeyword<IUsers>(allUsers, input.search);
