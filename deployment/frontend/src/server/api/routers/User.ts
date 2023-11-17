@@ -172,7 +172,24 @@ export const UserRouter = createTRPCRouter({
       });
 
       const allUsers = Array.from(userMap.values());
-      let result = allUsers;
+      let result = allUsers
+      // non-organization users
+      if (ctx.session.user.sysadmin) {
+        const nonOrgUsers = (await getAllUsers({ apiKey: ctx.session.user.apikey }))!;
+        const orgUsers = Array.from(userMap.keys());
+        const nonOrgUsersFiltered = nonOrgUsers.filter((user) => !orgUsers.includes(user.name!));
+        const nonOrgUsersFormatted = nonOrgUsersFiltered.map((user) => {
+          return {
+            title: user.name,
+            id: user.id,
+            description: user.email,
+            image_display_url: user.image_url,
+            orgnumber: 0,
+            orgs: []
+          }
+        });
+        result = [...allUsers, ...nonOrgUsersFormatted] as IUsers[];
+      }
       if (input.search) {
         result = searchArrayForKeyword<IUsers>(allUsers, input.search);
       }
