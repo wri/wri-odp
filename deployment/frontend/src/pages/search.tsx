@@ -9,8 +9,9 @@ import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import RedirectedSearchInput from '@/components/search/RedirectedSearchInput'
+import { NextSeo } from 'next-seo'
 
-export default function test() {
+export default function SearchPage() {
     const {
         data: recentlyAdded,
         isLoading: isLoadingRecentlyAdded,
@@ -33,6 +34,7 @@ export default function test() {
 
     return (
         <>
+            <NextSeo title="Explore Data" />
             <Header />
             <RedirectedSearchInput />
             <Highlights />
