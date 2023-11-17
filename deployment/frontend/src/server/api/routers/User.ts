@@ -191,7 +191,7 @@ export const UserRouter = createTRPCRouter({
         result = [...allUsers, ...nonOrgUsersFormatted] as IUsers[];
       }
       if (input.search) {
-        result = searchArrayForKeyword<IUsers>(allUsers, input.search);
+        result = searchArrayForKeyword<IUsers>(result, input.search);
       }
 
       return {
