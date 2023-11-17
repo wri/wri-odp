@@ -13,6 +13,7 @@ import { SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
 import { useSession } from 'next-auth/react'
 import TemporalCoverageFacet from './TemporalCoverageFacet'
+import MetadataModifiedFacet from './MetadataModifiedFacet'
 import Spinner from '../_shared/Spinner'
 
 export default function FilteredSearchLayout({
@@ -48,6 +49,7 @@ export default function FilteredSearchLayout({
         { key: 'license_id', title: 'License' },
         { key: 'language', title: 'Language' },
         { key: 'wri_data', title: 'WRI Data' },
+        { key: 'metadata_modified', title: 'Last Updated' },
     ]
 
     if (session.status == 'authenticated') {
@@ -167,8 +169,25 @@ export default function FilteredSearchLayout({
                                                         {!isLoadingFacets &&
                                                             facetFields.map(
                                                                 (ff) =>
-                                                                    ff.key !=
-                                                                    'temporal_coverage' ? (
+                                                                    ff.key === 'temporal_coverage' ? (
+                                                                        <TemporalCoverageFacet
+                                                                            filters={
+                                                                                filters
+                                                                            }
+                                                                            setFilters={
+                                                                                setFilters
+                                                                            }
+                                                                        />
+                                                                    ) : ff.key === 'metadata_modified' ? (
+                                                                        <MetadataModifiedFacet
+                                                                            filters={
+                                                                                filters
+                                                                            }
+                                                                            setFilters={
+                                                                                setFilters
+                                                                            }
+                                                                        />
+                                                                    ) : (
                                                                         <Facet
                                                                             text={
                                                                                 ff.title
@@ -210,15 +229,6 @@ export default function FilteredSearchLayout({
                                                                             }
                                                                             filters={
                                                                                 filters
-                                                                            }
-                                                                        />
-                                                                    ) : (
-                                                                        <TemporalCoverageFacet
-                                                                            filters={
-                                                                                filters
-                                                                            }
-                                                                            setFilters={
-                                                                                setFilters
                                                                             }
                                                                         />
                                                                     )
@@ -277,8 +287,25 @@ export default function FilteredSearchLayout({
                                                     <LocationSearch />
                                                     {!isLoadingFacets &&
                                                         facetFields.map((ff) =>
-                                                            ff.key !=
-                                                            'temporal_coverage' ? (
+                                                            ff.key === 'temporal_coverage' ? (
+                                                                <TemporalCoverageFacet
+                                                                    filters={
+                                                                        filters
+                                                                    }
+                                                                    setFilters={
+                                                                        setFilters
+                                                                    }
+                                                                />
+                                                            ) : ff.key === 'metadata_modified' ? (
+                                                                <MetadataModifiedFacet
+                                                                    filters={
+                                                                        filters
+                                                                    }
+                                                                    setFilters={
+                                                                        setFilters
+                                                                    }
+                                                                />
+                                                            ) : (
                                                                 <Facet
                                                                     text={
                                                                         ff.title
@@ -320,15 +347,6 @@ export default function FilteredSearchLayout({
                                                                     }
                                                                     filters={
                                                                         filters
-                                                                    }
-                                                                />
-                                                            ) : (
-                                                                <TemporalCoverageFacet
-                                                                    filters={
-                                                                        filters
-                                                                    }
-                                                                    setFilters={
-                                                                        setFilters
                                                                     }
                                                                 />
                                                             )

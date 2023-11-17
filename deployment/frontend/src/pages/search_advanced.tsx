@@ -87,12 +87,23 @@ export default function SearchPage({
 
                     keyFq = `[${temporalCoverageStart ?? "*"} TO ${temporalCoverageEnd?.value}]`
                 }
+            } else if (key === 'metadata_modified_since' || key === 'metadata_modified_before') {
+                const metadataModifiedSinceFilter = filters.find(f => f.key === 'metadata_modified_since');
+                const metadataModifiedSince = metadataModifiedSinceFilter ? metadataModifiedSinceFilter.value + 'T00:00:00Z' : '*';
+
+                const metadataModifiedBeforeFilter = filters.find(f => f.key === 'metadata_modified_before');
+                const metadataModifiedBefore = metadataModifiedBeforeFilter ? metadataModifiedBeforeFilter.value + 'T23:59:59Z' : '*';
+
+                fq['metadata_modified'] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`;
             } else {
                 keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             }
 
             if (keyFq) fq[key as string] = keyFq
         })
+
+        delete fq.metadata_modified_since;
+        delete fq.metadata_modified_before;
 
         setQuery((prev) => {
             return {
