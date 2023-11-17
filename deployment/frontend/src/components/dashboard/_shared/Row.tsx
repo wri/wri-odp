@@ -30,10 +30,11 @@ type RowProps = {
   groupStyle?: string
   className?: string;
   authorized?: boolean;
+  highlighted?: boolean;
 }
 
-export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, groupStyle, className, authorized }: RowProps) {
-  const [isShowSubRow, setIsShowSubRow] = useState(false)
+export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkButton, groupStyle, className, authorized, highlighted = false }: RowProps) {
+  const [isShowSubRow, setIsShowSubRow] = useState(highlighted)
   const { data: session } = useSession()
   // state event to change hover effect on desktop to click effect on mobile
   // const [isHover, setIsHover] = useState(false)

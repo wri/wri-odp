@@ -45,7 +45,7 @@ function SubTeamProfile({ team }: { team: GroupTree }) {
   )
 }
 
-function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefined }) {
+function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTree[] | undefined, highlighted?: boolean }) {
   const utils = api.useUtils()
   const [open, setOpen] = useState(false)
   const [selectedTeam, setSelectedTeam] = useState<GroupTree | null>(null)
@@ -76,6 +76,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                   <>
                     <Row
                       key={index}
+                      highlighted={highlighted}
                       groupStyle="group/item group-hover/item:visible "
                       className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                       rowMain={
@@ -246,6 +247,7 @@ export default function TeamCard() {
                   <Row
                     key={index}
                     className={`pr-2`}
+                    highlighted={team?.highlighted}
                     rowMain={<TeamProfile team={team} />}
                     linkButton={{
                       label: "View team",
@@ -275,7 +277,7 @@ export default function TeamCard() {
                         onClick: () => handleOpenModal(team)
                       },
                     ]}
-                    rowSub={<SubCardProfile teams={team.children} />}
+                    rowSub={<SubCardProfile teams={team.children} highlighted={team?.highlighted} />}
                     isDropDown
                   />
 
