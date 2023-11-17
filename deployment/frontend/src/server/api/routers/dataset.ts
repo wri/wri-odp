@@ -11,7 +11,13 @@ import {
     getUserGroups,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
-import type { CkanResponse } from '@/schema/ckan.schema'
+import type {
+    CkanResponse,
+    Collaborator,
+    Issue,
+    WriDataset,
+    WriUser,
+} from '@/schema/ckan.schema'
 import { DatasetSchema } from '@/schema/dataset.schema'
 import type { Dataset } from '@/interfaces/dataset.interface'
 import type { License } from '@/interfaces/licenses.interface'
@@ -151,6 +157,90 @@ export const DatasetRouter = createTRPCRouter({
                 searchFacets: dataset.searchFacets,
             }
         }),
+    getDatasetCollaborators: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            const user = ctx.session?.user
+            const collaboratorsRes = await fetch(
+                `${env.CKAN_URL}/api/action/package_collaborator_list?id=${input.id}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user?.apikey ?? ''}`,
+                    },
+                }
+            )
+            const collaborators: CkanResponse<Collaborator[]> =
+                await collaboratorsRes.json()
+            if (!collaborators.success && collaborators.error) {
+                if (collaborators.error.message)
+                    throw Error(collaborators.error.message)
+                throw Error(JSON.stringify(collaborators.error))
+            }
+            const collaboratorsWithDetails = await Promise.all(
+                collaborators.result.map(async (collaborator) => {
+                    const userRes = await fetch(
+                        `${env.CKAN_URL}/api/action/user_show?id=${collaborator.user_id}`,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: env.SYS_ADMIN_API_KEY,
+                            },
+                        }
+                    )
+                    const user: CkanResponse<WriUser> = await userRes.json()
+                    if (!user.success && user.error) {
+                        if (user.error.message) throw Error(user.error.message)
+                        throw Error(JSON.stringify(user.error))
+                    }
+                    return { ...collaborator, ...user.result }
+                })
+            )
+            return collaboratorsWithDetails
+        }),
+    getDatasetIssues: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            const user = ctx.session?.user
+            const issuesRes = await fetch(
+                `${env.CKAN_URL}/api/action/issue_search?dataset_id=${input.id}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user?.apikey ?? ''}`,
+                    },
+                }
+            )
+            const issues: CkanResponse<{ count: number; results: Issue[] }> =
+                await issuesRes.json()
+            console.log('Issues', issues)
+            if (!issues.success && issues.error) {
+                if (issues.error.message) throw Error(issues.error.message)
+                throw Error(JSON.stringify(issues.error))
+            }
+            const issuesWithDetails = await Promise.all(
+                issues.result.results.map(async (issue) => {
+                    console.log('Issue', issue)
+                    const detailsRes = await fetch(
+                        `${env.CKAN_URL}/api/action/issue_show?dataset_id=${input.id}&issue_number=${issue.number}`,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                        Authorization: `${user?.apikey ?? ''}`,
+                            },
+                        }
+                    )
+                    const details: CkanResponse<Issue> = await detailsRes.json()
+                    console.log('Details', details)
+                    if (!details.success && details.error) {
+                        if (details.error.message) throw Error(details.error.message)
+                        throw Error(JSON.stringify(details.error))
+                    }
+                    return {...issue, ...details.result}
+                })
+            )
+            return issuesWithDetails
+        }),
     getOneDataset: publicProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
@@ -164,12 +254,17 @@ export const DatasetRouter = createTRPCRouter({
                     },
                 }
             )
-            const dataset: CkanResponse<Dataset> = await datasetRes.json()
+            const dataset: CkanResponse<WriDataset> = await datasetRes.json()
             if (!dataset.success && dataset.error) {
                 if (dataset.error.message) throw Error(dataset.error.message)
                 throw Error(JSON.stringify(dataset.error))
             }
-            return dataset.result
+            return {
+                ...dataset.result,
+                open_in: dataset.result.open_in
+                    ? Object.values(dataset.result.open_in)
+                    : [],
+            }
         }),
     getMyDataset: protectedProcedure
         .input(searchSchema)

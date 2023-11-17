@@ -65,7 +65,6 @@ export function TopicsInner({
     value: string[]
     userTopics: string[] | null
 }) {
-    console.log('userTopics', userTopics)
     const [open, setOpen] = useState(false)
     const [query, setQuery] = useState('')
     const ref = useRef<HTMLButtonElement>(null)

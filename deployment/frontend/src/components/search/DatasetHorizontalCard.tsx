@@ -12,13 +12,13 @@ import {
     MapPinIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { colors } from '../datasets/sections/DataFiles'
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from '../_shared/Tooltip'
+import { getFormatColor, formatColors } from '@/utils/formatColors'
 
 export default function DatasetHorizontalCard({
     dataset,
@@ -160,8 +160,8 @@ export default function DatasetHorizontalCard({
                             <span
                                 key={`dataset-${dataset.name}-format-${format}`}
                                 className={`flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black ${
-                                    format && format in colors
-                                        ? colors[format?.toUpperCase()]
+                                    format && format in Object.keys(formatColors)
+                                        ? getFormatColor(format) 
                                         : 'bg-wri-light-green'
                                 }`}
                             >

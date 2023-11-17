@@ -47,6 +47,7 @@ export interface Resource {
   mimetype_inner?: string;
   name?: string;
   package_id?: string;
+  title: string;
   position?: number;
   resource_type?: null;
   size?: number;

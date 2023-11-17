@@ -434,3 +434,29 @@ Cypress.Commands.add("createUserApi", (name, email, password) => {
     },
   });
 });
+
+Cypress.Commands.add("addPackageCollaboratorApi", (username, packageId, capacity) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("package_collaborator_create"),
+    headers: headers,
+    body: {
+      id: packageId,
+      user_id: username,
+      capacity: capacity,
+    },
+  });
+});
+
+Cypress.Commands.add("addPackageIssueApi", (packageId, issueTitle, issueDescription) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("issue_create"),
+    headers: headers,
+    body: {
+      dataset_id: packageId,
+      title: issueTitle,
+      description: issueDescription,
+    },
+  });
+});

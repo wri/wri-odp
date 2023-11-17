@@ -4,7 +4,7 @@ import Select from '@/components/_shared/Select'
 
 export default function SearchPanel() {
     return (
-        <div className='pr-6'>
+        <div className="pr-6">
             <div className="relative py-4">
                 <input
                     className="block w-full rounded-md border-b border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
@@ -13,7 +13,7 @@ export default function SearchPanel() {
                 <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
             </div>
             <div>
-                <div className='flex justify-between items-center'>
+                <div className="flex justify-between items-center">
                     <span className="text-base font-semibold">
                         {6} Datasets
                     </span>
@@ -32,7 +32,19 @@ export default function SearchPanel() {
                 </div>
                 <div className="flex flex-col gap-y-4 py-2">
                     {[0, 1, 2, 3, 4, 5].map((dataset) => (
-                        <DatasetCard key={dataset} />
+                        <DatasetCard
+                            dataset={{
+                                name: 'Test',
+                                temporal_coverage_start: '',
+                                temporal_coverage_end: '',
+                                num_resources: 0,
+                                num_tags: 0,
+                                open_in: [],
+                                id: '123',
+                                resources: [],
+                            }}
+                            key={dataset}
+                        />
                     ))}
                 </div>
             </div>
