@@ -83,7 +83,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                       }
                       linkButton={{
                         label: "View team",
-                        link: "#",
+                        link: `../teams/${team.name}`,
                       }}
                       controlButtons={[
                         {
@@ -128,7 +128,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                       }
                       linkButton={{
                         label: "View team",
-                        link: "#",
+                        link: `../teams/${team.name}`,
                       }}
                       controlButtons={[
                         {
@@ -249,7 +249,7 @@ export default function TeamCard() {
                     rowMain={<TeamProfile team={team} />}
                     linkButton={{
                       label: "View team",
-                      link: "#",
+                      link: `../teams/${team.name}`,
                     }}
                     controlButtons={[
                       {
