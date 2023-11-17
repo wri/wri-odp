@@ -91,6 +91,41 @@ describe("Search page", () => {
     cy.contains("results", { timeout: 10000 });
   });
 
+  it("allows faceting by last updated since and before dates", () => {
+    cy.visit("/search_advanced");
+    cy.contains("Open sidebar").click();
+    cy.get("#facets-list")
+    cy.contains("Last Updated").focus().click({ force: true });
+
+    const today = new Date();
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+
+    const combinations = [
+      { since: yesterday, before: today, results: true },
+      { since: today, before: tomorrow, results: true },
+      { since: today, before: today, results: true },
+      { since: tomorrow, before: tomorrow, results: false },
+      { since: today, before: yesterday, results: false },
+    ];
+
+    combinations.forEach((combination) => {
+      const sinceDateFormatted = combination.since.toISOString().split('T')[0];
+      const beforeDateFormatted = combination.before.toISOString().split('T')[0];
+
+      cy.get("#since-date").type(sinceDateFormatted, { force: true });
+      cy.get("#before-date").type(beforeDateFormatted, { force: true });
+
+      if (combination.results) {
+        cy.contains("results", { timeout: 10000 });
+      } else {
+        cy.on("window:alert", (message) => {
+          expect(message).to.contains("Invalid date range");
+        });
+      }
+    });
+  });
+
   after(() => {
     // Delete and purge datasets
     datasets.forEach((name) => cy.deleteDatasetAPI(name));
