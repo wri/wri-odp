@@ -10,11 +10,7 @@ function subFields(dataset: WriDataset) {
   return [
     {
       title: "Status",
-      description: "RDI Approved"
-    },
-    {
-      title: "Type of Dataset",
-      description: dataset?.type
+      description: dataset.technical_notes ? "RDI Approved" : "RDI Pending"
     },
     {
       title: "Coverage Start",
