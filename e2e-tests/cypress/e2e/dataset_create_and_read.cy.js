@@ -42,8 +42,8 @@ describe("Create dataset", () => {
     cy.get("#tagsSearchInput").type("Tag 3{enter}").clear();
     cy.get("input[name=project]").type("Project 1");
     cy.get("input[name=technical_notes]").type("https://google.com");
-    cy.get("input[name=temporalCoverageStart]").type(1998);
-    cy.get("input[name=temporalCoverageEnd]").type(2023);
+    cy.get("input[name=temporal_coverage_start]").type(1998);
+    cy.get("input[name=temporal_coverage_end]").type(2023);
     cy.get("textarea[name=citation]").type("test");
     cy.get("#featured_dataset").click();
     cy.get("input[type=file]").selectFile("cypress/fixtures/logo.png", {
