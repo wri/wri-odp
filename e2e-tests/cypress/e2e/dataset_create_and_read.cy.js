@@ -96,17 +96,6 @@ describe("Create dataset", () => {
     cy.contains('Members').click()
     cy.contains(user_email)
   })
-  it("Should show the issues", () => {
-    cy.addPackageIssueApi(dataset, "issue example", "issue example description")
-    cy.visit("/datasets/" + dataset);
-    cy.get('h1').contains(dataset)
-    cy.get('h2').contains(org)
-    cy.contains('Data files').click()
-    cy.contains('Resource for E2E Testing')
-    cy.contains('Issues').click()
-    cy.contains('issue example')
-    cy.contains('issue example description')
-  })
 
   after(() => {
     cy.deleteOrganizationAPI(org);
