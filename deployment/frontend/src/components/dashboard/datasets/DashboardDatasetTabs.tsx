@@ -40,15 +40,14 @@ export default function DashboardDatasetTabs({ tabs }: { tabs: TabProps[] }) {
                         <Tab
                             as="div"
                             key={tab.title}
-                            className="text-base font-normal text-black accent-white"
+                            className="text-base font-normal text-black accent-white cursor-pointer"
                         >
                             {({ selected }) => (
                                 <div
-                                    className={`w-full border-b-2 py-4 font-normal focus:outline-0 ${
-                                        selected
+                                    className={`w-full border-b-2 py-4 font-normal focus:outline-0 ${selected
                                             ? ' border-b-2 border-b-wri-dark-green text-wri-green'
                                             : ''
-                                    } `}
+                                        } `}
                                 >
                                     {tab.title === 'Add dataset' ? (
                                         <div className="flex lg:px-12 2xl:px-14 px-6 sm:px-8 ">

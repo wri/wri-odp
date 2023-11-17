@@ -85,26 +85,23 @@ export const DatasetRouter = createTRPCRouter({
         .query(async ({ input, ctx }) => {
             const isUserSearch = input._isUserSearch
 
-            let fq = ''
+            let fq = `" "`
             let orgsFq = ''
-            if (isUserSearch && ctx.session) {
-                const organizations = await getUserOrganizations({
-                    userId: ctx.session?.user.id,
-                    apiKey: ctx.session?.user.apikey,
-                })
-                orgsFq = `organization:(${organizations
-                    ?.map((org) => org.name)
-                    .join(' OR ')})`
-            }
+            // if (isUserSearch && ctx.session) {
+            //     const organizations = await getUserOrganizations({
+            //         userId: ctx.session?.user.id,
+            //         apiKey: ctx.session?.user.apikey,
+            //     })
+            //     orgsFq = `organization:(${organizations
+            //         ?.map((org) => org.name)
+            //         .join(' OR ')})`
+            // }
 
             const fqArray = []
             if (input.fq) {
                 let temporalCoverageFqList = []
                 for (const key of Object.keys(input.fq)) {
-                    if (key === 'organization') {
-                        orgsFq = `organization:(${input.fq[key]})`
-                        continue
-                    }
+
                     if (
                         [
                             'temporal_coverage_start',
@@ -133,9 +130,8 @@ export const DatasetRouter = createTRPCRouter({
                     fq += `+(${temporalCoverageFqList
                         .map((f) => `(${f})`)
                         .join(' OR ')})`
-            } else {
-                fq = orgsFq
             }
+
 
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session?.user.apikey ?? '',

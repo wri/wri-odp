@@ -39,7 +39,7 @@ function SubTopicProfile({ team }: { team: GroupTree }) {
   )
 }
 
-function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefined }) {
+function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTree[] | undefined, highlighted?: boolean }) {
   const utils = api.useUtils()
   const [open, setOpen] = useState(false)
   const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
@@ -70,6 +70,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                   <>
                     <Row
                       key={index}
+                      highlighted={highlighted}
                       groupStyle="group/item group-hover/item:visible "
                       className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                       rowMain={
@@ -77,7 +78,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                       }
                       linkButton={{
                         label: "View topic",
-                        link: "#",
+                        link: `../topics/${team.name}`,
                       }}
                       controlButtons={[
                         {
@@ -122,7 +123,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
                       }
                       linkButton={{
                         label: "View topic",
-                        link: "#",
+                        link: `../topics/${team.name}`,
                       }}
                       controlButtons={[
                         {
@@ -230,7 +231,6 @@ export default function TopicCard() {
   }
 
 
-
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
       <SearchHeader leftStyle=' sm:pr-2 sm:pl-12' rightStyle=' px-2 sm:pr-6' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
@@ -243,10 +243,11 @@ export default function TopicCard() {
                   <Row
                     key={index}
                     className={`pr-6`}
+                    highlighted={topic?.highlighted}
                     rowMain={<TopicProfile team={topic} />}
                     linkButton={{
                       label: "View topic",
-                      link: "#",
+                      link: `../topics/${topic.name}`,
                     }}
                     controlButtons={[
                       {
@@ -272,7 +273,7 @@ export default function TopicCard() {
                         onClick: () => handleOpenModal(topic)
                       },
                     ]}
-                    rowSub={<SubCardProfile teams={topic.children} />}
+                    rowSub={<SubCardProfile teams={topic.children} highlighted={topic?.highlighted} />}
                     isDropDown
                   />
                 </div>

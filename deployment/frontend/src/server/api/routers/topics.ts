@@ -19,12 +19,17 @@ export const TopicRouter = createTRPCRouter({
             let groupTree: GroupTree[] = []
 
             if (input.search) {
-                groupTree = await searchHierarchy({ apiKey: ctx.session.user.apikey, q: input.search, group_type: 'group' })
+                groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, q: input.search, group_type: 'group' })
             }
             else {
-                groupTree = await getGroups({
-                    apiKey: ctx.session.user.apikey,
-                })
+                if (ctx.session.user.sysadmin) {
+                    groupTree = await getGroups({
+                        apiKey: ctx.session.user.apikey,
+                    })
+                }
+                else {
+                    groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, q: '', group_type: 'group' })
+                }
             }
 
             const result = groupTree

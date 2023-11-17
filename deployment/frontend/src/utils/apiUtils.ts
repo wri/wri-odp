@@ -13,16 +13,42 @@ import type { SearchInput } from '@/schema/search.schema'
 import { Facets } from '@/interfaces/search.interface'
 
 
-export async function searchHierarchy({ apiKey, q, group_type }: { apiKey: string, q: string, group_type: string }): Promise<GroupTree[]> {
+export async function searchHierarchy(
+    { isSysadmin,
+        apiKey,
+        q,
+        group_type
+    }:
+        {
+            isSysadmin: boolean,
+            apiKey: string, q: string, group_type: string
+        }): Promise<GroupTree[]> {
     try {
-        const response = await fetch(`${env.CKAN_URL}/api/3/action/${group_type == "group" ? "group_list" : "organization_list"}?q=${q}&all_fields=True`, {
-            headers: {
-                "Authorization": apiKey,
-            }
-        });
-        const data = (await response.json()) as CkanResponse<GroupTree[]>;
+        let response: Response;
+        let groups: GroupTree[] | [] = [];
+        if (isSysadmin) {
+            response = await fetch(`${env.CKAN_URL}/api/3/action/${group_type == "group" ? "group_list" : "organization_list"}?${q ? "q=" + q + "&" : ""}all_fields=True`, {
+                headers: {
+                    "Authorization": apiKey,
+                }
+            });
+            const data = (await response.json()) as CkanResponse<GroupTree[]>;
+            groups = data.success === true ? data.result : [];
+        }
+        else {
+            response = await fetch(`${env.CKAN_URL}/api/3/action/${group_type == "group" ? "group_list_authz" : "organization_list_for_user"}?all_fields=True`, {
+                headers: {
+                    "Authorization": apiKey,
+                }
+            });
 
-        const groups: GroupTree[] | [] = data.success === true ? data.result : [];
+            const data = (await response.json()) as CkanResponse<GroupTree[]>;
+            groups = data.success === true ? data.result : [];
+            if (groups.length && q) {
+                groups = groups.filter((group) => group.name.toLowerCase().includes(q.toLowerCase()));
+            }
+        }
+
 
         const groupTree: GroupTree[] = await Promise.all(groups.map(async (group) => {
             const g = await fetch(`${env.CKAN_URL}/api/3/action/group_tree_section?id=${group.id}&type=${group_type}&all_fields=True`, {
@@ -31,13 +57,19 @@ export async function searchHierarchy({ apiKey, q, group_type }: { apiKey: strin
                 }
             });
             const d = (await g.json()) as CkanResponse<GroupTree>;
-            if (d.success === true) {
-                return d.result
-            } else {
-                return {} as GroupTree
-            }
+            const result: GroupTree = d.success === true ? d.result : {} as GroupTree;
+            result.highlighted = true;
+            return result;
         }));
-        return groupTree
+        const t = groupTree.reduce((acc: Record<string, GroupTree>, group) => {
+            const key = group.id;
+            if (!acc[key]) {
+                acc[key] = group;
+            }
+            return acc;
+        }, {});
+
+        return Object.values(t);
 
     }
     catch (e) {
@@ -48,10 +80,12 @@ export async function searchHierarchy({ apiKey, q, group_type }: { apiKey: strin
 
 export async function getGroups({
     apiKey,
-    group_type = "group"
+    group_type = "group",
+    isSysadmin
 }: {
     apiKey: string,
-    group_type?: string
+    group_type?: string,
+    isSysadmin?: boolean
 }): Promise<GroupTree[]> {
     try {
         const response = await fetch(
