@@ -56,7 +56,7 @@ export function CreateDataFilesSection({
                             resourceId: uuidv4(),
                             title: '',
                             type: 'empty',
-                            format: { value: '', label: '' },
+                            format: '',
                             dataDictionary: [],
                         })
                     }
@@ -117,7 +117,7 @@ function AddDataFile({
             getUploadParameters: (file: UppyFile) =>
                 getUploadParameters(
                     file,
-                    watch('team') && watch('team')?.value
+                    watch('team') && watch('team')?.value !== ''
                         ? `${watch('team')?.id}/ckan/resources/${
                               datafile.resourceId
                           }`
@@ -142,10 +142,7 @@ function AddDataFile({
                 setValue(`resources.${index}.key`, key)
                 setValue(`resources.${index}.name`, name)
                 setValue(`resources.${index}.size`, size)
-                setValue(`resources.${index}.format`, {
-                    value: format,
-                    label: format.toUpperCase(),
-                })
+                setValue(`resources.${index}.format`, format)
                 if (uploadInputRef && uploadInputRef.current)
                     uploadInputRef.current.value = ''
             }

@@ -41,7 +41,7 @@ export const DatasetRouter = createTRPCRouter({
                     visibility_type: input.visibility_type?.value ?? '',
                     resources: input.resources.map((resource) => ({
                         ...resource,
-                        format: resource.format?.value ?? '',
+                        format: resource.format ?? '',
                         id: resource.resourceId,
                         url_type: resource.type,
                         schema: resource.dataDictionary
@@ -151,6 +151,26 @@ export const DatasetRouter = createTRPCRouter({
                 searchFacets: dataset.searchFacets,
             }
         }),
+    getOneDataset: publicProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            const user = ctx.session?.user
+            const datasetRes = await fetch(
+                `${env.CKAN_URL}/api/action/package_show?id=${input.id}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user?.apikey ?? ''}`,
+                    },
+                }
+            )
+            const dataset: CkanResponse<Dataset> = await datasetRes.json()
+            if (!dataset.success && dataset.error) {
+                if (dataset.error.message) throw Error(dataset.error.message)
+                throw Error(JSON.stringify(dataset.error))
+            }
+            return dataset.result
+        }),
     getMyDataset: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
@@ -164,7 +184,7 @@ export const DatasetRouter = createTRPCRouter({
                 count: dataset.count,
             }
         }),
-    getLicenses: protectedProcedure.query(async ({ input, ctx }) => {
+    getLicenses: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.session.user
         const licensesRes = await fetch(
             `${env.CKAN_URL}/api/action/license_list`,
@@ -182,6 +202,22 @@ export const DatasetRouter = createTRPCRouter({
         }
         return licenses.result
     }),
+    getFormats: protectedProcedure
+        .input(z.object({ q: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const formatRes = await fetch(
+                `${env.CKAN_URL}/api/action/format_autocomplete?q=${input.q}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const formats: CkanResponse<string[]> = await formatRes.json()
+            return formats.result ?? []
+        }),
     getDraftDataset: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {

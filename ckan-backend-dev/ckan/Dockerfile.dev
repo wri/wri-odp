@@ -45,6 +45,7 @@ RUN chown ckan:ckan ${APP_DIR}/run_unit_tests.sh
 
 COPY patches ${APP_DIR}/patches
 
+RUN apk --no-cache add patch
 RUN for d in $APP_DIR/patches/*; do \
         if [ -d $d ]; then \
             for f in `ls $d/*.patch | sort -g`; do \

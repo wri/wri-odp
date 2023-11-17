@@ -13,6 +13,7 @@ import { useRouter } from 'next/router'
 import Modal from '@/components/_shared/Modal'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
+import Link from 'next/link'
 
 export default function EditTeamForm({ team }: { team: TeamFormType }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -32,8 +33,10 @@ export default function EditTeamForm({ team }: { team: TeamFormType }) {
         resolver: zodResolver(TeamSchema),
     })
 
+    const utils = api.useContext()
     const editTeam = api.teams.editTeam.useMutation({
         onSuccess: async ({ name, title }) => {
+            await utils.teams.getTeam.invalidate({ id: name })
             notify(`Successfully edited the ${title ?? name} team`, 'success')
             router.push('/dashboard/teams')
         },
@@ -42,8 +45,12 @@ export default function EditTeamForm({ team }: { team: TeamFormType }) {
 
     const deleteTeam = api.teams.deleteTeam.useMutation({
         onSuccess: async () => {
+            await utils.teams.getTeam.invalidate({ id: team.name })
             setDeleteOpen(false)
-            notify(`Successfully deleted the ${team.title ?? team.name} team`, 'error')
+            notify(
+                `Successfully deleted the ${team.title ?? team.name} team`,
+                'error'
+            )
             router.push('/dashboard/teams')
         },
         onError: (error) => {
@@ -119,7 +126,10 @@ export default function EditTeamForm({ team }: { team: TeamFormType }) {
                     <div className="w-full py-8 border-b border-blue-800 shadow">
                         <div className="px-2 sm:px-8">
                             <TeamForm formObj={formObj} editing={true} />
-                            <div className="col-span-full flex justify-end">
+                            <div className="col-span-full flex justify-end gap-x-4">
+                                <Button type="button" variant="outline">
+                                    <Link href="/dashboard/teams">Cancel</Link>
+                                </Button>
                                 <LoaderButton
                                     loading={editTeam.isLoading}
                                     type="submit"

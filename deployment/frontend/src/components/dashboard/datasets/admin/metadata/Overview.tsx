@@ -122,11 +122,11 @@ export function OverviewForm({
                                         name="team"
                                         id="team"
                                         initialValue={watch('team') ?? null}
-                                        options={data.map((team) => ({
+                                        options={[{label: 'No team', value: '', id: ''}, ...data.map((team) => ({
                                             label: team.title ?? team.name,
                                             value: team.name,
                                             id: team.id,
-                                        }))}
+                                        }))]}
                                         placeholder="Select a team"
                                     />
                                 )
@@ -404,10 +404,13 @@ export function OverviewForm({
                                 }}
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
-                                        response.successful[0]?.name ?? null
-                                    setValue('featured_image', url)
+                                        response.successful[0]?.uploadURL ??
+                                        null
+                                    const name = url ? url.split('/').pop() : ''
+                                    setValue('featured_image', name)
                                 }}
                             />
+                            <ErrorDisplay name="featured_image" errors={errors} />
                         </div>
                     </div>
                 </div>
