@@ -24,7 +24,7 @@ type IOrg = {
 }
 
 function TeamProfile({ team }: { team: GroupTree }) {
-  const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
+  const description = team?.children?.length ? `${team?.children?.length} subteams` : 'No subteams'
   const TopicProfile = team as IRowProfile
   TopicProfile.description = description
   return (
@@ -35,7 +35,7 @@ function TeamProfile({ team }: { team: GroupTree }) {
 }
 
 function SubTeamProfile({ team }: { team: GroupTree }) {
-  const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
+  const description = team?.children?.length ? `${team?.children?.length} subteams` : 'No subteams'
   const TopicProfile = team as IRowProfile
   TopicProfile.description = description
   return (
