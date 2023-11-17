@@ -56,10 +56,6 @@ export const DatasetRouter = createTRPCRouter({
                         dataDictionary: null,
                         url: resource.url ?? resource.name,
                     })),
-                    temporal_coverage:
-                        input.temporalCoverageStart && input.temporalCoverageEnd
-                            ? `[${input.temporalCoverageStart},${input.temporalCoverageEnd}]`
-                            : null,
                 })
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,

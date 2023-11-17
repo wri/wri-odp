@@ -87,12 +87,12 @@ export function Preview({
                                 <SimpleDescription
                                     label="Temporal Coverage"
                                     text={
-                                        watch('temporalCoverageStart') ||
-                                        watch('temporalCoverageEnd')
+                                        watch('temporal_coverage_start') ||
+                                        watch('temporal_coverage_end')
                                             ? `${watch(
-                                                  'temporalCoverageStart'
+                                                  'temporal_coverage_start'
                                               )} - ${watch(
-                                                  'temporalCoverageEnd'
+                                                  'temporal_coverage_end'
                                               )}`
                                             : '_'
                                     }

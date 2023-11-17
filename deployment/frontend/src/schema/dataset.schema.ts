@@ -53,12 +53,12 @@ export const DatasetSchema = z
             .or(emptyStringToUndefined),
         tags: z.array(z.string()),
         topics: z.array(z.string()),
-        temporalCoverageStart: z
+        temporal_coverage_start: z
             .number()
             .optional()
             .nullable()
             .or(nanToUndefined),
-        temporalCoverageEnd: z
+        temporal_coverage_end: z
             .number()
             .optional()
             .nullable()

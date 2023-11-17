@@ -51,8 +51,8 @@ export default function CreateDatasetForm() {
             },
             title: '',
             name: '',
-            temporalCoverageEnd: null,
-            temporalCoverageStart: null,
+            temporal_coverage_start: null,
+            temporal_coverage_end: null,
             license: {
                 value: 'notspecified',
                 label: 'License not specified',

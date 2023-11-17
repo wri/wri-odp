@@ -13,8 +13,6 @@ type Only<T, U> = {
 
 type Either<T, U> = Only<T, U> | Only<U, T>
 
-type Either<T, U> = Only<T, U> | Only<U, T>
-
 export interface CkanResponse<T> {
     help: string
     success: boolean
