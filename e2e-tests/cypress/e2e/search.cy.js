@@ -94,7 +94,7 @@ describe("Search page", () => {
   after(() => {
     // Delete and purge datasets
     datasets.forEach((name) => cy.deleteDatasetAPI(name));
-    datasets.forEach((name) => cy.purgeDataset(name));
+    // datasets.forEach((name) => cy.purgeDataset(name));
 
     groups.forEach((name) => cy.deleteGroupAPI(name));
     groups.forEach((name) => cy.purgeGroup(name));
