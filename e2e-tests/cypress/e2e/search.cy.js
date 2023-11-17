@@ -105,8 +105,9 @@ describe("Search page", () => {
       { since: yesterday, before: today, results: true },
       { since: today, before: tomorrow, results: true },
       { since: today, before: today, results: true },
-      { since: tomorrow, before: tomorrow, results: false },
-      { since: today, before: yesterday, results: false },
+      { since: tomorrow, before: tomorrow, results: null },
+      { since: today, before: yesterday, results: null },
+      { since: yesterday, before: yesterday, results: false }
     ];
 
     combinations.forEach((combination) => {
@@ -116,12 +117,14 @@ describe("Search page", () => {
       cy.get("#since-date").type(sinceDateFormatted, { force: true });
       cy.get("#before-date").type(beforeDateFormatted, { force: true });
 
-      if (combination.results) {
+      if (combination.results === true) {
         cy.contains("results", { timeout: 10000 });
-      } else {
+      } else if (combination.results === null) {
         cy.on("window:alert", (message) => {
           expect(message).to.contains("Invalid date range");
         });
+      } else {
+        cy.contains("0 results", { timeout: 10000 });
       }
     });
   });
