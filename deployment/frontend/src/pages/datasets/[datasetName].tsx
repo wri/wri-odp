@@ -25,7 +25,8 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import superjson from 'superjson'
 import Spinner from '@/components/_shared/Spinner'
 import { Button } from '@/components/_shared/Button'
-import Link from 'next/link' 
+import Link from 'next/link'
+import { NextSeo } from 'next-seo'
 
 const links = [
     { label: 'Explore Data', url: '/search', current: false },
@@ -89,6 +90,9 @@ export default function DatasetPage(
 
     return (
         <>
+            <NextSeo
+                title={`${datasetData?.title ?? datasetData?.name} - Datasets`}
+            />
             <Header />
             <Breadcrumbs links={links} />
             {isApprovalRequest && <ApprovalRequestCard />}
