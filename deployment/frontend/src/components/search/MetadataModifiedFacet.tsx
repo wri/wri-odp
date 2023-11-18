@@ -3,6 +3,7 @@ import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Input } from '../_shared/SimpleInput';
+import notify from '@/utils/notify'
 
 export default function MetadataModifiedFacet({
     setFilters,
@@ -34,13 +35,13 @@ export default function MetadataModifiedFacet({
         const newBefore = key === 'metadata_modified_before' ? value : optionsState.metadata_modified_before;
 
         if (newSince && newBefore && new Date(newSince) > new Date(newBefore)) {
-            alert('Invalid date range: "Since" date must be before the "Before" date.');
+            notify('Invalid date range: "Since" date must be before the "Before" date.', 'error');
             setOptionsState(prev => ({ ...prev, [key]: '' }));
             return;
         }
   
         if (newSince && new Date(newSince) > new Date()) {
-            alert('Invalid date range: "Since" date must be today or in the past.');
+            notify('Invalid date range: "Since" date must be today or in the past.', 'error');
             setOptionsState(prev => ({ ...prev, [key]: '' }));
             return;
         }
