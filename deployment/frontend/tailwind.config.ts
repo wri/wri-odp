@@ -27,7 +27,8 @@ export default {
         "wri-light-gray": "#4C4C4C",
         "wri-dark-gray": "#666666",
         "wri-row-gray": "#F9F9F9",
-        "wri-slate": "#EFF5F7"
+        "wri-slate": "#EFF5F7",
+        "muted": "hsl(210 40% 96.1%)"
       },
       screens: {
         "4xl": "2048px",
@@ -50,5 +51,6 @@ export default {
       addVariant("not-last", "&:not(:last-child)");
     }),
     require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
   ],
 } satisfies Config;

@@ -7,28 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/_shared/Table";
+import { RouterOutput } from "@/server/api/root";
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import { PencilIcon } from "@heroicons/react/24/outline";
 
-const users = [
-  {
-    user: "User 1",
-    email: "User email",
-    role: "Member",
-  },
-  {
-    user: "User 2",
-    email: "User email",
-    role: "Member",
-  },
-  {
-    user: "User 3",
-    email: "User email",
-    role: "Member",
-  },
-];
+type DatasetMembers = RouterOutput["dataset"]["getDatasetCollaborators"];
 
-export function Members() {
+export function Members({ members }: { members: DatasetMembers }) {
   return (
     <>
       <Table>
@@ -47,17 +32,17 @@ export function Members() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user, index) => (
+          {members.map((user, index) => (
             <TableRow
-              key={user.user}
+              key={user.user_id}
               className={index === 1 ? "bg-neutral-100" : ""}
             >
               <TableCell className="flex flex-col items-center gap-x-2 font-medium sm:flex-row">
                 <div className="h-6 w-6 rounded-full bg-zinc-300" />
-                {user.user}
+                {user.display_name ?? user.fullname ?? user.name}
               </TableCell>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
+              <TableCell className="capitalize">{user.capacity}</TableCell>
               <TableCell className="flex justify-end">
                 <PencilIcon className="mr-4 h-5 w-5 text-black" />
               </TableCell>

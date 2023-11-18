@@ -8,11 +8,14 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const topic = `${uuid()}_test_topic`;
 const dataset = `${uuid()}-test-dataset`;
+const user = `${uuid()}-test-user`;
+const user_email = `${uuid()}@gmail.com`;
 
 describe("Create dataset", () => {
   before(() => {
     cy.createOrganizationAPI(org);
     cy.createGroupAPI(topic);
+    cy.createUserApi(user, user_email, "test_user");
   });
 
   beforeEach(function () {
@@ -39,8 +42,8 @@ describe("Create dataset", () => {
     cy.get("#tagsSearchInput").type("Tag 3{enter}").clear();
     cy.get("input[name=project]").type("Project 1");
     cy.get("input[name=technical_notes]").type("https://google.com");
-    cy.get("input[name=temporalCoverageStart]").type(1998);
-    cy.get("input[name=temporalCoverageEnd]").type(2023);
+    cy.get("input[name=temporal_coverage_start]").type(1998);
+    cy.get("input[name=temporal_coverage_end]").type(2023);
     cy.get("textarea[name=citation]").type("test");
     cy.get("#featured_dataset").click();
     cy.get("input[type=file]").selectFile("cypress/fixtures/logo.png", {
@@ -74,11 +77,25 @@ describe("Create dataset", () => {
     cy.get("input[type=file]").selectFile("cypress/fixtures/sample_csv.csv", {
       force: true,
     });
+    cy.get('input[name="resources.0.title"]').clear().type("Resource for E2E Testing");
     cy.contains("Next: Preview").click()
     //get button of type submit
     cy.get('button[type="submit"]').click()
     cy.contains(`Successfully created the "${dataset}" dataset`, { timeout: 15000})
   });
+  it("Should show the basic information", () => {
+    cy.visit("/datasets/" + dataset);
+    cy.get('h1').contains(dataset)
+    cy.get('h2').contains(org)
+    cy.contains('Data files').click()
+    cy.contains('CSV')
+  })
+  it("Should show the members", () => {
+    cy.addPackageCollaboratorApi(user, dataset, "editor")
+    cy.visit("/datasets/" + dataset);
+    cy.contains('Collaborators').click()
+    cy.contains(user_email)
+  })
 
   after(() => {
     cy.deleteOrganizationAPI(org);
