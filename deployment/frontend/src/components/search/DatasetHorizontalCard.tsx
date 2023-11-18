@@ -20,7 +20,7 @@ import {
 } from '../_shared/Tooltip'
 import Chip from '../_shared/Chip'
 import { useSession } from 'next-auth/react'
-import {visibilityTypeLabels} from '@/utils/constants'
+import { visibilityTypeLabels } from '@/utils/constants'
 import { getFormatColor, formatColors } from '@/utils/formatColors'
 
 export default function DatasetHorizontalCard({
@@ -48,9 +48,14 @@ export default function DatasetHorizontalCard({
                                 {dataset.title}
                             </h3>
                             {dataset.visibility_type &&
-                                session.status == 'authenticated' && (
+                                session.status == 'authenticated' &&
+                                dataset.visibility_type != 'public' && (
                                     <Chip
-                                        text={visibilityTypeLabels[dataset.visibility_type] ?? ''}
+                                        text={
+                                            visibilityTypeLabels[
+                                                dataset.visibility_type
+                                            ] ?? ''
+                                        }
                                     />
                                 )}
                         </div>
