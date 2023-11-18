@@ -4,7 +4,7 @@ Based on the context of a user, different datasets are going to be shown/hidden 
 
 Visibility type can be:
 
-- Draft - Only visible to org members, marks a dataset as a work in progress
+- Draft - Only visible to user who created the dataset and sysadmins
 - Private - Only visible to org members
 - Internal - Visible to any authenticated user
 - Public - Visible to any user, including anonymous
