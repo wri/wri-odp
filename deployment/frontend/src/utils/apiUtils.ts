@@ -49,7 +49,6 @@ export async function searchHierarchy(
             }
         }
 
-
         const groupTree: GroupTree[] = await Promise.all(groups.map(async (group) => {
             const g = await fetch(`${env.CKAN_URL}/api/3/action/group_tree_section?id=${group.id}&type=${group_type}&all_fields=True`, {
                 headers: {
@@ -58,7 +57,7 @@ export async function searchHierarchy(
             });
             const d = (await g.json()) as CkanResponse<GroupTree>;
             const result: GroupTree = d.success === true ? d.result : {} as GroupTree;
-            result.highlighted = true;
+            if (q) result.highlighted = true;
             return result;
         }));
         const t = groupTree.reduce((acc: Record<string, GroupTree>, group) => {
