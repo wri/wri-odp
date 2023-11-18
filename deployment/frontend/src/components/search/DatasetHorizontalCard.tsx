@@ -160,8 +160,9 @@ export default function DatasetHorizontalCard({
                             <span
                                 key={`dataset-${dataset.name}-format-${format}`}
                                 className={`flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black ${
-                                    format && format in Object.keys(formatColors)
-                                        ? getFormatColor(format) 
+                                    format &&
+                                    format in Object.keys(formatColors)
+                                        ? getFormatColor(format)
                                         : 'bg-wri-light-green'
                                 }`}
                             >

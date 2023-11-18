@@ -24,8 +24,8 @@ export function About({ dataset }: { dataset: WriDataset }) {
                 ))}
             </div>
             <div className="flex flex-col gap-y-2">
-                <div className="flex items-center gap-x-1">
-                    {dataset.project && (
+                {dataset.project && (
+                    <div className="flex items-center gap-x-1">
                         <>
                             <dt className="font-acumin text-sm font-semibold text-neutral-700">
                                 {' '}
@@ -35,10 +35,10 @@ export function About({ dataset }: { dataset: WriDataset }) {
                                 {dataset.project ?? ' - '}
                             </dd>
                         </>
-                    )}
-                </div>
-                <div className="flex items-center gap-x-1">
-                    {dataset.groups && dataset.groups.length > 0 && (
+                    </div>
+                )}
+                {dataset.groups && dataset.groups.length > 0 && (
+                    <div className="flex items-center gap-x-1">
                         <>
                             <dt className="font-acumin text-sm font-semibold text-neutral-700">
                                 {' '}
@@ -50,10 +50,10 @@ export function About({ dataset }: { dataset: WriDataset }) {
                                     .join(', ')}
                             </dd>
                         </>
-                    )}
-                </div>
-                <div className="flex items-center gap-x-1">
-                    {dataset.license_title && (
+                    </div>
+                )}
+                {dataset.license_title && (
+                    <div className="flex items-center gap-x-1">
                         <>
                             <dt className="font-acumin text-sm font-semibold text-neutral-700">
                                 License:{' '}
@@ -62,10 +62,22 @@ export function About({ dataset }: { dataset: WriDataset }) {
                                 {dataset.project ?? ' - '}
                             </dd>
                         </>
-                    )}
-                </div>
+                    </div>
+                )}
+                {dataset.extras?.map((extra) => (
+                    <div key={extra.key} className="flex items-center gap-x-1">
+                        <>
+                            <dt className="font-acumin text-sm font-semibold text-neutral-700">
+                                {extra.key}:{' '}
+                            </dt>
+                            <dd className="mb-1 text-sm font-light text-stone-900">
+                                {extra.value}
+                            </dd>
+                        </>
+                    </div>
+                ))}
             </div>
-            <div className="flex max-w-[36rem] flex-col gap-y-4">
+            <div className="flex max-w-[36rem] flex-col gap-y-8">
                 <div>
                     {dataset.citation && (
                         <>
@@ -80,6 +92,9 @@ export function About({ dataset }: { dataset: WriDataset }) {
                 </div>
                 {dataset?.notes && (
                     <div>
+                        <h3 className="font-acumin text-base font-normal text-black">
+              About
+                        </h3>
                         <TextWithReadMore
                             readMoreTrigger={(readMore: boolean) => (
                                 <Button className="mr-auto" variant="gray">
@@ -92,6 +107,50 @@ export function About({ dataset }: { dataset: WriDataset }) {
                                 className="prose max-w-none prose-sm prose-a:text-wri-green"
                                 dangerouslySetInnerHTML={{
                                     __html: dataset?.notes ?? '',
+                                }}
+                            ></div>
+                        </TextWithReadMore>
+                    </div>
+                )}
+                {dataset?.reason_for_adding && (
+                    <div>
+                        <h3 className="font-acumin text-base font-normal text-black">
+                            Reasons for adding
+                        </h3>
+                        <TextWithReadMore
+                            readMoreTrigger={(readMore: boolean) => (
+                                <Button className="mr-auto" variant="gray">
+                                    Read {readMore ? 'Less' : 'More'}
+                                </Button>
+                            )}
+                            className="text-justify font-acumin text-sm font-light text-stone-900 max-h-[180px]"
+                        >
+                            <div
+                                className="prose max-w-none prose-sm prose-a:text-wri-green"
+                                dangerouslySetInnerHTML={{
+                                    __html: dataset?.reason_for_adding ?? '',
+                                }}
+                            ></div>
+                        </TextWithReadMore>
+                    </div>
+                )}
+                {dataset?.restrictions && (
+                    <div>
+                        <h3 className="font-acumin text-base font-normal text-black">
+                            Restrictions
+                        </h3>
+                        <TextWithReadMore
+                            readMoreTrigger={(readMore: boolean) => (
+                                <Button className="mr-auto" variant="gray">
+                                    Read {readMore ? 'Less' : 'More'}
+                                </Button>
+                            )}
+                            className="text-justify font-acumin text-sm font-light text-stone-900 max-h-[180px]"
+                        >
+                            <div
+                                className="prose max-w-none prose-sm prose-a:text-wri-green"
+                                dangerouslySetInnerHTML={{
+                                    __html: dataset?.restrictions ?? '',
                                 }}
                             ></div>
                         </TextWithReadMore>

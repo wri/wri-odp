@@ -45,7 +45,7 @@ export const DatasetRouter = createTRPCRouter({
                             ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
-                    resources: input.resources.map((resource) => ({
+                    resources: input.resources.filter((resource) => resource.type !== 'empty').map((resource) => ({
                         ...resource,
                         format: resource.format ?? '',
                         id: resource.resourceId,
@@ -164,6 +164,7 @@ export const DatasetRouter = createTRPCRouter({
             )
             const collaborators: CkanResponse<Collaborator[]> =
                 await collaboratorsRes.json()
+            console.log('Collaborators', collaborators)
             if (!collaborators.success && collaborators.error) {
                 if (collaborators.error.message)
                     throw Error(collaborators.error.message)

@@ -29,9 +29,9 @@ interface TeamMemberProps {
 
 function TeamMember({ name, img, title, email }: TeamMemberProps) {
   return (
-    <div className="mb-2 grid md:grid-cols-3">
+    <div className="mb-2 flex">
       <div>
-        <div className="relative col-span-1 h-24 w-24 sm:w-auto">
+        <div className="relative col-span-1 aspect-square h-24 w-24 sm:w-auto">
           <Image alt={`${name} Avatar`} fill src={img} />
         </div>
       </div>

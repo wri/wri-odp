@@ -39,7 +39,6 @@ function LeftNode({ setQuery, query }: { setQuery: React.Dispatch<React.SetState
     </div>
   )
 
-  console.log("topicss", topics)
   return (
     <div className='flex  gap-x-3'>
       <SelectFilter

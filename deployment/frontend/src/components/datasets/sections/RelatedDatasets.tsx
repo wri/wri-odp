@@ -20,7 +20,13 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { getFormatColor } from '@/utils/formatColors'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
-export function RelatedDatasets({ datasets }: { datasets: WriDataset[] }) {
+export function RelatedDatasets({
+    datasets,
+    original,
+}: {
+    datasets: WriDataset[]
+    original: string
+}) {
     if (datasets.length === 0) {
         return (
             <div className="flex flex-col gap-y-4 py-2">
@@ -31,13 +37,23 @@ export function RelatedDatasets({ datasets }: { datasets: WriDataset[] }) {
     return (
         <div className="flex flex-col gap-y-4 py-2">
             {datasets.map((dataset) => (
-                <DatasetCard key={dataset.name} dataset={dataset} />
+                <DatasetCard
+                    key={dataset.name}
+                    dataset={dataset}
+                    original={original}
+                />
             ))}
         </div>
     )
 }
 
-export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
+export default function DatasetCard({
+    dataset,
+    original,
+}: {
+    dataset: WriDataset
+    original?: string
+}) {
     const [addDatasetModalOpen, setAddDatasetModalOpen] = useState(false)
     const [selectedDataFileNames, setSelectedDataFileNames] = useState<
         Array<string>
@@ -62,7 +78,11 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
             <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green">
                 {dataset.organization?.title ?? 'No team'}
             </p>
-            <Link href={`/datasets/${dataset.name}`}>
+            <Link
+                href={`/datasets/${dataset.name}${
+                    original ? `?go_back=/datasets/${original}` : ''
+                }`}
+            >
                 <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900">
                     {dataset.title ?? dataset.name}
                 </h3>
@@ -87,12 +107,6 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                             </p>
                         </div>
                     ) : null)}
-                <div className="flex items-center gap-x-1">
-                    <MapPinIcon className="h-3 w-3 text-blue-800 mb-1" />
-                    <p className="font-['Acumin Pro SemiCondensed'] text-xs font-light leading-snug text-stone-900 sm:text-sm">
-                        Sub-Regional
-                    </p>
-                </div>
             </div>
             <div className="mt-4 flex justify-start gap-x-3">
                 <div

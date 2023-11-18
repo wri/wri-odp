@@ -24,6 +24,7 @@ import { getFormatColor } from '@/utils/formatColors'
 import { useSession } from 'next-auth/react'
 import { DefaultTooltip } from '../_shared/Tooltip'
 import { PencilSquareIcon } from '@heroicons/react/24/solid'
+import { useRouter } from 'next/router'
 
 function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     const session = useSession()
@@ -78,7 +79,7 @@ function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="absolute left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
                         {open_in.map((item) => (
                             <Menu.Item key={item.url}>
@@ -106,6 +107,10 @@ function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
 
 export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
     const session = useSession()
+    const {
+        query: { go_back },
+    } = useRouter()
+    const go_back_url = go_back ? go_back.toString() + `?go_back=/datasets/${dataset?.name}` : '/search'
     const created_at = new Date(dataset?.metadata_created ?? '')
     const last_updated = new Date(dataset?.metadata_modified ?? '')
     const options = {
@@ -117,7 +122,7 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
         <div className="flex w-full flex-col pb-10 font-acumin">
             {!session.data?.user ? (
                 <div className="my-4 flex items-center gap-x-3 px-4 sm:px-6">
-                    <Link href="/search">
+                    <Link href={go_back_url}>
                         <Button variant="outline">
                             <ChevronLeftIcon className="mb-1 h-5 w-5" />
                             Go back
@@ -130,7 +135,7 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                     <div className="flex items-center gap-x-3">
                         <Link
                             className="flex gap-x-2 items-center text-center text-stone-900 text-base font-bold font-acumin"
-                            href="/search"
+                            href={go_back_url}
                         >
                             <ChevronLeftIcon className="mb-1 h-5 w-5" />
                             Go back
@@ -171,9 +176,16 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                     <h2 className="text-xs font-bold uppercase leading-none tracking-wide text-green-700">
                         {dataset?.organization?.title ?? 'No Team'}
                     </h2>
-                    <h1 className="text-3xl font-bold text-black">
-                        {dataset?.title ?? dataset?.name}
-                    </h1>
+                    <div className="flex items-center gap-x-3">
+                        <h1 className="text-3xl font-bold text-black">
+                            {dataset?.title ?? dataset?.name}{' '}
+                        </h1>
+                        {session?.data?.user && (
+                            <span className="rounded-full h-fit text-sm lg:text-xs px-2 py-y border border-gray-400 capitalize">
+                                {dataset?.visibility_type}
+                            </span>
+                        )}
+                    </div>
                     <p className=" text-justify text-base font-light leading-snug text-stone-900">
                         {dataset?.short_description ?? 'No description'}
                     </p>
@@ -230,17 +242,6 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                             ) : (
                                 ''
                             ))}
-                        <div className="flex gap-x-1">
-                            <MapPinIcon className="h-5 w-5 text-blue-800" />
-                            <div>
-                                <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
-                                    Location
-                                </div>
-                                <div className="text-sm font-light text-stone-900">
-                                    Sub-Regional
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 {dataset?.cautions && (
@@ -260,30 +261,41 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                     </div>
                 )}
                 <div className="mt-4 flex justify-start gap-x-3">
-                    <div className="flex items-center rounded-[3px] border border-green-500 bg-green-500">
-                        {dataset?.visibility_type === 'public' && (
+                    {dataset?.technical_notes ? (
+                        <div className="flex items-center rounded-[3px] border border-green-500 bg-green-500">
                             <div className="px-2 font-acumin text-xs font-medium text-white">
                                 RDI approved
                             </div>
-                        )}
-                    </div>
-                    <div className="flex gap-x-2 border-l border-zinc-300 pl-3">
-                        {dataset?.resources
-                            .filter((resource) => resource.format)
-                            .map((resource) => (
-                                <span
-                                    key={resource.id}
-                                    className={classNames(
-                                        'flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black',
-                                        getFormatColor(resource.format ?? '')
-                                    )}
-                                >
-                                    <span className="my-auto">
-                                        {resource.format?.toUpperCase()}
+                        </div>
+                    ) : (
+                        <div className="flex items-center rounded-[3px] border border-orange-400 bg-orange-400">
+                            <div className="px-2 font-acumin text-xs font-medium text-white">
+                                Awaiting RDI approval
+                            </div>
+                        </div>
+                    )}
+                    {dataset?.resources && dataset?.resources.filter((resource) => resource.format)
+                        .length > 0 && (
+                        <div className="flex gap-x-2 border-l border-zinc-300 pl-3">
+                            {dataset?.resources
+                                .filter((resource) => resource.format)
+                                .map((resource) => (
+                                    <span
+                                        key={resource.id}
+                                        className={classNames(
+                                            'flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black',
+                                            getFormatColor(
+                                                resource.format ?? ''
+                                            )
+                                        )}
+                                    >
+                                        <span className="my-auto">
+                                            {resource.format?.toUpperCase()}
+                                        </span>
                                     </span>
-                                </span>
-                            ))}
-                    </div>
+                                ))}
+                        </div>
+                    )}
                 </div>
                 {dataset?.technical_notes && (
                     <a

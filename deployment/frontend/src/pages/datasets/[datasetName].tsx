@@ -28,10 +28,6 @@ import { useSession } from 'next-auth/react'
 import { Button } from '@/components/_shared/Button'
 import { NextSeo } from 'next-seo'
 
-const links = [
-    { label: 'Explore Data', url: '/search', current: false },
-    { label: 'Name of dataset', url: '/datasets/dataset_test', current: true },
-]
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -95,6 +91,10 @@ export default function DatasetPage(
         { enabled: !!session.data?.user.apikey }
     )
 
+const links = [
+    { label: 'Explore Data', url: '/search', current: false },
+    { label: datasetData?.title ?? datasetData?.name ?? '', url: `/datasets/${datasetData?.title ?? datasetData?.name ?? ''}`, current: true },
+]
     if (isLoading || !datasetData) {
         return (
             <>
@@ -200,6 +200,7 @@ export default function DatasetPage(
                                             )}
                                             <Tab.Panel as="div">
                                                 <RelatedDatasets
+                                                    original={datasetData.name}
                                                     datasets={
                                                         datasetData?.groups &&
                                                         datasetData.groups

@@ -26,7 +26,6 @@ export default function DatasetPageLayout({
         }
     }, [rhs])
 
-    console.log(rhs)
     return (
         <div className="flex flex-wrap lg:flex-nowrap lg:max-w-screen">
             <Disclosure defaultOpen>
@@ -69,7 +68,7 @@ export default function DatasetPageLayout({
                         <Disclosure.Panel
                             as="div"
                             style={{ maxHeight: lhsMaxHeight }}
-                            className="overflow-y-scroll overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col py-4 border-r border-gray-200 @container"
+                            className="overflow-y-auto overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col py-4 border-r border-gray-200 @container"
                         >
                             {lhs}
                         </Disclosure.Panel>
@@ -116,7 +115,7 @@ export default function DatasetPageLayout({
                         </Disclosure.Button>
                         <Disclosure.Panel
                             as="div"
-                            className={`min-w-[100%] lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col border-r border-gray-200 @container`}
+                            className={`min-w-[100%] lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col border-l border-gray-200 @container`}
                         >
                             <div
                             ref={ref}

@@ -60,14 +60,24 @@ export function DataFiles({
             </div>
             <div className="flex flex-col gap-y-4">
                 {filteredDatafiles?.map((datafile) => (
-                    <DatafileCard key={datafile.id} datafile={datafile} dataset={dataset}/>
+                    <DatafileCard
+                        key={datafile.id}
+                        datafile={datafile}
+                        dataset={dataset}
+                    />
                 ))}
             </div>
         </>
     )
 }
 
-function DatafileCard({ datafile, dataset }: { datafile: Resource, dataset: WriDataset }) {
+function DatafileCard({
+    datafile,
+    dataset,
+}: {
+    datafile: Resource
+    dataset: WriDataset
+}) {
     const created_at = new Date(datafile?.created ?? '')
     const last_updated = new Date(datafile?.metadata_modified ?? '')
     const options = {
@@ -91,16 +101,18 @@ function DatafileCard({ datafile, dataset }: { datafile: Resource, dataset: WriD
                         )}
                     >
                         <div className="flex items-center gap-3">
-                            <span
-                                className={classNames(
-                                    'hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',
-                                    getFormatColor(datafile?.format ?? '')
-                                )}
-                            >
-                                <span className="my-auto">
-                                    {datafile.format}
+                            {datafile?.format && (
+                                <span
+                                    className={classNames(
+                                        'hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',
+                                        getFormatColor(datafile?.format ?? '')
+                                    )}
+                                >
+                                    <span className="my-auto">
+                                        {datafile.format}
+                                    </span>
                                 </span>
-                            </span>
+                            )}
                             <Disclosure.Button>
                                 <h3 className="font-acumin text-lg font-semibold leading-loose text-stone-900">
                                     {datafile.title ?? datafile.name}
@@ -144,7 +156,7 @@ function DatafileCard({ datafile, dataset }: { datafile: Resource, dataset: WriD
                     >
                         <Disclosure.Panel className="py-3">
                             <p className="font-acumin text-base font-light text-stone-900">
-                                {datafile.description ?? '-'}
+                                {datafile.description ?? 'No Description'}
                             </p>
                             <div className="mt-[0.33rem] flex justify-start gap-x-3">
                                 <div className="flex flex-row items-center gap-x-1">
@@ -163,12 +175,6 @@ function DatafileCard({ datafile, dataset }: { datafile: Resource, dataset: WriD
                                             'en-US',
                                             options
                                         )}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-x-1">
-                                    <MapPinIcon className="h-3 w-3 text-blue-800" />
-                                    <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
-                                        Sub-Regional
                                     </p>
                                 </div>
                             </div>
