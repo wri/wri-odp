@@ -104,7 +104,7 @@ export default function DatasetRow({ className, dataset, handleOpenModal }: { cl
       ]}
       linkButton={{
         label: "View dataset",
-        link: `../datasets/${dataset.name}?go_back=/dashboard/datasets`,
+        link: `../datasets/${dataset.name}`,
       }}
       rowSub={<SubCardProfile dataset={dataset} />}
       isDropDown
@@ -120,7 +120,7 @@ export function FavouriteRow({ className, dataset }: { className?: string, datas
       rowMain={<DatasetCardProfile dataset={dataset} />}
       linkButton={{
         label: "View dataset",
-        link: `../datasets/${dataset.name}?go_back=/dashboard/datasets`,
+        link: `../datasets/${dataset.name}`,
       }}
       rowSub={<SubCardProfile dataset={dataset} />}
       isDropDown

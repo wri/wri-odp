@@ -79,9 +79,7 @@ export default function DatasetCard({
                 {dataset.organization?.title ?? 'No team'}
             </p>
             <Link
-                href={`/datasets/${dataset.name}${
-                    original ? `?go_back=/datasets/${original}` : ''
-                }`}
+                href={`/datasets/${dataset.name}`}
             >
                 <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900">
                     {dataset.title ?? dataset.name}

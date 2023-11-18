@@ -107,10 +107,6 @@ function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
 
 export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
     const session = useSession()
-    const {
-        query: { go_back },
-    } = useRouter()
-    const go_back_url = go_back ? go_back.toString() + `?go_back=/datasets/${dataset?.name}` : '/search'
     const created_at = new Date(dataset?.metadata_created ?? '')
     const last_updated = new Date(dataset?.metadata_modified ?? '')
     const options = {
@@ -122,7 +118,7 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
         <div className="flex w-full flex-col pb-10 font-acumin">
             {!session.data?.user ? (
                 <div className="my-4 flex items-center gap-x-3 px-4 sm:px-6">
-                    <Link href={go_back_url}>
+                    <Link href="/search">
                         <Button variant="outline">
                             <ChevronLeftIcon className="mb-1 h-5 w-5" />
                             Go back
@@ -135,7 +131,7 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                     <div className="flex items-center gap-x-3">
                         <Link
                             className="flex gap-x-2 items-center text-center text-stone-900 text-base font-bold font-acumin"
-                            href={go_back_url}
+                            href="/search"
                         >
                             <ChevronLeftIcon className="mb-1 h-5 w-5" />
                             Go back
