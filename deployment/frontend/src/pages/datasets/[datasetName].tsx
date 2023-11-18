@@ -138,7 +138,7 @@ const links = [
         { name: 'Contact', enabled: true },
         { name: 'API', enabled: true },
         {
-            name: 'Members',
+            name: 'Collaborators',
             enabled: collaborators.data && collaborators.data.length > 0,
         },
         {

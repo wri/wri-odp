@@ -93,7 +93,7 @@ describe("Create dataset", () => {
   it("Should show the members", () => {
     cy.addPackageCollaboratorApi(user, dataset, "editor")
     cy.visit("/datasets/" + dataset);
-    cy.contains('Members').click()
+    cy.contains('Collaborators').click()
     cy.contains(user_email)
   })
 
