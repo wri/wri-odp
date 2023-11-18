@@ -18,6 +18,9 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '../_shared/Tooltip'
+import Chip from '../_shared/Chip'
+import { useSession } from 'next-auth/react'
+import {visibilityTypeLabels} from '@/utils/constants'
 import { getFormatColor, formatColors } from '@/utils/formatColors'
 
 export default function DatasetHorizontalCard({
@@ -25,21 +28,33 @@ export default function DatasetHorizontalCard({
 }: {
     dataset: WriDataset
 }) {
+    const session = useSession()
+
     const formats = [
         ...new Set(dataset.resources.map((r) => r.format).filter((f) => f)),
     ]
 
     return (
-        <Link href="/datasets/x">
+        <Link href={`/datasets/${dataset.name}`}>
             <div className="grid gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100 lg:grid-cols-5">
                 <div className="col-span-full lg:col-span-4">
                     <div className="pr-4">
                         <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green">
                             {dataset.organization?.title.toUpperCase()}
                         </p>
-                        <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900">
-                            {dataset.title}
-                        </h3>
+
+                        <div className="flex items-center">
+                            <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900">
+                                {dataset.title}
+                            </h3>
+                            {dataset.visibility_type &&
+                                session.status == 'authenticated' && (
+                                    <Chip
+                                        text={visibilityTypeLabels[dataset.visibility_type] ?? ''}
+                                    />
+                                )}
+                        </div>
+
                         <p className="font-['Acumin Pro SemiCondensed'] text-base font-light text-stone-900 h-[4.5em] line-clamp-3">
                             {dataset.short_description ?? dataset.notes}
                         </p>

@@ -13,18 +13,20 @@ export default function HighlightCard({
 }: {
     highlight: WriDataset
 }) {
-    console.log(highlight.featured_image)
     return (
-        <Link href="/datasets/x" className="flex w-full flex-col font-acumin">
+        <Link
+            href={`/datasets/${highlight.name}`}
+            className="flex w-full flex-col font-acumin border-b border-gray-200 pb-5"
+        >
             <div className="relative h-56 w-full 2xl:h-64">
                 <Image
                     src={highlight?.featured_image ?? `/images/map.png`}
                     alt="higlight"
                     fill
-                    className='object-cover'
+                    className="object-cover"
                 />
             </div>
-            <div className="z-10 -mt-6 w-[70%] bg-white pb-2 pt-4 text-[0.938rem] font-bold text-wri-green line-clamp-1">
+            <div className="z-10 -mt-6 w-[70%] bg-white pb-2 pt-4 text-[0.938rem] font-bold text-wri-green line-clamp-1 h-[3em]">
                 {highlight.organization?.title}
             </div>
             <h2 className="text-wri-black text-2xl font-bold w-[80%] line-clamp-2 h-[2.5em]">
@@ -33,7 +35,7 @@ export default function HighlightCard({
             <article className=" line-clamp-3 w-[88%] font-light text-base mt-4 leading-[1.375rem] line-clamp-3 h-[4em]">
                 {highlight.short_description ?? highlight.notes}
             </article>
-            <div className="flex font-light text-sm text-wri-black mt-4 leading-[1.375rem] ">
+            <div className="flex font-light text-sm text-wri-black mt-4 leading-[1.375rem] h-3">
                 {highlight.temporal_coverage_start ||
                 highlight.temporal_coverage_end ? (
                     <div className="flex  ">

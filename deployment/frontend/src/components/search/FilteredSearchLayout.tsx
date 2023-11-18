@@ -14,6 +14,7 @@ import { api } from '@/utils/api'
 import { useSession } from 'next-auth/react'
 import TemporalCoverageFacet from './TemporalCoverageFacet'
 import Spinner from '../_shared/Spinner'
+import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants'
 
 export default function FilteredSearchLayout({
     children,
@@ -80,6 +81,20 @@ export default function FilteredSearchLayout({
 
                 // @ts-ignore
                 searchFacets[key].items = items
+            } else if (key == 'visibility_type') {
+                // @ts-ignore
+                searchFacets[key].items = searchFacets[key].items.map((i) => ({
+                    ...i,
+                    // @ts-ignore
+                    display_name: visibilityTypeLabels[i.name],
+                }))
+            } else if (key == 'update_frequency') {
+                // @ts-ignore
+                searchFacets[key].items = searchFacets[key].items.map((i) => ({
+                    ...i,
+                    // @ts-ignore
+                    display_name: updateFrequencyLabels[i.name],
+                }))
             }
         }
     }
