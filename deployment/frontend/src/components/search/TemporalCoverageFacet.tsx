@@ -79,7 +79,7 @@ export default function TemporalCoverageFacet({
                                         </div>
                                         <div className="mr-3 flex h-6 items-center">
                                             <Input
-                                                id={`facet-temporal_coverage-start}`}
+                                                id={`facet-temporal_coverage-start`}
                                                 placeholder='E.g. "2010"'
                                                 type="number"
                                                 min="0"
@@ -181,7 +181,7 @@ export default function TemporalCoverageFacet({
                                         </div>
                                         <div className="mr-3 flex h-6 items-center">
                                             <Input
-                                                id={`facet-temporal_coverage-end}`}
+                                                id={`facet-temporal_coverage-end`}
                                                 type="number"
                                                 min="0"
                                                 max="3000"
