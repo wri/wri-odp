@@ -243,7 +243,7 @@ export function OverviewForm({
                     <InputGroup label="Temporal Coverage">
                         <div className="flex flex-col items-center justify-between gap-5 lg:flex-row xxl:w-[28rem]">
                             <Input
-                                {...register('temporalCoverageStart', {
+                                {...register('temporal_coverage_start', {
                                     valueAsNumber: true,
                                 })}
                                 placeholder="Start year"
@@ -251,7 +251,7 @@ export function OverviewForm({
                             />
                             <span className="hidden xxl:block">to</span>
                             <Input
-                                {...register('temporalCoverageEnd', {
+                                {...register('temporal_coverage_end', {
                                     valueAsNumber: true,
                                 })}
                                 placeholder="End year"
@@ -259,11 +259,11 @@ export function OverviewForm({
                             />
                         </div>
                         <ErrorDisplay
-                            name="temporalCoverageStart"
+                            name="temporal_coverage_start"
                             errors={errors}
                         />
                         <ErrorDisplay
-                            name="temporalCoverageEnd"
+                            name="temporal_coverage_end"
                             errors={errors}
                         />
                     </InputGroup>

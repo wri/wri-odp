@@ -21,6 +21,7 @@ import { useForm } from 'react-hook-form'
 import { match } from 'ts-pattern'
 import { v4 as uuidv4 } from 'uuid'
 import { OpenInForm } from './metadata/OpenIn'
+import Link from 'next/link'
 
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -50,8 +51,8 @@ export default function CreateDatasetForm() {
             },
             title: '',
             name: '',
-            temporalCoverageEnd: null,
-            temporalCoverageStart: null,
+            temporal_coverage_start: null,
+            temporal_coverage_end: null,
             license: {
                 value: 'notspecified',
                 label: 'License not specified',
@@ -156,6 +157,9 @@ export default function CreateDatasetForm() {
                     Save as Draft
                 </Button>
                 <div className="flex items-center gap-x-2">
+                    <Button type="button" variant="outline">
+                        <Link href="/dashboard/datasets">Cancel</Link>
+                    </Button>
                     {selectedIndex !== 0 && (
                         <Button
                             type="button"

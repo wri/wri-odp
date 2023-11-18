@@ -5,6 +5,7 @@ import EditTeamForm from '@/components/dashboard/teams/forms/EditTeamForm'
 import { getServerAuthSession } from '@/server/auth'
 import { api } from '@/utils/api'
 import { GetServerSideProps, NextPage } from 'next'
+import { NextSeo } from 'next-seo'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const session = await getServerAuthSession(context)
@@ -38,6 +39,9 @@ const EditTeamPage: NextPage<{ teamName: string }> = ({ teamName }) => {
     if (isLoading) return <Loading />
     return (
         <>
+            <NextSeo
+                title={`Edit ${team?.title ?? team?.name}`}
+            />
             <Header />
             {isError && (
                 <Container className="mb-20 font-acumin">

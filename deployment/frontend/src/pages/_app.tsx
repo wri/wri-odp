@@ -5,7 +5,7 @@ import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { useState } from 'react'
 import { Provider, useCreateStore } from '@/utils/store'
 import { type LayerState } from '@/interfaces/state.interface'
-import "react-toastify/dist/ReactToastify.css";
+import 'react-toastify/dist/ReactToastify.css'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
@@ -16,6 +16,7 @@ import { api } from '@/utils/api'
 import '@/styles/globals.scss'
 import '@/styles/rte.css'
 import ReactToastContainer from '@/components/_shared/ReactToastContainer'
+import { DefaultSeo } from 'next-seo'
 
 const acumin = localFont({
     src: [
@@ -68,6 +69,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     const [queryClient] = useState(() => new QueryClient())
     return (
         <QueryClientProvider client={queryClient}>
+            <DefaultSeo titleTemplate="%s - WRI ODP" />
             <Hydrate
                 /* @ts-ignore */
                 state={pageProps.dehydratedState}

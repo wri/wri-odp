@@ -44,7 +44,7 @@ function LeftNode({ setQuery, query }: { setQuery: React.Dispatch<React.SetState
       <SelectFilter
         options={[{ id: "None", label: "All teams" }].concat(getKeyValues(team?.organizations as GroupTree[], "title", "name"))} filtername="organization" setQuery={setQuery} query={query} />
       <SelectFilter
-        options={[{ id: "None", label: "All topics" }].concat(getKeyValues(topics?.topics as GroupTree[], "name", "name"))} setQuery={setQuery} query={query} filtername='group' />
+        options={[{ id: "None", label: "All topics" }].concat(getKeyValues(topics?.topics as GroupTree[], "name", "name"))} setQuery={setQuery} query={query} filtername='groups' />
     </div>
   )
 
