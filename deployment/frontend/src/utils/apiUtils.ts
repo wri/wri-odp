@@ -58,7 +58,7 @@ export async function searchHierarchy(
             });
             const d = (await g.json()) as CkanResponse<GroupTree>;
             const result: GroupTree = d.success === true ? d.result : {} as GroupTree;
-            result.highlighted = true;
+            if (q) result.highlighted = true;
             return result;
         }));
         const t = groupTree.reduce((acc: Record<string, GroupTree>, group) => {
