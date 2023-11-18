@@ -15,8 +15,7 @@ export default function Recent({
 }) {
     const identifier = title.toLowerCase().replace(' ', '-')
     return (
-        <Link
-            href="/datasets/x"
+        <div
             id="highlights"
             className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin gap-y-6 mt-16"
         >
@@ -44,6 +43,6 @@ export default function Recent({
                     <CarouselNavButton orientation="right" />
                 </div>
             </div>
-        </Link>
+        </div>
     )
 }

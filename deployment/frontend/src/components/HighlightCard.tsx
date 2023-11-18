@@ -13,15 +13,17 @@ export default function HighlightCard({
 }: {
     highlight: WriDataset
 }) {
-    console.log(highlight.featured_image)
     return (
-        <Link href="/datasets/x" className="flex w-full flex-col font-acumin">
+        <Link
+            href={`/datasets/${highlight.name}`}
+            className="flex w-full flex-col font-acumin border-b border-gray-200 pb-5"
+        >
             <div className="relative h-56 w-full 2xl:h-64">
                 <Image
                     src={highlight?.featured_image ?? `/images/map.png`}
                     alt="higlight"
                     fill
-                    className='object-cover'
+                    className="object-cover"
                 />
             </div>
             <div className="z-10 -mt-6 w-[70%] bg-white pb-2 pt-4 text-[0.938rem] font-bold text-wri-green line-clamp-1 h-[3em]">

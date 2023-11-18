@@ -7,10 +7,14 @@ import {
 import { ClockIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import Image from 'next/image'
 import { WriDataset } from '@/schema/ckan.schema'
+import Link from 'next/link'
 
 export default function Card({ dataset }: { dataset: WriDataset }) {
     return (
-        <div className="flex flex-col w-full font-acumin p-4 pb-6 border-b-2 border-b-wri-green shadow-wri mb-2">
+        <Link
+            href={`datasets/${dataset.name}`}
+            className="flex flex-col w-full font-acumin p-4 pb-6 border-b-2 border-b-wri-green shadow-wri mb-2"
+        >
             <div className="bg-white text-wri-green font-bold text-[0.938rem] leading-[1.125rem] w-full pt-4 pb-2 line-clamp-1 h-[2.5em]">
                 {dataset?.organization?.title ?? dataset?.organization?.name}
             </div>
@@ -67,6 +71,6 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                     <TableCellsIcon className="h-5 w-5 text-green-600" />
                 </div>
             </div>
-        </div>
+        </Link>
     )
 }

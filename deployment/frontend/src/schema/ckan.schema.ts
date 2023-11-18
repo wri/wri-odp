@@ -66,7 +66,7 @@ export interface WriDataset extends Dataset {
     temporal_coverage_start: string
     temporal_coverage_end: string
     update_frequency?: string
-    visibility_type?: string
+    visibility_type?: 'public' | 'private' | 'internal' | 'draft'
     short_description?: string
     project?: string
     reason_for_adding?: string
@@ -91,10 +91,10 @@ export interface WriUser extends CkanUser {
 }
 
 export interface GroupTree {
-  id: string;
-  name: string;
-  highlighted: boolean;
-  children: GroupTree[];
-  title?: string;
-  image_display_url?: string;
+    id: string
+    name: string
+    highlighted: boolean
+    children: GroupTree[]
+    title?: string
+    image_display_url?: string
 }

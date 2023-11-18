@@ -21,6 +21,7 @@ import {
 } from '../_shared/Tooltip'
 import Chip from '../_shared/Chip'
 import { useSession } from 'next-auth/react'
+import {visibilityTypeLabels} from '@/utils/constants'
 
 export default function DatasetHorizontalCard({
     dataset,
@@ -34,7 +35,7 @@ export default function DatasetHorizontalCard({
     ]
 
     return (
-        <Link href="/datasets/x">
+        <Link href={`/datasets/${dataset.name}`}>
             <div className="grid gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100 lg:grid-cols-5">
                 <div className="col-span-full lg:col-span-4">
                     <div className="pr-4">
@@ -49,7 +50,7 @@ export default function DatasetHorizontalCard({
                             {dataset.visibility_type &&
                                 session.status == 'authenticated' && (
                                     <Chip
-                                        text={dataset.visibility_type ?? ''}
+                                        text={visibilityTypeLabels[dataset.visibility_type] ?? ''}
                                     />
                                 )}
                         </div>
