@@ -11,6 +11,7 @@ import type {
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
 import { Facets } from '@/interfaces/search.interface'
+import { replaceNames } from '@/utils/replaceNames'
 
 
 export async function searchHierarchy(
@@ -21,13 +22,20 @@ export async function searchHierarchy(
     }:
         {
             isSysadmin: boolean,
-            apiKey: string, q: string, group_type: string
+            apiKey: string, q?: string, group_type: string
         }): Promise<GroupTree[]> {
     try {
         let response: Response;
         let groups: GroupTree[] | [] = [];
         if (isSysadmin) {
-            response = await fetch(`${env.CKAN_URL}/api/3/action/${group_type == "group" ? "group_list" : "organization_list"}?${q ? "q=" + q + "&" : ""}all_fields=True`, {
+            let urLink = ''
+            if (q) {
+                urLink = `${env.CKAN_URL}/api/3/action/${group_type == "group" ? "group_list" : "organization_list"}?q=${q}&all_fields=True`
+            }
+            else {
+                urLink = `${env.CKAN_URL}/api/3/action/${group_type == "group" ? "group_list" : "organization_list"}?all_fields=True`
+            }
+            response = await fetch(urLink, {
                 headers: {
                     "Authorization": apiKey,
                 }
@@ -57,7 +65,12 @@ export async function searchHierarchy(
             });
             const d = (await g.json()) as CkanResponse<GroupTree>;
             const result: GroupTree = d.success === true ? d.result : {} as GroupTree;
-            if (q) result.highlighted = true;
+            if (q) {
+                result.highlighted = true;
+            }
+            else {
+                result.highlighted = false;
+            }
             return result;
         }));
         const t = groupTree.reduce((acc: Record<string, GroupTree>, group) => {
@@ -155,15 +168,29 @@ export async function getAllUsers({
 
 export async function getAllOrganizations({ apiKey }: { apiKey: string }): Promise<WriOrganization[]> {
     try {
-        const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list?all_fields=True`,
-            {
-                headers: {
-                    "Authorization": apiKey,
+
+        const orgList = await Promise.all(
+            [0, 1, 2, 3, 4, 5].map(async (i) => {
+
+                const response = await fetch(
+                    `${env.CKAN_URL}/api/3/action/organization_list?all_fields=True&limit=${(i + 1) * 25
+                    }&offset=${i * 25}`,
+                    {
+                        headers: {
+                            "Authorization": apiKey,
+                        }
+                    });
+                const data = (await response.json()) as CkanResponse<WriOrganization[]>;
+                if (!data.success && data.error) {
+                    if (data.error.message)
+                        throw Error(replaceNames(data.error.message, true))
+                    throw Error(replaceNames(JSON.stringify(data.error), true))
                 }
-            });
-        const data = (await response.json()) as CkanResponse<WriOrganization[]>;
-        const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
-        return organizations
+                const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
+                return organizations
+            })
+        )
+        return orgList.flat()
     }
     catch (e) {
         console.error(e);
@@ -290,14 +317,11 @@ export async function getUserOrganizations({ userId, apiKey }: { userId: string,
     try {
         const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list_for_user?all_fields=true`,
             {
-                method: "POST",
-                body: JSON.stringify({ id: userId }),
                 headers: {
                     "Authorization": `${apiKey}`,
                     "Content-Type": "application/json"
                 }
             });
-
         const data = (await response.json()) as CkanResponse<WriOrganization[]>;
         const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
         return organizations
