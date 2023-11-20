@@ -67,6 +67,7 @@ export interface WriDataset extends Dataset {
     project?: string
     reason_for_adding?: string
     featured_dataset?: boolean
+    wri_data?: boolean
     featured_image?: string
     application?: string
     cautions?: string

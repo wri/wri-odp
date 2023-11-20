@@ -86,6 +86,8 @@ function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
                                 {({ active }) => (
                                     <a
                                         href={item.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className={classNames(
                                             active
                                                 ? 'bg-gray-100 text-gray-900'
@@ -173,7 +175,7 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                         {dataset?.organization?.title ?? 'No Team'}
                     </h2>
                     <div className="flex items-center gap-x-3">
-                        <h1 className="text-3xl font-bold text-black">
+                        <h1 className="w-fit text-3xl font-bold text-black">
                             {dataset?.title ?? dataset?.name}{' '}
                         </h1>
                         {session?.data?.user && (
@@ -217,27 +219,22 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                             </div>
                         </div>
                         {dataset?.temporal_coverage_start ||
-                            (dataset?.temporal_coverage_end ? (
-                                <div className="flex gap-x-1">
-                                    <ClockIcon className="h-5 w-5 text-blue-800" />
-                                    <div>
-                                        <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
-                                            Temporal coverage
-                                        </div>
-                                        <div className="text-sm font-light text-stone-900">
-                                            `$
-                                            {dataset?.temporal_coverage_start ??
-                                                ''}{' '}
-                                            - $
-                                            {dataset?.temporal_coverage_end ??
-                                                ''}
-                                            `
-                                        </div>
+                        dataset?.temporal_coverage_end ? (
+                            <div className="flex gap-x-1">
+                                <ClockIcon className="h-5 w-5 text-blue-800" />
+                                <div>
+                                    <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
+                                        Temporal coverage
+                                    </div>
+                                    <div className="text-sm font-light text-stone-900">
+                                        {dataset?.temporal_coverage_start ?? ''}{' '}
+                                        - {dataset?.temporal_coverage_end ?? ''}
                                     </div>
                                 </div>
-                            ) : (
-                                ''
-                            ))}
+                            </div>
+                        ) : (
+                            ''
+                        )}
                     </div>
                 </div>
                 {dataset?.cautions && (
@@ -257,6 +254,13 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                     </div>
                 )}
                 <div className="mt-4 flex justify-start gap-x-3">
+                    {dataset?.wri_data ? (
+                        <div className="flex items-center rounded-[3px] border border-blue-400 bg-blue-400">
+                            <div className="px-2 font-acumin text-xs font-medium text-white">
+                                WRI Data
+                            </div>
+                        </div>
+                    ) : ''}
                     {dataset?.technical_notes ? (
                         <div className="flex items-center rounded-[3px] border border-green-500 bg-green-500">
                             <div className="px-2 font-acumin text-xs font-medium text-white">
@@ -270,32 +274,35 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                             </div>
                         </div>
                     )}
-                    {dataset?.resources && dataset?.resources.filter((resource) => resource.format)
-                        .length > 0 && (
-                        <div className="flex gap-x-2 border-l border-zinc-300 pl-3">
-                            {dataset?.resources
-                                .filter((resource) => resource.format)
-                                .map((resource) => (
-                                    <span
-                                        key={resource.id}
-                                        className={classNames(
-                                            'flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black',
-                                            getFormatColor(
-                                                resource.format ?? ''
-                                            )
-                                        )}
-                                    >
-                                        <span className="my-auto">
-                                            {resource.format?.toUpperCase()}
+                    {dataset?.resources &&
+                        dataset?.resources.filter((resource) => resource.format)
+                            .length > 0 && (
+                            <div className="flex gap-x-2 border-l border-zinc-300 pl-3">
+                                {dataset?.resources
+                                    .filter((resource) => resource.format)
+                                    .map((resource) => (
+                                        <span
+                                            key={resource.id}
+                                            className={classNames(
+                                                'flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black',
+                                                getFormatColor(
+                                                    resource.format ?? ''
+                                                )
+                                            )}
+                                        >
+                                            <span className="my-auto">
+                                                {resource.format?.toUpperCase()}
+                                            </span>
                                         </span>
-                                    </span>
-                                ))}
-                        </div>
-                    )}
+                                    ))}
+                            </div>
+                        )}
                 </div>
                 {dataset?.technical_notes && (
                     <a
                         href={dataset?.technical_notes}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="flex items-center gap-x-1 pt-4"
                     >
                         <LinkIcon className="h-4 w-4 text-wri-green" />

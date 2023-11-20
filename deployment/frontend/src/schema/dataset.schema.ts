@@ -87,7 +87,7 @@ export const DatasetSchema = z
             })
             .optional()
             .default({ value: 'public', label: 'Public' }),
-        license: z
+        license_id: z
             .object({
                 value: z.string(),
                 label: z.string(),
@@ -97,6 +97,7 @@ export const DatasetSchema = z
             .string()
             .min(1, { message: 'Description is required' }),
         notes: z.string().optional().nullable(),
+        wri_data: z.boolean().optional().nullable(),
         featured_dataset: z.boolean().optional().nullable(),
         featured_image: z.string().optional().nullable(),
         signedUrl: z.string().url().optional().nullable(),
