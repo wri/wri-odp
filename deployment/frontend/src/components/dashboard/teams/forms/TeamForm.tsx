@@ -118,8 +118,6 @@ export default function TeamForm({
                                         .map((team) => ({
                                             label: team.title ?? team.name,
                                             value: team.name,
-                                            default:
-                                                watch('parent') === team.name,
                                         })),
                                 ]}
                                 placeholder="Select a parent"
