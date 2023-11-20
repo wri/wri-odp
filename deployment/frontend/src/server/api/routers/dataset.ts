@@ -42,7 +42,6 @@ export const DatasetRouter = createTRPCRouter({
                     license_id: input.license_id?.value ?? '',
                     owner_org: input.team ? input.team.value : '',
                     update_frequency: input.update_frequency?.value ?? '',
-                    license_id: input?.license?.value,
                     featured_image:
                         input.featured_image && input.featured_dataset
                             ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
@@ -132,7 +131,7 @@ export const DatasetRouter = createTRPCRouter({
                 } else {
                     fq = orgsFq
                 }
-              
+
 
                 if (temporalCoverageFqList.length)
                     fq += `+(${temporalCoverageFqList

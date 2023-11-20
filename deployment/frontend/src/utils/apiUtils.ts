@@ -12,6 +12,7 @@ import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
 import { Facets } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
+import { Session } from 'next-auth'
 
 
 export async function searchHierarchy(
@@ -39,7 +40,7 @@ export async function searchHierarchy(
                 headers: {
                     "Authorization": apiKey,
                 }
-            )
+            })
             const data = (await response.json()) as CkanResponse<GroupTree[]>
             groups = data.success === true ? data.result : []
         } else {
