@@ -28,7 +28,7 @@ export const TopicRouter = createTRPCRouter({
                     })
                 }
                 else {
-                    groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, q: '', group_type: 'group' })
+                    groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, group_type: 'group' })
                 }
             }
 

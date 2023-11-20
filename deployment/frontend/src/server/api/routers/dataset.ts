@@ -131,7 +131,7 @@ export const DatasetRouter = createTRPCRouter({
                 } else {
                     fq = orgsFq
                 }
-              
+
 
                 if (temporalCoverageFqList.length)
                     fq += `+(${temporalCoverageFqList
@@ -296,7 +296,7 @@ export const DatasetRouter = createTRPCRouter({
         .query(async ({ input, ctx }) => {
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session.user.apikey,
-                fq: `state:draft`,
+                fq: `visibility_type:draft`,
                 query: input,
             }))!
             return {

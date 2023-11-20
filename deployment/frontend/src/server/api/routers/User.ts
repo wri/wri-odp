@@ -23,7 +23,8 @@ export const UserRouter = createTRPCRouter({
       email: userdetails?.email,
       teamCount: TeamCount,
       datasetCount: DatasetCount,
-      isSysAdmin: userdetails?.sysadmin
+      isSysAdmin: userdetails?.sysadmin,
+      email_hash: userdetails?.email_hash
     }
     return {
       userdetails: dashboardUser
@@ -37,6 +38,7 @@ export const UserRouter = createTRPCRouter({
         title?: string;
         id: string;
         description?: string;
+        email_hash?: string;
         capacity?: string;
         image_display_url?: string;
         org?: string;
@@ -56,6 +58,7 @@ export const UserRouter = createTRPCRouter({
             return {
               title: user.name,
               id: user.id,
+              email_hash: user.email_hash,
               description: user.email,
               capacity: user.capacity,
               image_display_url: user.image_url,
@@ -80,6 +83,7 @@ export const UserRouter = createTRPCRouter({
             return {
               title: user.name,
               id: user.id,
+              email_hash: user.email_hash,
               description: user.email,
               capacity: user.capacity,
               image_display_url: user.image_url,
@@ -104,6 +108,7 @@ export const UserRouter = createTRPCRouter({
         description?: string;
         orgnumber?: number;
         image_display_url?: string;
+        email_hash?: string;
         orgs?:
         {
           title?: string;
@@ -126,7 +131,8 @@ export const UserRouter = createTRPCRouter({
           orgId,
           orgimage,
           orgtitle,
-          userCapacity } = user;
+          userCapacity,
+          email_hash } = user;
         const key = title ?? id;
 
         if (userMap.has(key)) {
@@ -141,7 +147,7 @@ export const UserRouter = createTRPCRouter({
                 capacity: capacity ?? '',
                 image_display_url: orgimage ?? '',
                 name: org || '',
-                userCapacity: userCapacity ?? ''
+                userCapacity: userCapacity ?? '',
               },
             ];
           }
@@ -154,6 +160,7 @@ export const UserRouter = createTRPCRouter({
             description,
             image_display_url,
             orgnumber: 1,
+            email_hash,
             orgs: org
               ? [
                 {
@@ -182,6 +189,7 @@ export const UserRouter = createTRPCRouter({
           return {
             title: user.name,
             id: user.id,
+            email_hash: user.email_hash,
             description: user.email,
             image_display_url: user.image_url,
             orgnumber: 0,

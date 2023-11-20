@@ -19,6 +19,7 @@ type IUser = {
   title?: string;
   id: string;
   description?: string;
+  email_hash?: string;
   orgnumber?: number;
   image_display_url?: string;
   orgs?:
@@ -35,6 +36,7 @@ type IUser = {
 function TeamProfile({ user }: { user: IRowProfile | IUser }) {
 
   const UserProfile = user as IUser
+  user.image_display_url = (user?.image_display_url as string) ? user?.image_display_url : `https://gravatar.com/avatar/${(user as IUser)?.email_hash}?s=270&d=identicon`
   return (
     <div className='flex flex-col sm:flex-row py-3 pl-4 sm:pl-8 gap-x-14 gap-y-6'>
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={user as IRowProfile} />

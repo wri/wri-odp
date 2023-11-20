@@ -10,10 +10,15 @@ export default function UserProfile() {
       <Spinner />
     </div>
   )
+
   return (
     <div className='w-full flex flex-col justify-center items-center font-acumin gap-y-2 text-white pb-6 pt-10'>
       <div className='relative w-24 h-24 rounded-full overflow-hidden'>
-        <Image src={`${data?.userdetails?.imageUrl ? data?.userdetails?.imageUrl : '/images/placeholders/user/userdefault.png'}`} fill alt='' />
+        {data?.userdetails?.imageUrl ?
+          <Image src={`${data?.userdetails?.imageUrl ? data?.userdetails?.imageUrl : '/images/placeholders/user/userdefault.png'}`} fill alt='' /> :
+          <Image src={`https://gravatar.com/avatar/${data?.userdetails?.email_hash}?s=270&d=identicon`}
+            alt="Gravatar" fill />
+        }
       </div>
       <div className='text-[1.438rem] leading-[1.725rem] font-semibold '>{data?.userdetails?.name}</div>
       <div className='font-normal text-base '>{data?.userdetails?.isSysAdmin ? "System Admin" : "Member"}</div>

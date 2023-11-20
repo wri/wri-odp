@@ -4,7 +4,7 @@ import {
   protectedProcedure
 } from "@/server/api/trpc";
 import { env } from "@/env.mjs";
-import { getGroups, searchHierarchy } from "@/utils/apiUtils";
+import { getGroups, searchHierarchy, getAllOrganizations, getUserOrganizations } from "@/utils/apiUtils";
 import { searchArrayForKeyword } from "@/utils/general";
 import { searchSchema } from "@/schema/search.schema";
 import type { GroupTree } from '@/schema/ckan.schema'
@@ -39,5 +39,16 @@ export const OrganizationRouter = createTRPCRouter({
         count: result.length,
       }
     }),
+  getAllOrganizations: protectedProcedure.query(async ({ ctx }) => {
+
+    if (ctx.session.user.sysadmin) {
+      const orgs = await getAllOrganizations({ apiKey: ctx.session.user.apikey })
+      return orgs
+    }
+    else {
+      const orgs = await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey })
+      return orgs
+    }
+  }),
 
 });
