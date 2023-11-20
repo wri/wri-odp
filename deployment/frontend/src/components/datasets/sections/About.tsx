@@ -12,6 +12,8 @@ export function About({ dataset }: { dataset: WriDataset }) {
             {dataset.technical_notes && (
                 <a
                     href={dataset.technical_notes}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex gap-x-1 font-acumin text-sm font-semibold text-wri-green"
                 >
                     <LinkIcon className="h-4 w-4" />
@@ -59,7 +61,7 @@ export function About({ dataset }: { dataset: WriDataset }) {
                                 License:{' '}
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
-                                {dataset.project ?? ' - '}
+                                {dataset.license_title ?? ' - '}
                             </dd>
                         </>
                     </div>
@@ -93,7 +95,7 @@ export function About({ dataset }: { dataset: WriDataset }) {
                 {dataset?.notes && (
                     <div>
                         <h3 className="font-acumin text-base font-normal text-black">
-              About
+                            About
                         </h3>
                         <TextWithReadMore
                             readMoreTrigger={(readMore: boolean) => (

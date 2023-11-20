@@ -52,8 +52,8 @@ export const teamRouter = createTRPCRouter({
                         ? `${env.CKAN_URL}/uploads/group/${input.image_url}`
                         : null,
                     groups:
-                        input.parent && input.parent !== ''
-                            ? [{ name: input.parent }]
+                        input.parent && input.parent.value !== ''
+                            ? [{ name: input.parent.value }]
                             : [],
                 })
                 const teamRes = await fetch(
@@ -140,8 +140,8 @@ export const teamRouter = createTRPCRouter({
                         ? `${env.CKAN_URL}/uploads/group/${input.image_url}`
                         : null,
                     groups:
-                        input.parent && input.parent !== ''
-                            ? [{ name: input.parent }]
+                        input.parent && input.parent.value !== ''
+                            ? [{ name: input.parent.value }]
                             : [],
                 })
                 const teamRes = await fetch(

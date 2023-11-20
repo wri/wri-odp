@@ -33,7 +33,7 @@ describe("Create dataset", () => {
     cy.get("li").contains('Public').click();
     cy.get("#team").click();
     cy.get("li").contains(org).click();
-    cy.get("input[name=applications]").type("GFW");
+    cy.get("input[name=application]").type("GFW");
     cy.get("#topicsButton").click();
     cy.get("div").contains(topic).click({ force: true });
     cy.get("button").contains('Tags').click();

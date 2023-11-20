@@ -59,6 +59,7 @@ describe("Search page", () => {
         update_frequency: i < 7 ? "annually" : "daily",
         language: i < 7 ? "en" : "pt",
         wri_data: i < 7 ? true : false,
+        visibility_type: 'public'
       });
       datasets.push(name);
     });

@@ -25,8 +25,8 @@ export async function searchHierarchy(
             apiKey: string, q?: string, group_type: string
         }): Promise<GroupTree[]> {
     try {
-        let response: Response;
-        let groups: GroupTree[] | [] = [];
+        let response: Response
+        let groups: GroupTree[] | [] = []
         if (isSysadmin) {
             let urLink = ''
             if (q) {
@@ -39,21 +39,28 @@ export async function searchHierarchy(
                 headers: {
                     "Authorization": apiKey,
                 }
-            });
-            const data = (await response.json()) as CkanResponse<GroupTree[]>;
-            groups = data.success === true ? data.result : [];
-        }
-        else {
-            response = await fetch(`${env.CKAN_URL}/api/3/action/${group_type == "group" ? "group_list_authz" : "organization_list_for_user"}?all_fields=True`, {
-                headers: {
-                    "Authorization": apiKey,
+            )
+            const data = (await response.json()) as CkanResponse<GroupTree[]>
+            groups = data.success === true ? data.result : []
+        } else {
+            response = await fetch(
+                `${env.CKAN_URL}/api/3/action/${group_type == 'group'
+                    ? 'group_list_authz'
+                    : 'organization_list_for_user'
+                }?all_fields=True`,
+                {
+                    headers: {
+                        Authorization: apiKey,
+                    },
                 }
-            });
+            )
 
-            const data = (await response.json()) as CkanResponse<GroupTree[]>;
-            groups = data.success === true ? data.result : [];
+            const data = (await response.json()) as CkanResponse<GroupTree[]>
+            groups = data.success === true ? data.result : []
             if (groups.length && q) {
-                groups = groups.filter((group) => group.name.toLowerCase().includes(q.toLowerCase()));
+                groups = groups.filter((group) =>
+                    group.name.toLowerCase().includes(q.toLowerCase())
+                )
             }
         }
 
@@ -74,17 +81,15 @@ export async function searchHierarchy(
             return result;
         }));
         const t = groupTree.reduce((acc: Record<string, GroupTree>, group) => {
-            const key = group.id;
+            const key = group.id
             if (!acc[key]) {
-                acc[key] = group;
+                acc[key] = group
             }
-            return acc;
-        }, {});
+            return acc
+        }, {})
 
-        return Object.values(t);
-
-    }
-    catch (e) {
+        return Object.values(t)
+    } catch (e) {
         console.log(e)
         throw new Error(e as string)
     }
@@ -92,11 +97,11 @@ export async function searchHierarchy(
 
 export async function getGroups({
     apiKey,
-    group_type = "group",
-    isSysadmin
+    group_type = 'group',
+    isSysadmin,
 }: {
-    apiKey: string,
-    group_type?: string,
+    apiKey: string
+    group_type?: string
     isSysadmin?: boolean
 }): Promise<GroupTree[]> {
     try {
@@ -166,7 +171,11 @@ export async function getAllUsers({
     }
 }
 
-export async function getAllOrganizations({ apiKey }: { apiKey: string }): Promise<WriOrganization[]> {
+export async function getAllOrganizations({
+    apiKey,
+}: {
+    apiKey: string
+}): Promise<WriOrganization[]> {
     try {
 
         const orgList = await Promise.all(
@@ -313,9 +322,16 @@ export async function getAllDatasetFq({
     }
 }
 
-export async function getUserOrganizations({ userId, apiKey }: { userId: string, apiKey: string }): Promise<WriOrganization[]> {
+export async function getUserOrganizations({
+    userId,
+    apiKey,
+}: {
+    userId: string
+    apiKey: string
+}): Promise<WriOrganization[]> {
     try {
-        const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_list_for_user?all_fields=true`,
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/organization_list_for_user?all_fields=true`,
             {
                 headers: {
                     "Authorization": `${apiKey}`,
@@ -325,9 +341,8 @@ export async function getUserOrganizations({ userId, apiKey }: { userId: string,
         const data = (await response.json()) as CkanResponse<WriOrganization[]>;
         const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
         return organizations
-    }
-    catch (e) {
-        console.error(e);
+    } catch (e) {
+        console.error(e)
         return []
     }
 }
@@ -393,25 +408,55 @@ export function activityDetails(activity: Activity): ActivityDisplay {
         deleted: 'deleted',
     }
 
-    const activityType = activity.activity_type?.split(" ");
-    const action = activityType[0]!;
-    let object = activityType[1]!;
-    const actionType = activityType.join("_");
-    let title = "";
+    const activityType = activity.activity_type?.split(' ')
+    const action = activityType[0]!
+    let object = activityType[1]!
+    const actionType = activityType.join('_')
+    let title = ''
     const GroupObject: Record<string, string> = {
-        "group": "topic",
-        "organization": "team"
+        group: 'topic',
+        organization: 'team',
     }
-    if (object === "package") {
-        title = activity.data?.package?.title ?? "";
+    if (object === 'package') {
+        title = activity.data?.package?.title ?? ''
+    } else {
+        title = activity.data?.group?.title ?? ''
+        object = GroupObject[object]!
     }
-    else {
-        title = activity.data?.group?.title ?? "";
-        object = GroupObject[object]!;
+    const description = `${activitProperties[action]} the ${object} ${title}`
+    const time = timeAgo(activity.timestamp)
+    return {
+        description,
+        time,
+        icon: action,
+        action,
+        timestamp: activity.timestamp,
+        actionType: actionType,
     }
-    const description = `${activitProperties[action]} the ${object} ${title}`;
-    const time = timeAgo(activity.timestamp);
-    return { description, time, icon: action, action, timestamp: activity.timestamp, actionType: actionType };
+}
+
+export async function getOneDataset(datasetName: string, session: Session | null) {
+    const user = session?.user
+    const datasetRes = await fetch(
+        `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${user?.apikey ?? ''}`,
+            },
+        }
+    )
+    const dataset: CkanResponse<WriDataset> = await datasetRes.json()
+    if (!dataset.success && dataset.error) {
+        if (dataset.error.message) throw Error(dataset.error.message)
+        throw Error(JSON.stringify(dataset.error))
+    }
+    return {
+        ...dataset.result,
+        open_in: dataset.result.open_in
+            ? Object.values(dataset.result.open_in)
+            : [],
+    }
 }
 
 export function timeAgo(timestamp: string): string {

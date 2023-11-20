@@ -27,7 +27,8 @@ import { Index } from 'flexsearch'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/_shared/Button'
 import { NextSeo } from 'next-seo'
-
+import { getOneDataset } from '@/utils/apiUtils'
+import { getServerAuthSession } from '@/server/auth'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -52,21 +53,33 @@ export async function getServerSideProps(
         transformer: superjson,
     })
     const datasetName = context.params?.datasetName as string
-    await helpers.dataset.getOneDataset.prefetch({ id: datasetName })
-
-    return {
-        props: {
-            trpcState: helpers.dehydrate(),
-            datasetName,
-        },
+    const session = await getServerAuthSession(context)
+    try {
+        const dataset = await getOneDataset(datasetName, session)
+        return {
+            props: {
+                dataset,
+                datasetName,
+            },
+        }
+    } catch {
+        return {
+            props: {
+                redirect: {
+                    destination: '/datasets/404',
+                },
+            },
+        }
     }
 }
 
 export default function DatasetPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const { datasetName } = props
-    const { query } = useRouter()
+    const { dataset } = props
+    const datasetName = props.datasetName as string
+    const router = useRouter()
+    const { query } = router
     const isApprovalRequest = query?.approval === 'true'
     const [isAddLayers, setIsAddLayers] = useState(false)
     const session = useSession()
@@ -74,7 +87,8 @@ export default function DatasetPage(
         data: datasetData,
         error: datasetError,
         isLoading,
-    } = api.dataset.getOneDataset.useQuery({ id: datasetName }, { retry: 0 })
+    } = api.dataset.getOneDataset.useQuery({ id: datasetName }, { retry: 0, initialData: dataset })
+    if (!datasetData && datasetError) router.replace('/datasets/404')
     const relatedDatasets = api.dataset.getAllDataset.useQuery({
         fq: {
             groups:
@@ -91,10 +105,14 @@ export default function DatasetPage(
         { enabled: !!session.data?.user.apikey }
     )
 
-const links = [
-    { label: 'Explore Data', url: '/search', current: false },
-    { label: datasetData?.title ?? datasetData?.name ?? '', url: `/datasets/${datasetData?.title ?? datasetData?.name ?? ''}`, current: true },
-]
+    const links = [
+        { label: 'Explore Data', url: '/search', current: false },
+        {
+            label: datasetData?.title ?? datasetData?.name ?? '',
+            url: `/datasets/${datasetData?.title ?? datasetData?.name ?? ''}`,
+            current: true,
+        },
+    ]
     if (isLoading || !datasetData) {
         return (
             <>

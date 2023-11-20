@@ -38,7 +38,7 @@ export function Preview({
                     {watch('title')}
                 </h1>
                 <h2 className="font-['Acumin Pro SemiCondensed'] text-lg font-semibold leading-tight text-stone-500">
-                    /dataset/{watch('name')}
+                    /datasets/{watch('name')}
                 </h2>
 
                 <div className="py-8">
@@ -115,7 +115,7 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="License"
-                                    text={watch('license')?.label ?? '_'}
+                                    text={watch('license_id')?.label ?? '_'}
                                 />
                             </dl>
                         </div>

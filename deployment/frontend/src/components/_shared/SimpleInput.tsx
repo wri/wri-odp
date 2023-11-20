@@ -3,7 +3,6 @@ import * as React from "react";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
-  placeholder: string;
   name?: string;
   type: string;
   icon?: React.ReactNode;
@@ -20,7 +19,6 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={classNames("relative w-full rounded-md", maxWidth)}>
         <input
-          placeholder={placeholder}
           type={type}
           ref={ref}
           {...props}
