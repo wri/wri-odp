@@ -78,9 +78,7 @@ export default function DatasetCard({
             <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green">
                 {dataset.organization?.title ?? 'No team'}
             </p>
-            <Link
-                href={`/datasets/${dataset.name}`}
-            >
+            <Link href={`/datasets/${dataset.name}`}>
                 <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900">
                     {dataset.title ?? dataset.name}
                 </h3>
@@ -96,15 +94,16 @@ export default function DatasetCard({
                     </p>
                 </div>{' '}
                 {dataset?.temporal_coverage_start ||
-                    (dataset?.temporal_coverage_end ? (
-                        <div className="flex items-center gap-x-1">
-                            <ClockIcon className="h-3 w-3 text-blue-800" />
-                            <p className="font-['Acumin Pro SemiCondensed'] text-xs font-light leading-snug text-stone-900 sm:text-sm">
-                                `${dataset?.temporal_coverage_start ?? ''} - $
-                                {dataset?.temporal_coverage_end ?? ''}`
-                            </p>
-                        </div>
-                    ) : null)}
+                dataset?.temporal_coverage_end ? (
+                    <div className="flex items-center gap-x-1">
+                        <p className="font-['Acumin Pro SemiCondensed'] text-xs font-light leading-snug text-stone-900 sm:text-sm">
+                            {dataset?.temporal_coverage_start ?? ''} -{' '}
+                            {dataset?.temporal_coverage_end ?? ''}
+                        </p>
+                    </div>
+                ) : (
+                    ''
+                )}
             </div>
             <div className="mt-4 flex justify-start gap-x-3">
                 <div

@@ -14,8 +14,11 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import Modal from '@/components/_shared/Modal'
 import Link from 'next/link'
+import { RouterOutput } from '@/server/api/root'
 
-export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
+type TopicOutput = RouterOutput["topics"]["getTopic"];
+
+export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [deleteOpen, setDeleteOpen] = useState(false)
     const router = useRouter()
@@ -29,7 +32,13 @@ export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
     ]
 
     const formObj = useForm<TopicFormType>({
-        defaultValues: topic,
+        defaultValues: {
+            ...topic,
+            parent: {
+                value: topic.groups[0]?.name ?? '',
+                label: topic.groups[0]?.name ?? '',
+            },
+        },
         resolver: zodResolver(TopicSchema),
     })
 

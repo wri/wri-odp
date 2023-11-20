@@ -165,6 +165,8 @@ function LearnMoreModal({
                                 {dataset.learn_more && (
                                     <a
                                         href={dataset.learn_more}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="flex items-center gap-x-1"
                                     >
                                         <ArrowTopRightOnSquareIcon className="h-4 w-4 text-blue-800" />

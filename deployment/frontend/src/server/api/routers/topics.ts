@@ -97,8 +97,8 @@ export const TopicRouter = createTRPCRouter({
                 const body = JSON.stringify({
                     ...input,
                     groups:
-                        input.parent && input.parent !== ''
-                            ? [{ name: input.parent }]
+                        input.parent && input.parent.value !== ''
+                            ? [{ name: input.parent.value }]
                             : [],
                 })
                 const topicRes = await fetch(
@@ -179,8 +179,8 @@ export const TopicRouter = createTRPCRouter({
                 const body = JSON.stringify({
                     ...input,
                     groups:
-                        input.parent && input.parent !== ''
-                            ? [{ name: input.parent }]
+                        input.parent && input.parent.value !== ''
+                            ? [{ name: input.parent.value }]
                             : [],
                 })
                 const topicRes = await fetch(

@@ -14,8 +14,11 @@ import Modal from '@/components/_shared/Modal'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import Link from 'next/link'
+import { RouterOutput } from '@/server/api/root'
 
-export default function EditTeamForm({ team }: { team: TeamFormType }) {
+type TeamOutput = RouterOutput['teams']['getTeam']
+
+export default function EditTeamForm({ team }: { team: TeamOutput }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [deleteOpen, setDeleteOpen] = useState(false)
     const router = useRouter()
@@ -29,7 +32,13 @@ export default function EditTeamForm({ team }: { team: TeamFormType }) {
     ]
 
     const formObj = useForm<TeamFormType>({
-        defaultValues: team,
+        defaultValues: {
+            ...team,
+            parent: {
+                value: team.groups[0]?.name ?? '',
+                label: team.groups[0]?.name ?? '',
+            },
+        },
         resolver: zodResolver(TeamSchema),
     })
 

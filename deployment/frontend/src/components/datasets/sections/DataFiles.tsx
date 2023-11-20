@@ -6,6 +6,7 @@ import {
     ArrowPathIcon,
     ArrowTopRightOnSquareIcon,
     ClockIcon,
+    FingerPrintIcon,
     LightBulbIcon,
     MagnifyingGlassIcon,
     MapPinIcon,
@@ -160,7 +161,7 @@ function DatafileCard({
                             </p>
                             <div className="mt-[0.33rem] flex justify-start gap-x-3">
                                 <div className="flex flex-row items-center gap-x-1">
-                                    <ArrowPathIcon className="h-3 w-3 text-blue-800" />
+                                    <FingerPrintIcon className="h-3 w-3 text-blue-800" />
                                     <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
                                         {created_at.toLocaleDateString(
                                             'en-US',
@@ -169,7 +170,7 @@ function DatafileCard({
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-x-1">
-                                    <ClockIcon className="h-3 w-3 text-blue-800" />
+                                    <ArrowPathIcon className="h-3 w-3 text-blue-800" />
                                     <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
                                         {last_updated.toLocaleDateString(
                                             'en-US',

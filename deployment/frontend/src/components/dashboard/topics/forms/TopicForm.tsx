@@ -119,8 +119,6 @@ export default function TopicForm({
                                         .map((topic) => ({
                                             label: topic.title ?? topic.name,
                                             value: topic.name,
-                                            default:
-                                                watch('parent') === topic.name,
                                         })),
                                 ]}
                                 placeholder="Select a parent"

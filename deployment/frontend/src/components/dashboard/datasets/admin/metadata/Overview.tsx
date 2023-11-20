@@ -267,6 +267,28 @@ export function OverviewForm({
                             errors={errors}
                         />
                     </InputGroup>
+                    <div className="relative flex justify-end">
+                        <div className="flex h-6 items-center">
+                            <input
+                                id="wri_data"
+                                aria-describedby="comments-description"
+                                {...register('wri_data')}
+                                type="checkbox"
+                                className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
+                            />
+                        </div>
+                        <div className="ml-3 text-sm leading-6">
+                            <label
+                                htmlFor="wri_data"
+                                className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
+                            >
+                                WRI Data
+                                <DefaultTooltip content="This flags this dataset as having been produced and curated by WRI">
+                                    <InformationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
+                                </DefaultTooltip>
+                            </label>
+                        </div>
+                    </div>
                     <InputGroup label="Update Frequency">
                         <SimpleSelect
                             formObj={formObj}
@@ -353,10 +375,12 @@ export function OverviewForm({
                                 { isSuccess: true, data: P.select() },
                                 (data) => (
                                     <SimpleSelect
-                                        name="license"
+                                        name="license_id"
                                         id="license"
                                         formObj={formObj}
-                                        initialValue={watch('license') ?? null}
+                                        initialValue={
+                                            watch('license_id') ?? null
+                                        }
                                         options={data.map((license) => ({
                                             label: license.title,
                                             value: license.id,
@@ -420,7 +444,10 @@ export function OverviewForm({
                                     setValue('featured_image', name)
                                 }}
                             />
-                            <ErrorDisplay name="featured_image" errors={errors} />
+                            <ErrorDisplay
+                                name="featured_image"
+                                errors={errors}
+                            />
                         </div>
                     </div>
                 </div>
