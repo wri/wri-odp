@@ -100,7 +100,6 @@ export default function MetadataModifiedFacet({
                                                 className="h-8 w-[8rem] rounded border-gray-300 text-gray-500 focus:ring-gray-500 px-3"
                                                 value={optionsState.metadata_modified_since}
                                                 onChange={e => handleDateChange('metadata_modified_since', e.target.value)}
-                                                placeholder='mm/dd/yyyy'
                                             />
                                         </div>
                                     </div>
@@ -120,7 +119,6 @@ export default function MetadataModifiedFacet({
                                                 className="h-8 w-[8rem] rounded border-gray-300 text-gray-500 focus:ring-gray-500 px-3"
                                                 value={optionsState.metadata_modified_before}
                                                 onChange={e => handleDateChange('metadata_modified_before', e.target.value)}
-                                                placeholder='mm/dd/yyyy'
                                             />
                                         </div>
                                     </div>
