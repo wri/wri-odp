@@ -219,7 +219,7 @@ export const DatasetRouter = createTRPCRouter({
                         {
                             headers: {
                                 'Content-Type': 'application/json',
-                        Authorization: `${user?.apikey ?? ''}`,
+                                Authorization: `${user?.apikey ?? ''}`,
                             },
                         }
                     )
@@ -229,7 +229,7 @@ export const DatasetRouter = createTRPCRouter({
                         if (details.error.message) throw Error(details.error.message)
                         throw Error(JSON.stringify(details.error))
                     }
-                    return {...issue, ...details.result}
+                    return { ...issue, ...details.result }
                 })
             )
             return issuesWithDetails
@@ -311,7 +311,7 @@ export const DatasetRouter = createTRPCRouter({
         .query(async ({ input, ctx }) => {
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session.user.apikey,
-                fq: `state:draft`,
+                fq: `visibility_type:draft`,
                 query: input,
             }))!
             return {
