@@ -12,29 +12,43 @@ import type { GroupTree } from '@/schema/ckan.schema';
 import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal';
 import { useRouter } from 'next/router'
+import { LoaderButton, Button } from '@/components/_shared/Button'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Dialog } from '@headlessui/react'
 
 
-function TeamProfile({ team }: { team: GroupTree }) {
+function TopicProfile({ team }: { team: GroupTree }) {
   const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
-  const teamProfile = team as IRowProfile
-  teamProfile.description = description
+  const TopicProfile = team as IRowProfile
+  TopicProfile.description = description
   return (
-    <div className='flex py-5 pl-4 sm:pl-8' >
-      <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} />
+    <div className='flex py-5 pl-2' >
+      <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] ' isPad profile={team} defaultImg='/images/placeholders/topics/topicsdefault.png' />
     </div>
   )
 }
 
-function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefined }) {
+function SubTopicProfile({ team }: { team: GroupTree }) {
+  const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
+  const TopicProfile = team as IRowProfile
+  TopicProfile.description = description
+  return (
+    <div className='flex py-5 pl-3 sm:pl-5' >
+      <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} defaultImg='/images/placeholders/topics/topicsdefault.png' />
+    </div>
+  )
+}
+
+function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTree[] | undefined, highlighted?: boolean }) {
   const utils = api.useUtils()
   const [open, setOpen] = useState(false)
   const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
   const router = useRouter()
   const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
     onSuccess: async (data) => {
-      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 2 } })
+      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 10 } })
       setOpen(false)
-      notify(`Topic delete is successful`, 'success')
+      notify(`Successfully deleted the ${selectedTopic?.name} topic`, 'error')
     }
   })
 
@@ -45,63 +59,151 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
 
   if (!teams || teams.length === 0) return (<></>)
   return (
-    <div className='flex flex-col pt-2'>
+    <div className='flex flex-col pt-2 pl-4'>
       {
         teams.map((team, index) => {
-          return (
-            <>
-              <Row
-                key={index}
-                groupStyle="group/item group-hover/item:visible "
-                className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
-                rowMain={
-                  <div className='flex pl-3 sm:pl-5  '>
-                    <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} />
-                  </div>
-                }
-                controlButtons={[
-                  {
-                    label: "Edit",
-                    color: 'bg-wri-gold hover:bg-yellow-500',
-                    icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
-                    tooltip: {
-                      id: `edit-tooltip-${team.name}`,
-                      content: "Edit topic"
-                    },
-                    onClick: () => {
-                      router.push(`/dashboard/topics/${team.name}/edit`)
-                    }
-                  },
-                  {
-                    label: "Delete",
-                    color: 'bg-red-600 hover:bg-red-500',
-                    icon: <TrashIcon className='w-4 h-4 text-white' />,
-                    tooltip: {
-                      id: `delete-tooltip-${team.name}`,
-                      content: "Delete topic"
-                    },
-                    onClick: () => handleOpenModal(team as GroupTree)
-                  },
-                ]}
-              />
-            </>
+          return (<>
 
-          )
+            {
+              (team as GroupTree).children?.length ?
+                (
+                  <>
+                    <Row
+                      key={index}
+                      highlighted={highlighted}
+                      groupStyle="group/item group-hover/item:visible "
+                      className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
+                      rowMain={
+                        <SubTopicProfile team={team as GroupTree} />
+                      }
+                      linkButton={{
+                        label: "View topic",
+                        link: `../topics/${team.name}`,
+                      }}
+                      controlButtons={[
+                        {
+                          label: "Edit",
+                          color: 'bg-wri-gold hover:bg-yellow-500',
+                          icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
+                          tooltip: {
+                            id: `edit-tooltip-${team.name}`,
+                            content: "Edit topic"
+                          },
+                          onClick: () => {
+                            router.push(`/dashboard/topics/${team.name}/edit`)
+                          }
+                        },
+                        {
+                          label: "Delete",
+                          color: 'bg-red-600 hover:bg-red-500',
+                          icon: <TrashIcon className='w-4 h-4 text-white' />,
+                          tooltip: {
+                            id: `delete-tooltip-${team.name}`,
+                            content: "Delete topic"
+                          },
+                          onClick: () => handleOpenModal(team as GroupTree)
+                        },
+                      ]}
+                      isDropDown
+                      rowSub={<SubCardProfile teams={(team as GroupTree).children} />}
+                    />
+                  </>
+
+                )
+                : (
+                  <>
+                    <Row
+                      key={index}
+                      groupStyle="group/item group-hover/item:visible "
+                      className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
+                      rowMain={
+                        <div className='flex pl-4 sm:pl-6  '>
+                          <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} defaultImg='/images/placeholders/topics/topicsdefault.png' />
+                        </div>
+                      }
+                      linkButton={{
+                        label: "View topic",
+                        link: `../topics/${team.name}`,
+                      }}
+                      controlButtons={[
+                        {
+                          label: "Edit",
+                          color: 'bg-wri-gold hover:bg-yellow-500',
+                          icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
+                          tooltip: {
+                            id: `edit-tooltip-${team.name}`,
+                            content: "Edit topic"
+                          },
+                          onClick: () => {
+                            router.push(`/dashboard/topics/${team.name}/edit`)
+                          }
+                        },
+                        {
+                          label: "Delete",
+                          color: 'bg-red-600 hover:bg-red-500',
+                          icon: <TrashIcon className='w-4 h-4 text-white' />,
+                          tooltip: {
+                            id: `delete-tooltip-${team.name}`,
+                            content: "Delete topic"
+                          },
+                          onClick: () => handleOpenModal(team as GroupTree)
+                        },
+                      ]}
+                    />
+                  </>
+
+                )
+            }
+          </>)
         })
       }
-      {selectedTopic && (
-        <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-          <h3 className='w-full text-center my-auto'>Delete Topic: {selectedTopic.name}</h3>
-          <button
-            className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
-            id={selectedTopic.name}
-            onClick={() => {
-              deleteTopic.mutate(selectedTopic.id)
-            }}
-            disabled={deleteTopic.isSuccess}
-          >{deleteTopic.isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTopic.isError ? "Something went wrong Try again" : "I want to delete this dataset"} </button>
-        </Modal>
-      )}
+      {
+        selectedTopic && (
+          <Modal
+            open={open}
+            setOpen={setOpen}
+            className="sm:w-full sm:max-w-lg"
+          >
+            <div className="sm:flex sm:items-start">
+              <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <ExclamationTriangleIcon
+                  className="h-6 w-6 text-red-600"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                <Dialog.Title
+                  as="h3"
+                  className="text-base font-semibold leading-6 text-gray-900"
+                >
+                  Delete Topic
+                </Dialog.Title>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500">
+                    Are you sure you want to delete this topic?
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+              <LoaderButton
+                variant="destructive"
+                loading={deleteTopic.isLoading}
+                onClick={() => deleteTopic.mutate(selectedTopic.id)}
+              >
+                Delete Topic
+              </LoaderButton>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </Modal>
+        )
+      }
     </div>
   )
 }
@@ -110,7 +212,7 @@ function SubCardProfile({ teams }: { teams: IRowProfile[] | GroupTree[] | undefi
 
 
 export default function TopicCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 2 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
   const [open, setOpen] = useState(false)
   const router = useRouter()
@@ -119,7 +221,7 @@ export default function TopicCard() {
     onSuccess: async (data) => {
       await refetch();
       setOpen(false)
-      notify(`Topic delete is successful`, 'success')
+      notify(`Successfully deleted the ${selectedTopic?.name} topic`, 'error')
     }
   })
 
@@ -127,7 +229,6 @@ export default function TopicCard() {
     setSelectedTopic(topic)
     setOpen(true)
   }
-
 
 
   return (
@@ -142,10 +243,11 @@ export default function TopicCard() {
                   <Row
                     key={index}
                     className={`pr-6`}
-                    rowMain={<TeamProfile team={topic} />}
+                    highlighted={topic?.highlighted}
+                    rowMain={<TopicProfile team={topic} />}
                     linkButton={{
                       label: "View topic",
-                      link: "#",
+                      link: `../topics/${topic.name}`,
                     }}
                     controlButtons={[
                       {
@@ -171,7 +273,7 @@ export default function TopicCard() {
                         onClick: () => handleOpenModal(topic)
                       },
                     ]}
-                    rowSub={<SubCardProfile teams={topic.children} />}
+                    rowSub={<SubCardProfile teams={topic.children} highlighted={topic?.highlighted} />}
                     isDropDown
                   />
                 </div>
@@ -181,19 +283,55 @@ export default function TopicCard() {
           )
         }
 
-        {selectedTopic && (
-          <Modal open={open} setOpen={setOpen} className="max-w-[36rem] font-acumin flex flex-col gap-y-4">
-            <h3 className='w-full text-center my-auto'>Delete Topic: {selectedTopic.name}</h3>
-            <button
-              className=' w-full bg-red-500 text-white rounded-lg text-md py-2 flex justify-center items-center'
-              id={selectedTopic.name}
-              onClick={() => {
-                deleteTopic.mutate(selectedTopic.id)
-              }}
-              disabled={deleteTopic.isSuccess}
-            >{deleteTopic.isLoading ?? isLoading ? <Spinner className='w-4 mr-4' /> : ""}{" "}{deleteTopic.isError ? "Something went wrong Try again" : "I want to delete this topic"} </button>
-          </Modal>
-        )}
+        {
+          selectedTopic && (
+            <Modal
+              open={open}
+              setOpen={setOpen}
+              className="sm:w-full sm:max-w-lg"
+            >
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <ExclamationTriangleIcon
+                    className="h-6 w-6 text-red-600"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-base font-semibold leading-6 text-gray-900"
+                  >
+                    Delete Topic
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Are you sure you want to delete this topic?
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                <LoaderButton
+                  variant="destructive"
+                  loading={deleteTopic.isLoading}
+                  onClick={() => deleteTopic.mutate(selectedTopic.id)}
+                  id={selectedTopic.name}
+                >
+                  Delete Topic
+                </LoaderButton>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </Modal>
+          )
+        }
+
       </div>
     </section>
   )

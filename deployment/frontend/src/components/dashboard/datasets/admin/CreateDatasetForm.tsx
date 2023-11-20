@@ -21,6 +21,7 @@ import { useForm } from 'react-hook-form'
 import { match } from 'ts-pattern'
 import { v4 as uuidv4 } from 'uuid'
 import { OpenInForm } from './metadata/OpenIn'
+import Link from 'next/link'
 
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -50,9 +51,9 @@ export default function CreateDatasetForm() {
             },
             title: '',
             name: '',
-            temporalCoverageEnd: null,
-            temporalCoverageStart: null,
-            license: {
+            temporal_coverage_start: null,
+            temporal_coverage_end: null,
+            license_id: {
                 value: 'notspecified',
                 label: 'License not specified',
             },
@@ -61,10 +62,7 @@ export default function CreateDatasetForm() {
                     resourceId: uuidv4(),
                     title: 'Example title',
                     type: 'empty',
-                    format: {
-                        value: '',
-                        label: '',
-                    },
+                    format: '',
                     dataDictionary: [],
                 },
             ],
@@ -72,8 +70,11 @@ export default function CreateDatasetForm() {
     })
 
     const createDataset = api.dataset.createDataset.useMutation({
-        onSuccess: async ({ name }) => {
-            notify(`Successfully created the ${name} dataset`, 'success')
+        onSuccess: async ({ title, name, visibility_type }) => {
+            notify(
+                `Successfully created the "${title ?? name}" dataset`,
+                'success'
+            )
             router.push('/dashboard/datasets')
             formObj.reset()
         },
@@ -89,7 +90,7 @@ export default function CreateDatasetForm() {
         formState: { dirtyFields, errors },
     } = formObj
 
-    console.log(errors)
+    console.log('Errors', errors)
     useEffect(() => {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])
@@ -113,8 +114,8 @@ export default function CreateDatasetForm() {
                         <DescriptionForm formObj={formObj} />
                         <PointOfContactForm formObj={formObj} />
                         <MoreDetailsForm formObj={formObj} />
-                        <CustomFieldsForm formObj={formObj} />
                         <OpenInForm formObj={formObj} />
+                        <CustomFieldsForm formObj={formObj} />
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <CreateDataFilesSection formObj={formObj} />
@@ -156,6 +157,9 @@ export default function CreateDatasetForm() {
                     Save as Draft
                 </Button>
                 <div className="flex items-center gap-x-2">
+                    <Button type="button" variant="outline">
+                        <Link href="/dashboard/datasets">Cancel</Link>
+                    </Button>
                     {selectedIndex !== 0 && (
                         <Button
                             type="button"

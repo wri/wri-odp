@@ -4,16 +4,13 @@ import Row from '../_shared/Row'
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { WriDataset } from '@/schema/ckan.schema';
 import { formatDate } from '@/utils/general';
+import { useRouter } from 'next/router'
 
 function subFields(dataset: WriDataset) {
   return [
     {
       title: "Status",
-      description: "RDI Approved"
-    },
-    {
-      title: "Type of Dataset",
-      description: dataset?.type
+      description: dataset.technical_notes ? "RDI Approved" : "RDI Pending"
     },
     {
       title: "Coverage Start",
@@ -78,6 +75,7 @@ function SubCardProfile({ dataset }: { dataset: WriDataset }) {
 }
 
 export default function DatasetRow({ className, dataset, handleOpenModal }: { className?: string, dataset: WriDataset, handleOpenModal: (dataset: WriDataset) => void }) {
+  const router = useRouter()
   return (
     <Row
       className={`pr-2 sm:pr-4 ${className ? className : ''}`}
@@ -90,7 +88,9 @@ export default function DatasetRow({ className, dataset, handleOpenModal }: { cl
             id: `edit-tooltip-${dataset.name}`,
             content: "Edit dataset"
           },
-          onClick: () => { }
+          onClick: () => {
+            router.push(`../datasets/${dataset.name}/edit`)
+          }
         },
         {
           label: "Delete", color: 'bg-red-600 hover:bg-red-500',
@@ -104,7 +104,7 @@ export default function DatasetRow({ className, dataset, handleOpenModal }: { cl
       ]}
       linkButton={{
         label: "View dataset",
-        link: "#",
+        link: `../datasets/${dataset.name}`,
       }}
       rowSub={<SubCardProfile dataset={dataset} />}
       isDropDown
@@ -120,7 +120,7 @@ export function FavouriteRow({ className, dataset }: { className?: string, datas
       rowMain={<DatasetCardProfile dataset={dataset} />}
       linkButton={{
         label: "View dataset",
-        link: "#",
+        link: `../datasets/${dataset.name}`,
       }}
       rowSub={<SubCardProfile dataset={dataset} />}
       isDropDown

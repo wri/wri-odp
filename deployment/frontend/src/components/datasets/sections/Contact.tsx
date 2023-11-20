@@ -1,38 +1,21 @@
+import { WriDataset } from "@/schema/ckan.schema";
 import Image from "next/image";
 
-const team = [
-  {
-    name: "Mr. Someone 1",
-    img: "/images/placeholders/people/1.avif",
-    title: "Creator",
-    email: "mrsomeone@gmail.com",
-  },
-  {
-    name: "Mr. Someone 2",
-    img: "/images/placeholders/people/2.avif",
-    title: "Creator",
-    email: "mrsomeone@gmail.com",
-  },
-  {
-    name: "Mr. Someone 3",
-    img: "/images/placeholders/people/3.avif",
-    title: "Creator",
-    email: "mrsomeone@gmail.com",
-  },
-];
-
-export function Contact() {
+export function Contact({ dataset }: { dataset: WriDataset }) {
   return (
-    <div className="grid grid-cols-2 gap-4">
-      {team.map((member) => (
+    <div className="grid grid-cols-2 gap-4 min-h-[300px] items-start">
         <TeamMember
-          key ={member.name}
-          name={member.name}
-          img={member.img}
-          title={member.title}
-          email={member.email}
+          name={dataset.author ?? ''}
+          img='/images/placeholders/user/userdefault.png'
+          title="Author"
+          email={dataset.author_email ?? ''}
         />
-      ))}
+        <TeamMember
+          name={dataset.maintainer ?? ''}
+          img='/images/placeholders/user/userdefault.png'
+          title="Maintainer"
+          email={dataset.maintainer_email ?? ''}
+        />
     </div>
   );
 }
@@ -46,9 +29,9 @@ interface TeamMemberProps {
 
 function TeamMember({ name, img, title, email }: TeamMemberProps) {
   return (
-    <div className="mb-2 grid md:grid-cols-3">
+    <div className="mb-2 flex">
       <div>
-        <div className="relative col-span-1 h-24 w-24 sm:w-auto">
+        <div className="relative col-span-1 aspect-square h-24 w-24 sm:w-auto">
           <Image alt={`${name} Avatar`} fill src={img} />
         </div>
       </div>

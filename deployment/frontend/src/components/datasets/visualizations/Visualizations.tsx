@@ -4,12 +4,14 @@ import MapView from './MapView'
 import TabularView from './TabularView'
 import ChartView from './ChartView'
 import { Dispatch, SetStateAction } from 'react'
+import { useRouter } from 'next/router'
 
 export default function Visualizations({
     setIsAddLayers: setisAddLayers,
 }: {
     setIsAddLayers: Dispatch<SetStateAction<boolean>>
 }) {
+    const router = useRouter()
     const tabs = [
         { name: 'Map View' },
         { name: 'Tabular View' },
@@ -18,7 +20,17 @@ export default function Visualizations({
 
     return (
         <div>
-            <Tab.Group>
+            <Tab.Group
+                onChange={(index) => {
+                    router.replace(
+                        {
+                            query: { ...router.query, index },
+                        },
+                        undefined,
+                        { shallow: true }
+                    )
+                }}
+            >
                 <Tab.List as="nav" className="flex  w-full">
                     <VisualizationTabs tabs={tabs} />
                 </Tab.List>

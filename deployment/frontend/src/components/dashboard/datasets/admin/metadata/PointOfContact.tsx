@@ -42,7 +42,7 @@ export function PointOfContactForm({
                     <InputGroup label="Author Email" required>
                         <Input
                             {...register('author_email')}
-                            placeholder="Global Forest Watch"
+                            placeholder="email@gmail.com"
                             type="email"
                         ></Input>
                         <ErrorDisplay name="author_email" errors={errors} />

@@ -154,7 +154,7 @@ attribute with the form `ckan-X.Y` -->
     <field name="resources_accessed_recent" type="int" indexed="true" stored="false"/>
 
     <field name="metadata_created" type="date" indexed="true" stored="true" multiValued="false"/>
-    <field name="metadata_modified" type="date" indexed="true" stored="true" multiValued="false"/>
+    <field name="metadata_modified" type="date" indexed="true" stored="true" multiValued="false" docValues="true"/>
 
     <field name="indexed_ts" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
 
@@ -176,11 +176,11 @@ attribute with the form `ckan-X.Y` -->
 
     <!-- WRI custom fields -->
     <field name="language" type="string" indexed="true" stored="true"/>
-    <field name="projects" type="text" indexed="true" stored="true" multiValued="true"/>
+    <field name="project" type="string" indexed="true" stored="true"/>
     <field name="application" type="string" indexed="true" stored="true"/>
     <field name="technical_notes" type="string" indexed="true" stored="true"/>
-    <field name="temporal_coverage_start" type="int" indexed="true" stored="true"/>
-    <field name="temporal_coverage_end" type="int" indexed="true" stored="true"/>
+    <field name="temporal_coverage_start" type="int" indexed="true" stored="true" docValues="true"/>
+    <field name="temporal_coverage_end" type="int" indexed="true" stored="true" docValues="true"/>
     <field name="update_frequency" type="string" indexed="true" stored="true"/>
     <field name="citation" type="text" indexed="true" stored="true"/>
     <field name="visibility_type" type="string" indexed="true" stored="true"/>
@@ -190,7 +190,7 @@ attribute with the form `ckan-X.Y` -->
     <field name="reason_for_adding" type="text" indexed="true" stored="true"/>
     <field name="learn_more" type="string" indexed="true" stored="true"/>
     <field name="cautions" type="text" indexed="true" stored="true"/>
-    <field name="summary" type="text" indexed="true" stored="true"/>
+    <field name="methodology" type="text" indexed="true" stored="true"/>
     <fiend name="featured_dataset" type="boolean" indexed="true" stored="true"/>
     <field name="wri_data" type="boolean" indexed="true" stored="true"/>
 </fields>

@@ -4,7 +4,6 @@ import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
 } from "@heroicons/react/20/solid";
-import { Fragment } from "react";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -28,7 +27,7 @@ export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number }[]
       >
         {tabs.map((tab) => (
           <SwiperSlide key={tab.name} className="">
-            <Tab as={Fragment}>
+            <Tab as="div">
               {({ selected }: { selected: boolean }) => (
                 <button
                   className={classNames(

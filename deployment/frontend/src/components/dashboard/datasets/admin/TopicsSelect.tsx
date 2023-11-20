@@ -26,12 +26,15 @@ import { TopicHierarchy } from '@/interfaces/topic.interface'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { Controller, UseFormReturn } from 'react-hook-form'
 import { DatasetFormType } from '@/schema/dataset.schema'
+import { Group } from '@portaljs/ckan'
 
 export function TopicsSelect({
+    userTopics,
     topicHierarchy,
     formObj,
 }: {
     topicHierarchy: TopicHierarchy[]
+    userTopics: string[] | null
     formObj: UseFormReturn<DatasetFormType>
 }) {
     const { control } = formObj
@@ -42,6 +45,7 @@ export function TopicsSelect({
             defaultValue={[]}
             render={({ field: { onChange, value } }) => (
                 <TopicsInner
+                    userTopics={userTopics}
                     onChange={onChange}
                     value={value}
                     topicHierarchy={topicHierarchy}
@@ -54,10 +58,12 @@ export function TopicsInner({
     topicHierarchy,
     onChange,
     value,
+    userTopics,
 }: {
     topicHierarchy: TopicHierarchy[]
     onChange: (value: string[]) => void
     value: string[]
+    userTopics: string[] | null
 }) {
     const [open, setOpen] = useState(false)
     const [query, setQuery] = useState('')
@@ -120,6 +126,9 @@ export function TopicsInner({
         return (
             <div key={topic.name}>
                 <CommandItem
+                    disabled={
+                        userTopics ? !userTopics.includes(topic.name) : false
+                    }
                     value={topic.name}
                     className={classNames(
                         'hover:bg-blue-800 hover:text-white group',
@@ -142,15 +151,30 @@ export function TopicsInner({
                                 : 'opacity-0'
                         )}
                     />
-                    <div
-                        className={classNames(
-                            topic.children
-                                ? 'font-acumin text-base font-normal text-black group-hover:text-white'
-                                : 'font-acumin text-base font-normal text-neutral-600 group-hover:text-white'
-                        )}
+                    <DefaultTooltip
+                        disabled={
+                            userTopics ? userTopics.includes(topic.name) : true
+                        }
+                        content={
+                            <span className="text-black">
+                                You are not part of this topic therefore you
+                                cant add a dataset to it
+                            </span>
+                        }
                     >
-                        {topic.title}
-                    </div>
+                        <div
+                            className={classNames(
+                                topic.children
+                                    ? 'font-acumin text-base font-normal text-black group-hover:text-white'
+                                    : 'font-acumin text-base font-normal text-neutral-600 group-hover:text-white',
+                                userTopics && !userTopics.includes(topic.name)
+                                    ? 'text-gray-400'
+                                    : ''
+                            )}
+                        >
+                            {topic.title}
+                        </div>
+                    </DefaultTooltip>
                 </CommandItem>
                 {topic.children &&
                     topic.children.map((child: TopicHierarchy) =>
@@ -166,7 +190,7 @@ export function TopicsInner({
                 <Button
                     variant="outline"
                     role="combobox"
-          id="topicsButton"
+                    id="topicsButton"
                     ref={ref}
                     aria-expanded={open}
                     className="relative flex h-auto min-h-[7rem] w-full flex-row items-start justify-between rounded-md border-0 px-5 py-3 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 hover:bg-white focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
@@ -223,14 +247,26 @@ export function TopicsInner({
                                 onClick={() =>
                                     onChange(
                                         query.length === 0
-                                            ? flattenedTopicHierarchy.map(
-                                                  (item) => item.name
-                                              )
+                                            ? flattenedTopicHierarchy
+                                                  .filter((item) =>
+                                                      userTopics
+                                                          ? userTopics.includes(
+                                                                item.name
+                                                            )
+                                                          : true
+                                                  )
+                                                  .map((item) => item.name)
                                             : [
                                                   ...new Set(
-                                                      filteredTopics.concat(
-                                                          value
-                                                      )
+                                                      filteredTopics
+                                                          .filter((item) =>
+                                                              userTopics
+                                                                  ? userTopics.includes(
+                                                                        item
+                                                                    )
+                                                                  : true
+                                                          )
+                                                          .concat(value)
                                                   ),
                                               ]
                                     )

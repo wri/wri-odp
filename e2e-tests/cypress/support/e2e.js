@@ -152,24 +152,24 @@ Cypress.Commands.add("purgeDataset", (datasetName) => {
   });
 });
 
-Cypress.Commands.add("purgeGroup", (datasetName) => {
+Cypress.Commands.add("purgeGroup", (groupName) => {
   const request = cy.request({
     method: "POST",
     url: apiUrl("group_purge"),
     headers: headers,
     body: {
-      id: datasetName,
+      id: groupName,
     },
   });
 });
 
-Cypress.Commands.add("purgeOrganization", (datasetName) => {
+Cypress.Commands.add("purgeOrganization", (orgName) => {
   const request = cy.request({
     method: "POST",
     url: apiUrl("organization_purge"),
     headers: headers,
     body: {
-      id: datasetName,
+      id: orgName,
     },
   });
 });
@@ -431,6 +431,32 @@ Cypress.Commands.add("createUserApi", (name, email, password) => {
       name: name,
       email: email,
       password: password,
+    },
+  });
+});
+
+Cypress.Commands.add("addPackageCollaboratorApi", (username, packageId, capacity) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("package_collaborator_create"),
+    headers: headers,
+    body: {
+      id: packageId,
+      user_id: username,
+      capacity: capacity,
+    },
+  });
+});
+
+Cypress.Commands.add("addPackageIssueApi", (packageId, issueTitle, issueDescription) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("issue_create"),
+    headers: headers,
+    body: {
+      dataset_id: packageId,
+      title: issueTitle,
+      description: issueDescription,
     },
   });
 });

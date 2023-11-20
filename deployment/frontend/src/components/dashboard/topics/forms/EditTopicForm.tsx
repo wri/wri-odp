@@ -13,8 +13,12 @@ import { useRouter } from 'next/router'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import Modal from '@/components/_shared/Modal'
+import Link from 'next/link'
+import { RouterOutput } from '@/server/api/root'
 
-export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
+type TopicOutput = RouterOutput["topics"]["getTopic"];
+
+export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [deleteOpen, setDeleteOpen] = useState(false)
     const router = useRouter()
@@ -28,12 +32,20 @@ export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
     ]
 
     const formObj = useForm<TopicFormType>({
-        defaultValues: topic,
+        defaultValues: {
+            ...topic,
+            parent: {
+                value: topic.groups[0]?.name ?? '',
+                label: topic.groups[0]?.name ?? '',
+            },
+        },
         resolver: zodResolver(TopicSchema),
     })
 
+    const utils = api.useContext()
     const editTopic = api.topics.editTopic.useMutation({
         onSuccess: async ({ title, name }) => {
+            await utils.topics.getTopic.invalidate({ id: name })
             notify(`Successfully edited the ${title ?? name} topic`, 'success')
             router.push('/dashboard/topics')
             formObj.reset()
@@ -45,7 +57,11 @@ export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
 
     const deleteTopic = api.topics.deleteTopic.useMutation({
         onSuccess: async () => {
-            notify(`Successfully deleted the ${topic.title ?? topic.name} team`, 'error')
+            await utils.topics.getTopic.invalidate({ id: topic.name })
+            notify(
+                `Successfully deleted the ${topic.title ?? topic.name} team`,
+                'error'
+            )
             setDeleteOpen(false)
             router.push('/dashboard/topics')
         },
@@ -122,7 +138,10 @@ export default function EditTopicForm({ topic }: { topic: TopicFormType }) {
                     <div className="w-full py-8 border-b border-blue-800 shadow">
                         <div className="px-2 sm:px-8">
                             <TopicForm formObj={formObj} editing={true} />
-                            <div className="col-span-full flex justify-end">
+                            <div className="col-span-full flex justify-end gap-x-4">
+                                <Button type="button" variant="outline">
+                                    <Link href="/dashboard/teams">Cancel</Link>
+                                </Button>
                                 <LoaderButton
                                     loading={editTopic.isLoading}
                                     type="submit"

@@ -2,7 +2,14 @@
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
  */
+
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
 await import("./src/env.mjs");
+
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -12,6 +19,7 @@ const config = {
     ignoreDuringBuilds: true,
   },
   reactStrictMode: true,
+
 
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
@@ -23,8 +31,8 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ['wri.dev.ckan.datopian.com', 'test-bucket-wri.s3.ap-northeast-1.amazonaws.com', 'ckan-dev'],
+    domains: ['wri.dev.ckan.datopian.com', 'test-bucket-wri.s3.ap-northeast-1.amazonaws.com', 'ckan-dev', 'gravatar.com'],
   },
 };
 
-export default config;
+export default bundleAnalyzer(config);
