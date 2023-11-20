@@ -15,6 +15,7 @@ import { DatasetFormType } from '@/schema/dataset.schema'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { convertBytes } from '@/utils/convertBytes'
 import Spinner from '@/components/_shared/Spinner'
+import FormatInput from '../FormatInput'
 
 export function UploadForm({
     removeFile,
@@ -85,17 +86,10 @@ export function UploadForm({
                 />
             </InputGroup>
             <InputGroup label="Format" className="whitespace-nowrap">
-                <SimpleSelect
+                <FormatInput
                     formObj={formObj}
-                    placeholder="Select format"
                     name={`resources.${index}.format`}
-                    maxWidth="max-w-[70rem]"
-                    options={[
-                        { value: 'csv', label: 'CSV' },
-                        { value: 'json', label: 'JSON' },
-                        { value: 'xml', label: 'XML' },
-                    ]}
-                ></SimpleSelect>
+                />
             </InputGroup>
             {dataDictionaryLoading &&
             watch(`resources.${index}.dataDictionary`) ? (

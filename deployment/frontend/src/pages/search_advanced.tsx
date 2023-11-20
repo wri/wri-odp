@@ -14,6 +14,7 @@ import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 export function getServerSideProps({ query }: { query: any }) {
     const initialFilters = query.search
@@ -35,6 +36,7 @@ export default function SearchPage({
     initialSortBy,
 }: any) {
     const router = useRouter()
+    const session = useSession()
 
     /**
      * Query used to show results
@@ -68,21 +70,59 @@ export default function SearchPage({
             if ((key as string) == 'temporal_coverage_start') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageStart = keyFilters[0]
+                    const temporalCoverageEnd = filters.find(
+                        (f) => f.key == 'temporal_coverage_end'
+                    )?.value
 
                     keyFq = `[${temporalCoverageStart?.value} TO *]`
+
+                    if (temporalCoverageEnd) {
+                        keyFq = `[* TO ${temporalCoverageEnd}]`
+                    }
                 }
             } else if ((key as string) == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageEnd = keyFilters[0]
+                    const temporalCoverageStart = filters.find(
+                        (f) => f.key == 'temporal_coverage_start'
+                    )?.value
 
-                    keyFq = `[${temporalCoverageEnd?.value} TO *]`
+                    keyFq = `[* TO ${temporalCoverageEnd?.value}]`
+
+                    if (temporalCoverageStart) {
+                        keyFq = `[${temporalCoverageStart} TO *]`
+                    }
                 }
+            } else if (
+                key === 'metadata_modified_since' ||
+                key === 'metadata_modified_before'
+            ) {
+                const metadataModifiedSinceFilter = filters.find(
+                    (f) => f.key === 'metadata_modified_since'
+                )
+                const metadataModifiedSince = metadataModifiedSinceFilter
+                    ? metadataModifiedSinceFilter.value + 'T00:00:00Z'
+                    : '*'
+
+                const metadataModifiedBeforeFilter = filters.find(
+                    (f) => f.key === 'metadata_modified_before'
+                )
+                const metadataModifiedBefore = metadataModifiedBeforeFilter
+                    ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
+                    : '*'
+
+                fq[
+                    'metadata_modified'
+                ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
             } else {
                 keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             }
 
             if (keyFq) fq[key as string] = keyFq
         })
+
+        delete fq.metadata_modified_since
+        delete fq.metadata_modified_before
 
         setQuery((prev) => {
             return {
@@ -118,28 +158,44 @@ export default function SearchPage({
         <>
             <Header />
             <Search filters={filters} setFilters={setFilters} />
-            <FilteredSearchLayout setFilters={setFilters} filters={filters}>
-                <SortBy
-                    count={data?.count ?? 0}
-                    setQuery={setQuery}
-                    query={query}
-                />
-                <FiltersSelected filters={filters} setFilters={setFilters} />
-                <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
-                    {data?.datasets.map((dataset, number) => (
-                        <DatasetHorizontalCard
-                            key={`dataset-card-${dataset.name}`}
-                            dataset={dataset}
-                        />
-                    ))}
-                    {isLoading && (
-                        <div className="mx-auto">
-                            <Spinner />
-                        </div>
-                    )}
+            {session.status == 'loading' && (
+                <div className="flex w-full justify-center mt-20">
+                    <Spinner />
                 </div>
-                {<Pagination setQuery={setQuery} query={query} data={data} />}
-            </FilteredSearchLayout>
+            )}
+            {session.status != 'loading' && (
+                <FilteredSearchLayout setFilters={setFilters} filters={filters}>
+                    <SortBy
+                        count={data?.count ?? 0}
+                        setQuery={setQuery}
+                        query={query}
+                    />
+                    <FiltersSelected
+                        filters={filters}
+                        setFilters={setFilters}
+                    />
+                    <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
+                        {data?.datasets.map((dataset, number) => (
+                            <DatasetHorizontalCard
+                                key={`dataset-card-${dataset.name}`}
+                                dataset={dataset}
+                            />
+                        ))}
+                        {isLoading && (
+                            <div className="mx-auto">
+                                <Spinner />
+                            </div>
+                        )}
+                    </div>
+                    {
+                        <Pagination
+                            setQuery={setQuery}
+                            query={query}
+                            data={data}
+                        />
+                    }
+                </FilteredSearchLayout>
+            )}
             <Footer />
         </>
     )

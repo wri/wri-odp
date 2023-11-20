@@ -1,6 +1,7 @@
 import { WriDataset } from '@/schema/ckan.schema'
 import {
     ChartBarIcon,
+    ExclamationCircleIcon,
     ExclamationTriangleIcon,
     GlobeAltIcon,
     TableCellsIcon,
@@ -11,34 +12,54 @@ import {
     MapPinIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { colors } from '../datasets/sections/DataFiles'
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from '../_shared/Tooltip'
+import Chip from '../_shared/Chip'
+import { useSession } from 'next-auth/react'
+import { visibilityTypeLabels } from '@/utils/constants'
+import { getFormatColor, formatColors } from '@/utils/formatColors'
 
 export default function DatasetHorizontalCard({
     dataset,
 }: {
     dataset: WriDataset
 }) {
+    const session = useSession()
+
     const formats = [
         ...new Set(dataset.resources.map((r) => r.format).filter((f) => f)),
     ]
 
     return (
-        <Link href="/datasets/x">
+        <Link href={`/datasets/${dataset.name}`}>
             <div className="grid gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100 lg:grid-cols-5">
                 <div className="col-span-full lg:col-span-4">
                     <div className="pr-4">
                         <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green">
                             {dataset.organization?.title.toUpperCase()}
                         </p>
-                        <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900">
-                            {dataset.title}
-                        </h3>
+
+                        <div className="flex items-center">
+                            <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900">
+                                {dataset.title}
+                            </h3>
+                            {dataset.visibility_type &&
+                                session.status == 'authenticated' &&
+                                dataset.visibility_type != 'public' && (
+                                    <Chip
+                                        text={
+                                            visibilityTypeLabels[
+                                                dataset.visibility_type
+                                            ] ?? ''
+                                        }
+                                    />
+                                )}
+                        </div>
+
                         <p className="font-['Acumin Pro SemiCondensed'] text-base font-light text-stone-900 h-[4.5em] line-clamp-3">
                             {dataset.short_description ?? dataset.notes}
                         </p>
@@ -105,7 +126,9 @@ export default function DatasetHorizontalCard({
                     <div className="mt-4 flex justify-start gap-x-3">
                         <div
                             className={`flex justify-start gap-x-3 ${
-                                dataset.cautions ? 'border-r border-black' : ''
+                                dataset.cautions || !dataset.technical_notes
+                                    ? 'border-r border-black'
+                                    : ''
                             } pr-3`}
                         >
                             <div className="rounded-full bg-stone-100 p-1">
@@ -132,6 +155,23 @@ export default function DatasetHorizontalCard({
                                 </TooltipProvider>
                             </div>
                         )}
+                        {!dataset.technical_notes && (
+                            <div className="rounded-full bg-stone-100 p-1 w-7 h-7">
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <ExclamationCircleIcon className="h-5 w-5 text-red-600" />
+                                        </TooltipTrigger>
+                                        <TooltipContent className="bg-neutral-200">
+                                            <p>
+                                                This dataset is not approved by
+                                                RDI
+                                            </p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="col-span-full w-full border-t border-stone-200 lg:col-span-1 lg:border-l lg:border-t-0">
@@ -140,8 +180,9 @@ export default function DatasetHorizontalCard({
                             <span
                                 key={`dataset-${dataset.name}-format-${format}`}
                                 className={`flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black ${
-                                    format && format in colors
-                                        ? colors[format?.toUpperCase()]
+                                    format &&
+                                    format in Object.keys(formatColors)
+                                        ? getFormatColor(format)
                                         : 'bg-wri-light-green'
                                 }`}
                             >

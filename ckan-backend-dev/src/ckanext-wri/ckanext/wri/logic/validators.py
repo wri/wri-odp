@@ -80,3 +80,25 @@ def iso_language_code(value: Any, context: Context):
         raise Invalid("Value must be a valid ISO 639-1 language code")
 
     return value
+
+
+def year_validator(value: Any, context: Context):
+    """
+    Check that the value is a valid year.
+
+    e.g. "2020"
+    """
+    if not value:
+        return
+
+    try:
+        value = int(value)
+    except ValueError as e:
+        log.error(f'Value must be a valid 4-digit year: {e}')
+        raise Invalid("Value must be a valid 4-digit year")
+
+    if value < 0 or value > 3000:
+        log.error(f'Value must be a valid 4-digit year: {value}')
+        raise Invalid("Value must be a valid 4-digit year")
+
+    return value

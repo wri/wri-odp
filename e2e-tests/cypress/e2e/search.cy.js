@@ -18,7 +18,7 @@ const facets = [
   "Location",
   "Featured",
   "Application",
-  "Projects",
+  "Project",
   "Team",
   "Topics",
   "Tags",
@@ -28,7 +28,6 @@ const facets = [
   "License",
   "Language",
   "WRI Data",
-  "Visibility",
 ];
 
 describe("Search page", () => {
@@ -56,12 +55,13 @@ describe("Search page", () => {
         application: i < 7 ? "Application 1" : "Application 2",
         tags: i < 7 ? [{ name: "tags 1" }] : [{ name: "tags 2" }],
         temporal_coverage_start: i < 7 ? 2005 : 2010,
-        temporal_coverage_end: i < 7 ? 20010 : 2012,
+        temporal_coverage_end: i < 7 ? 2010 : 2012,
         update_frequency: i < 7 ? "annually" : "daily",
         language: i < 7 ? "en" : "pt",
         wri_data: i < 7 ? true : false,
+        visibility_type: 'public'
       });
-      groups.push(name);
+      datasets.push(name);
     });
   });
 
@@ -92,15 +92,53 @@ describe("Search page", () => {
     cy.contains("results", { timeout: 10000 });
   });
 
+  it("allows faceting by last updated since and before dates", () => {
+    cy.visit("/search_advanced");
+    cy.contains("Open sidebar").click();
+    cy.get("#facets-list")
+    cy.contains("Last Updated").focus().click({ force: true });
+
+    const today = new Date();
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+
+    const combinations = [
+      { since: yesterday, before: today, results: true },
+      { since: today, before: tomorrow, results: true },
+      { since: today, before: today, results: true },
+      { since: tomorrow, before: tomorrow, results: null },
+      { since: today, before: yesterday, results: null },
+      { since: yesterday, before: yesterday, results: false }
+    ];
+
+    combinations.forEach((combination) => {
+      const sinceDateFormatted = combination.since.toISOString().split('T')[0];
+      const beforeDateFormatted = combination.before.toISOString().split('T')[0];
+
+      cy.get("#since-date").type(sinceDateFormatted, { force: true });
+      cy.get("#before-date").type(beforeDateFormatted, { force: true });
+
+      if (combination.results === true) {
+        cy.contains("results", { timeout: 10000 });
+      } else if (combination.results === null) {
+        cy.on("window:alert", (message) => {
+          expect(message).to.contains("Invalid date range");
+        });
+      } else {
+        cy.contains("0 results", { timeout: 10000 });
+      }
+    });
+  });
+
   after(() => {
     // Delete and purge datasets
     datasets.forEach((name) => cy.deleteDatasetAPI(name));
-    datasets.forEach((name) => cy.purgeDataset(name));
+    // datasets.forEach((name) => cy.purgeDataset(name));
 
-    datasets.forEach((name) => cy.deleteGroupAPI(name));
-    datasets.forEach((name) => cy.purgeGroup(name));
+    groups.forEach((name) => cy.deleteGroupAPI(name));
+    groups.forEach((name) => cy.purgeGroup(name));
 
-    datasets.forEach((name) => cy.deleteOrganizationAPI(name));
-    datasets.forEach((name) => cy.purgeOrganization(name));
+    orgs.forEach((name) => cy.deleteOrganizationAPI(name));
+    orgs.forEach((name) => cy.purgeOrganization(name));
   });
 });

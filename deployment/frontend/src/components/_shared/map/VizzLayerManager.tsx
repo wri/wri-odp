@@ -43,6 +43,7 @@ class LayerManagerComponent extends PureComponent<LayerManagerProps> {
           if (React.isValidElement(child)) {
             const { zIndex } = child.props as ChildProps;
             return cloneElement(child, {
+              key: i,
               //@ts-ignore
               layerManager: this.layerManager,
               zIndex: zIndex || 1000 - i,

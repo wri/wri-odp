@@ -6,6 +6,7 @@ import {
     ArrowPathIcon,
     ArrowTopRightOnSquareIcon,
     ClockIcon,
+    FingerPrintIcon,
     LightBulbIcon,
     MagnifyingGlassIcon,
     MapPinIcon,
@@ -13,31 +14,41 @@ import {
 import { DownloadButton } from './datafiles/Download'
 import { LearnMoreButton } from './datafiles/LearnMore'
 import { OpenInButton } from './datafiles/OpenIn'
+import { Resource } from '@/interfaces/dataset.interface'
+import { getFormatColor } from '@/utils/formatColors'
+import { Index } from 'flexsearch'
+import { useState } from 'react'
+import { WriDataset } from '@/schema/ckan.schema'
 
-const datafilesMock = [
-    { format: 'TIFF', name: 'Name of the file', canShow: true, showing: true },
-    { format: 'CSV', name: 'Name of the file', canShow: false, showing: false },
-    {
-        format: 'GEOJSON',
-        name: 'Name of the file',
-        canShow: true,
-        showing: false,
-    },
-]
-
-export function DataFiles() {
+export function DataFiles({
+    dataset,
+    index,
+}: {
+    dataset: WriDataset
+    index: Index
+}) {
+    const datafiles = dataset?.resources
+    const [q, setQ] = useState('')
+    const filteredDatafiles =
+        q !== ''
+            ? datafiles?.filter((datafile) =>
+                  index.search(q).includes(datafile.id)
+              )
+            : datafiles
     return (
         <>
             <div className="relative py-4">
                 <input
                     className="block w-full rounded-md border-b border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
+                    onChange={(e) => setQ(e.target.value)}
+                    value={q}
                     placeholder="Search data"
                 />
                 <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
             </div>
             <div className="flex justify-between pb-1">
                 <span className="font-acumin text-base font-normal text-black">
-                    3 Data Files
+                    {filteredDatafiles?.length ?? 0} Data Files
                 </span>
                 <div className="flex gap-x-4">
                     <div className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline">
@@ -49,35 +60,32 @@ export function DataFiles() {
                 </div>
             </div>
             <div className="flex flex-col gap-y-4">
-                {datafilesMock.map((datafile) => (
-                    <DatafileCard key={datafile.format} datafile={datafile} />
+                {filteredDatafiles?.map((datafile) => (
+                    <DatafileCard
+                        key={datafile.id}
+                        datafile={datafile}
+                        dataset={dataset}
+                    />
                 ))}
             </div>
         </>
     )
 }
 
-export const colors: Record<string, string> = {
-    // NOTE: colors may have to be tweaked
-    TIFF: 'bg-wri-light-green',
-    CSV: 'bg-wri-light-yellow',
-    GEOJSON: 'bg-wri-light-blue',
-    HTML: 'bg-wri-gold',
-    PDF: 'bg-wri-light-gray',
-    XLS: 'wri-green',
-    XLSX: 'wri-darl-blue',
-    API: 'wri-gray',
-    ZIP: 'wri-slate',
-}
-
-interface Datafile {
-    format: string
-    name: string
-    showing: boolean
-    canShow: boolean
-}
-
-function DatafileCard({ datafile }: { datafile: Datafile }) {
+function DatafileCard({
+    datafile,
+    dataset,
+}: {
+    datafile: Resource
+    dataset: WriDataset
+}) {
+    const created_at = new Date(datafile?.created ?? '')
+    const last_updated = new Date(datafile?.metadata_modified ?? '')
+    const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    } as const
     return (
         <Disclosure>
             {({ open }) => (
@@ -94,24 +102,26 @@ function DatafileCard({ datafile }: { datafile: Datafile }) {
                         )}
                     >
                         <div className="flex items-center gap-3">
-                            <span
-                                className={classNames(
-                                    'hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',
-                                    colors[datafile.format] ?? 'bg-gray-400'
-                                )}
-                            >
-                                <span className="my-auto">
-                                    {datafile.format}
+                            {datafile?.format && (
+                                <span
+                                    className={classNames(
+                                        'hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',
+                                        getFormatColor(datafile?.format ?? '')
+                                    )}
+                                >
+                                    <span className="my-auto">
+                                        {datafile.format}
+                                    </span>
                                 </span>
-                            </span>
+                            )}
                             <Disclosure.Button>
                                 <h3 className="font-acumin text-lg font-semibold leading-loose text-stone-900">
-                                    {datafile.name}
+                                    {datafile.title ?? datafile.name}
                                 </h3>
                             </Disclosure.Button>
                         </div>
                         <div className="flex gap-x-2">
-                            {datafile.canShow && (
+                            {/*{datafile.canShow && (
                                 <>
                                     {datafile.showing ? (
                                         <Button variant="light" size="sm">
@@ -125,7 +135,7 @@ function DatafileCard({ datafile }: { datafile: Datafile }) {
                                         </Button>
                                     )}
                                 </>
-                            )}
+                            )} */}
                             <Disclosure.Button>
                                 <ChevronDownIcon
                                     className={`${
@@ -147,35 +157,31 @@ function DatafileCard({ datafile }: { datafile: Datafile }) {
                     >
                         <Disclosure.Panel className="py-3">
                             <p className="font-acumin text-base font-light text-stone-900">
-                                Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit. Etiam porta sem malesuada magna
-                                mollis euismod. Aenean lacinia bibendum nulla
-                                sed consectetur. Nullam quis risus eget urna
-                                mollis ornare vel eu leo.
+                                {datafile.description ?? 'No Description'}
                             </p>
                             <div className="mt-[0.33rem] flex justify-start gap-x-3">
                                 <div className="flex flex-row items-center gap-x-1">
+                                    <FingerPrintIcon className="h-3 w-3 text-blue-800" />
+                                    <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
+                                        {created_at.toLocaleDateString(
+                                            'en-US',
+                                            options
+                                        )}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-x-1">
                                     <ArrowPathIcon className="h-3 w-3 text-blue-800" />
                                     <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
-                                        2 Feb 2023
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-x-1">
-                                    <ClockIcon className="h-3 w-3 text-blue-800" />
-                                    <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
-                                        2020 - 2023
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-x-1">
-                                    <MapPinIcon className="h-3 w-3 text-blue-800" />
-                                    <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
-                                        Sub-Regional
+                                        {last_updated.toLocaleDateString(
+                                            'en-US',
+                                            options
+                                        )}
                                     </p>
                                 </div>
                             </div>
                             <div className="grid max-w-[30rem] grid-cols-3 gap-x-3 py-4 ">
-                                <DownloadButton />
-                                <LearnMoreButton />
+                                <DownloadButton datafile={datafile} />
+                                {/*<LearnMoreButton datafile={datafile} dataset={dataset} />*/}
                                 <OpenInButton />
                             </div>
                         </Disclosure.Panel>

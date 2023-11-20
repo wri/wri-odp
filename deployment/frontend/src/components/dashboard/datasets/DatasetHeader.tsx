@@ -4,7 +4,8 @@ import SelectFilter from '../_shared/SelectFilter'
 import { api } from '@/utils/api'
 import type { SearchInput } from '@/schema/search.schema';
 import { getKeyValues } from '@/utils/general';
-import type { GroupTree } from "@/schema/ckan.schema";
+import type { Group } from '@portaljs/ckan'
+import type { WriOrganization } from '@/schema/ckan.schema'
 
 type IOrg = {
   title: string | undefined;
@@ -14,9 +15,8 @@ type IOrg = {
 }
 
 function LeftNode({ setQuery, query }: { setQuery: React.Dispatch<React.SetStateAction<SearchInput>>, query: SearchInput }) {
-  const [queryN, setQueryN] = useState<SearchInput>({ search: '', page: { start: 0, rows: 100 } })
-  const { data: team, isLoading: isLoadingTeam } = api.organization.getUsersOrganizations.useQuery(queryN)
-  const { data: topics, isLoading: isLoadingTopics } = api.topics.getUsersTopics.useQuery(queryN)
+  const { data: team, isLoading: isLoadingTeam } = api.organization.getAllOrganizations.useQuery()
+  const { data: topics, isLoading: isLoadingTopics } = api.topics.getAllTopics.useQuery()
 
   if (isLoadingTeam || isLoadingTopics) return (
     <div className='flex  gap-x-3'>
@@ -42,9 +42,9 @@ function LeftNode({ setQuery, query }: { setQuery: React.Dispatch<React.SetState
   return (
     <div className='flex  gap-x-3'>
       <SelectFilter
-        options={[{ id: "None", label: "All teams" }].concat(getKeyValues(team?.organizations as IOrg[], "title", "name"))} filtername="organization" setQuery={setQuery} query={query} />
+        options={[{ id: "None", label: "All teams" }].concat(getKeyValues(team as WriOrganization[], "title", "name"))} filtername="organization" setQuery={setQuery} query={query} />
       <SelectFilter
-        options={[{ id: "None", label: "All topics" }].concat(getKeyValues(topics?.topics as GroupTree[], "name", "name"))} setQuery={setQuery} query={query} filtername='group' />
+        options={[{ id: "None", label: "All topics" }].concat(getKeyValues(topics as Group[], "name", "name"))} setQuery={setQuery} query={query} filtername='groups' />
     </div>
   )
 

@@ -19,13 +19,7 @@ export const ResourceSchema = z.object({
     url: z.string().min(2, { message: 'URL is required' }).url().optional(),
     name: z.string().optional(),
     key: z.string().optional(),
-    format: z
-        .object({
-            value: z.string(),
-            label: z.string(),
-        })
-        .optional()
-        .nullable(),
+    format: z.string().optional().nullable(),
     size: z.number().optional(),
     title: z.string().min(1, { message: 'Title is required' }),
     fileBlob: z.any(),
@@ -44,17 +38,13 @@ export const DatasetSchema = z
                 label: z.string(),
             })
             .optional(),
-        team: z
-            .object({
-                value: z.string(),
-                label: z.string(),
-                id: z.string(),
-            })
-            .refine((val) => val.value !== '', {
-                message: 'Team is required',
-            }),
-        projects: z.array(z.string()),
-        applications: z.string().optional().nullable(),
+        team: z.object({
+            value: z.string(),
+            label: z.string(),
+            id: z.string(),
+        }),
+        project: z.string().optional().nullable().or(emptyStringToUndefined),
+        application: z.string().optional().nullable(),
         technical_notes: z
             .string()
             .url()
@@ -63,12 +53,12 @@ export const DatasetSchema = z
             .or(emptyStringToUndefined),
         tags: z.array(z.string()),
         topics: z.array(z.string()),
-        temporalCoverageStart: z
+        temporal_coverage_start: z
             .number()
             .optional()
             .nullable()
             .or(nanToUndefined),
-        temporalCoverageEnd: z
+        temporal_coverage_end: z
             .number()
             .optional()
             .nullable()
@@ -76,8 +66,8 @@ export const DatasetSchema = z
         update_frequency: z
             .object({
                 value: z.enum([
-                    'anually',
-                    'bianually',
+                    'annually',
+                    'biannually',
                     'weekly',
                     'as_needed',
                     'hourly',
@@ -97,7 +87,7 @@ export const DatasetSchema = z
             })
             .optional()
             .default({ value: 'public', label: 'Public' }),
-        license: z
+        license_id: z
             .object({
                 value: z.string(),
                 label: z.string(),
@@ -107,6 +97,7 @@ export const DatasetSchema = z
             .string()
             .min(1, { message: 'Description is required' }),
         notes: z.string().optional().nullable(),
+        wri_data: z.boolean().optional().nullable(),
         featured_dataset: z.boolean().optional().nullable(),
         featured_image: z.string().optional().nullable(),
         signedUrl: z.string().url().optional().nullable(),
@@ -124,7 +115,7 @@ export const DatasetSchema = z
             .nullable()
             .or(emptyStringToUndefined),
         cautions: z.string().optional().nullable(),
-        summary: z.string().optional().nullable(),
+        methodology: z.string().optional().nullable(),
         extras: z.array(
             z.object({
                 key: z.string(),
@@ -139,6 +130,17 @@ export const DatasetSchema = z
         ),
         resources: z.array(ResourceSchema),
     })
+    .refine(
+        (obj) => {
+            if (!obj.featured_dataset) return true
+            if (obj.featured_dataset && !obj.featured_image) return false
+            return true
+        },
+        {
+            message: 'An image is required for featured datasets',
+            path: ['featured_image'],
+        }
+    )
     .refine(
         (obj) => {
             if (obj.visibility_type.value !== 'public') return true

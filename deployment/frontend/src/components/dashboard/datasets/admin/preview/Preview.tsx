@@ -38,7 +38,7 @@ export function Preview({
                     {watch('title')}
                 </h1>
                 <h2 className="font-['Acumin Pro SemiCondensed'] text-lg font-semibold leading-tight text-stone-500">
-                    /dataset/{watch('name')}
+                    /datasets/{watch('name')}
                 </h2>
 
                 <div className="py-8">
@@ -61,12 +61,8 @@ export function Preview({
                                     text={watch('team')?.label ?? '_'}
                                 />
                                 <SimpleDescription
-                                    label="Projects"
-                                    text={
-                                        watch('projects')
-                                            ? watch('projects').join(', ')
-                                            : '_'
-                                    }
+                                    label="Project"
+                                    text={watch('project') ?? '_'}
                                 />
                                 <ListOfItems
                                     label="Topics"
@@ -91,12 +87,12 @@ export function Preview({
                                 <SimpleDescription
                                     label="Temporal Coverage"
                                     text={
-                                        watch('temporalCoverageStart') ||
-                                        watch('temporalCoverageEnd')
+                                        watch('temporal_coverage_start') ||
+                                        watch('temporal_coverage_end')
                                             ? `${watch(
-                                                  'temporalCoverageStart'
+                                                  'temporal_coverage_start'
                                               )} - ${watch(
-                                                  'temporalCoverageEnd'
+                                                  'temporal_coverage_end'
                                               )}`
                                             : '_'
                                     }
@@ -119,7 +115,7 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="License"
-                                    text={watch('license')?.label ?? '_'}
+                                    text={watch('license_id')?.label ?? '_'}
                                 />
                             </dl>
                         </div>
@@ -180,7 +176,7 @@ export function Preview({
                         watch('restrictions') ||
                         watch('learn_more') ||
                         watch('reason_for_adding') ||
-                        watch('summary') ||
+                        watch('methodology') ||
                         watch('cautions')) && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
@@ -227,10 +223,10 @@ export function Preview({
                                             }}
                                         ></div>
                                     </FullDescription>
-                                    <FullDescription label="Summary">
+                                    <FullDescription label="Methodology">
                                         <div
                                             dangerouslySetInnerHTML={{
-                                                __html: watch('summary') ?? '_',
+                                                __html: watch('methodology') ?? '_',
                                             }}
                                         ></div>
                                     </FullDescription>
@@ -252,7 +248,7 @@ export function Preview({
                                         }
                                         title={resource.title ?? '-'}
                                         type={resource.type ?? 'empty'}
-                                        format={resource.format?.label ?? '-'}
+                                        format={resource.format ?? '-'}
                                         size={resource.size ?? null}
                                         description={
                                             resource.description ?? '-'

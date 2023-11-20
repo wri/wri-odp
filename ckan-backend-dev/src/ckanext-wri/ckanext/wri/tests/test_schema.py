@@ -26,7 +26,7 @@ def test_package_create():
         "url": "http://example.com/dataset.json",
         "language": "en",
         "owner_org": organization_dict["id"],
-        "projects": ["wri", "gfw"],
+        "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
         "application": "rw",
         "groups": [{"id": group_dict["id"]}],
         "technical_notes": "http://example.com/technical_notes.pdf",
@@ -49,7 +49,7 @@ def test_package_create():
         "reason_for_adding": "This data is being added because...",
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
-        "summary": "A short summary of the dataset"
+        "methodology": "A short methodology of the dataset"
     }
 
     try:
@@ -72,7 +72,7 @@ def test_package_create():
     assert result["url"] == dataset["url"]
     assert result["language"] == dataset["language"]
     assert result["owner_org"] == organization_dict["id"]
-    assert result["projects"] == dataset["projects"]
+    assert result["project"] == dataset["project"]
     assert result["application"] == dataset["application"]
     assert result["groups"][0]["name"] == group_dict["name"]
     assert result["technical_notes"] == dataset["technical_notes"]
@@ -97,7 +97,7 @@ def test_package_create():
     assert result["reason_for_adding"] == dataset["reason_for_adding"]
     assert result["learn_more"] == dataset["learn_more"]
     assert result["cautions"] == dataset["cautions"]
-    assert result["summary"] == dataset["summary"]
+    assert result["methodology"] == dataset["methodology"]
 
     invalid_urls = ["invalid_url_1", "invalid_url_2", "invalid_url_3"]
 

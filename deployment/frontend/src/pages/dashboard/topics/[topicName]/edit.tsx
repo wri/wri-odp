@@ -5,6 +5,7 @@ import EditTopicForm from '@/components/dashboard/topics/forms/EditTopicForm'
 import { getServerAuthSession } from '@/server/auth'
 import { api } from '@/utils/api'
 import { GetServerSideProps, NextPage } from 'next'
+import { NextSeo } from 'next-seo'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const session = await getServerAuthSession(context)
@@ -29,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 }
 
-const EditTeamPage: NextPage<{ topicName: string }> = ({ topicName }) => {
+const EditTopicPage: NextPage<{ topicName: string }> = ({ topicName }) => {
     const {
         data: topic,
         isLoading,
@@ -38,6 +39,9 @@ const EditTeamPage: NextPage<{ topicName: string }> = ({ topicName }) => {
     if (isLoading) return <Loading />
     return (
         <>
+            <NextSeo
+                title={`Edit ${topic?.title ?? topic?.name}`}
+            />
             <Header />
             {isError && (
                 <Container className="mb-20 font-acumin">
@@ -51,4 +55,4 @@ const EditTeamPage: NextPage<{ topicName: string }> = ({ topicName }) => {
     )
 }
 
-export default EditTeamPage
+export default EditTopicPage

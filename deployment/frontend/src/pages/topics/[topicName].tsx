@@ -8,6 +8,7 @@ import Subtopics from '@/components/topics/Subtopics'
 import { useState } from 'react'
 import { SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
+import { NextSeo } from 'next-seo'
 
 const links = [
     { label: 'Topics', url: '/topics', current: false },
@@ -22,8 +23,11 @@ export default function TopicPage() {
     })
 
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
+
+    const topic = { title: 'Team Title', name: 'Team Name' }
     return (
         <>
+            <NextSeo title={`${topic?.title ?? topic?.name} - Topics`} />
             <Header />
             <Breadcrumbs links={links} />
             <Hero />

@@ -13,7 +13,9 @@ import { SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
 import { useSession } from 'next-auth/react'
 import TemporalCoverageFacet from './TemporalCoverageFacet'
+import MetadataModifiedFacet from './MetadataModifiedFacet'
 import Spinner from '../_shared/Spinner'
+import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants'
 
 export default function FilteredSearchLayout({
     children,
@@ -35,7 +37,7 @@ export default function FilteredSearchLayout({
     const facetFields = [
         { key: 'featured_dataset', title: 'Featured' },
         { key: 'application', title: 'Application' },
-        { key: 'projects', title: 'Projects' },
+        { key: 'project', title: 'Project' },
         { key: 'organization', title: 'Team' },
         { key: 'groups', title: 'Topics' },
         { key: 'tags', title: 'Tags' },
@@ -48,8 +50,12 @@ export default function FilteredSearchLayout({
         { key: 'license_id', title: 'License' },
         { key: 'language', title: 'Language' },
         { key: 'wri_data', title: 'WRI Data' },
-        { key: 'visibility_type', title: 'Visibility' },
+        { key: 'metadata_modified', title: 'Last Updated' },
     ]
+
+    if (session.status == 'authenticated') {
+        facetFields.push({ key: 'visibility_type', title: 'Visibility' })
+    }
 
     const [facetsQuery] = useState<SearchInput>({
         search: '',
@@ -77,6 +83,20 @@ export default function FilteredSearchLayout({
 
                 // @ts-ignore
                 searchFacets[key].items = items
+            } else if (key == 'visibility_type') {
+                // @ts-ignore
+                searchFacets[key].items = searchFacets[key].items.map((i) => ({
+                    ...i,
+                    // @ts-ignore
+                    display_name: visibilityTypeLabels[i.name],
+                }))
+            } else if (key == 'update_frequency') {
+                // @ts-ignore
+                searchFacets[key].items = searchFacets[key].items.map((i) => ({
+                    ...i,
+                    // @ts-ignore
+                    display_name: updateFrequencyLabels[i.name],
+                }))
             }
         }
     }
@@ -149,7 +169,10 @@ export default function FilteredSearchLayout({
                                         </div>
                                     </Transition.Child>
                                     {/* Sidebar component, swap this element with another sidebar if you like */}
-                                    <div id="facets-list" className="flex grow flex-col gap-y-5 overflow-y-auto bg-white pb-4">
+                                    <div
+                                        id="facets-list"
+                                        className="flex grow flex-col gap-y-5 overflow-y-auto bg-white pb-4"
+                                    >
                                         <nav className="flex flex-1 flex-col">
                                             <ul
                                                 role="list"
@@ -161,8 +184,25 @@ export default function FilteredSearchLayout({
                                                         {!isLoadingFacets &&
                                                             facetFields.map(
                                                                 (ff) =>
-                                                                    ff.key !=
-                                                                    'temporal_coverage' ? (
+                                                                    ff.key === 'temporal_coverage' ? (
+                                                                        <TemporalCoverageFacet
+                                                                            filters={
+                                                                                filters
+                                                                            }
+                                                                            setFilters={
+                                                                                setFilters
+                                                                            }
+                                                                        />
+                                                                    ) : ff.key === 'metadata_modified' ? (
+                                                                        <MetadataModifiedFacet
+                                                                            filters={
+                                                                                filters
+                                                                            }
+                                                                            setFilters={
+                                                                                setFilters
+                                                                            }
+                                                                        />
+                                                                    ) : (
                                                                         <Facet
                                                                             text={
                                                                                 ff.title
@@ -176,14 +216,23 @@ export default function FilteredSearchLayout({
                                                                                     ? searchFacets[
                                                                                           ff
                                                                                               .key
-                                                                                      ]?.items.map(
-                                                                                          (
-                                                                                              o
-                                                                                          ) => ({
-                                                                                              label: o.display_name,
-                                                                                              value: o.name,
-                                                                                          })
-                                                                                      ) ||
+                                                                                      ]?.items
+                                                                                          .filter(
+                                                                                              (
+                                                                                                  o
+                                                                                              ) =>
+                                                                                                  o.name
+                                                                                          )
+                                                                                          .map(
+                                                                                              (
+                                                                                                  o
+                                                                                              ) => ({
+                                                                                                  label:
+                                                                                                      o.display_name ??
+                                                                                                      o.name,
+                                                                                                  value: o.name,
+                                                                                              })
+                                                                                          ) ||
                                                                                       []
                                                                                     : []
                                                                             }
@@ -195,15 +244,6 @@ export default function FilteredSearchLayout({
                                                                             }
                                                                             filters={
                                                                                 filters
-                                                                            }
-                                                                        />
-                                                                    ) : (
-                                                                        <TemporalCoverageFacet
-                                                                            filters={
-                                                                                filters
-                                                                            }
-                                                                            setFilters={
-                                                                                setFilters
                                                                             }
                                                                         />
                                                                     )
@@ -248,7 +288,10 @@ export default function FilteredSearchLayout({
                                 className="hidden w-[25%] min-w-[25%] lg:z-10 lg:flex lg:flex-col"
                             >
                                 {/* Sidebar component, swap this element with another sidebar if you like */}
-                                <div id="facets-list" className="flex grow flex-col gap-y-5 overflow-y-auto pb-4">
+                                <div
+                                    id="facets-list"
+                                    className="flex grow flex-col gap-y-5 overflow-y-auto pb-4"
+                                >
                                     <nav className="flex flex-1 flex-col">
                                         <ul
                                             role="list"
@@ -259,8 +302,25 @@ export default function FilteredSearchLayout({
                                                     <LocationSearch />
                                                     {!isLoadingFacets &&
                                                         facetFields.map((ff) =>
-                                                            ff.key !=
-                                                            'temporal_coverage' ? (
+                                                            ff.key === 'temporal_coverage' ? (
+                                                                <TemporalCoverageFacet
+                                                                    filters={
+                                                                        filters
+                                                                    }
+                                                                    setFilters={
+                                                                        setFilters
+                                                                    }
+                                                                />
+                                                            ) : ff.key === 'metadata_modified' ? (
+                                                                <MetadataModifiedFacet
+                                                                    filters={
+                                                                        filters
+                                                                    }
+                                                                    setFilters={
+                                                                        setFilters
+                                                                    }
+                                                                />
+                                                            ) : (
                                                                 <Facet
                                                                     text={
                                                                         ff.title
@@ -274,14 +334,23 @@ export default function FilteredSearchLayout({
                                                                             ? searchFacets[
                                                                                   ff
                                                                                       .key
-                                                                              ]?.items.map(
-                                                                                  (
-                                                                                      o
-                                                                                  ) => ({
-                                                                                      label: o.display_name,
-                                                                                      value: o.name,
-                                                                                  })
-                                                                              ) ||
+                                                                              ]?.items
+                                                                                  .filter(
+                                                                                      (
+                                                                                          o
+                                                                                      ) =>
+                                                                                          o.name
+                                                                                  )
+                                                                                  .map(
+                                                                                      (
+                                                                                          o
+                                                                                      ) => ({
+                                                                                          label:
+                                                                                              o.display_name ??
+                                                                                              o.name,
+                                                                                          value: o.name,
+                                                                                      })
+                                                                                  ) ||
                                                                               []
                                                                             : []
                                                                     }
@@ -293,15 +362,6 @@ export default function FilteredSearchLayout({
                                                                     }
                                                                     filters={
                                                                         filters
-                                                                    }
-                                                                />
-                                                            ) : (
-                                                                <TemporalCoverageFacet
-                                                                    filters={
-                                                                        filters
-                                                                    }
-                                                                    setFilters={
-                                                                        setFilters
                                                                     }
                                                                 />
                                                             )
