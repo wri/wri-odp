@@ -74,9 +74,11 @@ export default function SearchPage({
                         (f) => f.key == 'temporal_coverage_end'
                     )?.value
 
-                    keyFq = `[${temporalCoverageStart?.value} TO ${
-                        temporalCoverageEnd ?? '*'
-                    }]`
+                    keyFq = `[${temporalCoverageStart?.value} TO *]`
+
+                    if (temporalCoverageEnd) {
+                        keyFq = `[* TO ${temporalCoverageEnd}]`
+                    }
                 }
             } else if ((key as string) == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
@@ -85,16 +87,33 @@ export default function SearchPage({
                         (f) => f.key == 'temporal_coverage_start'
                     )?.value
 
-                    keyFq = `[${temporalCoverageStart ?? "*"} TO ${temporalCoverageEnd?.value}]`
+                    keyFq = `[* TO ${temporalCoverageEnd?.value}]`
+
+                    if (temporalCoverageStart) {
+                        keyFq = `[${temporalCoverageStart} TO *]`
+                    }
                 }
-            } else if (key === 'metadata_modified_since' || key === 'metadata_modified_before') {
-                const metadataModifiedSinceFilter = filters.find(f => f.key === 'metadata_modified_since');
-                const metadataModifiedSince = metadataModifiedSinceFilter ? metadataModifiedSinceFilter.value + 'T00:00:00Z' : '*';
+            } else if (
+                key === 'metadata_modified_since' ||
+                key === 'metadata_modified_before'
+            ) {
+                const metadataModifiedSinceFilter = filters.find(
+                    (f) => f.key === 'metadata_modified_since'
+                )
+                const metadataModifiedSince = metadataModifiedSinceFilter
+                    ? metadataModifiedSinceFilter.value + 'T00:00:00Z'
+                    : '*'
 
-                const metadataModifiedBeforeFilter = filters.find(f => f.key === 'metadata_modified_before');
-                const metadataModifiedBefore = metadataModifiedBeforeFilter ? metadataModifiedBeforeFilter.value + 'T23:59:59Z' : '*';
+                const metadataModifiedBeforeFilter = filters.find(
+                    (f) => f.key === 'metadata_modified_before'
+                )
+                const metadataModifiedBefore = metadataModifiedBeforeFilter
+                    ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
+                    : '*'
 
-                fq['metadata_modified'] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`;
+                fq[
+                    'metadata_modified'
+                ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
             } else {
                 keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             }
@@ -102,8 +121,8 @@ export default function SearchPage({
             if (keyFq) fq[key as string] = keyFq
         })
 
-        delete fq.metadata_modified_since;
-        delete fq.metadata_modified_before;
+        delete fq.metadata_modified_since
+        delete fq.metadata_modified_before
 
         setQuery((prev) => {
             return {
