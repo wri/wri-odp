@@ -59,7 +59,7 @@ export function About({ dataset }: { dataset: WriDataset }) {
                                 License:{' '}
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
-                                {dataset.project ?? ' - '}
+                                {dataset.license_title ?? ' - '}
                             </dd>
                         </>
                     </div>
