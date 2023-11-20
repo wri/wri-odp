@@ -44,7 +44,7 @@ export const DatasetSchema = z
             id: z.string(),
         }),
         project: z.string().optional().nullable().or(emptyStringToUndefined),
-        applications: z.string().optional().nullable(),
+        application: z.string().optional().nullable(),
         technical_notes: z
             .string()
             .url()

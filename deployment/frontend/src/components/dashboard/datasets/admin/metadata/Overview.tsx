@@ -155,7 +155,7 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup label="Application">
                         <Input
-                            {...register('applications')}
+                            {...register('application')}
                             placeholder="ex. Global Forest Watch"
                             type="text"
                         />
