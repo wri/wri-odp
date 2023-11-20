@@ -1,9 +1,14 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import ckan.lib.plugins as lib_plugins
 
 import ckanext.wri.logic.action as action
 import ckanext.wri.logic.validators as wri_validators
 from ckanext.wri.logic.action.get import package_search
+from ckan import model, logic, authz
+
+import logging
+log = logging.getLogger(__name__)
 
 
 class WriPlugin(plugins.SingletonPlugin):
@@ -11,6 +16,7 @@ class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IActions)
+    plugins.implements(plugins.IPermissionLabels)
 
     # IConfigurer
 
@@ -56,3 +62,47 @@ class WriPlugin(plugins.SingletonPlugin):
             'password_reset': action.password_reset
 
         }
+
+    # IPermissionLabels
+
+    def get_dataset_labels(self, dataset_obj: model.Package) -> list[str]:
+        visibility_type = dataset_obj.extras.get('visibility_type', '')
+        if dataset_obj.state == u'active' and visibility_type == "public":
+            return [u'public']
+
+        if authz.check_config_permission('allow_dataset_collaborators'):
+            # Add a generic label for all this dataset collaborators
+            labels = [u'collaborator-%s' % dataset_obj.id]
+        else:
+            labels = []
+
+        if dataset_obj.owner_org and visibility_type in ["private"]:
+            labels.append(u'member-%s' % dataset_obj.owner_org)
+        elif visibility_type == "internal":
+            labels.append(u'authenticated')
+        else: # Draft
+            labels.append(u'creator-%s' % dataset_obj.creator_user_id)
+
+        return labels
+
+    def get_user_dataset_labels(self, user_obj: model.User) -> list[str]:
+        labels = [u'public']
+        if not user_obj or user_obj.is_anonymous:
+            return labels
+
+        labels.append(u'authenticated')
+        labels.append(u'creator-%s' % user_obj.id)
+
+        orgs = logic.get_action(u'organization_list_for_user')(
+            {u'user': user_obj.id}, {u'permission': u'read'})
+        labels.extend(u'member-%s' % o[u'id'] for o in orgs)
+
+        if authz.check_config_permission('allow_dataset_collaborators'):
+            # Add a label for each dataset this user is a collaborator of
+            datasets = logic.get_action('package_collaborator_list_for_user')(
+                {'ignore_auth': True}, {'id': user_obj.id})
+
+            labels.extend('collaborator-%s' % d['package_id'] for d in datasets)
+
+        return labels
+
