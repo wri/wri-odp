@@ -127,11 +127,12 @@ export const DatasetRouter = createTRPCRouter({
                 } else {
                     fq = orgsFq
                 }
+              
 
                 if (temporalCoverageFqList.length)
                     fq += `+(${temporalCoverageFqList
                         .map((f) => `(${f})`)
-                        .join(' OR ')})`
+                        .join(' AND ')})`
             }
 
 
