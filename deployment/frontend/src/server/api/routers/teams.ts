@@ -61,7 +61,7 @@ export const teamRouter = createTRPCRouter({
                             : [],
                 })
                 const teamRes = await fetch(
-                    `${env.CKAN_URL}/api/action/organization_update`,
+                    `${env.CKAN_URL}/api/action/organization_patch`,
                     {
                         method: 'POST',
                         headers: {
@@ -90,7 +90,7 @@ export const teamRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const user = ctx.session.user
             const teamRes = await fetch(
-                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}`,
+                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
