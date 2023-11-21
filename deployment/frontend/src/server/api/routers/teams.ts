@@ -9,6 +9,7 @@ import { replaceNames } from '@/utils/replaceNames'
 export const teamRouter = createTRPCRouter({
     getAllTeams: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.session.user
+        const teamsMap = new Map()
         const teamsList = await Promise.all(
             [0, 1, 2, 3, 4, 5].map(async (i) => {
                 const teamRes = await fetch(
@@ -36,10 +37,13 @@ export const teamRouter = createTRPCRouter({
                         throw Error(replaceNames(teams.error.message, true))
                     throw Error(replaceNames(JSON.stringify(teams.error), true))
                 }
-                return teams.result.filter((team) => team.state === 'active')
+                teams.result.forEach((team) => {
+                    if (teamsMap.has(team.id)) return
+                    teamsMap.set(team.id, team)
+                })
             })
         )
-        return teamsList.flat()
+        return Array.from(teamsMap.values())
     }),
     editTeam: protectedProcedure
         .input(TeamSchema)
@@ -57,7 +61,7 @@ export const teamRouter = createTRPCRouter({
                             : [],
                 })
                 const teamRes = await fetch(
-                    `${env.CKAN_URL}/api/action/organization_update`,
+                    `${env.CKAN_URL}/api/action/organization_patch`,
                     {
                         method: 'POST',
                         headers: {
@@ -86,7 +90,7 @@ export const teamRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const user = ctx.session.user
             const teamRes = await fetch(
-                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}`,
+                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
