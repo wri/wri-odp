@@ -102,7 +102,7 @@ export const TopicRouter = createTRPCRouter({
                             : [],
                 })
                 const topicRes = await fetch(
-                    `${env.CKAN_URL}/api/action/group_update`,
+                    `${env.CKAN_URL}/api/action/group_patch`,
                     {
                         method: 'POST',
                         headers: {
@@ -130,7 +130,7 @@ export const TopicRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const user = ctx.session.user
             const topicRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_show?id=${input.id}`,
+                `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
