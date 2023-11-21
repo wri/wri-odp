@@ -1,16 +1,60 @@
 import { Button } from '@/components/_shared/Button'
 import Modal from '@/components/_shared/Modal'
+import Spinner from '@/components/_shared/Spinner'
+import { Resource } from '@/interfaces/dataset.interface'
+import { api } from '@/utils/api'
 import { convertBytes } from '@/utils/convertBytes'
 import {
     ArrowDownTrayIcon,
     PaperAirplaneIcon,
 } from '@heroicons/react/24/outline'
-import { Resource } from '@portaljs/ckan'
 import { useState } from 'react'
 
 export function DownloadButton({ datafile }: { datafile: Resource }) {
+    console.log(datafile)
     const [open, setOpen] = useState(false)
-    if (datafile.url) {
+    const { data: signedUrl, isLoading } = api.uploads.getPresignedUrl.useQuery(
+        {
+            key: datafile.key as string,
+        },
+        { enabled: !!datafile.key }
+    )
+    if (datafile.key && isLoading) {
+        return (
+            <span
+                className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
+            >
+                <Spinner className="h-5 w-5 sm:h-9 sm:w-9" />
+                <div className="font-acumin text-xs sm:text-sm font-normal text-black">
+                    Loading Link
+                </div>
+                {datafile.size && (
+                    <div className="font-acumin text-xs sm:text-xs font-normal text-black">
+                        {convertBytes(datafile.size)}
+                    </div>
+                )}
+            </span>
+        )
+    }
+    if (signedUrl && !isLoading) {
+        return (
+            <a
+                href={signedUrl}
+                className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
+            >
+                <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                <div className="font-acumin text-xs sm:text-sm font-normal text-black">
+                    Download
+                </div>
+                {datafile.size && (
+                    <div className="font-acumin text-xs sm:text-xs font-normal text-black">
+                        {convertBytes(datafile.size)}
+                    </div>
+                )}
+            </a>
+        )
+    }
+    if (!datafile.key && datafile.url) {
         return (
             <a
                 href={datafile.url}
