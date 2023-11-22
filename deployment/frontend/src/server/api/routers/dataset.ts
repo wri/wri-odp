@@ -54,10 +54,7 @@ export const DatasetRouter = createTRPCRouter({
                             format: resource.format ?? '',
                             id: resource.resourceId,
                             url_type: resource.type,
-                            schema: resource.dataDictionary
-                                ? { schema: resource.dataDictionary }
-                                : '{}',
-                            dataDictionary: null,
+                            schema: resource.schema ? { value: resource.schema } : '{}',
                             url: resource.url ?? resource.name,
                         })),
                 })
@@ -87,6 +84,67 @@ export const DatasetRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
+    editDataset: protectedProcedure
+        .input(DatasetSchema)
+        .mutation(async ({ ctx, input }) => {
+            try {
+                const user = ctx.session.user
+                const body = JSON.stringify({
+                    ...input,
+                    tags: input.tags
+                        ? input.tags.map((tag) => ({ name: tag }))
+                        : [],
+                    groups: input.topics
+                        ? input.topics.map((topic) => ({ name: topic }))
+                        : [],
+                    open_in: input.open_in ? { ...input.open_in } : '',
+                    language: input.language?.value ?? '',
+                    license_id: input.license_id?.value ?? '',
+                    owner_org: input.team ? input.team.value : '',
+                    update_frequency: input.update_frequency?.value ?? '',
+                    featured_image:
+                        input.featured_image && input.featured_dataset
+                            ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
+                            : null,
+                    visibility_type: input.visibility_type?.value ?? '',
+                    resources: input.resources
+                        .filter((resource) => resource.type !== 'empty')
+                        .map((resource) => ({
+                            ...resource,
+                            format: resource.format ?? '',
+                            id: resource.resourceId,
+                            url_type: resource.type,
+                            schema: resource.schema ? { value: resource.schema } : '{}',
+                            url: resource.url ?? resource.name,
+                        })),
+                })
+                const datasetRes = await fetch(
+                    `${env.CKAN_URL}/api/action/package_patch`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${user.apikey}`,
+                        },
+                        body,
+                    }
+                )
+                const dataset: CkanResponse<Dataset> = await datasetRes.json()
+                if (!dataset.success && dataset.error) {
+                    if (dataset.error.message)
+                        throw Error(dataset.error.message)
+                    throw Error(JSON.stringify(dataset.error))
+                }
+
+                return dataset.result
+            } catch (e) {
+                let error =
+                    'Something went wrong please contact the system administrator'
+                if (e instanceof Error) error = e.message
+                throw Error(error)
+            }
+        }),
+
     getAllDataset: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
@@ -131,7 +189,6 @@ export const DatasetRouter = createTRPCRouter({
                 } else {
                     fq = orgsFq
                 }
-
 
                 if (temporalCoverageFqList.length)
                     fq += `+(${temporalCoverageFqList

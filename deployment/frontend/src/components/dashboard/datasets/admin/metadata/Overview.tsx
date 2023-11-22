@@ -21,6 +21,11 @@ import Spinner from '@/components/_shared/Spinner'
 import classNames from '@/utils/classnames'
 import { env } from '@/env.mjs'
 import MulText from '../MulText'
+import {
+    languageOptions,
+    updateFrequencyOptions,
+    visibilityOptions,
+} from '../formOptions'
 
 export function OverviewForm({
     formObj,
@@ -74,7 +79,7 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup label="Source">
                         <Input
-                            {...register('source')}
+                            {...register('url')}
                             placeholder="ex. https://source/to/original/data"
                             type="text"
                             icon={
@@ -83,7 +88,7 @@ export function OverviewForm({
                                 </DefaultTooltip>
                             }
                         />
-                        <ErrorDisplay name="source" errors={errors} />
+                        <ErrorDisplay name="url" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Language">
                         <SimpleSelect
@@ -92,11 +97,7 @@ export function OverviewForm({
                             name="language"
                             placeholder="Language"
                             initialValue={watch('language') ?? null}
-                            options={[
-                                { value: 'en', label: 'English' },
-                                { value: 'fr', label: 'French' },
-                                { value: 'pt', label: 'Portuguese' },
-                            ]}
+                            options={languageOptions}
                         />
                     </InputGroup>
                     <InputGroup label="Team">
@@ -295,34 +296,7 @@ export function OverviewForm({
                             name="update_frequency"
                             id="update_frequency"
                             placeholder="Select update frequency"
-                            options={[
-                                {
-                                    value: 'biannually',
-                                    label: 'Biannually',
-                                },
-                                {
-                                    value: 'quarterly',
-                                    label: 'Quarterly',
-                                },
-                                {
-                                    value: 'daily',
-                                    label: 'Daily',
-                                },
-                                {
-                                    value: 'hourly',
-                                    label: 'Hourly',
-                                },
-                                {
-                                    value: 'as_needed',
-                                    label: 'As needed',
-                                },
-                                {
-                                    value: 'monthly',
-                                    label: 'Monthly',
-                                },
-                                { value: 'weekly', label: 'Weekly' },
-                                { value: 'annually', label: 'Annually' },
-                            ]}
+                            options={updateFrequencyOptions}
                         />
                         <ErrorDisplay name="update_frequency" errors={errors} />
                     </InputGroup>
@@ -345,14 +319,7 @@ export function OverviewForm({
                             name="visibility_type"
                             id="visibility_type"
                             formObj={formObj}
-                            options={[
-                                { value: 'public', label: 'Public' },
-                                { value: 'internal', label: 'Internal Use' },
-                                {
-                                    value: 'private',
-                                    label: 'Private',
-                                },
-                            ]}
+                            options={visibilityOptions}
                         />
                     </InputGroup>
                     <InputGroup label="License">
@@ -432,7 +399,7 @@ export function OverviewForm({
                                     setValue('featured_image', '')
                                     setValue('signedUrl', '')
                                 }}
-                                defaultImage={watch('signedUrl') ?? null}
+                                defaultImage={watch('featured_image') ?? watch('signedUrl') ?? null}
                                 onPresignedUrlSuccess={(url: string) => {
                                     setValue('signedUrl', url)
                                 }}

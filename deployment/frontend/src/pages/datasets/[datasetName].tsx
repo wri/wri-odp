@@ -47,11 +47,6 @@ const LazyViz = dynamic(
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ datasetName: string }>
 ) {
-    const helpers = createServerSideHelpers({
-        router: appRouter,
-        ctx: { session: null },
-        transformer: superjson,
-    })
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
     try {

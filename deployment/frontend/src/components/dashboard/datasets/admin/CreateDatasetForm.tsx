@@ -63,7 +63,7 @@ export default function CreateDatasetForm() {
                     title: 'Example title',
                     type: 'empty',
                     format: '',
-                    dataDictionary: [],
+                    schema: [],
                 },
             ],
         },

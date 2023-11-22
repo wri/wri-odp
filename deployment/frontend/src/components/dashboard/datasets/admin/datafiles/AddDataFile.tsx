@@ -12,9 +12,8 @@ import {
 import classNames from '@/utils/classnames'
 import { LinkExternalForm } from './sections/LinkExternalForm'
 import { UploadForm } from './sections/UploadForm'
-import { useMemo, useRef, useState } from 'react'
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
+import { useMemo, useRef } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 import { DataFileAccordion } from './DatafileAccordion'
 import { match } from 'ts-pattern'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
@@ -27,52 +26,7 @@ import { convertBytes } from '@/utils/convertBytes'
 import { useDataDictionary } from '@/utils/getDataDictionary'
 import { Field } from 'tableschema'
 
-export function CreateDataFilesSection({
-    formObj,
-}: {
-    formObj: UseFormReturn<DatasetFormType>
-}) {
-    const { control, watch } = formObj
-    const { fields, append, prepend, remove, swap, move, insert } =
-        useFieldArray({
-            control, // control props comes from useForm (optional: if you are using FormContext)
-            name: 'resources',
-        })
-    return (
-        <>
-            {fields.map((field, index) => (
-                <AddDataFile
-                    key={index}
-                    index={index}
-                    field={field}
-                    remove={() => remove(index)}
-                    formObj={formObj}
-                />
-            ))}
-            <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
-                <button
-                    onClick={() =>
-                        append({
-                            resourceId: uuidv4(),
-                            title: '',
-                            type: 'empty',
-                            format: '',
-                            schema: [],
-                        })
-                    }
-                    className="ml-auto flex items-center justify-end gap-x-1"
-                >
-                    <PlusCircleIcon className="h-5 w-5 text-amber-400" />
-                    <span className="font-['Acumin Pro SemiCondensed'] text-lg font-normal leading-tight text-black">
-                        Add another data file
-                    </span>
-                </button>
-            </div>
-        </>
-    )
-}
-
-function AddDataFile({
+export function AddDataFile({
     remove,
     field,
     index,

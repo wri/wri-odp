@@ -3,6 +3,19 @@ import z from 'zod'
 const emptyStringToUndefined = z.literal('').transform(() => undefined)
 const nanToUndefined = z.literal(NaN).transform(() => undefined)
 
+const updateFrequencySchema = z.enum([
+    'annually',
+    'biannually',
+    'weekly',
+    'as_needed',
+    'hourly',
+    'monthly',
+    'quarterly',
+    'daily',
+])
+
+const visibilityTypeSchema = z.enum(['public', 'private', 'draft', 'internal'])
+
 export const DataDictionarySchema = z.array(
     z.object({
         field: z.string(),
@@ -16,6 +29,8 @@ export const DataDictionarySchema = z.array(
 export const ResourceSchema = z.object({
     description: z.string().optional(),
     resourceId: z.string().uuid(),
+    new: z.boolean().optional(),
+    package_id: z.string().optional().nullable(),
     url: z.string().min(2, { message: 'URL is required' }).url().optional(),
     name: z.string().optional(),
     key: z.string().optional(),
@@ -24,14 +39,15 @@ export const ResourceSchema = z.object({
     title: z.string().min(1, { message: 'Title is required' }),
     fileBlob: z.any(),
     type: z.enum(['link', 'upload', 'layer', 'empty']),
-    dataDictionary: DataDictionarySchema.optional().nullable(),
+    schema: DataDictionarySchema.optional().nullable(),
 })
 
 export const DatasetSchema = z
     .object({
+        id: z.string().uuid().optional().nullable(),
         title: z.string().min(1, { message: 'Title is required' }),
         name: z.string().min(1, { message: 'Name is required' }),
-        source: z.string().optional().nullable().or(emptyStringToUndefined),
+        url: z.string().optional().nullable().or(emptyStringToUndefined),
         language: z
             .object({
                 value: z.string(),
@@ -65,16 +81,7 @@ export const DatasetSchema = z
             .or(nanToUndefined),
         update_frequency: z
             .object({
-                value: z.enum([
-                    'annually',
-                    'biannually',
-                    'weekly',
-                    'as_needed',
-                    'hourly',
-                    'monthly',
-                    'quarterly',
-                    'daily',
-                ]),
+                value: updateFrequencySchema,
                 label: z.string(),
             })
             .optional()
@@ -82,7 +89,7 @@ export const DatasetSchema = z
         citation: z.string().optional().nullable(),
         visibility_type: z
             .object({
-                value: z.enum(['public', 'private', 'draft', 'internal']),
+                value: visibilityTypeSchema,
                 label: z.string(),
             })
             .optional()
@@ -100,7 +107,12 @@ export const DatasetSchema = z
         wri_data: z.boolean().optional().nullable(),
         featured_dataset: z.boolean().optional().nullable(),
         featured_image: z.string().optional().nullable(),
-        signedUrl: z.string().url().optional().nullable(),
+        signedUrl: z
+            .string()
+            .url()
+            .optional()
+            .nullable()
+            .or(emptyStringToUndefined),
         author: z.string(),
         author_email: z.string().email(),
         maintainer: z.string(),
@@ -152,6 +164,9 @@ export const DatasetSchema = z
             path: ['technical_notes'],
         }
     )
+
+export type VisibilityTypeUnion = z.infer<typeof visibilityTypeSchema>
+export type UpdateFrequencyUnion = z.infer<typeof updateFrequencySchema>
 
 export type DataDictionaryFormType = z.infer<typeof DataDictionarySchema>
 export type DatasetFormType = z.infer<typeof DatasetSchema>
