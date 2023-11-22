@@ -4,8 +4,8 @@ import type { Group, Organization, User as CkanUser } from '@portaljs/ckan'
 type Only<T, U> = {
     [P in keyof T]: T[P]
 } & {
-    [P in keyof U]?: never
-}
+        [P in keyof U]?: never
+    }
 
 type Either<T, U> = Only<T, U> | Only<U, T>
 
@@ -143,4 +143,10 @@ export interface Comment {
     visibility: string
     abuse_status: string
     user: WriUser
+}
+
+export interface FolloweeList {
+    type: string;
+    display_name: string;
+    dict: WriDataset | WriOrganization | WriUser | Group;
 }
