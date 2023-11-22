@@ -15,6 +15,7 @@ class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IFacets)
+    plugins.implements(plugins.IClick)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IPermissionLabels)
 
@@ -24,6 +25,18 @@ class WriPlugin(plugins.SingletonPlugin):
         toolkit.add_template_directory(config_, "templates")
         toolkit.add_public_directory(config_, "public")
         toolkit.add_resource("assets", "wri")
+
+    def get_commands(self):
+        """CLI commands - Creates activity_viewed data tables"""
+        import click
+
+        @click.command()
+        def activitydb():
+            """Creates activity_viewed data tables"""
+            from ckanext.wri.model import setup
+            setup()
+
+        return [activitydb]
 
     # IValidators
 
