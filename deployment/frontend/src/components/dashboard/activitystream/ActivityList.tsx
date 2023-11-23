@@ -22,7 +22,8 @@ export default function ActivityList() {
     }
 
     const fq = query.fq!;
-    if (Object.keys(fq).length > 0) {
+    if (fq && Object.keys(fq).length > 0) {
+      console.log("in here")
       filteredActivity = filterObjects(filteredActivity, fq);
     }
 
@@ -33,6 +34,8 @@ export default function ActivityList() {
   }, {
     enabled: !!data, // Only run the query when data is available
   });
+
+
 
 
   return (

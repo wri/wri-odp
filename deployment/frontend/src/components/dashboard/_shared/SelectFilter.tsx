@@ -15,9 +15,11 @@ export default function SelectFilter({ options, setQuery, query, filtername }: {
   const handleSelect = (option: Option) => {
     setSelected(option)
     if (option.id === "None") {
+      const { [filtername]: filterdata, ...remainingFilters } = query.fq || {};
       const updateQuery: SearchInput = {
         page: { ...query?.page, start: 0 },
         search: query.search,
+        fq: remainingFilters
       }
       setQuery && setQuery(updateQuery)
     }

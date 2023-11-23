@@ -44,7 +44,7 @@ export interface Activity {
     object_id?: string
     activity_type: string
     user_data?: User
-    data: Record<string, { title?: string }>
+    data: Record<string, { title?: string, owner_org?: string }>
 }
 
 export interface ActivityDisplay {
@@ -54,6 +54,7 @@ export interface ActivityDisplay {
     action: string
     timestamp: string
     actionType: string
+    orgId?: string
 }
 
 export interface WriDataset extends Dataset {
