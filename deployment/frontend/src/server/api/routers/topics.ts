@@ -39,10 +39,7 @@ export const TopicRouter = createTRPCRouter({
 
             const result = groupTree
             return {
-                topics: result.slice(
-                    input.page.start,
-                    input.page.start + input.page.rows
-                ),
+                topics: result,
                 topic2Image: topic2Image,
                 count: result.length,
             }

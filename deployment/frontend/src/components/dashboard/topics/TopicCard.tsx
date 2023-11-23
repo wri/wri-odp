@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SearchHeader from '../_shared/SearchHeader'
 import RowProfile from '../_shared/RowProfile';
 import Row from '../_shared/Row';
@@ -15,6 +15,7 @@ import { useRouter } from 'next/router'
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
+import { useQuery } from 'react-query';
 
 
 function TopicProfile({ team, topic2Image }: { team: GroupTree, topic2Image: Record<string, string> }) {
@@ -53,7 +54,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
   const router = useRouter()
   const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
     onSuccess: async (data) => {
-      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 10 } })
+      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 10000 } })
       setOpen(false)
       notify(`Successfully deleted the ${selectedTopic?.name} topic`, 'error')
     }
@@ -225,7 +226,8 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
 
 
 export default function TopicCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10000 } })
+  const [pagination, setPagination] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
   const [open, setOpen] = useState(false)
   const router = useRouter()
@@ -243,21 +245,35 @@ export default function TopicCard() {
     setOpen(true)
   }
 
+  const ProcessedTopic = useQuery(['paginatedTopics', data, pagination], () => {
+    if (!data) return { topics: [], topic2Image: {}, count: 0 };
+    const topics = data?.topics.slice(pagination.page.start, pagination.page.start + pagination.page.rows)
+    const topic2Image = data?.topic2Image
+    return { topics, topic2Image, count: data?.count }
+  }, {
+    enabled: !!data
+  })
+
+  useEffect(() => {
+    setPagination({ search: '', page: { start: 0, rows: 10 } })
+
+  }, [query.search])
+
 
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
-      <SearchHeader leftStyle=' sm:pr-2 sm:pl-12' rightStyle=' px-2 sm:pr-6' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
+      <SearchHeader leftStyle=' sm:pr-2 sm:pl-12' rightStyle=' px-2 sm:pr-6' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setPagination} query={pagination} isLoading={ProcessedTopic.isLoading} count={ProcessedTopic.data?.count} />} />
       <div className='w-full'>
         {
-          isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
-            data?.topics.map((topic, index) => {
+          isLoading || ProcessedTopic.isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
+            ProcessedTopic.data?.topics.map((topic, index) => {
               return (
                 <div key={topic.name}>
                   <Row
                     key={index}
                     className={`pr-6`}
                     highlighted={topic?.highlighted}
-                    rowMain={<TopicProfile team={topic} topic2Image={data?.topic2Image} />}
+                    rowMain={<TopicProfile team={topic} topic2Image={data?.topic2Image as Record<string, string>} />}
                     linkButton={{
                       label: "View topic",
                       link: `../topics/${topic.name}`,

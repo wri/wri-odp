@@ -38,10 +38,7 @@ export const OrganizationRouter = createTRPCRouter({
 
       const result = groupTree
       return {
-        organizations: result.slice(
-          input.page.start,
-          input.page.start + input.page.rows
-        ),
+        organizations: result,
         count: result.length,
         org2Image: Org2Image
       }
