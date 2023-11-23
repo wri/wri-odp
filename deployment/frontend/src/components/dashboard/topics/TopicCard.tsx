@@ -17,10 +17,11 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 
 
-function TopicProfile({ team }: { team: GroupTree }) {
+function TopicProfile({ team, topic2Image }: { team: GroupTree, topic2Image: Record<string, string> }) {
   const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
   const TopicProfile = team as IRowProfile
   TopicProfile.description = description
+  TopicProfile.image_display_url = topic2Image[team.id]
   return (
     <div className='flex py-5 pl-2' >
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] ' isPad profile={team} defaultImg='/images/placeholders/topics/topicsdefault.png' />
@@ -28,10 +29,11 @@ function TopicProfile({ team }: { team: GroupTree }) {
   )
 }
 
-function SubTopicProfile({ team }: { team: GroupTree }) {
+function SubTopicProfile({ team, topic2Image }: { team: GroupTree, topic2Image: Record<string, string> }) {
   const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
   const TopicProfile = team as IRowProfile
   TopicProfile.description = description
+  TopicProfile.image_display_url = topic2Image[team.id]
   return (
     <div className='flex py-5 pl-3 sm:pl-5' >
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} defaultImg='/images/placeholders/topics/topicsdefault.png' />
@@ -39,7 +41,12 @@ function SubTopicProfile({ team }: { team: GroupTree }) {
   )
 }
 
-function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTree[] | undefined, highlighted?: boolean }) {
+function SubCardProfile({ teams, highlighted, topic2Image }:
+  {
+    teams: IRowProfile[] | GroupTree[] | undefined,
+    highlighted?: boolean,
+    topic2Image: Record<string, string>
+  }) {
   const utils = api.useUtils()
   const [open, setOpen] = useState(false)
   const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
@@ -55,6 +62,12 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
   const handleOpenModal = (topic: GroupTree) => {
     setSelectedTopic(topic)
     setOpen(true)
+  }
+
+  const Topic = (team: GroupTree) => {
+    const TeamProfile = team as IRowProfile
+    TeamProfile.image_display_url = topic2Image[team.id]
+    return TeamProfile
   }
 
   if (!teams || teams.length === 0) return (<></>)
@@ -74,7 +87,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
                       groupStyle="group/item group-hover/item:visible "
                       className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                       rowMain={
-                        <SubTopicProfile team={team as GroupTree} />
+                        <SubTopicProfile team={team as GroupTree} topic2Image={topic2Image} />
                       }
                       linkButton={{
                         label: "View topic",
@@ -105,7 +118,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
                         },
                       ]}
                       isDropDown
-                      rowSub={<SubCardProfile teams={(team as GroupTree).children} />}
+                      rowSub={<SubCardProfile teams={(team as GroupTree).children} topic2Image={topic2Image} />}
                     />
                   </>
 
@@ -118,7 +131,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
                       className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                       rowMain={
                         <div className='flex pl-4 sm:pl-6  '>
-                          <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} defaultImg='/images/placeholders/topics/topicsdefault.png' />
+                          <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={Topic(team as GroupTree)} defaultImg='/images/placeholders/topics/topicsdefault.png' />
                         </div>
                       }
                       linkButton={{
@@ -244,7 +257,7 @@ export default function TopicCard() {
                     key={index}
                     className={`pr-6`}
                     highlighted={topic?.highlighted}
-                    rowMain={<TopicProfile team={topic} />}
+                    rowMain={<TopicProfile team={topic} topic2Image={data?.topic2Image} />}
                     linkButton={{
                       label: "View topic",
                       link: `../topics/${topic.name}`,
@@ -273,7 +286,7 @@ export default function TopicCard() {
                         onClick: () => handleOpenModal(topic)
                       },
                     ]}
-                    rowSub={<SubCardProfile teams={topic.children} highlighted={topic?.highlighted} />}
+                    rowSub={<SubCardProfile teams={topic.children} highlighted={topic?.highlighted} topic2Image={data?.topic2Image} />}
                     isDropDown
                   />
                 </div>

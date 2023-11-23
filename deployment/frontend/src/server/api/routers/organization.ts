@@ -14,6 +14,12 @@ export const OrganizationRouter = createTRPCRouter({
     .input(searchSchema)
     .query(async ({ input, ctx }) => {
       let groupTree: GroupTree[] = []
+      const allOrg = await getAllOrganizations({ apiKey: ctx.session.user.apikey })
+      const Org2Image = allOrg.reduce((acc, org) => {
+        acc[org.id] = org.image_display_url!
+        return acc
+      }
+        , {} as Record<string, string>)
 
       if (input.search) {
         groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, q: input.search, group_type: 'organization' })
@@ -37,6 +43,7 @@ export const OrganizationRouter = createTRPCRouter({
           input.page.start + input.page.rows
         ),
         count: result.length,
+        org2Image: Org2Image
       }
     }),
   getAllOrganizations: protectedProcedure.query(async ({ ctx }) => {
