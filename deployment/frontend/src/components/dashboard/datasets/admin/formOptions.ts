@@ -1,4 +1,8 @@
-import { UpdateFrequencyUnion, VisibilityTypeUnion } from "@/schema/dataset.schema"
+import {
+    CapacityUnion,
+    UpdateFrequencyUnion,
+    VisibilityTypeUnion,
+} from '@/schema/dataset.schema'
 
 export const languageOptions = [
     { value: 'en', label: 'English' },
@@ -6,7 +10,16 @@ export const languageOptions = [
     { value: 'pt', label: 'Portuguese' },
 ]
 
-export const updateFrequencyOptions: { value: UpdateFrequencyUnion, label: string }[] = [
+export const capacityOptions: { value: CapacityUnion; label: string }[] = [
+    { value: 'admin', label: 'Admin' },
+    { value: 'editor', label: 'Editor' },
+    { value: 'member', label: 'Member' },
+]
+
+export const updateFrequencyOptions: {
+    value: UpdateFrequencyUnion
+    label: string
+}[] = [
     {
         value: 'biannually',
         label: 'Biannually',
@@ -35,7 +48,10 @@ export const updateFrequencyOptions: { value: UpdateFrequencyUnion, label: strin
     { value: 'annually', label: 'Annually' },
 ]
 
-export const visibilityOptions: { value: VisibilityTypeUnion, label: string}[] = [
+export const visibilityOptions: {
+    value: VisibilityTypeUnion
+    label: string
+}[] = [
     { value: 'public', label: 'Public' },
     { value: 'internal', label: 'Internal Use' },
     {

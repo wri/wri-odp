@@ -25,6 +25,7 @@ export async function getServerSideProps(
     await helpers.topics.getTopicsHierarchy.prefetch()
     await helpers.dataset.getLicenses.prefetch()
     await helpers.dataset.getOneDataset.prefetch({ id: datasetName })
+    await helpers.dataset.getDatasetCollaborators.prefetch({ id: datasetName })
     return {
         props: {
             trpcState: helpers.dehydrate(),
@@ -40,7 +41,6 @@ export default function EditDatasetPage(
     const dataset = api.dataset.getOneDataset.useQuery({
         id: datasetName,
     })
-    console.log(dataset)
     const links = [
         { label: 'Dashboard', url: '/dashboard', current: false },
         { label: 'Datasets', url: '/dashboard/datasets', current: false },

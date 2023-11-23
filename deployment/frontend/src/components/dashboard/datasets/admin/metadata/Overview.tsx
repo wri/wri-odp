@@ -196,7 +196,7 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup
                         label="Technical Notes"
-                        required={watch('visibility_type').value === 'public'}
+                        required={watch('visibility_type')?.value ? watch('visibility_type').value === 'public' : false}
                     >
                         <Input
                             {...register('technical_notes')}
@@ -397,9 +397,9 @@ export function OverviewForm({
                             <ImageUploader
                                 clearImage={() => {
                                     setValue('featured_image', '')
-                                    setValue('signedUrl', '')
+                                    setValue('signedUrl', undefined)
                                 }}
-                                defaultImage={watch('featured_image') ?? watch('signedUrl') ?? null}
+                                defaultImage={watch('signedUrl') ?? watch('featured_image') ?? null}
                                 onPresignedUrlSuccess={(url: string) => {
                                     setValue('signedUrl', url)
                                 }}

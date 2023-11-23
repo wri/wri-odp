@@ -1,6 +1,6 @@
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { CkanResponse } from '@/schema/ckan.schema'
+import { CkanResponse, Collaborator } from '@/schema/ckan.schema'
 import { Organization } from '@portaljs/ckan'
 import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
@@ -132,6 +132,23 @@ export const teamRouter = createTRPCRouter({
             return {
                 ...team.result,
             }
+        }),
+    getTeamUsers: protectedProcedure
+        .input(z.object({ id: z.string(), capacity: z.string().optional() }))
+        .query(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const membersListRes = await fetch(
+                `${env.CKAN_URL}/api/action/member_list?id=${input.id}${input.capacity ? `&capacity=${input.capacity}` : ''}&object_type=user`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const membersList: CkanResponse<string[][]> = await membersListRes.json()
+            console.log('MEMBER LIST', membersList)
+            return membersList.result
         }),
     createTeam: protectedProcedure
         .input(TeamSchema)

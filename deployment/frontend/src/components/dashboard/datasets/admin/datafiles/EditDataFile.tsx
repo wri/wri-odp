@@ -10,7 +10,7 @@ import { match } from 'ts-pattern'
 import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import { convertBytes } from '@/utils/convertBytes'
 import { Tab } from '@headlessui/react'
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import classNames from '@/utils/classnames'
 import { DataDictionaryTable } from './DataDictionaryTable'
 import { InputGroup } from '../metadata/InputGroup'
@@ -18,6 +18,10 @@ import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { Input } from '@/components/_shared/SimpleInput'
 import FormatInput from './FormatInput'
+import { LoaderButton } from '@/components/_shared/Button'
+import { api } from '@/utils/api'
+import notify from '@/utils/notify'
+import { ErrorAlert } from '@/components/_shared/Alerts'
 
 const tabs = [
     { name: 'Metadata' },
@@ -41,8 +45,20 @@ export function EditDataFile({
         register,
         formState: { errors },
     } = formObj
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const editResource = api.dataset.editResource.useMutation({
+        onSuccess: async ({ title, name, id }) => {
+            notify(
+                `Successfully edited the "${title ?? name ?? id}" resource`,
+                'success'
+            )
+        },
+        onError: (error) => {
+            setErrorMessage(error.message)
+        },
+    })
+
     const datafile = watch(`resources.${index}`)
-    console.log(datafile)
     return (
         <>
             <DataFileAccordion
@@ -65,7 +81,10 @@ export function EditDataFile({
                                                 : 'N/A'}
                                         </span>
                                     </div>
-                                    <button onClick={() => remove()}>
+                                    <button
+                                        type="button"
+                                        onClick={() => remove()}
+                                    >
                                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
                                     </button>
                                 </>
@@ -78,7 +97,10 @@ export function EditDataFile({
                                             {field.title}
                                         </span>
                                     </div>
-                                    <button onClick={() => remove()}>
+                                    <button
+                                        type="button"
+                                        onClick={() => remove()}
+                                    >
                                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
                                     </button>
                                 </>
@@ -91,7 +113,10 @@ export function EditDataFile({
                                             {field.title}
                                         </span>
                                     </div>
-                                    <button onClick={() => remove()}>
+                                    <button
+                                        type="button"
+                                        onClick={() => remove()}
+                                    >
                                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
                                     </button>
                                 </>
@@ -99,7 +124,10 @@ export function EditDataFile({
                             .otherwise(() => (
                                 <>
                                     <div className="flex items-center gap-x-2"></div>
-                                    <button onClick={() => remove()}>
+                                    <button
+                                        type="button"
+                                        onClick={() => remove()}
+                                    >
                                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
                                     </button>
                                 </>
@@ -129,7 +157,7 @@ export function EditDataFile({
                             {datafile.size ? convertBytes(datafile.size) : ''}
                         </span>
                     </div>
-                    <button onClick={() => remove()}>
+                    <button type="button" onClick={() => remove()}>
                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
                     </button>
                 </div>
@@ -217,7 +245,7 @@ export function EditDataFile({
                                                     `resources.${index}.title`
                                                 )}
                                                 type="text"
-                                                maxWidth="max-w-[70rem]"
+                                                maxWidth="max-w-[55rem]"
                                             />
                                             <ErrorDisplay
                                                 name={`resources.${index}.title`}
@@ -234,17 +262,19 @@ export function EditDataFile({
                                                     `resources.${index}.description`
                                                 )}
                                                 type="text"
-                                                maxWidth="max-w-[70rem]"
+                                                maxWidth="max-w-[55rem]"
                                             />
                                         </InputGroup>
                                         <InputGroup
                                             label="Format"
                                             className="whitespace-nowrap"
                                         >
-                                            <FormatInput
-                                                formObj={formObj}
-                                                name={`resources.${index}.format`}
-                                            />
+                                            <div className="max-w-[55rem] w-full">
+                                                <FormatInput
+                                                    formObj={formObj}
+                                                    name={`resources.${index}.format`}
+                                                />
+                                            </div>
                                         </InputGroup>
                                     </div>
                                 </Tab.Panel>
@@ -261,6 +291,27 @@ export function EditDataFile({
                             </Tab.Panels>
                         </div>
                     </Tab.Group>
+                    <div
+                        className={classNames(
+                            'w-full mx-auto sm:px-6 xxl:px-0 max-w-[1380px]'
+                        )}
+                    >
+                        {errorMessage && (
+                            <div className="py-4">
+                                <ErrorAlert text={errorMessage} />
+                            </div>
+                        )}
+                    </div>
+                    <div className="px-4 sm:px-6 xxl:px-0 py-2 w-full flex justify-end">
+                        <LoaderButton
+                            variant="muted"
+                            type="button"
+                            onClick={() => editResource.mutate(datafile)}
+                            loading={editResource.isLoading}
+                        >
+                            Update
+                        </LoaderButton>
+                    </div>
                 </div>
             </DataFileAccordion>
         </>

@@ -16,6 +16,8 @@ const updateFrequencySchema = z.enum([
 
 const visibilityTypeSchema = z.enum(['public', 'private', 'draft', 'internal'])
 
+const capacitySchema = z.enum(['admin', 'editor', 'member'])
+
 export const DataDictionarySchema = z.array(
     z.object({
         field: z.string(),
@@ -26,16 +28,26 @@ export const DataDictionarySchema = z.array(
     })
 )
 
+export const CollaboratorSchema = z.object({
+    user: z.object({value: z.string(), label: z.string()}),
+    package_id: z.string(),
+    capacity: z.object({
+        value: capacitySchema,
+        label: z.string(),
+    }),
+})
+
 export const ResourceSchema = z.object({
     description: z.string().optional(),
     resourceId: z.string().uuid(),
+    id: z.string().uuid().optional().nullable(),
     new: z.boolean().optional(),
     package_id: z.string().optional().nullable(),
     url: z.string().min(2, { message: 'URL is required' }).url().optional(),
     name: z.string().optional(),
     key: z.string().optional(),
     format: z.string().optional().nullable(),
-    size: z.number().optional(),
+    size: z.number().optional().nullable(),
     title: z.string().min(1, { message: 'Title is required' }),
     fileBlob: z.any(),
     type: z.enum(['link', 'upload', 'layer', 'empty']),
@@ -141,6 +153,7 @@ export const DatasetSchema = z
             })
         ),
         resources: z.array(ResourceSchema),
+        collaborators: z.array(CollaboratorSchema).default([]),
     })
     .refine(
         (obj) => {
@@ -167,6 +180,7 @@ export const DatasetSchema = z
 
 export type VisibilityTypeUnion = z.infer<typeof visibilityTypeSchema>
 export type UpdateFrequencyUnion = z.infer<typeof updateFrequencySchema>
+export type CapacityUnion = z.infer<typeof capacitySchema>
 
 export type DataDictionaryFormType = z.infer<typeof DataDictionarySchema>
 export type DatasetFormType = z.infer<typeof DatasetSchema>

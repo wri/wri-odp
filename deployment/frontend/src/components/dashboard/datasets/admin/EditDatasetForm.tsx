@@ -1,5 +1,9 @@
-import { WriDataset } from '@/schema/ckan.schema'
-import { DatasetFormType, DatasetSchema } from '@/schema/dataset.schema'
+import { Collaborator, WriDataset } from '@/schema/ckan.schema'
+import {
+    CapacityUnion,
+    DatasetFormType,
+    DatasetSchema,
+} from '@/schema/dataset.schema'
 import classNames from '@/utils/classnames'
 import { Tab } from '@headlessui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -13,6 +17,7 @@ import { MoreDetailsForm } from './metadata/MoreDetails'
 import { OpenInForm } from './metadata/OpenIn'
 import { CustomFieldsForm } from './metadata/CustomFields'
 import {
+    capacityOptions,
     languageOptions,
     updateFrequencyOptions,
     visibilityOptions,
@@ -23,12 +28,9 @@ import { Button, LoaderButton } from '@/components/_shared/Button'
 import Link from 'next/link'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { EditDataFilesSection } from './datafiles/EditDataFilesSection'
-
-const tabs = [
-    { name: 'Metadata' },
-    { name: 'Data Files' },
-    { name: 'Collaborators' },
-]
+import { useSession } from 'next-auth/react'
+import { match } from 'ts-pattern'
+import { Collaborators } from './metadata/Collaborators'
 
 //change image
 //change title
@@ -44,9 +46,42 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const router = useRouter()
     const possibleLicenses = api.dataset.getLicenses.useQuery()
+    const { data: teamUsers } = api.teams.getTeamUsers.useQuery(
+        {
+            id: dataset.organization?.id ?? '',
+            capacity: 'admin',
+        },
+        { enabled: !!dataset.organization?.id }
+    )
     const license = possibleLicenses.data?.find(
         (license) => license.id === dataset.license_id
     )
+    const session = useSession()
+    const { data: collaborators } =
+        api.dataset.getDatasetCollaborators.useQuery({
+            id: dataset.name,
+        })
+
+    const canEditCollaborators = match(session.data?.user.sysadmin ?? false)
+        .with(true, () => true)
+        .with(false, () => {
+            if (dataset.creator_user_id === session.data?.user.id) return true
+            if (teamUsers && teamUsers.length > 0) {
+                console.log('TEAM USERS', teamUsers)
+                return teamUsers.some(
+                    (user: string[]) =>
+                        user[0] === session.data?.user.id
+                )
+            }
+            return collaborators
+                ? collaborators.some(
+                      (collaborator) =>
+                          collaborator.id === session.data?.user.id &&
+                          collaborator.capacity === 'admin'
+                  )
+                : false
+        })
+        .otherwise(() => false)
 
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
@@ -55,8 +90,12 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             ...dataset,
             id: dataset.id,
             tags: dataset.tags ? dataset.tags.map((tag) => tag.name) : [],
-            temporal_coverage_start: Number(dataset.temporal_coverage_start),
-            temporal_coverage_end: Number(dataset.temporal_coverage_end),
+            temporal_coverage_start: dataset.temporal_coverage_start
+                ? Number(dataset.temporal_coverage_start)
+                : null,
+            temporal_coverage_end: dataset.temporal_coverage_end
+                ? Number(dataset.temporal_coverage_end)
+                : null,
             update_frequency: updateFrequencyOptions.find(
                 (option) => option.value === dataset.update_frequency
             ),
@@ -79,6 +118,18 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             visibility_type: visibilityOptions.find(
                 (option) => option.value === dataset.visibility_type
             ),
+            collaborators: collaborators
+                ? collaborators.map((collaborator) => ({
+                      package_id: dataset.id,
+                      user: {
+                          value: collaborator.id,
+                          label: collaborator.name,
+                      },
+                      capacity: capacityOptions.find(
+                          (option) => option.value === collaborator.capacity
+                      ),
+                  }))
+                : [],
             resources: dataset.resources.map((resource) => ({
                 ...resource,
                 schema: resource.schema ? resource.schema.value : undefined,
@@ -93,13 +144,20 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 'success'
             )
             router.push('/dashboard/datasets')
-            formObj.reset()
         },
         onError: (error) => {
             setErrorMessage(error.message)
         },
     })
 
+    const tabs = [
+        { name: 'Metadata', enabled: true },
+        { name: 'Data Files', enabled: true },
+        { name: 'Collaborators', enabled: canEditCollaborators },
+    ]
+    console.log('Errors', formObj.formState.errors)
+    console.log('Dataset', dataset)
+    console.log('Temporal coverage', formObj.watch('temporal_coverage_start'))
     return (
         <form
             onSubmit={formObj.handleSubmit((data) => {
@@ -114,26 +172,30 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         aria-label="Tabs"
                     >
                         <div className="flex-col justify-start flex sm:flex-row gap-y-4 sm:gap-x-8 sm:border-b-2 border-gray-300 w-full">
-                            {tabs.map((tab) => (
-                                <Tab as={Fragment}>
-                                    {({ selected }) => (
-                                        <div
-                                            key={tab.name}
-                                            className={classNames(
-                                                'sm:px-8 border-b-2 sm:border-none text-black text-[22px] font-normal font-acumin whitespace-nowrap',
-                                                selected
-                                                    ? 'border-wri-green sm:border-solid text-wri-dark-green sm:border-b-2 -mb-px'
-                                                    : 'text-black'
-                                            )}
-                                            aria-current={
-                                                selected ? 'page' : undefined
-                                            }
-                                        >
-                                            {tab.name}
-                                        </div>
-                                    )}
-                                </Tab>
-                            ))}
+                            {tabs
+                                .filter((tab) => tab.enabled)
+                                .map((tab) => (
+                                    <Tab as={Fragment}>
+                                        {({ selected }) => (
+                                            <div
+                                                key={tab.name}
+                                                className={classNames(
+                                                    'sm:px-8 border-b-2 sm:border-none text-black text-[22px] font-normal font-acumin whitespace-nowrap',
+                                                    selected
+                                                        ? 'border-wri-green sm:border-solid text-wri-dark-green sm:border-b-2 -mb-px'
+                                                        : 'text-black'
+                                                )}
+                                                aria-current={
+                                                    selected
+                                                        ? 'page'
+                                                        : undefined
+                                                }
+                                            >
+                                                {tab.name}
+                                            </div>
+                                        )}
+                                    </Tab>
+                                ))}
                         </div>
                     </Tab.List>
                     <Tab.Panels>
@@ -154,6 +216,17 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         >
                             <EditDataFilesSection formObj={formObj} />
                         </Tab.Panel>
+                        {canEditCollaborators && (
+                            <Tab.Panel
+                                as="div"
+                                className="flex flex-col gap-y-12 mt-8"
+                            >
+                                <Collaborators
+                                    formObj={formObj}
+                                    dataset={dataset}
+                                />
+                            </Tab.Panel>
+                        )}
                     </Tab.Panels>
                 </div>
             </Tab.Group>

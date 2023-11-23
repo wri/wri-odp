@@ -10,6 +10,8 @@ import {
     getAllDatasetFq,
     getUserGroups,
     getOneDataset,
+    getAllUsers,
+    upsertCollaborator,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -19,8 +21,8 @@ import type {
     WriDataset,
     WriUser,
 } from '@/schema/ckan.schema'
-import { DatasetSchema } from '@/schema/dataset.schema'
-import type { Dataset } from '@/interfaces/dataset.interface'
+import { DatasetSchema, ResourceSchema } from '@/schema/dataset.schema'
+import type { Dataset, Resource } from '@/interfaces/dataset.interface'
 import type { License } from '@/interfaces/licenses.interface'
 
 export const DatasetRouter = createTRPCRouter({
@@ -41,6 +43,7 @@ export const DatasetRouter = createTRPCRouter({
                     language: input.language?.value ?? '',
                     license_id: input.license_id?.value ?? '',
                     owner_org: input.team ? input.team.value : '',
+                    collaborators: null,
                     update_frequency: input.update_frequency?.value ?? '',
                     featured_image:
                         input.featured_image && input.featured_dataset
@@ -54,7 +57,9 @@ export const DatasetRouter = createTRPCRouter({
                             format: resource.format ?? '',
                             id: resource.resourceId,
                             url_type: resource.type,
-                            schema: resource.schema ? { value: resource.schema } : '{}',
+                            schema: resource.schema
+                                ? { value: resource.schema }
+                                : '{}',
                             url: resource.url ?? resource.name,
                         })),
                 })
@@ -101,6 +106,7 @@ export const DatasetRouter = createTRPCRouter({
                     language: input.language?.value ?? '',
                     license_id: input.license_id?.value ?? '',
                     owner_org: input.team ? input.team.value : '',
+                    collaborators: null,
                     update_frequency: input.update_frequency?.value ?? '',
                     featured_image:
                         input.featured_image && input.featured_dataset
@@ -113,8 +119,11 @@ export const DatasetRouter = createTRPCRouter({
                             ...resource,
                             format: resource.format ?? '',
                             id: resource.resourceId,
+                            new: false,
                             url_type: resource.type,
-                            schema: resource.schema ? { value: resource.schema } : '{}',
+                            schema: resource.schema
+                                ? { value: resource.schema }
+                                : '{}',
                             url: resource.url ?? resource.name,
                         })),
                 })
@@ -135,8 +144,60 @@ export const DatasetRouter = createTRPCRouter({
                         throw Error(dataset.error.message)
                     throw Error(JSON.stringify(dataset.error))
                 }
+                const collaborators = await Promise.all(
+                    (input.collaborators ?? []).map(async (collaborator) => {
+                        return await upsertCollaborator(
+                            {
+                                package_id: collaborator.package_id,
+                                user_id: collaborator.user.value,
+                                capacity: collaborator.capacity.value,
+                            },
+                            ctx.session
+                        )
+                    })
+                )
+                return { ...dataset.result, collaborators }
+            } catch (e) {
+                let error =
+                    'Something went wrong please contact the system administrator'
+                if (e instanceof Error) error = e.message
+                throw Error(error)
+            }
+        }),
+    editResource: protectedProcedure
+        .input(ResourceSchema)
+        .mutation(async ({ ctx, input }) => {
+            console.log('Input', input)
+            try {
+                const user = ctx.session.user
+                const body = JSON.stringify({
+                    ...input,
+                    format: input.format ?? '',
+                    new: false,
+                    url_type: input.type,
+                    schema: input.schema ? { value: input.schema } : '{}',
+                    url: input.url ?? input.name,
+                })
+                const resourceRes = await fetch(
+                    `${env.CKAN_URL}/api/action/resource_patch`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${user.apikey}`,
+                        },
+                        body,
+                    }
+                )
+                const resource: CkanResponse<Resource> =
+                    await resourceRes.json()
+                if (!resource.success && resource.error) {
+                    if (resource.error.message)
+                        throw Error(resource.error.message)
+                    throw Error(JSON.stringify(resource.error))
+                }
 
-                return dataset.result
+                return resource.result
             } catch (e) {
                 let error =
                     'Something went wrong please contact the system administrator'
@@ -300,6 +361,33 @@ export const DatasetRouter = createTRPCRouter({
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
             return getOneDataset(input.id, ctx.session)
+        }),
+    getPossibleCollaborators: protectedProcedure.query(async () => {
+        const apiKey = env.SYS_ADMIN_API_KEY
+        return getAllUsers({ apiKey })
+    }),
+    removeCollaborator: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                user_id: z.string(),
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/package_collaborator_delete`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify(input),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const data = (await response.json()) as CkanResponse<null>
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
         }),
     getMyDataset: protectedProcedure
         .input(searchSchema)
