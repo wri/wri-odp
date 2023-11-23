@@ -294,7 +294,7 @@ export default function TeamCard() {
                     key={index}
                     className={`pr-2`}
                     highlighted={team?.highlighted}
-                    rowMain={<TeamProfile team={team} org2img={data?.org2Image} />}
+                    rowMain={<TeamProfile team={team} org2img={data?.org2Image as Record<string, string>} />}
                     linkButton={{
                       label: "View team",
                       link: `../teams/${team.name}`,
@@ -323,7 +323,7 @@ export default function TeamCard() {
                         onClick: () => handleOpenModal(team)
                       },
                     ]}
-                    rowSub={<SubCardProfile teams={team.children} highlighted={team?.highlighted} org2img={data?.org2Image} />}
+                    rowSub={<SubCardProfile teams={team.children} highlighted={team?.highlighted} org2img={data?.org2Image as Record<string, string>} />}
                     isDropDown
                   />
 

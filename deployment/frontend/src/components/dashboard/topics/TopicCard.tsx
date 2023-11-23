@@ -302,7 +302,7 @@ export default function TopicCard() {
                         onClick: () => handleOpenModal(topic)
                       },
                     ]}
-                    rowSub={<SubCardProfile teams={topic.children} highlighted={topic?.highlighted} topic2Image={data?.topic2Image} />}
+                    rowSub={<SubCardProfile teams={topic.children} highlighted={topic?.highlighted} topic2Image={data?.topic2Image as Record<string, string>} />}
                     isDropDown
                   />
                 </div>
