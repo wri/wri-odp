@@ -157,7 +157,7 @@ export function EditDataFile({
                             {datafile.size ? convertBytes(datafile.size) : ''}
                         </span>
                     </div>
-                    <button type="button" onClick={() => remove()}>
+                    <button type="button" id={`remove_${index}_datafile`} onClick={() => remove()}>
                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
                     </button>
                 </div>

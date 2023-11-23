@@ -67,7 +67,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         .with(false, () => {
             if (dataset.creator_user_id === session.data?.user.id) return true
             if (teamUsers && teamUsers.length > 0) {
-                console.log('TEAM USERS', teamUsers)
                 return teamUsers.some(
                     (user: string[]) =>
                         user[0] === session.data?.user.id
