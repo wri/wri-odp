@@ -25,6 +25,10 @@ import ckan.authz as authz
 
 from ckan.common import _
 from ckan.types import ActionResult, Context, DataDict
+from typing_extensions import TypeAlias
+from ckanext.wri.model.activity_viewed import ActivityViewed,activity_dictize, activity_list_dictize
+import datetime
+
 
 log = logging.getLogger('ckan.logic')
 
@@ -38,6 +42,7 @@ NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 
 
+ActivityViewedGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
 
 
@@ -382,3 +387,22 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
             key=lambda facet: facet['display_name'], reverse=True)
 
     return search_results
+
+@logic.side_effect_free
+def get_user_viewed_activity(
+    context: Context, data_dict: DataDict
+    ) -> ActivityViewedGetUserViewedActivity:
+    """Get all activities for a user.
+    """
+
+    model = context["model"]
+    user_obj = model.User.get(context["user"])
+    assert user_obj
+    user_id = user_obj.id
+
+    user_activity_objects = ActivityViewed.get(user_id)
+    activity_dicts = activity_list_dictize(
+        user_activity_objects, context
+    )
+
+    return activity_dicts
