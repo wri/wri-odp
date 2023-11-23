@@ -17,7 +17,9 @@ export default function Favourite() {
     if (!data) return { dataset: [], count: 0 };
     const searchTerm = query.search.toLowerCase();
     const dataset = data.datasets;
-    const filteredData = dataset.filter(item => item.name.toLowerCase().includes(searchTerm));
+    let filteredData = dataset
+    if (searchTerm)
+      filteredData = dataset.filter(item => item.name.toLowerCase().includes(searchTerm));
     const start = query.page.start || 0;
     const rows = query.page.rows || filteredData.length;
     const slicedData = filteredData.slice(start, start + rows);

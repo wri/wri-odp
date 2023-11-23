@@ -186,14 +186,17 @@ export default function UserCard() {
     if (!data) return { users: [], count: 0 };
     const searchTerm = query.search.toLowerCase();
     const users = data.users;
-    const filteredData = users
-      .filter(user => user.title?.toLowerCase().includes(searchTerm))
-      .sort((a, b) => {
-        const titleA = a.title?.toLowerCase() || '';
-        const titleB = b.title?.toLowerCase() || '';
+    let filteredData = users;
+    if (searchTerm) {
+      filteredData = users
+        .filter(user => user.title?.toLowerCase().includes(searchTerm))
+        .sort((a, b) => {
+          const titleA = a.title?.toLowerCase() || '';
+          const titleB = b.title?.toLowerCase() || '';
 
-        return titleA.localeCompare(titleB);
-      });;
+          return titleA.localeCompare(titleB);
+        });
+    }
     const start = query.page.start;
     const rows = query.page.rows;
     const slicedData = filteredData.slice(start, start + rows);
