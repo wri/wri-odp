@@ -4,7 +4,7 @@ import ckan.lib.plugins as lib_plugins
 
 import ckanext.wri.logic.action as action
 import ckanext.wri.logic.validators as wri_validators
-from ckanext.wri.logic.action.get import package_search, get_user_viewed_activity
+from ckanext.wri.logic.action.get import package_search, get_user_viewed_activity, get_user_viewed_activity_all
 from ckan import model, logic, authz
 
 import logging
@@ -73,7 +73,8 @@ class WriPlugin(plugins.SingletonPlugin):
         return {
             'package_search': package_search,
             'password_reset': action.password_reset,
-            'get_user_viewed_activity': get_user_viewed_activity
+            'get_user_viewed_activity': get_user_viewed_activity,
+            'get_user_viewed_activity_all': get_user_viewed_activity_all
 
         }
 

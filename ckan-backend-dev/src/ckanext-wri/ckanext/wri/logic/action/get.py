@@ -392,15 +392,56 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
 def get_user_viewed_activity(
     context: Context, data_dict: DataDict
     ) -> ActivityViewedGetUserViewedActivity:
-    """Get all activities for a user.
+    """Get the activity status for a user and add to the db if not already present
     """
 
     model = context["model"]
+    session = context['session']
     user_obj = model.User.get(context["user"])
+
+    import logging
+    logging.error(data_dict)
     assert user_obj
     user_id = user_obj.id
 
+    activity_id = data_dict['activity_id']
+    user_activity_objects = ActivityViewed.get(user_id, activity_id)
+
+    # Create activity for user if it doesnt exist
+    if not user_activity_objects:
+        user_activity_objects = ActivityViewed(user_id, activity_id)
+        session.add(user_activity_objects)
+        if not context.get('defer_commit'):
+            model.repo.commit()
+
+    activity_dicts = activity_dictize(
+        user_activity_objects, context
+    )
+
+    return activity_dicts
+
+@logic.side_effect_free
+def get_user_viewed_activity_all(
+    context: Context, data_dict: DataDict
+    ) -> ActivityViewedGetUserViewedActivity:
+    """Get the activity status for a user and add to the db if not already present
+    """
+
+    model = context["model"]
+    session = context['session']
+    user_obj = model.User.get(context["user"])
+
+    import logging
+    logging.error(data_dict)
+    assert user_obj
+    user_id = user_obj.id
+
+    #activity_id = data_dict['activity_id']
     user_activity_objects = ActivityViewed.get(user_id)
+
+    if not user_activity_objects:
+        return None
+
     activity_dicts = activity_list_dictize(
         user_activity_objects, context
     )
