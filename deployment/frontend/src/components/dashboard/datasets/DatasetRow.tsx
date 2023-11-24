@@ -89,7 +89,7 @@ export default function DatasetRow({ className, dataset, handleOpenModal }: { cl
             content: "Edit dataset"
           },
           onClick: () => {
-            router.push(`../datasets/${dataset.name}/edit`)
+            router.push(`/dashboard/datasets/${dataset.name}/edit`)
           }
         },
         {

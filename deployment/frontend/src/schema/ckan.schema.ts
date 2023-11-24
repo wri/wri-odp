@@ -62,13 +62,23 @@ export interface WriDataset extends Dataset {
     technical_notes?: string
     temporal_coverage_start: string
     temporal_coverage_end: string
-    update_frequency?: string
-    visibility_type?: 'public' | 'private' | 'internal' | 'draft'
+    update_frequency:
+        | 'annually'
+        | 'biannually'
+        | 'quarterly'
+        | 'monthly'
+        | 'weekly'
+        | 'daily'
+        | 'as_needed'
+        | 'hourly'
+    visibility_type: 'public' | 'private' | 'internal' | 'draft'
     short_description?: string
     project?: string
     reason_for_adding?: string
     featured_dataset?: boolean
     wri_data?: boolean
+    creator_user_id: string
+    language?: string
     featured_image?: string
     application?: string
     cautions?: string
