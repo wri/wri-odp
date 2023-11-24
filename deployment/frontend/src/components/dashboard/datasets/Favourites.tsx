@@ -5,25 +5,44 @@ import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner';
 import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
+import { useQuery } from 'react-query';
+import { WriDataset } from '@/schema/ckan.schema';
+
 
 export default function Favourite() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
-  const { data, isLoading } = api.dataset.getFavoriteDataset.useQuery(query)
+  const { data, isLoading } = api.dataset.getFavoriteDataset.useQuery()
 
-  if (isLoading) {
+  const processedData = useQuery(['processedData', data, query], () => {
+    if (!data) return { dataset: [], count: 0 };
+    const searchTerm = query.search.toLowerCase();
+    const dataset = data.datasets;
+    let filteredData = dataset
+    if (searchTerm)
+      filteredData = dataset.filter(item => item.name.toLowerCase().includes(searchTerm));
+    const start = query.page.start || 0;
+    const rows = query.page.rows || filteredData.length;
+    const slicedData = filteredData.slice(start, start + rows);
+    return { dataset: slicedData, count: data.count };
+  }, {
+    enabled: !!data,
+  });
+
+  if (isLoading || processedData.isLoading) {
     return (
       <div className='flex justify-center items-center h-screen'>
         <Spinner className="mx-auto my-2" />
       </div>
     )
   }
+
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0 '>
       <SearchHeader leftStyle='px-2 sm:pr-4 sm:pl-12' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
       <div className='w-full'>
         {
-          data?.datasets.length === 0 ? <div className='flex justify-center items-center h-screen'>No data</div> :
-            data?.datasets.map((items, index) => {
+          processedData.data?.dataset.length === 0 ? <div className='flex justify-center items-center h-screen'>No data</div> :
+            data?.datasets?.map((items, index) => {
               return (
                 <FavouriteRow key={index} dataset={items} className={index % 2 === 0 ? ' bg-wri-row-gray hover:bg-wri-slate' : ''} />
               )

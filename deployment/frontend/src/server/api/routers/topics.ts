@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { getGroups, getGroup, searchHierarchy } from '@/utils/apiUtils'
+import { getGroups, getGroup, searchHierarchy, getUserGroups } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type { GroupTree } from '@/schema/ckan.schema'
 import { searchArrayForKeyword } from '@/utils/general'
@@ -17,7 +17,12 @@ export const TopicRouter = createTRPCRouter({
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             let groupTree: GroupTree[] = []
-
+            const allGroups = (await getUserGroups({ apiKey: ctx.session.user.apikey, userId: ctx.session.user.id }))!
+            const topic2Image = allGroups.reduce((acc, org) => {
+                acc[org.id] = org.image_display_url!
+                return acc
+            }
+                , {} as Record<string, string>)
             if (input.search) {
                 groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, q: input.search, group_type: 'group' })
             }
@@ -34,10 +39,8 @@ export const TopicRouter = createTRPCRouter({
 
             const result = groupTree
             return {
-                topics: result.slice(
-                    input.page.start,
-                    input.page.start + input.page.rows
-                ),
+                topics: result,
+                topic2Image: topic2Image,
                 count: result.length,
             }
         }),

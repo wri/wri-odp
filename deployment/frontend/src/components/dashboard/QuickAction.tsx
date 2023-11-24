@@ -29,10 +29,10 @@ export default function QuickAction({ drag }: { drag: boolean }) {
           <SquaresPlusIcon className='w-8 h-8 text-black' />
           <div className='text-base'>Add a topic</div>
         </Link>
-        <div className={`hover:font-semibold font-normal rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? "bg-white" : "bg-slate-100"} `}>
+        <Link href="/settings" className={`hover:font-semibold font-normal rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? "bg-white" : "bg-slate-100"} `}>
           <UsersIcon className='w-8 h-8 text-black' />
           <div className=' text-base '>Edit account</div>
-        </div>
+        </Link>
       </div>
     </div>
   )

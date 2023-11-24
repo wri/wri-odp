@@ -21,8 +21,7 @@ function Favourite({ dataset }: { dataset: WriDataset }) {
   )
 }
 export default function Favourites({ drag }: { drag: boolean }) {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
-  const { data, isLoading } = api.dataset.getFavoriteDataset.useQuery(query)
+  const { data, isLoading } = api.dataset.getFavoriteDataset.useQuery()
   return (
     <section id="favourites" className={`p-6 w-full shadow-wri h-full overflow-y-auto ${drag ? "border-dashed border border-wri-black" : ""}`}>
       {
@@ -38,7 +37,7 @@ export default function Favourites({ drag }: { drag: boolean }) {
       </div>
       {
         data?.datasets.length === 0 ? <div className='flex justify-center items-center h-screen'>No data</div> :
-          data?.datasets.map((items, index) => {
+          data?.datasets.slice(0, 10).map((items, index) => {
             return (
               <Favourite key={index} dataset={items} />
             )

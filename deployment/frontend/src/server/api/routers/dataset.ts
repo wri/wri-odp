@@ -18,6 +18,7 @@ import type {
     Issue,
     WriDataset,
     WriUser,
+    FolloweeList
 } from '@/schema/ckan.schema'
 import { DatasetSchema } from '@/schema/dataset.schema'
 import type { Dataset } from '@/interfaces/dataset.interface'
@@ -305,16 +306,28 @@ export const DatasetRouter = createTRPCRouter({
             }
         }),
     getFavoriteDataset: protectedProcedure
-        .input(searchSchema)
-        .query(async ({ input, ctx }) => {
-            const dataset = (await getAllDatasetFq({
-                apiKey: ctx.session.user.apikey,
-                fq: `featured_dataset:true`,
-                query: input,
-            }))!
+        .query(async ({ ctx }) => {
+
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${ctx.session.user.apikey}`,
+                },
+            })
+            const data = (await response.json()) as CkanResponse<FolloweeList[]>
+            if (!data.success && data.error) throw Error(data.error.message)
+            const result = data.result.reduce((acc, item) => {
+                if (item.type === 'dataset') {
+                    const t = item.dict as WriDataset;
+                    acc.push(t);
+                }
+                return acc;
+            }, [] as WriDataset[]);
+
+
             return {
-                datasets: dataset.datasets,
-                count: dataset.count,
+                datasets: result,
+                count: result?.length,
             }
         }),
     getFeaturedDatasets: publicProcedure

@@ -420,12 +420,34 @@ export function activityDetails(activity: Activity): ActivityDisplay {
     }
     if (object === 'package') {
         title = activity.data?.package?.title ?? ''
-    } else {
+    }
+    else if (object === 'user') {
+        if (action === 'new') {
+            title = 'signed up'
+        }
+        else if (action === 'changed') {
+            title = 'updated their profile'
+        }
+        else {
+            title = 'deleted their profile'
+        }
+    }
+    else {
         title = activity.data?.group?.title ?? ''
         object = GroupObject[object]!
     }
-    const description = `${activitProperties[action]} the ${object} ${title}`
+    let description = `${activitProperties[action]} the ${object} ${title}`
+    if (object === 'user')
+        description = title
     const time = timeAgo(activity.timestamp)
+
+    let orgId = '';
+    if (object === 'package') {
+        orgId = activity.data?.package?.owner_org as string
+    }
+    else if (object === 'team') {
+        orgId = activity.object_id as string
+    }
     return {
         description,
         time,
@@ -433,6 +455,7 @@ export function activityDetails(activity: Activity): ActivityDisplay {
         action,
         timestamp: activity.timestamp,
         actionType: actionType,
+        orgId: orgId ? orgId : undefined
     }
 }
 
