@@ -31,6 +31,9 @@ import { EditDataFilesSection } from './datafiles/EditDataFilesSection'
 import { useSession } from 'next-auth/react'
 import { match } from 'ts-pattern'
 import { Collaborators } from './metadata/Collaborators'
+import Modal from '@/components/_shared/Modal'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Dialog } from '@headlessui/react'
 
 //change image
 //change title
@@ -68,8 +71,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             if (dataset.creator_user_id === session.data?.user.id) return true
             if (teamUsers && teamUsers.length > 0) {
                 return teamUsers.some(
-                    (user: string[]) =>
-                        user[0] === session.data?.user.id
+                    (user: string[]) => user[0] === session.data?.user.id
                 )
             }
             return collaborators
