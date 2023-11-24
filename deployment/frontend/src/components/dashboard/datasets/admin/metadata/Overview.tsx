@@ -29,8 +29,10 @@ import {
 
 export function OverviewForm({
     formObj,
+    editing = false,
 }: {
     formObj: UseFormReturn<DatasetFormType>
+    editing?: boolean
 }) {
     const {
         register,
@@ -67,6 +69,7 @@ export function OverviewForm({
                     <InputGroup label="Url" required>
                         <Input
                             {...register('name')}
+                            disabled={editing}
                             placeholder="name-of-dataset"
                             type="text"
                             className="pl-[5.2rem] sm:pl-[5rem] md:pl-[4.9rem] lg:pl-[4.8rem]"
@@ -196,7 +199,11 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup
                         label="Technical Notes"
-                        required={watch('visibility_type')?.value ? watch('visibility_type').value === 'public' : false}
+                        required={
+                            watch('visibility_type')?.value
+                                ? watch('visibility_type').value === 'public'
+                                : false
+                        }
                     >
                         <Input
                             {...register('technical_notes')}
@@ -399,7 +406,11 @@ export function OverviewForm({
                                     setValue('featured_image', '')
                                     setValue('signedUrl', undefined)
                                 }}
-                                defaultImage={watch('signedUrl') ?? watch('featured_image') ?? null}
+                                defaultImage={
+                                    watch('signedUrl') ??
+                                    watch('featured_image') ??
+                                    null
+                                }
                                 onPresignedUrlSuccess={(url: string) => {
                                     setValue('signedUrl', url)
                                 }}

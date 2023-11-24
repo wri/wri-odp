@@ -204,7 +204,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
-                            <OverviewForm formObj={formObj} />
+                            <OverviewForm formObj={formObj} editing={true} />
                             <DescriptionForm formObj={formObj} />
                             <PointOfContactForm formObj={formObj} />
                             <MoreDetailsForm formObj={formObj} />
