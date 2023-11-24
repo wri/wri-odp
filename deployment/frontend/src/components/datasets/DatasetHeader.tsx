@@ -148,7 +148,11 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                             <StarIcon className="cursor-pointer h-6 w-6" />
                         </DefaultTooltip>
                         <DefaultTooltip content="Edit" side="bottom">
-                            <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
+                            <Link
+                                href={`/dashboard/datasets/${dataset?.name}/edit`}
+                            >
+                                <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
+                            </Link>
                         </DefaultTooltip>
                     </div>
                 </div>
@@ -260,7 +264,9 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                                 WRI Data
                             </div>
                         </div>
-                    ) : ''}
+                    ) : (
+                        ''
+                    )}
                     {dataset?.technical_notes ? (
                         <div className="flex items-center rounded-[3px] border border-green-500 bg-green-500">
                             <div className="px-2 font-acumin text-xs font-medium text-white">
