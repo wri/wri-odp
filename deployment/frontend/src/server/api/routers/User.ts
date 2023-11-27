@@ -8,6 +8,9 @@ import { getUser, getUserOrganizations, getUserDataset, getOrgDetails, getAllOrg
 import { searchArrayForKeyword } from "@/utils/general";
 import { searchSchema } from "@/schema/search.schema";
 import type { CkanResponse } from "@/schema/ckan.schema";
+import { UserFormSchema } from '@/schema/user.schema';
+import { User } from "@portaljs/ckan";
+
 
 export const UserRouter = createTRPCRouter({
   getDashboardUser: protectedProcedure.query(async ({ ctx }) => {
@@ -240,6 +243,33 @@ export const UserRouter = createTRPCRouter({
       const data = (await response.json()) as CkanResponse<null>;
       if (!data.success && data.error) throw Error(data.error.message)
       return data
-    })
-
+    }),
+  
+  getUser: protectedProcedure
+    .input(z.string())
+    .query(async ({input,  ctx }) => {
+      const userdetails = (await getUser({ userId: input, apiKey: ctx.session.user.apikey }))!;
+      return {
+        userdetails: userdetails
+      }
+    }),
+  updateUser: protectedProcedure
+    .input(UserFormSchema)
+    .mutation(async ({ input, ctx }) => {
+      const image_url = input.image_url;
+      if (image_url?.includes("ckanuploadimage:")) {
+        input.image_url = image_url.replace("ckanuploadimage:", `${env.CKAN_URL}/uploads/group/`);
+      }
+      const response = await fetch(`${env.CKAN_URL}/api/3/action/user_update`, {
+        method: "POST",
+        body: JSON.stringify({ ...input}),
+        headers: {
+          "Authorization": ctx.session.user.apikey,
+          "Content-Type": "application/json"
+        }
+      });
+      const data = (await response.json()) as CkanResponse<User>;
+      if (!data.success && data.error) throw Error(data.error.message)
+      return data.result
+     })
 });

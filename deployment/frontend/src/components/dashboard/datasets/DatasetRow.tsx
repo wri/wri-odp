@@ -40,7 +40,7 @@ function subFields(dataset: WriDataset) {
 }
 
 function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
-  const created = dataset?.metadata_created ? dataset.metadata_created : ''
+  const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
   return (
     <div className='flex flex-col p-1 py-3 rounded-md pl-4 sm:pl-14'>
       <p className='font-semibold text-[15px]'>{dataset?.title ?? dataset?.name}</p>

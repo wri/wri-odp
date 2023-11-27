@@ -2,6 +2,8 @@ import React, { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { UserCircleIcon } from '@heroicons/react/20/solid'
 import { signOut, useSession } from 'next-auth/react'
+import Link from 'next/link'
+
 
 const navigation = [
     {
@@ -11,7 +13,7 @@ const navigation = [
     },
     {
         title: 'Settings',
-        href: '/settings',
+        href: '/dashboard/users/edit/',
         active: false,
     },
     {
@@ -27,6 +29,7 @@ export default function UserMenu({
     colors?: 'dark' | 'light'
 }) {
     const session = useSession()
+
 
     return (
         <div className="text-right -ml-6 sm:ml-0 font-acumin" id="nav-user-menu">
@@ -67,9 +70,9 @@ export default function UserMenu({
                                                     {item.title}
                                                 </button>
                                             ) : (
-                                                <a href={item.href}>
+                                                <Link href={ item.title === 'Settings' ? item.href+session.data?.user.name :item.href}>
                                                     {item.title}
-                                                </a>
+                                                </Link>
                                             )}
                                         </Menu.Item>
                                     </div>
