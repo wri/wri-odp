@@ -14,6 +14,7 @@ import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { useQuery } from 'react-query';
+import { useRouter } from 'next/router'
 
 
 type IUser = {
@@ -173,6 +174,7 @@ export default function UserCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.user.getAllUsers.useQuery({ search: '', page: { start: 0, rows: 100 } })
   const [open, setOpen] = useState(false)
+  const router = useRouter()
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const datasetUser = api.user.deleteUser.useMutation({
     onSuccess: async (data) => {
@@ -239,7 +241,7 @@ export default function UserCard() {
                           id: `edit-tooltip-${user.title}`,
                           content: "Edit user"
                         },
-                        onClick: () => { }
+                        onClick: async () => { router.push(`/dashboard/users/edit/${user.title}`) }
                       },
                       {
                         label: "Delete", color: 'bg-red-600 hover:bg-red-500',
