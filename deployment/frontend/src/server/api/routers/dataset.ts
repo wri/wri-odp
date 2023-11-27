@@ -469,10 +469,22 @@ export const DatasetRouter = createTRPCRouter({
                 return acc;
             }, [] as WriDataset[]);
 
+            const dataDetails = await Promise.all(result.map(async (item) => {
+                const response = await fetch(`${env.CKAN_URL}/api/3/action/package_show?id=${item.id}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${ctx.session.user.apikey}`,
+                    },
+                })
+                const data = (await response.json()) as CkanResponse<WriDataset>
+                if (!data.success && data.error) throw Error(data.error.message)
+                return data.result;
+            }));
+
 
             return {
-                datasets: result,
-                count: result?.length,
+                datasets: dataDetails,
+                count: dataDetails?.length,
             }
         }),
     getFeaturedDatasets: publicProcedure
