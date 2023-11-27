@@ -7,7 +7,7 @@ import type { WriDataset } from '@/schema/ckan.schema';
 import { formatDate } from '@/utils/general';
 
 function Favourite({ dataset }: { dataset: WriDataset }) {
-  const created = dataset?.metadata_created ? dataset.metadata_created : ''
+  const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
   return (
     <div className='flex flex-col hover:bg-slate-100 px-3 py-2 mb-2 pb-2 rounded-md'>
       <p className='font-normal text-base'>{dataset?.title ?? dataset?.name}</p>
