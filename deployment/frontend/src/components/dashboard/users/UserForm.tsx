@@ -109,6 +109,7 @@ export default function UserForm({ user }: { user: User }) {
                 <Input
                     {...register('fullname')}
                     placeholder="Full Name"
+                    name="fullname"
                     type="text"
                 />
                 <ErrorDisplay name="fullname" errors={errors} />
