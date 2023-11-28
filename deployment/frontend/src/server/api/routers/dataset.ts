@@ -20,11 +20,12 @@ import type {
     Issue,
     WriDataset,
     WriUser,
-    FolloweeList
+    FolloweeList,
 } from '@/schema/ckan.schema'
 import { DatasetSchema, ResourceSchema } from '@/schema/dataset.schema'
 import type { Dataset, Resource } from '@/interfaces/dataset.interface'
 import type { License } from '@/interfaces/licenses.interface'
+import { isValidUrl } from '@/utils/isValidUrl'
 
 export const DatasetRouter = createTRPCRouter({
     createDataset: protectedProcedure
@@ -111,7 +112,9 @@ export const DatasetRouter = createTRPCRouter({
                     update_frequency: input.update_frequency?.value ?? '',
                     featured_image:
                         input.featured_image && input.featured_dataset
-                            ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
+                            ? !isValidUrl(input.featured_image)
+                                ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
+                                : input.featured_image
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
                     resources: input.resources
@@ -450,31 +453,31 @@ export const DatasetRouter = createTRPCRouter({
                 count: dataset.count,
             }
         }),
-    getFavoriteDataset: protectedProcedure
-        .query(async ({ ctx }) => {
-
-            const response = await fetch(`${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`, {
+    getFavoriteDataset: protectedProcedure.query(async ({ ctx }) => {
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
+            {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `${ctx.session.user.apikey}`,
                 },
-            })
-            const data = (await response.json()) as CkanResponse<FolloweeList[]>
-            if (!data.success && data.error) throw Error(data.error.message)
-            const result = data.result.reduce((acc, item) => {
-                if (item.type === 'dataset') {
-                    const t = item.dict as WriDataset;
-                    acc.push(t);
-                }
-                return acc;
-            }, [] as WriDataset[]);
-
-
-            return {
-                datasets: result,
-                count: result?.length,
             }
-        }),
+        )
+        const data = (await response.json()) as CkanResponse<FolloweeList[]>
+        if (!data.success && data.error) throw Error(data.error.message)
+        const result = data.result.reduce((acc, item) => {
+            if (item.type === 'dataset') {
+                const t = item.dict as WriDataset
+                acc.push(t)
+            }
+            return acc
+        }, [] as WriDataset[])
+
+        return {
+            datasets: result,
+            count: result?.length,
+        }
+    }),
     getFeaturedDatasets: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
