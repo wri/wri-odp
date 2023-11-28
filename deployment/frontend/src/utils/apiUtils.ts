@@ -233,8 +233,6 @@ export async function getUserGroups({
         const response = await fetch(
             `${env.CKAN_URL}/api/3/action/group_list?all_fields=true`,
             {
-                method: 'POST',
-                body: JSON.stringify({ id: userId }),
                 headers: {
                     Authorization: apiKey,
                     'Content-Type': 'application/json',

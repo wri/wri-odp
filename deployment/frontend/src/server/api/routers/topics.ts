@@ -1,9 +1,9 @@
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import { getGroups, getGroup, searchHierarchy, getUserGroups } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
-import type { GroupTree } from '@/schema/ckan.schema'
+import type { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { searchArrayForKeyword } from '@/utils/general'
 import type { CkanResponse } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
@@ -227,5 +227,37 @@ export const TopicRouter = createTRPCRouter({
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(replaceNames(data.error.message))
             return data
+        }),
+    getGeneralTopics: publicProcedure
+        .input(searchSchema)
+        .query(async ({ input }) => {
+            let groupTree: GroupTree[] = []
+            const allGroups = (await getUserGroups({ apiKey: "", userId: "" }))!
+            const topicDetails = allGroups.reduce((acc, org) => {
+                acc[org.id] = {
+                    img_url: org.image_display_url,
+                    description: org.description,
+                    package_count: org.package_count,
+                }
+                return acc
+            }
+                , {} as Record<string, GroupsmDetails>)
+            if (input.search) {
+                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: "", q: input.search, group_type: 'group' })
+            }
+            else {
+                
+                groupTree = await getGroups({
+                    apiKey: "",
+                })
+                
+            }
+
+            const result = groupTree
+            return {
+                topics: result,
+                topicDetails: topicDetails,
+                count: result.length,
+            }
         }),
 })

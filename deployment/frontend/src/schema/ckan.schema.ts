@@ -161,3 +161,9 @@ export interface FolloweeList {
     display_name: string;
     dict: WriDataset | WriOrganization | WriUser | Group;
 }
+
+export interface GroupsmDetails{
+    img_url: string;
+    description: string;
+    package_count: number;
+}
