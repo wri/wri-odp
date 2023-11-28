@@ -9,11 +9,11 @@ import { useState } from 'react'
 import { SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
 import { NextSeo } from 'next-seo'
-
-const links = [
-    { label: 'Topics', url: '/topics', current: false },
-    { label: 'Topics 1', url: '/topics/test', current: true },
-]
+import { useRouter } from 'next/router'
+import { GroupTree } from '@/schema/ckan.schema'
+import DatasetTopic from '@/components/topics/DatasetTopic'
+import { getServerAuthSession } from '@/server/auth'
+import Spinner from '@/components/_shared/Spinner'
 
 export default function TopicPage() {
     const [query, setQuery] = useState<SearchInput>({
@@ -21,26 +21,48 @@ export default function TopicPage() {
         page: { start: 0, rows: 0 },
         fq: {},
     })
+    const router = useRouter()
+    const { topicName } = router.query
+    const { data, isLoading: topicIsLoading } =
+        api.topics.getGeneralTopics.useQuery({
+            search: topicName as string,
+            page: { start: 0, rows: 100 },
+        })
 
-    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
+    const links = [
+        { label: 'Topics', url: '/topics', current: false },
+        {
+            label: topicName as string,
+            url: `/topics/${topicName as string}`,
+            current: true,
+        },
+    ]
 
-    const topic = { title: 'Team Title', name: 'Team Name' }
     return (
         <>
-            <NextSeo title={`${topic?.title ?? topic?.name} - Topics`} />
+            <NextSeo
+                title={`${topicName as string}
+                } - Topics`}
+            />
             <Header />
             <Breadcrumbs links={links} />
-            <Hero />
-            <Subtopics />
-            <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
-                <div className="font-['Acumin Pro SemiCondensed'] text-2xl font-semibold text-black truncate whitespace-normal">
-                    Datasets associated with Topic 1 (784)
-                </div>
-                {data?.datasets.map((dataset, number) => (
-                    <DatasetHorizontalCard dataset={dataset} key={number} />
-                ))}
-                <Pagination />
-            </div>
+            {topicIsLoading ? (
+                <Spinner className="mx-auto" />
+            ) : (
+                <>
+                    <Hero
+                        topics={data?.topics}
+                        topicsDetails={data?.topicDetails!}
+                    />
+                    <Subtopics
+                        topics={data?.topics}
+                        topicsDetails={data?.topicDetails!}
+                    />
+                    <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
+                        <DatasetTopic topics={data?.topics} />
+                    </div>
+                </>
+            )}
             <Footer />
         </>
     )

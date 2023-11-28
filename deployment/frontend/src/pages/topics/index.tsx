@@ -61,7 +61,7 @@ export default function TopicsPage() {
                 <Spinner />
             ) : (
                 <TopicsSearchResults
-                    count={data?.count}
+                    count={data?.count as number}
                     topics={ProcessedTopic?.data?.topics as GroupTree[]}
                     topicDetails={
                         ProcessedTopic?.data?.topicDetails as Record<

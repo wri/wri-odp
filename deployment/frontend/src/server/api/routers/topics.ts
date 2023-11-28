@@ -230,9 +230,9 @@ export const TopicRouter = createTRPCRouter({
         }),
     getGeneralTopics: publicProcedure
         .input(searchSchema)
-        .query(async ({ input }) => {
+        .query(async ({ input, ctx }) => {
             let groupTree: GroupTree[] = []
-            const allGroups = (await getUserGroups({ apiKey: "", userId: "" }))!
+            const allGroups = (await getUserGroups({ apiKey: ctx?.session?.user.apikey ?? "", userId: "" }))!
             const topicDetails = allGroups.reduce((acc, org) => {
                 acc[org.id] = {
                     img_url: org.image_display_url,
@@ -243,12 +243,19 @@ export const TopicRouter = createTRPCRouter({
             }
                 , {} as Record<string, GroupsmDetails>)
             if (input.search) {
-                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: "", q: input.search, group_type: 'group' })
+                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: ctx?.session?.user.apikey ?? "", q: input.search, group_type: 'group' })
+                // if (groupTree.length === 1 && input.search?.includes('-')) {
+                //     const groupOne = groupTree[0] as GroupTree
+                //     if (groupOne.name === input.search) {
+                //         groupTree = [groupOne]
+                //     }
+                //     else { }
+                // }
             }
             else {
                 
                 groupTree = await getGroups({
-                    apiKey: "",
+                    apiKey: ctx?.session?.user.apikey ?? "",
                 })
                 
             }

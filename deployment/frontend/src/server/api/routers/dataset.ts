@@ -269,6 +269,8 @@ export const DatasetRouter = createTRPCRouter({
                 sortBy: input.sortBy,
             }))!
 
+            // console.log('Dataset', dataset)
+
             return {
                 datasets: dataset.datasets,
                 count: dataset.count,
