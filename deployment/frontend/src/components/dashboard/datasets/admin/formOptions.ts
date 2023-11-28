@@ -16,6 +16,16 @@ export const capacityOptions: { value: CapacityUnion; label: string }[] = [
     { value: 'member', label: 'Member' },
 ]
 
+export const layerTypeOptions = [
+    { value: 'vector', label: 'Vector' },
+    { value: 'raster', label: 'Raster' },
+]
+
+export const providerOptions = [
+    { value: 'cartodb', label: 'Cartodb' },
+    { value: 'gee', label: 'Google Earth Engine' },
+]
+
 export const updateFrequencyOptions: {
     value: UpdateFrequencyUnion
     label: string
