@@ -453,48 +453,43 @@ export const DatasetRouter = createTRPCRouter({
                 count: dataset.count,
             }
         }),
-    getFavoriteDataset: protectedProcedure.query(async ({ ctx }) => {
-        const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
-            {
+getFavoriteDataset: protectedProcedure
+        .query(async ({ ctx }) => {
+
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `${ctx.session.user.apikey}`,
                 },
-            }
-        )
-        const data = (await response.json()) as CkanResponse<FolloweeList[]>
-        if (!data.success && data.error) throw Error(data.error.message)
-        const result = data.result.reduce((acc, item) => {
-            if (item.type === 'dataset') {
-                const t = item.dict as WriDataset
-                acc.push(t)
-            }
-            return acc
-        }, [] as WriDataset[])
+            })
+            const data = (await response.json()) as CkanResponse<FolloweeList[]>
+            if (!data.success && data.error) throw Error(data.error.message)
+            const result = data.result.reduce((acc, item) => {
+                if (item.type === 'dataset') {
+                    const t = item.dict as WriDataset;
+                    acc.push(t);
+                }
+                return acc;
+            }, [] as WriDataset[]);
 
-        const dataDetails = await Promise.all(
-            result.map(async (item) => {
-                const response = await fetch(
-                    `${env.CKAN_URL}/api/3/action/package_show?id=${item.id}`,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `${ctx.session.user.apikey}`,
-                        },
-                    }
-                )
+            const dataDetails = await Promise.all(result.map(async (item) => {
+                const response = await fetch(`${env.CKAN_URL}/api/3/action/package_show?id=${item.id}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${ctx.session.user.apikey}`,
+                    },
+                })
                 const data = (await response.json()) as CkanResponse<WriDataset>
                 if (!data.success && data.error) throw Error(data.error.message)
-                return data.result
-            })
-        )
+                return data.result;
+            }));
 
-        return {
-            datasets: dataDetails,
-            count: dataDetails?.length,
-        }
-    }),
+
+            return {
+                datasets: dataDetails,
+                count: dataDetails?.length,
+            }
+        }),
     getFeaturedDatasets: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
