@@ -267,23 +267,27 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                     ) : (
                         ''
                     )}
-                    {dataset?.technical_notes ? (
-                        <div className="flex items-center rounded-[3px] border border-green-500 bg-green-500">
-                            <div className="px-2 font-acumin text-xs font-medium text-white">
-                                RDI approved
+                    {session.data?.user ? (
+                        dataset?.technical_notes ? (
+                            <div className="flex items-center rounded-[3px] border border-green-500 bg-green-500">
+                                <div className="px-2 font-acumin text-xs font-medium text-white">
+                                    RDI approved
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="flex items-center rounded-[3px] border border-orange-400 bg-orange-400">
+                                <div className="px-2 font-acumin text-xs font-medium text-white">
+                                    Awaiting RDI approval
+                                </div>
+                            </div>
+                        )
                     ) : (
-                        <div className="flex items-center rounded-[3px] border border-orange-400 bg-orange-400">
-                            <div className="px-2 font-acumin text-xs font-medium text-white">
-                                Awaiting RDI approval
-                            </div>
-                        </div>
+                        <></>
                     )}
                     {dataset?.resources &&
                         dataset?.resources.filter((resource) => resource.format)
                             .length > 0 && (
-                            <div className="flex gap-x-2 border-l border-zinc-300 pl-3">
+                            <div className={classNames("flex gap-x-2 border-zinc-300", session.data?.user ? 'border-l pl-3' : '')}>
                                 {dataset?.resources
                                     .filter((resource) => resource.format)
                                     .map((resource) => (
