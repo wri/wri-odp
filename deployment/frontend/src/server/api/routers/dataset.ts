@@ -499,21 +499,6 @@ getFavoriteDataset: protectedProcedure
                 datasets: dataDetails,
                 count: dataDetails?.length,
             }
-        )
-        const data = (await response.json()) as CkanResponse<FolloweeList[]>
-        if (!data.success && data.error) throw Error(data.error.message)
-        const result = data.result.reduce((acc, item) => {
-            if (item.type === 'dataset') {
-                const t = item.dict as WriDataset
-                acc.push(t)
-            }
-            return acc
-        }, [] as WriDataset[])
-
-        return {
-            datasets: result,
-            count: result?.length,
-        }
     }),
     getFeaturedDatasets: publicProcedure
         .input(searchSchema)
