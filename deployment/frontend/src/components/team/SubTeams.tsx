@@ -1,25 +1,25 @@
 import { SwiperSlide } from 'swiper/react'
 import Carousel from '../Carousel'
-import SubtopicCard from './SubtopicCard'
+import Subteamcard from './Subteamcard'
 import CarouselNavButton from '../_shared/CarouselNavButton'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 
-export default function Subtopics({
-    topics,
-    topicsDetails,
+export default function SubTeams({
+    teams,
+    teamsDetails,
 }: {
-    topics?: GroupTree[]
-    topicsDetails: Record<string, GroupsmDetails>
+    teams?: GroupTree[]
+    teamsDetails: Record<string, GroupsmDetails>
 }) {
-    topics = topics as GroupTree[]
-    const topic = topics[0] as GroupTree
+    teams = teams as GroupTree[]
+    const team = teams[0] as GroupTree
     return (
         <section
             id="subtopics"
             className=" mx-auto mt-8 flex  max-w-[1380px] flex-col gap-y-6 px-4 font-acumin sm:px-6 lg:mt-16 xxl:px-0"
         >
             <h1 className="font-['Acumin Pro SemiCondensed'] truncate whitespace-normal text-2xl font-semibold text-black">
-                Subtopics ({topic.children.length})
+                Subtopics ({team.children.length})
             </h1>
             <div className="relative">
                 <div className="peer">
@@ -52,12 +52,12 @@ export default function Subtopics({
                             },
                         }}
                     >
-                        {topic.children.map((subtopic, index) => {
+                        {team.children.map((subtopic, index) => {
                             return (
                                 <SwiperSlide key={index} className="">
-                                    <SubtopicCard
-                                        topic={subtopic}
-                                        topicsDetails={topicsDetails}
+                                    <Subteamcard
+                                        team={subtopic}
+                                        teamsDetails={teamsDetails}
                                     />
                                 </SwiperSlide>
                             )

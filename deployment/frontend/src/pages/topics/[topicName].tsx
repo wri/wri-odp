@@ -16,11 +16,6 @@ import { getServerAuthSession } from '@/server/auth'
 import Spinner from '@/components/_shared/Spinner'
 
 export default function TopicPage() {
-    const [query, setQuery] = useState<SearchInput>({
-        search: '',
-        page: { start: 0, rows: 0 },
-        fq: {},
-    })
     const router = useRouter()
     const { topicName } = router.query
     const { data, isLoading: topicIsLoading } =

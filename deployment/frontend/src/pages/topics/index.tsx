@@ -46,8 +46,6 @@ export default function TopicsPage() {
         setPagination({ search: '', page: { start: 0, rows: 10 } })
     }, [query.search])
 
-    console.log('data: ', data?.topics)
-
     return (
         <>
             <NextSeo title="Topics" />
@@ -58,7 +56,7 @@ export default function TopicsPage() {
                 query={query}
             />
             {isLoading || ProcessedTopic.isLoading ? (
-                <Spinner />
+                <Spinner className="mx-auto" />
             ) : (
                 <TopicsSearchResults
                     count={data?.count as number}
@@ -73,7 +71,7 @@ export default function TopicsPage() {
             )}
 
             {isLoading || ProcessedTopic.isLoading ? (
-                <Spinner />
+                <Spinner className="mx-auto" />
             ) : (
                 <div className="w-full px-8 xxl:px-0 max-w-8xl mx-auto">
                     <Pagination

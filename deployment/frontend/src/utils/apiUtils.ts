@@ -327,7 +327,7 @@ export async function getAllDatasetFq({
         }
 
         const datasets = data.success === true ? data.result.results : []
-        console.log("datasets: ", datasets)
+        
         const count = data.success === true ? data.result.count : 0
         const searchFacets =
             data.success === true ? data.result?.search_facets : {}
