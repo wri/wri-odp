@@ -20,7 +20,7 @@ import type {
     Issue,
     WriDataset,
     WriUser,
-    FolloweeList
+    FolloweeList,
 } from '@/schema/ckan.schema'
 import { DatasetSchema, ResourceSchema } from '@/schema/dataset.schema'
 import type { Dataset, Resource } from '@/interfaces/dataset.interface'
@@ -63,6 +63,15 @@ export const DatasetRouter = createTRPCRouter({
                                 : '{}',
                             url: resource.url ?? resource.name,
                         })),
+                    spatial:
+                        input.spatial && input.spatial_address
+                            ? null
+                            : JSON.stringify(input.spatial)
+                            ? JSON.stringify(input.spatial)
+                            : null,
+                    spatial_address: input.spatial_address
+                        ? input.spatial_address
+                        : null,
                 })
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
@@ -127,6 +136,15 @@ export const DatasetRouter = createTRPCRouter({
                                 : '{}',
                             url: resource.url ?? resource.name,
                         })),
+                    spatial:
+                        input.spatial && input.spatial_address
+                            ? null
+                            : JSON.stringify(input.spatial)
+                            ? JSON.stringify(input.spatial)
+                            : null,
+                    spatial_address: input.spatial_address
+                        ? input.spatial_address
+                        : null,
                 })
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_patch`,
@@ -210,19 +228,8 @@ export const DatasetRouter = createTRPCRouter({
     getAllDataset: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const isUserSearch = input._isUserSearch
-
             let fq = `" "`
             let orgsFq = ''
-            // if (isUserSearch && ctx.session) {
-            //     const organizations = await getUserOrganizations({
-            //         userId: ctx.session?.user.id,
-            //         apiKey: ctx.session?.user.apikey,
-            //     })
-            //     orgsFq = `organization:(${organizations
-            //         ?.map((org) => org.name)
-            //         .join(' OR ')})`
-            // }
 
             const fqArray = []
             if (input.fq) {
@@ -241,6 +248,7 @@ export const DatasetRouter = createTRPCRouter({
                         temporalCoverageFqList.push(`${key}:(${input.fq[key]})`)
                         continue
                     }
+
                     fqArray.push(`${key}:(${input.fq[key]})`)
                 }
                 const filter = fqArray.join('+')
@@ -264,6 +272,8 @@ export const DatasetRouter = createTRPCRouter({
                 query: input,
                 facetFields: input.facetFields,
                 sortBy: input.sortBy,
+                extLocationQ: input.extLocationQ,
+                extAddressQ: input.extAddressQ
             }))!
 
             return {
@@ -450,31 +460,31 @@ export const DatasetRouter = createTRPCRouter({
                 count: dataset.count,
             }
         }),
-    getFavoriteDataset: protectedProcedure
-        .query(async ({ ctx }) => {
-
-            const response = await fetch(`${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`, {
+    getFavoriteDataset: protectedProcedure.query(async ({ ctx }) => {
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
+            {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `${ctx.session.user.apikey}`,
                 },
-            })
-            const data = (await response.json()) as CkanResponse<FolloweeList[]>
-            if (!data.success && data.error) throw Error(data.error.message)
-            const result = data.result.reduce((acc, item) => {
-                if (item.type === 'dataset') {
-                    const t = item.dict as WriDataset;
-                    acc.push(t);
-                }
-                return acc;
-            }, [] as WriDataset[]);
-
-
-            return {
-                datasets: result,
-                count: result?.length,
             }
-        }),
+        )
+        const data = (await response.json()) as CkanResponse<FolloweeList[]>
+        if (!data.success && data.error) throw Error(data.error.message)
+        const result = data.result.reduce((acc, item) => {
+            if (item.type === 'dataset') {
+                const t = item.dict as WriDataset
+                acc.push(t)
+            }
+            return acc
+        }, [] as WriDataset[])
+
+        return {
+            datasets: result,
+            count: result?.length,
+        }
+    }),
     getFeaturedDatasets: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {

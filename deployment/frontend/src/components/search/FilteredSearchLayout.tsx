@@ -299,7 +299,7 @@ export default function FilteredSearchLayout({
                                         >
                                             <li>
                                                 <ul role="list">
-                                                    <LocationSearch />
+                                                    <LocationSearch setFilters={setFilters} filters={filters} />
                                                     {!isLoadingFacets &&
                                                         facetFields.map((ff) =>
                                                             ff.key === 'temporal_coverage' ? (

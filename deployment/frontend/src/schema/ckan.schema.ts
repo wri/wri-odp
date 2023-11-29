@@ -89,6 +89,8 @@ export interface WriDataset extends Dataset {
     restrictions?: string
     open_in: OpenIn[]
     extras?: Extra[]
+    spatial?: any
+    spatial_address?: string
 }
 
 export interface Extra {
