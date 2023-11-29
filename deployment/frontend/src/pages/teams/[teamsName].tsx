@@ -11,6 +11,7 @@ import Spinner from '@/components/_shared/Spinner'
 import SubTeams from '@/components/team/SubTeams'
 import DatasetTopic from '@/components/topics/DatasetTopic'
 import DatasetTeams from '@/components/team/DatasetTeams'
+import GroupBreadcrumb from '@/components/team/GroupBreadcrumb'
 
 const links = [
     { label: 'Teams', url: '/teams', current: false },
@@ -27,20 +28,15 @@ export default function teams() {
             tree: true,
         })
 
-    const links = [
-        { label: 'Teams', url: '/teams', current: false },
-        {
-            label: teamsName as string,
-            url: `/teams/${teamsName as string}`,
-            current: true,
-        },
-    ]
-
     return (
         <>
             <NextSeo title={`${teamsName as string} - Teams`} />
             <Header />
-            <Breadcrumbs links={links} />
+            <GroupBreadcrumb
+                groups={data?.teams!}
+                groupType="teams"
+                isLoading={topicIsLoading}
+            />
             {topicIsLoading ? (
                 <Spinner className="mx-auto" />
             ) : (

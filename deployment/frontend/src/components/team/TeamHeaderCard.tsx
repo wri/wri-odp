@@ -5,6 +5,10 @@ import { Button } from '../_shared/Button'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { useSession } from 'next-auth/react'
+import { api } from '@/utils/api'
+import Spinner from '../_shared/Spinner'
+import EditCard from './EditCard'
 
 export default function TeamHeaderCard({
     teams,
@@ -13,8 +17,19 @@ export default function TeamHeaderCard({
     teams?: GroupTree[]
     teamsDetails: Record<string, GroupsmDetails>
 }) {
+    const { data: session } = useSession()
+
     teams = teams as GroupTree[]
     const team = teams[0] as GroupTree
+    let authorized = session && session.user?.sysadmin ? true : false
+    const enableQuery = session && !authorized
+    const orgdetails = api.teams.getTeam.useQuery(
+        { id: team.id },
+        {
+            enabled: !!enableQuery,
+        }
+    )
+
     return (
         <section
             id="team-header-card"
@@ -45,10 +60,28 @@ export default function TeamHeaderCard({
                 </div>
             </div>
             <div className="w-full px-2 md:w-fit flex flex-col justify-center gap-y-3 md:pl-8">
-                <div className="flex outline-wri-gold outline-1 outline font-bold text-[14px] text-black rounded-md px-6 py-3 gap-x-1 w-fit">
-                    <div className="mr-1 w-fit h-[14px]">Edit</div>
-                    <PencilSquareIcon className="h-4 w-4" />
-                </div>
+                {authorized && !enableQuery ? (
+                    <>
+                        <Link
+                            href="#"
+                            className="flex outline-wri-gold outline-1 outline font-bold text-[14px] text-black rounded-md px-6 py-3 gap-x-1 w-fit"
+                        >
+                            <div className="mr-1 w-fit h-[14px]">Edit</div>
+                            <PencilSquareIcon className="h-4 w-4" />
+                        </Link>
+                    </>
+                ) : (
+                    <></>
+                )}
+                {enableQuery ? (
+                    <EditCard
+                        userName={session?.user?.name as string}
+                        orgDetails={orgdetails?.data!}
+                        isLoading={orgdetails?.isLoading}
+                    />
+                ) : (
+                    <></>
+                )}
                 <div className="flex flex-col md:w-[90%] lg:w-[579.33px] gap-y-2 ">
                     <h2 className="font-bold text-[2.063rem]">{team.title}</h2>
                     <p className="line-clamp-3 font-light text-[1.125rem]">

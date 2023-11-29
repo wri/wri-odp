@@ -14,6 +14,7 @@ import { GroupTree } from '@/schema/ckan.schema'
 import DatasetTopic from '@/components/topics/DatasetTopic'
 import { getServerAuthSession } from '@/server/auth'
 import Spinner from '@/components/_shared/Spinner'
+import GroupBreadcrumb from '@/components/team/GroupBreadcrumb'
 
 export default function TopicPage() {
     const router = useRouter()
@@ -25,15 +26,6 @@ export default function TopicPage() {
             tree: true,
         })
 
-    const links = [
-        { label: 'Topics', url: '/topics', current: false },
-        {
-            label: topicName as string,
-            url: `/topics/${topicName as string}`,
-            current: true,
-        },
-    ]
-
     return (
         <>
             <NextSeo
@@ -41,7 +33,11 @@ export default function TopicPage() {
                 } - Topics`}
             />
             <Header />
-            <Breadcrumbs links={links} />
+            <GroupBreadcrumb
+                groups={data?.topics!}
+                groupType="topics"
+                isLoading={topicIsLoading}
+            />
             {topicIsLoading ? (
                 <Spinner className="mx-auto" />
             ) : (
@@ -55,7 +51,7 @@ export default function TopicPage() {
                         topicsDetails={data?.topicDetails!}
                     />
                     <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
-                        <DatasetTopic topics={data?.topics} />
+                        <DatasetTopic topics={data?.topics!} />
                     </div>
                 </>
             )}

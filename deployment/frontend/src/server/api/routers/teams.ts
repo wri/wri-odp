@@ -218,7 +218,7 @@ export const teamRouter = createTRPCRouter({
         .query(async ({ input, ctx }) => {
             let groupTree: GroupTree[] = []
             const allGroups = (await getAllOrganizations({ apiKey: ctx?.session?.user.apikey ?? "" }))!
-            console.log("ALL GROUPS: ", allGroups?.length)
+            
 
             const teamDetails = allGroups.reduce((acc, org) => {
                 acc[org.id] = {
