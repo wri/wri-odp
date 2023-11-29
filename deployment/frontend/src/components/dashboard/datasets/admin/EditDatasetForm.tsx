@@ -164,7 +164,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     ]
     console.log('Errors', formObj.formState.errors)
     console.log('Dataset', dataset)
-    console.log('Temporal coverage', formObj.watch('temporal_coverage_start'))
+    console.log('New Dataset', formObj.watch())
     return (
         <form
             onSubmit={formObj.handleSubmit((data) => {
@@ -187,7 +187,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                             <div
                                                 key={tab.name}
                                                 className={classNames(
-                                                    'sm:px-8 border-b-2 sm:border-none text-black text-[22px] font-normal font-acumin whitespace-nowrap',
+                                                    'sm:px-8 cursor-pointer border-b-2 sm:border-none text-black text-[22px] font-normal font-acumin whitespace-nowrap',
                                                     selected
                                                         ? 'border-wri-green sm:border-solid text-wri-dark-green sm:border-b-2 -mb-px'
                                                         : 'text-black'
