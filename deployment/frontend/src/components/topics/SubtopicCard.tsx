@@ -16,6 +16,7 @@ export default function SubtopicCard({
     topic: GroupTree
     topicsDetails: Record<string, GroupsmDetails>
 }) {
+    console.log('img_url: ', topicsDetails[topic.id]?.img_url)
     return (
         <Link
             href={`/topics/${topic.name}`}
@@ -24,8 +25,9 @@ export default function SubtopicCard({
             <div className="relative w-full md:w-56 h-44">
                 <Image
                     src={`${
-                        topicsDetails[topic.id]?.img_url ??
-                        '/images/placeholders/topics/topicsdefault.png'
+                        topicsDetails[topic.id]?.img_url
+                            ? topicsDetails[topic.id]?.img_url
+                            : '/images/placeholders/topics/topicsdefault.png'
                     }`}
                     alt="higlight"
                     fill

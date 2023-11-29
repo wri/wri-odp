@@ -8,6 +8,7 @@ import type {
     WriOrganization,
     GroupTree,
     Collaborator,
+    GroupsmDetails,
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
@@ -304,6 +305,8 @@ export async function getAllDatasetFq({
             url += `&sort=${sortBy}`
         }
 
+        console.log("url: ", url)
+
         const response = await fetch(
             `${url}&start=${query.page?.start}&rows=${query.page?.rows}`,
             {
@@ -324,6 +327,7 @@ export async function getAllDatasetFq({
         }
 
         const datasets = data.success === true ? data.result.results : []
+        console.log("datasets: ", datasets)
         const count = data.success === true ? data.result.count : 0
         const searchFacets =
             data.success === true ? data.result?.search_facets : {}
@@ -546,4 +550,23 @@ export function timeAgo(timestamp: string): string {
     } else {
         return `${seconds} seconds ago`
     }
+}
+
+export function findNameInTree(tree: GroupTree, targetName: string): GroupTree | null {
+    // Base case: if the current node's name matches the target, return the node
+    if (tree.name === targetName) {
+        return tree;
+    }
+
+    // Recursive case: search through children
+    if (tree.children && tree.children.length > 0) {
+        for (const child of tree.children) {
+            const result = findNameInTree(child, targetName);
+            if (result) {
+                return result; // If found in child, return the result
+            }
+        }
+    }
+    // If not found in the current node or its children, return null
+    return null;
 }

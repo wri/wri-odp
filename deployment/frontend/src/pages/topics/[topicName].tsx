@@ -27,6 +27,7 @@ export default function TopicPage() {
         api.topics.getGeneralTopics.useQuery({
             search: topicName as string,
             page: { start: 0, rows: 100 },
+            tree: true,
         })
 
     const links = [

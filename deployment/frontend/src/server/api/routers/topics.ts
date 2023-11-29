@@ -11,6 +11,7 @@ import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 
 import { TopicSchema } from '@/schema/topic.schema'
 import { replaceNames } from '@/utils/replaceNames'
+import { findNameInTree } from '@/utils/apiUtils'
 
 export const TopicRouter = createTRPCRouter({
     getUsersTopics: protectedProcedure
@@ -244,13 +245,15 @@ export const TopicRouter = createTRPCRouter({
                 , {} as Record<string, GroupsmDetails>)
             if (input.search) {
                 groupTree = await searchHierarchy({ isSysadmin: true, apiKey: ctx?.session?.user.apikey ?? "", q: input.search, group_type: 'group' })
-                // if (groupTree.length === 1 && input.search?.includes('-')) {
-                //     const groupOne = groupTree[0] as GroupTree
-                //     if (groupOne.name === input.search) {
-                //         groupTree = [groupOne]
-                //     }
-                //     else { }
-                // }
+                if (input.tree) {
+                    let groupFetchTree = groupTree[0] as GroupTree
+                    const findTree = findNameInTree(groupFetchTree, input.search)
+                    if (findTree) {
+                        groupFetchTree = findTree
+                    }
+                    groupTree = [groupFetchTree]
+                }
+                
             }
             else {
                 

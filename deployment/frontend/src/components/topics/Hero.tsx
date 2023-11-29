@@ -4,6 +4,7 @@ import { ChevronLeftIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import Link from 'next/link'
 
 export function Hero({
     topics,
@@ -21,15 +22,19 @@ export function Hero({
                     alt="Topic name"
                     fill={true}
                     src={`${
-                        topicsDetails[topic.id]?.img_url ??
-                        '/images/placeholders/topics/topicsdefault.png'
+                        topicsDetails[topic.id]?.img_url
+                            ? topicsDetails[topic.id]?.img_url
+                            : '/images/placeholders/topics/topicsdefault.png'
                     }`}
                 />
                 <div className="absolute bottom-0 z-10 flex lg:h-[68px] lg:w-56 px-4 py-4 items-center justify-center rounded-t-[3px] bg-white">
-                    <Button>
+                    <Link
+                        href="/topics"
+                        className="inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-400 text-stone-900 font-bold font-acumin hover:bg-yellow-500 h-11 px-6 py-4 rounded-[3px] text-base"
+                    >
                         <ChevronLeftIcon className="mb-1 lg:mr-1 h-6 w-6" />
                         <span>See all topics</span>
-                    </Button>
+                    </Link>
                 </div>
             </div>
             <div className="flex flex-col gap-y-1 px-4 py-6 lg:col-span-3">

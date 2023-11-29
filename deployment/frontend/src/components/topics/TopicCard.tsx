@@ -18,8 +18,9 @@ export default function TopicCard({
             <div className="relative w-full h-56 2xl:h-64">
                 <Image
                     src={`${
-                        topicDetails[topic.id]?.img_url ??
-                        '/images/placeholders/topics/topicsdefault.png'
+                        topicDetails[topic.id]?.img_url
+                            ? topicDetails[topic.id]?.img_url
+                            : '/images/placeholders/topics/topicsdefault.png'
                     }`}
                     alt={`Topic - ${topic.title}`}
                     fill
