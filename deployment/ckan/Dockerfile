@@ -13,6 +13,8 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
 
+USER root
+
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
 
@@ -32,8 +34,6 @@ RUN pip install --disable-pip-version-check Shapely==2.0.1
 
 RUN apk del build-base python3-dev && \
     rm -rf /var/cache/apk/*
-
-USER root
 
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
