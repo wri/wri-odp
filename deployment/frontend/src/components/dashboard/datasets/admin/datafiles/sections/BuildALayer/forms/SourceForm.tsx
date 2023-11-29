@@ -11,6 +11,7 @@ import { Input } from '@/components/_shared/SimpleInput'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { layerTypeOptions, providerOptions } from '../../../../formOptions'
+import { TextArea } from '@/components/_shared/SimpleTextArea'
 
 const sourceSchema = z
     .object({
@@ -25,8 +26,7 @@ const sourceSchema = z
             }),
             account: z.string().optional().nullable(),
             options: z.object({
-                sql: z.string(),
-                type: z.enum(['cartodb', 'gee']),
+                sql: z.string().optional().nullable(),
             }),
         }),
         minzoom: z.number().min(0).max(22).default(0),
@@ -82,6 +82,7 @@ export default function SourceForm({
     return (
         <>
             <form
+                id="layerForm"
                 className="flex flex-col px-4 min-h-[416px] justify-between"
                 onSubmit={handleSubmit(onSubmit)}
             >
@@ -116,6 +117,20 @@ export default function SourceForm({
                             options={providerOptions}
                         />
                     </InputGroup>
+                    {watch('provider.type')?.value === 'cartodb' && (
+                        <InputGroup label="SQL Query">
+                            <TextArea
+                                {...register('provider.options.sql')}
+                                type="text"
+                                defaultValue=""
+                            />
+                            {/* TODO Parse SQL and show errors*/}
+                            <ErrorDisplay
+                                errors={errors}
+                                name="provider.options.sql"
+                            />
+                        </InputGroup>
+                    )}
                     <InputGroup label="Min Zoom">
                         <Input
                             {...register('minzoom', { valueAsNumber: true })}
@@ -143,7 +158,12 @@ export default function SourceForm({
                         <ErrorDisplay errors={errors} name="zoom" />
                     </InputGroup>
                 </div>
-                <Button type="submit" className="mt-4 ml-auto w-fit">
+                <Button
+                    form="#layerForm"
+                    type="button"
+                    onClick={() => onNext(watch())}
+                    className="mt-4 ml-auto w-fit"
+                >
                     Next: Legend
                 </Button>
             </form>

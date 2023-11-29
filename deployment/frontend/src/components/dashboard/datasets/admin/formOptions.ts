@@ -26,6 +26,20 @@ export const providerOptions = [
     { value: 'gee', label: 'Google Earth Engine' },
 ]
 
+export const filterOperationOptions = [
+    { value: '==', label: 'Equals to' },
+    { value: '>=', label: 'Greater than or equal' },
+    { value: '<=', label: 'Smaller than or equal' },
+    { value: '>', label: 'Greater than' },
+    { value: '<', label: 'Smaller than' },
+]
+
+export const renderTypeOptions = [
+    { value: 'circle', label: 'Circle' },
+    { value: 'line', label: 'Line' },
+    { value: 'fill', label: 'Fill' },
+]
+
 export const updateFrequencyOptions: {
     value: UpdateFrequencyUnion
     label: string

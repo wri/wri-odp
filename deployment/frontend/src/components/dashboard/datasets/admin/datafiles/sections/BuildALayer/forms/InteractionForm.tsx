@@ -14,6 +14,7 @@ export default function InteractionForm({
   const {
     handleSubmit,
     register,
+    watch,
     formState: { errors },
   } = useForm<{ example?: string }>();
   const onSubmit = () => {
@@ -23,7 +24,6 @@ export default function InteractionForm({
     <>
       <form
         className="flex min-h-[416px] flex-col justify-between px-4"
-        onSubmit={handleSubmit(onSubmit)}
       >
         <div className="mt-10 grid gap-x-6 gap-y-4">
           <div className="grid grid-cols-12 gap-x-6">

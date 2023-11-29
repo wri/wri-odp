@@ -3,7 +3,7 @@ import * as React from "react";
 
 export interface TextAreaProps
   extends React.InputHTMLAttributes<HTMLTextAreaElement> {
-  placeholder: string;
+  placeholder?: string;
   name?: string;
   type: string;
   icon?: React.ReactNode;
