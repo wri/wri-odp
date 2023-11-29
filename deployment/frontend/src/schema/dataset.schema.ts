@@ -154,6 +154,9 @@ export const DatasetSchema = z
         ),
         resources: z.array(ResourceSchema),
         collaborators: z.array(CollaboratorSchema).default([]),
+        spatial_address: z.string().optional(),
+        spatial: z.any().optional(),
+        spatial_type: z.enum(['address', 'geom']).optional()
     })
     .refine(
         (obj) => {
