@@ -1,17 +1,17 @@
-from .activity_viewed import ActivityViewed, activity_viewed
+from .notification import Notification, notification
 from ckan import model
 import logging
 
 log = logging.getLogger(__name__)
 
-__all__ = ["ActivityViewed"]
+__all__ = ["Notification"]
 
 def setup():
     """
-    Create Activity Viewed Table in the database.
+    Create Notifications Table in the database.
     """
-    if not activity_viewed.exists():
-        activity_viewed.create(checkfirst=True)
-        log.info('Tables created for activity_viewed')
+    if not notification.exists():
+        notification.create(checkfirst=True)
+        log.info('Tables created for notifications')
     else:
-        log.info('Activity Viewed Table already exists')
+        log.info('Notificaitons Table already exists')

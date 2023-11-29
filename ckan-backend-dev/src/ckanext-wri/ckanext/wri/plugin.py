@@ -4,7 +4,9 @@ import ckan.lib.plugins as lib_plugins
 
 import ckanext.wri.logic.action as action
 import ckanext.wri.logic.validators as wri_validators
-from ckanext.wri.logic.action.get import package_search, get_user_viewed_activity, get_user_viewed_activity_all
+from ckanext.wri.logic.action.get import package_search, notification_get_all
+from ckanext.wri.logic.action.create import notification_create
+from ckanext.wri.logic.action.update import notification_update
 from ckan import model, logic, authz
 
 import logging
@@ -27,16 +29,16 @@ class WriPlugin(plugins.SingletonPlugin):
         toolkit.add_resource("assets", "wri")
 
     def get_commands(self):
-        """CLI commands - Creates activity_viewed data tables"""
+        """CLI commands - Creates notifications data tables"""
         import click
 
         @click.command()
-        def activitydb():
-            """Creates activity_viewed data tables"""
+        def notificationdb():
+            """Creates notification data tables"""
             from ckanext.wri.model import setup
             setup()
 
-        return [activitydb]
+        return [notificationdb]
 
     # IValidators
 
@@ -73,8 +75,9 @@ class WriPlugin(plugins.SingletonPlugin):
         return {
             'package_search': package_search,
             'password_reset': action.password_reset,
-            'get_user_viewed_activity': get_user_viewed_activity,
-            'get_user_viewed_activity_all': get_user_viewed_activity_all
+            'notification_get_all': notification_get_all,
+            'notification_create': notification_create,
+            'notification_update': notification_update
 
         }
 
