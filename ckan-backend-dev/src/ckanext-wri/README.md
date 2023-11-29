@@ -14,11 +14,11 @@ This is the WRI Open Data Portal extension for CKAN. It contains CKAN backend cu
 
 ## DB Setup
 
-This extension adds a table `activity_viewed` in the db for api notification feature which needs to be initiated on initial bootup of the extension
+This extension adds a table `notifications` in the db for api notification feature which needs to be initiated on initial bootup of the extension
 
 Use
 ```console
-ckan -c <path-to-ini-file> activitydb
+ckan -c <path-to-ini-file>  notificationdb
 ```
 
 ## Development
