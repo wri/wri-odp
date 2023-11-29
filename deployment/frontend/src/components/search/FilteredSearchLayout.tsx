@@ -180,7 +180,7 @@ export default function FilteredSearchLayout({
                                             >
                                                 <li>
                                                     <ul role="list">
-                                                        <LocationSearch />
+                                                        <LocationSearch filters={filters} setFilters={setFilters} />
                                                         {!isLoadingFacets &&
                                                             facetFields.map(
                                                                 (ff) =>
