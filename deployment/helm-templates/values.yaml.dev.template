@@ -173,7 +173,8 @@ ckan:
 solr:
   nodeSelector: {}
   image:
-    tag: 8.11.1
+    repository: ckan/ckan-solr
+    tag: 2.10-solr8-spatial
   resources:
     limits:
       memory: 3G
