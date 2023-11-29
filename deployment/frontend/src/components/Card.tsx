@@ -40,12 +40,12 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                     <div className="h-4 mt-4" />
                 )}
 
-                {(dataset as any).location &&
+                {dataset.spatial_address &&
                 (dataset.temporal_coverage_start ||
                     dataset.temporal_coverage_end) ? (
                     <div className="border-l border-wri-black h-4  mx-2"></div>
                 ) : null}
-                {(dataset as any).location && (
+                {dataset.spatial_address&& (
                     <div className="flex ">
                         <div className="w-4 h-4 relative">
                             <Image
@@ -55,7 +55,7 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                             />
                         </div>
                         <div className="ml-1 w-fit h-[14px]">
-                            {(dataset as any).location}
+                            {dataset.spatial_address}
                         </div>
                     </div>
                 )}

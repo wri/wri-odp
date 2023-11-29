@@ -22,6 +22,7 @@ import { match } from 'ts-pattern'
 import { v4 as uuidv4 } from 'uuid'
 import { OpenInForm } from './metadata/OpenIn'
 import Link from 'next/link'
+import {LocationForm} from './metadata/LocationForm'
 
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -111,6 +112,7 @@ export default function CreateDatasetForm() {
                 <Tab.Panels>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <OverviewForm formObj={formObj} />
+                        <LocationForm formObj={formObj} />
                         <DescriptionForm formObj={formObj} />
                         <PointOfContactForm formObj={formObj} />
                         <MoreDetailsForm formObj={formObj} />

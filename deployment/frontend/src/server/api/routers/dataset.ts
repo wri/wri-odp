@@ -64,6 +64,15 @@ export const DatasetRouter = createTRPCRouter({
                                 : '{}',
                             url: resource.url ?? resource.name,
                         })),
+                    spatial:
+                        input.spatial && input.spatial_address
+                            ? null
+                            : JSON.stringify(input.spatial)
+                            ? JSON.stringify(input.spatial)
+                            : null,
+                    spatial_address: input.spatial_address
+                        ? input.spatial_address
+                        : null,
                 })
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
@@ -130,6 +139,15 @@ export const DatasetRouter = createTRPCRouter({
                                 : '{}',
                             url: resource.url ?? resource.name,
                         })),
+                    spatial:
+                        input.spatial && input.spatial_address
+                            ? null
+                            : JSON.stringify(input.spatial)
+                            ? JSON.stringify(input.spatial)
+                            : null,
+                    spatial_address: input.spatial_address
+                        ? input.spatial_address
+                        : null,
                 })
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_patch`,
@@ -213,19 +231,8 @@ export const DatasetRouter = createTRPCRouter({
     getAllDataset: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const isUserSearch = input._isUserSearch
-
             let fq = `" "`
             let orgsFq = ''
-            // if (isUserSearch && ctx.session) {
-            //     const organizations = await getUserOrganizations({
-            //         userId: ctx.session?.user.id,
-            //         apiKey: ctx.session?.user.apikey,
-            //     })
-            //     orgsFq = `organization:(${organizations
-            //         ?.map((org) => org.name)
-            //         .join(' OR ')})`
-            // }
 
             const fqArray = []
             if (input.fq) {
@@ -244,6 +251,7 @@ export const DatasetRouter = createTRPCRouter({
                         temporalCoverageFqList.push(`${key}:(${input.fq[key]})`)
                         continue
                     }
+
                     fqArray.push(`${key}:(${input.fq[key]})`)
                 }
                 const filter = fqArray.join('+')
@@ -267,6 +275,8 @@ export const DatasetRouter = createTRPCRouter({
                 query: input,
                 facetFields: input.facetFields,
                 sortBy: input.sortBy,
+                extLocationQ: input.extLocationQ,
+                extAddressQ: input.extAddressQ
             }))!
 
             // console.log('Dataset', dataset)
@@ -491,7 +501,7 @@ getFavoriteDataset: protectedProcedure
                 datasets: dataDetails,
                 count: dataDetails?.length,
             }
-        }),
+    }),
     getFeaturedDatasets: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {

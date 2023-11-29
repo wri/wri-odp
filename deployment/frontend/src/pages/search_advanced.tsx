@@ -11,7 +11,6 @@ import SortBy from '@/components/search/SortBy'
 import { Filter } from '@/interfaces/search.interface'
 import { SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
-import notify from '@/utils/notify'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
@@ -62,6 +61,8 @@ export default function SearchPage({
         )
 
         const fq: any = {}
+        let extLocationQ = ''
+        let extAddressQ = ''
 
         keys.forEach((key) => {
             let keyFq
@@ -114,6 +115,13 @@ export default function SearchPage({
                 fq[
                     'metadata_modified'
                 ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+            } else if (key == 'spatial') {
+                const coordinates = keyFilters[0]?.value
+                const address = keyFilters[0]?.label
+
+                // @ts-ignore
+                if (coordinates) extLocationQ = coordinates.reverse().join(',')
+                if (address) extAddressQ = address
             } else {
                 keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             }
@@ -123,12 +131,15 @@ export default function SearchPage({
 
         delete fq.metadata_modified_since
         delete fq.metadata_modified_before
+        delete fq.spatial
 
         setQuery((prev) => {
             return {
                 ...prev,
                 fq,
                 search: filters.find((e) => e?.key == 'search')?.value ?? '',
+                extLocationQ,
+                extAddressQ
             }
         })
     }, [filters])

@@ -283,12 +283,16 @@ export async function getAllDatasetFq({
     query,
     facetFields = [],
     sortBy = '',
+    extLocationQ = '',
+    extAddressQ = ''
 }: {
     apiKey: string
     fq: string
     query: SearchInput
     facetFields?: string[]
     sortBy?: string
+    extLocationQ?: string
+    extAddressQ?: string
 }): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets }> {
     try {
         let url = `${env.CKAN_URL}/api/3/action/package_search?q=${query.search}`
@@ -305,7 +309,14 @@ export async function getAllDatasetFq({
             url += `&sort=${sortBy}`
         }
 
-        console.log("url: ", url)
+
+        if (extLocationQ) {
+            url += `&ext_location_q=${extLocationQ}`
+        }
+
+        if (extAddressQ) {
+            url += `&ext_address_q=${extAddressQ}`
+        }
 
         const response = await fetch(
             `${url}&start=${query.page?.start}&rows=${query.page?.rows}`,
@@ -501,6 +512,7 @@ export async function getOneDataset(
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
+        spatial: dataset.result.spatial ? JSON.parse(dataset.result.spatial) : undefined,
     }
 }
 

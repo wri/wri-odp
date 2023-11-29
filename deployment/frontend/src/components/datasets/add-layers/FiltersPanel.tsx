@@ -15,7 +15,7 @@ export default function FiltersPanel() {
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
                         <li>
                             <ul role="list">
-                                <LocationSearch />
+                                <LocationSearch filters={filters} setFilters={setFilters}/>
                                 <Facet
                                     filters={filters}
                                     setFilters={setFilters}
