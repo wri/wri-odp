@@ -19,11 +19,11 @@ export default function EditCard({
     let user = orgDetails?.users?.find((user) => user.name === userName)
 
     if (user) {
-        user = user as WriUser
+        const user2 = user as WriUser
 
         if (
-            user?.capacity &&
-            ['admin', 'editor'].includes(user?.capacity as string)
+            user2?.capacity &&
+            ['admin', 'editor'].includes(user2?.capacity as string)
         )
             return (
                 <Link

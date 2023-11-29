@@ -89,7 +89,9 @@ export default function TeamHeaderCard({
                     </p>
                     <div className="flex items-center gap-3">
                         <div className="text-base font-light text-black">
-                            {teamsDetails[team.id]?.package_count <= 1
+                            {teamsDetails[team.id]?.package_count &&
+                            (teamsDetails[team.id]?.package_count as number) <=
+                                1
                                 ? `${teamsDetails[team.id]
                                       ?.package_count} Dataset`
                                 : `${teamsDetails[team.id]

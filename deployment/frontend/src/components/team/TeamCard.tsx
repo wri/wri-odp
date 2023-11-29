@@ -35,7 +35,8 @@ export default function TeamCard({
             </article>
             <div className="flex font-light text-sm text-wri-black mt-1 leading-[1.375rem] items-center">
                 <span className="mr-2">
-                    {teamsDetails[team.id]?.package_count <= 1
+                    {teamsDetails[team.id]?.package_count &&
+                    (teamsDetails[team.id]?.package_count as number) <= 1
                         ? `${teamsDetails[team.id]?.package_count} dataset`
                         : `${teamsDetails[team.id]?.package_count} datasets`}
                 </span>
