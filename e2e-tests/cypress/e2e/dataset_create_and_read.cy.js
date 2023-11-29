@@ -49,7 +49,7 @@ describe("Create dataset", () => {
     cy.get("input[name=temporal_coverage_end]").type(2023);
     cy.get("textarea[name=citation]").type("test");
     cy.get("#featured_dataset").click();
-    cy.get("input[type=file]").selectFile("cypress/fixtures/logo.png", {
+    cy.get('input[type=file][accept="image/png image/jpeg image/svg"]').selectFile("cypress/fixtures/logo.png", {
       force: true,
     });
     cy.get("textarea[name=short_description]").type("test");
