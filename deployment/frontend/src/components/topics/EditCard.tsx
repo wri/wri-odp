@@ -13,9 +13,7 @@ export default function EditCard({
     topicName,
 }: {
     isLoading: boolean
-    topicDetails: Topic & {
-        users: Group['users']
-    }
+    topicDetails: Group
     userName: string
     topicName: string
 }) {

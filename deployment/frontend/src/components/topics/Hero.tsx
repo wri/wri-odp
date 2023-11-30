@@ -10,6 +10,7 @@ import { api } from '@/utils/api'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
 import EditCard from './EditCard'
 import { Group } from '@portaljs/ckan'
+import Topic from '@/interfaces/topic.interface'
 
 export function Hero({
     topics,
@@ -23,7 +24,7 @@ export function Hero({
     const { data: session } = useSession()
     let authorized = session && session.user?.sysadmin ? true : false
     const enableQuery = session && !authorized
-    const topicdetails = api.topics.getTopic.useQuery(
+    const topicdetails = api.topics.getTopicV2.useQuery(
         { id: topic.id },
         {
             enabled: !!enableQuery,
@@ -69,11 +70,7 @@ export function Hero({
                 {enableQuery ? (
                     <EditCard
                         userName={session?.user?.name as string}
-                        topicDetails={
-                            topicdetails?.data as Topic & {
-                                users: Group['users']
-                            }
-                        }
+                        topicDetails={topicdetails.data?.topic as Group}
                         isLoading={topicdetails?.isLoading}
                         topicName={topic.name}
                     />

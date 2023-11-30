@@ -280,4 +280,24 @@ export const TopicRouter = createTRPCRouter({
                 count: result.length,
             }
         }),
+     getTopicV2: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const topic: CkanResponse<Group> =
+                await topicRes.json()
+            if (!topic.success && topic.error) throw Error(replaceNames(topic.error.message))
+            return {
+                topic: topic.result
+            }
+        }),
 })
