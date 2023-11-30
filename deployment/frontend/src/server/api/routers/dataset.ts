@@ -279,6 +279,8 @@ export const DatasetRouter = createTRPCRouter({
                 extAddressQ: input.extAddressQ
             }))!
 
+            // console.log('Dataset', dataset)
+
             return {
                 datasets: dataset.datasets,
                 count: dataset.count,
