@@ -16,9 +16,9 @@ This is the WRI Open Data Portal extension for CKAN. It contains CKAN backend cu
 
 This extension includes a notification feature that utilizes its own database, action endpoints, and custom validators.
 The feature adds three actions
-* notification_create
-* notification_update
-* notification_get_all
+* `notification_create`
+* `notification_update`
+* `notification_get_all`
 
 ### Database Setup
 
