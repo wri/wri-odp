@@ -10,8 +10,34 @@ import type { SearchInput } from '@/schema/search.schema'
 import { useQuery } from 'react-query'
 import Pagination from '@/components/datasets/Pagination'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { getServerAuthSession } from '@/server/auth'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { appRouter } from '@/server/api/root'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import superjson from 'superjson'
 
-export default function TeamsPage() {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const session = await getServerAuthSession(context)
+    const helpers = createServerSideHelpers({
+        router: appRouter,
+        ctx: { session },
+        transformer: superjson,
+    })
+    await helpers.teams.getGeneralTeam.prefetch({
+        search: '',
+        page: { start: 0, rows: 10000 },
+    })
+
+    return {
+        props: {
+            trpcState: helpers.dehydrate(),
+        },
+    }
+}
+
+export default function TeamsPage(
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
     const [pagination, setPagination] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
@@ -20,8 +46,7 @@ export default function TeamsPage() {
         search: '',
         page: { start: 0, rows: 10000 },
     })
-    const { data, isLoading, refetch } =
-        api.teams.getGeneralTeam.useQuery(query)
+    const { data, isLoading } = api.teams.getGeneralTeam.useQuery(query)
 
     const ProcessedTeam = useQuery(
         ['teamspage', data, pagination],

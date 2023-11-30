@@ -582,3 +582,101 @@ export function findNameInTree(tree: GroupTree, targetName: string): GroupTree |
     // If not found in the current node or its children, return null
     return null;
 }
+
+export async function getOrganizationTreeDetails({
+    input,
+    session,
+}: {
+        input: SearchInput,
+        session: Session | null,
+    }) {
+    
+    let groupTree: GroupTree[] = []
+            const allGroups = (await getAllOrganizations({ apiKey: session?.user.apikey ?? "" }))!
+            
+
+            const teamDetails = allGroups.reduce((acc, org) => {
+                acc[org.id] = {
+                    img_url: org.image_display_url ?? "",
+                    description: org.description ?? "",
+                    package_count: org.package_count,
+                }
+                return acc
+            }
+                , {} as Record<string, GroupsmDetails>)
+            
+            console.log("teamDetails: ", allGroups?.length)
+            if (input.search) {
+                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: session?.user.apikey ?? "", q: input.search, group_type: "organization" })
+                if (input.tree) {
+                    let groupFetchTree = groupTree[0] as GroupTree
+                    const findTree = findNameInTree(groupFetchTree, input.search)
+                    if (findTree) {
+                        groupFetchTree = findTree
+                    }
+                    groupTree = [groupFetchTree]
+                }
+                
+            }
+            else {
+                
+                groupTree = await getGroups({
+                    apiKey: session?.user.apikey ?? "",
+                    group_type: "organization"
+                })
+                
+            }
+
+            const result = groupTree
+            return {
+                teams: result,
+                teamsDetails: teamDetails,
+                count: result.length,
+            }
+}
+
+export async function getTopicTreeDetails({
+    input,
+    session,
+}: {
+        input: SearchInput,
+        session: Session | null,
+    }) {
+     let groupTree: GroupTree[] = []
+            const allGroups = (await getUserGroups({ apiKey: session?.user.apikey ?? "", userId: "" }))!
+            const topicDetails = allGroups.reduce((acc, org) => {
+                acc[org.id] = {
+                    img_url: org.image_display_url,
+                    description: org.description,
+                    package_count: org.package_count,
+                }
+                return acc
+            }
+                , {} as Record<string, GroupsmDetails>)
+            if (input.search) {
+                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: session?.user.apikey ?? "", q: input.search, group_type: 'group' })
+                if (input.tree) {
+                    let groupFetchTree = groupTree[0] as GroupTree
+                    const findTree = findNameInTree(groupFetchTree, input.search)
+                    if (findTree) {
+                        groupFetchTree = findTree
+                    }
+                    groupTree = [groupFetchTree]
+                }
+                
+            }
+            else {
+                
+                groupTree = await getGroups({
+                    apiKey: session?.user.apikey ?? "",
+                })
+                
+            }
+
+            const result = groupTree
+            return {
+                topics: result,
+                topicDetails: topicDetails,
+                count: result.length,
+            }
+}
