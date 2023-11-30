@@ -53,7 +53,10 @@ export async function getServerSideProps(
         const dataset = await getOneDataset(datasetName, session)
         return {
             props: {
-                dataset,
+                dataset: {
+                    ...dataset,
+                    spatial: dataset.spatial ?? null,
+                },
                 datasetName,
             },
         }
@@ -82,7 +85,10 @@ export default function DatasetPage(
         data: datasetData,
         error: datasetError,
         isLoading,
-    } = api.dataset.getOneDataset.useQuery({ id: datasetName }, { retry: 0, initialData: dataset })
+    } = api.dataset.getOneDataset.useQuery(
+        { id: datasetName },
+        { retry: 0, initialData: dataset }
+    )
     if (!datasetData && datasetError) router.replace('/datasets/404')
     const relatedDatasets = api.dataset.getAllDataset.useQuery({
         fq: {

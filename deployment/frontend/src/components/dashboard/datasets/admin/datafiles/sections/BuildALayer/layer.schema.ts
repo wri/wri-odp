@@ -1,0 +1,193 @@
+import { z } from 'zod'
+const emptyStringToUndefined = z.literal('').transform(() => undefined)
+const nanToUndefined = z.literal(NaN).transform(() => undefined)
+const zeroToUndefined = z.literal(0).transform(() => undefined)
+
+const sourceSchema = z
+    .object({
+        provider: z.object({
+            type: z.object({
+                value: z.enum(['gee', 'carto', 'wms']),
+                label: z.string(),
+            }),
+            account: z.string().optional().nullable(),
+            options: z.object({}).default({}),
+            layers: z.array(
+                z.object({
+                    options: z.object({
+                        sql: z.string().optional().nullable(),
+                        type: z.string().default('cartodb'),
+                    }),
+                })
+            ),
+        }),
+        minzoom: z.number().min(0).max(22).default(0),
+        maxzoom: z.number().min(0).max(22).default(22),
+        tiles: z.string().url().optional().nullable(),
+    })
+    //Make sure that maxZoom is always bigger than minZoom
+    .refine((obj) => obj.maxzoom >= obj.minzoom, {
+        path: ['zoom'],
+        message: 'maxZoom must be bigger than minZoom',
+    })
+    .refine(
+        (obj) => {
+            if (obj.provider.type.value === 'carto')
+                return (
+                    obj.provider.type.value === 'carto' &&
+                    obj.provider.account &&
+                    obj.provider.account.length > 0
+                )
+            return true
+        },
+        {
+            path: ['provider.account'],
+            message:
+                'Informing an account is required when the provider is setup as cartodb',
+        }
+    )
+
+const numericExpression = z.object({
+    operation: z.literal('get'),
+    column: z.string().optional().nullable(),
+})
+
+const filterExpression = z.object({
+    operation: z
+        .object({
+            value: z.enum(['==', '<=', '>=', '>', '<']),
+            label: z.string(),
+        })
+        .optional()
+        .nullable(),
+    column: z.string().optional().nullable(),
+    value: z.coerce.number().optional().nullable(),
+})
+const rampObj = z.object({
+    type: z.object({
+        value: z.enum([
+            'step',
+            'interpolate',
+            'interpolate-lab',
+            'interpolate-hcl',
+        ]),
+        label: z.string(),
+    }),
+    interpolationType: z.object({
+        value: z.enum(['linear', 'exponential', 'cubic-bezier']),
+        label: z.string(),
+    }),
+    input: z.union([z.number(), numericExpression]),
+})
+
+const renderSchema = z.object({
+    layers: z.array(
+        z.object({
+            type: z.object({
+                value: z.enum(['circle', 'line', 'fill']),
+                label: z.string(),
+            }),
+            'source-layer': z.string().default('layer0'),
+            paint: z
+                .object({
+                    'fill-color': z
+                        .union([z.string(), rampObj])
+                        .optional()
+                        .nullable()
+                        .or(emptyStringToUndefined),
+                    'fill-opacity': z.coerce
+                        .number()
+                        .optional()
+                        .nullable()
+                        .or(nanToUndefined),
+                    'line-color': z
+                        .union([z.string(), rampObj])
+                        .optional()
+                        .nullable()
+                        .or(emptyStringToUndefined),
+                    'line-opacity': z.coerce
+                        .number()
+                        .optional()
+                        .nullable()
+                        .or(nanToUndefined),
+                    'line-width': z.coerce
+                        .number()
+                        .optional()
+                        .nullable()
+                        .or(nanToUndefined),
+                    'circle-color': z
+                        .union([z.string(), rampObj])
+                        .optional()
+                        .nullable()
+                        .or(emptyStringToUndefined),
+                    'circle-radius': z.coerce
+                        .number()
+                        .optional()
+                        .nullable()
+                        .transform((val) => {
+                            if (val === 0) return undefined
+                            return val
+                        }),
+                    'circle-opacity': z.coerce
+                        .number()
+                        .optional()
+                        .nullable()
+                        .transform((val) => {
+                            if (val === 0) return undefined
+                            return val
+                        }),
+                })
+                .optional()
+                .nullable(),
+            filter: z.array(z.literal('all').or(filterExpression)),
+        })
+    ),
+})
+
+const legendsSchema = z.object({
+    type: z.enum(['basic', 'choropleth', 'gradient']),
+    items: z.array(
+        z.object({
+            color: z
+                .string()
+                .length(7, 'It needs to be 7 characters long')
+                .regex(/^#/, 'Must start with #'),
+            name: z.string(),
+        })
+    ),
+})
+
+export const layerSchema = z
+    .object({
+        id: z.string().uuid().optional().nullable().or(emptyStringToUndefined),
+        type: z.object({
+            value: z.enum(['raster', 'vector']),
+            label: z.string(),
+        }),
+        legendConfig: legendsSchema.optional().nullable(),
+        source: sourceSchema.optional().nullable(),
+        render: renderSchema.optional().nullable(),
+    })
+    .refine(
+        (obj) => {
+            if (
+                obj.type.value === 'raster' &&
+                obj.source?.provider.type.value === 'wms'
+            )
+                return (
+                    obj.type.value === 'raster' &&
+                    obj.source?.tiles &&
+                    obj.source?.tiles.length > 0
+                )
+            return true
+        },
+        {
+            path: ['tiles'],
+            message: 'Tiles are required for raster layers',
+        }
+    )
+
+export type LayerFormType = z.infer<typeof layerSchema>
+export type SourceFormType = z.infer<typeof sourceSchema>
+export type RenderFormType = z.infer<typeof renderSchema>
+export type LegendsFormType = z.infer<typeof legendsSchema>

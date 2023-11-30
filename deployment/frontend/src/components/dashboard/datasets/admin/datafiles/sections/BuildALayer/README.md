@@ -33,3 +33,7 @@ definition numericExpression
 
 operation: ['get', 'has']
 column: string (should autofill eventually)
+
+## Questions
+
+- For the GEE Provider, the Layer ID is used to identify the tiles in GEE, does that mean that the ids for GEE Layers are not created with the layer creation, but before hand?

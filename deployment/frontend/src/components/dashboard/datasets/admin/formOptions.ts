@@ -22,8 +22,9 @@ export const layerTypeOptions = [
 ]
 
 export const providerOptions = [
-    { value: 'cartodb', label: 'Cartodb' },
+    { value: 'carto', label: 'Cartodb' },
     { value: 'gee', label: 'Google Earth Engine' },
+    { value: 'wms', label: 'WMS' },
 ]
 
 export const filterOperationOptions = [

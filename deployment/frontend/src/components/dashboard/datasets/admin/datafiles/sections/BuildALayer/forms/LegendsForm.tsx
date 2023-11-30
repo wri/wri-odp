@@ -8,22 +8,6 @@ import {
     useFieldArray,
     useForm,
 } from 'react-hook-form'
-import { z } from 'zod'
-
-const legendsSchema = z.object({
-    type: z.enum(['basic', 'choropleth', 'gradient']),
-    items: z.array(
-        z.object({
-            color: z
-                .string()
-                .length(7, 'It needs to be 7 characters long')
-                .regex(/^#/, 'Must start with #'),
-            name: z.string(),
-        })
-    ),
-})
-
-export type LegendsFormType = z.infer<typeof legendsSchema>
 
 export default function LegendForm({
     onNext,
@@ -32,13 +16,7 @@ export default function LegendForm({
     onNext: (data: LegendsFormType) => void
     onPrev: () => void
 }) {
-    const { register, control, handleSubmit, watch } = useForm<LegendsFormType>(
-        {
-            resolver: zodResolver(legendsSchema),
-        }
-    )
     const onSubmit = (data: LegendsFormType) => onNext(data)
-
     return (
         <>
             <form
