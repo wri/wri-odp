@@ -31,8 +31,8 @@ export function DataFileAccordion({
               open ? "border-blue-800" : "border-zinc-400",
             )}
           >
-            <div className="px-4 sm:px-8">
-              <Disclosure.Button className="col-span-full flex w-full justify-between border-b border-stone-50 py-5">
+            <div>
+              <Disclosure.Button className="sm:px-8 px-4 col-span-full flex w-full justify-between border-b border-stone-50 py-5">
                 <h3 className="text-black text-xl font-normal font-['Acumin Pro SemiCondensed']">{title}</h3>
                 <ChevronDownIcon
                   className={`${

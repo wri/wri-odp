@@ -10,6 +10,8 @@ import {
     getAllDatasetFq,
     getUserGroups,
     getOneDataset,
+    getAllUsers,
+    upsertCollaborator,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -18,10 +20,12 @@ import type {
     Issue,
     WriDataset,
     WriUser,
+    FolloweeList,
 } from '@/schema/ckan.schema'
-import { DatasetSchema } from '@/schema/dataset.schema'
-import type { Dataset } from '@/interfaces/dataset.interface'
+import { DatasetSchema, ResourceSchema } from '@/schema/dataset.schema'
+import type { Dataset, Resource } from '@/interfaces/dataset.interface'
 import type { License } from '@/interfaces/licenses.interface'
+import { isValidUrl } from '@/utils/isValidUrl'
 
 export const DatasetRouter = createTRPCRouter({
     createDataset: protectedProcedure
@@ -41,6 +45,7 @@ export const DatasetRouter = createTRPCRouter({
                     language: input.language?.value ?? '',
                     license_id: input.license_id?.value ?? '',
                     owner_org: input.team ? input.team.value : '',
+                    collaborators: null,
                     update_frequency: input.update_frequency?.value ?? '',
                     featured_image:
                         input.featured_image && input.featured_dataset
@@ -54,12 +59,20 @@ export const DatasetRouter = createTRPCRouter({
                             format: resource.format ?? '',
                             id: resource.resourceId,
                             url_type: resource.type,
-                            schema: resource.dataDictionary
-                                ? { schema: resource.dataDictionary }
+                            schema: resource.schema
+                                ? { value: resource.schema }
                                 : '{}',
-                            dataDictionary: null,
                             url: resource.url ?? resource.name,
                         })),
+                    spatial:
+                        input.spatial && input.spatial_address
+                            ? null
+                            : JSON.stringify(input.spatial)
+                            ? JSON.stringify(input.spatial)
+                            : null,
+                    spatial_address: input.spatial_address
+                        ? input.spatial_address
+                        : null,
                 })
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
@@ -87,22 +100,139 @@ export const DatasetRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
+    editDataset: protectedProcedure
+        .input(DatasetSchema)
+        .mutation(async ({ ctx, input }) => {
+            try {
+                const user = ctx.session.user
+                const body = JSON.stringify({
+                    ...input,
+                    tags: input.tags
+                        ? input.tags.map((tag) => ({ name: tag }))
+                        : [],
+                    groups: input.topics
+                        ? input.topics.map((topic) => ({ name: topic }))
+                        : [],
+                    open_in: input.open_in ? { ...input.open_in } : '',
+                    language: input.language?.value ?? '',
+                    license_id: input.license_id?.value ?? '',
+                    owner_org: input.team ? input.team.value : '',
+                    collaborators: null,
+                    update_frequency: input.update_frequency?.value ?? '',
+                    featured_image:
+                        input.featured_image && input.featured_dataset
+                            ? !isValidUrl(input.featured_image)
+                                ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
+                                : input.featured_image
+                            : null,
+                    visibility_type: input.visibility_type?.value ?? '',
+                    resources: input.resources
+                        .filter((resource) => resource.type !== 'empty')
+                        .map((resource) => ({
+                            ...resource,
+                            format: resource.format ?? '',
+                            id: resource.resourceId,
+                            new: false,
+                            url_type: resource.type,
+                            schema: resource.schema
+                                ? { value: resource.schema }
+                                : '{}',
+                            url: resource.url ?? resource.name,
+                        })),
+                    spatial:
+                        input.spatial && input.spatial_address
+                            ? null
+                            : JSON.stringify(input.spatial)
+                            ? JSON.stringify(input.spatial)
+                            : null,
+                    spatial_address: input.spatial_address
+                        ? input.spatial_address
+                        : null,
+                })
+                const datasetRes = await fetch(
+                    `${env.CKAN_URL}/api/action/package_patch`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${user.apikey}`,
+                        },
+                        body,
+                    }
+                )
+                const dataset: CkanResponse<Dataset> = await datasetRes.json()
+                if (!dataset.success && dataset.error) {
+                    if (dataset.error.message)
+                        throw Error(dataset.error.message)
+                    throw Error(JSON.stringify(dataset.error))
+                }
+                const collaborators = await Promise.all(
+                    (input.collaborators ?? []).map(async (collaborator) => {
+                        return await upsertCollaborator(
+                            {
+                                package_id: collaborator.package_id,
+                                user_id: collaborator.user.value,
+                                capacity: collaborator.capacity.value,
+                            },
+                            ctx.session
+                        )
+                    })
+                )
+                return { ...dataset.result, collaborators }
+            } catch (e) {
+                let error =
+                    'Something went wrong please contact the system administrator'
+                if (e instanceof Error) error = e.message
+                throw Error(error)
+            }
+        }),
+    editResource: protectedProcedure
+        .input(ResourceSchema)
+        .mutation(async ({ ctx, input }) => {
+            console.log('Input', input)
+            try {
+                const user = ctx.session.user
+                const body = JSON.stringify({
+                    ...input,
+                    format: input.format ?? '',
+                    new: false,
+                    url_type: input.type,
+                    schema: input.schema ? { value: input.schema } : '{}',
+                    url: input.url ?? input.name,
+                })
+                const resourceRes = await fetch(
+                    `${env.CKAN_URL}/api/action/resource_patch`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${user.apikey}`,
+                        },
+                        body,
+                    }
+                )
+                const resource: CkanResponse<Resource> =
+                    await resourceRes.json()
+                if (!resource.success && resource.error) {
+                    if (resource.error.message)
+                        throw Error(resource.error.message)
+                    throw Error(JSON.stringify(resource.error))
+                }
+
+                return resource.result
+            } catch (e) {
+                let error =
+                    'Something went wrong please contact the system administrator'
+                if (e instanceof Error) error = e.message
+                throw Error(error)
+            }
+        }),
+
     getAllDataset: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const isUserSearch = input._isUserSearch
-
             let fq = `" "`
             let orgsFq = ''
-            // if (isUserSearch && ctx.session) {
-            //     const organizations = await getUserOrganizations({
-            //         userId: ctx.session?.user.id,
-            //         apiKey: ctx.session?.user.apikey,
-            //     })
-            //     orgsFq = `organization:(${organizations
-            //         ?.map((org) => org.name)
-            //         .join(' OR ')})`
-            // }
 
             const fqArray = []
             if (input.fq) {
@@ -121,6 +251,7 @@ export const DatasetRouter = createTRPCRouter({
                         temporalCoverageFqList.push(`${key}:(${input.fq[key]})`)
                         continue
                     }
+
                     fqArray.push(`${key}:(${input.fq[key]})`)
                 }
                 const filter = fqArray.join('+')
@@ -131,7 +262,6 @@ export const DatasetRouter = createTRPCRouter({
                 } else {
                     fq = orgsFq
                 }
-
 
                 if (temporalCoverageFqList.length)
                     fq += `+(${temporalCoverageFqList
@@ -145,7 +275,11 @@ export const DatasetRouter = createTRPCRouter({
                 query: input,
                 facetFields: input.facetFields,
                 sortBy: input.sortBy,
+                extLocationQ: input.extLocationQ,
+                extAddressQ: input.extAddressQ
             }))!
+
+            // console.log('Dataset', dataset)
 
             return {
                 datasets: dataset.datasets,
@@ -244,6 +378,33 @@ export const DatasetRouter = createTRPCRouter({
         .query(async ({ input, ctx }) => {
             return getOneDataset(input.id, ctx.session)
         }),
+    getPossibleCollaborators: protectedProcedure.query(async () => {
+        const apiKey = env.SYS_ADMIN_API_KEY
+        return getAllUsers({ apiKey })
+    }),
+    removeCollaborator: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                user_id: z.string(),
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/package_collaborator_delete`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify(input),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const data = (await response.json()) as CkanResponse<null>
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
+        }),
     getMyDataset: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
@@ -304,19 +465,43 @@ export const DatasetRouter = createTRPCRouter({
                 count: dataset.count,
             }
         }),
-    getFavoriteDataset: protectedProcedure
-        .input(searchSchema)
-        .query(async ({ input, ctx }) => {
-            const dataset = (await getAllDatasetFq({
-                apiKey: ctx.session.user.apikey,
-                fq: `featured_dataset:true`,
-                query: input,
-            }))!
+getFavoriteDataset: protectedProcedure
+        .query(async ({ ctx }) => {
+
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${ctx.session.user.apikey}`,
+                },
+            })
+            const data = (await response.json()) as CkanResponse<FolloweeList[]>
+            if (!data.success && data.error) throw Error(data.error.message)
+            const result = data.result.reduce((acc, item) => {
+                if (item.type === 'dataset') {
+                    const t = item.dict as WriDataset;
+                    acc.push(t);
+                }
+                return acc;
+            }, [] as WriDataset[]);
+
+            const dataDetails = await Promise.all(result.map(async (item) => {
+                const response = await fetch(`${env.CKAN_URL}/api/3/action/package_show?id=${item.id}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${ctx.session.user.apikey}`,
+                    },
+                })
+                const data = (await response.json()) as CkanResponse<WriDataset>
+                if (!data.success && data.error) throw Error(data.error.message)
+                return data.result;
+            }));
+
+
             return {
-                datasets: dataset.datasets,
-                count: dataset.count,
+                datasets: dataDetails,
+                count: dataDetails?.length,
             }
-        }),
+    }),
     getFeaturedDatasets: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {

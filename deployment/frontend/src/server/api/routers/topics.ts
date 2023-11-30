@@ -1,9 +1,9 @@
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { getGroups, getGroup, searchHierarchy } from '@/utils/apiUtils'
+import { getGroups, getGroup, searchHierarchy, getUserGroups, findAllNameInTree } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
-import type { GroupTree } from '@/schema/ckan.schema'
+import type { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { searchArrayForKeyword } from '@/utils/general'
 import type { CkanResponse } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
@@ -11,13 +11,19 @@ import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 
 import { TopicSchema } from '@/schema/topic.schema'
 import { replaceNames } from '@/utils/replaceNames'
+import { findNameInTree } from '@/utils/apiUtils'
 
 export const TopicRouter = createTRPCRouter({
     getUsersTopics: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             let groupTree: GroupTree[] = []
-
+            const allGroups = (await getUserGroups({ apiKey: ctx.session.user.apikey, userId: ctx.session.user.id }))!
+            const topic2Image = allGroups.reduce((acc, org) => {
+                acc[org.id] = org.image_display_url!
+                return acc
+            }
+                , {} as Record<string, string>)
             if (input.search) {
                 groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, q: input.search, group_type: 'group' })
             }
@@ -34,10 +40,8 @@ export const TopicRouter = createTRPCRouter({
 
             const result = groupTree
             return {
-                topics: result.slice(
-                    input.page.start,
-                    input.page.start + input.page.rows
-                ),
+                topics: result,
+                topic2Image: topic2Image,
                 count: result.length,
             }
         }),
@@ -224,5 +228,56 @@ export const TopicRouter = createTRPCRouter({
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(replaceNames(data.error.message))
             return data
+        }),
+    getGeneralTopics: publicProcedure
+        .input(searchSchema)
+        .query(async ({ input, ctx }) => {
+            let groupTree: GroupTree[] = []
+            const allGroups = (await getUserGroups({ apiKey: ctx?.session?.user.apikey ?? "", userId: "" }))!
+            const topicDetails = allGroups.reduce((acc, org) => {
+                acc[org.id] = {
+                    img_url: org.image_display_url,
+                    description: org.description,
+                    package_count: org.package_count,
+                }
+                return acc
+            }
+                , {} as Record<string, GroupsmDetails>)
+            if (input.search) {
+                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: ctx?.session?.user.apikey ?? "", q: input.search, group_type: 'group' })
+                if (input.tree) {
+                    let groupFetchTree = groupTree[0] as GroupTree
+                    const findTree = findNameInTree(groupFetchTree, input.search)
+                    if (findTree) {
+                        groupFetchTree = findTree
+                    }
+                    groupTree = [groupFetchTree]
+                }
+                if (input.allTree) {
+                     
+                    const filterTree = groupTree.flatMap((group) => {
+                        const search = input.search.toLowerCase()
+                        if ( group.name.toLowerCase().includes(search) || group.title?.toLowerCase().includes(search) ) return [group]
+                        const findtree = findAllNameInTree(group, search)
+                        return findtree
+                    })
+                    groupTree = filterTree
+                }
+                
+            }
+            else {
+                
+                groupTree = await getGroups({
+                    apiKey: ctx?.session?.user.apikey ?? "",
+                })
+                
+            }
+
+            const result = groupTree
+            return {
+                topics: result,
+                topicDetails: topicDetails,
+                count: result.length,
+            }
         }),
 })

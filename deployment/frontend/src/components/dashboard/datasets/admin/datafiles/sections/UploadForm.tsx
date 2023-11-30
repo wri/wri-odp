@@ -16,6 +16,7 @@ import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { convertBytes } from '@/utils/convertBytes'
 import Spinner from '@/components/_shared/Spinner'
 import FormatInput from '../FormatInput'
+import { DataDictionaryTable } from '../DataDictionaryTable'
 
 export function UploadForm({
     removeFile,
@@ -91,110 +92,11 @@ export function UploadForm({
                     name={`resources.${index}.format`}
                 />
             </InputGroup>
-            {dataDictionaryLoading &&
-            watch(`resources.${index}.dataDictionary`) ? (
+            {dataDictionaryLoading && watch(`resources.${index}.schema`) ? (
                 <Spinner />
             ) : (
-                <PreviewTable formObj={formObj} resourceIndex={index} />
+                <DataDictionaryTable formObj={formObj} resourceIndex={index} />
             )}
         </div>
-    )
-}
-
-function PreviewTable({
-    formObj,
-    resourceIndex,
-}: {
-    formObj: UseFormReturn<DatasetFormType>
-    resourceIndex: number
-}) {
-    const { control, watch, register } = formObj
-    const { fields } = useFieldArray({
-        control, // control props comes from useForm (optional: if you are using FormContext)
-        name: `resources.${resourceIndex}.dataDictionary`, // unique name for your Field Array
-    })
-    if (fields.length === 0) return <></>
-    return (
-        <Table>
-            <TableHeader>
-                <TableRow className="bg-neutral-50">
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Field
-                    </TableHead>
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Type
-                    </TableHead>
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Null
-                    </TableHead>
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Key
-                    </TableHead>
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Default
-                    </TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {fields.map((field, index) => (
-                    <TableRow
-                        key={index}
-                        className={
-                            index % 2 != 0
-                                ? 'border-0 bg-[#FDFDFD]'
-                                : 'border-0'
-                        }
-                    >
-                        <TableCell>
-                            <input
-                                {...register(
-                                    `resources.${resourceIndex}.dataDictionary.${index}.field`
-                                )}
-                                type="text"
-                                className="p-0 border-0 ring-0 ring-offset-0"
-                            />
-                        </TableCell>
-                        <TableCell>
-                            <input
-                                type="text"
-                                {...register(
-                                    `resources.${resourceIndex}.dataDictionary.${index}.type`
-                                )}
-                                className="p-0 border-0 ring-0 ring-offset-0"
-                            />
-                        </TableCell>
-                        <TableCell>
-                            <select
-                                {...register(
-                                    `resources.${resourceIndex}.dataDictionary.${index}.null`
-                                )}
-                                className="p-0 border-0 ring-0 ring-offset-0 appearance-none bg-none"
-                            >
-                                <option value="YES">YES</option>
-                                <option value="NO">NO</option>
-                            </select>
-                        </TableCell>
-                        <TableCell>
-                            <input
-                                type="text"
-                                {...register(
-                                    `resources.${resourceIndex}.dataDictionary.${index}.key`
-                                )}
-                                className="p-0 border-0 ring-0 ring-offset-0"
-                            />
-                        </TableCell>
-                        <TableCell>
-                            <input
-                                type="text"
-                                {...register(
-                                    `resources.${resourceIndex}.dataDictionary.${index}.default`
-                                )}
-                                className="p-0 border-0 ring-0 ring-offset-0"
-                            />
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
     )
 }

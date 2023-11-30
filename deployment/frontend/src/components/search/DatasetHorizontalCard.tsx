@@ -113,11 +113,11 @@ export default function DatasetHorizontalCard({
                                     </Tooltip>
                                 </TooltipProvider>
                             )}
-                            {(dataset as any).location && (
+                            {dataset.spatial_address && (
                                 <div className="flex items-center gap-x-1">
                                     <MapPinIcon className="h-3 w-3 text-blue-800" />
                                     <p className="font-['Acumin Pro SemiCondensed'] text-xs font-light leading-snug text-stone-900 sm:text-sm">
-                                        Sub-Regional
+                                        {dataset.spatial_address}
                                     </p>
                                 </div>
                             )}

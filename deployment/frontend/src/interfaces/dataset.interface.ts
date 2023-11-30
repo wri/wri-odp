@@ -1,3 +1,4 @@
+import { DataDictionaryFormType } from "@/schema/dataset.schema";
 import { Activity, Group, Organization } from "@portaljs/ckan";
 
 export interface Dataset {
@@ -55,6 +56,7 @@ export interface Resource {
   url?: string;
   url_type?: string;
   key?: string;
+  schema?: { value: DataDictionaryFormType }
 }
 
 export interface DatasetListQueryOptions {

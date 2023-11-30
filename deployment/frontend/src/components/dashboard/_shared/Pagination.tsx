@@ -22,7 +22,7 @@ export default function Pagination({ setQuery, query, isLoading, count }: {
     <div className='flex font-acumin gap-x-2 items-center self-end'>
       {isLoading ? <Spinner className="mx-auto my-2" /> :
         <div
-          className=' text-gray-300 font-light text-sm'>{`${query.page.start === 0 ? 1 : Math.floor(query.page.start / query.page.rows) + 1} of ${count! < query.page.rows ? 1 : Math.round(count! / query.page.rows)}`}
+          className=' text-gray-300 font-light text-sm'>{`${query.page.start === 0 ? 1 : Math.floor(query.page.start / query.page.rows) + 1} of ${count! < query.page.rows ? 1 : Math.ceil(count! / query.page.rows)}`}
         </div>}
 
       <button

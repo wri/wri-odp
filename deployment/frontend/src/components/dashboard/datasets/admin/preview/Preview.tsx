@@ -50,7 +50,7 @@ export function Preview({
                             <dl className="flex flex-col gap-y-6">
                                 <SimpleDescription
                                     label="Source"
-                                    text={watch('source') ?? '_'}
+                                    text={watch('url') ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="Language"
@@ -116,6 +116,10 @@ export function Preview({
                                 <SimpleDescription
                                     label="License"
                                     text={watch('license_id')?.label ?? '_'}
+                                />
+                                <SimpleDescription
+                                    label="Location"
+                                    text={watch('spatial_address') || watch('spatial') ? "Yes" : '_'}
                                 />
                             </dl>
                         </div>
@@ -254,7 +258,7 @@ export function Preview({
                                             resource.description ?? '-'
                                         }
                                         dataDictionary={
-                                            resource.dataDictionary ?? []
+                                            resource.schema ?? []
                                         }
                                     />
                                 ))}

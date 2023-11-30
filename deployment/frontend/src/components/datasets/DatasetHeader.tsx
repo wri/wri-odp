@@ -148,7 +148,11 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                             <StarIcon className="cursor-pointer h-6 w-6" />
                         </DefaultTooltip>
                         <DefaultTooltip content="Edit" side="bottom">
-                            <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
+                            <Link
+                                href={`/dashboard/datasets/${dataset?.name}/edit`}
+                            >
+                                <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
+                            </Link>
                         </DefaultTooltip>
                     </div>
                 </div>
@@ -260,24 +264,30 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                                 WRI Data
                             </div>
                         </div>
-                    ) : ''}
-                    {dataset?.technical_notes ? (
-                        <div className="flex items-center rounded-[3px] border border-green-500 bg-green-500">
-                            <div className="px-2 font-acumin text-xs font-medium text-white">
-                                RDI approved
-                            </div>
-                        </div>
                     ) : (
-                        <div className="flex items-center rounded-[3px] border border-orange-400 bg-orange-400">
-                            <div className="px-2 font-acumin text-xs font-medium text-white">
-                                Awaiting RDI approval
+                        ''
+                    )}
+                    {session.data?.user ? (
+                        dataset?.technical_notes ? (
+                            <div className="flex items-center rounded-[3px] border border-green-500 bg-green-500">
+                                <div className="px-2 font-acumin text-xs font-medium text-white">
+                                    RDI approved
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="flex items-center rounded-[3px] border border-orange-400 bg-orange-400">
+                                <div className="px-2 font-acumin text-xs font-medium text-white">
+                                    Awaiting RDI approval
+                                </div>
+                            </div>
+                        )
+                    ) : (
+                        <></>
                     )}
                     {dataset?.resources &&
                         dataset?.resources.filter((resource) => resource.format)
                             .length > 0 && (
-                            <div className="flex gap-x-2 border-l border-zinc-300 pl-3">
+                            <div className={classNames("flex gap-x-2 border-zinc-300", session.data?.user ? 'border-l pl-3' : '')}>
                                 {dataset?.resources
                                     .filter((resource) => resource.format)
                                     .map((resource) => (

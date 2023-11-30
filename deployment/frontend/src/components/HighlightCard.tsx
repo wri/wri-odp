@@ -48,12 +48,12 @@ export default function HighlightCard({
                         </div>
                     </div>
                 ) : null}
-                {(highlight as any).location &&
+                {highlight.spatial_address &&
                 (highlight.temporal_coverage_start ||
                     highlight.temporal_coverage_end) ? (
                     <div className="border-l border-wri-black h-4  mx-2"></div>
                 ) : null}
-                {(highlight as any).location ? (
+                {highlight.spatial_address ? (
                     <div className="flex ">
                         <div className="w-4 h-4 relative">
                             <Image

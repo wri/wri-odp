@@ -178,7 +178,7 @@ export const authOptions: NextAuthOptions = {
                         const orgList: CkanResponse<Organization[]> =
                             await orgListRes.json()
 
-                        console.log('Org list', orgList)
+                        // console.log('Org list', orgList)
                         return {
                             ...user.result,
                             image: '',

@@ -36,9 +36,12 @@ export default function SearchPanel() {
                             dataset={{
                                 name: 'Test',
                                 temporal_coverage_start: '',
+                                creator_user_id: 'test',
                                 temporal_coverage_end: '',
                                 num_resources: 0,
                                 num_tags: 0,
+                                update_frequency: 'as_needed',
+                                visibility_type: 'public',
                                 open_in: [],
                                 id: '123',
                                 resources: [],

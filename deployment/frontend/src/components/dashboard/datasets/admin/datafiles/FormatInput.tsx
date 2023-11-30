@@ -12,9 +12,11 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline'
 export default function FormatInput({
     formObj,
     name,
+    className = '',
 }: {
     formObj: UseFormReturn<DatasetFormType>
     name: Path<DatasetFormType>
+    className?: string
 }) {
     const { control } = formObj
     const [query, setQuery] = useState('')
@@ -26,11 +28,18 @@ export default function FormatInput({
             name={name}
             defaultValue={[]}
             render={({ field: { onChange, value } }) => (
-                <Combobox as="div" value={value} onChange={onChange}>
-                    <div className="relative mt-2">
+                <Combobox
+                    as="div"
+                    className="w-full"
+                    value={value}
+                    onChange={onChange}
+                >
+                    <div className="relative mt-2 w-full">
                         <Combobox.Input
-              placeholder='Select format'
-                            className="relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 max-w-[70rem]"
+                            placeholder="Select format"
+                            className={classNames(
+                                'relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 max-w-[70rem]'
+                            )}
                             onChange={(event) => setQuery(event.target.value)}
                         />
                         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">

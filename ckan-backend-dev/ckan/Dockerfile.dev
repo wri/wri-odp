@@ -30,6 +30,26 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
 
+# Required by shapely dependency
+RUN apk --update add build-base libxslt-dev python3-dev 
+
+RUN apk add --virtual .build-deps \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        gcc libc-dev geos-dev geos && \
+    runDeps="$(scanelf --needed --nobanner --recursive /usr/local \
+    | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+    | xargs -r apk info --installed \
+    | sort -u)" && \
+    apk add --virtual .rundeps $runDeps
+
+RUN geos-config --cflags
+
+RUN pip install --disable-pip-version-check Shapely==2.0.1
+
+RUN apk del build-base python3-dev && \
+    rm -rf /var/cache/apk/*
+ 
 # Update ckanext-s3filestore test.ini with minio credentials
 RUN sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \
     sed -i "s|ckanext.s3filestore.aws_secret_access_key = test-secret-key|ckanext.s3filestore.aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}|g" src/ckanext-s3filestore/test.ini && \
