@@ -89,6 +89,8 @@ export interface WriDataset extends Dataset {
     restrictions?: string
     open_in: OpenIn[]
     extras?: Extra[]
+    spatial?: any
+    spatial_address?: string
 }
 
 export interface Extra {
@@ -160,4 +162,10 @@ export interface FolloweeList {
     type: string;
     display_name: string;
     dict: WriDataset | WriOrganization | WriUser | Group;
+}
+
+export interface GroupsmDetails{
+    img_url: string;
+    description: string;
+    package_count: number;
 }

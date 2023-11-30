@@ -9,33 +9,32 @@ export interface SubtopicProps {
     img: string
 }
 
-export default function SubtopicCard({
-    topic,
-    topicsDetails,
+export default function Subteamcard({
+    team,
+    teamsDetails,
 }: {
-    topic: GroupTree
-    topicsDetails: Record<string, GroupsmDetails>
+    team: GroupTree
+    teamsDetails: Record<string, GroupsmDetails>
 }) {
-    console.log('img_url: ', topicsDetails[topic.id]?.img_url)
     return (
         <Link
-            href={`/topics/${topic.name}`}
+            href={`/teams/${team.name}`}
             className="flex flex-col w-full font-acumin gap-1"
         >
             <div className="relative w-full md:w-56 h-44">
                 <Image
                     src={`${
-                        topicsDetails[topic.id]?.img_url
-                            ? topicsDetails[topic.id]?.img_url
+                        teamsDetails[team.id]?.img_url
+                            ? teamsDetails[team.id]?.img_url
                             : '/images/placeholders/topics/topicsdefault.png'
                     }`}
                     alt="higlight"
                     fill
                 />
             </div>
-            <div className="text-black text-lg font-normal">{topic.title}</div>
+            <div className="text-black text-lg font-normal">{team.title}</div>
             <div className="text-black text-sm font-normal">
-                {topicsDetails[topic.id]?.package_count} Datasets
+                {teamsDetails[team.id]?.package_count} Datasets
             </div>
         </Link>
     )

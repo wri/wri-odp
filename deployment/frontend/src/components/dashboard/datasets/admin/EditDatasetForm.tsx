@@ -34,6 +34,7 @@ import { Collaborators } from './metadata/Collaborators'
 import Modal from '@/components/_shared/Modal'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
+import { LocationForm } from './metadata/LocationForm'
 
 //change image
 //change title
@@ -135,6 +136,11 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 ...resource,
                 schema: resource.schema ? resource.schema.value : undefined,
             })),
+            spatial_type: dataset.spatial_address
+                ? 'address'
+                : dataset.spatial
+                ? 'geom'
+                : undefined,
         },
     })
 
@@ -205,6 +211,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             className="flex flex-col gap-y-12 mt-8"
                         >
                             <OverviewForm formObj={formObj} editing={true} />
+                            <LocationForm formObj={formObj} />
                             <DescriptionForm formObj={formObj} />
                             <PointOfContactForm formObj={formObj} />
                             <MoreDetailsForm formObj={formObj} />

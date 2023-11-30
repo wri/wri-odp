@@ -11,7 +11,11 @@ export const searchSchema = z.object({
     fq: z.record(z.string()).optional(),
     facetFields: z.array(z.string()).optional(),
     sortBy: z.string().default("relevance asc").optional(),
+    extLocationQ: z.string().optional(),
+    extAddressQ: z.string().optional(),
     _isUserSearch: z.boolean().default(false).optional(),
+    tree: z.boolean().optional(),
+    allTree: z.boolean().optional(),
 })
 
 export type SearchInput = z.infer<typeof searchSchema>

@@ -8,6 +8,7 @@ import type {
     WriOrganization,
     GroupTree,
     Collaborator,
+    GroupsmDetails,
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
@@ -233,8 +234,6 @@ export async function getUserGroups({
         const response = await fetch(
             `${env.CKAN_URL}/api/3/action/group_list?all_fields=true`,
             {
-                method: 'POST',
-                body: JSON.stringify({ id: userId }),
                 headers: {
                     Authorization: apiKey,
                     'Content-Type': 'application/json',
@@ -284,12 +283,16 @@ export async function getAllDatasetFq({
     query,
     facetFields = [],
     sortBy = '',
+    extLocationQ = '',
+    extAddressQ = ''
 }: {
     apiKey: string
     fq: string
     query: SearchInput
     facetFields?: string[]
     sortBy?: string
+    extLocationQ?: string
+    extAddressQ?: string
 }): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets }> {
     try {
         let url = `${env.CKAN_URL}/api/3/action/package_search?q=${query.search}`
@@ -304,6 +307,15 @@ export async function getAllDatasetFq({
 
         if (sortBy) {
             url += `&sort=${sortBy}`
+        }
+
+
+        if (extLocationQ) {
+            url += `&ext_location_q=${extLocationQ}`
+        }
+
+        if (extAddressQ) {
+            url += `&ext_address_q=${extAddressQ}`
         }
 
         const response = await fetch(
@@ -326,6 +338,7 @@ export async function getAllDatasetFq({
         }
 
         const datasets = data.success === true ? data.result.results : []
+        
         const count = data.success === true ? data.result.count : 0
         const searchFacets =
             data.success === true ? data.result?.search_facets : {}
@@ -499,6 +512,7 @@ export async function getOneDataset(
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
+        spatial: dataset.result.spatial ? JSON.parse(dataset.result.spatial) : undefined,
     }
 }
 
@@ -548,4 +562,139 @@ export function timeAgo(timestamp: string): string {
     } else {
         return `${seconds} seconds ago`
     }
+}
+
+export function findNameInTree(tree: GroupTree, targetName: string): GroupTree | null {
+    // Base case: if the current node's name matches the target, return the node
+    if (tree.name === targetName) {
+        return tree;
+    }
+
+    // Recursive case: search through children
+    if (tree.children && tree.children.length > 0) {
+        for (const child of tree.children) {
+            const result = findNameInTree(child, targetName);
+            if (result) {
+                return result; // If found in child, return the result
+            }
+        }
+    }
+    // If not found in the current node or its children, return null
+    return null;
+}
+
+export function findAllNameInTree(tree: GroupTree, targetName: string): GroupTree[] {
+    const result: GroupTree[] = [];
+
+    // Check if the targetName is a substring of the current node's name
+    if (tree.name.toLowerCase().includes(targetName) || tree.title?.toLowerCase().includes(targetName)) {
+        result.push(tree);
+    }
+
+    // Recursive case: search through children
+    if (tree.children && tree.children.length > 0) {
+        for (const child of tree.children) {
+            const childResults = findAllNameInTree(child, targetName);
+            result.push(...childResults); // Add child results to the overall result
+        }
+    }
+
+    return result;
+}
+export async function getOrganizationTreeDetails({
+    input,
+    session,
+}: {
+        input: SearchInput,
+        session: Session | null,
+    }) {
+    
+    let groupTree: GroupTree[] = []
+            const allGroups = (await getAllOrganizations({ apiKey: session?.user.apikey ?? "" }))!
+            
+
+            const teamDetails = allGroups.reduce((acc, org) => {
+                acc[org.id] = {
+                    img_url: org.image_display_url ?? "",
+                    description: org.description ?? "",
+                    package_count: org.package_count,
+                }
+                return acc
+            }
+                , {} as Record<string, GroupsmDetails>)
+            
+            
+            if (input.search) {
+                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: session?.user.apikey ?? "", q: input.search, group_type: "organization" })
+                if (input.tree) {
+                    let groupFetchTree = groupTree[0] as GroupTree
+                    const findTree = findNameInTree(groupFetchTree, input.search)
+                    if (findTree) {
+                        groupFetchTree = findTree
+                    }
+                    groupTree = [groupFetchTree]
+                }
+                
+            }
+            else {
+                
+                groupTree = await getGroups({
+                    apiKey: session?.user.apikey ?? "",
+                    group_type: "organization"
+                })
+                
+            }
+
+            const result = groupTree
+            return {
+                teams: result,
+                teamsDetails: teamDetails,
+                count: result.length,
+            }
+}
+
+export async function getTopicTreeDetails({
+    input,
+    session,
+}: {
+        input: SearchInput,
+        session: Session | null,
+    }) {
+     let groupTree: GroupTree[] = []
+            const allGroups = (await getUserGroups({ apiKey: session?.user.apikey ?? "", userId: "" }))!
+            const topicDetails = allGroups.reduce((acc, org) => {
+                acc[org.id] = {
+                    img_url: org.image_display_url,
+                    description: org.description,
+                    package_count: org.package_count,
+                }
+                return acc
+            }
+                , {} as Record<string, GroupsmDetails>)
+            if (input.search) {
+                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: session?.user.apikey ?? "", q: input.search, group_type: 'group' })
+                if (input.tree) {
+                    let groupFetchTree = groupTree[0] as GroupTree
+                    const findTree = findNameInTree(groupFetchTree, input.search)
+                    if (findTree) {
+                        groupFetchTree = findTree
+                    }
+                    groupTree = [groupFetchTree]
+                }
+                
+            }
+            else {
+                
+                groupTree = await getGroups({
+                    apiKey: session?.user.apikey ?? "",
+                })
+                
+            }
+
+            const result = groupTree
+            return {
+                topics: result,
+                topicDetails: topicDetails,
+                count: result.length,
+            }
 }
