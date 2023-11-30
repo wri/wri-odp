@@ -2,6 +2,7 @@ import { Button } from '@/components/_shared/Button'
 import { TextWithReadMore } from '@/components/_shared/TextWithReadMore'
 import { WriDataset } from '@/schema/ckan.schema'
 import { LinkIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
 
 export function About({ dataset }: { dataset: WriDataset }) {
     return (
@@ -48,8 +49,8 @@ export function About({ dataset }: { dataset: WriDataset }) {
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
                                 {dataset.groups
-                                    .map((topic) => topic.display_name)
-                                    .join(', ')}
+                                    .map((topic, topicIdx) => <Link href={`/topics/${topic.name}`}>{topic.display_name}{dataset.groups && topicIdx !== dataset.groups?.length - 1 ? ', ' : ''}</Link>)
+                                    }
                             </dd>
                         </>
                     </div>

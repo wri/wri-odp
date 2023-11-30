@@ -6,6 +6,14 @@ about_url: http://github.com/ckan/ckanext-scheming
 
 dataset_fields:
 
+- field_name: spatial_address
+  label: Spatial address
+  validators: ignore_missing
+
+- field_name: spatial
+  label: Spatial
+  validators: ignore_missing
+
 - field_name: wri_data
   label: WRI Data
   validators: boolean_validator

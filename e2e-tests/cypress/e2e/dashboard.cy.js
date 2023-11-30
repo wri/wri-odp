@@ -16,6 +16,7 @@ const datasetName2 = `${uuid()}${Cypress.env('DATASET_NAME_SUFFIX')}`;
 const group = `${uuid()}${Cypress.env("GROUP_SUFFIX")}`;
 const user = `${uuid()}-user`;
 const email = `${uuid()}@gmail.com`;
+const userfullname = `${uuid()}-fullname`;
 
 describe("Dashboard Test", () => {
   before(() => {
@@ -51,6 +52,13 @@ describe("Dashboard Test", () => {
     cy.get('[id^="headlessui-listbox-button"]').first().click();;
     cy.contains('[role="option"]', 'new').click();
     cy.contains(`${ckanUserName} created the package ${datasetName}`);
+  })
+
+  it("Should test user form", () => {
+    cy.visit(`/dashboard/users/edit/${user}`)
+    cy.get('input[name="fullname"]').type(userfullname);
+    cy.get('button[type="submit"]').click();
+    cy.contains(`Successfully updated user: ${user}`)
   })
 
   it("Should test Users page", () => {

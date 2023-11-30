@@ -54,6 +54,10 @@ contains filter by time and days
 
 ![](./activityfilter.png)
 
+contains filter by Teams
+
+![](./activityfilter1.png)
+
 
 ## Teams `/dashboard/teams`
 

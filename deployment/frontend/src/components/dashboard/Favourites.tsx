@@ -7,7 +7,7 @@ import type { WriDataset } from '@/schema/ckan.schema';
 import { formatDate } from '@/utils/general';
 
 function Favourite({ dataset }: { dataset: WriDataset }) {
-  const created = dataset?.metadata_created ? dataset.metadata_created : ''
+  const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
   return (
     <div className='flex flex-col hover:bg-slate-100 px-3 py-2 mb-2 pb-2 rounded-md'>
       <p className='font-normal text-base'>{dataset?.title ?? dataset?.name}</p>
@@ -21,8 +21,7 @@ function Favourite({ dataset }: { dataset: WriDataset }) {
   )
 }
 export default function Favourites({ drag }: { drag: boolean }) {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
-  const { data, isLoading } = api.dataset.getFavoriteDataset.useQuery(query)
+  const { data, isLoading } = api.dataset.getFavoriteDataset.useQuery()
   return (
     <section id="favourites" className={`p-6 w-full shadow-wri h-full overflow-y-auto ${drag ? "border-dashed border border-wri-black" : ""}`}>
       {
@@ -38,7 +37,7 @@ export default function Favourites({ drag }: { drag: boolean }) {
       </div>
       {
         data?.datasets.length === 0 ? <div className='flex justify-center items-center h-screen'>No data</div> :
-          data?.datasets.map((items, index) => {
+          data?.datasets.slice(0, 10).map((items, index) => {
             return (
               <Favourite key={index} dataset={items} />
             )

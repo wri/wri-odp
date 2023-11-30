@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SearchHeader from '../_shared/SearchHeader'
 import RowProfile from '../_shared/RowProfile';
 import Row from '../_shared/Row';
@@ -15,6 +15,7 @@ import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import type { GroupTree } from '@/schema/ckan.schema';
+import { useQuery } from 'react-query';
 
 type IOrg = {
   title: string | undefined;
@@ -23,10 +24,11 @@ type IOrg = {
   description: string;
 }
 
-function TeamProfile({ team }: { team: GroupTree }) {
+function TeamProfile({ team, org2img }: { team: GroupTree, org2img: Record<string, string> }) {
   const description = team?.children?.length ? `${team?.children?.length} subteams` : 'No subteams'
   const TopicProfile = team as IRowProfile
   TopicProfile.description = description
+  TopicProfile.image_display_url = org2img[team.id]
   return (
     <div className='flex py-5 pl-2' >
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} defaultImg='/images/placeholders/teams/teamdefault.png' />
@@ -34,10 +36,11 @@ function TeamProfile({ team }: { team: GroupTree }) {
   )
 }
 
-function SubTeamProfile({ team }: { team: GroupTree }) {
+function SubTeamProfile({ team, org2img }: { team: GroupTree, org2img: Record<string, string> }) {
   const description = team?.children?.length ? `${team?.children?.length} subteams` : 'No subteams'
   const TopicProfile = team as IRowProfile
   TopicProfile.description = description
+  TopicProfile.image_display_url = org2img[team.id]
   return (
     <div className='flex py-5 pl-3 sm:pl-5' >
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] ' isPad profile={team} defaultImg='/images/placeholders/teams/teamdefault.png' />
@@ -45,7 +48,16 @@ function SubTeamProfile({ team }: { team: GroupTree }) {
   )
 }
 
-function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTree[] | undefined, highlighted?: boolean }) {
+function SubCardProfile({
+  teams,
+  highlighted,
+  org2img
+}:
+  {
+    teams: IRowProfile[] | GroupTree[] | undefined,
+    highlighted?: boolean,
+    org2img: Record<string, string>
+  }) {
   const utils = api.useUtils()
   const [open, setOpen] = useState(false)
   const [selectedTeam, setSelectedTeam] = useState<GroupTree | null>(null)
@@ -63,12 +75,18 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
     setOpen(true)
   }
 
+  const Team = (team: GroupTree) => {
+    const TeamProfile = team as IRowProfile
+    TeamProfile.image_display_url = org2img[team.id]
+    return TeamProfile
+  }
+
   if (!teams || teams.length === 0) return (<></>)
   return (
     <div className='flex flex-col pt-2 pl-4'>
       {
         teams.map((team, index) => {
-          return (<>
+          return (<div key={team.title}>
 
             {
               (team as GroupTree).children?.length ?
@@ -80,7 +98,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
                       groupStyle="group/item group-hover/item:visible "
                       className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                       rowMain={
-                        <SubTeamProfile team={team as GroupTree} />
+                        <SubTeamProfile team={team as GroupTree} org2img={org2img} />
                       }
                       linkButton={{
                         label: "View team",
@@ -111,7 +129,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
                         },
                       ]}
                       isDropDown
-                      rowSub={<SubCardProfile teams={(team as GroupTree).children} />}
+                      rowSub={<SubCardProfile teams={(team as GroupTree).children} org2img={org2img} />}
                     />
                   </>
 
@@ -124,7 +142,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
                       className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                       rowMain={
                         <div className='flex pl-4 sm:pl-6  '>
-                          <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} defaultImg='/images/placeholders/teams/teamdefault.png' />
+                          <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={Team(team as GroupTree)} defaultImg='/images/placeholders/teams/teamdefault.png' />
                         </div>
                       }
                       linkButton={{
@@ -160,7 +178,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
 
                 )
             }
-          </>)
+          </div>)
         })
       }
       {
@@ -218,6 +236,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
 
 export default function TeamCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
+  const [pagination, setPagination] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.organization.getUsersOrganizations.useQuery(query)
   const [selectedTeam, setSelectedTeam] = useState<GroupTree | null>(null);
   const [open, setOpen] = useState(false)
@@ -235,20 +254,47 @@ export default function TeamCard() {
     setOpen(true);
   };
 
+  const ProcessedTeam = useQuery(['paginatedTeams', data, pagination], () => {
+    if (!data) return { organizations: [], org2Image: {}, count: 0 }
+
+    const organizations = data?.organizations.slice(pagination.page.start, pagination.page.start + pagination.page.rows)
+    const org2Image = data?.org2Image
+    return { organizations, org2Image, count: data?.count }
+  }, {
+    enabled: !!data
+  })
+
+
+  useEffect(() => {
+    setPagination({ search: '', page: { start: 0, rows: 10 } })
+  }, [query.search])
+
+
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-4 sm:gap-y-0'>
-      <SearchHeader leftStyle=' px-2 sm:pr-2 sm:pl-12' rightStyle='pr-2 sm:pr-6' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
+      <SearchHeader leftStyle=' px-2 sm:pr-2 sm:pl-12' rightStyle='pr-2 sm:pr-6'
+        setQuery={setQuery}
+        query={query}
+        Pagination={
+          <Pagination
+            setQuery={setPagination}
+            query={pagination}
+            isLoading={ProcessedTeam.isLoading}
+            count={ProcessedTeam.data?.count}
+          />
+        }
+      />
       {
-        isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> :
-          data?.organizations.length === 0 ? <div className='flex justify-center items-center h-screen'>No Organization</div> :
-            data?.organizations.map((team, index) => {
+        isLoading || ProcessedTeam.isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> :
+          ProcessedTeam.data?.organizations.length === 0 ? <div className='flex justify-center items-center h-screen'>No Organization</div> :
+            ProcessedTeam.data?.organizations.map((team, index) => {
               return (
                 <div key={team.name}>
                   <Row
                     key={index}
                     className={`pr-2`}
                     highlighted={team?.highlighted}
-                    rowMain={<TeamProfile team={team} />}
+                    rowMain={<TeamProfile team={team} org2img={data?.org2Image as Record<string, string>} />}
                     linkButton={{
                       label: "View team",
                       link: `../teams/${team.name}`,
@@ -277,7 +323,7 @@ export default function TeamCard() {
                         onClick: () => handleOpenModal(team)
                       },
                     ]}
-                    rowSub={<SubCardProfile teams={team.children} highlighted={team?.highlighted} />}
+                    rowSub={<SubCardProfile teams={team.children} highlighted={team?.highlighted} org2img={data?.org2Image as Record<string, string>} />}
                     isDropDown
                   />
 

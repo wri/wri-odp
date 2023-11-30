@@ -90,3 +90,28 @@ Results are displayed using the following card:
 9) Has tabular view
 10) Has cautions
 11) Formats of the data files
+
+### Location search
+
+When creating or editing datasets, there are two options to index a dataset spatially:
+
+1) Upload a GeoJSON file
+2) Choose a location string
+
+After a dataset is spatially indexed, it will show up on location searches on the advanced search page.
+
+#### GeoJSON file
+
+Datasets spatially indexed by uploading a GeoJSON file will be shown on results when the search query has a "ext_spatial_q:x,y" parameter which defines a point within the uploaded shape. 
+
+#### Location string
+
+Datasets spatially indexed by setting a location string will be shown on results when the search query has a "ext_address_q:{location string}" parameter which matches the end on the dataset's location string.
+
+Example: if a dataset is indexed with location string set to "Paraná, Brazil", search queries with ext_address_q set to the following values will match
+
+1) Pato Branco, Paraná, Brazil
+2) Paraná, Brazil
+
+
+

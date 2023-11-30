@@ -4,8 +4,8 @@ import type { Group, Organization, User as CkanUser } from '@portaljs/ckan'
 type Only<T, U> = {
     [P in keyof T]: T[P]
 } & {
-    [P in keyof U]?: never
-}
+        [P in keyof U]?: never
+    }
 
 type Either<T, U> = Only<T, U> | Only<U, T>
 
@@ -44,7 +44,7 @@ export interface Activity {
     object_id?: string
     activity_type: string
     user_data?: User
-    data: Record<string, { title?: string }>
+    data: Record<string, { title?: string, owner_org?: string }>
 }
 
 export interface ActivityDisplay {
@@ -54,6 +54,7 @@ export interface ActivityDisplay {
     action: string
     timestamp: string
     actionType: string
+    orgId?: string
 }
 
 export interface WriDataset extends Dataset {
@@ -61,13 +62,23 @@ export interface WriDataset extends Dataset {
     technical_notes?: string
     temporal_coverage_start: string
     temporal_coverage_end: string
-    update_frequency?: string
-    visibility_type?: 'public' | 'private' | 'internal' | 'draft'
+    update_frequency:
+        | 'annually'
+        | 'biannually'
+        | 'quarterly'
+        | 'monthly'
+        | 'weekly'
+        | 'daily'
+        | 'as_needed'
+        | 'hourly'
+    visibility_type: 'public' | 'private' | 'internal' | 'draft'
     short_description?: string
     project?: string
     reason_for_adding?: string
     featured_dataset?: boolean
     wri_data?: boolean
+    creator_user_id: string
+    language?: string
     featured_image?: string
     application?: string
     cautions?: string
@@ -78,6 +89,8 @@ export interface WriDataset extends Dataset {
     restrictions?: string
     open_in: OpenIn[]
     extras?: Extra[]
+    spatial?: any
+    spatial_address?: string
 }
 
 export interface Extra {
@@ -143,4 +156,16 @@ export interface Comment {
     visibility: string
     abuse_status: string
     user: WriUser
+}
+
+export interface FolloweeList {
+    type: string;
+    display_name: string;
+    dict: WriDataset | WriOrganization | WriUser | Group;
+}
+
+export interface GroupsmDetails{
+    img_url: string;
+    description: string;
+    package_count: number;
 }

@@ -26,7 +26,7 @@ export function searchArrayForKeyword<T>(
 export function filterObjects<T>(arrayObject: T[], filterObject: Record<string, string>): T[] {
   return arrayObject.filter((item) => {
 
-    return Object.keys(filterObject).some((key) => {
+    return Object.keys(filterObject).every((key) => {
       const filterValue = filterObject[key];
       const itemValue = (item as Record<string, string>)[key];
       if (key === 'timestamp') {

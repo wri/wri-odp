@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Login from './Login'
 import UserMenu from './UserMenu'
-import {useSession} from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 
 export default function Header() {
     const { asPath } = useRouter()
@@ -73,7 +73,7 @@ export default function Header() {
                 <div className=" hidden sm:flex gap-x-6 font-semibold text-[1.0625rem] text-wri-black">
                     {navigation.map((item) => {
                         return (
-                            <a
+                            <Link
                                 key={`nav-${item.title}`}
                                 href={item.href}
                                 className={
@@ -83,7 +83,7 @@ export default function Header() {
                                 }
                             >
                                 {item.title}
-                            </a>
+                            </Link>
                         )
                     })}
                 </div>
@@ -167,7 +167,7 @@ export default function Header() {
                                         >
                                             <Menu.Item>
                                                 {({ active }) => (
-                                                    <a
+                                                    <Link
                                                         className={`${
                                                             active &&
                                                             'bg-blue-500'
@@ -175,7 +175,7 @@ export default function Header() {
                                                         href={item.href}
                                                     >
                                                         {item.title}
-                                                    </a>
+                                                    </Link>
                                                 )}
                                             </Menu.Item>
                                         </div>
