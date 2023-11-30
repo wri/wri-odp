@@ -24,13 +24,13 @@ export default function TeamCard({
                     }`}
                     alt={`Topic - ${team.title}`}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                 />
             </div>
-            <div className="bg-white w-[70%] pt-2 -ml-[1px] -mt-6 z-10">
+            <div className="bg-white w-[70%] pt-2 -ml-[1px] -mt-6 z-10 line-clamp-2 h-16 pb-1.5">
                 <h2 className="text-2xl font-bold w-[80%]">{team.title}</h2>
             </div>
-            <article className=" line-clamp-3 w-[88%] font-light text-base mt-2 leading-[1.375rem] line-clamp-3">
+            <article className=" line-clamp-3 w-[88%] font-light text-base mt-2 leading-[1.375rem] h-16">
                 {teamsDetails[team.id]?.description}
             </article>
             <div className="flex font-light text-sm text-wri-black mt-1 leading-[1.375rem] items-center">

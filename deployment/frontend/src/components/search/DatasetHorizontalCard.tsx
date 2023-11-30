@@ -36,15 +36,15 @@ export default function DatasetHorizontalCard({
 
     return (
         <Link href={`/datasets/${dataset.name}`}>
-            <div className="grid gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100 lg:grid-cols-5">
+            <div className="grid gap-y-3 border-b-2 border-wri-green bg-white p-5 mb-2 shadow-wri transition hover:bg-slate-100 lg:grid-cols-5">
                 <div className="col-span-full lg:col-span-4">
                     <div className="pr-4">
-                        <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green">
+                        <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green line-clamp-1">
                             {dataset.organization?.title.toUpperCase()}
                         </p>
 
                         <div className="flex items-center">
-                            <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900">
+                            <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900 line-clamp-1">
                                 {dataset.title}
                             </h3>
                             {dataset.visibility_type &&

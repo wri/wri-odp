@@ -55,6 +55,7 @@ export default function TeamHeaderCard({
                             }`}
                             alt="Team card"
                             fill
+                            className="object-contain"
                         />
                     </div>
                 </div>
@@ -63,7 +64,7 @@ export default function TeamHeaderCard({
                 {authorized && !enableQuery ? (
                     <>
                         <Link
-                            href="#"
+                            href={`/dashboard/teams/${team.name}/edit`}
                             className="flex outline-wri-gold outline-1 outline font-bold text-[14px] text-black rounded-md px-6 py-3 gap-x-1 w-fit"
                         >
                             <div className="mr-1 w-fit h-[14px]">Edit</div>
@@ -78,6 +79,7 @@ export default function TeamHeaderCard({
                         userName={session?.user?.name as string}
                         orgDetails={orgdetails?.data!}
                         isLoading={orgdetails?.isLoading}
+                        teamName={team.name}
                     />
                 ) : (
                     <></>

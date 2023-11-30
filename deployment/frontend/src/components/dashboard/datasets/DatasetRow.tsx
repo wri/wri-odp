@@ -34,7 +34,7 @@ function subFields(dataset: WriDataset) {
     },
     {
       title: "Region",
-      description: "Sub-regional"
+      description: ""
     }
   ]
 }
@@ -129,6 +129,7 @@ export function FavouriteRow({ className, dataset }: { className?: string, datas
 }
 
 export function DraftRow({ className, dataset, handleOpenModal }: { className?: string, dataset: WriDataset, handleOpenModal: (dataset: WriDataset) => void }) {
+  const router = useRouter()
   return (
     <Row
       authorized={true}
@@ -142,7 +143,9 @@ export function DraftRow({ className, dataset, handleOpenModal }: { className?: 
             id: `delete-tooltip-${dataset.name}`,
             content: "Edit dataset"
           },
-          onClick: () => { }
+          onClick: () => {
+             router.push(`/dashboard/datasets/${dataset.name}/edit`)
+           }
         },
         {
           label: "Delete", color: 'bg-red-600 hover:bg-red-500',
