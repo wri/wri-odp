@@ -52,7 +52,7 @@ The parameters `time_sent` (set to the current timestamp), `state` (set as `acti
 - **object_id** (string) – The ID of the object on which the action is being performed (required).
 - **time_sent** (datetime with timezone) – The timestamp of the sent time (required).
 - **is_unread** (string) – Indicates whether the notification is read or not (required).
-- **state** (string) – Active or Deleted (required).
+- **state** (string) – `active` or `deleted` (required).
 
 #### GET /api/action/notification_get_all
 
