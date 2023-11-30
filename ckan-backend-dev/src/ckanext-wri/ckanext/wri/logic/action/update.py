@@ -5,6 +5,7 @@ from ckanext.wri.model.notification import Notification, notification_list_dicti
 from ckanext.wri.logic.auth import schema
 import ckan.plugins.toolkit as tk
 import ckan.logic as logic
+from ckan.common import _
 
 NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
@@ -33,6 +34,7 @@ def notification_update(context: Context, data_dict: DataDict) -> NotificationGe
     object_id = data_dict.get('object_id')
     time_sent = data_dict.get('time_sent')
     is_unread = data_dict.get('is_unread')
+    state = data_dict.get('state')
 
     user_notifications = Notification.update(
         notification_id=notification_id,
@@ -42,10 +44,11 @@ def notification_update(context: Context, data_dict: DataDict) -> NotificationGe
         object_type=object_type,
         object_id=object_id,
         time_sent=time_sent,
-        is_unread=is_unread
+        is_unread=is_unread,
+        state=state
     )
 
     notification_dicts = notification_list_dictize(user_notifications, context)
     if not notification_dicts:
-        raise logic.ValidationError("No notification updated")
+        raise logic.NotFound(_('Notification not found'))
     return notification_dicts

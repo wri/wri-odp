@@ -36,6 +36,8 @@ notification = sqlalchemy.Table('notification', meta.metadata,
         nullable=False),
     sqlalchemy.Column('is_unread', sqlalchemy.types.Boolean,
         nullable=False),
+    sqlalchemy.Column('state', sqlalchemy.types.UnicodeText,
+        nullable=False),
 )
 
 class Notification(object):
@@ -48,6 +50,7 @@ class Notification(object):
     object_id: str
     time_sent: datetime.datetime
     is_unread: bool
+    state: str
 
     def __init__(self, recipient_id: str, sender_id: str, activity_type:str, object_type:str, 
     object_id:str) -> None:
@@ -58,6 +61,7 @@ class Notification(object):
         self.object_id = object_id
         self.time_sent = datetime.datetime.utcnow()
         self.is_unread = True
+        self.state = "active"
 
     @classmethod
     def get(cls, recipient_id: str, sender_id: Optional[str] = None) -> Optional['Notification']:
@@ -87,6 +91,7 @@ class Notification(object):
         object_id: str,
         time_sent: datetime.datetime,
         is_unread: bool,
+        state: str,
     ) -> Optional['Notification']:
         
         stmt = (
@@ -99,7 +104,8 @@ class Notification(object):
                 object_type=object_type, 
                 object_id=object_id,
                 time_sent=time_sent,
-                is_unread=is_unread
+                is_unread=is_unread,
+                state=state
             )
             .returning(Notification)
         )

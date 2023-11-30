@@ -40,7 +40,7 @@ ckan -c <path-to-ini-file> notificationdb
 - **object_type** (string) – The type of the object on which the action is being performed (e.g., dataset, resource, etc.) (required).
 - **object_id** (string) – The ID of the object on which the action is being performed (required).
 
-The parameters `time_sent` (set to the current timestamp) and `is_unread` (set to `false`) are automatically configured during creation.
+The parameters `time_sent` (set to the current timestamp), `state` (set as `active`) and `is_unread` (set to `false`) are automatically configured during creation.
 
 #### POST /api/action/notification_update
 
@@ -52,6 +52,7 @@ The parameters `time_sent` (set to the current timestamp) and `is_unread` (set t
 - **object_id** (string) – The ID of the object on which the action is being performed (required).
 - **time_sent** (datetime with timezone) – The timestamp of the sent time (required).
 - **is_unread** (string) – Indicates whether the notification is read or not (required).
+- **state** (string) – Active or Deleted (required).
 
 #### GET /api/action/notification_get_all
 

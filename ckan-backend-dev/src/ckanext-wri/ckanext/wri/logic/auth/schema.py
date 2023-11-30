@@ -43,7 +43,8 @@ def default_create_notification_schema(
             unicode_safe,
         ],
         "time_sent": [ignore_empty, ignore_missing],
-        "is_unread":[ignore_empty, ignore_missing]
+        "is_unread": [ignore_empty, ignore_missing],
+        "state": [ignore_empty, ignore_missing]
     }
 
 @validator_args
@@ -96,6 +97,11 @@ def default_update_notification_schema(
             not_empty,
             unicode_safe,
         ],
+        "state":[
+            not_missing,
+            not_empty,
+            unicode_safe,
+        ],
     }
 
 
@@ -123,5 +129,6 @@ def default_get_notification_schema(
         "object_type": [ignore_empty, ignore_missing],
         "object_id": [ignore_empty, ignore_missing],
         "time_sent": [ignore_empty, ignore_missing],
-        "is_unread":[ignore_empty, ignore_missing]
+        "is_unread":[ignore_empty, ignore_missing],
+        "state": [ignore_empty, ignore_missing]
     }
