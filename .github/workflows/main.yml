@@ -81,9 +81,6 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
-      - name: Print Logs
-        run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
-        working-directory: ./ckan-backend-dev
       - name: Cypress Install and Frontend setup
         uses: cypress-io/github-action@v6
         with:
