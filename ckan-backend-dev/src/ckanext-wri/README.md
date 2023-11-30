@@ -28,10 +28,10 @@ To initiate the database setup, use the following command:
 
 ```console
 ckan -c <path-to-ini-file> notificationdb
+```
+### API Endpoints
 
-## API Endpoints
-
-### POST /api/action/notification_create
+#### POST /api/action/notification_create
 
 **Parameters:**
 - **recipient_id** (string) – The user ID of the recipient of the notification (required).
@@ -53,7 +53,7 @@ The parameters `time_sent` (set to the current timestamp) and `is_unread` (set t
 - **time_sent** (datetime with timezone) – The timestamp of the sent time (required).
 - **is_unread** (string) – Indicates whether the notification is read or not (required).
 
-### GET /api/action/notification_get_all
+#### GET /api/action/notification_get_all
 
 Returns a list of notifications for a sender or recipient.
 
