@@ -2,16 +2,24 @@ from ckan.types import ActionResult, Context, DataDict
 from typing_extensions import TypeAlias
 import logging
 from ckanext.wri.model.notification import Notification, notification_dictize
+import ckan.plugins.toolkit as tk
+from ckanext.wri.logic.auth import schema
 
 NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
 
 def notification_create(context: Context, data_dict: DataDict) -> NotificationGetUserViewedActivity:
-    """Get the activity status for a user and add it to the database if not already present."""
+    """Create a Notification by providing Sender and Recipient"""
     
     model = context["model"]
     session = context['session']
     user_obj = model.User.get(context["user"])
+
+    tk.check_access("notification_create", context, data_dict)
+    sch = context.get("schema") or schema.default_create_notification_schema()
+    data, errors = tk.navl_validate(data_dict, sch, context)
+    if errors:
+        raise tk.ValidationError(errors)
 
     recipient_id = data_dict.get('recipient_id')
     sender_id = data_dict.get('sender_id')

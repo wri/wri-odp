@@ -39,7 +39,7 @@ notification = sqlalchemy.Table('notification', meta.metadata,
 )
 
 class Notification(object):
-    '''Saved data used for the user's activity.'''
+    '''Saved data used for the user's notifications.'''
     id: str
     recipient_id: str
     sender_id: str
@@ -74,7 +74,7 @@ class Notification(object):
         if recipient_id:
             query = query.filter(Notification.recipient_id == recipient_id)
 
-        return query.first()
+        return query.all()
     
     @classmethod
     def update(

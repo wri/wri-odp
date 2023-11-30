@@ -4,10 +4,12 @@ import ckan.lib.plugins as lib_plugins
 
 import ckanext.wri.logic.action as action
 import ckanext.wri.logic.validators as wri_validators
+from ckanext.wri.logic.auth import auth as auth
 from ckanext.wri.logic.action.get import package_search, notification_get_all
 from ckanext.wri.logic.action.create import notification_create
 from ckanext.wri.logic.action.update import notification_update
 from ckan import model, logic, authz
+from ckan.types import Action, AuthFunction, Context
 
 import logging
 log = logging.getLogger(__name__)
@@ -18,6 +20,7 @@ class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IClick)
+    plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IPermissionLabels)
 
@@ -39,6 +42,14 @@ class WriPlugin(plugins.SingletonPlugin):
             setup()
 
         return [notificationdb]
+
+    # IAuth
+
+    def get_auth_functions(self) -> dict[str, AuthFunction]:
+        return {
+            'notification_get_all': auth.notification_get_all,
+            'notification_create': auth.notification_create
+        }
 
     # IValidators
 

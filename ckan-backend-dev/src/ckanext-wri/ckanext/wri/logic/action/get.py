@@ -28,7 +28,8 @@ from ckan.types import ActionResult, Context, DataDict
 from typing_extensions import TypeAlias
 from ckanext.wri.model.notification import Notification,notification_dictize, notification_list_dictize
 import datetime
-
+import ckan.plugins.toolkit as tk
+from ckanext.wri.logic.auth import schema
 
 log = logging.getLogger('ckan.logic')
 
@@ -392,23 +393,36 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
 def notification_get_all(
     context: Context, data_dict: DataDict
     ) -> NotificationGetUserViewedActivity:
-    """Get the activity status for a user and add to the db if not already present
+    """Get the notifications for a user by sender_id or receiver_id
     """
-
     model = context["model"]
     session = context['session']
-    user_obj = model.User.get(context["user"])
 
-    assert user_obj
-    user_id = user_obj.id
+    tk.check_access("notification_get_all", context, data_dict)
     sender_id = data_dict.get('sender_id')
     recipient_id = data_dict.get('recipient_id')
-    if not (sender_id or recipient_id):
-        return
+
+    user_obj = model.User.get(context["user"])
+    user_id = user_obj.id
+
+    sch = context.get("schema") or schema.default_get_notification_schema()
+    data, errors = tk.navl_validate(data_dict, sch, context)
+    if errors:
+        raise tk.ValidationError(errors)
 
     notification_objects = Notification.get(recipient_id=recipient_id,sender_id=sender_id)
-    notification_dicts = notification_list_dictize(
+
+    try:
+        iter(notification_objects)
+        notification_objecst_result =  notification_list_dictize(
+    notification_objects, context
+    )
+    except TypeError:
+        notification_objecst_result = notification_dictize(
     notification_objects, context
     )
 
-    return notification_dicts
+    if not notification_objecst_result:
+        raise logic.NotFound(_('Notification not found'))
+
+    return notification_objecst_result
