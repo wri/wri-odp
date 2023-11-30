@@ -42,7 +42,7 @@ ckan -c <path-to-ini-file> notificationdb
 
 The parameters `time_sent` (set to the current timestamp) and `is_unread` (set to `false`) are automatically configured during creation.
 
-### POST /api/action/notification_update
+#### POST /api/action/notification_update
 
 **Parameters:**
 - **recipient_id** (string) – The user ID of the recipient of the notification (required).
