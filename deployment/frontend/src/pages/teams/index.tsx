@@ -26,6 +26,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     await helpers.teams.getGeneralTeam.prefetch({
         search: '',
         page: { start: 0, rows: 10000 },
+        allTree: true,
     })
 
     return {
@@ -45,6 +46,7 @@ export default function TeamsPage(
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10000 },
+        allTree: true,
     })
     const { data, isLoading } = api.teams.getGeneralTeam.useQuery(query)
 
@@ -68,7 +70,6 @@ export default function TeamsPage(
         setPagination({ search: '', page: { start: 0, rows: 10 } })
     }, [query.search])
 
-    console.log('teamDetails', data?.teamsDetails)
     return (
         <>
             <NextSeo title="Teams" />

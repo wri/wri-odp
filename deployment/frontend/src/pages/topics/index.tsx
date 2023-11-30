@@ -29,6 +29,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     await helpers.topics.getGeneralTopics.prefetch({
         search: '',
         page: { start: 0, rows: 10000 },
+        allTree: true,
     })
 
     return {
@@ -48,6 +49,7 @@ export default function TopicsPage(
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10000 },
+        allTree: true,
     })
     const { data, isLoading, refetch } =
         api.topics.getGeneralTopics.useQuery(query)

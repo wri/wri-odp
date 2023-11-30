@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
 import { searchSchema } from '@/schema/search.schema'
 import type { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
-import { getGroups, getAllOrganizations, searchHierarchy } from '@/utils/apiUtils'
+import { getGroups, getAllOrganizations, searchHierarchy, findAllNameInTree } from '@/utils/apiUtils'
 import { findNameInTree } from '@/utils/apiUtils'
 
 export const teamRouter = createTRPCRouter({
@@ -230,9 +230,9 @@ export const teamRouter = createTRPCRouter({
             }
                 , {} as Record<string, GroupsmDetails>)
             
-            console.log("teamDetails: ", allGroups?.length)
             if (input.search) {
                 groupTree = await searchHierarchy({ isSysadmin: true, apiKey: ctx?.session?.user.apikey ?? "", q: input.search, group_type: 'organization' })
+                
                 if (input.tree) {
                     let groupFetchTree = groupTree[0] as GroupTree
                     const findTree = findNameInTree(groupFetchTree, input.search)
@@ -240,6 +240,17 @@ export const teamRouter = createTRPCRouter({
                         groupFetchTree = findTree
                     }
                     groupTree = [groupFetchTree]
+                }
+
+                if (input.allTree) {
+                    const filterTree = groupTree.flatMap((group) => {
+                        const search = input.search.toLowerCase()
+                        if ( group.name.toLowerCase().includes(search) || group.title?.toLowerCase().includes(search) ) return [group]
+                        const findtree = findAllNameInTree(group, input.search)
+                        return findtree
+                    })
+                    
+                    groupTree = filterTree
                 }
                 
             }

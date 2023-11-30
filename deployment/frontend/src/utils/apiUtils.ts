@@ -583,6 +583,24 @@ export function findNameInTree(tree: GroupTree, targetName: string): GroupTree |
     return null;
 }
 
+export function findAllNameInTree(tree: GroupTree, targetName: string): GroupTree[] {
+    const result: GroupTree[] = [];
+
+    // Check if the targetName is a substring of the current node's name
+    if (tree.name.toLowerCase().includes(targetName) || tree.title?.toLowerCase().includes(targetName)) {
+        result.push(tree);
+    }
+
+    // Recursive case: search through children
+    if (tree.children && tree.children.length > 0) {
+        for (const child of tree.children) {
+            const childResults = findAllNameInTree(child, targetName);
+            result.push(...childResults); // Add child results to the overall result
+        }
+    }
+
+    return result;
+}
 export async function getOrganizationTreeDetails({
     input,
     session,
@@ -605,7 +623,7 @@ export async function getOrganizationTreeDetails({
             }
                 , {} as Record<string, GroupsmDetails>)
             
-            console.log("teamDetails: ", allGroups?.length)
+            
             if (input.search) {
                 groupTree = await searchHierarchy({ isSysadmin: true, apiKey: session?.user.apikey ?? "", q: input.search, group_type: "organization" })
                 if (input.tree) {

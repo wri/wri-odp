@@ -17,6 +17,7 @@ export default function TopicsSearch({
         e.preventDefault()
         if (inputRef.current) {
             const updateQuery: SearchInput = {
+                ...query,
                 page: { ...query.page, start: 0 },
                 search: inputRef.current.value,
             }

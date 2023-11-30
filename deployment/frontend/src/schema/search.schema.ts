@@ -15,6 +15,7 @@ export const searchSchema = z.object({
     extAddressQ: z.string().optional(),
     _isUserSearch: z.boolean().default(false).optional(),
     tree: z.boolean().optional(),
+    allTree: z.boolean().optional(),
 })
 
 export type SearchInput = z.infer<typeof searchSchema>

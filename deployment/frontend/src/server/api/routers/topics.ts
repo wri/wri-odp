@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { getGroups, getGroup, searchHierarchy, getUserGroups } from '@/utils/apiUtils'
+import { getGroups, getGroup, searchHierarchy, getUserGroups, findAllNameInTree } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { searchArrayForKeyword } from '@/utils/general'
@@ -252,6 +252,16 @@ export const TopicRouter = createTRPCRouter({
                         groupFetchTree = findTree
                     }
                     groupTree = [groupFetchTree]
+                }
+                if (input.allTree) {
+                     
+                    const filterTree = groupTree.flatMap((group) => {
+                        const search = input.search.toLowerCase()
+                        if ( group.name.toLowerCase().includes(search) || group.title?.toLowerCase().includes(search) ) return [group]
+                        const findtree = findAllNameInTree(group, search)
+                        return findtree
+                    })
+                    groupTree = filterTree
                 }
                 
             }

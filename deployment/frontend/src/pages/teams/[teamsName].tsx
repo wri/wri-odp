@@ -59,6 +59,8 @@ export async function getServerSideProps(
                 rows: 100,
             },
         })
+
+        await helpers.teams.getTeam.prefetch({ id: team.id })
         return {
             props: {
                 trpcState: helpers.dehydrate(),
