@@ -117,6 +117,10 @@ export function Preview({
                                     label="License"
                                     text={watch('license_id')?.label ?? '_'}
                                 />
+                                <SimpleDescription
+                                    label="Location"
+                                    text={watch('spatial_address') || watch('spatial') ? "Yes" : '_'}
+                                />
                             </dl>
                         </div>
                     </div>
