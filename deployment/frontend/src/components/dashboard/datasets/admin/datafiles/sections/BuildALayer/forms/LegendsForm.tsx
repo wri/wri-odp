@@ -7,16 +7,20 @@ import {
     UseFormRegister,
     useFieldArray,
     useForm,
+    useFormContext,
 } from 'react-hook-form'
+import { LayerFormType } from '../layer.schema'
 
 export default function LegendForm({
     onNext,
     onPrev,
 }: {
-    onNext: (data: LegendsFormType) => void
+    onNext: () => void
     onPrev: () => void
 }) {
-    const onSubmit = (data: LegendsFormType) => onNext(data)
+    const formObj = useFormContext<LayerFormType>()
+    const { handleSubmit, register, watch, control } = formObj
+    const onSubmit = () => onNext()
     return (
         <>
             <form
@@ -29,7 +33,7 @@ export default function LegendForm({
                             Type of Legend
                         </label>
                         <select
-                            {...register('type')}
+                            {...register('legendConfig.type')}
                             className="relative lg:col-span-10  col-span-full block w-full rounded-md border-0 px-5 py-2 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
                         >
                             <option value="basic">Basic</option>
@@ -47,7 +51,7 @@ export default function LegendForm({
                     >
                         Back
                     </Button>
-                    <Button type="button" onClick={() => onNext(watch())}>
+                    <Button type="button" onClick={() => onNext()}>
                         Next: Interaction
                     </Button>
                 </div>
@@ -60,12 +64,12 @@ function ItemsArray({
     control,
     register,
 }: {
-    register: UseFormRegister<LegendsFormType>
-    control: Control<LegendsFormType>
+    register: UseFormRegister<LayerFormType>
+    control: Control<LayerFormType>
 }) {
     const { fields, append, remove } = useFieldArray({
         control,
-        name: 'items',
+        name: 'legendConfig.items',
     })
     return (
         <div className="flex flex-col gap-y-4">
@@ -77,13 +81,13 @@ function ItemsArray({
                     <input
                         className="shadow-wri-small col-span-8 block w-full rounded-md border-0 px-5 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
                         key={field.id}
-                        {...register(`items.${index}.name`)}
+                        {...register(`legendConfig.items.${index}.name`)}
                     />
                     <input
                         type="color"
                         className="col-span-1 h-[40px] w-[40px] rounded shadow"
                         key={field.id}
-                        {...register(`items.${index}.color`)}
+                        {...register(`legendConfig.items.${index}.color`)}
                     />
                     <div className="lg:col-span-1 col-span-2 pl-8 lg:pl-0">
                         <button type="button" onClick={() => remove(index)}>

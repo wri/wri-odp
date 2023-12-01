@@ -9,6 +9,8 @@ import {
 } from '@heroicons/react/24/outline'
 import {
     FieldArrayWithId,
+    FieldValues,
+    Path,
     UseFormReturn,
     useFieldArray,
     useForm,
@@ -18,10 +20,15 @@ import { match } from 'ts-pattern'
 import { z } from 'zod'
 import {
     filterOperationOptions,
+    rampTypes,
     renderTypeOptions,
 } from '../../../../formOptions'
-import { Disclosure, Transition } from '@headlessui/react'
+import { Disclosure, Switch, Transition } from '@headlessui/react'
 import { LayerFormType } from '../layer.schema'
+import { useState } from 'react'
+import classNames from '@/utils/classnames'
+import { useColumns } from '../useColumns'
+import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
 
 interface InteractionFormProps {
     onNext: () => void
@@ -70,49 +77,60 @@ function ItemsArray() {
         name: 'render.layers',
     })
 
-    const RenderCirclePaint = (
-        index: number,
-        field: FieldArrayWithId<LayerFormType>
-    ) => (
+    const RenderCirclePaint = (index: number) => (
         <div className="flex flex-col gap-y-2">
-            <InputGroup label="Circle Color">
-                <input
-                    type="color"
-                    className="col-span-1 h-[40px] w-[40px] rounded shadow"
-                    key={field.id}
-                    defaultValue={null}
-                    {...register(`render.layers.${index}.paint.circle-color`)}
+            <InputGroup
+                label="Circle Color"
+                className="sm:grid-cols-1"
+                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+            >
+                <ColorPicker
+                    name={`render.layers.${index}.paint.circle-color`}
                 />
             </InputGroup>
-            <InputGroup label="Circle Radius">
-                <Input
-                    {...register(`render.layers.${index}.paint.circle-radius`)}
-                    type="number"
-                />
-            </InputGroup>
-            <InputGroup label="Circle Opacity">
-                <Input
-                    {...register(`render.layers.${index}.paint.circle-opacity`)}
-                    type="number"
-                />
-            </InputGroup>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <InputGroup
+                    label="Circle Radius"
+                    className="sm:grid-cols-1"
+                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                >
+                    <Input
+                        {...register(
+                            `render.layers.${index}.paint.circle-radius`
+                        )}
+                        type="number"
+                    />
+                </InputGroup>
+                <InputGroup
+                    label="Circle Opacity"
+                    className="sm:grid-cols-1"
+                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                >
+                    <Input
+                        {...register(
+                            `render.layers.${index}.paint.circle-opacity`
+                        )}
+                        type="number"
+                    />
+                </InputGroup>
+            </div>
         </div>
     )
 
-    const RenderFillPaint = (
-        index: number,
-        field: FieldArrayWithId<LayerFormType>
-    ) => (
+    const RenderFillPaint = (index: number) => (
         <div className="flex flex-col gap-y-2">
-            <InputGroup label="Fill Color">
-                <input
-                    type="color"
-                    className="col-span-1 h-[40px] w-[40px] rounded shadow"
-                    key={field.id}
-                    {...register(`render.layers.${index}.paint.fill-color`)}
-                />
+            <InputGroup
+                label="Fill Color"
+                className="sm:grid-cols-1"
+                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+            >
+                <ColorPicker name={`render.layers.${index}.paint.fill-color`} />
             </InputGroup>
-            <InputGroup label="Fill Opacity">
+            <InputGroup
+                label="Fill Opacity"
+                className="sm:grid-cols-1"
+                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+            >
                 <Input
                     {...register(`render.layers.${index}.paint.fill-opacity`)}
                     type="number"
@@ -121,122 +139,104 @@ function ItemsArray() {
         </div>
     )
 
-    const RenderLinePaint = (
-        index: number,
-        field: FieldArrayWithId<LayerFormType>
-    ) => (
+    const RenderLinePaint = (index: number) => (
         <div className="flex flex-col gap-y-2">
-            <InputGroup label="Line Color">
-                <input
-                    type="color"
-                    className="col-span-1 h-[40px] w-[40px] rounded shadow"
-                    key={field.id}
-                    {...register(`render.layers.${index}.paint.line-color`)}
-                />
+            <InputGroup
+                label="Line Color"
+                className="sm:grid-cols-1"
+                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+            >
+                <ColorPicker name={`render.layers.${index}.paint.line-color`} />
             </InputGroup>
-            <InputGroup label="Line Width">
-                <Input
-                    {...register(`render.layers.${index}.paint.line-width`)}
-                    type="number"
-                />
-            </InputGroup>
-            <InputGroup label="Line Opacity">
-                <Input
-                    {...register(`render.layers.${index}.paint.line-opacity`)}
-                    type="number"
-                />
-            </InputGroup>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <InputGroup
+                    label="Line Width"
+                    className="sm:grid-cols-1"
+                    labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                >
+                    <Input
+                        {...register(`render.layers.${index}.paint.line-width`)}
+                        type="number"
+                    />
+                </InputGroup>
+                <InputGroup
+                    label="Line Opacity"
+                    className="sm:grid-cols-1"
+                    labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                >
+                    <Input
+                        {...register(
+                            `render.layers.${index}.paint.line-opacity`
+                        )}
+                        type="number"
+                    />
+                </InputGroup>
+            </div>
         </div>
     )
 
     return (
         <div className="flex flex-col gap-y-4 max-h-[375px] overflow-auto">
             {fields.map((field, index) => (
-                <Disclosure
-                    key={field.id}
-                    as="div"
-                    className="border-b border-r border-stone-200 shadow"
-                >
-                    {({ open }) => (
-                        <>
-                            <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
-                                <div className="flex h-16 w-full items-center gap-x-2">
-                                    Render Item
-                                </div>
-                                <ChevronDownIcon
-                                    className={`${
-                                        open
-                                            ? 'rotate-180 transform  transition'
-                                            : ''
-                                    } h-5 w-5 text-black`}
-                                />
-                            </Disclosure.Button>
-                            <Transition
-                                enter="transition duration-100 ease-out"
-                                enterFrom="transform scale-95 opacity-0"
-                                enterTo="transform scale-100 opacity-100"
-                                leave="transition duration-75 ease-out"
-                                leaveFrom="transform scale-100 opacity-100"
-                                leaveTo="transform scale-95 opacity-0"
-                            >
-                                <Disclosure.Panel className="border-t-2 border-amber-400 bg-white px-7 pb-2 text-sm text-gray-500 py-8">
-                                    <div key={field.id}>
-                                        <InputGroup label="Render Type">
-                                            <SimpleSelect
-                                                formObj={formObj}
-                                                name={`render.layers.${index}.type`}
-                                                placeholder="Select the type of render"
-                                                options={renderTypeOptions}
-                                            />
-                                        </InputGroup>
-                                        <h2 className="text-xl font-acumin font-semibold">
-                                            Paint Properties
-                                        </h2>
-                                        {match(watch('render.layers')[index])
-                                            .with(
-                                                { type: { value: 'circle' } },
-                                                () =>
-                                                    RenderCirclePaint(
-                                                        index,
-                                                        field
-                                                    )
-                                            )
-                                            .with(
-                                                { type: { value: 'fill' } },
-                                                () =>
-                                                    RenderFillPaint(
-                                                        index,
-                                                        field
-                                                    )
-                                            )
-                                            .with(
-                                                { type: { value: 'line' } },
-                                                () =>
-                                                    RenderLinePaint(
-                                                        index,
-                                                        field
-                                                    )
-                                            )
-                                            .otherwise(() => (
-                                                <></>
-                                            ))}
-                                        <FilterExpressions layerIdx={index} />
-                                    </div>
-                                    <div className="w-full flex justify-end">
-                                        <Button
-                                            variant="destructive"
-                                            type="button"
-                                            className="mb-4 ml-auto"
-                                            onClick={() => remove(index)}
-                                        >
-                                            Delete Render Item
-                                        </Button>
-                                    </div>
-                                </Disclosure.Panel>
-                            </Transition>
-                        </>
-                    )}
-                </Disclosure>
+                <Accordion text="Render Item">
+                    <div key={field.id}>
+                        <Accordion text="Render Properties">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <InputGroup
+                                    label="Render Type"
+                                    className="sm:grid-cols-1"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                                >
+                                    <SimpleSelect
+                                        formObj={formObj}
+                                        name={`render.layers.${index}.type`}
+                                        placeholder="Select the type of render"
+                                        options={renderTypeOptions}
+                                    />
+                                </InputGroup>
+                                <InputGroup
+                                    className="sm:grid-cols-1"
+                                    label="Source Layer"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                                >
+                                    <Input
+                                        defaultValue={'layer0'}
+                                        {...register(
+                                            `render.layers.${index}.source-layer`
+                                        )}
+                                        type="text"
+                                    />
+                                </InputGroup>
+                            </div>
+                        </Accordion>
+                        <Accordion text="Paint Properties">
+                            {match(watch('render.layers')[index])
+                                .with({ type: { value: 'circle' } }, () =>
+                                    RenderCirclePaint(index)
+                                )
+                                .with({ type: { value: 'fill' } }, () =>
+                                    RenderFillPaint(index)
+                                )
+                                .with({ type: { value: 'line' } }, () =>
+                                    RenderLinePaint(index)
+                                )
+                                .otherwise(() => (
+                                    <></>
+                                ))}
+                        </Accordion>
+                        <FilterExpressions layerIdx={index} />
+                    </div>
+                    <div className="w-full flex justify-end">
+                        <Button
+                            variant="destructive"
+                            type="button"
+                            className="mb-4 ml-auto"
+                            onClick={() => remove(index)}
+                        >
+                            Delete Render Item
+                        </Button>
+                    </div>
+                </Accordion>
             ))}
             <button
                 onClick={() =>
@@ -270,9 +270,6 @@ function FilterExpressions({ layerIdx }: { layerIdx: number }) {
     })
     return (
         <div className="flex flex-col gap-y-4 pb-4">
-            {fields.length > 1 && (
-                <h2 className="text-xl font-acumin font-semibold">Filters</h2>
-            )}
             {fields.map((field, index) => (
                 <FilterExpression
                     key={field.id}
@@ -286,7 +283,7 @@ function FilterExpressions({ layerIdx }: { layerIdx: number }) {
                     append({
                         operation: { value: '==', label: 'Equals to' },
                         column: '',
-                        value: '',
+                        value: null,
                     })
                 }
                 type="button"
@@ -314,6 +311,227 @@ function FilterExpression({
     const { control, register, watch } = formObj
     if (watch(`render.layers.${layerIdx}.filter.${filterIdx}`) === 'all')
         return <></>
+    const columns = useColumns(
+        watch('source.provider.type.value'),
+        watch('connectorUrl') as string,
+        !!watch('connectorUrl')
+    )
+    return (
+        <Accordion text={`Filter ${filterIdx}`}>
+            <div className="py-4 flex flex-col gap-y-2">
+                <InputGroup label="Operation">
+                    <SimpleSelect
+                        formObj={formObj}
+                        name={`render.layers.${layerIdx}.filter.${filterIdx}.operation`}
+                        placeholder="Select filter operation"
+                        options={filterOperationOptions}
+                    />
+                </InputGroup>
+                <InputGroup label="Column">
+                    <SimpleCombobox
+                        options={
+                            columns.data
+                                ? columns.data.map((column) => ({
+                                      value: column,
+                                      label: column,
+                                  }))
+                                : []
+                        }
+                        placeholder="Select column to match"
+                        formObj={formObj}
+                        name={`render.layers.${layerIdx}.filter.${filterIdx}.column`}
+                    />
+                </InputGroup>
+                <InputGroup label="Value">
+                    <Input
+                        {...register(
+                            `render.layers.${layerIdx}.filter.${filterIdx}.value`,
+                            {
+                                valueAsNumber: true,
+                            }
+                        )}
+                        type="number"
+                    />
+                </InputGroup>
+            </div>
+            <div className="w-full flex justify-end">
+                <Button
+                    variant="destructive"
+                    type="button"
+                    className="mb-4 ml-auto"
+                    onClick={() => remove()}
+                >
+                    Delete Filter Item
+                </Button>
+            </div>
+        </Accordion>
+    )
+}
+
+function ColorPicker({
+    name,
+}: {
+    name:
+        | `render.layers.${number}.paint.fill-color`
+        | `render.layers.${number}.paint.circle-color`
+        | `render.layers.${number}.paint.line-color`
+}) {
+    const formObj = useFormContext<LayerFormType>()
+    const { register, watch } = formObj
+    const [rampObjEnabled, setRampObjEnabled] = useState(
+        watch(name) ? typeof watch(name) !== 'string' : false
+    )
+    return (
+        <div className="flex flex-col gap-y-4">
+            <Switch.Group as="div" className="flex items-center">
+                <Switch
+                    checked={rampObjEnabled}
+                    onChange={setRampObjEnabled}
+                    className={classNames(
+                        rampObjEnabled ? 'bg-blue-800' : 'bg-gray-200',
+                        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-800 focus:ring-offset-2'
+                    )}
+                >
+                    <span
+                        aria-hidden="true"
+                        className={classNames(
+                            rampObjEnabled ? 'translate-x-5' : 'translate-x-0',
+                            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
+                        )}
+                    />
+                </Switch>
+                <Switch.Label as="span" className="ml-3 text-sm">
+                    <span className="font-medium text-gray-900">
+                        Use a {rampObjEnabled ? 'plain color' : 'ramp object'}
+                    </span>{' '}
+                </Switch.Label>
+            </Switch.Group>
+            {rampObjEnabled ? (
+                <RampObj name={name} />
+            ) : (
+                <div className="pb-8">
+                    <input
+                        type="color"
+                        className="col-span-1 h-[40px] w-[40px] rounded shadow"
+                        defaultValue={''}
+                        {...register(name)}
+                    />
+                </div>
+            )}
+        </div>
+    )
+}
+
+function RampObj({
+    name,
+}: {
+    name:
+        | `render.layers.${number}.paint.fill-color`
+        | `render.layers.${number}.paint.circle-color`
+        | `render.layers.${number}.paint.line-color`
+}) {
+    const formObj = useFormContext<LayerFormType>()
+    const { control, register, watch } = formObj
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: `${name}.output`,
+    })
+    const columns = useColumns(
+        watch('source.provider.type.value'),
+        watch('connectorUrl') as string,
+        !!watch('connectorUrl')
+    )
+    return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 pb-8">
+            <InputGroup
+                label="Type"
+                className="sm:grid-cols-1"
+                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+            >
+                <SimpleSelect
+                    formObj={formObj}
+                    name={`${name}.type` as Path<LayerFormType>}
+                    placeholder="Select a step operation"
+                    options={rampTypes}
+                />
+            </InputGroup>
+            <InputGroup
+                label="Column to match"
+                className="sm:grid-cols-1"
+                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+            >
+                <SimpleCombobox
+                    options={
+                        columns.data
+                            ? columns.data.map((column) => ({
+                                  value: column,
+                                  label: column,
+                              }))
+                            : []
+                    }
+                    placeholder="Select column to match"
+                    formObj={formObj}
+                    name={`${name}.input.column` as Path<LayerFormType>}
+                />
+            </InputGroup>
+            {fields.map((field, index) => (
+                <>
+                    <InputGroup
+                        label="Color of step"
+                        className="sm:grid-cols-1"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                    >
+                        <Input
+                            {...register(
+                                `${name}.output.${index}.color` as Path<LayerFormType>
+                            )}
+                            type="text"
+                        />
+                    </InputGroup>
+                    <InputGroup
+                        label="Value of stop"
+                        className="sm:grid-cols-1"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                    >
+                        <Input
+                            {...register(
+                                `${name}.output.${index}.value` as Path<LayerFormType>,
+                                {
+                                    setValueAs: (v) =>
+                                        v === '' ? undefined : parseFloat(v),
+                                }
+                            )}
+                            type="number"
+                        />
+                    </InputGroup>
+                </>
+            ))}
+            <button
+                onClick={() =>
+                    append({
+                        color: '',
+                        value: 0,
+                    })
+                }
+                type="button"
+                className="ml-auto flex items-center justify-end gap-x-1 col-span-full"
+            >
+                <PlusCircleIcon className="h-4 w-4 text-amber-400 mb-1" />
+                <span className="font-acumin text-sm font-normal leading-tight text-black">
+                    Add a step
+                </span>
+            </button>
+        </div>
+    )
+}
+
+export function Accordion({
+    text,
+    children,
+}: {
+    text: string
+    children: React.ReactNode
+}) {
     return (
         <Disclosure
             as="div"
@@ -323,7 +541,7 @@ function FilterExpression({
                 <>
                     <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
                         <div className="flex h-16 w-full items-center gap-x-2">
-                            Filter {filterIdx + 1}
+                            {text}
                         </div>
                         <ChevronDownIcon
                             className={`${
@@ -339,46 +557,8 @@ function FilterExpression({
                         leaveFrom="transform scale-100 opacity-100"
                         leaveTo="transform scale-95 opacity-0"
                     >
-                        <Disclosure.Panel className="border-t-2 border-amber-400 bg-white px-7 pb-2 text-sm text-gray-500">
-                            <div className="py-4 flex flex-col gap-y-2">
-                                <InputGroup label="Operation">
-                                    <SimpleSelect
-                                        formObj={formObj}
-                                        name={`render.layers.${layerIdx}.filter.${filterIdx}.operation`}
-                                        placeholder="Select filter operation"
-                                        options={filterOperationOptions}
-                                    />
-                                </InputGroup>
-                                <InputGroup label="Column">
-                                    <Input
-                                        {...register(
-                                            `render.layers.${layerIdx}.filter.${filterIdx}.column`
-                                        )}
-                                        type="text"
-                                    />
-                                </InputGroup>
-                                <InputGroup label="Value">
-                                    <Input
-                                        {...register(
-                                            `render.layers.${layerIdx}.filter.${filterIdx}.value`,
-                                            {
-                                                valueAsNumber: true,
-                                            }
-                                        )}
-                                        type="number"
-                                    />
-                                </InputGroup>
-                            </div>
-                            <div className="w-full flex justify-end">
-                                <Button
-                                    variant="destructive"
-                                    type="button"
-                                    className="mb-4 ml-auto"
-                                    onClick={() => remove()}
-                                >
-                                    Delete Filter Item
-                                </Button>
-                            </div>
+                        <Disclosure.Panel className="border-t-2 border-amber-400 bg-white p-4 text-sm text-gray-500">
+                            {children}
                         </Disclosure.Panel>
                     </Transition>
                 </>

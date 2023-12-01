@@ -41,6 +41,13 @@ export const renderTypeOptions = [
     { value: 'fill', label: 'Fill' },
 ]
 
+export const rampTypes = [
+    { value: 'step', label: 'Steps' },
+    { value: 'interpolate', label: 'Interpolate' },
+    { value: 'interpolate-lab', label: 'Interpolate(CIELAB color space)' },
+    { value: 'interpolate-hcl', label: 'Interpolate(HCL color space)' },
+]
+
 export const updateFrequencyOptions: {
     value: UpdateFrequencyUnion
     label: string

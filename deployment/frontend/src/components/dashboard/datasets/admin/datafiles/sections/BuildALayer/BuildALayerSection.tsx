@@ -5,7 +5,7 @@ import SourceForm from './forms/SourceForm'
 import LegendForm from './forms/LegendsForm'
 import InteractionForm from './forms/InteractionForm'
 import RenderForm from './forms/RenderForm'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ReactMapGL from 'react-map-gl'
 
 import {
@@ -20,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import LayerManager from '@/components/_shared/map/LayerManager'
 import { Button } from '@/components/_shared/Button'
 import { convertFormToLayerObj } from './convertObjects'
+import { Legends } from './preview/Legends'
 
 export function BuildALayer({
     formObj,
@@ -32,12 +33,48 @@ export function BuildALayer({
     const [preview, setPreview] = useState<LayerFormType | null>(null)
     const layerFormObj = useForm<LayerFormType>({
         resolver: zodResolver(layerSchema),
+        defaultValues: {
+            type: { value: 'vector', label: 'Vector' },
+            source: {
+                provider: {
+                    account: 'wri-rw',
+                    type: {
+                        value: 'carto',
+                        label: 'Carto',
+                    },
+                },
+            },
+        },
     })
 
     const updatePreview = () => {
         console.log('WATCH', layerFormObj.watch())
-        setPreview(convertFormToLayerObj(layerSchema.parse(layerFormObj.watch())))
+        setPreview(
+            convertFormToLayerObj(layerSchema.parse(layerFormObj.watch()))
+        )
     }
+
+    const {
+        watch,
+        setValue,
+        formState: { dirtyFields, errors },
+    } = layerFormObj
+    useEffect(() => {
+        if (!dirtyFields['connectorUrl'])
+            setValue(
+                'connectorUrl',
+                `https://${watch(
+                    'source.provider.account'
+                )}.carto.com:443/api/v2/sql?q=${
+                    watch('source.provider.layers.0.options.sql') ?? ''
+                }`
+            )
+    }, [
+        watch('source.provider.account'),
+        watch('source.provider.layers.0.options.sql'),
+    ])
+
+    console.log('Errors', errors)
 
     return (
         <FormProvider {...layerFormObj}>
@@ -111,7 +148,7 @@ function Map({
         zoom: 1,
     })
 
-    console.log('Layer Form Obj', layerFormObj)
+    const { watch } = useFormContext<LayerFormType>()
     return (
         <div className="relative">
             <Button
@@ -136,11 +173,16 @@ function Map({
                             {
                                 id: 'placeholder-id',
                                 ...layerFormObj,
-                            }
+                            },
                         ]}
                     />
                 )}
             </ReactMapGL>
+            <Legends
+                legendConfig={watch('legendConfig') ?? null}
+                source={watch('source') ?? null}
+                type={watch('type')?.value}
+            />
         </div>
     )
 }

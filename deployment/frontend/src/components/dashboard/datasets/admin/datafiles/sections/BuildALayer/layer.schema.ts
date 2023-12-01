@@ -1,35 +1,31 @@
 import { z } from 'zod'
 const emptyStringToUndefined = z.literal('').transform(() => undefined)
 const nanToUndefined = z.literal(NaN).transform(() => undefined)
-const zeroToUndefined = z.literal(0).transform(() => undefined)
 
 const sourceSchema = z
     .object({
         provider: z.object({
             type: z.object({
-                value: z.enum(['gee', 'carto', 'wms']),
+                value: z.enum(['gee', 'carto', 'wms', 'featureservice']),
                 label: z.string(),
             }),
             account: z.string().optional().nullable(),
-            options: z.object({}).default({}),
-            layers: z.array(
-                z.object({
-                    options: z.object({
-                        sql: z.string().optional().nullable(),
-                        type: z.string().default('cartodb'),
-                    }),
-                })
-            ),
+            layers: z
+                .array(
+                    z.object({
+                        options: z.object({
+                            sql: z.string().optional().nullable(),
+                            type: z.string().default('cartodb'),
+                        }),
+                    })
+                )
+                .default([]),
         }),
-        minzoom: z.number().min(0).max(22).default(0),
-        maxzoom: z.number().min(0).max(22).default(22),
+        minzoom: z.number().optional(),
+        maxzoom: z.number().optional(),
         tiles: z.string().url().optional().nullable(),
     })
     //Make sure that maxZoom is always bigger than minZoom
-    .refine((obj) => obj.maxzoom >= obj.minzoom, {
-        path: ['zoom'],
-        message: 'maxZoom must be bigger than minZoom',
-    })
     .refine(
         (obj) => {
             if (obj.provider.type.value === 'carto')
@@ -47,10 +43,17 @@ const sourceSchema = z
         }
     )
 
-const numericExpression = z.object({
-    operation: z.literal('get'),
-    column: z.string().optional().nullable(),
-})
+const numericExpression = z
+    .object({
+        coercion: z.literal('to-number').default('to-number'),
+        operation: z.literal('get').default('get'),
+        column: z.string().optional().nullable(),
+    })
+    .default({
+        coercion: 'to-number',
+        operation: 'get',
+        column: '',
+    })
 
 const filterExpression = z.object({
     operation: z
@@ -63,22 +66,49 @@ const filterExpression = z.object({
     column: z.string().optional().nullable(),
     value: z.coerce.number().optional().nullable(),
 })
-const rampObj = z.object({
-    type: z.object({
-        value: z.enum([
-            'step',
-            'interpolate',
-            'interpolate-lab',
-            'interpolate-hcl',
-        ]),
-        label: z.string(),
-    }),
-    interpolationType: z.object({
-        value: z.enum(['linear', 'exponential', 'cubic-bezier']),
-        label: z.string(),
-    }),
-    input: z.union([z.number(), numericExpression]),
-})
+
+const rampObj = z
+    .object({
+        type: z.object({
+            value: z.enum([
+                'step',
+                'interpolate',
+                'interpolate-lab',
+                'interpolate-hcl',
+            ]),
+            label: z.string(),
+        }),
+        interpolationType: z
+            .object({
+                value: z.enum(['linear', 'exponential', 'cubic-bezier']),
+                label: z.string(),
+            })
+            .optional()
+            .nullable()
+            .default({ value: 'linear', label: 'Linear' }),
+        input: z.union([z.number(), numericExpression]),
+        output: z.array(
+            z.object({
+                color: z.string(),
+                value: z.number().optional(),
+            })
+        ),
+    })
+    .transform((val) => {
+        if (val.type.value === 'step') {
+            return {
+                ...val,
+                interpolationType: null,
+            }
+        }
+        return val
+    })
+
+const colorPattern = z
+    .union([z.string(), rampObj])
+    .optional()
+    .nullable()
+    .or(emptyStringToUndefined)
 
 const renderSchema = z.object({
     layers: z.array(
@@ -90,21 +120,13 @@ const renderSchema = z.object({
             'source-layer': z.string().default('layer0'),
             paint: z
                 .object({
-                    'fill-color': z
-                        .union([z.string(), rampObj])
-                        .optional()
-                        .nullable()
-                        .or(emptyStringToUndefined),
+                    'fill-color': colorPattern,
                     'fill-opacity': z.coerce
                         .number()
                         .optional()
                         .nullable()
                         .or(nanToUndefined),
-                    'line-color': z
-                        .union([z.string(), rampObj])
-                        .optional()
-                        .nullable()
-                        .or(emptyStringToUndefined),
+                    'line-color': colorPattern,
                     'line-opacity': z.coerce
                         .number()
                         .optional()
@@ -115,11 +137,7 @@ const renderSchema = z.object({
                         .optional()
                         .nullable()
                         .or(nanToUndefined),
-                    'circle-color': z
-                        .union([z.string(), rampObj])
-                        .optional()
-                        .nullable()
-                        .or(emptyStringToUndefined),
+                    'circle-color': colorPattern,
                     'circle-radius': z.coerce
                         .number()
                         .optional()
@@ -157,16 +175,37 @@ const legendsSchema = z.object({
     ),
 })
 
+const interactionConfigSchema = z.object({
+    output: z.array(
+        z.object({
+            column: z.string().optional().nullable(),
+            format: z.string().optional().nullable(),
+            prefix: z.string().optional().nullable(),
+            property: z.string().optional().nullable(),
+            suffix: z.string().optional().nullable(),
+            type: z.string().optional().nullable(),
+        })
+    ),
+})
+
 export const layerSchema = z
     .object({
         id: z.string().uuid().optional().nullable().or(emptyStringToUndefined),
+        account: z.string().optional().nullable().or(emptyStringToUndefined),
         type: z.object({
             value: z.enum(['raster', 'vector']),
             label: z.string(),
         }),
+        connectorUrl: z
+            .string()
+            .url()
+            .optional()
+            .nullable()
+            .default('https://wri-rw.carto.com:443/api/v2/sql?q='),
         legendConfig: legendsSchema.optional().nullable(),
         source: sourceSchema.optional().nullable(),
         render: renderSchema.optional().nullable(),
+        interactionConfig: interactionConfigSchema.optional().nullable(),
     })
     .refine(
         (obj) => {
@@ -187,6 +226,7 @@ export const layerSchema = z
         }
     )
 
+export type ColorPatternType = z.infer<typeof colorPattern>
 export type LayerFormType = z.infer<typeof layerSchema>
 export type SourceFormType = z.infer<typeof sourceSchema>
 export type RenderFormType = z.infer<typeof renderSchema>

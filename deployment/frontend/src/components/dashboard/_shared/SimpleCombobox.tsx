@@ -58,7 +58,7 @@ export default function SimpleCombobox<
                     value={selected}
                     onChange={setSelected}
                 >
-                    <div className="relative mt-2 w-full">
+                    <div className="relative w-full">
                         <Combobox.Input
                             id={name}
                             className={classNames(
