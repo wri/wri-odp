@@ -26,13 +26,14 @@ export default function Subteamcard({
                     src={`${
                         teamsDetails[team.id]?.img_url
                             ? teamsDetails[team.id]?.img_url
-                            : '/images/placeholders/topics/topicsdefault.png'
+                            : '/images/placeholders/teams/teamdefault.png'
                     }`}
                     alt="higlight"
                     fill
+                    className="object-contain"
                 />
             </div>
-            <div className="text-black text-lg font-normal">{team.title}</div>
+            <div className="text-black text-lg font-normal line-clamp-1">{team.title}</div>
             <div className="text-black text-sm font-normal">
                 {teamsDetails[team.id]?.package_count} Datasets
             </div>

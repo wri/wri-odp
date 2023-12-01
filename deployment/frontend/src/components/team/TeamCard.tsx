@@ -20,7 +20,7 @@ export default function TeamCard({
                     src={`${
                         teamsDetails[team.id]?.img_url
                             ? teamsDetails[team.id]?.img_url
-                            : '/images/placeholders/topics/topicsdefault.png'
+                            : '/images/placeholders/teams/teamdefault.png'
                     }`}
                     alt={`Topic - ${team.title}`}
                     fill

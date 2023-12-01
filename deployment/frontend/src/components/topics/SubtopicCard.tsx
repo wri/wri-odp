@@ -31,6 +31,7 @@ export default function SubtopicCard({
                     }`}
                     alt="higlight"
                     fill
+                    className="object-contain"
                 />
             </div>
             <div className="text-black text-lg font-normal">{topic.title}</div>
