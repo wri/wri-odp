@@ -6,6 +6,11 @@ import logging
 from ckan.types import Context
 from ckan.plugins.toolkit import ValidationError
 import ckan.lib.navl.dictization_functions as df
+from ckan.lib.navl.dictization_functions import StopOnError
+from ckan.lib.navl.validators import FlattenKey, FlattenDataDict, FlattenErrorDict, Context, Validator
+from ckan.lib.navl.dictization_functions import missing
+from ckan.common import _
+
 
 Invalid = df.Invalid
 
@@ -102,3 +107,48 @@ def year_validator(value: Any, context: Context):
         raise Invalid("Value must be a valid 4-digit year")
 
     return value
+
+def mutually_exclusive(other_key: str) -> Validator:
+    """Ensure that either current value or other field has value, but not both.
+
+    .. code-block::
+
+        data, errors = tk.navl_validate(
+            {"sender_id": 1},
+            {"sender_id": [mutually_exclusive("recipient_id")]}
+        )
+        assert errors == {"sender_id": [error_message]}
+
+        data, errors = tk.navl_validate(
+            {"recipient_id": 1},
+            {"sender_id": [mutually_exclusive("recipient_id")]}
+        )
+        assert errors == {"sender_id": [error_message]}
+
+        data, errors = tk.navl_validate(
+            {"sender_id": 1, "recipient_id": 2},
+            {"sender_id": [mutually_exclusive("recipient_id")]}
+        )
+        assert errors == {"sender_id": [error_message]}
+
+        data, errors = tk.navl_validate(
+            {"sender_id": 1, "recipient_id": []},
+            {"sender_id": [mutually_exclusive("recipient_id")]}
+        )
+        assert not errors
+
+    """
+    def callable(key: FlattenKey, data: FlattenDataDict,
+                 errors: FlattenErrorDict, context: Context):
+        value = data.get(key)
+        other_value = data.get(key[:-1] + (other_key,))
+
+        if (value and not other_value) or (other_value and not value):
+            # Either current value or other field should have a value, but not both
+            return
+
+        errors[key].append(_('Either {0} or {1} should be present, not both.')
+                           .format(key[-1], other_key))
+        raise StopOnError
+
+    return callable
