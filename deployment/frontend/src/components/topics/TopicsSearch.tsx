@@ -41,7 +41,7 @@ export default function TopicsSearch({
                     <input
                         ref={inputRef}
                         name="search"
-                        placeholder="Search data"
+                        placeholder="Search topics"
                         className="h-14 rounded-sm block w-full border-0 px-5 py-2 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-gray-900 placeholder:text-base border-b-2 border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
                     />
                     {isLoading ? (

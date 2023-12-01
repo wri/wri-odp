@@ -55,6 +55,7 @@ export async function getServerSideProps(
                 rows: 100,
             },
         })
+        await helpers.topics.getTopic.prefetch({ id: topic.id })
         return {
             props: {
                 trpcState: helpers.dehydrate(),

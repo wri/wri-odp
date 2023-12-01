@@ -512,7 +512,7 @@ export async function getOneDataset(
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
-        spatial: dataset.result.spatial ? JSON.parse(dataset.result.spatial) : undefined,
+        spatial: dataset.result.spatial ? JSON.parse(dataset.result.spatial) : null,
     }
 }
 
