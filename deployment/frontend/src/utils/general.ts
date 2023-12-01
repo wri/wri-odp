@@ -29,6 +29,14 @@ export function filterObjects<T>(arrayObject: T[], filterObject: Record<string, 
     return Object.keys(filterObject).every((key) => {
       const filterValue = filterObject[key];
       const itemValue = (item as Record<string, string>)[key];
+
+      if (key === 'groupId') {
+        const groupIds = (item as Record<string, string[] | undefined>).packageGroup;
+        if (groupIds !== undefined) {
+         return groupIds.includes(filterValue as string);
+        }
+
+      }
       if (key === 'timestamp') {
         return isWithinTimeframe(itemValue!, filterValue!);
       }

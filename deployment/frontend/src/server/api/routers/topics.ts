@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/
 import { env } from '@/env.mjs'
 import { getGroups, getGroup, searchHierarchy, getUserGroups, findAllNameInTree } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
-import type { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import type { FolloweeList, GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { searchArrayForKeyword } from '@/utils/general'
 import type { CkanResponse } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
@@ -300,4 +300,26 @@ export const TopicRouter = createTRPCRouter({
                 topic: topic.result
             }
         }),
+     
+    getFollowedTopics: protectedProcedure
+        .query(async ({ ctx }) => {
+
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${ctx.session.user.apikey}`,
+                },
+            })
+            const data = (await response.json()) as CkanResponse<FolloweeList[]>
+            if (!data.success && data.error) throw Error(data.error.message)
+            const result = data.result.reduce((acc, item) => {
+                if (item.type === 'group') {
+                    const t = item.dict as Group;
+                    acc.push(t);
+                }
+                return acc;
+            }, [] as Group[]);
+            return result
+         })
+     
 })
