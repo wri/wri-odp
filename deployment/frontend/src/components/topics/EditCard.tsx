@@ -20,7 +20,6 @@ export default function EditCard({
     if (isLoading) return <Spinner className="mx-auto" />
     const users = topicDetails?.users!
     let user = topicDetails?.users?.find((user) => user.name === userName)
-
     if (user) {
         const user2 = user as WriUser
 
