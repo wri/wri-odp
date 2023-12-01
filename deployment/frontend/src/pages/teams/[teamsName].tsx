@@ -117,7 +117,7 @@ export default function teams(
 
     return (
         <>
-            <NextSeo title={`${teamName} - Teams`} />
+            <NextSeo title={`${teamTitle} - Teams`} />
             <Header />
             <Breadcrumbs links={links} />
             {topicIsLoading ? (
