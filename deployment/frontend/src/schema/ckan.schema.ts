@@ -44,7 +44,10 @@ export interface Activity {
     object_id?: string
     activity_type: string
     user_data?: User
-    data: Record<string, { title?: string, owner_org?: string }>
+    data: Record<string, {
+        title?: string, owner_org?: string, groups: {
+        id: string
+    }[] }>
 }
 
 export interface ActivityDisplay {
@@ -55,6 +58,9 @@ export interface ActivityDisplay {
     timestamp: string
     actionType: string
     orgId?: string
+    packageId?: string
+    groupId?: string
+    packageGroup?: string[]
 }
 
 export interface WriDataset extends Dataset {
@@ -162,4 +168,10 @@ export interface FolloweeList {
     type: string;
     display_name: string;
     dict: WriDataset | WriOrganization | WriUser | Group;
+}
+
+export interface GroupsmDetails{
+    img_url: string;
+    description: string;
+    package_count: number;
 }

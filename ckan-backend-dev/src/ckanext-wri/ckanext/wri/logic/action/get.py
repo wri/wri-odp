@@ -25,6 +25,11 @@ import ckan.authz as authz
 
 from ckan.common import _
 from ckan.types import ActionResult, Context, DataDict
+from typing_extensions import TypeAlias
+from ckanext.wri.model.notification import Notification,notification_dictize, notification_list_dictize
+import datetime
+import ckan.plugins.toolkit as tk
+from ckanext.wri.logic.auth import schema
 
 log = logging.getLogger('ckan.logic')
 
@@ -38,6 +43,7 @@ NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 
 
+NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
 
 
@@ -382,3 +388,41 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
             key=lambda facet: facet['display_name'], reverse=True)
 
     return search_results
+
+@logic.side_effect_free
+def notification_get_all(
+    context: Context, data_dict: DataDict
+    ) -> NotificationGetUserViewedActivity:
+    """Get the notifications for a user by sender_id or receiver_id
+    """
+    model = context["model"]
+    session = context['session']
+
+    tk.check_access("notification_get_all", context, data_dict)
+    sender_id = data_dict.get('sender_id')
+    recipient_id = data_dict.get('recipient_id')
+
+    user_obj = model.User.get(context["user"])
+    user_id = user_obj.id
+
+    sch = context.get("schema") or schema.default_get_notification_schema()
+    data, errors = tk.navl_validate(data_dict, sch, context)
+    if errors:
+        raise tk.ValidationError(errors)
+
+    notification_objects = Notification.get(recipient_id=recipient_id,sender_id=sender_id)
+
+    try:
+        iter(notification_objects)
+        notification_objecst_result =  notification_list_dictize(
+    notification_objects, context
+    )
+    except TypeError:
+        notification_objecst_result = notification_dictize(
+    notification_objects, context
+    )
+
+    if not notification_objecst_result:
+        raise logic.NotFound(_('Notification not found'))
+
+    return notification_objecst_result

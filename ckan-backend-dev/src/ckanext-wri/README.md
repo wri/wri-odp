@@ -12,6 +12,56 @@
 
 This is the WRI Open Data Portal extension for CKAN. It contains CKAN backend customizations for this project.
 
+## Notifications Feature
+
+This extension includes a notification feature that utilizes its own database, action endpoints, and custom validators.
+The feature adds three actions
+* `notification_create`
+* `notification_update`
+* `notification_get_all`
+
+### Database Setup
+
+This extension adds a table named `notifications` to the database for the API notification feature. Initialization is required on the initial boot-up of the extension.
+
+To initiate the database setup, use the following command:
+
+```console
+ckan -c <path-to-ini-file> notificationdb
+```
+### API Endpoints
+
+#### POST /api/action/notification_create
+
+**Parameters:**
+- **recipient_id** (string) – The user ID of the recipient of the notification (required).
+- **sender_id** (string) – The user ID of the sender of the notification (required).
+- **activity_type** (string) – The type of activity that triggers the notification, such as `dataset_create`, etc. (required).
+- **object_type** (string) – The type of the object on which the action is being performed (e.g., dataset, resource, etc.) (required).
+- **object_id** (string) – The ID of the object on which the action is being performed (required).
+
+The parameters `time_sent` (set to the current timestamp), `state` (set as `active`) and `is_unread` (set to `false`) are automatically configured during creation.
+
+#### POST /api/action/notification_update
+
+**Parameters:**
+- **recipient_id** (string) – The user ID of the recipient of the notification (required).
+- **sender_id** (string) – The user ID of the sender of the notification (required).
+- **activity_type** (string) – The type of activity that triggers the notification, such as `dataset_create`, etc. (required).
+- **object_type** (string) – The type of the object on which the action is being performed (e.g., dataset, resource, etc.) (required).
+- **object_id** (string) – The ID of the object on which the action is being performed (required).
+- **time_sent** (datetime withut timezone) – The timestamp of the sent time (required).
+- **is_unread** (string) – Indicates whether the notification is read or not (required).
+- **state** (string) – `active` or `deleted` (required).
+
+#### GET /api/action/notification_get_all
+
+Returns a list of notifications for a sender or recipient.
+
+**Parameters:**
+- **recipient_id** (string) – The user ID of the recipient of the notification (optional, but either `recipient_id` or `sender_id` is required).
+- **sender_id** (string) – The user ID of the sender of the notification (optional, but either `recipient_id` or `sender_id` is required).
+
 ## Development
 
 See the [CKAN Backend Development README](ckan-backend-dev/README.md) for instructions on how to set up a local Docker CKAN backend development environment.

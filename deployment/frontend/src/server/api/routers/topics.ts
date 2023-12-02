@@ -1,9 +1,9 @@
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { getGroups, getGroup, searchHierarchy, getUserGroups } from '@/utils/apiUtils'
+import { getGroups, getGroup, searchHierarchy, getUserGroups, findAllNameInTree } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
-import type { GroupTree } from '@/schema/ckan.schema'
+import type { FolloweeList, GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { searchArrayForKeyword } from '@/utils/general'
 import type { CkanResponse } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
@@ -11,6 +11,7 @@ import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 
 import { TopicSchema } from '@/schema/topic.schema'
 import { replaceNames } from '@/utils/replaceNames'
+import { findNameInTree } from '@/utils/apiUtils'
 
 export const TopicRouter = createTRPCRouter({
     getUsersTopics: protectedProcedure
@@ -228,4 +229,97 @@ export const TopicRouter = createTRPCRouter({
             if (!data.success && data.error) throw Error(replaceNames(data.error.message))
             return data
         }),
+    getGeneralTopics: publicProcedure
+        .input(searchSchema)
+        .query(async ({ input, ctx }) => {
+            let groupTree: GroupTree[] = []
+            const allGroups = (await getUserGroups({ apiKey: ctx?.session?.user.apikey ?? "", userId: "" }))!
+            const topicDetails = allGroups.reduce((acc, org) => {
+                acc[org.id] = {
+                    img_url: org.image_display_url,
+                    description: org.description,
+                    package_count: org.package_count,
+                }
+                return acc
+            }
+                , {} as Record<string, GroupsmDetails>)
+            if (input.search) {
+                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: ctx?.session?.user.apikey ?? "", q: input.search, group_type: 'group' })
+                if (input.tree) {
+                    let groupFetchTree = groupTree[0] as GroupTree
+                    const findTree = findNameInTree(groupFetchTree, input.search)
+                    if (findTree) {
+                        groupFetchTree = findTree
+                    }
+                    groupTree = [groupFetchTree]
+                }
+                if (input.allTree) {
+                     
+                    const filterTree = groupTree.flatMap((group) => {
+                        const search = input.search.toLowerCase()
+                        if ( group.name.toLowerCase().includes(search) || group.title?.toLowerCase().includes(search) ) return [group]
+                        const findtree = findAllNameInTree(group, search)
+                        return findtree
+                    })
+                    groupTree = filterTree
+                }
+                
+            }
+            else {
+                
+                groupTree = await getGroups({
+                    apiKey: ctx?.session?.user.apikey ?? "",
+                })
+                
+            }
+
+            const result = groupTree
+            return {
+                topics: result,
+                topicDetails: topicDetails,
+                count: result.length,
+            }
+        }),
+     getTopicV2: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const topic: CkanResponse<Group> =
+                await topicRes.json()
+            if (!topic.success && topic.error) throw Error(replaceNames(topic.error.message))
+            return {
+                topic: topic.result
+            }
+        }),
+     
+    getFollowedTopics: protectedProcedure
+        .query(async ({ ctx }) => {
+
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${ctx.session.user.apikey}`,
+                },
+            })
+            const data = (await response.json()) as CkanResponse<FolloweeList[]>
+            if (!data.success && data.error) throw Error(data.error.message)
+            const result = data.result.reduce((acc, item) => {
+                if (item.type === 'group') {
+                    const t = item.dict as Group;
+                    acc.push(t);
+                }
+                return acc;
+            }, [] as Group[]);
+            return result
+         })
+     
 })

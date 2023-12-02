@@ -2,7 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
-import { TrashIcon, PencilIcon, PlusCircleIcon, UserGroupIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, PencilIcon, PlusCircleIcon, UserGroupIcon, BuildingLibraryIcon, UserIcon } from '@heroicons/react/24/outline';
 
 export interface activity {
   description: string,
@@ -22,6 +22,9 @@ const IconB: Record<string, React.ReactNode> = {
   "changed_group": <UserGroupIcon className='w-4 h-4 text-blue-500' />,
   "new_group": <UserGroupIcon className='w-4 h-4 text-green-500' />,
   "deleted_group": <UserGroupIcon className='w-4 h-4 text-red-500' />,
+  "new_user": <UserIcon className='w-4 h-4 text-green-500' />,
+  "deleted_user": <UserIcon className='w-4 h-4 text-red-500' />,
+  "changed_user": <UserIcon className='w-4 h-4 text-blue-500' />,
 }
 
 export default function ActivityStreamCard({ activity }: { activity: activity }) {
@@ -30,6 +33,7 @@ export default function ActivityStreamCard({ activity }: { activity: activity })
     new: "add",
     deleted: "update",
   }
+  
   return (
     <div className='w-full flex gap-x-3'>
       <DefaultTooltip content={activity.actionType}>
