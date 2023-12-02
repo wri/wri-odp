@@ -13,7 +13,7 @@ export default function MapView({
 
     useEffect(() => {
         addLayerGroup({
-            layers: ['74306f01-3baa-4256-9cdc-694080cf6b13'],
+            layers: ['0237e906-8a57-4c10-9403-6b14be42d89f'],
             datasetId: '',
         })
     }, [])

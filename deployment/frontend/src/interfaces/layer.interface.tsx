@@ -33,7 +33,7 @@ export interface layerConfigSpec {
 export interface APILayerSpec {
   id: string;
   name: string;
-  dataset: string;
+  dataset?: string;
   slug: string;
   description?: string;
   application: string[];
@@ -51,6 +51,6 @@ export interface APILayerSpec {
   applicationConfig: Record<string, string | number | boolean | unknown>;
   interactionConfig: Record<string, string | number | boolean | unknown>;
   staticImageConfig: Record<string, string | number | boolean | unknown>;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

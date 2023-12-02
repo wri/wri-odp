@@ -326,6 +326,7 @@ export function AddDataFile({
                                                 title: '',
                                                 type: 'empty',
                                                 schema: [],
+                                                layerObj: null,
                                             })
                                         }
                                     />
@@ -337,7 +338,10 @@ export function AddDataFile({
                                     />
                                 </Tab.Panel>
                                 <Tab.Panel>
-                                    <BuildALayer />
+                                    <BuildALayer
+                                        formObj={formObj}
+                                        index={index}
+                                    />
                                 </Tab.Panel>
                             </Tab.Panels>
                         </Tab.Group>
