@@ -471,11 +471,21 @@ export function activityDetails(activity: Activity): ActivityDisplay {
     const time = timeAgo(activity.timestamp)
 
     let orgId = '';
+    let packageId = '';
+    let groupId = '';
+    let packageGroup: string[] = [];
     if (object === 'package') {
         orgId = activity.data?.package?.owner_org as string
+        packageId = activity.object_id as string
+        //get all groups id
+        const groups = activity.data?.package?.groups as { id: string }[]
+        packageGroup = groups.map((group) => group.id)
     }
     else if (object === 'team') {
         orgId = activity.object_id as string
+    }
+    else if (object === 'topic') {
+        groupId = activity.object_id as string
     }
     return {
         description,
@@ -484,7 +494,10 @@ export function activityDetails(activity: Activity): ActivityDisplay {
         action,
         timestamp: activity.timestamp,
         actionType: actionType,
-        orgId: orgId ? orgId : undefined
+        orgId: orgId ? orgId : undefined,
+        packageId: packageId ? packageId : undefined,
+        groupId: groupId ? groupId : undefined,
+        packageGroup: packageGroup.length > 0 ? packageGroup : undefined,
     }
 }
 

@@ -111,8 +111,7 @@ export default function TopicPage(
     return (
         <>
             <NextSeo
-                title={`${topicName}
-                } - Topics`}
+                title={`${topicTitle} - Topics`}
             />
             <Header />
             <Breadcrumbs links={links} />

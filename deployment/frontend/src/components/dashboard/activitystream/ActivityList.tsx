@@ -37,7 +37,6 @@ export default function ActivityList() {
 
 
 
-
   return (
     <section className='max-w-8xl  w-full flex flex-col gap-y-5 sm:gap-y-0'>
       <ActivitystreamHeader setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={processedActivity.isLoading} count={processedActivity.data?.count} />} />

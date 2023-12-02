@@ -164,7 +164,7 @@ export default function Layout({
                             return (
                               <li key={item.name} className={`text-center py-6 ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
                                 <Link
-                                  href={item.href.includes("default") ? "./" : `/dashboard${item.href}`}
+                                  href={item.href.includes("default")  ? "/dashboard" : `/dashboard${item.href}`}
                                   className="flex w-full justify-center items-center gap-x-2"
                                 >
                                   <div className="font-normal text-[1.125rem]">{item.name}</div>
@@ -202,7 +202,7 @@ export default function Layout({
                         return (
                           <li key={item.name} className={` text-center py-6 hover:bg-white hover:text-wri-black ${item.active ? "bg-white text-wri-black" : " text-white"}`}>
                             <Link
-                              href={item.href.includes("default") ? "./" : `/dashboard${item.href}`}
+                              href={item.href.includes("default") ? "/dashboard" : `/dashboard${item.href}`}
                               className="flex w-full justify-center items-center gap-x-2"
                             >
                               <div className="font-normal text-[1.125rem]">{item.name}</div>

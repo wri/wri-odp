@@ -128,10 +128,6 @@ function CopyLink() {
                         <p className="text-start text-sm font-semibold text-black">
                             Link copied to clipboard
                         </p>
-                        <p className="text-start text-sm font-light">
-                            Make sure that the users who you are sharing the
-                            collection with, have permissions to see it.
-                        </p>
                     </div>
                 </button>
             )}
