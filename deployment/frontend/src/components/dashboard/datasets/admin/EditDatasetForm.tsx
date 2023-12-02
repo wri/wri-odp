@@ -258,7 +258,13 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 <Button type="button" variant="outline">
                     <Link href="/dashboard/datasets">Cancel</Link>
                 </Button>
-                <LoaderButton loading={editDataset.isLoading} type="submit">
+                <LoaderButton
+                    loading={editDataset.isLoading}
+                    type="submit"
+                    onClick={formObj.handleSubmit((data) => {
+                        editDataset.mutate(data)
+                    })}
+                >
                     Update Dataset
                 </LoaderButton>
             </div>

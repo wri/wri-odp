@@ -94,9 +94,9 @@ export const DatasetRouter = createTRPCRouter({
             }
             input.resources.forEach((r) => {
                 if (r.layerObj) {
-                    const url = `https://api.resourcewatch.org/v1/layer/${
-                        layersMap.get(r.resourceId).data.id
-                    }`
+                    const url = `https://api.resourcewatch.org/v1/dataset/${
+                        layersMap.get(r.resourceId).data.attributes.dataset
+                    }/layer/${layersMap.get(r.resourceId).data.id}`
                     const name = layersMap.get(r.resourceId).data.id
                     r.url = url
                     r.name = name
@@ -174,6 +174,39 @@ export const DatasetRouter = createTRPCRouter({
     editDataset: protectedProcedure
         .input(DatasetSchema)
         .mutation(async ({ ctx, input }) => {
+            await Promise.all(
+                input.resources
+                    .filter((r) => r.layerObj)
+                    .map(async (r) => {
+                        try {
+                            if (r.layerObj && r.url) {
+                                const body = JSON.stringify(
+                                    convertFormToLayerObj(r.layerObj)
+                                )
+                                const layerRwRes = await fetch(r.url, {
+                                    method: 'PATCH',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        Authorization: `Bearer ${env.RW_API_KEY}`,
+                                    },
+                                    body,
+                                })
+                                const layerRw: any = await layerRwRes.json()
+                                if (layerRw.errors)
+                                    throw Error(
+                                        `Error creating resource at the Resource Watch API - (${JSON.stringify(
+                                            layerRw.errors
+                                        )})`
+                                    )
+                            }
+                        } catch (e) {
+                            let error =
+                                'Something went wrong when we tried to create some resources in the Resource Watch API please contact the system administrator'
+                            if (e instanceof Error) error = e.message
+                            throw Error(error)
+                        }
+                    })
+            )
             try {
                 const user = ctx.session.user
                 const body = JSON.stringify({
@@ -261,24 +294,25 @@ export const DatasetRouter = createTRPCRouter({
         .input(ResourceSchema)
         .mutation(async ({ ctx, input }) => {
             try {
-                if (input.layerObj) {
+                if (input.layerObj && input.url) {
                     const body = JSON.stringify(
                         convertFormToLayerObj(input.layerObj)
                     )
-                    console.log(input.name)
-                    const layerRwRes = await fetch(
-                        `https://api.resourcewatch.org/v1/dataset/${input.name}/layer`,
-                        {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${env.RW_API_KEY}`,
-                            },
-                            body,
-                        }
-                    )
+                    const layerRwRes = await fetch(input.url, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${env.RW_API_KEY}`,
+                        },
+                        body,
+                    })
                     const layerRw: any = await layerRwRes.json()
-                    console.log('LAYER RW', layerRw)
+                    if (layerRw.errors)
+                        throw Error(
+                            `Error creating resource at the Resource Watch API - (${JSON.stringify(
+                                layerRw.errors
+                            )})`
+                        )
                 }
             } catch (e) {
                 let error =
