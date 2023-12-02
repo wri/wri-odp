@@ -47,12 +47,18 @@ const numericExpression = z
     .object({
         coercion: z.literal('to-number').default('to-number'),
         operation: z.literal('get').default('get'),
-        column: z.string().optional().nullable(),
+        column: z
+            .object({
+                value: z.string(),
+                label: z.string(),
+            })
+            .optional()
+            .nullable(),
     })
     .default({
         coercion: 'to-number',
         operation: 'get',
-        column: '',
+        column: { value: '', label: '' },
     })
 
 const filterExpression = z.object({
@@ -90,7 +96,7 @@ const rampObj = z
         output: z.array(
             z.object({
                 color: z.string(),
-                value: z.number().optional(),
+                value: z.number().optional().nullable(),
             })
         ),
     })
@@ -125,24 +131,41 @@ const renderSchema = z.object({
                         .number()
                         .optional()
                         .nullable()
-                        .or(nanToUndefined),
+                        .or(nanToUndefined)
+                        .transform((val) => {
+                            if (val && isNaN(val)) return undefined
+                            if (val === 0) return undefined
+                            return val
+                        }),
                     'line-color': colorPattern,
                     'line-opacity': z.coerce
                         .number()
                         .optional()
                         .nullable()
-                        .or(nanToUndefined),
+                        .or(nanToUndefined)
+                        .transform((val) => {
+                            if (val && isNaN(val)) return undefined
+                            if (val === 0) return undefined
+                            return val
+                        }),
                     'line-width': z.coerce
                         .number()
                         .optional()
                         .nullable()
-                        .or(nanToUndefined),
+                        .or(nanToUndefined)
+                        .transform((val) => {
+                            if (val && isNaN(val)) return undefined
+                            if (val === 0) return undefined
+                            return val
+                        }),
                     'circle-color': colorPattern,
                     'circle-radius': z.coerce
                         .number()
                         .optional()
                         .nullable()
+                        .or(nanToUndefined)
                         .transform((val) => {
+                            if (val && isNaN(val)) return undefined
                             if (val === 0) return undefined
                             return val
                         }),
@@ -150,7 +173,9 @@ const renderSchema = z.object({
                         .number()
                         .optional()
                         .nullable()
+                        .or(nanToUndefined)
                         .transform((val) => {
+                            if (val && isNaN(val)) return undefined
                             if (val === 0) return undefined
                             return val
                         }),
@@ -184,6 +209,7 @@ const interactionConfigSchema = z.object({
             property: z.string().optional().nullable(),
             suffix: z.string().optional().nullable(),
             type: z.string().optional().nullable(),
+            enabled: z.boolean().default(false)
         })
     ),
 })

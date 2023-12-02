@@ -1,8 +1,9 @@
 import { useFieldArray, useForm, useFormContext } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Button } from '@/components/_shared/Button'
+import { Button, LoaderButton } from '@/components/_shared/Button'
 import {
+    ArrowPathIcon,
     ExclamationCircleIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline'
@@ -15,10 +16,11 @@ import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { LayerFormType } from '../layer.schema'
 import { useState } from 'react'
 import { useColumns } from '../useColumns'
+import classNames from '@/utils/classnames'
 
 export default function SourceForm({ onNext }: { onNext: () => void }) {
     const formObj = useFormContext<LayerFormType>()
-    const [sqlFilled, setSqlFilled] = useState(false)
+    const [columnsFetchEnabled, setColumnsFetchEnabled] = useState(false)
     const {
         register,
         watch,
@@ -37,7 +39,7 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
     const columns = useColumns(
         watch('source.provider.type.value'),
         watch('connectorUrl') as string,
-        !!watch('connectorUrl') && sqlFilled,
+        columnsFetchEnabled,
         (data) => {
             if (data && watch('interactionConfig.output').length === 0) {
                 data.forEach((col) => {
@@ -45,9 +47,10 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                         column: col,
                         format: '',
                         prefix: '',
-                        property: '',
+                        property: col,
                         suffix: '',
-                        type: '',
+                        enabled: false,
+                        type: 'string',
                     })
                 })
             }
@@ -61,7 +64,11 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="mt-10 grid gap-x-6 gap-y-4 max-h-[375px] overflow-auto">
-                    <InputGroup label="Layer Type">
+                    <InputGroup
+                        label="Layer Type"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
                         <SimpleSelect
                             id="layer_type"
                             formObj={formObj}
@@ -71,7 +78,11 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                             options={layerTypeOptions}
                         />
                     </InputGroup>
-                    <InputGroup label="Provider">
+                    <InputGroup
+                        label="Provider"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
                         <SimpleSelect
                             maxWidth=""
                             id="provider"
@@ -83,7 +94,11 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                     </InputGroup>
                     {watch('type')?.value === 'raster' &&
                         watch('source.provider.type')?.value === 'wms' && (
-                            <InputGroup label="Tiles of your data">
+                            <InputGroup
+                                label="Tiles of your data"
+                                className="sm:grid-cols-1 gap-x-2"
+                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                            >
                                 <Input
                                     {...register('source.tiles')}
                                     type="text"
@@ -91,13 +106,23 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                                 <ErrorDisplay errors={errors} name="tiles" />
                             </InputGroup>
                         )}
-                    <InputGroup label="Layer ID">
-                        <Input {...register('id')} type="text" />
-                        <ErrorDisplay errors={errors} name="id" />
-                    </InputGroup>
+                    {watch('source.provider.type')?.value === 'gee' && (
+                        <InputGroup
+                            label="Layer ID"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                        >
+                            <Input {...register('id')} type="text" />
+                            <ErrorDisplay errors={errors} name="id" />
+                        </InputGroup>
+                    )}
                     {watch('source.provider.type')?.value === 'carto' && (
                         <>
-                            <InputGroup label="Account">
+                            <InputGroup
+                                label="Account"
+                                className="sm:grid-cols-1 gap-x-2"
+                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                            >
                                 <Input
                                     {...register('source.provider.account')}
                                     type="text"
@@ -109,12 +134,15 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                                     name="provider.account"
                                 />
                             </InputGroup>
-                            <InputGroup label="SQL Query">
+                            <InputGroup
+                                label="SQL Query"
+                                className="sm:grid-cols-1 gap-x-2"
+                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                            >
                                 <TextArea
                                     {...register(
                                         'source.provider.layers.0.options.sql'
                                     )}
-                                    onBlur={() => setSqlFilled(true)}
                                     type="text"
                                     defaultValue=""
                                 />
@@ -124,16 +152,47 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                                     name="provider.options.sql"
                                 />
                             </InputGroup>
+                            <InputGroup
+                                label="Columns URL"
+                                className="sm:grid-cols-1 gap-x-2"
+                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                            >
+                                <div className="flex gap-x-2 items-center">
+                                    <Input
+                                        {...register('connectorUrl')}
+                                        type="text"
+                                        defaultValue="https://wri-rw.carto.com:443/api/v2/sql?q="
+                                        icon={
+                                            <DefaultTooltip content="URL to get fetch columns from, this allows the form to autofill the interaction and some of the render sections with predefined values from the SQL Table">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
+                                    />
+                                    <DefaultTooltip content="Try to fetch columns">
+                                        <Button
+                                            onClick={() => columns.refetch()}
+                                            className="px-2"
+                                            type="button"
+                                        >
+                                            <ArrowPathIcon
+                                                className={classNames(
+                                                    'h-4 w-4 text-white',
+                                                    columns.isLoading
+                                                        ? 'animate-spin'
+                                                        : ''
+                                                )}
+                                            />
+                                        </Button>
+                                    </DefaultTooltip>
+                                </div>
+                            </InputGroup>
                         </>
                     )}
-                    <InputGroup label="Connector URL">
-                        <Input
-                            {...register('connectorUrl')}
-                            type="text"
-                            defaultValue="https://wri-rw.carto.com:443/api/v2/sql?q="
-                        />
-                    </InputGroup>
-                    <InputGroup label="Min Zoom">
+                    <InputGroup
+                        label="Min Zoom"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
                         <Input
                             {...register('source.minzoom', {
                                 setValueAs: (v) =>
@@ -148,7 +207,11 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                         />
                         <ErrorDisplay errors={errors} name="zoom" />
                     </InputGroup>
-                    <InputGroup label="Max Zoom">
+                    <InputGroup
+                        label="Max Zoom"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
                         <Input
                             {...register('source.maxzoom', {
                                 setValueAs: (v) =>
@@ -169,7 +232,9 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                     type="submit"
                     className="mt-4 ml-auto w-fit"
                 >
-                    Next: Legend
+                    {formObj.watch('source.provider.type').value === 'carto'
+                        ? 'Next: Render'
+                        : 'Next: Legend'}
                 </Button>
             </form>
         </>

@@ -35,7 +35,23 @@ export default function InteractionForm({
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="mt-10 gap-x-6 gap-y-4">
-                <ItemsArray control={control} register={register} />
+                    <ItemsArray control={control} register={register} />
+                </div>
+                <div className="flex items-center justify-end gap-x-2 my-2">
+                    <Button
+                        variant="outline"
+                        onClick={() => onPrev()}
+                        type="button"
+                    >
+                        Back
+                    </Button>
+                    <Button
+                        type="button"
+                        onClick={() => onNext()}
+                        className="w-fit"
+                    >
+                        Save layer
+                    </Button>
                 </div>
             </form>
         </>
@@ -54,14 +70,14 @@ function ItemsArray({
         name: 'interactionConfig.output',
     })
     return (
-        <div className="flex flex-col gap-y-4">
+        <div className="flex flex-col gap-y-4 max-h-[375px] overflow-auto">
             {fields.map((field, index) => (
                 <Accordion text="Output Item">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 pb-8">
                         <InputGroup
                             label="Column"
-                            className="sm:grid-cols-1"
-                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
                             <Input
                                 {...register(
@@ -72,8 +88,8 @@ function ItemsArray({
                         </InputGroup>
                         <InputGroup
                             label="Format"
-                            className="sm:grid-cols-1"
-                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
                             <Input
                                 {...register(
@@ -84,8 +100,8 @@ function ItemsArray({
                         </InputGroup>
                         <InputGroup
                             label="Prefix"
-                            className="sm:grid-cols-1"
-                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
                             <Input
                                 {...register(
@@ -96,8 +112,8 @@ function ItemsArray({
                         </InputGroup>
                         <InputGroup
                             label="Property"
-                            className="sm:grid-cols-1"
-                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
                             <Input
                                 {...register(
@@ -107,9 +123,9 @@ function ItemsArray({
                             />
                         </InputGroup>
                         <InputGroup
-                            label="Property"
-                            className="sm:grid-cols-1"
-                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                            label="Suffix"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
                             <Input
                                 {...register(
@@ -120,8 +136,8 @@ function ItemsArray({
                         </InputGroup>
                         <InputGroup
                             label="Property"
-                            className="sm:grid-cols-1"
-                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
                             <Input
                                 {...register(
@@ -130,6 +146,24 @@ function ItemsArray({
                                 type="text"
                             />
                         </InputGroup>
+                        <div className="relative flex justify-start">
+                            <div className="flex h-6 items-center">
+                                <input
+                                    id="featured_dataset"
+                                    aria-describedby="comments-description"
+                                    {...register(
+                                        `interactionConfig.output.${index}.enabled`
+                                    )}
+                                    type="checkbox"
+                                    className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
+                                />
+                            </div>
+                            <div className="ml-3 text-sm leading-6">
+                                <label className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800">
+                                    Enable
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <Button
                         variant="destructive"
@@ -150,6 +184,7 @@ function ItemsArray({
                         property: '',
                         suffix: '',
                         type: '',
+                        enabled: false,
                     })
                 }
                 type="button"

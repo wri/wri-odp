@@ -3,7 +3,7 @@ import { UseQueryOptions, useQuery } from 'react-query'
 export function useColumns(
     type: 'carto' | 'gee' | 'wms' | 'featureservice',
     connector_url: string,
-    enabled: boolean = true,
+    enabled: boolean,
     onSuccess?: (data: string[]) => void
 ) {
     //react-query hook that fetches the columns from the connector_url

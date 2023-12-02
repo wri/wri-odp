@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { Button } from '@/components/_shared/Button'
 import { InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
@@ -61,7 +62,7 @@ export default function RenderForm({ onPrev, onNext }: InteractionFormProps) {
                             onClick={() => onNext()}
                             className="w-fit"
                         >
-                            Save layer
+                            Next: Legends
                         </Button>
                     </div>
                 </div>
@@ -81,8 +82,8 @@ function ItemsArray() {
         <div className="flex flex-col gap-y-2">
             <InputGroup
                 label="Circle Color"
-                className="sm:grid-cols-1"
-                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                className="sm:grid-cols-1 gap-x-2"
+                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
                 <ColorPicker
                     name={`render.layers.${index}.paint.circle-color`}
@@ -91,25 +92,36 @@ function ItemsArray() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <InputGroup
                     label="Circle Radius"
-                    className="sm:grid-cols-1"
-                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                    className="sm:grid-cols-1 gap-x-2"
+                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.circle-radius`
+                            `render.layers.${index}.paint.circle-radius`,
+                            {
+                                valueAsNumber: true,
+                                setValueAs: (v) =>
+                                    v === '' ? undefined : parseFloat(v),
+                            }
                         )}
                         type="number"
                     />
                 </InputGroup>
                 <InputGroup
                     label="Circle Opacity"
-                    className="sm:grid-cols-1"
-                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                    className="sm:grid-cols-1 gap-x-2"
+                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.circle-opacity`
+                            `render.layers.${index}.paint.circle-opacity`,
+                            {
+                                valueAsNumber: true,
+                                setValueAs: (v) =>
+                                    v === '' ? undefined : parseFloat(v),
+                            }
                         )}
+                        defaultValue={1}
                         type="number"
                     />
                 </InputGroup>
@@ -121,18 +133,23 @@ function ItemsArray() {
         <div className="flex flex-col gap-y-2">
             <InputGroup
                 label="Fill Color"
-                className="sm:grid-cols-1"
-                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                className="sm:grid-cols-1 gap-x-2"
+                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
                 <ColorPicker name={`render.layers.${index}.paint.fill-color`} />
             </InputGroup>
             <InputGroup
                 label="Fill Opacity"
-                className="sm:grid-cols-1"
-                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                className="sm:grid-cols-1 gap-x-2"
+                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
                 <Input
-                    {...register(`render.layers.${index}.paint.fill-opacity`)}
+                    {...register(`render.layers.${index}.paint.fill-opacity`, {
+                        valueAsNumber: true,
+                        setValueAs: (v) =>
+                            v === '' ? undefined : parseFloat(v),
+                    })}
+                    defaultValue={1}
                     type="number"
                 />
             </InputGroup>
@@ -143,31 +160,44 @@ function ItemsArray() {
         <div className="flex flex-col gap-y-2">
             <InputGroup
                 label="Line Color"
-                className="sm:grid-cols-1"
-                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                className="sm:grid-cols-1 gap-x-2"
+                labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
                 <ColorPicker name={`render.layers.${index}.paint.line-color`} />
             </InputGroup>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <InputGroup
                     label="Line Width"
-                    className="sm:grid-cols-1"
-                    labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                    className="sm:grid-cols-1 gap-x-2"
+                    labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                 >
                     <Input
-                        {...register(`render.layers.${index}.paint.line-width`)}
+                        {...register(
+                            `render.layers.${index}.paint.line-width`,
+                            {
+                                valueAsNumber: true,
+                                setValueAs: (v) =>
+                                    v === '' ? undefined : parseFloat(v),
+                            }
+                        )}
                         type="number"
                     />
                 </InputGroup>
                 <InputGroup
                     label="Line Opacity"
-                    className="sm:grid-cols-1"
-                    labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                    className="sm:grid-cols-1 gap-x-2"
+                    labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.line-opacity`
+                            `render.layers.${index}.paint.line-opacity`,
+                            {
+                                valueAsNumber: true,
+                                setValueAs: (v) =>
+                                    v === '' ? undefined : parseFloat(v),
+                            }
                         )}
+                        defaultValue={1}
                         type="number"
                     />
                 </InputGroup>
@@ -178,14 +208,14 @@ function ItemsArray() {
     return (
         <div className="flex flex-col gap-y-4 max-h-[375px] overflow-auto">
             {fields.map((field, index) => (
-                <Accordion text="Render Item">
-                    <div key={field.id}>
+                <Accordion key={field.id} text="Render Item">
+                    <div>
                         <Accordion text="Render Properties">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <InputGroup
                                     label="Render Type"
-                                    className="sm:grid-cols-1"
-                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                                    className="sm:grid-cols-1 gap-x-2"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                 >
                                     <SimpleSelect
                                         formObj={formObj}
@@ -195,9 +225,9 @@ function ItemsArray() {
                                     />
                                 </InputGroup>
                                 <InputGroup
-                                    className="sm:grid-cols-1"
+                                    className="sm:grid-cols-1 gap-x-2"
                                     label="Source Layer"
-                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                 >
                                     <Input
                                         defaultValue={'layer0'}
@@ -348,6 +378,8 @@ function FilterExpression({
                             `render.layers.${layerIdx}.filter.${filterIdx}.value`,
                             {
                                 valueAsNumber: true,
+                                setValueAs: (v) =>
+                                    v === '' ? undefined : parseFloat(v),
                             }
                         )}
                         type="number"
@@ -445,8 +477,8 @@ function RampObj({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 pb-8">
             <InputGroup
                 label="Type"
-                className="sm:grid-cols-1"
-                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                className="sm:grid-cols-1 gap-x-2"
+                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
                 <SimpleSelect
                     formObj={formObj}
@@ -457,8 +489,8 @@ function RampObj({
             </InputGroup>
             <InputGroup
                 label="Column to match"
-                className="sm:grid-cols-1"
-                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                className="sm:grid-cols-1 gap-x-2"
+                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
                 <SimpleCombobox
                     options={
@@ -475,11 +507,11 @@ function RampObj({
                 />
             </InputGroup>
             {fields.map((field, index) => (
-                <>
+                <Fragment key={field.id}>
                     <InputGroup
                         label="Color of step"
-                        className="sm:grid-cols-1"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                     >
                         <Input
                             {...register(
@@ -490,8 +522,8 @@ function RampObj({
                     </InputGroup>
                     <InputGroup
                         label="Value of stop"
-                        className="sm:grid-cols-1"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                     >
                         <Input
                             {...register(
@@ -504,7 +536,7 @@ function RampObj({
                             type="number"
                         />
                     </InputGroup>
-                </>
+                </Fragment>
             ))}
             <button
                 onClick={() =>

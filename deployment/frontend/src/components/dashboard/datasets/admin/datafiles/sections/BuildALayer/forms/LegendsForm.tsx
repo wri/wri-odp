@@ -72,7 +72,8 @@ function ItemsArray({
         name: 'legendConfig.items',
     })
     return (
-        <div className="flex flex-col gap-y-4">
+    <>
+        <div className="flex flex-col gap-y-4 max-h-[315px] overflow-auto">
             {fields.map((field, index) => (
                 <div className="grid grid-cols-12 items-center gap-x-2 lg:gap-x-6">
                     <label className="lg:col-span-2 col-span-full lg:text-right text-left font-acumin text-lg font-normal leading-tight text-black">
@@ -96,16 +97,17 @@ function ItemsArray({
                     </div>
                 </div>
             ))}
+        </div>
             <button
-                onClick={() => append({ name: '', color: '#000000' })}
+                onClick={() => append({ name: 'Item', color: '#000000' })}
                 type="button"
-                className="ml-auto flex items-center justify-end gap-x-1"
+                className="ml-auto flex items-center justify-end gap-x-1 my-2"
             >
                 <PlusCircleIcon className="h-5 w-5 text-amber-400" />
                 <span className="font-acumin text-lg font-normal leading-tight text-black">
                     Add another item
                 </span>
             </button>
-        </div>
+            </>
     )
 }
