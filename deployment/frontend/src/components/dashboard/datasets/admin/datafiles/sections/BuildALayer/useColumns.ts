@@ -1,7 +1,7 @@
 import { UseQueryOptions, useQuery } from 'react-query'
 
 export function useColumns(
-    type: 'carto' | 'gee' | 'wms' | 'featureservice',
+    type: string,
     connector_url: string,
     enabled: boolean,
     onSuccess?: (data: string[]) => void
