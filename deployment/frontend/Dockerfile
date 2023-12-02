@@ -6,13 +6,16 @@ WORKDIR /usr/src/app
 ARG NEXTAUTH_SECRET
 ARG NEXTAUTH_URL
 ARG CKAN_URL
+ARG AZURE_AD_CLIENT_ID
+ARG AZURE_AD_CLIENT_SECRET
+ARG AZURE_AD_TENANT_ID
 
 COPY . .
 
 # You can setup env vars here or via `.env` file
 
 RUN npm ci -f
-RUN SKIP_ENV_VALIDATION=1 npm run build
+RUN SKIP_ENV_VALIDATION=0 npm run build
 EXPOSE 3000
 
 # For staging/production please use `yarn start` command.

@@ -95,6 +95,12 @@ export function LocationForm({
                 <>
                     <MapPinIcon className="h-7 w-7" />
                     Location
+                    <DefaultTooltip content="This field defines whether a dataset will show up on the results or not when doing a search by location">
+                        <InformationCircleIcon
+                            className="h-5 w-5 text-neutral-500"
+                            aria-hidden="true"
+                        />
+                    </DefaultTooltip>
                 </>
             }
         >

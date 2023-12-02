@@ -2,7 +2,6 @@
 
 `/dashboard` - to visit dashboard page
 
-
 The left sidebar contains the login user details and accessible list of pages
 
 -user profile-
@@ -23,14 +22,11 @@ The setting button once clicked enables the container to be rearranged using dra
 
 and once then with re-arrangement click the check button to save the arrangment for your next visit.
 
-
-
 ## Dashboard dataset Page `/dashboard/datasets`
 
 Contain tabs of different categories of dataset
 
 ![](./datasetpage.png)
-
 
 Each dataset item on hover contains a dropdown button to show it full details
 
@@ -46,7 +42,7 @@ List all actions , like delete, update and creation of dataset, Teams and topics
 
 ![](./activitypage.png)
 
-contains filter by activity type  and pagination
+contains filter by activity type and pagination
 
 ![](./activityfilter2.png)
 
@@ -54,10 +50,25 @@ contains filter by time and days
 
 ![](./activityfilter.png)
 
-contains filter by Teams
+contains `Filter by` select options: this let you chose the entity you want to filter the activity stream by, either by dataset favorites or Teams you are following or belong to
 
-![](./activityfilter1.png)
+![](./filterby.png)
 
+In the filterby you can select dataset for example to see list of dataset you are following
+
+![](./filterdataset.png)
+
+then click on one of the dataset
+
+![](./filterdataset1.png)
+
+you can also select filter by Teams
+
+![](./filterteams.png)
+
+and then select the team
+
+![](./teamsselect.png)
 
 ## Teams `/dashboard/teams`
 
@@ -81,7 +92,6 @@ Each Topics has a drop down that display list of subtopics
 
 ![](./topics.png)
 
-
 ## Users `/dashboard/users`
 
 Display list of users
@@ -89,8 +99,6 @@ Display list of users
 Each user row contains dropdown to display list of teams user belongs to
 
 ![](./users.png)
-
-
 
 ### Delete Entities
 
