@@ -1,5 +1,11 @@
 import { match, P } from 'ts-pattern'
-import { ColorPatternType, LayerFormType, layerSchema } from './layer.schema'
+import {
+    ColorPatternType,
+    InteractionFormType,
+    LayerFormType,
+    layerSchema,
+    LegendsFormType,
+} from './layer.schema'
 import { v4 as uuidv4 } from 'uuid'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 
@@ -170,23 +176,38 @@ function matchColorPattern(colorPattern: ColorPatternType) {
         .otherwise(() => '#000000')
 }
 
-function convertLayerObjToForm(layerObj: APILayerSpec) {
+function convertLayerObjToForm(layerObj: APILayerSpec): LayerFormType {
     return {
         ...layerObj,
-        layerConfig: {
-            ...layerObj.layerConfig,
-            type: {
-                value: layerObj.layerConfig.type,
-                label: layerObj.layerConfig.type,
-            },
-            source: {
-                ...layerObj.layerConfig.source,
-                provider: {
-                    ...layerObj.layerConfig.source.provider,
-                    type: {
-                        value: layerObj.layerConfig.source.provider,
-                        label: layerObj.layerConfig.source.provider,
-                    },
+        ...layerObj.layerConfig,
+        interactionConfig: (layerObj.interactionConfig as
+            | InteractionFormType
+            | undefined) ?? { output: [] },
+        legendConfig: (layerObj.legendConfig as
+            | LegendsFormType
+            | undefined) ?? { type: 'basic', items: [] },
+        description: layerObj.description ?? '',
+        type: {
+            value: layerObj.layerConfig.type,
+            label: layerObj.layerConfig.type,
+        },
+        source: {
+            ...layerObj.layerConfig.source,
+            tiles:
+                'tiles' in layerObj.layerConfig.source &&
+                layerObj.layerConfig.source?.tiles &&
+                layerObj.layerConfig.source?.tiles[0]
+                    ? (layerObj.layerConfig.source.tiles[0] as string)
+                    : undefined,
+            provider: {
+                ...layerObj.layerConfig.source.provider,
+                layers: layerObj.layerConfig.render?.layers,
+                type: {
+                    value:
+                        (layerObj.layerConfig.source.provider?.type as any) ??
+                        'other',
+                    label:
+                        layerObj.layerConfig.source.provider?.type ?? 'Other',
                 },
             },
         },

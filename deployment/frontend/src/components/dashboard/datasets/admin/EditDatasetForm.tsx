@@ -166,12 +166,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     console.log('Dataset', dataset)
     console.log('New Dataset', formObj.watch())
     return (
-        <form
-            onSubmit={formObj.handleSubmit((data) => {
-                console.log('Data', data)
-                editDataset.mutate(data)
-            })}
-        >
+        <>
             <Tab.Group>
                 <div>
                     <Tab.List
@@ -210,13 +205,23 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
-                            <OverviewForm formObj={formObj} editing={true} />
-                            <LocationForm formObj={formObj} />
-                            <DescriptionForm formObj={formObj} />
-                            <PointOfContactForm formObj={formObj} />
-                            <MoreDetailsForm formObj={formObj} />
-                            <OpenInForm formObj={formObj} />
-                            <CustomFieldsForm formObj={formObj} />
+                            <form
+                                onSubmit={formObj.handleSubmit((data) => {
+                                    console.log('Data', data)
+                                    editDataset.mutate(data)
+                                })}
+                            >
+                                <OverviewForm
+                                    formObj={formObj}
+                                    editing={true}
+                                />
+                                <LocationForm formObj={formObj} />
+                                <DescriptionForm formObj={formObj} />
+                                <PointOfContactForm formObj={formObj} />
+                                <MoreDetailsForm formObj={formObj} />
+                                <OpenInForm formObj={formObj} />
+                                <CustomFieldsForm formObj={formObj} />
+                            </form>
                         </Tab.Panel>
                         <Tab.Panel
                             as="div"
@@ -257,6 +262,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     Update Dataset
                 </LoaderButton>
             </div>
-        </form>
+        </>
     )
 }

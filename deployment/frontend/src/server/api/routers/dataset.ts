@@ -75,7 +75,7 @@ export const DatasetRouter = createTRPCRouter({
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OGIxYTc5OGQ0OGU1YTJkMjYyMGU3YSIsInJvbGUiOiJVU0VSIiwicHJvdmlkZXIiOiJnb29nbGUiLCJlbWFpbCI6Imx1Y2Nhcy5tYXRldXNAZGF0b3BpYW4uY29tIiwiZXh0cmFVc2VyRGF0YSI6eyJhcHBzIjpbInJ3Il19LCJjcmVhdGVkQXQiOjE3MDEzNTkwODM3ODcsIm5hbWUiOiJMdWNjYXMgTWF0ZXVzIiwiaWF0IjoxNzAxMzU5MDgzfQ.ady0usWS0eGOIIz7HenApzMNmhUFq8jizwKeCSSIPPE`,
+                                        Authorization: `Bearer ${env.RW_API_KEY}`,
                                     },
                                     body,
                                 }
@@ -260,7 +260,32 @@ export const DatasetRouter = createTRPCRouter({
     editResource: protectedProcedure
         .input(ResourceSchema)
         .mutation(async ({ ctx, input }) => {
-            console.log('Input', input)
+            try {
+                if (input.layerObj) {
+                    const body = JSON.stringify(
+                        convertFormToLayerObj(input.layerObj)
+                    )
+                    console.log(input.name)
+                    const layerRwRes = await fetch(
+                        `https://api.resourcewatch.org/v1/dataset/${input.name}/layer`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${env.RW_API_KEY}`,
+                            },
+                            body,
+                        }
+                    )
+                    const layerRw: any = await layerRwRes.json()
+                    console.log('LAYER RW', layerRw)
+                }
+            } catch (e) {
+                let error =
+                    'Something went wrong when we tried to create some resources in the Resource Watch API please contact the system administrator'
+                if (e instanceof Error) error = e.message
+                throw Error(error)
+            }
             try {
                 const user = ctx.session.user
                 const body = JSON.stringify({
@@ -445,7 +470,8 @@ export const DatasetRouter = createTRPCRouter({
     getOneDataset: publicProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
-            return getOneDataset(input.id, ctx.session)
+            const dataset = getOneDataset(input.id, ctx.session)
+            return dataset
         }),
     getPossibleCollaborators: protectedProcedure.query(async () => {
         const apiKey = env.SYS_ADMIN_API_KEY

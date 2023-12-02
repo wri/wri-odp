@@ -6,7 +6,7 @@ const sourceSchema = z
     .object({
         provider: z.object({
             type: z.object({
-                value: z.enum(['gee', 'carto', 'wms', 'featureservice']),
+                value: z.enum(['gee', 'carto', 'wms', 'featureservice', 'other']),
                 label: z.string(),
             }),
             account: z.string().optional().nullable(),
@@ -229,7 +229,7 @@ export const layerSchema = z
         description: z.string().default(''),
         account: z.string().optional().nullable().or(emptyStringToUndefined),
         type: z.object({
-            value: z.enum(['raster', 'vector']),
+            value: z.enum(['raster', 'vector', 'geojson', 'deck']),
             label: z.string(),
         }),
         connectorUrl: z.string().url().optional().nullable(),
@@ -262,3 +262,4 @@ export type LayerFormType = z.infer<typeof layerSchema>
 export type SourceFormType = z.infer<typeof sourceSchema>
 export type RenderFormType = z.infer<typeof renderSchema>
 export type LegendsFormType = z.infer<typeof legendsSchema>
+export type InteractionFormType = z.infer<typeof interactionConfigSchema>
