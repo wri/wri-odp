@@ -57,7 +57,10 @@ export async function getServerSideProps(
         const dataset = await getOneDataset(datasetName, session)
         return {
             props: {
-                dataset,
+                dataset: {
+                    ...dataset,
+                    spatial: dataset.spatial ?? null,
+                },
                 datasetName,
                 initialZustandState: state,
             },

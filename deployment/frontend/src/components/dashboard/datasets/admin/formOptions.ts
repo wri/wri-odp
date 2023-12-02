@@ -16,6 +16,37 @@ export const capacityOptions: { value: CapacityUnion; label: string }[] = [
     { value: 'member', label: 'Member' },
 ]
 
+export const layerTypeOptions = [
+    { value: 'vector', label: 'Vector' },
+    { value: 'raster', label: 'Raster' },
+]
+
+export const providerOptions = [
+    { value: 'carto', label: 'Cartodb' },
+    { value: 'gee', label: 'Google Earth Engine' },
+]
+
+export const filterOperationOptions = [
+    { value: '==', label: 'Equals to' },
+    { value: '>=', label: 'Greater than or equal' },
+    { value: '<=', label: 'Smaller than or equal' },
+    { value: '>', label: 'Greater than' },
+    { value: '<', label: 'Smaller than' },
+]
+
+export const renderTypeOptions = [
+    { value: 'circle', label: 'Circle' },
+    { value: 'line', label: 'Line' },
+    { value: 'fill', label: 'Fill' },
+]
+
+export const rampTypes = [
+    { value: 'step', label: 'Steps' },
+    { value: 'interpolate', label: 'Interpolate' },
+    { value: 'interpolate-lab', label: 'Interpolate(CIELAB color space)' },
+    { value: 'interpolate-hcl', label: 'Interpolate(HCL color space)' },
+]
+
 export const updateFrequencyOptions: {
     value: UpdateFrequencyUnion
     label: string

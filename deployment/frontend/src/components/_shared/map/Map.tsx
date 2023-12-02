@@ -44,6 +44,8 @@ export default function Map({
         return () => ro.disconnect()
     }, [])
 
+    console.log('LAYERS', layers)
+    console.log('ACTIVE LAYERS', activeLayersIds)
     return (
         <div ref={mapContainerRef} className="h-full" id="map">
             <ReactMapGL

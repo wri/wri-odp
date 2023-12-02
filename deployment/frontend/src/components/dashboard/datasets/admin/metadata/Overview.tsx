@@ -99,7 +99,6 @@ export function OverviewForm({
                             formObj={formObj}
                             name="language"
                             placeholder="Language"
-                            initialValue={watch('language') ?? null}
                             options={languageOptions}
                         />
                     </InputGroup>
@@ -125,7 +124,6 @@ export function OverviewForm({
                                         formObj={formObj}
                                         name="team"
                                         id="team"
-                                        initialValue={watch('team') ?? null}
                                         options={[
                                             {
                                                 label: 'No team',
@@ -211,6 +209,34 @@ export function OverviewForm({
                             type="text"
                         />
                         <ErrorDisplay name="technical_notes" errors={errors} />
+                    </InputGroup>
+                    <InputGroup label="Connector URL">
+                        <Input
+                            {...register('connectorUrl')}
+                            placeholder="https://wri-01.carto.com/tables/wdpa_protected_areas/table"
+                            type="text"
+                        />
+                    </InputGroup>
+                    <InputGroup label="Connector Type">
+                        <Input
+                            {...register('connectorType')}
+                            placeholder="rest"
+                            type="text"
+                        />
+                    </InputGroup>
+                    <InputGroup label="Provider">
+                        <Input
+                            {...register('provider')}
+                            placeholder="cartodb"
+                            type="text"
+                        />
+                    </InputGroup>
+                    <InputGroup label="Table Name">
+                        <Input
+                            {...register('tableName')}
+                            placeholder="users/resourcewatch_wri/dataset_name"
+                            type="text"
+                        />
                     </InputGroup>
                 </div>
                 <div className="flex flex-col justify-start gap-y-4">
@@ -352,9 +378,6 @@ export function OverviewForm({
                                         name="license_id"
                                         id="license"
                                         formObj={formObj}
-                                        initialValue={
-                                            watch('license_id') ?? null
-                                        }
                                         options={data.map((license) => ({
                                             label: license.title,
                                             value: license.id,

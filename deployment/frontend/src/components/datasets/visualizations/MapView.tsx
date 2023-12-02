@@ -8,7 +8,6 @@ export default function MapView({
     setIsAddLayers: Dispatch<SetStateAction<boolean>>
 }) {
     const { data: activeLayers } = useLayersFromRW()
-
     return (
         <div>
             <Map

@@ -22,7 +22,7 @@ import { match } from 'ts-pattern'
 import { v4 as uuidv4 } from 'uuid'
 import { OpenInForm } from './metadata/OpenIn'
 import Link from 'next/link'
-import {LocationForm} from './metadata/LocationForm'
+import { LocationForm } from './metadata/LocationForm'
 
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -97,11 +97,7 @@ export default function CreateDatasetForm() {
     }, [watch('title')])
 
     return (
-        <form
-            onSubmit={formObj.handleSubmit((data) => {
-                createDataset.mutate(data)
-            })}
-        >
+        <>
             <Tab.Group
                 selectedIndex={selectedIndex}
                 onChange={setSelectedIndex}
@@ -110,20 +106,37 @@ export default function CreateDatasetForm() {
                     <CreateDatasetTabs currentStep={selectedIndex} />
                 </div>
                 <Tab.Panels>
-                    <Tab.Panel as="div" className="flex flex-col gap-y-12">
-                        <OverviewForm formObj={formObj} />
-                        <LocationForm formObj={formObj} />
-                        <DescriptionForm formObj={formObj} />
-                        <PointOfContactForm formObj={formObj} />
-                        <MoreDetailsForm formObj={formObj} />
-                        <OpenInForm formObj={formObj} />
-                        <CustomFieldsForm formObj={formObj} />
+                    <Tab.Panel as="div">
+                        <form
+                            className="flex flex-col gap-y-12"
+                            id="create_dataset_form"
+                            onSubmit={formObj.handleSubmit((data) => {
+                                createDataset.mutate(data)
+                            })}
+                        >
+                            <OverviewForm formObj={formObj} />
+                            <LocationForm formObj={formObj} />
+                            <DescriptionForm formObj={formObj} />
+                            <PointOfContactForm formObj={formObj} />
+                            <MoreDetailsForm formObj={formObj} />
+                            <OpenInForm formObj={formObj} />
+                            <CustomFieldsForm formObj={formObj} />
+                        </form>
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <CreateDataFilesSection formObj={formObj} />
                     </Tab.Panel>
-                    <Tab.Panel as="div" className="flex flex-col gap-y-12">
-                        <Preview formObj={formObj} />
+                    <Tab.Panel as="div">
+                        <form
+                            className="flex flex-col gap-y-12"
+                            id="create_dataset_form"
+                            onSubmit={formObj.handleSubmit((data) => {
+                        console.log(data)
+                                createDataset.mutate(data)
+                            })}
+                        >
+                            <Preview formObj={formObj} />
+                        </form>
                     </Tab.Panel>
                 </Tab.Panels>
             </Tab.Group>
@@ -190,12 +203,13 @@ export default function CreateDatasetForm() {
                         <LoaderButton
                             loading={createDataset.isLoading}
                             type="submit"
+                            form="create_dataset_form"
                         >
                             Save
                         </LoaderButton>
                     )}
                 </div>
             </div>
-        </form>
+        </>
     )
 }

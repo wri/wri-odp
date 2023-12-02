@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeftIcon } from '@heroicons/react/20/solid'
 import { Button } from '../_shared/Button'
@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react'
 import { api } from '@/utils/api'
 import Spinner from '../_shared/Spinner'
 import EditCard from './EditCard'
+import { ClipboardDocumentIcon } from '@heroicons/react/24/outline'
 
 export default function TeamHeaderCard({
     teams,
@@ -106,8 +107,46 @@ export default function TeamHeaderCard({
                                 : `${team.children.length} Subeams`}
                         </div>
                     </div>
+                    <CopyLink />
                 </div>
             </div>
         </section>
+    )
+}
+
+function CopyLink() {
+    const [clicked, setClicked] = useState(false)
+    return (
+        <>
+            {!clicked ? (
+                <Button
+                    onClick={async () => {
+                        await navigator.clipboard.writeText(
+                            window.location.href
+                        )
+                        setClicked(!clicked)
+                        setTimeout(() => {
+                            setClicked(false)
+                        }, 3000)
+                    }}
+                    variant="outline"
+                    className="mr-auto mt-3"
+                >
+                    Share Teams
+                </Button>
+            ) : (
+                <button
+                    onClick={() => setClicked(!clicked)}
+                    className="mt-3 flex h-auto max-w-[578px] gap-2 rounded-sm border border-amber-400 px-5 py-3"
+                >
+                    <ClipboardDocumentIcon className="h-6 w-6 text-gray-800" />
+                    <div className="max-w-[30rem]">
+                        <p className="text-start text-sm font-semibold text-black">
+                            Link copied to clipboard
+                        </p>
+                    </div>
+                </button>
+            )}
+        </>
     )
 }

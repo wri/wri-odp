@@ -142,6 +142,11 @@ class Layer extends PureComponent<LayerProps> {
       ? render
       : JSON.parse(replace(JSON.stringify(render), params, sqlParams));
 
+    console.log('SOURCE BEFORE PARSE', source)
+    console.log('SOURCE PARSED', sourceParsed)
+    console.log('RENDER BEFORE PARSE', render)
+    console.log('TYPEOF RENDER BEFORE PARSE', typeof render)
+    console.log('RENDER PARSED', renderParsed)
     layerManager.add(
       {
         ...props,

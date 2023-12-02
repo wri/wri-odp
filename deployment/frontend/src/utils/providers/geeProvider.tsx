@@ -10,6 +10,7 @@ export class GeeProvider implements ProviderMaker {
   public name = "gee";
 
   private getTilerUrl = (layer: LayerSpec): string | Error => {
+    console.log('Layer inside provider', layer)
     if (!layer) throw new Error("layer required to generate tiler URL");
     return `https://api.resourcewatch.org/v1/layer/${layer.id}/tile/gee/{z}/{x}/{y}`;
   };

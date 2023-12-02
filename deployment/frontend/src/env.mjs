@@ -22,6 +22,7 @@ export const env = createEnv({
             process.env.VERCEL ? z.string() : z.string().url()
         ),
         CKAN_URL: z.string(),
+        RW_API_KEY: z.string(),
         S3_BUCKET_NAME: z.string(),
         S3_BUCKET_REGION: z.string(),
         S3_ACCESS_KEY_ID: z.string(),
@@ -30,6 +31,9 @@ export const env = createEnv({
             (str) => process.env.SYS_ADMIN_API_KEY ?? str,
             z.string()
         ),
+        AZURE_AD_TENANT_ID: z.string(),
+        AZURE_AD_CLIENT_ID: z.string(),
+        AZURE_AD_CLIENT_SECRET: z.string(),
     },
 
     /**
@@ -45,6 +49,7 @@ export const env = createEnv({
      * middlewares) or client-side so we need to destruct manually.
      */
     runtimeEnv: {
+        RW_API_KEY: process.env.RW_API_KEY,
         NODE_ENV: process.env.NODE_ENV,
         NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
         NEXTAUTH_URL: process.env.NEXTAUTH_URL,
@@ -54,6 +59,9 @@ export const env = createEnv({
         S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
         S3_BUCKET_REGION: process.env.S3_BUCKET_REGION,
         SYS_ADMIN_API_KEY: process.env.SYS_ADMIN_API_KEY,
+        AZURE_AD_TENANT_ID: process.env.AZURE_AD_TENANT_ID,
+        AZURE_AD_CLIENT_ID: process.env.AZURE_AD_CLIENT_ID,
+        AZURE_AD_CLIENT_SECRET: process.env.AZURE_AD_CLIENT_SECRET,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

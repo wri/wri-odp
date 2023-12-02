@@ -1,112 +1,285 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/_shared/Button";
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { useFieldArray, useForm, useFormContext } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Button, LoaderButton } from '@/components/_shared/Button'
+import {
+    ArrowPathIcon,
+    ExclamationCircleIcon,
+    InformationCircleIcon,
+} from '@heroicons/react/24/outline'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
+import { Input } from '@/components/_shared/SimpleInput'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import SimpleSelect from '@/components/_shared/SimpleSelect'
+import { layerTypeOptions, providerOptions } from '../../../../formOptions'
+import { TextArea } from '@/components/_shared/SimpleTextArea'
+import { LayerFormType } from '../layer.schema'
+import { useState } from 'react'
+import { useColumns } from '../useColumns'
+import classNames from '@/utils/classnames'
 
-const sourceSchema = z
-  .object({
-    type: z.enum(["raster", "vector"]),
-    minzoom: z.number().min(0).max(22).default(0),
-    maxzoom: z.number().min(0).max(22).default(22),
-    tiles: z.string().url(),
-  })
-  //Make sure that maxZoom is always bigger than minZoom
-  .refine((obj) => obj.maxzoom >= obj.minzoom, {
-    path: ["zoom"],
-    message: "maxZoom must be bigger than minZoom",
-  });
-
-export type SourceFormType = z.infer<typeof sourceSchema>;
-
-export default function SourceForm({
-  onNext,
-  defaultValues,
-}: {
-  onNext: (data: SourceFormType) => void;
-  defaultValues: SourceFormType | null;
-}) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SourceFormType & { zoom?: string }>({
-    defaultValues: defaultValues || undefined,
-    resolver: zodResolver(sourceSchema),
-  });
-  const onSubmit = (data: SourceFormType) => onNext(data);
-
-  return (
-    <>
-      <form className="flex flex-col px-4 min-h-[416px] justify-between" onSubmit={handleSubmit(onSubmit)}>
-        <div className="mt-10 grid gap-x-6 gap-y-4">
-          <div className="grid grid-cols-12 gap-x-6">
-            <label className="lg:col-span-2 col-span-full lg:text-right text-left font-acumin text-lg font-normal leading-tight text-black">
-              Type of data
-            </label>
-            <select
-              {...register("type")}
-              className="relative lg:col-span-10 col-span-full block w-full rounded-md border-0 px-5 py-2 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
+export default function SourceForm({ onNext }: { onNext: () => void }) {
+    const formObj = useFormContext<LayerFormType>()
+    const [columnsFetchEnabled, setColumnsFetchEnabled] = useState(false)
+    const {
+        register,
+        watch,
+        handleSubmit,
+        control,
+        formState: { errors },
+    } = formObj
+    const onSubmit = () => {
+        console.log('Submitting')
+        onNext()
+    }
+    const { append } = useFieldArray({
+        control,
+        name: 'interactionConfig.output',
+    })
+    const columns = useColumns(
+        watch('source.provider.type.value'),
+        watch('connectorUrl') as string,
+        columnsFetchEnabled,
+        (data) => {
+            if (data && watch('interactionConfig.output').length === 0) {
+                data.forEach((col) => {
+                    append({
+                        column: col,
+                        format: '',
+                        prefix: '',
+                        property: col,
+                        suffix: '',
+                        enabled: false,
+                        type: 'string',
+                    })
+                })
+            }
+        }
+    )
+    return (
+        <>
+            <form
+                id="layerForm"
+                className="flex flex-col px-4 min-h-[416px] justify-between"
+                onSubmit={handleSubmit(onSubmit)}
             >
-              <option value="raster">Raster</option>
-              <option value="vector">Vector</option>
-            </select>
-          </div>
-          <div className="grid grid-cols-12 gap-x-6">
-            <label className="lg:col-span-2 col-span-full lg:text-right text-left font-acumin text-lg font-normal leading-tight text-black">
-              Tiles of your data
-            </label>
-            <input
-              type="text"
-              defaultValue="https://tiles.globalforestwatch.org/umd_tree_cover_loss/v1.10/tcd_30/{z}/{x}/{y}.png"
-              {...register("tiles")}
-              className="shadow-wri-small lg:col-span-10 col-span-full block w-full rounded-md border-0 px-5 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
-            />
-            <p>{errors.tiles?.message}</p>
-          </div>
-          <div className="relative grid grid-cols-12 gap-x-6">
-            <label className="lg:col-span-2 col-span-full lg:text-right text-left font-acumin text-lg font-normal leading-tight text-black">
-              Min zoom
-            </label>
-            <input
-              type="number"
-              {...register("minzoom", { valueAsNumber: true })}
-              defaultValue={1}
-              className="shadow-wri-small lg:col-span-10 col-span-full block w-full rounded-md border-0 px-5 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
-            />
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <ExclamationCircleIcon
-                className="h-5 w-5 text-neutral-500"
-                aria-hidden="true"
-              />
-            </div>
-            <p className="text-red-600">{errors.minzoom?.message}</p>
-            <p className="text-red-600">{errors.zoom?.message}</p>
-          </div>
-          <div className="relative grid grid-cols-12 gap-x-6">
-            <label className="lg:col-span-2 col-span-full lg:text-right text-left font-acumin text-lg font-normal leading-tight text-black">
-              Max zoom
-            </label>
-            <input
-              type="number"
-              defaultValue={20}
-              {...register("maxzoom", { valueAsNumber: true })}
-              className="shadow-wri-small lg:col-span-10 col-span-full block w-full rounded-md border-0 px-5 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
-            />
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <ExclamationCircleIcon
-                className="h-5 w-5 text-neutral-500"
-                aria-hidden="true"
-              />
-            </div>
-            <p className="text-red-600">{errors.maxzoom?.message}</p>
-            <p className="text-red-600">{errors.zoom?.message}</p>
-          </div>
-        </div>
-          <Button type="submit" className="mt-4 ml-auto w-fit">
-            Next: Legend
-          </Button>
-      </form>
-    </>
-  );
+                <div className="mt-10 grid gap-x-6 gap-y-4 max-h-[375px] overflow-auto">
+                    <InputGroup
+                        label="Name of Layer"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input {...register('name')} type="text" />
+                    </InputGroup>
+                    <InputGroup
+                        label="Slug of layer"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input {...register('slug')} type="text" />
+                    </InputGroup>
+                    <InputGroup
+                        label="Description of Layer"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input {...register('description')} type="text" />
+                    </InputGroup>
+                    <div className="relative flex justify-start">
+                        <div className="flex h-6 items-center">
+                            <input
+                                id="featured_dataset"
+                                aria-describedby="comments-description"
+                                {...register(`default`)}
+                                type="checkbox"
+                                className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
+                            />
+                        </div>
+                        <div className="ml-3 text-sm leading-6">
+                            <label className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800">
+                                Default Layer
+                            </label>
+                        </div>
+                    </div>
+                    <InputGroup
+                        label="Layer Type"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <SimpleSelect
+                            id="layer_type"
+                            formObj={formObj}
+                            maxWidth=""
+                            name="type"
+                            placeholder="Select layer type"
+                            options={layerTypeOptions}
+                        />
+                    </InputGroup>
+                    <InputGroup
+                        label="Provider"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <SimpleSelect
+                            maxWidth=""
+                            id="provider"
+                            formObj={formObj}
+                            name="source.provider.type"
+                            placeholder="Select a provider"
+                            options={providerOptions}
+                        />
+                    </InputGroup>
+                    {watch('type')?.value === 'raster' &&
+                        watch('source.provider.type')?.value === 'wms' && (
+                            <InputGroup
+                                label="Tiles of your data"
+                                className="sm:grid-cols-1 gap-x-2"
+                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                            >
+                                <Input
+                                    {...register('source.tiles')}
+                                    type="text"
+                                />
+                                <ErrorDisplay errors={errors} name="tiles" />
+                            </InputGroup>
+                        )}
+                    {watch('source.provider.type')?.value === 'gee' && (
+                        <InputGroup
+                            label="Layer ID"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                        >
+                            <Input {...register('id')} type="text" />
+                            <ErrorDisplay errors={errors} name="id" />
+                        </InputGroup>
+                    )}
+                    {watch('source.provider.type')?.value === 'carto' && (
+                        <>
+                            <InputGroup
+                                label="Account"
+                                className="sm:grid-cols-1 gap-x-2"
+                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                            >
+                                <Input
+                                    {...register('source.provider.account')}
+                                    type="text"
+                                    defaultValue="wri-rw"
+                                />
+                                {/* TODO Parse SQL and show errors*/}
+                                <ErrorDisplay
+                                    errors={errors}
+                                    name="provider.account"
+                                />
+                            </InputGroup>
+                            <InputGroup
+                                label="SQL Query"
+                                className="sm:grid-cols-1 gap-x-2"
+                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                            >
+                                <TextArea
+                                    {...register(
+                                        'source.provider.layers.0.options.sql'
+                                    )}
+                                    type="text"
+                                    defaultValue=""
+                                />
+                                {/* TODO Parse SQL and show errors*/}
+                                <ErrorDisplay
+                                    errors={errors}
+                                    name="provider.options.sql"
+                                />
+                            </InputGroup>
+                            <InputGroup
+                                label="Columns URL"
+                                className="sm:grid-cols-1 gap-x-2"
+                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                            >
+                                <div className="flex gap-x-2 items-center">
+                                    <Input
+                                        {...register('connectorUrl')}
+                                        type="text"
+                                        defaultValue="https://wri-rw.carto.com:443/api/v2/sql?q="
+                                        icon={
+                                            <DefaultTooltip content="URL to get fetch columns from, this allows the form to autofill the interaction and some of the render sections with predefined values from the SQL Table">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
+                                    />
+                                    <DefaultTooltip content="Try to fetch columns (this will clear the interaction config)">
+                                        <Button
+                                            onClick={() => {
+                                                formObj.setValue(
+                                                    'interactionConfig.output',
+                                                    []
+                                                )
+                                                columns.refetch()
+                                            }}
+                                            className="px-2"
+                                            type="button"
+                                        >
+                                            <ArrowPathIcon
+                                                className={classNames(
+                                                    'h-4 w-4 text-white',
+                                                    columns.isLoading
+                                                        ? 'animate-spin'
+                                                        : ''
+                                                )}
+                                            />
+                                        </Button>
+                                    </DefaultTooltip>
+                                </div>
+                            </InputGroup>
+                        </>
+                    )}
+                    <InputGroup
+                        label="Min Zoom"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input
+                            {...register('source.minzoom', {
+                                setValueAs: (v) =>
+                                    v === '' ? undefined : parseInt(v),
+                            })}
+                            icon={
+                                <DefaultTooltip content="Min zoom in which content will appera">
+                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                </DefaultTooltip>
+                            }
+                            type="text"
+                        />
+                        <ErrorDisplay errors={errors} name="zoom" />
+                    </InputGroup>
+                    <InputGroup
+                        label="Max Zoom"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input
+                            {...register('source.maxzoom', {
+                                setValueAs: (v) =>
+                                    v === '' ? undefined : parseInt(v),
+                            })}
+                            icon={
+                                <DefaultTooltip content="Max zoom in which content will appera">
+                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                </DefaultTooltip>
+                            }
+                            type="text"
+                        />
+                        <ErrorDisplay errors={errors} name="zoom" />
+                    </InputGroup>
+                </div>
+                <Button
+                    form="layerForm"
+                    type="submit"
+                    className="mt-4 ml-auto w-fit"
+                >
+                    {formObj.watch('source.provider.type').value === 'carto'
+                        ? 'Next: Render'
+                        : 'Next: Legend'}
+                </Button>
+            </form>
+        </>
+    )
 }
