@@ -50,7 +50,7 @@ export default function InteractionForm({
                         onClick={() => onNext()}
                         className="w-fit"
                     >
-                        Save layer
+                        Save changes
                     </Button>
                 </div>
             </form>

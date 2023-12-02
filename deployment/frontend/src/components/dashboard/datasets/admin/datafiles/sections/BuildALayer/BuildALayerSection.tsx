@@ -7,12 +7,7 @@ import InteractionForm from './forms/InteractionForm'
 import RenderForm from './forms/RenderForm'
 import { useEffect, useState, useRef } from 'react'
 import ReactMapGL, { MapRef } from 'react-map-gl'
-import {
-    FormProvider,
-    UseFormReturn,
-    useForm,
-    useFormContext,
-} from 'react-hook-form'
+import { FormProvider, UseFormReturn, useForm } from 'react-hook-form'
 import { DatasetFormType } from '@/schema/dataset.schema'
 import { LayerFormType, layerSchema } from './layer.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -24,7 +19,7 @@ import { Steps } from './Steps'
 import { getInteractiveLayers } from '@/utils/queryHooks'
 import Tooltip from './preview/Tooltip'
 import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
-import { watchFile } from 'fs'
+import { APILayerSpec } from '@/interfaces/layer.interface'
 
 export function BuildALayer({
     formObj,
@@ -34,7 +29,15 @@ export function BuildALayer({
     index: number
 }) {
     const [current, send] = useMachine(layerEditorMachine)
-    const [preview, setPreview] = useState<LayerFormType | null>(null)
+    const [preview, setPreview] = useState<APILayerSpec | null>(
+        formObj.getValues(`resources.${index}.layerObj`)
+            ? convertFormToLayerObj(
+                  layerSchema.parse(
+                      formObj.getValues(`resources.${index}.layerObj`)
+                  )
+              )
+            : null
+    )
     const layerFormObj = useForm<LayerFormType>({
         resolver: zodResolver(layerSchema),
         defaultValues: {
@@ -48,19 +51,26 @@ export function BuildALayer({
                     },
                 },
             },
+            ...formObj.getValues(`resources.${index}.layerObj`),
         },
     })
 
+    const syncValues = () => {
+        const values = layerFormObj.getValues()
+        formObj.setValue(`resources.${index}.layerObj`, values)
+    }
+
     const updatePreview = () => {
+        syncValues()
         setPreview(
-            convertFormToLayerObj(layerSchema.parse(layerFormObj.watch()))
+            convertFormToLayerObj(layerSchema.parse(layerFormObj.getValues()))
         )
     }
 
     const {
         watch,
         setValue,
-        formState: { dirtyFields, errors },
+        formState: { dirtyFields },
     } = layerFormObj
     useEffect(() => {
         if (!dirtyFields['connectorUrl'])
@@ -85,6 +95,7 @@ export function BuildALayer({
                     {current.matches('setSourceConfig') && (
                         <SourceForm
                             onNext={() => {
+                                syncValues()
                                 layerFormObj.watch('source.provider.type')
                                     .value === 'carto'
                                     ? send('GO_TO_RENDER')
@@ -95,9 +106,11 @@ export function BuildALayer({
                     {current.matches('setRenderConfig') && (
                         <RenderForm
                             onPrev={() => {
+                                syncValues()
                                 send('BACK_TO_SOURCE')
                             }}
                             onNext={() => {
+                                syncValues()
                                 send('GO_TO_LEGEND')
                             }}
                         />
@@ -105,9 +118,11 @@ export function BuildALayer({
                     {current.matches('setLegendConfig') && (
                         <LegendForm
                             onNext={() => {
+                                syncValues()
                                 send('NEXT')
                             }}
                             onPrev={() => {
+                                syncValues()
                                 layerFormObj.watch('source.provider.type')
                                     .value === 'carto'
                                     ? send('BACK_TO_RENDER')
@@ -118,16 +133,18 @@ export function BuildALayer({
                     {current.matches('setInteractionConfig') && (
                         <InteractionForm
                             onPrev={() => {
+                                syncValues()
                                 send('PREV')
                             }}
                             onNext={() => {
+                                syncValues()
                                 send('NEXT')
                             }}
                         />
                     )}
                 </div>
                 <div className="pt-4">
-                    <Map
+                    <PreviewMap
                         layerFormObj={preview ?? null}
                         updatePreview={updatePreview}
                     />
@@ -136,12 +153,13 @@ export function BuildALayer({
         </FormProvider>
     )
 }
-function Map({
+
+export function PreviewMap({
     layerFormObj,
     updatePreview,
 }: {
-    layerFormObj: LayerFormType | null
-    updatePreview: () => void
+    layerFormObj: APILayerSpec | null
+    updatePreview?: () => void
 }) {
     const [viewState, setViewState] = useState({
         longitude: -100,
@@ -185,7 +203,7 @@ function Map({
             console.log('FOUND INTERACTION CONFIG', interactionConfig)
             const layerInfo = {
                 id: layer.id,
-                name: 'sample-name',
+                name: layer.name ?? 'sample-name',
             }
 
             if (feature && interactionConfig?.output) {
@@ -210,13 +228,15 @@ function Map({
 
     return (
         <div className="relative">
-            <Button
-                className="z-10 absolute top-0 right-0"
-                type="button"
-                onClick={updatePreview}
-            >
-                Update Preview
-            </Button>
+            {updatePreview && (
+                <Button
+                    className="z-10 absolute top-0 right-0"
+                    type="button"
+                    onClick={updatePreview}
+                >
+                    Update Preview
+                </Button>
+            )}
             <ReactMapGL
                 {...viewState}
                 ref={(_map) => {

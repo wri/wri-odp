@@ -1,3 +1,4 @@
+import { layerSchema } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/layer.schema'
 import z from 'zod'
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined)
@@ -48,10 +49,11 @@ export const ResourceSchema = z.object({
     key: z.string().optional(),
     format: z.string().optional().nullable(),
     size: z.number().optional().nullable(),
-    title: z.string().min(1, { message: 'Title is required' }),
+    title: z.string().optional(),
     fileBlob: z.any(),
     type: z.enum(['link', 'upload', 'layer', 'empty']),
     schema: DataDictionarySchema.optional().nullable(),
+    layerObj: layerSchema.optional().nullable(),
 })
 
 export const DatasetSchema = z
@@ -60,6 +62,10 @@ export const DatasetSchema = z
         title: z.string().min(1, { message: 'Title is required' }),
         name: z.string().min(1, { message: 'Name is required' }),
         url: z.string().optional().nullable().or(emptyStringToUndefined),
+        connectorUrl: z.string().optional().nullable().default(''),
+        connectorType: z.string().optional().nullable().default('rest'),
+        tableName: z.string().optional().nullable().default(''),
+        provider: z.string().optional().nullable().default('cartodb'),
         language: z
             .object({
                 value: z.string(),

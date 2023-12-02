@@ -73,9 +73,9 @@ function ItemsArray({
     })
     return (
     <>
-        <div className="flex flex-col gap-y-4 max-h-[315px] overflow-auto">
+        <div className="flex flex-col gap-y-4 max-h-[315px] overflow-y-auto">
             {fields.map((field, index) => (
-                <div className="grid grid-cols-12 items-center gap-x-2 lg:gap-x-6">
+                <div className="grid grid-cols-12 items-center justify-start gap-x-2">
                     <label className="lg:col-span-2 col-span-full lg:text-right text-left font-acumin text-lg font-normal leading-tight text-black">
                         Item {index + 1}
                     </label>

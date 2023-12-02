@@ -1,8 +1,6 @@
 import { Popup } from 'react-map-gl'
 
 export function Tooltip({ layersInfo, coordinates, close }: any) {
-    console.log('LAYERS INFO', layersInfo)
-    console.log('COORDINATES', coordinates)
     if (layersInfo.length === 0) return <></>
     if (!coordinates) return <></>
     return (
@@ -13,8 +11,7 @@ export function Tooltip({ layersInfo, coordinates, close }: any) {
             onClose={() => close()}
             maxWidth={'250px'}
         >
-            TEST
-            {/*layersInfo.map((info: any, i: number) => {
+            {layersInfo.map((info: any, i: number) => {
                 return (
                     <div key={`tooltip-layer-${i}`} className="mb-5">
                         <h1 className="font-semibold line-clamp-1 text-lg">
@@ -43,7 +40,7 @@ export function Tooltip({ layersInfo, coordinates, close }: any) {
                         </div>
                     </div>
                 )
-            })} */}
+            })}
         </Popup>
     )
 }

@@ -3,8 +3,22 @@ import { ColorPatternType, LayerFormType, layerSchema } from './layer.schema'
 import { v4 as uuidv4 } from 'uuid'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 
-export function convertFormToLayerObj(formData: LayerFormType) {
+export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
     return {
+        ...formData,
+        type: formData.type.value,
+        dataset: '',
+        userId: '',
+        applicationConfig: {},
+        staticImageConfig: {},
+        published: false,
+        default: false,
+        env: 'staging',
+        thumbnailUrl: '',
+        protected: false,
+        iso: [],
+        provider: formData.source?.provider.type.value ?? '',
+        application: ['rw'],
         id: formData.id ?? uuidv4(),
         interactionConfig: formData.interactionConfig
             ? {
@@ -18,47 +32,74 @@ export function convertFormToLayerObj(formData: LayerFormType) {
             formData.legendConfig.items &&
             formData.legendConfig.items.length > 0
                 ? formData.legendConfig
-                : null,
+                : {},
         layerConfig: {
             type: formData.type.value,
-            render: {
-                layers: formData.render?.layers.map((layer) => ({
-                    type: layer.type.value,
-                    'source-layer': layer['source-layer'],
-                    paint:
-                        layer.paint &&
-                        removeKeysWithUndefined({
-                            'circle-opacity':
-                                layer.paint['circle-opacity'] ?? undefined,
-                            'circle-radius':
-                                layer.paint['circle-radius'] ?? undefined,
-                            'line-width':
-                                layer.paint?.['line-width'] ?? undefined,
-                            'line-opacity':
-                                layer.paint['line-opacity'] ?? undefined,
-                            'fill-opacity':
-                                layer.paint['fill-opacity'] ?? undefined,
-                            'circle-color': matchColorPattern(
-                                layer.paint['circle-color']
-                            ),
-                            'fill-color': matchColorPattern(
-                                layer.paint['fill-color']
-                            ),
-                            'line-color': matchColorPattern(
-                                layer.paint['line-color']
-                            ),
-                        }),
-                    filter: layer.filter.map((filter) =>
-                        filter === 'all'
-                            ? filter
-                            : [
-                                  filter.operation?.value ?? '==',
-                                  filter.column,
-                                  filter.value,
-                              ]
-                    ),
-                })),
-            },
+            render:
+                formData.source?.provider.type.value === 'carto'
+                    ? {
+                          layers: formData.render?.layers.map((layer) => ({
+                              type: layer.type.value,
+                              'source-layer': layer['source-layer'],
+                              paint:
+                                  layer.paint &&
+                                  removeKeysWithUndefined({
+                                      'circle-opacity':
+                                          layer.type.value === 'circle'
+                                              ? layer.paint['circle-opacity'] ??
+                                                undefined
+                                              : undefined,
+                                      'circle-radius':
+                                          layer.type.value === 'circle'
+                                              ? layer.paint['circle-radius'] ??
+                                                undefined
+                                              : undefined,
+                                      'circle-color': matchColorPattern(
+                                          layer.type.value === 'circle'
+                                              ? layer.paint['circle-color'] ??
+                                                    undefined
+                                              : undefined
+                                      ),
+                                      'line-width':
+                                          layer.type.value === 'line'
+                                              ? layer.paint['line-width'] ??
+                                                undefined
+                                              : undefined,
+                                      'line-opacity':
+                                          layer.type.value === 'line'
+                                              ? layer.paint['line-opacity'] ??
+                                                undefined
+                                              : undefined,
+                                      'line-color': matchColorPattern(
+                                          layer.type.value === 'line'
+                                              ? layer.paint['line-color'] ??
+                                                    undefined
+                                              : undefined
+                                      ),
+                                      'fill-opacity':
+                                          layer.type.value === 'fill'
+                                              ? layer.paint['fill-opacity'] ??
+                                                undefined
+                                              : undefined,
+                                      'fill-color': matchColorPattern(
+                                          layer.type.value === 'fill'
+                                              ? layer.paint['fill-color'] ??
+                                                    undefined
+                                              : undefined
+                                      ),
+                                  }),
+                              filter: layer.filter.map((filter) =>
+                                  typeof filter === 'string'
+                                      ? filter
+                                      : [
+                                            filter.operation?.value ?? '==',
+                                            filter.column?.value ?? '',
+                                            filter.value,
+                                        ]
+                              ),
+                          })),
+                      }
+                    : {},
             source: removeKeysWithUndefined({
                 type: formData.type.value,
                 ...formData.source,

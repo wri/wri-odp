@@ -372,7 +372,7 @@ function AddDataFile({
                                 />
                             </Tab.Panel>
                             <Tab.Panel>
-                                <BuildALayer />
+                                <BuildALayer formObj={formObj} index={index} />
                             </Tab.Panel>
                         </Tab.Panels>
                     </Tab.Group>

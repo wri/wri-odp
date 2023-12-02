@@ -326,6 +326,7 @@ export function AddDataFile({
                                                 title: '',
                                                 type: 'empty',
                                                 schema: [],
+                                                layerObj: null,
                                             })
                                         }
                                     />

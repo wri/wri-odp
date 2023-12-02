@@ -69,7 +69,13 @@ const filterExpression = z.object({
         })
         .optional()
         .nullable(),
-    column: z.string().optional().nullable(),
+    column: z
+        .object({
+            value: z.string(),
+            label: z.string(),
+        })
+        .optional()
+        .nullable(),
     value: z.coerce.number().optional().nullable(),
 })
 
@@ -182,7 +188,7 @@ const renderSchema = z.object({
                 })
                 .optional()
                 .nullable(),
-            filter: z.array(z.literal('all').or(filterExpression)),
+            filter: z.array(z.union([z.string(), filterExpression])),
         })
     ),
 })
@@ -209,7 +215,7 @@ const interactionConfigSchema = z.object({
             property: z.string().optional().nullable(),
             suffix: z.string().optional().nullable(),
             type: z.string().optional().nullable(),
-            enabled: z.boolean().default(false)
+            enabled: z.boolean().default(false),
         })
     ),
 })
@@ -217,17 +223,16 @@ const interactionConfigSchema = z.object({
 export const layerSchema = z
     .object({
         id: z.string().uuid().optional().nullable().or(emptyStringToUndefined),
+        name: z.string().default(''),
+        slug: z.string().default(''),
+        default: z.boolean().default(false),
+        description: z.string().default(''),
         account: z.string().optional().nullable().or(emptyStringToUndefined),
         type: z.object({
             value: z.enum(['raster', 'vector']),
             label: z.string(),
         }),
-        connectorUrl: z
-            .string()
-            .url()
-            .optional()
-            .nullable()
-            .default('https://wri-rw.carto.com:443/api/v2/sql?q='),
+        connectorUrl: z.string().url().optional().nullable(),
         legendConfig: legendsSchema.optional().nullable(),
         source: sourceSchema.optional().nullable(),
         render: renderSchema.optional().nullable(),

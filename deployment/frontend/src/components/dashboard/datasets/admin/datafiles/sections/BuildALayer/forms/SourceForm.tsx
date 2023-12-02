@@ -65,6 +65,43 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
             >
                 <div className="mt-10 grid gap-x-6 gap-y-4 max-h-[375px] overflow-auto">
                     <InputGroup
+                        label="Name of Layer"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input {...register('name')} type="text" />
+                    </InputGroup>
+                    <InputGroup
+                        label="Slug of layer"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input {...register('slug')} type="text" />
+                    </InputGroup>
+                    <InputGroup
+                        label="Description of Layer"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input {...register('description')} type="text" />
+                    </InputGroup>
+                    <div className="relative flex justify-start">
+                        <div className="flex h-6 items-center">
+                            <input
+                                id="featured_dataset"
+                                aria-describedby="comments-description"
+                                {...register(`default`)}
+                                type="checkbox"
+                                className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
+                            />
+                        </div>
+                        <div className="ml-3 text-sm leading-6">
+                            <label className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800">
+                                Default Layer
+                            </label>
+                        </div>
+                    </div>
+                    <InputGroup
                         label="Layer Type"
                         className="sm:grid-cols-1 gap-x-2"
                         labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
@@ -168,9 +205,15 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                                             </DefaultTooltip>
                                         }
                                     />
-                                    <DefaultTooltip content="Try to fetch columns">
+                                    <DefaultTooltip content="Try to fetch columns (this will clear the interaction config)">
                                         <Button
-                                            onClick={() => columns.refetch()}
+                                            onClick={() => {
+                                                formObj.setValue(
+                                                    'interactionConfig.output',
+                                                    []
+                                                )
+                                                columns.refetch()
+                                            }}
                                             className="px-2"
                                             type="button"
                                         >

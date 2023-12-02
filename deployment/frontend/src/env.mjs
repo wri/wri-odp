@@ -22,6 +22,7 @@ export const env = createEnv({
             process.env.VERCEL ? z.string() : z.string().url()
         ),
         CKAN_URL: z.string(),
+        RW_API_KEY: z.string(),
         S3_BUCKET_NAME: z.string(),
         S3_BUCKET_REGION: z.string(),
         S3_ACCESS_KEY_ID: z.string(),
@@ -45,6 +46,7 @@ export const env = createEnv({
      * middlewares) or client-side so we need to destruct manually.
      */
     runtimeEnv: {
+        RW_API_KEY: process.env.RW_API_KEY,
         NODE_ENV: process.env.NODE_ENV,
         NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
         NEXTAUTH_URL: process.env.NEXTAUTH_URL,

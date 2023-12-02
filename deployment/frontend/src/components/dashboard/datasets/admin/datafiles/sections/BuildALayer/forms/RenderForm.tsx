@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import { Button } from '@/components/_shared/Button'
 import { InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
@@ -41,6 +41,7 @@ export default function RenderForm({ onPrev, onNext }: InteractionFormProps) {
     const onSubmit = () => {
         onNext()
     }
+
     return (
         <>
             <form
@@ -100,10 +101,13 @@ function ItemsArray() {
                             `render.layers.${index}.paint.circle-radius`,
                             {
                                 valueAsNumber: true,
-                                setValueAs: (v) =>
-                                    v === '' ? undefined : parseFloat(v),
+                                setValueAs: (v) => {
+                                    console.log('V', v)
+                                    return v === '' ? undefined : parseFloat(v)
+                                },
                             }
                         )}
+                        defaultValue={1}
                         type="number"
                     />
                 </InputGroup>
@@ -312,7 +316,7 @@ function FilterExpressions({ layerIdx }: { layerIdx: number }) {
                 onClick={() =>
                     append({
                         operation: { value: '==', label: 'Equals to' },
-                        column: '',
+                        column: { value: '', label: ''},
                         value: null,
                     })
                 }
