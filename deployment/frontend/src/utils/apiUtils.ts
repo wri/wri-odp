@@ -15,6 +15,7 @@ import type { SearchInput } from '@/schema/search.schema'
 import { Facets } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
+import {Resource} from '@/interfaces/dataset.interface'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -284,7 +285,7 @@ export async function getAllDatasetFq({
     facetFields = [],
     sortBy = '',
     extLocationQ = '',
-    extAddressQ = ''
+    extAddressQ = '',
 }: {
     apiKey: string
     fq: string
@@ -308,7 +309,6 @@ export async function getAllDatasetFq({
         if (sortBy) {
             url += `&sort=${sortBy}`
         }
-
 
         if (extLocationQ) {
             url += `&ext_location_q=${extLocationQ}`
@@ -338,7 +338,7 @@ export async function getAllDatasetFq({
         }
 
         const datasets = data.success === true ? data.result.results : []
-        
+
         const count = data.success === true ? data.result.count : 0
         const searchFacets =
             data.success === true ? data.result?.search_facets : {}
@@ -449,32 +449,26 @@ export function activityDetails(activity: Activity): ActivityDisplay {
     }
     if (object === 'package') {
         title = activity.data?.package?.title ?? ''
-    }
-    else if (object === 'user') {
+    } else if (object === 'user') {
         if (action === 'new') {
             title = 'signed up'
-        }
-        else if (action === 'changed') {
+        } else if (action === 'changed') {
             title = 'updated their profile'
-        }
-        else {
+        } else {
             title = 'deleted their profile'
         }
-    }
-    else {
+    } else {
         title = activity.data?.group?.title ?? ''
         object = GroupObject[object]!
     }
     let description = `${activitProperties[action]} the ${object} ${title}`
-    if (object === 'user')
-        description = title
+    if (object === 'user') description = title
     const time = timeAgo(activity.timestamp)
 
-    let orgId = '';
+    let orgId = ''
     if (object === 'package') {
         orgId = activity.data?.package?.owner_org as string
-    }
-    else if (object === 'team') {
+    } else if (object === 'team') {
         orgId = activity.object_id as string
     }
     return {
@@ -484,7 +478,7 @@ export function activityDetails(activity: Activity): ActivityDisplay {
         action,
         timestamp: activity.timestamp,
         actionType: actionType,
-        orgId: orgId ? orgId : undefined
+        orgId: orgId ? orgId : undefined,
     }
 }
 
@@ -512,12 +506,21 @@ export async function getOneDataset(
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
-        spatial: dataset.result.spatial ? JSON.parse(dataset.result.spatial) : null,
+        spatial: dataset.result.spatial
+            ? JSON.parse(dataset.result.spatial)
+            : null,
+        resources: dataset.result.resources.map((r) => ({
+            ...r,
+            _extra: {
+                is_layer: r.url?.startsWith('https://api.resourcewatch'),
+                rw_layer_id: r.url ? r.url.split('/').at(-1) : null,
+            },
+        } as Resource)),
     }
 }
 
 export async function upsertCollaborator(
-    _collaborator: { package_id: string, user_id: string, capacity: string },
+    _collaborator: { package_id: string; user_id: string; capacity: string },
     session: Session
 ) {
     const user = session.user
@@ -535,7 +538,8 @@ export async function upsertCollaborator(
             }),
         }
     )
-    const collaborator: CkanResponse<Collaborator> = await collaboratorRes.json()
+    const collaborator: CkanResponse<Collaborator> =
+        await collaboratorRes.json()
     if (!collaborator.success && collaborator.error) {
         if (collaborator.error.message) throw Error(collaborator.error.message)
         throw Error(JSON.stringify(collaborator.error))
@@ -564,137 +568,155 @@ export function timeAgo(timestamp: string): string {
     }
 }
 
-export function findNameInTree(tree: GroupTree, targetName: string): GroupTree | null {
+export function findNameInTree(
+    tree: GroupTree,
+    targetName: string
+): GroupTree | null {
     // Base case: if the current node's name matches the target, return the node
     if (tree.name === targetName) {
-        return tree;
+        return tree
     }
 
     // Recursive case: search through children
     if (tree.children && tree.children.length > 0) {
         for (const child of tree.children) {
-            const result = findNameInTree(child, targetName);
+            const result = findNameInTree(child, targetName)
             if (result) {
-                return result; // If found in child, return the result
+                return result // If found in child, return the result
             }
         }
     }
     // If not found in the current node or its children, return null
-    return null;
+    return null
 }
 
-export function findAllNameInTree(tree: GroupTree, targetName: string): GroupTree[] {
-    const result: GroupTree[] = [];
+export function findAllNameInTree(
+    tree: GroupTree,
+    targetName: string
+): GroupTree[] {
+    const result: GroupTree[] = []
 
     // Check if the targetName is a substring of the current node's name
-    if (tree.name.toLowerCase().includes(targetName) || tree.title?.toLowerCase().includes(targetName)) {
-        result.push(tree);
+    if (
+        tree.name.toLowerCase().includes(targetName) ||
+        tree.title?.toLowerCase().includes(targetName)
+    ) {
+        result.push(tree)
     }
 
     // Recursive case: search through children
     if (tree.children && tree.children.length > 0) {
         for (const child of tree.children) {
-            const childResults = findAllNameInTree(child, targetName);
-            result.push(...childResults); // Add child results to the overall result
+            const childResults = findAllNameInTree(child, targetName)
+            result.push(...childResults) // Add child results to the overall result
         }
     }
 
-    return result;
+    return result
 }
 export async function getOrganizationTreeDetails({
     input,
     session,
 }: {
-        input: SearchInput,
-        session: Session | null,
-    }) {
-    
+    input: SearchInput
+    session: Session | null
+}) {
     let groupTree: GroupTree[] = []
-            const allGroups = (await getAllOrganizations({ apiKey: session?.user.apikey ?? "" }))!
-            
+    const allGroups = (await getAllOrganizations({
+        apiKey: session?.user.apikey ?? '',
+    }))!
 
-            const teamDetails = allGroups.reduce((acc, org) => {
-                acc[org.id] = {
-                    img_url: org.image_display_url ?? "",
-                    description: org.description ?? "",
-                    package_count: org.package_count,
-                }
-                return acc
+    const teamDetails = allGroups.reduce(
+        (acc, org) => {
+            acc[org.id] = {
+                img_url: org.image_display_url ?? '',
+                description: org.description ?? '',
+                package_count: org.package_count,
             }
-                , {} as Record<string, GroupsmDetails>)
-            
-            
-            if (input.search) {
-                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: session?.user.apikey ?? "", q: input.search, group_type: "organization" })
-                if (input.tree) {
-                    let groupFetchTree = groupTree[0] as GroupTree
-                    const findTree = findNameInTree(groupFetchTree, input.search)
-                    if (findTree) {
-                        groupFetchTree = findTree
-                    }
-                    groupTree = [groupFetchTree]
-                }
-                
-            }
-            else {
-                
-                groupTree = await getGroups({
-                    apiKey: session?.user.apikey ?? "",
-                    group_type: "organization"
-                })
-                
-            }
+            return acc
+        },
+        {} as Record<string, GroupsmDetails>
+    )
 
-            const result = groupTree
-            return {
-                teams: result,
-                teamsDetails: teamDetails,
-                count: result.length,
+    if (input.search) {
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
+            apiKey: session?.user.apikey ?? '',
+            q: input.search,
+            group_type: 'organization',
+        })
+        if (input.tree) {
+            let groupFetchTree = groupTree[0] as GroupTree
+            const findTree = findNameInTree(groupFetchTree, input.search)
+            if (findTree) {
+                groupFetchTree = findTree
             }
+            groupTree = [groupFetchTree]
+        }
+    } else {
+        groupTree = await getGroups({
+            apiKey: session?.user.apikey ?? '',
+            group_type: 'organization',
+        })
+    }
+
+    const result = groupTree
+    return {
+        teams: result,
+        teamsDetails: teamDetails,
+        count: result.length,
+    }
 }
 
 export async function getTopicTreeDetails({
     input,
     session,
 }: {
-        input: SearchInput,
-        session: Session | null,
-    }) {
-     let groupTree: GroupTree[] = []
-            const allGroups = (await getUserGroups({ apiKey: session?.user.apikey ?? "", userId: "" }))!
-            const topicDetails = allGroups.reduce((acc, org) => {
-                acc[org.id] = {
-                    img_url: org.image_display_url,
-                    description: org.description,
-                    package_count: org.package_count,
-                }
-                return acc
+    input: SearchInput
+    session: Session | null
+}) {
+    let groupTree: GroupTree[] = []
+    const allGroups = (await getUserGroups({
+        apiKey: session?.user.apikey ?? '',
+        userId: '',
+    }))!
+    const topicDetails = allGroups.reduce(
+        (acc, org) => {
+            acc[org.id] = {
+                img_url: org.image_display_url,
+                description: org.description,
+                package_count: org.package_count,
             }
-                , {} as Record<string, GroupsmDetails>)
-            if (input.search) {
-                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: session?.user.apikey ?? "", q: input.search, group_type: 'group' })
-                if (input.tree) {
-                    let groupFetchTree = groupTree[0] as GroupTree
-                    const findTree = findNameInTree(groupFetchTree, input.search)
-                    if (findTree) {
-                        groupFetchTree = findTree
-                    }
-                    groupTree = [groupFetchTree]
-                }
-                
+            return acc
+        },
+        {} as Record<string, GroupsmDetails>
+    )
+    if (input.search) {
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
+            apiKey: session?.user.apikey ?? '',
+            q: input.search,
+            group_type: 'group',
+        })
+        if (input.tree) {
+            let groupFetchTree = groupTree[0] as GroupTree
+            const findTree = findNameInTree(groupFetchTree, input.search)
+            if (findTree) {
+                groupFetchTree = findTree
             }
-            else {
-                
-                groupTree = await getGroups({
-                    apiKey: session?.user.apikey ?? "",
-                })
-                
-            }
+            groupTree = [groupFetchTree]
+        }
+    } else {
+        groupTree = await getGroups({
+            apiKey: session?.user.apikey ?? '',
+        })
+    }
 
-            const result = groupTree
-            return {
-                topics: result,
-                topicDetails: topicDetails,
-                count: result.length,
-            }
+    const result = groupTree
+    return {
+        topics: result,
+        topicDetails: topicDetails,
+        count: result.length,
+    }
 }
+

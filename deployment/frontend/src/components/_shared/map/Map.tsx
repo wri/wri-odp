@@ -85,7 +85,7 @@ export default function Map({
                             </>
                         )}
 
-                        {isDrawing && <Tooltip ref={mapTooltipRef} />}
+                        {!isDrawing && <Tooltip ref={mapTooltipRef} />}
 
                         {showLegends && <Legends />}
                     </>

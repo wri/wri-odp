@@ -5,11 +5,14 @@ import TabularView from './TabularView'
 import ChartView from './ChartView'
 import { Dispatch, SetStateAction } from 'react'
 import { useRouter } from 'next/router'
+import { WriDataset } from '@/schema/ckan.schema'
 
 export default function Visualizations({
-    setIsAddLayers: setisAddLayers,
+    setIsAddLayers,
+    dataset,
 }: {
     setIsAddLayers: Dispatch<SetStateAction<boolean>>
+    dataset: WriDataset
 }) {
     const router = useRouter()
     const tabs = [
@@ -36,7 +39,7 @@ export default function Visualizations({
                 </Tab.List>
                 <Tab.Panels>
                     <Tab.Panel>
-                        <MapView setIsAddLayers={setisAddLayers} />
+                        <MapView setIsAddLayers={setIsAddLayers} />
                     </Tab.Panel>
                     <Tab.Panel>
                         <TabularView />

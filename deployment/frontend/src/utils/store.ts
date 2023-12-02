@@ -9,7 +9,7 @@ import {
 } from "@/interfaces/state.interface";
 import { useLayoutEffect } from "react";
 import { ViewState } from "react-map-gl";
-import { UseBoundStore, create} from "zustand";
+import create, { UseBoundStore } from "zustand";
 import createContext from "zustand/context";
 import { combine } from "zustand/middleware";
 
@@ -94,6 +94,20 @@ export const initializeStore = (preloadedState = {}) => {
           activeLayerGroups: layerGroups,
         });
       },
+      updateLayerGroup: (datasetId: string, layers: ActiveLayerGroup ) => {
+        const activeLayerGroups = get().activeLayerGroups;
+        
+        const layerGroupIndex = activeLayerGroups.findIndex(lg => lg.datasetId == datasetId);
+        
+        if(layerGroupIndex != -1) {
+          // @ts-ignore
+          activeLayerGroups[layerGroupIndex].layers = layers
+        }
+
+        set({
+          activeLayerGroups: activeLayerGroups,
+        });
+      },
       addLayerGroup: (layerGroup: ActiveLayerGroup) => {
         const activeLayerGroups = get().activeLayerGroups;
         set({
@@ -128,7 +142,7 @@ export const initializeStore = (preloadedState = {}) => {
   );
 };
 
-export const useCreateStore = (serverInitialState: InitialState) => {
+export const useCreateStore = (serverInitialState: Partial<InitialState>) => {
   // For SSR & SSG, always use a new store.
   if (typeof window === "undefined") {
     return () => initializeStore(serverInitialState);

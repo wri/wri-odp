@@ -19,6 +19,8 @@ import { getFormatColor } from '@/utils/formatColors'
 import { Index } from 'flexsearch'
 import { useState } from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
+import { useLayersFromRW } from '@/utils/queryHooks'
+import { useActiveLayerGroups } from '@/utils/storeHooks'
 
 export function DataFiles({
     dataset,
@@ -27,6 +29,8 @@ export function DataFiles({
     dataset: WriDataset
     index: Index
 }) {
+    const { addLayerGroup, removeLayerGroup } = useActiveLayerGroups()
+    const { data: activeLayers } = useLayersFromRW()
     const datafiles = dataset?.resources
     const [q, setQ] = useState('')
     const filteredDatafiles =
@@ -51,12 +55,41 @@ export function DataFiles({
                     {filteredDatafiles?.length ?? 0} Data Files
                 </span>
                 <div className="flex gap-x-4">
-                    <div className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline">
+                    <button
+                        onClick={() => {
+                            dataset.resources.forEach((r) => {
+                                if (
+                                    r._extra?.is_layer &&
+                                    !activeLayers.some(
+                                        (l) => l.id == r?._extra?.rw_layer_id
+                                    )
+                                ) {
+                                    addLayerGroup({
+                                        layers: [r._extra.rw_layer_id],
+                                        datasetId: dataset.id,
+                                    })
+                                }
+                            })
+                        }}
+                        className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                    >
                         Show All Layers
-                    </div>
-                    <div className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline">
+                    </button>
+                    <button
+                        className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                        onClick={() => {
+                            dataset.resources.forEach((r) => {
+                                if (r._extra?.is_layer) {
+                                    removeLayerGroup({
+                                        layers: [r._extra.rw_layer_id],
+                                        datasetId: dataset.id,
+                                    })
+                                }
+                            })
+                        }}
+                    >
                         Hide All
-                    </div>
+                    </button>
                 </div>
             </div>
             <div className="flex flex-col gap-y-4">
@@ -79,6 +112,8 @@ function DatafileCard({
     datafile: Resource
     dataset: WriDataset
 }) {
+    const { data: activeLayers } = useLayersFromRW()
+    const { addLayerGroup, removeLayerGroup } = useActiveLayerGroups()
     const created_at = new Date(datafile?.created ?? '')
     const last_updated = new Date(datafile?.metadata_modified ?? '')
     const options = {
@@ -116,26 +151,59 @@ function DatafileCard({
                             )}
                             <Disclosure.Button>
                                 <h3 className="font-acumin text-lg font-semibold leading-loose text-stone-900">
-                                    {datafile.title ?? datafile.name}
+                                    {datafile.name}
                                 </h3>
                             </Disclosure.Button>
                         </div>
                         <div className="flex gap-x-2">
-                            {/*{datafile.canShow && (
+                            {datafile?._extra?.is_layer && (
                                 <>
-                                    {datafile.showing ? (
-                                        <Button variant="light" size="sm">
+                                    {activeLayers.some(
+                                        (a) => datafile.url?.endsWith(a.id)
+                                    ) ? (
+                                        <Button
+                                            variant="light"
+                                            size="sm"
+                                            onClick={() => {
+                                                if (
+                                                    datafile._extra?.rw_layer_id
+                                                )
+                                                    removeLayerGroup({
+                                                        layers: [
+                                                            datafile?._extra
+                                                                ?.rw_layer_id,
+                                                        ],
+                                                        datasetId: dataset.id,
+                                                    })
+                                            }}
+                                        >
                                             <span className="mt-1">
                                                 Remove Layer
                                             </span>
                                         </Button>
                                     ) : (
-                                        <Button variant="outline" size="sm">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                console.log(activeLayers)
+                                                if (
+                                                    datafile._extra?.rw_layer_id
+                                                )
+                                                    addLayerGroup({
+                                                        layers: [
+                                                            datafile._extra
+                                                                .rw_layer_id,
+                                                        ],
+                                                        datasetId: dataset.id,
+                                                    })
+                                            }}
+                                        >
                                             <span>Show Layer</span>
                                         </Button>
                                     )}
                                 </>
-                            )} */}
+                            )}
                             <Disclosure.Button>
                                 <ChevronDownIcon
                                     className={`${
