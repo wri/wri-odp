@@ -1,11 +1,16 @@
 import { Dataset } from '@/interfaces/dataset.interface'
-import type { Group, Organization, User as CkanUser } from '@portaljs/ckan'
+import type {
+    Group,
+    Organization,
+    User as CkanUser,
+    Resource,
+} from '@portaljs/ckan'
 
 type Only<T, U> = {
     [P in keyof T]: T[P]
 } & {
-        [P in keyof U]?: never
-    }
+    [P in keyof U]?: never
+}
 
 type Either<T, U> = Only<T, U> | Only<U, T>
 
@@ -165,13 +170,13 @@ export interface Comment {
 }
 
 export interface FolloweeList {
-    type: string;
-    display_name: string;
-    dict: WriDataset | WriOrganization | WriUser | Group;
+    type: string
+    display_name: string
+    dict: WriDataset | WriOrganization | WriUser | Group
 }
 
-export interface GroupsmDetails{
-    img_url: string;
-    description: string;
-    package_count: number;
+export interface GroupsmDetails {
+    img_url: string
+    description: string
+    package_count: number
 }

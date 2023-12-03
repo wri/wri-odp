@@ -12,6 +12,8 @@ import { useMapState, useBounds } from '@/utils/storeHooks'
 import isEmpty from 'lodash/isEmpty'
 import IconButton from './IconButton'
 import { SearchIcon } from '../../icons/SearchIcon'
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
+import classNames from '@/utils/classnames'
 
 export default function Search({
     mapContainerRef,
@@ -19,9 +21,30 @@ export default function Search({
     mapContainerRef: MutableRefObject<HTMLDivElement | null>
 }) {
     const [showSearchInput, setShowSearchInput] = useState(false)
-    // const geosuggest = useRef<Geosuggest | null>(null)
+    const firstRender = useRef(true)
     const { setViewState, viewState } = useMapState()
     const { bounds, setBounds } = useBounds()
+
+    useEffect(() => {
+        if (firstRender.current) {
+            const geocoder = new MapboxGeocoder({
+                marker: false,
+                accessToken:
+                    'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w',
+                types: 'country,region,place,locality',
+            })
+
+            geocoder.on('result', (r) => {
+                geocoder.clear()
+                handleSearchInput(false)
+                handleSearch(r)
+            })
+
+            geocoder.addTo('#search-location-map')
+
+            firstRender.current = false
+        }
+    }, [])
 
     const debouncedOnMapViewportChange = useDebouncedCallback((v) => {
         setViewState(v)
@@ -30,7 +53,7 @@ export default function Search({
     const handleSearch = useCallback(
         (locationParams: any) => {
             setBounds({
-                ...locationParams,
+                bbox: locationParams.result.bbox,
                 options: { zoom: 2 },
             })
         },
@@ -65,39 +88,18 @@ export default function Search({
 
         const viewport = { ...viewState, ...newViewport }
         setViewState(viewport)
-        // debouncedOnMapViewportChange(newViewport);
+        debouncedOnMapViewportChange(newViewport)
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bounds, debouncedOnMapViewportChange, mapContainerRef])
 
-    const onSuggestSelect = (e: any) => {
-        if (e) {
-            const { gmaps, location } = e
-            const viewport = gmaps?.geometry && gmaps.geometry.viewport
-
-            if (viewport) {
-                const { south, west, north, east } = viewport.toJSON()
-                handleSearch({ bbox: [east, south, west, north] })
-            }
-
-            if (!viewport && location) {
-                handleSearch({ ...location, zoom: 7 })
-            }
-
-            handleSearchInput(false)
-        }
-    }
-
-    const onKeyDown = (e: { keyCode: number }) => {
-        if (e.keyCode === 27) handleSearchInput(false)
-    }
-
     const handleSearchInput = (show: boolean) => {
+        const el = document.getElementById('search_location_map')
         if (show) {
-            // geosuggest.current?.focus();
+            if (el) el.focus()
             setShowSearchInput(true)
         } else {
-            // geosuggest.current?.clear();
+            if (el) el.focus()
             setShowSearchInput(false)
         }
     }
@@ -113,13 +115,14 @@ export default function Search({
     }, [bounds, handleFitBounds])
 
     return (
-        <div className="c-search-control">
-            {showSearchInput && (
-                /* <Geosuggest
-          onSuggestSelect={onSuggestSelect}
-          onKeyDown={onKeyDown}
-        /> */ <div></div>
-            )}
+        <div className="c-search-control relative">
+            <div
+                id="search-location-map"
+                className={classNames(
+                    'absolute right-16 top-0',
+                    showSearchInput ? '' : 'hidden'
+                )}
+            ></div>
             <IconButton
                 type="button"
                 className="search-control--btn "

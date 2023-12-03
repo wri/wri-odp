@@ -65,11 +65,13 @@ export const useActiveLayerGroups = () => {
   const {
     activeLayerGroups,
     replaceLayersGroups,
+    updateLayerGroup,
     addLayerGroup,
     removeLayerGroup,
   } = useStore((store) => ({
     activeLayerGroups: store.activeLayerGroups,
     replaceLayersGroups: store.replaceLayerGroups,
+    updateLayerGroup: store.updateLayerGroup,
     addLayerGroup: store.addLayerGroup,
     removeLayerGroup: store.removeLayerGroup,
   }));
@@ -77,6 +79,7 @@ export const useActiveLayerGroups = () => {
   return {
     activeLayerGroups,
     replaceLayersGroups,
+    updateLayerGroup,
     addLayerGroup,
     removeLayerGroup,
   };

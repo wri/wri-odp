@@ -18,17 +18,17 @@ import ApprovalRequestCard from '@/components/datasets/ApprovalRequestCard'
 import { useRouter } from 'next/router'
 import { api } from '@/utils/api'
 import dynamic from 'next/dynamic'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import { appRouter } from '@/server/api/root'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import superjson from 'superjson'
 import Spinner from '@/components/_shared/Spinner'
 import { Index } from 'flexsearch'
 import { useSession } from 'next-auth/react'
-import { Button } from '@/components/_shared/Button'
 import { NextSeo } from 'next-seo'
 import { getOneDataset } from '@/utils/apiUtils'
 import { getServerAuthSession } from '@/server/auth'
+import { Provider, useCreateStore } from '@/utils/store'
+import { type LayerState } from '@/interfaces/state.interface'
+import { decodeMapParam } from '@/utils/urlEncoding'
+import SyncUrl from '@/components/_shared/map/SyncUrl'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -47,6 +47,10 @@ const LazyViz = dynamic(
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ datasetName: string }>
 ) {
+    const { query } = context
+    const { map } = query
+    const state = decodeMapParam(map as string)
+
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
     try {
@@ -58,6 +62,7 @@ export async function getServerSideProps(
                     spatial: dataset.spatial ?? null,
                 },
                 datasetName,
+                initialZustandState: state,
             },
         }
     } catch {
@@ -75,6 +80,35 @@ export default function DatasetPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
     const { dataset } = props
+
+    const newLayersState = new Map()
+    if (props.initialZustandState && props.initialZustandState.layersParsed) {
+        props.initialZustandState.layersParsed?.forEach(
+            (layer: [string, LayerState]) => {
+                newLayersState.set(layer[0], layer[1])
+            }
+        )
+    }
+
+    let activeLayerGroups = props.initialZustandState?.activeLayerGroups
+    if (!activeLayerGroups) {
+        activeLayerGroups = []
+        dataset?.resources.forEach((r) => {
+            if (r._extra?.is_layer) {
+                activeLayerGroups?.push({
+                    layers: [r?._extra?.rw_layer_id ?? ''],
+                    datasetId: dataset.id,
+                })
+            }
+        })
+    }
+
+    const createStore = useCreateStore({
+        ...props.initialZustandState,
+        layers: newLayersState,
+        activeLayerGroups,
+    })
+
     const datasetName = props.datasetName as string
     const router = useRouter()
     const { query } = router
@@ -169,108 +203,127 @@ export default function DatasetPage(
 
     return (
         <>
-            <NextSeo
-                title={`${datasetData?.title ?? datasetData?.name} - Datasets`}
-            />
-            <Header />
-            <Breadcrumbs links={links} />
-            {isApprovalRequest && <ApprovalRequestCard />}
-            <DatasetPageLayout
-                lhs={
-                    isAddLayers ? (
-                        <div className="px-4 sm:px-6">
-                            <AddLayers />
-                        </div>
-                    ) : (
-                        <>
-                            <DatasetHeader dataset={datasetData} />
+            <Provider createStore={createStore}>
+                <NextSeo
+                    title={`${
+                        datasetData?.title ?? datasetData?.name
+                    } - Datasets`}
+                />
+                <Header />
+                <Breadcrumbs links={links} />
+                {isApprovalRequest && <ApprovalRequestCard />}
+                <DatasetPageLayout
+                    lhs={
+                        isAddLayers ? (
                             <div className="px-4 sm:px-6">
-                                <Tab.Group as="div">
-                                    <Tab.List
-                                        as="nav"
-                                        className="flex w-full gap-x-2 border-b border-zinc-300"
-                                    >
-                                        <DatasetTabs
-                                            tabs={tabs.filter(
-                                                (tab) => tab.enabled
-                                            )}
-                                        />
-                                    </Tab.List>
-                                    <div className="mb-4 mr-9" />
-                                    <div>
-                                        <Tab.Panels as="div">
-                                            <Tab.Panel as="div">
-                                                <DataFiles
-                                                    dataset={datasetData}
-                                                    index={index}
-                                                />
-                                            </Tab.Panel>
-                                            <Tab.Panel as="div">
-                                                <About dataset={datasetData} />
-                                            </Tab.Panel>
-                                            {datasetData.methodology && (
+                                <AddLayers />
+                            </div>
+                        ) : (
+                            <>
+                                <DatasetHeader dataset={datasetData} />
+                                <div className="px-4 sm:px-6">
+                                    <Tab.Group as="div">
+                                        <Tab.List
+                                            as="nav"
+                                            className="flex w-full gap-x-2 border-b border-zinc-300"
+                                        >
+                                            <DatasetTabs
+                                                tabs={tabs.filter(
+                                                    (tab) => tab.enabled
+                                                )}
+                                            />
+                                        </Tab.List>
+                                        <div className="mb-4 mr-9" />
+                                        <div>
+                                            <Tab.Panels as="div">
                                                 <Tab.Panel as="div">
-                                                    <Methodology
-                                                        methodology={
-                                                            datasetData.methodology
-                                                        }
+                                                    <DataFiles
+                                                        dataset={datasetData}
+                                                        index={index}
                                                     />
                                                 </Tab.Panel>
-                                            )}
-                                            <Tab.Panel as="div">
-                                                <RelatedDatasets
-                                                    original={datasetData.name}
-                                                    datasets={
-                                                        datasetData?.groups &&
-                                                        datasetData.groups
-                                                            .length > 0 &&
-                                                        relatedDatasets.data
-                                                            ? relatedDatasets.data.datasets.filter(
-                                                                  (dataset) =>
-                                                                      dataset.name !==
-                                                                      datasetData.name
-                                                              )
-                                                            : []
-                                                    }
-                                                />
-                                            </Tab.Panel>
-                                            <Tab.Panel as="div">
-                                                <Contact
-                                                    dataset={datasetData}
-                                                />
-                                            </Tab.Panel>
-                                            <Tab.Panel as="div">
-                                                <API />
-                                            </Tab.Panel>
-                                            {collaborators.data &&
-                                                collaborators.data.length >
-                                                    0 && (
+                                                <Tab.Panel as="div">
+                                                    <About
+                                                        dataset={datasetData}
+                                                    />
+                                                </Tab.Panel>
+                                                {datasetData.methodology && (
                                                     <Tab.Panel as="div">
-                                                        <Members
-                                                            members={
-                                                                collaborators.data
+                                                        <Methodology
+                                                            methodology={
+                                                                datasetData.methodology
                                                             }
                                                         />
                                                     </Tab.Panel>
                                                 )}
-                                            {issues.data &&
-                                                issues.data.length > 0 && (
-                                                    <Tab.Panel as="div">
-                                                        <Issues
-                                                            issues={issues.data}
-                                                            index={indexIssues}
-                                                        />
-                                                    </Tab.Panel>
-                                                )}
-                                        </Tab.Panels>
-                                    </div>
-                                </Tab.Group>
-                            </div>
-                        </>
-                    )
-                }
-                rhs={<LazyViz setIsAddLayers={setIsAddLayers} />}
-            />
+                                                <Tab.Panel as="div">
+                                                    <RelatedDatasets
+                                                        original={
+                                                            datasetData.name
+                                                        }
+                                                        datasets={
+                                                            datasetData?.groups &&
+                                                            datasetData.groups
+                                                                .length > 0 &&
+                                                            relatedDatasets.data
+                                                                ? relatedDatasets.data.datasets.filter(
+                                                                      (
+                                                                          dataset
+                                                                      ) =>
+                                                                          dataset.name !==
+                                                                          datasetData.name
+                                                                  )
+                                                                : []
+                                                        }
+                                                    />
+                                                </Tab.Panel>
+                                                <Tab.Panel as="div">
+                                                    <Contact
+                                                        dataset={datasetData}
+                                                    />
+                                                </Tab.Panel>
+                                                <Tab.Panel as="div">
+                                                    <API />
+                                                </Tab.Panel>
+                                                {collaborators.data &&
+                                                    collaborators.data.length >
+                                                        0 && (
+                                                        <Tab.Panel as="div">
+                                                            <Members
+                                                                members={
+                                                                    collaborators.data
+                                                                }
+                                                            />
+                                                        </Tab.Panel>
+                                                    )}
+                                                {issues.data &&
+                                                    issues.data.length > 0 && (
+                                                        <Tab.Panel as="div">
+                                                            <Issues
+                                                                issues={
+                                                                    issues.data
+                                                                }
+                                                                index={
+                                                                    indexIssues
+                                                                }
+                                                            />
+                                                        </Tab.Panel>
+                                                    )}
+                                            </Tab.Panels>
+                                        </div>
+                                    </Tab.Group>
+                                </div>
+                            </>
+                        )
+                    }
+                    rhs={
+                        <LazyViz
+                            setIsAddLayers={setIsAddLayers}
+                            dataset={datasetData}
+                        />
+                    }
+                />
+            </Provider>
         </>
     )
 }
