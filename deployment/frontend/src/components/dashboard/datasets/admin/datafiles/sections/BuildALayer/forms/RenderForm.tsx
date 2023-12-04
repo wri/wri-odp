@@ -184,6 +184,7 @@ function ItemsArray() {
                                     v === '' ? undefined : parseFloat(v),
                             }
                         )}
+                        defaultValue={1}
                         type="number"
                     />
                 </InputGroup>
@@ -316,7 +317,7 @@ function FilterExpressions({ layerIdx }: { layerIdx: number }) {
                 onClick={() =>
                     append({
                         operation: { value: '==', label: 'Equals to' },
-                        column: { value: '', label: ''},
+                        column: { value: '', label: '' },
                         value: null,
                     })
                 }

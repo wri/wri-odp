@@ -53,7 +53,7 @@ export const ResourceSchema = z.object({
     fileBlob: z.any(),
     type: z.enum(['link', 'upload', 'layer', 'empty']),
     schema: DataDictionarySchema.optional().nullable(),
-    layerObj: layerSchema.optional().nullable().default(null),
+    layerObj: layerSchema.optional().nullable(),
 })
 
 export const DatasetSchema = z
