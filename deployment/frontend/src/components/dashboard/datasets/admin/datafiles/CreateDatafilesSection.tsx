@@ -58,6 +58,7 @@ export function CreateDataFilesSection({
                             type: 'empty',
                             format: '',
                             schema: [],
+                            layerObj: null,
                         })
                     }
                     className="ml-auto flex items-center justify-end gap-x-1"
@@ -361,6 +362,7 @@ function AddDataFile({
                                             title: '',
                                             type: 'empty',
                                             schema: [],
+                                            layerObj: null,
                                         })
                                     }
                                 />
