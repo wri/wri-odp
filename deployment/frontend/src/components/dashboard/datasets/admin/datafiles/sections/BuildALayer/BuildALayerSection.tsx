@@ -11,7 +11,6 @@ import { FormProvider, UseFormReturn, useForm } from 'react-hook-form'
 import { DatasetFormType } from '@/schema/dataset.schema'
 import { LayerFormType, layerSchema } from './layer.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import LayerManager from '@/components/_shared/map/LayerManager'
 import { Button } from '@/components/_shared/Button'
 import { convertFormToLayerObj } from './convertObjects'
 import { Legends } from './preview/Legends'
@@ -20,6 +19,7 @@ import { getInteractiveLayers } from '@/utils/queryHooks'
 import Tooltip from './preview/Tooltip'
 import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
 import { APILayerSpec } from '@/interfaces/layer.interface'
+import LayerManagerPreview from './preview/LayerManagerPreview'
 
 export function BuildALayer({
     formObj,
@@ -252,7 +252,7 @@ export function PreviewMap({
                     height: '400px',
                 }}
             >
-                {layerFormObj && <LayerManager layers={[layerFormObj]} />}
+                {layerFormObj && <LayerManagerPreview layers={[layerFormObj]} />}
                 <Tooltip
                     layersInfo={layersInfo}
                     coordinates={coordinates}

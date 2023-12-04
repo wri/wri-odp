@@ -100,6 +100,8 @@ export const DatasetRouter = createTRPCRouter({
                     const name = layersMap.get(r.resourceId).data.id
                     r.url = url
                     r.name = name
+                    r.title = r.layerObj.name
+                    r.description = r.layerObj.description
                 }
             })
             try {
