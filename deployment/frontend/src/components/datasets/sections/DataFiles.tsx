@@ -151,7 +151,7 @@ function DatafileCard({
                             )}
                             <Disclosure.Button>
                                 <h3 className="font-acumin text-lg font-semibold leading-loose text-stone-900">
-                                    {datafile.name}
+                                    {datafile.title ?? datafile.name}
                                 </h3>
                             </Disclosure.Button>
                         </div>
