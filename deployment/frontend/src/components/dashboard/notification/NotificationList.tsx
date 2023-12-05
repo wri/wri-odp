@@ -8,69 +8,6 @@ import Pagination from '../_shared/Pagination'
 import type { SearchInput } from '@/schema/search.schema'
 import { NotificationType } from '@/schema/notification.schema'
 
-const notifications = [
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-    {
-        title: 'Someone sent you a request for approval',
-        description: '1 hour ago',
-        check: true,
-    },
-]
-
 export default function NotificationList() {
     const { data, isLoading } = api.notification.getAllNotifications.useQuery()
     const [selected, setSelected] = useState<string[]>([])
