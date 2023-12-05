@@ -12,6 +12,7 @@ import { filterObjects } from "@/utils/general";
 import { NotificationSchema, NotificationInput } from "@/schema/notification.schema";
 import type { NotificationType, NotificationInputType } from "@/schema/notification.schema";
 import { timeAgo } from "@/utils/apiUtils";
+import { replaceNames } from "@/utils/replaceNames";
 
 export const notificationRouter = createTRPCRouter({
   getAllNotifications: protectedProcedure
@@ -39,13 +40,51 @@ export const notificationRouter = createTRPCRouter({
           sender_emailHash: user_data?.email_hash,
           object_name: objectName,
           checked: false,
-          time_sent: timeAgo(notification.time_sent!),
+          time_text: timeAgo(notification.time_sent!),
         }
         return resultNotification;
       }));
-
-
-
       return activities.filter((notification) => notification.state !== "deleted");  
+    }),
+  updateNotification: protectedProcedure
+    .input(NotificationInput)
+    .mutation(async ({ input, ctx }) => {
+
+      try {
+        const response = await Promise.all(input.notifications.map(async (notification) => {
+          console.log("notification ", input.state)
+          const payload: NotificationType= notification
+          if (input.state) payload.state = input.state;
+          if (input.is_unread !== undefined) {
+            payload.is_unread = input.is_unread;
+          }
+         
+          const response = await fetch(`${env.CKAN_URL}/api/action/notification_update`,
+            {
+              method: "POST",
+              headers: {
+                "Authorization": ctx.session.user.apikey,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            })
+          const data = (await response.json()) as CkanResponse<NotificationType>;
+          if (!data.success && data.error) {
+              if (data.error.message)
+                    throw Error(replaceNames(data.error.message, true))
+              throw Error(replaceNames(JSON.stringify(data.error), true))
+          }
+            
+          return data.result;
+        }
+        ));
+        return response;
+      }
+      catch (e) {
+          let error =
+              'Something went wrong please contact the system administrator'
+          if (e instanceof Error) error = e.message
+          throw Error(replaceNames(error, true))
+      }
      }),
 })

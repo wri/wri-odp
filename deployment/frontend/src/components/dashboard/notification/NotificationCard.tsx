@@ -32,7 +32,7 @@ function Card({
                     <div className="w-2 h-2 rounded-full bg-wri-gold my-auto"></div>
                 </DefaultTooltip>
             ) : (
-                ''
+                <div className="w-2 h-2 rounded-full bg-wri-gold my-auto invisible"></div>
             )}
 
             <div className="flex items-center">
@@ -78,7 +78,7 @@ function Card({
                         </p>
                         {rowProfile.time_sent ? (
                             <span className="text-[#666666] font-tight text-[12px] ">
-                                {rowProfile.time_sent}
+                                {rowProfile.time_text}
                             </span>
                         ) : (
                             ''

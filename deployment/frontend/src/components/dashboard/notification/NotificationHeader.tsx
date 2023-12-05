@@ -1,9 +1,17 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useState } from 'react'
 import TableHeader from '../_shared/TableHeader'
 import { TrashIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline'
 import { Menu, Transition } from '@headlessui/react'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { NotificationType } from '@/schema/notification.schema'
+import Modal from '@/components/_shared/Modal'
+import { LoaderButton, Button } from '@/components/_shared/Button'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Dialog } from '@headlessui/react'
+import notify from '@/utils/notify'
+import Spinner from '@/components/_shared/Spinner'
+import { api } from '@/utils/api'
+import { ErrorAlert } from '@/components/_shared/Alerts'
 
 function LeftNode({
     selected,
@@ -14,6 +22,34 @@ function LeftNode({
     setSelected: React.Dispatch<React.SetStateAction<string[]>>
     data: NotificationType[]
 }) {
+    const [openDelete, setOpenDelete] = useState(false)
+    const [openMarkAsRead, setOpenMarkAsRead] = useState(false)
+    const [openMarkAsUnread, setOpenMarkAsUnread] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const utils = api.useUtils()
+    const UpdateNotfication = api.notification.updateNotification.useMutation({
+        onSuccess: async (data) => {
+            await utils.notification.getAllNotifications.invalidate()
+            setSelected([])
+
+            if (openDelete) {
+                setOpenDelete(false)
+                notify(`Successfully deleted the notification`, 'error')
+            }
+            if (openMarkAsRead) {
+                setOpenMarkAsRead(false)
+                notify(`Successfully marked notification as read`, 'success')
+            }
+
+            if (openMarkAsUnread) {
+                setOpenMarkAsUnread(false)
+                notify(`Successfully marked notification as unread`, 'success')
+            }
+        },
+        onError: (error) => {
+            setErrorMessage(error.message)
+        },
+    })
     return (
         <div className="relative flex flex-row items-center gap-x-3 w-full pl-10 sm:pl-12">
             <div className="flex h-6 items-center">
@@ -36,7 +72,12 @@ function LeftNode({
             </div>
             <div>
                 <DefaultTooltip content="delete">
-                    <TrashIcon className="w-4 h-4 text-red-500" />
+                    <button
+                        className="p-0 m-0 mt-2"
+                        onClick={() => setOpenDelete(true)}
+                    >
+                        <TrashIcon className="w-4 h-4 text-red-500" />
+                    </button>
                 </DefaultTooltip>
             </div>
             <div className="">
@@ -65,14 +106,22 @@ function LeftNode({
                         <Menu.Items className="absolute left-0 w-32 whitespace-nowrap  origin-top-left divide-y divide-gray-100 rounded-md bg-white shadow-md text-[14px] font-normal focus:outline-none">
                             <div className="hover:bg-slate-100">
                                 <div className="px-2 pr-2 py-3 ">
-                                    <Menu.Item>
+                                    <Menu.Item
+                                        as={'button'}
+                                        onClick={() => setOpenMarkAsRead(true)}
+                                    >
                                         <div>Mark as read</div>
                                     </Menu.Item>
                                 </div>
                             </div>
                             <div className="hover:bg-slate-100">
                                 <div className="px-2 pr-4 py-3 ">
-                                    <Menu.Item>
+                                    <Menu.Item
+                                        as={'button'}
+                                        onClick={() =>
+                                            setOpenMarkAsUnread(true)
+                                        }
+                                    >
                                         <div>Mark as unread</div>
                                     </Menu.Item>
                                 </div>
@@ -81,6 +130,176 @@ function LeftNode({
                     </Transition>
                 </Menu>
             </div>
+            {errorMessage && (
+                <div className="py-4">
+                    <ErrorAlert text={errorMessage} />
+                </div>
+            )}
+            {selected.length > 0 && (
+                <Modal
+                    open={openDelete}
+                    setOpen={setOpenDelete}
+                    className="sm:w-full sm:max-w-lg"
+                    key="delete"
+                >
+                    <div className="sm:flex sm:items-start">
+                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <ExclamationTriangleIcon
+                                className="h-6 w-6 text-red-600"
+                                aria-hidden="true"
+                            />
+                        </div>
+                        <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                            <Dialog.Title
+                                as="h3"
+                                className="text-base font-semibold leading-6 text-gray-900"
+                            >
+                                Delete Notification
+                            </Dialog.Title>
+                            <div className="mt-2">
+                                <p className="text-sm text-gray-500">
+                                    Are you sure you want to delete this
+                                    Notification?
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                        <LoaderButton
+                            variant="destructive"
+                            loading={UpdateNotfication.isLoading}
+                            onClick={() =>
+                                UpdateNotfication.mutate({
+                                    notifications: data.filter((item) =>
+                                        selected.includes(item.id)
+                                    ),
+                                    state: 'deleted',
+                                })
+                            }
+                            id="deleteNotification"
+                        >
+                            Delete Notification
+                        </LoaderButton>
+                        <Button
+                            variant="outline"
+                            type="button"
+                            onClick={() => setOpenDelete(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                </Modal>
+            )}
+            {selected.length > 0 && (
+                <Modal
+                    open={openMarkAsRead}
+                    setOpen={setOpenMarkAsRead}
+                    className="sm:w-full sm:max-w-lg"
+                    key="read"
+                >
+                    <div className="sm:flex sm:items-start">
+                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <ExclamationTriangleIcon
+                                className="h-6 w-6 text-red-600"
+                                aria-hidden="true"
+                            />
+                        </div>
+                        <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                            <Dialog.Title
+                                as="h3"
+                                className="text-base font-semibold leading-6 text-gray-900"
+                            >
+                                Update Notification
+                            </Dialog.Title>
+                            <div className="mt-2">
+                                <p className="text-sm text-gray-500">
+                                    Are you sure you want to mark this
+                                    Notification as read?
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                        <LoaderButton
+                            variant="destructive"
+                            loading={UpdateNotfication.isLoading}
+                            onClick={() =>
+                                UpdateNotfication.mutate({
+                                    notifications: data.filter((item) =>
+                                        selected.includes(item.id)
+                                    ),
+                                    is_unread: false,
+                                })
+                            }
+                            id="readNotification"
+                        >
+                            Update Notification
+                        </LoaderButton>
+                        <Button
+                            variant="outline"
+                            type="button"
+                            onClick={() => setOpenMarkAsRead(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                </Modal>
+            )}
+            {selected.length > 0 && (
+                <Modal
+                    open={openMarkAsUnread}
+                    setOpen={setOpenMarkAsUnread}
+                    className="sm:w-full sm:max-w-lg"
+                    key="unread"
+                >
+                    <div className="sm:flex sm:items-start">
+                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <ExclamationTriangleIcon
+                                className="h-6 w-6 text-red-600"
+                                aria-hidden="true"
+                            />
+                        </div>
+                        <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                            <Dialog.Title
+                                as="h3"
+                                className="text-base font-semibold leading-6 text-gray-900"
+                            >
+                                Update Notification
+                            </Dialog.Title>
+                            <div className="mt-2">
+                                <p className="text-sm text-gray-500">
+                                    Are you sure you want to mark this
+                                    Notification as unread?
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                        <LoaderButton
+                            variant="destructive"
+                            loading={UpdateNotfication.isLoading}
+                            onClick={() =>
+                                UpdateNotfication.mutate({
+                                    notifications: data.filter((item) =>
+                                        selected.includes(item.id)
+                                    ),
+                                    is_unread: true,
+                                })
+                            }
+                            id="unreadnotification"
+                        >
+                            Update Notification
+                        </LoaderButton>
+                        <Button
+                            variant="outline"
+                            type="button"
+                            onClick={() => setOpenMarkAsUnread(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                </Modal>
+            )}
         </div>
     )
 }
