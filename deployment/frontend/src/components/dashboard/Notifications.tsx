@@ -113,7 +113,7 @@ export default function Notifications({ drag }: { drag: boolean }) {
                     <ArrowRightIcon className="w-4 h-4 mb-1" />
                 </Link>
             </div>
-            {data.length
+            {data?.length
                 ? data?.slice(0, 6).map((items) => {
                       return <Notification key={items.id} items={items} />
                   })
