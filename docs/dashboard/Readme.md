@@ -117,3 +117,69 @@ here is how you delete a Dataset has an authorized user
 - remove user from an organization: click on the delete button in the user drop down to remove user from an organization
 
 ![](./removeuser.png)
+
+### Notification
+
+Notification page can be accessed via `/dashboard/notifications`
+
+![](./notification.png)
+
+As you can see, we have 3 unread notification on the sidebar, and also the yellow div beside each notification row shows that its unread
+
+We can mark on of them unread
+
+![](./selectread.png)
+
+click update
+
+![](./selectread1.png)
+
+can also do **bulk update** e.g mark all as read
+
+![](./selectall.png)
+
+every notification is now marked has read
+
+![](./selectall1.png)
+
+Also on hover you can go the the sender user page and also the dataset page
+
+![](./links.png)
+
+Notification can also ve view from the overview dashboard page `/dashboard`
+
+![](./notoverview.png)
+
+## Favorite Dataset
+
+To add dataset to favorite, go to the dataset page and click on the star icon
+
+![](./addfave.png)
+
+click add in the popup modal to confirm action
+
+![](./addfave1.png)
+
+see changed refelected
+
+![](./addfave2.png)
+
+also favorite get reflected in `/dashboard` overview
+
+![](./faved.png)
+
+and also in `/dashboard/datasets` page
+
+![](./fave3.png)
+
+Dataset can be remove from favorite
+
+![](./addfave2.png)
+
+click on the star icon
+
+![](./removefave.png)
+
+see changed reflected
+
+![](./addfave.png)
