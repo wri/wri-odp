@@ -19,6 +19,10 @@ const email = `${uuid()}@gmail.com`;
 const userfullname = `${uuid()}-fullname`;
 
 describe("Dashboard Test", () => {
+  let senderid;
+  let receiverid;
+  let datasetid
+
   before(() => {
     cy.createOrganizationAPI(parentOrg);
     cy.createDatasetAPI(parentOrg, datasetName, true)
@@ -29,11 +33,30 @@ describe("Dashboard Test", () => {
     cy.createGroupAPI(group)
     cy.createUserApi(user, email, 'test1234')
 
+    cy.userMetadata(user).as('sender')
+    
+    cy.userMetadata(ckanUserName).as('reciever')
+
+    
+    cy.datasetMetadata(datasetName).as('dataset')
+
+    cy.get('@reciever').then((reciever) => {
+      cy.get('@sender').then((sender) => {
+        cy.get('@dataset').then((dataset) => {
+          cy.addNotificationApi(reciever.id, sender.id, dataset.id, "new dataset");
+          cy.addNotificationApi(reciever.id, sender.id, dataset.id, "changed dataset");
+          cy.addNotificationApi(reciever.id, sender.id, dataset.id, "deleted dataset");
+        });
+      });
+    });
+
   });
+
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
+ 
   it("Should test dataset page", () => {
     cy.visit("/dashboard/datasets")
     cy.get('#alldataset').should('exist');
@@ -110,6 +133,32 @@ describe("Dashboard Test", () => {
     cy.get(`button#${group}`).click();
     cy.contains(`Successfully deleted the ${group} topic`)
   })
+
+   it("should test notification page", () => {
+    cy.visit("/dashboard/notifications")
+    cy.contains('deleted dataset')
+    cy.get('#notificatoin').check();
+    cy.get('#notificatoin').should('be.checked');
+    cy.get('input[type="checkbox"]').should('be.checked');
+
+    cy.get('#markedaction').click({ force: true });
+    cy.contains('Mark as read')
+    cy.get('#markasread').click({ force: true });
+    cy.get(`button#readNotification`).click()
+    cy.wait(15000);
+    cy.get('#unreadn').should('not.exist');
+
+  })
+  it("should delete notification", () => {
+    cy.visit("/dashboard/notifications")
+    cy.get('#notificatoin').check();
+    cy.get('#deletenotification').click({ force: true });
+    cy.contains('Delete Notification')
+    cy.contains('button', 'Delete Notification').click();
+    cy.wait(15000);
+    cy.contains('deleted dataset').should('not.exist');
+   })
+
 
   after(() => {
     cy.deleteDatasetAPI(datasetName)

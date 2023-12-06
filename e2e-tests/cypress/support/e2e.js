@@ -460,3 +460,61 @@ Cypress.Commands.add("addPackageIssueApi", (packageId, issueTitle, issueDescript
     },
   });
 });
+
+Cypress.Commands.add("addNotificationApi",(recipient, sender, object_id, activity_type) => {
+  cy.request({
+    method: "POST",
+    url: apiUrl("notification_create"),
+    headers: headers,
+    body: {
+      recipient_id: recipient,
+      sender_id: sender,
+      activity_type: activity_type,
+      object_id: object_id,
+      object_type: "dataset"
+    },
+  });
+});
+
+Cypress.Commands.add("userMetadata", (name) => {
+  return cy
+    .request({
+      method: "GET",
+      url: apiUrl("user_show"),
+      headers: headers,
+      qs: {
+        id: name,
+      },
+    })
+    .then((res) => {
+      return res.body.result;
+    });
+});
+
+// Cypress.Commands.add("addNotificationApi", async ( object_id) => {
+  
+//   const dataset = await cy.request({
+//     method: "GET",
+//     url: apiUrl("package_show"),
+//     headers: headers,
+//     qs: {
+//       id: object_id,
+//     },
+//   });
+
+//   const dataset_id = dataset.body.result.id;
+//   console.log(dataset_id);
+
+//   cy.request({
+//     method: "POST",
+//     url: apiUrl("notification_create"),
+//     headers: headers,
+//     body: {
+//       recipient_id: "2b6f6d69-5f13-4091-8131-2182be659ea1",
+//       sender_id: "b53a31a7-55f0-425b-bd6e-db9a20b517c6",
+//       activity_type: "deleted dataset",
+//       object_id: dataset_id,
+//       object_type: "dataset"
+//     },
+//   });
+// });
