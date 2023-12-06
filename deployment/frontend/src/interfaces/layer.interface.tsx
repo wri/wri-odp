@@ -40,12 +40,13 @@ export interface APILayerSpec {
   type?: string;
   iso: string[];
   provider: string;
-  userId: string;
+  userId?: string;
   default: boolean;
   protected: boolean;
   published: boolean;
   env: string;
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
+  connectorUrl?: string | null;
   layerConfig: layerConfigSpec;
   legendConfig: Record<string, string | number | boolean | unknown>;
   applicationConfig: Record<string, string | number | boolean | unknown>;

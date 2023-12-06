@@ -6,7 +6,13 @@ const sourceSchema = z
     .object({
         provider: z.object({
             type: z.object({
-                value: z.enum(['gee', 'carto', 'wms', 'featureservice', 'other']),
+                value: z.enum([
+                    'gee',
+                    'carto',
+                    'wms',
+                    'featureservice',
+                    'other',
+                ]),
                 label: z.string(),
             }),
             account: z.string().optional().nullable(),
@@ -76,7 +82,7 @@ const filterExpression = z.object({
         })
         .optional()
         .nullable(),
-    value: z.coerce.number().optional().nullable(),
+    value: z.union([z.string(), z.number()]).optional().nullable(),
 })
 
 const rampObj = z
@@ -226,28 +232,46 @@ export const layerSchema = z
         name: z.string().default(''),
         slug: z.string().default(''),
         default: z.boolean().default(false),
+        dataset: z.string().uuid(),
+        applicationConfig: z.any().optional().nullable(),
+        staticImageConfig: z.any().optional().nullable(),
+        published: z.boolean().default(false),
+        protected: z.boolean().default(false),
+        thumbnailUrl: z
+            .string()
+            .optional()
+            .or(emptyStringToUndefined),
+        env: z
+            .enum(['production', 'staging', 'development'])
+            .default('staging'),
+        application: z.array(z.string()).default(['rw']),
         description: z.string().default(''),
+        provider: z.string().default('cartodb'),
+        type: z.string().default('layer'),
+        iso: z.array(z.string()).default([]),
         account: z.string().optional().nullable().or(emptyStringToUndefined),
-        type: z.object({
-            value: z.enum(['raster', 'vector', 'geojson', 'deck']),
-            label: z.string(),
+        layerConfig: z.object({
+            type: z.object({
+                value: z.enum(['raster', 'vector', 'geojson', 'deck']),
+                label: z.string(),
+            }),
+            source: sourceSchema.optional().nullable(),
+            render: renderSchema.optional().nullable(),
         }),
         connectorUrl: z.string().url().optional().nullable(),
         legendConfig: legendsSchema.optional().nullable(),
-        source: sourceSchema.optional().nullable(),
-        render: renderSchema.optional().nullable(),
         interactionConfig: interactionConfigSchema.optional().nullable(),
     })
     .refine(
         (obj) => {
             if (
-                obj.type.value === 'raster' &&
-                obj.source?.provider.type.value === 'wms'
+                obj.layerConfig.type.value === 'raster' &&
+                obj.layerConfig.source?.provider.type.value === 'wms'
             )
                 return (
-                    obj.type.value === 'raster' &&
-                    obj.source?.tiles &&
-                    obj.source?.tiles.length > 0
+                    obj.layerConfig.type.value === 'raster' &&
+                    obj.layerConfig.source?.tiles &&
+                    obj.layerConfig.source?.tiles.length > 0
                 )
             return true
         },

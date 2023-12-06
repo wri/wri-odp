@@ -1,24 +1,11 @@
-import { Fragment, useEffect } from 'react'
+import { Fragment } from 'react'
 import { Button } from '@/components/_shared/Button'
 import { InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
-import {
-    ChevronDownIcon,
-    ExclamationCircleIcon,
-    PlusCircleIcon,
-} from '@heroicons/react/24/outline'
-import {
-    FieldArrayWithId,
-    FieldValues,
-    Path,
-    UseFormReturn,
-    useFieldArray,
-    useForm,
-    useFormContext,
-} from 'react-hook-form'
+import { ChevronDownIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
+import { Path, useFieldArray, useFormContext } from 'react-hook-form'
 import { match } from 'ts-pattern'
-import { z } from 'zod'
 import {
     filterOperationOptions,
     rampTypes,
@@ -30,6 +17,7 @@ import { useState } from 'react'
 import classNames from '@/utils/classnames'
 import { useColumns } from '../useColumns'
 import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
+import { TemplateLayerModal } from './ChooseTemplates'
 
 interface InteractionFormProps {
     onNext: () => void
@@ -76,7 +64,7 @@ function ItemsArray() {
     const { control, register, watch } = formObj
     const { fields, append, remove } = useFieldArray({
         control,
-        name: 'render.layers',
+        name: 'layerConfig.render.layers',
     })
 
     const RenderCirclePaint = (index: number) => (
@@ -87,7 +75,7 @@ function ItemsArray() {
                 labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
                 <ColorPicker
-                    name={`render.layers.${index}.paint.circle-color`}
+                    name={`layerConfig.render.layers.${index}.paint.circle-color`}
                 />
             </InputGroup>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -98,7 +86,7 @@ function ItemsArray() {
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.circle-radius`,
+                            `layerConfig.render.layers.${index}.paint.circle-radius`,
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) => {
@@ -118,7 +106,7 @@ function ItemsArray() {
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.circle-opacity`,
+                            `layerConfig.render.layers.${index}.paint.circle-opacity`,
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) =>
@@ -140,7 +128,9 @@ function ItemsArray() {
                 className="sm:grid-cols-1 gap-x-2"
                 labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
-                <ColorPicker name={`render.layers.${index}.paint.fill-color`} />
+                <ColorPicker
+                    name={`layerConfig.render.layers.${index}.paint.fill-color`}
+                />
             </InputGroup>
             <InputGroup
                 label="Fill Opacity"
@@ -148,11 +138,14 @@ function ItemsArray() {
                 labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
                 <Input
-                    {...register(`render.layers.${index}.paint.fill-opacity`, {
-                        valueAsNumber: true,
-                        setValueAs: (v) =>
-                            v === '' ? undefined : parseFloat(v),
-                    })}
+                    {...register(
+                        `layerConfig.render.layers.${index}.paint.fill-opacity`,
+                        {
+                            valueAsNumber: true,
+                            setValueAs: (v) =>
+                                v === '' ? undefined : parseFloat(v),
+                        }
+                    )}
                     defaultValue={1}
                     type="number"
                 />
@@ -167,7 +160,9 @@ function ItemsArray() {
                 className="sm:grid-cols-1 gap-x-2"
                 labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
-                <ColorPicker name={`render.layers.${index}.paint.line-color`} />
+                <ColorPicker
+                    name={`layerConfig.render.layers.${index}.paint.line-color`}
+                />
             </InputGroup>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <InputGroup
@@ -177,7 +172,7 @@ function ItemsArray() {
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.line-width`,
+                            `layerConfig.render.layers.${index}.paint.line-width`,
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) =>
@@ -195,7 +190,7 @@ function ItemsArray() {
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.line-opacity`,
+                            `layerConfig.render.layers.${index}.paint.line-opacity`,
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) =>
@@ -224,7 +219,7 @@ function ItemsArray() {
                                 >
                                     <SimpleSelect
                                         formObj={formObj}
-                                        name={`render.layers.${index}.type`}
+                                        name={`layerConfig.render.layers.${index}.type`}
                                         placeholder="Select the type of render"
                                         options={renderTypeOptions}
                                     />
@@ -237,7 +232,7 @@ function ItemsArray() {
                                     <Input
                                         defaultValue={'layer0'}
                                         {...register(
-                                            `render.layers.${index}.source-layer`
+                                            `layerConfig.render.layers.${index}.source-layer`
                                         )}
                                         type="text"
                                     />
@@ -245,7 +240,7 @@ function ItemsArray() {
                             </div>
                         </Accordion>
                         <Accordion text="Paint Properties">
-                            {match(watch('render.layers')[index])
+                            {match(watch('layerConfig.render.layers')[index])
                                 .with({ type: { value: 'circle' } }, () =>
                                     RenderCirclePaint(index)
                                 )
@@ -289,7 +284,7 @@ function ItemsArray() {
             >
                 <PlusCircleIcon className="h-5 w-5 text-amber-400" />
                 <span className="font-acumin text-lg font-normal leading-tight text-black">
-                    Add a render item
+                    Add a layerConfig.render.item
                 </span>
             </button>
         </div>
@@ -301,7 +296,7 @@ function FilterExpressions({ layerIdx }: { layerIdx: number }) {
     const { control, register, watch } = formObj
     const { fields, append, remove } = useFieldArray({
         control,
-        name: `render.layers.${layerIdx}.filter`,
+        name: `layerConfig.render.layers.${layerIdx}.filter`,
     })
     return (
         <div className="flex flex-col gap-y-4 pb-4">
@@ -344,10 +339,13 @@ function FilterExpression({
 }) {
     const formObj = useFormContext<LayerFormType>()
     const { control, register, watch } = formObj
-    if (watch(`render.layers.${layerIdx}.filter.${filterIdx}`) === 'all')
+    if (
+        watch(`layerConfig.render.layers.${layerIdx}.filter.${filterIdx}`) ===
+        'all'
+    )
         return <></>
     const columns = useColumns(
-        watch('source.provider.type.value'),
+        watch('layerConfig.source.provider.type.value'),
         watch('connectorUrl') as string,
         !!watch('connectorUrl')
     )
@@ -357,7 +355,7 @@ function FilterExpression({
                 <InputGroup label="Operation">
                     <SimpleSelect
                         formObj={formObj}
-                        name={`render.layers.${layerIdx}.filter.${filterIdx}.operation`}
+                        name={`layerConfig.render.layers.${layerIdx}.filter.${filterIdx}.operation`}
                         placeholder="Select filter operation"
                         options={filterOperationOptions}
                     />
@@ -374,13 +372,13 @@ function FilterExpression({
                         }
                         placeholder="Select column to match"
                         formObj={formObj}
-                        name={`render.layers.${layerIdx}.filter.${filterIdx}.column`}
+                        name={`layerConfig.render.layers.${layerIdx}.filter.${filterIdx}.column`}
                     />
                 </InputGroup>
                 <InputGroup label="Value">
                     <Input
                         {...register(
-                            `render.layers.${layerIdx}.filter.${filterIdx}.value`,
+                            `layerConfig.render.layers.${layerIdx}.filter.${filterIdx}.value`,
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) =>
@@ -409,9 +407,9 @@ function ColorPicker({
     name,
 }: {
     name:
-        | `render.layers.${number}.paint.fill-color`
-        | `render.layers.${number}.paint.circle-color`
-        | `render.layers.${number}.paint.line-color`
+        | `layerConfig.render.layers.${number}.paint.fill-color`
+        | `layerConfig.render.layers.${number}.paint.circle-color`
+        | `layerConfig.render.layers.${number}.paint.line-color`
 }) {
     const formObj = useFormContext<LayerFormType>()
     const { register, watch } = formObj
@@ -463,9 +461,9 @@ function RampObj({
     name,
 }: {
     name:
-        | `render.layers.${number}.paint.fill-color`
-        | `render.layers.${number}.paint.circle-color`
-        | `render.layers.${number}.paint.line-color`
+        | `layerConfig.render.layers.${number}.paint.fill-color`
+        | `layerConfig.render.layers.${number}.paint.circle-color`
+        | `layerConfig.render.layers.${number}.paint.line-color`
 }) {
     const formObj = useFormContext<LayerFormType>()
     const { control, register, watch } = formObj
@@ -474,7 +472,7 @@ function RampObj({
         name: `${name}.output`,
     })
     const columns = useColumns(
-        watch('source.provider.type.value'),
+        watch('layerConfig.source.provider.type.value'),
         watch('connectorUrl') as string,
         !!watch('connectorUrl')
     )

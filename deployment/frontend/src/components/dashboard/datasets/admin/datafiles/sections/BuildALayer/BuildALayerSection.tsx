@@ -41,13 +41,15 @@ export function BuildALayer({
     const layerFormObj = useForm<LayerFormType>({
         resolver: zodResolver(layerSchema),
         defaultValues: {
-            type: { value: 'vector', label: 'Vector' },
-            source: {
-                provider: {
-                    account: 'wri-rw',
-                    type: {
-                        value: 'carto',
-                        label: 'Carto',
+            layerConfig: {
+                type: { value: 'vector', label: 'Vector' },
+                source: {
+                    provider: {
+                        account: 'wri-rw',
+                        type: {
+                            value: 'carto',
+                            label: 'Carto',
+                        },
                     },
                 },
             },
@@ -77,14 +79,14 @@ export function BuildALayer({
             setValue(
                 'connectorUrl',
                 `https://${watch(
-                    'source.provider.account'
+                    'layerConfig.source.provider.account'
                 )}.carto.com:443/api/v2/sql?q=${
-                    watch('source.provider.layers.0.options.sql') ?? ''
+                    watch('layerConfig.source.provider.layers.0.options.sql') ?? ''
                 }`
             )
     }, [
-        watch('source.provider.account'),
-        watch('source.provider.layers.0.options.sql'),
+        watch('layerConfig.source.provider.account'),
+        watch('layerConfig.source.provider.layers.0.options.sql'),
     ])
 
     return (
@@ -96,7 +98,7 @@ export function BuildALayer({
                         <SourceForm
                             onNext={() => {
                                 syncValues()
-                                layerFormObj.watch('source.provider.type')
+                                layerFormObj.watch('layerConfig.source.provider.type')
                                     .value === 'carto'
                                     ? send('GO_TO_RENDER')
                                     : send('GO_TO_LEGEND')
@@ -123,7 +125,7 @@ export function BuildALayer({
                             }}
                             onPrev={() => {
                                 syncValues()
-                                layerFormObj.watch('source.provider.type')
+                                layerFormObj.watch('layerConfig.source.provider.type')
                                     .value === 'carto'
                                     ? send('BACK_TO_RENDER')
                                     : send('BACK_TO_SOURCE')
@@ -252,7 +254,9 @@ export function PreviewMap({
                     height: '400px',
                 }}
             >
-                {layerFormObj && <LayerManagerPreview layers={[layerFormObj]} />}
+                {layerFormObj && (
+                    <LayerManagerPreview layers={[layerFormObj]} />
+                )}
                 <Tooltip
                     layersInfo={layersInfo}
                     coordinates={coordinates}

@@ -17,10 +17,12 @@ import { LayerFormType } from '../layer.schema'
 import { useState } from 'react'
 import { useColumns } from '../useColumns'
 import classNames from '@/utils/classnames'
+import { ChooseTemplates } from './ChooseTemplates'
 
 export default function SourceForm({ onNext }: { onNext: () => void }) {
     const formObj = useFormContext<LayerFormType>()
     const [columnsFetchEnabled, setColumnsFetchEnabled] = useState(false)
+    const [templateModalOpen, setTemplateModalOpen] = useState(false)
     const {
         register,
         watch,
@@ -29,7 +31,6 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
         formState: { errors },
     } = formObj
     const onSubmit = () => {
-        console.log('Submitting')
         onNext()
     }
     const { append } = useFieldArray({
@@ -37,7 +38,7 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
         name: 'interactionConfig.output',
     })
     const columns = useColumns(
-        watch('source.provider.type.value'),
+        watch('layerConfig.source.provider.type.value'),
         watch('connectorUrl') as string,
         columnsFetchEnabled,
         (data) => {
@@ -63,7 +64,15 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                 className="flex flex-col px-4 min-h-[416px] justify-between"
                 onSubmit={handleSubmit(onSubmit)}
             >
-                <div className="mt-10 grid gap-x-6 gap-y-4 max-h-[375px] overflow-auto">
+                <ChooseTemplates
+                    open={templateModalOpen}
+                    setOpen={() => setTemplateModalOpen(!open)}
+                />
+                <div className="mt-10 flex w-full justify-end">
+                <Button onClick={() => setTemplateModalOpen(true)} type="button">
+                    Use Template
+                </Button></div>
+                <div className="grid gap-x-6 gap-y-4 max-h-[375px] overflow-auto">
                     <InputGroup
                         label="Name of Layer"
                         className="sm:grid-cols-1 gap-x-2"
@@ -110,7 +119,7 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                             id="layer_type"
                             formObj={formObj}
                             maxWidth=""
-                            name="type"
+                            name="layerConfig.type"
                             placeholder="Select layer type"
                             options={layerTypeOptions}
                         />
@@ -124,26 +133,28 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                             maxWidth=""
                             id="provider"
                             formObj={formObj}
-                            name="source.provider.type"
+                            name="layerConfig.source.provider.type"
                             placeholder="Select a provider"
                             options={providerOptions}
                         />
                     </InputGroup>
-                    {watch('type')?.value === 'raster' &&
-                        watch('source.provider.type')?.value === 'wms' && (
+                    {watch('layerConfig.type')?.value === 'raster' &&
+                        watch('layerConfig.source.provider.type')?.value ===
+                            'wms' && (
                             <InputGroup
                                 label="Tiles of your data"
                                 className="sm:grid-cols-1 gap-x-2"
                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                             >
                                 <Input
-                                    {...register('source.tiles')}
+                                    {...register('layerConfig.source.tiles')}
                                     type="text"
                                 />
                                 <ErrorDisplay errors={errors} name="tiles" />
                             </InputGroup>
                         )}
-                    {watch('source.provider.type')?.value === 'gee' && (
+                    {watch('layerConfig.source.provider.type')?.value ===
+                        'gee' && (
                         <InputGroup
                             label="Layer ID"
                             className="sm:grid-cols-1 gap-x-2"
@@ -153,7 +164,8 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                             <ErrorDisplay errors={errors} name="id" />
                         </InputGroup>
                     )}
-                    {watch('source.provider.type')?.value === 'carto' && (
+                    {watch('layerConfig.source.provider.type')?.value ===
+                        'carto' && (
                         <>
                             <InputGroup
                                 label="Account"
@@ -161,7 +173,9 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                             >
                                 <Input
-                                    {...register('source.provider.account')}
+                                    {...register(
+                                        'layerConfig.source.provider.account'
+                                    )}
                                     type="text"
                                     defaultValue="wri-rw"
                                 />
@@ -178,7 +192,7 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                             >
                                 <TextArea
                                     {...register(
-                                        'source.provider.layers.0.options.sql'
+                                        'layerConfig.source.provider.layers.0.options.sql'
                                     )}
                                     type="text"
                                     defaultValue=""
@@ -237,7 +251,7 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                         labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                     >
                         <Input
-                            {...register('source.minzoom', {
+                            {...register('layerConfig.source.minzoom', {
                                 setValueAs: (v) =>
                                     v === '' ? undefined : parseInt(v),
                             })}
@@ -256,7 +270,7 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                         labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                     >
                         <Input
-                            {...register('source.maxzoom', {
+                            {...register('layerConfig.source.maxzoom', {
                                 setValueAs: (v) =>
                                     v === '' ? undefined : parseInt(v),
                             })}
@@ -275,7 +289,8 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                     type="submit"
                     className="mt-4 ml-auto w-fit"
                 >
-                    {formObj.watch('source.provider.type').value === 'carto'
+                    {formObj.watch('layerConfig.source.provider.type').value ===
+                    'carto'
                         ? 'Next: Render'
                         : 'Next: Legend'}
                 </Button>
