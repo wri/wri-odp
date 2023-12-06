@@ -29,9 +29,11 @@ export const notificationRouter = createTRPCRouter({
         let user_data = await getUser({ userId: notification.sender_id, apiKey: ctx.session.user.apikey });
         user_data = user_data === undefined ? null : user_data;
         let objectName = "";
+        let objectIdName = "";
         if (notification.object_type === "dataset") {
           const dataset = await getDatasetDetails({ id: notification.object_id, session: ctx.session });
           objectName = dataset?.title ?? dataset?.name ?? "";
+          objectIdName = dataset?.name;
          }
         const resultNotification = {
           ...notification,
@@ -41,6 +43,7 @@ export const notificationRouter = createTRPCRouter({
           object_name: objectName,
           checked: false,
           time_text: timeAgo(notification.time_sent!),
+          objectIdName: objectIdName,
         }
         return resultNotification;
       }));

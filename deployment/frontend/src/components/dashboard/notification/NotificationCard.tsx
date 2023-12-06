@@ -6,6 +6,7 @@ import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { NotificationType } from '@/schema/notification.schema'
 import Image from 'next/image'
 import { set } from 'lodash'
+import Link from 'next/link'
 
 function Card({
     rowProfile,
@@ -72,17 +73,20 @@ function Card({
                         </div>
                     </div>
                     <div className={`flex flex-col `}>
-                        <p className="font-normal text-base">
-                            {rowProfile?.sender_name} {rowProfile.activity_type}{' '}
-                            {rowProfile?.object_name}
-                        </p>
-                        {rowProfile.time_sent ? (
-                            <span className="text-[#666666] font-tight text-[12px] ">
-                                {rowProfile.time_text}
-                            </span>
-                        ) : (
-                            ''
-                        )}
+                        <Link href={`/datasets/${rowProfile?.objectIdName}`}>
+                            <p className="font-normal text-base group-hover:underline">
+                                {rowProfile?.sender_name}{' '}
+                                {rowProfile.activity_type}{' '}
+                                {rowProfile?.object_name}
+                            </p>
+                            {rowProfile.time_sent ? (
+                                <span className="text-[#666666] font-tight text-[12px] ">
+                                    {rowProfile.time_text}
+                                </span>
+                            ) : (
+                                ''
+                            )}
+                        </Link>
                     </div>
                 </div>
             </div>
