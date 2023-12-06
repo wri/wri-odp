@@ -14,7 +14,7 @@ export default function NotificationList() {
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         fq: {},
-        page: { start: 0, rows: 2 },
+        page: { start: 0, rows: 10 },
     })
 
     const paginatedData = useQuery(
@@ -26,7 +26,11 @@ export default function NotificationList() {
             const start = query.page.start
             const rows = query.page.rows
             const slicedData = data.slice(start, start + rows)
-            slicedData.sort((a, b) => a.id.localeCompare(b.id) * -1)
+            slicedData.sort(
+                (a, b) =>
+                    new Date(a.time_sent!).getTime() -
+                    new Date(b.time_sent!).getTime()
+            )
             return slicedData
         },
         {
