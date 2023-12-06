@@ -30,20 +30,39 @@ export const notificationRouter = createTRPCRouter({
         user_data = user_data === undefined ? null : user_data;
         let objectName = "";
         let objectIdName = "";
+        let msg = "";
         if (notification.object_type === "dataset") {
           const dataset = await getDatasetDetails({ id: notification.object_id, session: ctx.session });
           objectName = dataset?.title ?? dataset?.name ?? "";
           objectIdName = dataset?.name;
+
+          const actionType = notification.activity_type.split("_")
+
+          if (actionType[0] === "collaborator") {
+            const role = actionType[2]
+            const action = actionType[1]
+            msg = ` ${action} you as a collaborator (${role}) to the ${notification.object_type}`
+          }
+          else {
+            if (notification.activity_type.includes(" ")) {
+              msg = ` ${notification.activity_type} `
+            }
+            else {
+              msg = ` ${actionType[0]}  ${actionType[1]} `
+            
+            }
+          }
          }
         const resultNotification = {
           ...notification,
           sender_name: user_data?.name,
-          sender_image: user_data?.image_display_url,
+          sender_image: user_data?.image_display_url ?? "",
           sender_emailHash: user_data?.email_hash,
           object_name: objectName,
           checked: false,
           time_text: timeAgo(notification.time_sent!),
           objectIdName: objectIdName,
+          msg: msg ?? ""
         }
         return resultNotification;
       }));

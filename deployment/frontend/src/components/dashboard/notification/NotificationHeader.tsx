@@ -74,6 +74,7 @@ function LeftNode({
                 <DefaultTooltip content="delete">
                     <button
                         className="p-0 m-0 mt-2"
+                        id="deletenotification"
                         onClick={() => setOpenDelete(true)}
                     >
                         <TrashIcon className="w-4 h-4 text-red-500" />
@@ -86,7 +87,7 @@ function LeftNode({
                     className="relative inline-block text-left  pr-1 z-50"
                 >
                     <div>
-                        <Menu.Button>
+                        <Menu.Button id="markedaction">
                             <div className="h-full mt-2">
                                 <DefaultTooltip content="read actions">
                                     <EllipsisVerticalIcon className="w-4 h-4 text-black" />
@@ -108,6 +109,7 @@ function LeftNode({
                                 <div className="px-2 pr-2 py-3 ">
                                     <Menu.Item
                                         as={'button'}
+                                        id="markasread"
                                         onClick={() => setOpenMarkAsRead(true)}
                                     >
                                         <div>Mark as read</div>
@@ -118,6 +120,7 @@ function LeftNode({
                                 <div className="px-2 pr-4 py-3 ">
                                     <Menu.Item
                                         as={'button'}
+                                        id="markasunread"
                                         onClick={() =>
                                             setOpenMarkAsUnread(true)
                                         }
@@ -176,7 +179,7 @@ function LeftNode({
                                     state: 'deleted',
                                 })
                             }
-                            id="deleteNotification"
+                            id="deletemodalnotification"
                         >
                             Delete Notification
                         </LoaderButton>

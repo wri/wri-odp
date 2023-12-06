@@ -173,8 +173,8 @@ export default function Layout({
                                   {
                                     item.name === "Notifications" ?
                                       (isLoading ? <Spinner className="w-2 h-2" /> :
-                                        data.length ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
-                                          {data.filter((item) => item.is_unread).length}</div>) : "") : ""
+                                        data?.length ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
+                                          {data?.filter((item) => item.is_unread).length}</div>) : "") : ""
                                   }
                                   {/* {item.count ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-4 h-4 rounded-full ">{item.count}</div>) : ""} */}
                                 </Link>
@@ -217,8 +217,8 @@ export default function Layout({
                              {
                                     item.name === "Notifications" ?
                                       (isLoading ? <Spinner className="w-2 h-2" /> :
-                                        data.length ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
-                                          {data.filter((item) => item.is_unread).length}</div>) : "") : ""
+                                        data?.length ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
+                                          {data?.filter((item) => item.is_unread).length}</div>) : "") : ""
                                   }
                             </Link>
                           </li>

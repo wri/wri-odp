@@ -17,6 +17,7 @@ export const NotificationSchema = z.object({
   sender_emailHash: z.string().optional(),
   time_text: z.string().optional(),
   objectIdName: z.string().optional(),
+  msg: z.string().optional(),
 
 })
 

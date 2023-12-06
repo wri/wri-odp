@@ -170,8 +170,8 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
 
 
 
-export default function UserCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
+export default function UserCard({username}: {username: string}) {
+  const [query, setQuery] = useState<SearchInput>({ search: username ?? '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.user.getAllUsers.useQuery({ search: '', page: { start: 0, rows: 100 } })
   const [open, setOpen] = useState(false)
   const router = useRouter()

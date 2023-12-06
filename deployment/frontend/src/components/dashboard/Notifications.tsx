@@ -13,7 +13,7 @@ import { NotificationType } from '@/schema/notification.schema'
 
 function Notification({ items }: { items: NotificationType }) {
     return (
-        <div className="flex flex-col sm:flex-row gap-x-4 hover:bg-slate-100 p-2 px-3 py-4 mb-2 pb-2 rounded-md">
+        <div className="flex flex-col sm:flex-row gap-x-4 group hover:bg-slate-100 p-2 px-3 py-4 mb-2 pb-2 rounded-md">
             <div className="flex gap-x-3">
                 {items?.is_unread ? (
                     <DefaultTooltip content="unread">
@@ -43,8 +43,19 @@ function Notification({ items }: { items: NotificationType }) {
             </div>
             <div className="flex flex-col">
                 <p className="font-normal text-base">
-                    {items?.sender_name} {items.activity_type}{' '}
-                    {items?.object_name}
+                    <Link
+                        href={`/dashboard/users?q=${items?.sender_name}`}
+                        className="group-hover:underline"
+                    >
+                        {items?.sender_name}{' '}
+                    </Link>
+                    {items?.msg}{' '}
+                    <Link
+                        href={`/datasets/${items?.objectIdName}`}
+                        className="group-hover:underline"
+                    >
+                        {items?.object_name}
+                    </Link>
                 </p>
                 {items.time_sent ? (
                     <span className="text-[#666666] font-tight text-[12px] ">

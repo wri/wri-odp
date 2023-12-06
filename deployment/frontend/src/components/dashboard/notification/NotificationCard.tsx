@@ -30,7 +30,10 @@ function Card({
         <div className="flex gap-x-4 items-center pl-4 sm:pl-6 py-4">
             {rowProfile?.is_unread ? (
                 <DefaultTooltip content="unread">
-                    <div className="w-2 h-2 rounded-full bg-wri-gold my-auto"></div>
+                    <div
+                        className="w-2 h-2 rounded-full bg-wri-gold my-auto"
+                        id="unreadn"
+                    ></div>
                 </DefaultTooltip>
             ) : (
                 <div className="w-2 h-2 rounded-full bg-wri-gold my-auto invisible"></div>
@@ -73,20 +76,28 @@ function Card({
                         </div>
                     </div>
                     <div className={`flex flex-col `}>
-                        <Link href={`/datasets/${rowProfile?.objectIdName}`}>
-                            <p className="font-normal text-base group-hover:underline">
+                        <p className="font-normal text-base ">
+                            <Link
+                                href={`/dashboard/users?q=${rowProfile?.sender_name}`}
+                                className="group-hover:underline"
+                            >
                                 {rowProfile?.sender_name}{' '}
-                                {rowProfile.activity_type}{' '}
+                            </Link>
+                            {rowProfile?.msg}{' '}
+                            <Link
+                                href={`/datasets/${rowProfile?.objectIdName}`}
+                                className="group-hover:underline"
+                            >
                                 {rowProfile?.object_name}
-                            </p>
-                            {rowProfile.time_sent ? (
-                                <span className="text-[#666666] font-tight text-[12px] ">
-                                    {rowProfile.time_text}
-                                </span>
-                            ) : (
-                                ''
-                            )}
-                        </Link>
+                            </Link>
+                        </p>
+                        {rowProfile.time_sent ? (
+                            <span className="text-[#666666] font-tight text-[12px] ">
+                                {rowProfile.time_text}
+                            </span>
+                        ) : (
+                            ''
+                        )}
                     </div>
                 </div>
             </div>
