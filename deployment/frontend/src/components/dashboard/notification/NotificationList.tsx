@@ -14,7 +14,7 @@ export default function NotificationList() {
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         fq: {},
-        page: { start: 0, rows: 10 },
+        page: { start: 0, rows: 2 },
     })
 
     const paginatedData = useQuery(
@@ -26,6 +26,7 @@ export default function NotificationList() {
             const start = query.page.start
             const rows = query.page.rows
             const slicedData = data.slice(start, start + rows)
+            slicedData.sort((a, b) => a.id.localeCompare(b.id) * -1)
             return slicedData
         },
         {
@@ -45,6 +46,14 @@ export default function NotificationList() {
                 setSelected={setSelected}
                 selected={selected}
                 data={paginatedData.data!}
+                Pagination={
+                    <Pagination
+                        setQuery={setQuery}
+                        query={query}
+                        isLoading={paginatedData.isLoading}
+                        count={data?.length}
+                    />
+                }
             />
             <div className=" w-full">
                 {paginatedData.data?.map((notification, index) => {

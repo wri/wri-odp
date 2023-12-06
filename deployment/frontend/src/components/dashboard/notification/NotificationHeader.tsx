@@ -308,10 +308,12 @@ export default function NotificationHeader({
     selected,
     setSelected,
     data,
+    Pagination,
 }: {
     selected: string[]
     setSelected: React.Dispatch<React.SetStateAction<string[]>>
     data: NotificationType[]
+    Pagination: React.ReactNode
 }) {
     return (
         <TableHeader
@@ -323,6 +325,7 @@ export default function NotificationHeader({
                 />
             }
             leftstyle="order-last sm:order-first"
+            Pagination={Pagination}
         />
     )
 }
