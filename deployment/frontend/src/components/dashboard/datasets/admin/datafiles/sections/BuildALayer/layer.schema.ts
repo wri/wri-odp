@@ -205,7 +205,6 @@ const legendsSchema = z.object({
         z.object({
             color: z
                 .string()
-                .length(7, 'It needs to be 7 characters long')
                 .regex(/^#/, 'Must start with #'),
             name: z.string(),
         })

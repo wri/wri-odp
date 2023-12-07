@@ -17,7 +17,6 @@ import { useState } from 'react'
 import classNames from '@/utils/classnames'
 import { useColumns } from '../useColumns'
 import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
-import { TemplateLayerModal } from './ChooseTemplates'
 
 interface InteractionFormProps {
     onNext: () => void
@@ -284,7 +283,7 @@ function ItemsArray() {
             >
                 <PlusCircleIcon className="h-5 w-5 text-amber-400" />
                 <span className="font-acumin text-lg font-normal leading-tight text-black">
-                    Add a layerConfig.render.item
+                    Add a render item
                 </span>
             </button>
         </div>
@@ -563,14 +562,19 @@ function RampObj({
 export function Accordion({
     text,
     children,
+    className,
 }: {
     text: string
     children: React.ReactNode
+    className?: string
 }) {
     return (
         <Disclosure
             as="div"
-            className="border-b border-r border-stone-200 shadow"
+            className={classNames(
+                'border-b border-r border-stone-200 shadow',
+                className ?? ''
+            )}
         >
             {({ open }) => (
                 <>
