@@ -10,9 +10,9 @@ env:
   PROJECT_NAME: wri-odp
   BRANCH_NAME: dev
 permissions:
-      id-token: write
-      contents: read
-      security-events: write
+  id-token: write
+  contents: read
+  security-events: write
 jobs:
   buildandtest:
     name: Build and Scan Image with Integration Tests
@@ -66,6 +66,8 @@ jobs:
         working-directory: ./ckan-backend-dev
       - name: Initialize the ckanext-issues table
         run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
+      - name: Initialize the notification table
+        run: docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
@@ -107,7 +109,7 @@ jobs:
         with:
           name: cypress-screenshots
           path: /home/runner/work/wri-odp/wri-odp/e2e-tests/cypress/screenshots
-          if-no-files-found: ignore 
+          if-no-files-found: ignore
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev
@@ -191,7 +193,7 @@ jobs:
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
           IMAGE_TAG: ${{ github.sha }}
-        run: |    
+        run: |
           cd deployment
           curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
           bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml

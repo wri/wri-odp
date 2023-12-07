@@ -734,3 +734,27 @@ export async function getTopicTreeDetails({
     }
 }
 
+export async function getDatasetDetails({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+   const user = session?.user
+    const datasetRes = await fetch(
+        `${env.CKAN_URL}/api/action/package_show?id=${id}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${user?.apikey ?? ''}`,
+            },
+        }
+    )
+    const dataset: CkanResponse<WriDataset> = await datasetRes.json()
+    if (!dataset.success && dataset.error) {
+        if (dataset.error.message) throw Error(dataset.error.message)
+        throw Error(JSON.stringify(dataset.error))
+    }
+    return dataset.result
+}

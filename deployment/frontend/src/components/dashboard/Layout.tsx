@@ -5,7 +5,8 @@ import UserProfile from "./UserProfile";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react"
 import Link from "next/link";
-
+import { api } from '@/utils/api'
+import Spinner from "../_shared/Spinner";
 
 let routes = [
   {
@@ -74,6 +75,7 @@ export default function Layout({
   const { asPath } = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data: session } = useSession()
+  const { data, isLoading } = api.notification.getAllNotifications.useQuery()
 
   if (!session?.user.sysadmin) {
     routes = routes.filter((item) => !item.isSysAdmin)
@@ -168,7 +170,13 @@ export default function Layout({
                                   className="flex w-full justify-center items-center gap-x-2"
                                 >
                                   <div className="font-normal text-[1.125rem]">{item.name}</div>
-                                  {item.count ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-4 h-4 rounded-full ">{item.count}</div>) : ""}
+                                  {
+                                    item.name === "Notifications" ?
+                                      (isLoading ? <Spinner className="w-2 h-2" /> :
+                                        data?.length ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
+                                          {data?.filter((item) => item.is_unread).length}</div>) : "") : ""
+                                  }
+                                  {/* {item.count ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-4 h-4 rounded-full ">{item.count}</div>) : ""} */}
                                 </Link>
                               </li>
                             )
@@ -206,7 +214,12 @@ export default function Layout({
                               className="flex w-full justify-center items-center gap-x-2"
                             >
                               <div className="font-normal text-[1.125rem]">{item.name}</div>
-                              {item.count ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">{item.count}</div>) : ""}
+                             {
+                                    item.name === "Notifications" ?
+                                      (isLoading ? <Spinner className="w-2 h-2" /> :
+                                        data?.length ? (<div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
+                                          {data?.filter((item) => item.is_unread).length}</div>) : "") : ""
+                                  }
                             </Link>
                           </li>
                         )
