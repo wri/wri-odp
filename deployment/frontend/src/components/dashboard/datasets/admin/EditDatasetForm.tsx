@@ -91,6 +91,8 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         defaultValues: {
             ...dataset,
             id: dataset.id,
+            rw_id: dataset.rw_id,
+            rw_dataset: !!dataset.rw_id,
             tags: dataset.tags ? dataset.tags.map((tag) => tag.name) : [],
             temporal_coverage_start: dataset.temporal_coverage_start
                 ? Number(dataset.temporal_coverage_start)

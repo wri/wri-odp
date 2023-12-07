@@ -32,7 +32,7 @@ export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
                       return !!item.enabled
                   }),
               }
-            : {},
+            : undefined,
         legendConfig:
             formData.legendConfig &&
             formData.legendConfig.items &&
@@ -220,9 +220,7 @@ export function convertLayerObjToForm(layerObj: APILayerSpec): LayerFormType {
                         : undefined,
                 provider: {
                     ...layerObj.layerConfig.source.provider,
-                    layers:
-                        layerObj.layerConfig.source.provider?.layers ??
-                        undefined,
+                    layers: layerObj.layerConfig.source.provider?.layers ?? [],
                     type: {
                         value:
                             (layerObj.layerConfig.source.provider

@@ -38,7 +38,7 @@ export function OverviewForm({
         register,
         setValue,
         watch,
-        formState: { errors },
+        formState: { errors, defaultValues },
     } = formObj
 
     const possibleOwners = api.teams.getAllTeams.useQuery()
@@ -210,34 +210,64 @@ export function OverviewForm({
                         />
                         <ErrorDisplay name="technical_notes" errors={errors} />
                     </InputGroup>
-                    <InputGroup label="Connector URL">
-                        <Input
-                            {...register('connectorUrl')}
-                            placeholder="https://wri-01.carto.com/tables/wdpa_protected_areas/table"
-                            type="text"
-                        />
-                    </InputGroup>
-                    <InputGroup label="Connector Type">
-                        <Input
-                            {...register('connectorType')}
-                            placeholder="rest"
-                            type="text"
-                        />
-                    </InputGroup>
-                    <InputGroup label="Provider">
-                        <Input
-                            {...register('provider')}
-                            placeholder="cartodb"
-                            type="text"
-                        />
-                    </InputGroup>
-                    <InputGroup label="Table Name">
-                        <Input
-                            {...register('tableName')}
-                            placeholder="users/resourcewatch_wri/dataset_name"
-                            type="text"
-                        />
-                    </InputGroup>
+                    <div className="relative flex justify-end">
+                        <div className="flex h-6 items-center">
+                            <input
+                                id="rw_dataset"
+                                aria-describedby="comments-description"
+                                {...register('rw_dataset')}
+                                type="checkbox"
+                                className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
+                            />
+                        </div>
+                        <div className="ml-3 text-sm leading-6">
+                            <label
+                                htmlFor="rw_dataset"
+                                className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
+                            >
+                                RW Dataset
+                                <DefaultTooltip content="Settings this will create an equivalent dataset in the Resource Watch API, required if you want to show Mapbox Layers">
+                                    <InformationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
+                                </DefaultTooltip>
+                            </label>
+                        </div>
+                    </div>
+                    {watch(`rw_dataset`) && (
+                        <>
+                            <InputGroup label="Connector URL">
+                                <Input
+                                    {...register('connectorUrl')}
+                                    placeholder="https://wri-01.carto.com/tables/wdpa_protected_areas/table"
+                                    type="text"
+                                    disabled={editing && !!defaultValues?.connectorUrl && defaultValues?.connectorUrl !== ''}
+                                />
+                            </InputGroup>
+                            <InputGroup label="Connector Type">
+                                <Input
+                                    {...register('connectorType')}
+                                    placeholder="rest"
+                                    type="text"
+                                    disabled={editing && !!defaultValues?.connectorType && defaultValues?.connectorType !== ''}
+                                />
+                            </InputGroup>
+                            <InputGroup label="Provider">
+                                <Input
+                                    {...register('provider')}
+                                    placeholder="cartodb"
+                                    disabled={editing && !!defaultValues?.provider && defaultValues?.provider !== ''}
+                                    type="text"
+                                />
+                            </InputGroup>
+                            <InputGroup label="Table Name">
+                                <Input
+                                    {...register('tableName')}
+                                    placeholder="users/resourcewatch_wri/dataset_name"
+                                    type="text"
+                                    disabled={editing && !!defaultValues?.tableName && defaultValues?.tableName !== ''}
+                                />
+                            </InputGroup>
+                        </>
+                    )}
                 </div>
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup label="Tags">

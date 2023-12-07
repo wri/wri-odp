@@ -1,5 +1,4 @@
 export const marine_ecoregions = {
-    id: '2dd860af-21be-47c6-8e1d-0b8eb63bfa46',
     name: '2007 Marine Ecoregions of the World',
     slug: 'marine-ecoregions-words',
     dataset: '36803484-c413-49a9-abe2-2286ee99b624',

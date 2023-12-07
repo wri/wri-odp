@@ -444,9 +444,8 @@ function ColorPicker({
                 <RampObj name={name} />
             ) : (
                 <div className="pb-8">
-                    <input
-                        type="color"
-                        className="col-span-1 h-[40px] w-[40px] rounded shadow"
+                    <Input
+                        type="text"
                         defaultValue={''}
                         {...register(name)}
                     />

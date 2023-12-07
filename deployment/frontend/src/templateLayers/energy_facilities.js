@@ -1,5 +1,4 @@
 export const energy_facilities = {
-    id: '8905878f-8888-42a1-95b5-801fd0b529a8',
     name: '2016 Energy Facility Emissions ( MT CO₂e, thousands)',
     slug: '2016-Energy-Facility-Emissions-MT-COe-thousands',
     dataset: 'f61e9516-ae23-4870-b26b-4d1b57ac3225',

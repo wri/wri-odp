@@ -1,5 +1,4 @@
 export const democracy_index = {
-    id: 'c3340efd-4a1c-40d6-9106-5157632a3dba',
     name: '2014 Overall Environmental Democracy Index Score',
     slug: 'overall-environmental-democracy-index-score',
     dataset: '0b9f0100-ce5b-430f-ad8f-3363efa05481',

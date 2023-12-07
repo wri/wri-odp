@@ -1,4 +1,5 @@
 
+import { InteractionFormType } from "@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/layer.schema";
 import type { Source, LayerType } from "@vizzuality/layer-manager";
 
 export interface DeckProps {
@@ -50,7 +51,7 @@ export interface APILayerSpec {
   layerConfig: layerConfigSpec;
   legendConfig: Record<string, string | number | boolean | unknown>;
   applicationConfig: Record<string, string | number | boolean | unknown>;
-  interactionConfig: Record<string, string | number | boolean | unknown>;
+  interactionConfig?: InteractionFormType;
   staticImageConfig: Record<string, string | number | boolean | unknown>;
   createdAt?: string;
   updatedAt?: string;

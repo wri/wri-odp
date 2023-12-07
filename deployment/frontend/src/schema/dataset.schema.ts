@@ -42,6 +42,7 @@ export const ResourceSchema = z.object({
     description: z.string().optional(),
     resourceId: z.string().uuid(),
     id: z.string().uuid().optional().nullable(),
+    rw_id: z.string().optional().nullable(),
     new: z.boolean().optional(),
     package_id: z.string().optional().nullable(),
     url: z.string().min(2, { message: 'URL is required' }).url().optional(),
@@ -51,17 +52,20 @@ export const ResourceSchema = z.object({
     size: z.number().optional().nullable(),
     title: z.string().optional(),
     fileBlob: z.any(),
-    type: z.enum(['link', 'upload', 'layer', 'empty']),
+    type: z.enum(['link', 'upload', 'layer', 'empty', 'layer-raw']),
     schema: DataDictionarySchema.optional().nullable(),
     layerObj: layerSchema.optional().nullable(),
+    layerObjRaw: z.any().optional().nullable(),
 })
 
 export const DatasetSchema = z
     .object({
         id: z.string().uuid().optional().nullable(),
+        rw_id: z.string().optional().nullable(),
         title: z.string().min(1, { message: 'Title is required' }),
         name: z.string().min(1, { message: 'Name is required' }),
         url: z.string().optional().nullable().or(emptyStringToUndefined),
+        rw_dataset: z.boolean().optional().nullable(),
         connectorUrl: z.string().optional().nullable().default(''),
         connectorType: z.string().optional().nullable().default('rest'),
         tableName: z.string().optional().nullable().default(''),
@@ -173,6 +177,19 @@ export const DatasetSchema = z
         {
             message: 'An image is required for featured datasets',
             path: ['featured_image'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (!obj.rw_dataset) return true
+            if (obj.rw_dataset && !obj.connectorUrl) return false
+            if (obj.rw_dataset && !obj.connectorType) return false
+            if (obj.rw_dataset && !obj.provider) return false
+            return true
+        },
+        {
+            message: 'Connector URL, Connector Type, and Provider are required for RW datasets',
+            path: ['rw_dataset'],
         }
     )
     .refine(

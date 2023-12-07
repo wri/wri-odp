@@ -203,9 +203,7 @@ const legendsSchema = z.object({
     type: z.enum(['basic', 'choropleth', 'gradient']),
     items: z.array(
         z.object({
-            color: z
-                .string()
-                .regex(/^#/, 'Must start with #'),
+            color: z.string().regex(/^#/, 'Must start with #'),
             name: z.string(),
         })
     ),
@@ -231,18 +229,13 @@ export const layerSchema = z
         name: z.string().default(''),
         slug: z.string().default(''),
         default: z.boolean().default(false),
-        dataset: z.string().uuid(),
+        dataset: z.string().uuid().optional(),
         applicationConfig: z.any().optional().nullable(),
         staticImageConfig: z.any().optional().nullable(),
         published: z.boolean().default(false),
         protected: z.boolean().default(false),
-        thumbnailUrl: z
-            .string()
-            .optional()
-            .or(emptyStringToUndefined),
-        env: z
-            .enum(['production', 'staging', 'development'])
-            .default('staging'),
+        thumbnailUrl: z.string().optional().or(emptyStringToUndefined),
+        env: z.string().default('staging'),
         application: z.array(z.string()).default(['rw']),
         description: z.string().default(''),
         provider: z.string().default('cartodb'),

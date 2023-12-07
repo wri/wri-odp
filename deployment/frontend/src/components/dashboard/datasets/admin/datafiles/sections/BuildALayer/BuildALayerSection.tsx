@@ -57,6 +57,8 @@ export function BuildALayer({
         },
     })
 
+    console.log('LAYER OBJ ERRORS', layerFormObj.formState.errors)
+
     const syncValues = () => {
         const values = layerFormObj.getValues()
         formObj.setValue(`resources.${index}.layerObj`, values)
