@@ -3,6 +3,9 @@ import { Tab } from '@headlessui/react'
 import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
 import UserCard from './UserCard'
 import { useRouter } from 'next/router'
+import AddUserForm from './AddUserForm'
+import { api } from '@/utils/api'
+import Spinner from '@/components/_shared/Spinner'
 
 export function empty({ username }: { username: string }) {
     return <div></div>
@@ -15,7 +18,7 @@ const tabs = [
     },
     {
         id: 'addteam',
-        content: empty,
+        content: AddUserForm,
         title: 'Add user',
     },
 ]
@@ -23,6 +26,8 @@ const tabs = [
 export default function UserList() {
     const { q } = useRouter().query
     const username = (q as string) ?? ''
+    const { data, isLoading } = api.user.getUserCapacity.useQuery()
+
     return (
         <section id="teamtab" className="w-full max-w-8xl  font-acumin ">
             <Tab.Group>
@@ -41,12 +46,16 @@ export default function UserList() {
                                     } `}
                                 >
                                     {tab.title === 'Add user' ? (
-                                        <div className="flex">
-                                            <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">
-                                                <PlusSmallIcon className="w-3 h-3 text-white" />
+                                        isLoading ? (
+                                            <Spinner />
+                                        ) : data?.isOrgAdmin ? (
+                                            <div className="flex">
+                                                <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">
+                                                    <PlusSmallIcon className="w-3 h-3 text-white" />
+                                                </div>
+                                                <span>{tab.title}</span>
                                             </div>
-                                            <span>{tab.title}</span>
-                                        </div>
+                                        ) : null
                                     ) : (
                                         <span>{tab.title}</span>
                                     )}
@@ -59,9 +68,11 @@ export default function UserList() {
                     {tabs.map((tab) => (
                         <Tab.Panel key={tab.title} className="">
                             {tab.id === 'allteams' ? (
-                                <tab.content username={username} />
+                                <UserCard username={username} />
+                            ) : isLoading ? (
+                                <Spinner />
                             ) : (
-                                <tab.content username={''} />
+                                <AddUserForm orgList={data?.adminOrg!} />
                             )}
                         </Tab.Panel>
                     ))}

@@ -15,7 +15,8 @@ import type { SearchInput } from '@/schema/search.schema'
 import { Facets } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
-import {Resource} from '@/interfaces/dataset.interface'
+import { Resource } from '@/interfaces/dataset.interface'
+import nodemailer from 'nodemailer';
 
 export async function searchHierarchy({
     isSysadmin,
@@ -757,4 +758,92 @@ export async function getDatasetDetails({
         throw Error(JSON.stringify(dataset.error))
     }
     return dataset.result
+}
+
+export async function getRandomUsernameFromEmail(email: string): Promise<string> {
+    const localpart = email.split('@')[0] as string;
+    const cleanedLocalpart = localpart.replace(/[^\w]/g, '-').toLowerCase();
+
+    const maxNameCreationAttempts = 100;
+
+    const checkUsernameExists = async (username: string): Promise<boolean> => {
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/user_show?q=${username}`);
+        const userData = (await response.json()) as CkanResponse<User>;
+        return !!userData.result;
+    };
+
+    for (let i = 0; i < maxNameCreationAttempts; i++) {
+        const randomNumber = Math.floor(Math.random() * 10000);
+        const randomName = `${cleanedLocalpart}-${randomNumber}`;
+
+        const userExists = await checkUsernameExists(randomName);
+
+        if (!userExists) {
+            return randomName;
+        }
+    }
+
+    return cleanedLocalpart; 
+}
+
+export function generateRandomPassword(length: number): string {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+";
+    let password = "";
+
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset.charAt(randomIndex);
+    }
+
+    return password;
+}
+
+export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+    const transporter = nodemailer.createTransport({
+        host: env.SMTP_HOST,
+        port: env.SMTP_PORT,
+        secure: false,
+        auth: {
+            user: env.SMTP_USER,
+            pass: env.SMTP_PASSWORD,
+        },
+    });
+
+    await transporter.sendMail({
+        from: env.SMTP_FROM,
+        to,
+        subject,
+        html,
+    });
+}
+
+export function generateEmail(email: string, password: string, username: string): string {
+    return `
+        <p>Hi there,</p>
+        <p>You have been invited to join the WRI OpenData Platform. Please use the following credentials to log in to ${env.NEXTAUTH_URL}:</p>
+        <p>Username: ${username}</p>
+        <p>Email: ${email}</p>
+        <p>Password: ${password}</p>
+        <p>Once you log in, remember to change your password</p>
+        <p>Thanks!</p>
+    `;
+}
+
+export function generateInviteEmail(email: string,
+    password: string,
+    username: string,
+    orgName: string,
+    role: string
+    ): string {
+    return `
+        <p>Hi there,</p>
+        <p>You have been invited to join the WRI OpenData Platform and you have been added to the team ${orgName} 
+        with the following role: ${role}.</p>
+        <p>Please use the following credentials to log in to ${env.NEXTAUTH_URL}:</p>
+        <p>Username: ${username}</p>
+        <p>Email: ${email}</p>
+        <p>Password: ${password}</p>
+        <p>Once you log in, remember to change your password</p>
+        <p>Thanks!</p>
+    `;
 }
