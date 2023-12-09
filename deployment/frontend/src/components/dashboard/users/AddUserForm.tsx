@@ -78,7 +78,7 @@ export default function AddUserForm({
         <>
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="max-w-8xl mx-auto w-full xl:w-[90%] py-12 px-4 sm:px-6 lg:px-12  rounded-lg shadow-wri flex flex-col gap-y-8"
+                className="max-w-8xl mx-auto sm:mt-40 w-full xl:w-[90%] py-12 px-4 sm:px-6 lg:px-12  rounded-lg shadow-wri flex flex-col gap-y-8"
             >
                 <InputGroup
                     label="Email"
