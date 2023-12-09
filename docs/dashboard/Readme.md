@@ -183,3 +183,23 @@ click on the star icon
 see changed reflected
 
 ![](./addfave.png)
+
+## Add User
+
+To add user to the platform visit `/dashboard/users` and click on Add user tab
+
+![](./adduser.png)
+
+You can add a user without assigning them to a team
+
+![](./adduser1.png)
+
+And if a team is selected , the Role field get displayed
+
+![](./adduser2.png)
+
+and once the user is created the user should recieve a notification.
+
+Also you can visit the users page to view newly added user
+
+![](./adduser3.png)
