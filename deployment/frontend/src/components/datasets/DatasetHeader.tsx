@@ -3,6 +3,7 @@ import {
     ChartBarIcon,
     ChevronLeftIcon,
     ExclamationTriangleIcon,
+    InformationCircleIcon,
     GlobeAltIcon,
     TableCellsIcon,
 } from '@heroicons/react/20/solid'
@@ -225,9 +226,9 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                             key="add-to-favorites"
                         >
                             <div className="sm:flex sm:items-start">
-                                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                    <ExclamationTriangleIcon
-                                        className="h-6 w-6 text-red-600"
+                                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                                    <InformationCircleIcon
+                                        className="h-6 w-6 text-green-600"
                                         aria-hidden="true"
                                     />
                                 </div>
@@ -249,7 +250,8 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                             </div>
                             <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
                                 <LoaderButton
-                                    variant="destructive"
+                                    variant="light"
+                                    className="bg-wri-gold "
                                     onClick={() => {
                                         addToFavorites.mutate(
                                             dataset?.id as string
