@@ -26,6 +26,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { convertBytes } from '@/utils/convertBytes'
 import { useDataDictionary } from '@/utils/getDataDictionary'
 import { Field } from 'tableschema'
+import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 
 export function CreateDataFilesSection({
     formObj,
@@ -86,6 +87,7 @@ function AddDataFile({
 }) {
     const { setValue, watch } = formObj
     const datafile = watch(`resources.${index}`)
+    console.log(datafile)
     const uploadInputRef = useRef<HTMLInputElement>(null)
     const { isLoading: dataDictionaryLoading } = useDataDictionary(
         watch(`resources.${index}.fileBlob`),
@@ -263,12 +265,13 @@ function AddDataFile({
                             .with('upload', () => 1)
                             .with('link', () => 2)
                             .with('layer', () => 3)
+                            .with('layer-raw', () => 4)
                             .otherwise(() => 0)}
                     >
                         <Tab.List
                             as="div"
                             className={classNames(
-                                'grid max-w-[35rem] grid-cols-2 sm:grid-cols-3 gap-3 py-4',
+                                'grid max-w-[50rem] grid-cols-2 lg:grid-cols-4 gap-3 py-4',
                                 datafile.type === 'upload' ? 'hidden' : ''
                             )}
                         >
@@ -349,7 +352,10 @@ function AddDataFile({
                             <Tab
                                 id="tabLayerRaw"
                                 onClick={() =>
-                                    setValue(`resources.${index}.type`, 'layer-raw')
+                                    setValue(
+                                        `resources.${index}.type`,
+                                        'layer-raw'
+                                    )
                                 }
                             >
                                 {({ selected }) => (
@@ -403,6 +409,12 @@ function AddDataFile({
                             </Tab.Panel>
                             <Tab.Panel>
                                 <BuildALayer formObj={formObj} index={index} />
+                            </Tab.Panel>
+                            <Tab.Panel>
+                                <BuildALayerRaw
+                                    formObj={formObj}
+                                    index={index}
+                                />
                             </Tab.Panel>
                         </Tab.Panels>
                     </Tab.Group>

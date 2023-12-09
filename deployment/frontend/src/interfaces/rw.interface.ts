@@ -11,7 +11,7 @@ export type RwResponse = RwLayerResp | RwDatasetResp | RwErrorResponse
 export interface RwLayerResp {
     data: {
         id: string
-        attributes: RwDataset
+        attributes: APILayerSpec
     }
 }
 

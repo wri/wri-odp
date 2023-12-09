@@ -359,7 +359,7 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
 }
 
 interface DatafilePreviewProps {
-    type: 'link' | 'upload' | 'layer' | 'empty'
+    type: 'link' | 'upload' | 'layer' | 'empty' | 'layer-raw'
     name: string
     title: string
     format: string
@@ -519,3 +519,4 @@ function PreviewTable({
         </Table>
     )
 }
+

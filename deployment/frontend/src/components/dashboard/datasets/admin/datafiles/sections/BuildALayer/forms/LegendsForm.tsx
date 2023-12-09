@@ -12,6 +12,7 @@ import {
 } from 'react-hook-form'
 import { LayerFormType } from '../layer.schema'
 import { getColors, legendsToAdd } from '../getColors'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
 export default function LegendForm({
     onNext,
@@ -34,22 +35,24 @@ export default function LegendForm({
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="mt-10 flex w-full justify-end">
-                    <Button
-                        type="button"
-                        onClick={() =>
-                            legendsToAdd(
-                                formObj.watch('legendConfig'),
-                                formObj.watch('layerConfig.render')
-                            ).forEach((color) => {
-                                useFieldArrayObj.append({
-                                    name: 'Item',
-                                    color: color ?? '#000000',
+                    <DefaultTooltip content="This button will try to load the colors defined in the render object of the layer config directly as legends">
+                        <Button
+                            type="button"
+                            onClick={() =>
+                                legendsToAdd(
+                                    formObj.watch('legendConfig'),
+                                    formObj.watch('layerConfig.render')
+                                ).forEach((color) => {
+                                    useFieldArrayObj.append({
+                                        name: 'Item',
+                                        color: color ?? '#000000',
+                                    })
                                 })
-                            })
-                        }
-                    >
-                        Load Paint
-                    </Button>
+                            }
+                        >
+                            Load Paint
+                        </Button>
+                    </DefaultTooltip>
                 </div>
                 <div className="flex flex-col gap-y-4">
                     <div className="grid grid-cols-12 gap-x-6">

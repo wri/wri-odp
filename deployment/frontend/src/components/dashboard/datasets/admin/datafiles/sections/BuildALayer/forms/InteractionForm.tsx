@@ -11,9 +11,9 @@ import {
 import { LayerFormType } from '../layer.schema'
 import { InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
-import { Accordion } from './RenderForm'
 import { Button } from '@/components/_shared/Button'
 import { useState } from 'react'
+import { Accordion } from '../Accordion'
 
 interface InteractionFormProps {
     onNext: () => void
@@ -53,13 +53,6 @@ export default function InteractionForm({
                         type="button"
                     >
                         Back
-                    </Button>
-                    <Button
-                        type="button"
-                        onClick={() => onNext()}
-                        className="w-fit"
-                    >
-                        Save changes
                     </Button>
                 </div>
             </form>

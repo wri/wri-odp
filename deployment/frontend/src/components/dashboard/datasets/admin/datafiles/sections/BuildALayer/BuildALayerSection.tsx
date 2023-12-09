@@ -12,7 +12,7 @@ import { DatasetFormType } from '@/schema/dataset.schema'
 import { LayerFormType, layerSchema } from './layer.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/_shared/Button'
-import { convertFormToLayerObj } from './convertObjects'
+import { convertFormToLayerObj, getRawObjFromApiSpec } from './convertObjects'
 import { Legends } from './preview/Legends'
 import { Steps } from './Steps'
 import { getInteractiveLayers } from '@/utils/queryHooks'
@@ -57,7 +57,16 @@ export function BuildALayer({
         },
     })
 
-    console.log('LAYER OBJ ERRORS', layerFormObj.formState.errors)
+    console.log('LAYER OBJ VALUES', layerFormObj.getValues())
+
+    const convertToRaw = () => {
+        formObj.setValue(`resources.${index}.type`, 'layer-raw')
+        const layerObjRaw = getRawObjFromApiSpec(
+            convertFormToLayerObj(layerFormObj.getValues())
+        )
+        formObj.setValue(`resources.${index}.layerObjRaw`, layerObjRaw)
+        formObj.setValue(`resources.${index}.layerObj`, null)
+    }
 
     const syncValues = () => {
         const values = layerFormObj.getValues()
@@ -83,7 +92,8 @@ export function BuildALayer({
                 `https://${watch(
                     'layerConfig.source.provider.account'
                 )}.carto.com:443/api/v2/sql?q=${
-                    watch('layerConfig.source.provider.layers.0.options.sql') ?? ''
+                    watch('layerConfig.source.provider.layers.0.options.sql') ??
+                    ''
                 }`
             )
     }, [
@@ -98,10 +108,12 @@ export function BuildALayer({
                 <div>
                     {current.matches('setSourceConfig') && (
                         <SourceForm
+                            convertToRaw={convertToRaw}
                             onNext={() => {
                                 syncValues()
-                                layerFormObj.watch('layerConfig.source.provider.type')
-                                    .value === 'carto'
+                                layerFormObj.watch(
+                                    'layerConfig.source.provider.type'
+                                ).value === 'carto'
                                     ? send('GO_TO_RENDER')
                                     : send('GO_TO_LEGEND')
                             }}
@@ -127,8 +139,9 @@ export function BuildALayer({
                             }}
                             onPrev={() => {
                                 syncValues()
-                                layerFormObj.watch('layerConfig.source.provider.type')
-                                    .value === 'carto'
+                                layerFormObj.watch(
+                                    'layerConfig.source.provider.type'
+                                ).value === 'carto'
                                     ? send('BACK_TO_RENDER')
                                     : send('BACK_TO_SOURCE')
                             }}

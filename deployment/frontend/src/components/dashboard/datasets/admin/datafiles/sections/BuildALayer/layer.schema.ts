@@ -223,6 +223,14 @@ const interactionConfigSchema = z.object({
     ),
 })
 
+export const rawLayerSchema = z.object({
+    id: z.string().uuid().optional().nullable().or(emptyStringToUndefined),
+    generalConfig: z.any().optional().nullable(),
+    layerConfig: z.any().optional().nullable(),
+    interactionConfig: z.any().optional().nullable(),
+    legendConfig: z.any().optional().nullable(),
+})
+
 export const layerSchema = z
     .object({
         id: z.string().uuid().optional().nullable().or(emptyStringToUndefined),
@@ -274,6 +282,7 @@ export const layerSchema = z
     )
 
 export type ColorPatternType = z.infer<typeof colorPattern>
+export type RawLayerFormType = z.infer<typeof rawLayerSchema>
 export type LayerFormType = z.infer<typeof layerSchema>
 export type SourceFormType = z.infer<typeof sourceSchema>
 export type RenderFormType = z.infer<typeof renderSchema>

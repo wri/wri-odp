@@ -5,6 +5,7 @@ import {
     LayerFormType,
     layerSchema,
     LegendsFormType,
+    RawLayerFormType,
 } from './layer.schema'
 import { v4 as uuidv4 } from 'uuid'
 import { APILayerSpec } from '@/interfaces/layer.interface'
@@ -355,4 +356,32 @@ function parseRender(render: any) {
         })),
     }
     return _render
+}
+
+export const getApiSpecFromRawObj = (rawLayerFormObj: RawLayerFormType) => {
+    const { generalConfig, layerConfig, interactionConfig, legendConfig } =
+        rawLayerFormObj
+    try {
+        const apiSpec = {
+            ...JSON.parse(generalConfig ?? '{}'),
+            layerConfig: JSON.parse(layerConfig ?? '{}'),
+            interactionConfig: JSON.parse(interactionConfig ?? '{}'),
+            legendConfig: JSON.parse(legendConfig ?? '{}'),
+        }
+        return apiSpec
+    } catch (e) {
+        throw new Error('Could not convert to layer object')
+    }
+}
+
+export const getRawObjFromApiSpec = (apiSpec: APILayerSpec) => {
+    const { layerConfig, interactionConfig, legendConfig, id, ...attributes } =
+        apiSpec
+    return {
+        id,
+        generalConfig: JSON.stringify(attributes, null, 2),
+        layerConfig: JSON.stringify(layerConfig, null, 2),
+        interactionConfig: JSON.stringify(interactionConfig, null, 2),
+        legendConfig: JSON.stringify(legendConfig, null, 2),
+    }
 }

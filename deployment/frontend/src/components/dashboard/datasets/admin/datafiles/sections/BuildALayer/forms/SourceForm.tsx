@@ -19,7 +19,13 @@ import { useColumns } from '../useColumns'
 import classNames from '@/utils/classnames'
 import { ChooseTemplates } from './ChooseTemplates'
 
-export default function SourceForm({ onNext }: { onNext: () => void }) {
+export default function SourceForm({
+    onNext,
+    convertToRaw,
+}: {
+    onNext: () => void
+    convertToRaw: () => void
+}) {
     const formObj = useFormContext<LayerFormType>()
     const [columnsFetchEnabled, setColumnsFetchEnabled] = useState(false)
     const [templateModalOpen, setTemplateModalOpen] = useState(false)
@@ -57,6 +63,7 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
             }
         }
     )
+
     return (
         <>
             <form
@@ -68,10 +75,19 @@ export default function SourceForm({ onNext }: { onNext: () => void }) {
                     open={templateModalOpen}
                     setOpen={() => setTemplateModalOpen(!open)}
                 />
-                <div className="mt-10 flex w-full justify-end">
-                <Button onClick={() => setTemplateModalOpen(true)} type="button">
-                    Use Template
-                </Button></div>
+                <div className="mt-10 flex gap-x-2 w-full justify-end">
+                    <DefaultTooltip content="This will convert this guided form to a raw JSON object that can be edited directly, this is useful for advanced users that want to use features that are not yet supported by the guided form">
+                        <Button onClick={() => convertToRaw()} type="button">
+                            Convert to raw object
+                        </Button>
+                    </DefaultTooltip>
+                    <Button
+                        onClick={() => setTemplateModalOpen(true)}
+                        type="button"
+                    >
+                        Use Template
+                    </Button>
+                </div>
                 <div className="grid gap-x-6 gap-y-4 max-h-[375px] overflow-auto">
                     <InputGroup
                         label="Name of Layer"
