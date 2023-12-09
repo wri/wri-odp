@@ -54,8 +54,12 @@ export default function AddUserForm({
     const { errors } = formState
     const userCreateApi = api.user.createOtherUser.useMutation({
         onSuccess: async (data) => {
+            await utils.user.getAllUsers.invalidate({
+                search: '',
+                page: { start: 0, rows: 100 },
+            })
             notify(`Successfully created user: ${data.name}`, 'success')
-            router.push('/dashboard/users')
+            router.push(`/dashboard`)
         },
         onError: (error) => setErrorMessage(error.message),
     })

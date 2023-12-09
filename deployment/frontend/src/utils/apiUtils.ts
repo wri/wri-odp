@@ -799,9 +799,10 @@ export function generateRandomPassword(length: number): string {
 }
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const transporter = nodemailer.createTransport({
-        host: env.SMTP_HOST,
-        port: env.SMTP_PORT,
+        host: env.SMTP_SERVER,
+        port: Number(env.SMTP_PORT) || 0,
         secure: false,
         auth: {
             user: env.SMTP_USER,
@@ -809,6 +810,7 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
         },
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     await transporter.sendMail({
         from: env.SMTP_FROM,
         to,

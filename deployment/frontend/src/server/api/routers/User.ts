@@ -326,10 +326,9 @@ export const UserRouter = createTRPCRouter({
 
       
       if (input.team?.value) {
-        // add user to organization
         const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_member_create`, {
           method: "POST",
-          body: JSON.stringify({ id: input.team?.value, username: name, role: input.role?.value }),
+          body: JSON.stringify({ id: input.team?.id, username: name, role: input.role?.id }),
           headers: {
             "Authorization": ctx.session.user.apikey,
             "Content-Type": "application/json"
@@ -338,9 +337,10 @@ export const UserRouter = createTRPCRouter({
         const data = (await response.json()) as CkanResponse<null>;
         if (!data.success && data.error) throw Error(data.error.message)
 
+
         try {
           const role = input.role?.value as string;
-          const email = generateInviteEmail(input.email, password,  name, input.team.label, role);
+          const email = generateInviteEmail(input.email, password, name, input.team.label, role);
           await sendEmail(input.email, "Invite for WRI OpenData Platform", email);
         }
         catch (error) {
@@ -351,7 +351,7 @@ export const UserRouter = createTRPCRouter({
       else {
         try {
           const email = generateEmail(input.email, password, name);
-          await sendEmail(input.email, "Welcome to WRI OpenData Platform", email);
+          await sendEmail(input.email, "Invite for WRI OpenData Platform", email);
         }
         catch (error) {
           throw Error(error as string)
