@@ -20,7 +20,8 @@ export interface CkanResponse<T> {
     error?: {
         __type: string
         message: string
-    }
+
+    } | Record<string, string | string[]>
     result: T
 }
 
