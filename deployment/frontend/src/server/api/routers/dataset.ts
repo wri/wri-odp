@@ -745,4 +745,69 @@ export const DatasetRouter = createTRPCRouter({
             if (!data.success && data.error) throw Error(data.error.message)
             return data
         }),
+    
+    followDataset: protectedProcedure
+        .input(z.string())
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/follow_dataset`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        id: input
+                    }),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const data = (await response.json()) as CkanResponse<null>
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
+        }),
+    unFollowDataset: protectedProcedure
+        .input(z.string())
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/unfollow_dataset`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        id: input
+                    }),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const data = (await response.json()) as CkanResponse<null>
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
+        }),
+    isFavoriteDataset: protectedProcedure
+        .input(z.string())
+        .query(async ({input, ctx }) => {
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${ctx.session.user.apikey}`,
+                },
+            }
+        )
+        const data = (await response.json()) as CkanResponse<FolloweeList[]>
+        if (!data.success && data.error) throw Error(data.error.message)
+        const result = data.result.reduce((acc, item) => {
+            if (item.type === 'dataset') {
+                const t = item.dict as WriDataset
+                acc.push(t)
+            }
+            return acc
+        }, [] as WriDataset[])
+
+        return result.some((dataset) => dataset.id === input)
+    }),
 })
