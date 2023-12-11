@@ -17,6 +17,7 @@ import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
 import { Resource } from '@/interfaces/dataset.interface'
 import nodemailer from 'nodemailer';
+import { randomBytes } from 'crypto';
 
 export async function searchHierarchy({
     isSysadmin,
@@ -760,6 +761,10 @@ export async function getDatasetDetails({
     return dataset.result
 }
 
+function cryptoRandomFloat(): number {
+    return randomBytes(4).readUInt32BE(0) / 0xffffffff;
+}
+
 export async function getRandomUsernameFromEmail(email: string): Promise<string> {
     const localpart = email.split('@')[0] as string;
     const cleanedLocalpart = localpart.replace(/[^\w]/g, '-').toLowerCase();
@@ -773,8 +778,9 @@ export async function getRandomUsernameFromEmail(email: string): Promise<string>
     };
 
     for (let i = 0; i < maxNameCreationAttempts; i++) {
-        const randomNumber = Math.floor(Math.random() * 10000);
-        const randomName = `${cleanedLocalpart}-${randomNumber}`;
+        const randomNumber = cryptoRandomFloat();
+        const randomSuffix = Math.floor(randomNumber * 10000);
+        const randomName = `${cleanedLocalpart}-${randomSuffix}`;
 
         const userExists = await checkUsernameExists(randomName);
 
@@ -791,7 +797,8 @@ export function generateRandomPassword(length: number): string {
     let password = "";
 
     for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * charset.length);
+        const randomNumber = cryptoRandomFloat();
+        const randomIndex = Math.floor(randomNumber * charset.length);
         password += charset.charAt(randomIndex);
     }
 
