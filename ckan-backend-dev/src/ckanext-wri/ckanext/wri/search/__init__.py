@@ -201,12 +201,26 @@ you need to split the geometry in order to fit the parts. Not indexing"""
             search_params["fq_list"] = []
 
         queries = []
-
-        if point:
-            queries.append("_query_:\"{{!field f=spatial_geom}}Contains({y}, {x})\"".format(**point))
-
+        
         if address:
             queries.append("spatial_address:/.*{}/".format(address))
+
+            segments = address.split(',')
+            
+            geojson_file = ""
+            
+            if len(segments) == 1:
+                # It's a country
+                with open("../world_geojsons/countries/{}.geojson".format(segments[0]), 'r') as f:
+                    content = f.read()
+
+            elif len(segments) == 2:
+                # It's a state
+
+            elif len(segments) == 3:
+                # It's a city
+                if point:
+                    queries.append("_query_:\"{{!field f=spatial_geom}}Contains({y}, {x})\"".format(**point))
 
         search_params["fq_list"].append(" OR ".join(queries))
 
