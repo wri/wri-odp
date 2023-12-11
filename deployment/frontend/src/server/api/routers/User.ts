@@ -322,7 +322,16 @@ export const UserRouter = createTRPCRouter({
       });
 
       const data = (await response.json()) as CkanResponse<User>;
-      if (!data.success && data.error) throw Error(data.error.message)
+      if (!data.success && data.error) {
+         const errors = Object.keys(data.error).map((key) => {
+            const error = data.error as Record<string, string | string[]>;
+            const value = error[key];
+            if (Array.isArray(value)) {
+              return `${key}: ${value.join(", ")}`;
+            }
+          })
+        throw Error(errors.join(",\n"))
+      }
 
       
       if (input.team?.value) {
