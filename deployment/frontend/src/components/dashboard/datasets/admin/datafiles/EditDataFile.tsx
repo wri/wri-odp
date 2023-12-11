@@ -6,7 +6,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { UseFormReturn } from 'react-hook-form'
 import { DataFileAccordion } from './DatafileAccordion'
-import { match } from 'ts-pattern'
+import { match, P } from 'ts-pattern'
 import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import { convertBytes } from '@/utils/convertBytes'
 import { Tab } from '@headlessui/react'
@@ -23,12 +23,7 @@ import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
-
-const tabs = [
-    { name: 'Metadata' },
-    { name: 'Views' },
-    { name: 'Data Dictionary' },
-]
+import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 
 export function EditDataFile({
     remove,
@@ -106,7 +101,7 @@ export function EditDataFile({
                                     </button>
                                 </>
                             ))
-                            .with('layer', () => (
+                            .with(P.union('layer', 'layer-raw'), () => (
                                 <>
                                     <div className="flex items-center gap-x-2">
                                         <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
@@ -169,6 +164,8 @@ export function EditDataFile({
                 <div className="px-4 py-8">
                     {datafile.type === 'layer' ? (
                         <BuildALayer formObj={formObj} index={index} />
+                    ) : datafile.type === 'layer-raw' ? (
+                        <BuildALayerRaw formObj={formObj} index={index} />
                     ) : (
                         <Tab.Group>
                             <div>
@@ -311,7 +308,12 @@ export function EditDataFile({
                             </div>
                         )}
                     </div>
-                    <div className={classNames("px-4 sm:px-6 xxl:px-0 py-2 w-full flex justify-end", datafile.type === 'layer' ? "sm:px-0 px-0" : '')}>
+                    <div
+                        className={classNames(
+                            'px-4 sm:px-6 xxl:px-0 py-2 w-full flex justify-end',
+                            datafile.type === 'layer' ? 'sm:px-0 px-0' : ''
+                        )}
+                    >
                         <LoaderButton
                             variant="muted"
                             type="button"

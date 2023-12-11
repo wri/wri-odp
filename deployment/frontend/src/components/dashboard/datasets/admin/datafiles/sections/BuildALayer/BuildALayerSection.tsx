@@ -12,7 +12,7 @@ import { DatasetFormType } from '@/schema/dataset.schema'
 import { LayerFormType, layerSchema } from './layer.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/_shared/Button'
-import { convertFormToLayerObj } from './convertObjects'
+import { convertFormToLayerObj, getRawObjFromApiSpec } from './convertObjects'
 import { Legends } from './preview/Legends'
 import { Steps } from './Steps'
 import { getInteractiveLayers } from '@/utils/queryHooks'
@@ -41,19 +41,30 @@ export function BuildALayer({
     const layerFormObj = useForm<LayerFormType>({
         resolver: zodResolver(layerSchema),
         defaultValues: {
-            type: { value: 'vector', label: 'Vector' },
-            source: {
-                provider: {
-                    account: 'wri-rw',
-                    type: {
-                        value: 'carto',
-                        label: 'Carto',
+            layerConfig: {
+                type: { value: 'vector', label: 'Vector' },
+                source: {
+                    provider: {
+                        account: 'wri-rw',
+                        type: {
+                            value: 'carto',
+                            label: 'Carto',
+                        },
                     },
                 },
             },
             ...formObj.getValues(`resources.${index}.layerObj`),
         },
     })
+
+    const convertToRaw = () => {
+        formObj.setValue(`resources.${index}.type`, 'layer-raw')
+        const layerObjRaw = getRawObjFromApiSpec(
+            convertFormToLayerObj(layerFormObj.getValues())
+        )
+        formObj.setValue(`resources.${index}.layerObjRaw`, layerObjRaw)
+        formObj.setValue(`resources.${index}.layerObj`, null)
+    }
 
     const syncValues = () => {
         const values = layerFormObj.getValues()
@@ -62,9 +73,8 @@ export function BuildALayer({
 
     const updatePreview = () => {
         syncValues()
-        setPreview(
-            convertFormToLayerObj(layerSchema.parse(layerFormObj.getValues()))
-        )
+        console.log('UPDATING PREVIEW', layerFormObj.getValues())
+        setPreview(convertFormToLayerObj(layerFormObj.getValues()))
     }
 
     const {
@@ -77,14 +87,15 @@ export function BuildALayer({
             setValue(
                 'connectorUrl',
                 `https://${watch(
-                    'source.provider.account'
+                    'layerConfig.source.provider.account'
                 )}.carto.com:443/api/v2/sql?q=${
-                    watch('source.provider.layers.0.options.sql') ?? ''
+                    watch('layerConfig.source.provider.layers.0.options.sql') ??
+                    ''
                 }`
             )
     }, [
-        watch('source.provider.account'),
-        watch('source.provider.layers.0.options.sql'),
+        watch('layerConfig.source.provider.account'),
+        watch('layerConfig.source.provider.layers.0.options.sql'),
     ])
 
     return (
@@ -94,10 +105,12 @@ export function BuildALayer({
                 <div>
                     {current.matches('setSourceConfig') && (
                         <SourceForm
+                            convertToRaw={convertToRaw}
                             onNext={() => {
                                 syncValues()
-                                layerFormObj.watch('source.provider.type')
-                                    .value === 'carto'
+                                layerFormObj.watch(
+                                    'layerConfig.source.provider.type'
+                                ).value === 'carto'
                                     ? send('GO_TO_RENDER')
                                     : send('GO_TO_LEGEND')
                             }}
@@ -123,8 +136,9 @@ export function BuildALayer({
                             }}
                             onPrev={() => {
                                 syncValues()
-                                layerFormObj.watch('source.provider.type')
-                                    .value === 'carto'
+                                layerFormObj.watch(
+                                    'layerConfig.source.provider.type'
+                                ).value === 'carto'
                                     ? send('BACK_TO_RENDER')
                                     : send('BACK_TO_SOURCE')
                             }}
@@ -252,7 +266,9 @@ export function PreviewMap({
                     height: '400px',
                 }}
             >
-                {layerFormObj && <LayerManagerPreview layers={[layerFormObj]} />}
+                {layerFormObj && (
+                    <LayerManagerPreview layers={[layerFormObj]} />
+                )}
                 <Tooltip
                     layersInfo={layersInfo}
                     coordinates={coordinates}

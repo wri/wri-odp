@@ -18,6 +18,7 @@ import { Session } from 'next-auth'
 import { Resource } from '@/interfaces/dataset.interface'
 import nodemailer from 'nodemailer';
 import { randomBytes } from 'crypto';
+import { RwDatasetResp, RwErrorResponse, RwResponse, isRwError } from '@/interfaces/rw.interface'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -467,21 +468,19 @@ export function activityDetails(activity: Activity): ActivityDisplay {
     if (object === 'user') description = title
     const time = timeAgo(activity.timestamp)
 
-    let orgId = '';
-    let packageId = '';
-    let groupId = '';
-    let packageGroup: string[] = [];
+    let orgId = ''
+    let packageId = ''
+    let groupId = ''
+    let packageGroup: string[] = []
     if (object === 'package') {
         orgId = activity.data?.package?.owner_org as string
         packageId = activity.object_id as string
         //get all groups id
         const groups = activity.data?.package?.groups as { id: string }[]
         packageGroup = groups.map((group) => group.id)
-    }
-    else if (object === 'team') {
+    } else if (object === 'team') {
         orgId = activity.object_id as string
-    }
-    else if (object === 'topic') {
+    } else if (object === 'topic') {
         groupId = activity.object_id as string
     }
     return {
@@ -517,6 +516,28 @@ export async function getOneDataset(
         if (dataset.error.message) throw Error(dataset.error.message)
         throw Error(JSON.stringify(dataset.error))
     }
+    if (dataset.result.rw_id) {
+        const rwRes = await fetch(
+            `https://api.resourcewatch.org/v1/dataset/${dataset.result.rw_id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${env.RW_API_KEY}`,
+                },
+            }
+        )
+        const datasetRw: RwDatasetResp | RwErrorResponse = await rwRes.json()
+        if (isRwError(datasetRw))
+            throw Error(
+                `Error resource at the Resource Watch API - (${JSON.stringify(
+                    datasetRw.errors
+                )})`
+            )
+        dataset.result.connectorType = datasetRw.data.attributes.connectorType
+        dataset.result.connectorUrl = datasetRw.data.attributes.connectorUrl
+        dataset.result.provider = datasetRw.data.attributes.provider
+        dataset.result.tableName = datasetRw.data.attributes.tableName
+    }
     return {
         ...dataset.result,
         open_in: dataset.result.open_in
@@ -525,13 +546,18 @@ export async function getOneDataset(
         spatial: dataset.result.spatial
             ? JSON.parse(dataset.result.spatial)
             : null,
-        resources: dataset.result.resources.map((r) => ({
-            ...r,
-            _extra: {
-                is_layer: r.url?.startsWith('https://api.resourcewatch'),
-                rw_layer_id: r.url ? r.url.split('/').at(-1) : null,
-            },
-        } as Resource)),
+        resources: dataset.result.resources.map(
+            (r) =>
+                ({
+                    ...r,
+                    _extra: {
+                        is_layer: r.url?.startsWith(
+                            'https://api.resourcewatch'
+                        ),
+                        rw_layer_id: r.url ? r.url.split('/').at(-1) : null,
+                    },
+                }) as Resource
+        ),
     }
 }
 

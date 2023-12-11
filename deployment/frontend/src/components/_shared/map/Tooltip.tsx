@@ -52,7 +52,7 @@ export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
           name: layer.name,
         };
 
-        if (feature && interactionConfig.output) {
+        if (feature && interactionConfig?.output) {
           //  TODO: output is supposed to be an array
           //  @ts-ignore
           layerInfo.properties = interactionConfig.output.map((c: any) => {

@@ -30,7 +30,7 @@ export const DataDictionarySchema = z.array(
 )
 
 export const CollaboratorSchema = z.object({
-    user: z.object({value: z.string(), label: z.string()}),
+    user: z.object({ value: z.string(), label: z.string() }),
     package_id: z.string(),
     capacity: z.object({
         value: capacitySchema,
@@ -38,30 +38,45 @@ export const CollaboratorSchema = z.object({
     }),
 })
 
-export const ResourceSchema = z.object({
-    description: z.string().optional(),
-    resourceId: z.string().uuid(),
-    id: z.string().uuid().optional().nullable(),
-    new: z.boolean().optional(),
-    package_id: z.string().optional().nullable(),
-    url: z.string().min(2, { message: 'URL is required' }).url().optional(),
-    name: z.string().optional(),
-    key: z.string().optional(),
-    format: z.string().optional().nullable(),
-    size: z.number().optional().nullable(),
-    title: z.string().optional(),
-    fileBlob: z.any(),
-    type: z.enum(['link', 'upload', 'layer', 'empty']),
-    schema: DataDictionarySchema.optional().nullable(),
-    layerObj: layerSchema.optional().nullable(),
-})
+export const ResourceSchema = z
+    .object({
+        description: z.string().optional(),
+        resourceId: z.string().uuid(),
+        id: z.string().uuid().optional().nullable(),
+        rw_id: z.string().optional().nullable(),
+        new: z.boolean().optional(),
+        package_id: z.string().optional().nullable(),
+        url: z.string().optional(),
+        name: z.string().optional(),
+        key: z.string().optional(),
+        format: z.string().optional().nullable(),
+        size: z.number().optional().nullable(),
+        title: z.string().optional(),
+        fileBlob: z.any(),
+        type: z.enum(['link', 'upload', 'layer', 'empty', 'layer-raw']),
+        schema: DataDictionarySchema.optional().nullable(),
+        layerObj: layerSchema.optional().nullable(),
+        layerObjRaw: z.any().optional().nullable(),
+    })
+    .refine(
+        (obj) => {
+            if (obj.type !== 'link') return true
+            if (!obj.url) return false
+        },
+        {
+            message: 'URL are required for resource of type link',
+            path: ['url'],
+        }
+    )
 
 export const DatasetSchema = z
     .object({
         id: z.string().uuid().optional().nullable(),
+        rw_id: z.string().optional().nullable(),
         title: z.string().min(1, { message: 'Title is required' }),
         name: z.string().min(1, { message: 'Name is required' }),
         url: z.string().optional().nullable().or(emptyStringToUndefined),
+        rw_dataset: z.boolean().optional().nullable(),
         connectorUrl: z.string().optional().nullable().default(''),
         connectorType: z.string().optional().nullable().default('rest'),
         tableName: z.string().optional().nullable().default(''),
@@ -122,7 +137,7 @@ export const DatasetSchema = z
             .string()
             .min(1, { message: 'Description is required' }),
         notes: z.string().optional().nullable(),
-        wri_data: z.boolean().optional().nullable(),
+        wri_data: z.boolean().default(false),
         featured_dataset: z.boolean().optional().nullable(),
         featured_image: z.string().optional().nullable(),
         signedUrl: z
@@ -162,7 +177,7 @@ export const DatasetSchema = z
         collaborators: z.array(CollaboratorSchema).default([]),
         spatial_address: z.string().optional(),
         spatial: z.any().optional(),
-        spatial_type: z.enum(['address', 'geom']).optional()
+        spatial_type: z.enum(['address', 'geom']).optional(),
     })
     .refine(
         (obj) => {
@@ -173,6 +188,20 @@ export const DatasetSchema = z
         {
             message: 'An image is required for featured datasets',
             path: ['featured_image'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (!obj.rw_dataset) return true
+            if (obj.rw_dataset && !obj.connectorUrl) return false
+            if (obj.rw_dataset && !obj.connectorType) return false
+            if (obj.rw_dataset && !obj.provider) return false
+            return true
+        },
+        {
+            message:
+                'Connector URL, Connector Type, and Provider are required for RW datasets',
+            path: ['rw_dataset'],
         }
     )
     .refine(

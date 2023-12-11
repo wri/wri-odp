@@ -22,90 +22,163 @@ import type {
     WriUser,
     FolloweeList,
 } from '@/schema/ckan.schema'
-import { DatasetSchema, ResourceSchema } from '@/schema/dataset.schema'
+import {
+    DatasetFormType,
+    DatasetSchema,
+    ResourceFormType,
+    ResourceSchema,
+} from '@/schema/dataset.schema'
 import type { Dataset, Resource } from '@/interfaces/dataset.interface'
 import type { License } from '@/interfaces/licenses.interface'
 import { isValidUrl } from '@/utils/isValidUrl'
-import { convertFormToLayerObj } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
+import {
+    convertFormToLayerObj,
+    convertLayerObjToForm,
+    getApiSpecFromRawObj,
+    getRawObjFromApiSpec,
+} from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
+import { APILayerSpec } from '@/interfaces/layer.interface'
+import { RwLayerResp, RwResponse, isRwError, RwErrorResponse } from '@/interfaces/rw.interface'
+
+async function createDatasetRw(dataset: DatasetFormType) {
+    const rwDataset: Record<string, any> = {
+        name: dataset.title ?? '',
+        connectorType: dataset.connectorType,
+        provider: dataset.provider,
+        published: false,
+        env: 'staging',
+        application: ['rw'],
+    }
+    if (dataset.provider === 'gee') {
+        rwDataset.tableName = dataset.tableName
+    } else {
+        rwDataset.connectorUrl = dataset.connectorUrl
+    }
+    const body = JSON.stringify({ dataset: rwDataset })
+    const datasetRwRes = await fetch(
+        'https://api.resourcewatch.org/v1/dataset',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+            },
+            body,
+        }
+    )
+    const datasetRw: { data: { id: string; attributes: APILayerSpec } } =
+        await datasetRwRes.json()
+    return datasetRw
+}
+
+async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
+    if (!r.layerObj && !r.layerObjRaw) return r
+    const body = r.layerObj
+        ? JSON.stringify(convertFormToLayerObj(r.layerObj))
+        : JSON.stringify({
+              ...getApiSpecFromRawObj(r.layerObjRaw),
+          })
+    const layerRwRes = await fetch(
+        `https://api.resourcewatch.org/v1/dataset/${datasetRwId}/layer`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+            },
+            body,
+        }
+    )
+    const layerRw: any = await layerRwRes.json()
+    const url = `https://api.resourcewatch.org/v1/dataset/${layerRw.data.attributes.dataset}/layer/${layerRw.data.id}`
+    const name = layerRw.data.id
+    const title = layerRw.data.attributes.name
+    const description = layerRw.data.attributes.description
+    r.url = url
+    r.name = name
+    r.title = title
+    r.description = description
+    r.rw_id = layerRw.data.id
+    return r
+}
+
+async function editLayerRw(r: ResourceFormType) {
+    if ((!r.layerObj && !r.layerObjRaw) || !r.rw_id) return r
+    try {
+        if ((r.layerObj || r.layerObjRaw) && r.url) {
+            const body = r.layerObj
+                ? JSON.stringify(convertFormToLayerObj(r.layerObj))
+                : JSON.stringify(getApiSpecFromRawObj(r.layerObjRaw))
+            const layerRwRes = await fetch(r.url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${env.RW_API_KEY}`,
+                },
+                body,
+            })
+            const layerRw: RwResponse = await layerRwRes.json()
+            if (isRwError(layerRw))
+                throw Error(
+                    `Error creating resource at the Resource Watch API - (${JSON.stringify(
+                        layerRw.errors
+                    )})`
+                )
+            const title = layerRw.data.attributes.name
+            const description = layerRw.data.attributes.description
+            r.title = title
+            r.description = description
+            return r
+        }
+    } catch (e) {
+        let error =
+            'Something went wrong when we tried to create some resources in the Resource Watch API please contact the system administrator'
+        if (e instanceof Error) error = e.message
+        throw Error(error)
+    }
+    return r
+}
+
+async function getLayerRw(layerUrl: string) {
+    const layerRwRes = await fetch(layerUrl, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${env.RW_API_KEY}`,
+        },
+    })
+    const layerRw: RwLayerResp | RwErrorResponse = await layerRwRes.json()
+    if (isRwError(layerRw))
+        throw Error(
+            `Error creating resource at the Resource Watch API - (${JSON.stringify(
+                layerRw.errors
+            )})`
+        )
+    return { ...layerRw.data.attributes, id: layerRw.data.id }
+}
 
 export const DatasetRouter = createTRPCRouter({
     createDataset: protectedProcedure
         .input(DatasetSchema)
         .mutation(async ({ ctx, input }) => {
-            const layersMap = new Map<string, any>()
-            try {
-                const rwDataset: Record<string, any> = {
-                    name: input.title ?? '',
-                    connectorType: input.connectorType,
-                    provider: input.provider,
-                    published: false,
-                    env: 'staging',
-                    application: ['rw'],
+            let resources = input.resources
+            let datasetRw: null | any = null
+            if (input.rw_dataset) {
+                try {
+                    datasetRw = await createDatasetRw(input)
+                    resources = await Promise.all(
+                        resources.map(async (r) =>
+                            datasetRw
+                                ? await createLayerRw(r, datasetRw.data.id)
+                                : r
+                        )
+                    )
+                } catch (e) {
+                    let error =
+                        'Something went wrong when we tried to create some resources in the Resource Watch API please contact the system administrator'
+                    if (e instanceof Error) error = e.message
+                    throw Error(error)
                 }
-                if (input.provider === 'gee') {
-                    rwDataset.tableName = input.tableName
-                } else {
-                    rwDataset.connectorUrl = input.connectorUrl
-                }
-                const body = JSON.stringify({ dataset: rwDataset })
-                const datasetRwRes = await fetch(
-                    'https://api.resourcewatch.org/v1/dataset',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${env.RW_API_KEY}`,
-                        },
-                        body,
-                    }
-                )
-                const datasetRw: any = await datasetRwRes.json()
-                console.log('DATASET', datasetRw)
-                await Promise.all(
-                    input.resources
-                        .filter((r) => r.layerObj)
-                        .map(async (r) => {
-                            if (!r.layerObj) return null
-                            const body = JSON.stringify(
-                                convertFormToLayerObj(r.layerObj)
-                            )
-                            const layerRwRes = await fetch(
-                                `https://api.resourcewatch.org/v1/dataset/${datasetRw.data.id}/layer`,
-                                {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        Authorization: `Bearer ${env.RW_API_KEY}`,
-                                    },
-                                    body,
-                                }
-                            )
-                            const layerRw: any = await layerRwRes.json()
-                            console.log('LAYER', layerRw)
-                            layersMap.set(r.resourceId, layerRw)
-                            return layerRw
-                        })
-                )
-            } catch (e) {
-                let error =
-                    'Something went wrong when we tried to create some resources in the Resource Watch API please contact the system administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(error)
             }
-            input.resources.forEach((r) => {
-                if (r.layerObj) {
-                    const url = `https://api.resourcewatch.org/v1/dataset/${
-                        layersMap.get(r.resourceId).data.attributes.dataset
-                    }/layer/${layersMap.get(r.resourceId).data.id}`
-                    const name = layersMap.get(r.resourceId).data.id
-                    const title = layersMap.get(r.resourceId).data.attributes.name
-                    const description = layersMap.get(r.resourceId).data.attributes.description
-                    r.url = url
-                    r.name = name
-                    r.title = title
-                    r.description = description
-                }
-            })
             try {
                 const user = ctx.session.user
                 const body = JSON.stringify({
@@ -121,19 +194,22 @@ export const DatasetRouter = createTRPCRouter({
                     license_id: input.license_id?.value ?? '',
                     owner_org: input.team ? input.team.value : '',
                     collaborators: null,
+                    rw_id: datasetRw ? datasetRw.data.id : '',
                     update_frequency: input.update_frequency?.value ?? '',
                     featured_image:
                         input.featured_image && input.featured_dataset
                             ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
-                    resources: input.resources
+                    resources: resources
                         .filter((resource) => resource.type !== 'empty')
                         .map((resource) => ({
                             ...resource,
                             format: resource.format ?? '',
                             id: resource.resourceId,
                             url_type: resource.type,
+                            layerObjRaw: null,
+                            layerObj: null,
                             schema: resource.schema
                                 ? { value: resource.schema }
                                 : '{}',
@@ -178,39 +254,44 @@ export const DatasetRouter = createTRPCRouter({
     editDataset: protectedProcedure
         .input(DatasetSchema)
         .mutation(async ({ ctx, input }) => {
-            await Promise.all(
-                input.resources
-                    .filter((r) => r.layerObj)
-                    .map(async (r) => {
-                        try {
-                            if (r.layerObj && r.url) {
-                                const body = JSON.stringify(
-                                    convertFormToLayerObj(r.layerObj)
-                                )
-                                const layerRwRes = await fetch(r.url, {
-                                    method: 'PATCH',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        Authorization: `Bearer ${env.RW_API_KEY}`,
-                                    },
-                                    body,
-                                })
-                                const layerRw: any = await layerRwRes.json()
-                                if (layerRw.errors)
-                                    throw Error(
-                                        `Error creating resource at the Resource Watch API - (${JSON.stringify(
-                                            layerRw.errors
-                                        )})`
-                                    )
-                            }
-                        } catch (e) {
-                            let error =
-                                'Something went wrong when we tried to create some resources in the Resource Watch API please contact the system administrator'
-                            if (e instanceof Error) error = e.message
-                            throw Error(error)
-                        }
-                    })
+            const resourcesWithoutLayer = input.resources.filter(
+                (r) => !r.layerObj && !r.layerObjRaw
             )
+            let rw_id = input.rw_id ?? null
+            if (!input.rw_id && input.rw_dataset) {
+                const datasetRw = await createDatasetRw(input)
+                rw_id = datasetRw.data.id
+            }
+            const resourcesToEditLayer = input.rw_id
+                ? await Promise.all(
+                      input.resources
+                          .filter(
+                              (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
+                          )
+                          .map(async (r) => {
+                              return await editLayerRw(r)
+                          })
+                  )
+                : []
+            const resourcesToCreateLayer =
+                rw_id !== null
+                    ? await Promise.all(
+                          input.resources
+                              .filter(
+                                  (r) =>
+                                      (r.layerObj || r.layerObjRaw) && !r.rw_id
+                              )
+                              .map(async (r) => {
+                                  return await createLayerRw(r, rw_id ?? '')
+                              })
+                      )
+                    : []
+            const resources = [
+                ...resourcesWithoutLayer,
+                ...resourcesToEditLayer,
+                ...resourcesToCreateLayer,
+            ]
+
             try {
                 const user = ctx.session.user
                 const body = JSON.stringify({
@@ -224,6 +305,7 @@ export const DatasetRouter = createTRPCRouter({
                     open_in: input.open_in ? { ...input.open_in } : '',
                     language: input.language?.value ?? '',
                     license_id: input.license_id?.value ?? '',
+                    rw_id: rw_id ?? '',
                     owner_org: input.team ? input.team.value : '',
                     collaborators: null,
                     update_frequency: input.update_frequency?.value ?? '',
@@ -234,13 +316,15 @@ export const DatasetRouter = createTRPCRouter({
                                 : input.featured_image
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
-                    resources: input.resources
+                    resources: resources
                         .filter((resource) => resource.type !== 'empty')
                         .map((resource) => ({
                             ...resource,
                             format: resource.format ?? '',
                             id: resource.resourceId,
                             new: false,
+                            layerObjRaw: null,
+                            layerObj: null,
                             url_type: resource.type,
                             schema: resource.schema
                                 ? { value: resource.schema }
@@ -298,25 +382,8 @@ export const DatasetRouter = createTRPCRouter({
         .input(ResourceSchema)
         .mutation(async ({ ctx, input }) => {
             try {
-                if (input.layerObj && input.url) {
-                    const body = JSON.stringify(
-                        convertFormToLayerObj(input.layerObj)
-                    )
-                    const layerRwRes = await fetch(input.url, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${env.RW_API_KEY}`,
-                        },
-                        body,
-                    })
-                    const layerRw: any = await layerRwRes.json()
-                    if (layerRw.errors)
-                        throw Error(
-                            `Error creating resource at the Resource Watch API - (${JSON.stringify(
-                                layerRw.errors
-                            )})`
-                        )
+                if ((input.layerObj || input.layerObjRaw) && input.url) {
+                    return await editLayerRw(input)
                 }
             } catch (e) {
                 let error =
@@ -331,6 +398,8 @@ export const DatasetRouter = createTRPCRouter({
                     format: input.format ?? '',
                     new: false,
                     url_type: input.type,
+                    layerObjRaw: null,
+                    layerObj: null,
                     schema: input.schema ? { value: input.schema } : '{}',
                     url: input.url ?? input.name,
                 })
@@ -352,7 +421,6 @@ export const DatasetRouter = createTRPCRouter({
                         throw Error(resource.error.message)
                     throw Error(JSON.stringify(resource.error))
                 }
-
                 return resource.result
             } catch (e) {
                 let error =
@@ -413,8 +481,6 @@ export const DatasetRouter = createTRPCRouter({
                 extAddressQ: input.extAddressQ,
             }))!
 
-            // console.log('Dataset', dataset)
-
             return {
                 datasets: dataset.datasets,
                 count: dataset.count,
@@ -436,7 +502,6 @@ export const DatasetRouter = createTRPCRouter({
             )
             const collaborators: CkanResponse<Collaborator[]> =
                 await collaboratorsRes.json()
-            console.log('Collaborators', collaborators)
             if (!collaborators.success && collaborators.error) {
                 if (collaborators.error.message)
                     throw Error(collaborators.error.message)
@@ -478,14 +543,12 @@ export const DatasetRouter = createTRPCRouter({
             )
             const issues: CkanResponse<{ count: number; results: Issue[] }> =
                 await issuesRes.json()
-            console.log('Issues', issues)
             if (!issues.success && issues.error) {
                 if (issues.error.message) throw Error(issues.error.message)
                 throw Error(JSON.stringify(issues.error))
             }
             const issuesWithDetails = await Promise.all(
                 issues.result.results.map(async (issue) => {
-                    console.log('Issue', issue)
                     const detailsRes = await fetch(
                         `${env.CKAN_URL}/api/action/issue_show?dataset_id=${input.id}&issue_number=${issue.number}`,
                         {
@@ -496,7 +559,6 @@ export const DatasetRouter = createTRPCRouter({
                         }
                     )
                     const details: CkanResponse<Issue> = await detailsRes.json()
-                    console.log('Details', details)
                     if (!details.success && details.error) {
                         if (details.error.message)
                             throw Error(details.error.message)
@@ -510,8 +572,19 @@ export const DatasetRouter = createTRPCRouter({
     getOneDataset: publicProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
-            const dataset = getOneDataset(input.id, ctx.session)
-            return dataset
+            const dataset = await getOneDataset(input.id, ctx.session)
+            const resources = await Promise.all(
+                dataset.resources.map(async (r) => {
+                    if (r.url_type === 'upload' || r.url_type === 'link')
+                        return r
+                    if (!r.url) return r
+                    const layerObj = await getLayerRw(r.url)
+                    if (r.url_type === 'layer') return {...r, layerObj: convertLayerObjToForm(layerObj)}
+                    if (r.url_type === 'layer-raw') return {...r, layerObjRaw: getRawObjFromApiSpec(layerObj)}
+                    return r
+                })
+            )
+            return { ...dataset, resources }
         }),
     getPossibleCollaborators: protectedProcedure.query(async () => {
         const apiKey = env.SYS_ADMIN_API_KEY
