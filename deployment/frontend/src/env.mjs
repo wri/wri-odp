@@ -34,6 +34,11 @@ export const env = createEnv({
         AZURE_AD_TENANT_ID: z.string(),
         AZURE_AD_CLIENT_ID: z.string(),
         AZURE_AD_CLIENT_SECRET: z.string(),
+        SMTP_SERVER: z.string(),
+        SMTP_PORT: z.string(),
+        SMTP_USER: z.string(),
+        SMTP_PASSWORD: z.string(),
+        SMTP_FROM: z.string(),
     },
 
     /**
@@ -62,6 +67,11 @@ export const env = createEnv({
         AZURE_AD_TENANT_ID: process.env.AZURE_AD_TENANT_ID,
         AZURE_AD_CLIENT_ID: process.env.AZURE_AD_CLIENT_ID,
         AZURE_AD_CLIENT_SECRET: process.env.AZURE_AD_CLIENT_SECRET,
+        SMTP_SERVER: process.env.SMTP_SERVER,
+        SMTP_PORT: process.env.SMTP_PORT,
+        SMTP_USER: process.env.SMTP_USER,
+        SMTP_PASSWORD: process.env.SMTP_PASSWORD,
+        SMTP_FROM: process.env.SMTP_FROM,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

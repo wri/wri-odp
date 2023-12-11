@@ -4,13 +4,26 @@ import {
   protectedProcedure
 } from "@/server/api/trpc";
 import { env } from "@/env.mjs";
-import { getUser, getUserOrganizations, getUserDataset, getOrgDetails, getAllOrganizations, getAllUsers } from "@/utils/apiUtils";
+import {
+  getUser,
+  getUserOrganizations,
+  getUserDataset,
+  getOrgDetails,
+  getAllOrganizations,
+  getAllUsers,
+  getRandomUsernameFromEmail,
+  generateRandomPassword,
+  sendEmail,
+  generateEmail,
+  generateInviteEmail
+
+} from "@/utils/apiUtils";
 import { searchArrayForKeyword } from "@/utils/general";
 import { searchSchema } from "@/schema/search.schema";
-import type { CkanResponse } from "@/schema/ckan.schema";
-import { UserFormSchema } from '@/schema/user.schema';
+import type { CkanResponse, WriOrganization } from "@/schema/ckan.schema";
+import { UserFormInviteSchema, UserFormSchema } from '@/schema/user.schema';
 import { User } from "@portaljs/ckan";
-
+import { send } from "xstate";
 
 export const UserRouter = createTRPCRouter({
   getDashboardUser: protectedProcedure.query(async ({ ctx }) => {
@@ -271,5 +284,82 @@ export const UserRouter = createTRPCRouter({
       const data = (await response.json()) as CkanResponse<User>;
       if (!data.success && data.error) throw Error(data.error.message)
       return data.result
-     })
+    }),
+  getUserCapacity: protectedProcedure
+    .query(async ({ ctx }) => {
+      let isOrgAdmin = false;
+      let adminOrg: WriOrganization[] = []
+      if (ctx.session.user.sysadmin) {
+        isOrgAdmin = true;
+        adminOrg = (await getAllOrganizations({ apiKey: ctx.session.user.apikey }))!;
+      }
+      else {
+        const orgdetails = await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey });
+        isOrgAdmin = orgdetails?.some((org) => org.capacity === "admin");
+        adminOrg = orgdetails?.filter((org) => org.capacity === "admin");
+      }
+
+      return {
+        isOrgAdmin: isOrgAdmin,
+        adminOrg: adminOrg
+      }
+    }),
+  
+  createOtherUser: protectedProcedure
+    .input(UserFormInviteSchema)
+    .mutation(async ({ input, ctx }) => {
+
+      const name = await getRandomUsernameFromEmail(input.email);
+      const password = generateRandomPassword(12);
+      
+      const response = await fetch(`${env.CKAN_URL}/api/3/action/user_create`, {
+        method: "POST",
+        body: JSON.stringify({ email: input.email, name, password }),
+        headers: {
+          "Authorization": ctx.session.user.apikey,
+          "Content-Type": "application/json"
+        }
+      });
+
+      const data = (await response.json()) as CkanResponse<User>;
+      if (!data.success && data.error) throw Error(data.error.message)
+
+      
+      if (input.team?.value) {
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_member_create`, {
+          method: "POST",
+          body: JSON.stringify({ id: input.team?.id, username: name, role: input.role?.id }),
+          headers: {
+            "Authorization": ctx.session.user.apikey,
+            "Content-Type": "application/json"
+          }
+        });
+        const data = (await response.json()) as CkanResponse<null>;
+        if (!data.success && data.error) throw Error(data.error.message)
+
+
+        try {
+          const role = input.role?.value as string;
+          const email = generateInviteEmail(input.email, password, name, input.team.label, role);
+          await sendEmail(input.email, "Invite for WRI OpenData Platform", email);
+        }
+        catch (error) {
+          throw Error(error as string)
+        }
+
+      }
+      else {
+        try {
+          const email = generateEmail(input.email, password, name);
+          await sendEmail(input.email, "Invite for WRI OpenData Platform", email);
+        }
+        catch (error) {
+          throw Error(error as string)
+        }
+      }
+
+      return data.result
+     
+    })
+  
 });
