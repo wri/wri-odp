@@ -78,25 +78,32 @@ export default function AddUserForm({
         <>
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="max-w-8xl mx-auto sm:mt-40 w-full xl:w-[90%] py-12 px-4 sm:px-6 lg:px-12  rounded-lg shadow-wri flex flex-col gap-y-8"
+                className="max-w-8xl mx-auto sm:mt-40 w-full xl:w-[60%] py-12 px-4 sm:px-6 lg:px-12  rounded-lg shadow-wri flex flex-col gap-y-8"
             >
                 <InputGroup
                     label="Email"
-                    labelClassName="sm:max-w-[10rem]"
+                    labelClassName=" w-[13%] sm:w-[12%] sm:max-w-[40%] "
+                    className=" gap-x-12 gap-y-4  flex flex-col sm:flex-row  "
                     required
                 >
                     <Input
                         {...register('email')}
                         placeholder="Email address"
                         type="email"
+                        className="xl:max-w-[50rem]"
                     />
                     <ErrorDisplay name="email" errors={errors} />
                 </InputGroup>
-                <InputGroup label="Teams" labelClassName="sm:max-w-[10rem]">
+                <InputGroup
+                    label="Teams"
+                    labelClassName=" w-[13%] sm:w-[12%] sm:max-w-[40%] "
+                    className=" gap-x-12 gap-y-4   flex flex-col sm:flex-row  "
+                >
                     <SimpleSelect
                         formObj={form}
                         name="team"
                         id="orgId"
+                        maxWidth="xl:max-w-[50rem]"
                         options={[
                             {
                                 label: 'No team',
@@ -113,11 +120,16 @@ export default function AddUserForm({
                     />
                 </InputGroup>
                 {watch('team')?.label && watch('team')?.label !== 'No team' && (
-                    <InputGroup label="Role" labelClassName="sm:max-w-[10rem]">
+                    <InputGroup
+                        label="Role"
+                        labelClassName=" w-[13%] sm:w-[12%] sm:max-w-[40%] "
+                        className=" gap-x-12 gap-y-4   flex flex-col sm:flex-row  "
+                    >
                         <SimpleSelect
                             formObj={form}
                             name="role"
                             id="role"
+                            maxWidth="xl:max-w-[50rem]"
                             options={[
                                 {
                                     label: 'Member',
@@ -140,12 +152,12 @@ export default function AddUserForm({
                     </InputGroup>
                 )}
 
-                <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-6 xxl:px-0">
+                <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-0">
                     <LoaderButton
                         loading={userCreateApi.isLoading}
                         type="submit"
                     >
-                        Add User
+                        Add user
                     </LoaderButton>
                 </div>
                 {errorMessage && (
