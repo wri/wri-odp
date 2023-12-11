@@ -76,7 +76,7 @@ export const DatasetSchema = z
         title: z.string().min(1, { message: 'Title is required' }),
         name: z.string().min(1, { message: 'Name is required' }),
         url: z.string().optional().nullable().or(emptyStringToUndefined),
-        rw_dataset: z.boolean().optional().nullable(),
+        rw_dataset: z.boolean().default(false),
         connectorUrl: z.string().optional().nullable().default(''),
         connectorType: z.string().optional().nullable().default('rest'),
         tableName: z.string().optional().nullable().default(''),
@@ -193,15 +193,25 @@ export const DatasetSchema = z
     .refine(
         (obj) => {
             if (!obj.rw_dataset) return true
-            if (obj.rw_dataset && !obj.connectorUrl) return false
             if (obj.rw_dataset && !obj.connectorType) return false
-            if (obj.rw_dataset && !obj.provider) return false
             return true
         },
         {
             message:
-                'Connector URL, Connector Type, and Provider are required for RW datasets',
-            path: ['rw_dataset'],
+                'Connector Type is required for RW datasets',
+            path: ['connectorType'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (!obj.rw_dataset) return true
+            if (obj.rw_dataset && !obj.connectorType) return false
+            return true
+        },
+        {
+            message:
+                'Provider is required for RW datasets',
+            path: ['provider'],
         }
     )
     .refine(
