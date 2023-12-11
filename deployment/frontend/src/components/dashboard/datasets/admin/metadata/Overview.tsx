@@ -232,6 +232,9 @@ export function OverviewForm({
                             </label>
                         </div>
                     </div>
+                    <div className="flex justify-end">
+                        <ErrorDisplay name="rw_dataset" errors={errors} />
+                    </div>
                     {watch(`rw_dataset`) && (
                         <>
                             <InputGroup label="Connector URL">
@@ -239,7 +242,30 @@ export function OverviewForm({
                                     {...register('connectorUrl')}
                                     placeholder="https://wri-01.carto.com/tables/wdpa_protected_areas/table"
                                     type="text"
-                                    disabled={editing && !!defaultValues?.connectorUrl && defaultValues?.connectorUrl !== ''}
+                                    disabled={
+                                        editing &&
+                                        !!defaultValues?.connectorUrl &&
+                                        defaultValues?.connectorUrl !== ''
+                                    }
+                                    icon={
+                                        <DefaultTooltip
+                                            content={
+                                                <span>
+                                                    Go to the{' '}
+                                                    <a
+                                                        className="text-blue-800 underline"
+                                                        href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
+                                                    >
+                                                        {' '}
+                                                        RW API Docs
+                                                    </a>{' '}
+                                                    for more information
+                                                </span>
+                                            }
+                                        >
+                                            <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                        </DefaultTooltip>
+                                    }
                                 />
                             </InputGroup>
                             <InputGroup label="Connector Type">
@@ -247,14 +273,60 @@ export function OverviewForm({
                                     {...register('connectorType')}
                                     placeholder="rest"
                                     type="text"
-                                    disabled={editing && !!defaultValues?.connectorType && defaultValues?.connectorType !== ''}
+                                    disabled={
+                                        editing &&
+                                        !!defaultValues?.connectorType &&
+                                        defaultValues?.connectorType !== ''
+                                    }
+                                    icon={
+                                        <DefaultTooltip
+                                            content={
+                                                <span>
+                                                    Go to the{' '}
+                                                    <a
+                                                        className="text-blue-800 underline"
+                                                        href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
+                                                    >
+                                                        {' '}
+                                                        RW API Docs
+                                                    </a>{' '}
+                                                    for more information
+                                                </span>
+                                            }
+                                        >
+                                            <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                        </DefaultTooltip>
+                                    }
                                 />
                             </InputGroup>
                             <InputGroup label="Provider">
                                 <Input
                                     {...register('provider')}
                                     placeholder="cartodb"
-                                    disabled={editing && !!defaultValues?.provider && defaultValues?.provider !== ''}
+                                    disabled={
+                                        editing &&
+                                        !!defaultValues?.provider &&
+                                        defaultValues?.provider !== ''
+                                    }
+                                    icon={
+                                        <DefaultTooltip
+                                            content={
+                                                <span>
+                                                    Go to the{' '}
+                                                    <a
+                                                        className="text-blue-800 underline"
+                                                        href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
+                                                    >
+                                                        {' '}
+                                                        RW API Docs
+                                                    </a>{' '}
+                                                    for more information
+                                                </span>
+                                            }
+                                        >
+                                            <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                        </DefaultTooltip>
+                                    }
                                     type="text"
                                 />
                             </InputGroup>
@@ -263,7 +335,30 @@ export function OverviewForm({
                                     {...register('tableName')}
                                     placeholder="users/resourcewatch_wri/dataset_name"
                                     type="text"
-                                    disabled={editing && !!defaultValues?.tableName && defaultValues?.tableName !== ''}
+                                    disabled={
+                                        editing &&
+                                        !!defaultValues?.tableName &&
+                                        defaultValues?.tableName !== ''
+                                    }
+                                    icon={
+                                        <DefaultTooltip
+                                            content={
+                                                <span>
+                                                    Go to the{' '}
+                                                    <a
+                                                        className="text-blue-800 underline"
+                                                        href="https://resource-watch.github.io/doc-api/reference.html#google-earth-engine"
+                                                    >
+                                                        {' '}
+                                                        RW API Docs
+                                                    </a>{' '}
+                                                    for more information
+                                                </span>
+                                            }
+                                        >
+                                            <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                        </DefaultTooltip>
+                                    }
                                 />
                             </InputGroup>
                         </>

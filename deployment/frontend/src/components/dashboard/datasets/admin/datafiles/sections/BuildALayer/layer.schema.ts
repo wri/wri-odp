@@ -68,21 +68,15 @@ const numericExpression = z
     })
 
 const filterExpression = z.object({
-    operation: z
-        .object({
-            value: z.enum(['==', '<=', '>=', '>', '<']),
-            label: z.string(),
-        })
-        .optional()
-        .nullable(),
-    column: z
-        .object({
-            value: z.string(),
-            label: z.string(),
-        })
-        .optional()
-        .nullable(),
-    value: z.union([z.string(), z.number()]).optional().nullable(),
+    operation: z.object({
+        value: z.enum(['==', '<=', '>=', '>', '<']),
+        label: z.string(),
+    }),
+    column: z.object({
+        value: z.string(),
+        label: z.string(),
+    }),
+    value: z.union([z.string(), z.number(), z.literal(NaN)]),
 })
 
 const rampObj = z
@@ -287,4 +281,5 @@ export type LayerFormType = z.infer<typeof layerSchema>
 export type SourceFormType = z.infer<typeof sourceSchema>
 export type RenderFormType = z.infer<typeof renderSchema>
 export type LegendsFormType = z.infer<typeof legendsSchema>
+export type FilterFormType = z.infer<typeof filterExpression>
 export type InteractionFormType = z.infer<typeof interactionConfigSchema>

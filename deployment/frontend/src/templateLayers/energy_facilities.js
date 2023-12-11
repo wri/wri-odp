@@ -1,4 +1,5 @@
 export const energy_facilities = {
+    id: '8905878f-8888-42a1-95b5-801fd0b529a8',
     name: '2016 Energy Facility Emissions ( MT CO₂e, thousands)',
     slug: '2016-Energy-Facility-Emissions-MT-COe-thousands',
     dataset: 'f61e9516-ae23-4870-b26b-4d1b57ac3225',
@@ -259,6 +260,7 @@ export const energy_facilities = {
                 property: 'State',
                 suffix: '',
                 type: 'string',
+                enabled: true,
             },
             {
                 column: 'city_name',
@@ -267,6 +269,7 @@ export const energy_facilities = {
                 property: 'City',
                 suffix: '',
                 type: 'string',
+                enabled: true,
             },
             {
                 column: 'facility_name',
@@ -275,6 +278,7 @@ export const energy_facilities = {
                 property: 'Facility',
                 suffix: '',
                 type: 'string',
+                enabled: true,
             },
             {
                 column: 'parent_companies',
@@ -283,6 +287,7 @@ export const energy_facilities = {
                 property: 'Company Ownership',
                 suffix: '',
                 type: 'string',
+                enabled: true,
             },
             {
                 column: 'ghg_quantity_metric_tons_co2e',
@@ -291,6 +296,7 @@ export const energy_facilities = {
                 property: 'GHG Quantity',
                 suffix: ' MT CO₂e',
                 type: 'number',
+                enabled: true,
             },
         ],
     },

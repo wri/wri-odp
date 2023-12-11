@@ -12,7 +12,7 @@ import {
     renderTypeOptions,
 } from '../../../../formOptions'
 import { Disclosure, Switch, Transition } from '@headlessui/react'
-import { LayerFormType } from '../layer.schema'
+import { FilterFormType, LayerFormType } from '../layer.schema'
 import { useState } from 'react'
 import classNames from '@/utils/classnames'
 import { useColumns } from '../useColumns'
@@ -318,7 +318,7 @@ function FilterExpressions({ layerIdx }: { layerIdx: number }) {
                     append({
                         operation: { value: '==', label: 'Equals to' },
                         column: { value: '', label: '' },
-                        value: null,
+                        value: '',
                     })
                 }
                 type="button"
@@ -354,6 +354,11 @@ function FilterExpression({
         watch('connectorUrl') as string,
         !!watch('connectorUrl')
     )
+
+    const filterExpression: FilterFormType = watch(
+        `layerConfig.render.layers.${layerIdx}.filter.${filterIdx}`
+    ) as FilterFormType
+    console.log('FILTER EXPRESSION', filterExpression)
     return (
         <Accordion text={`Filter ${filterIdx}`}>
             <div className="py-4 flex flex-col gap-y-2">
@@ -385,9 +390,16 @@ function FilterExpression({
                         {...register(
                             `layerConfig.render.layers.${layerIdx}.filter.${filterIdx}.value`,
                             {
-                                valueAsNumber: true,
-                                setValueAs: (v) =>
-                                    v === '' ? undefined : parseFloat(v),
+                                valueAsNumber:
+                                    filterExpression.operation.value !== '==',
+                                setValueAs: (v) => {
+                                    if (
+                                        filterExpression.operation.value ===
+                                        '=='
+                                    )
+                                        return v
+                                    return v === '' ? undefined : parseFloat(v)
+                                },
                             }
                         )}
                         type="text"

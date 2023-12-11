@@ -1,4 +1,5 @@
 export const temperature = {
+    id: 'eb22d3f8-343c-4981-ab11-f0c2e091896a',
     name: 'Urban Daytime Temperature Difference from Surrounding Area (°C)',
     slug: 'Urban-Daytime-Temperature-Difference-from-Surrounding-Area-degreeC_4',
     dataset: 'f05fde43-ce5a-4910-83b1-85dafd39bfbb',
@@ -228,6 +229,7 @@ export const temperature = {
                 property: 'City',
                 suffix: '',
                 type: 'string',
+                enabled: true,
             },
             {
                 column: 'sqkm_final',
@@ -236,6 +238,7 @@ export const temperature = {
                 property: 'Area',
                 suffix: ' km²',
                 type: 'number',
+                enabled: true,
             },
             {
                 column: 'd_t_diff',
@@ -244,6 +247,7 @@ export const temperature = {
                 property: 'Daytime Temperature Difference',
                 suffix: '°C',
                 type: 'number',
+                enabled: true,
             },
         ],
     },

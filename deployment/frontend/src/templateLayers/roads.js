@@ -1,5 +1,6 @@
 export const roads = {
     name: 'Roads',
+    id: '1baa17a0-51bb-4d97-8876-4980013e81de',
     slug: 'Roads_4',
     dataset: '5fe43cd9-0210-4a6f-86ba-d8a7b91a180d',
     description:
@@ -98,6 +99,7 @@ export const roads = {
                 property: 'Length',
                 suffix: ' km',
                 type: 'number',
+                enabled: true,
             },
             {
                 column: 'onme',
@@ -106,6 +108,7 @@ export const roads = {
                 property: 'Official Road Name',
                 suffix: '',
                 type: 'string',
+                enabled: true,
             },
         ],
     },

@@ -1,4 +1,5 @@
 export const hdi = {
+    id: 'a26606ad-3b16-4a4d-be7f-f2640a5c81e2',
     name: '2015 Human Development Index',
     slug: 'human-development-index',
     dataset: 'bea122ce-1e4b-465d-8b7b-fa11aadd20f7',
@@ -170,6 +171,7 @@ export const hdi = {
                 property: 'Country',
                 suffix: '',
                 type: 'string',
+                enabled: true,
             },
             {
                 column: 'yr_data',
@@ -178,6 +180,7 @@ export const hdi = {
                 property: '2015 Human Development Index',
                 suffix: '',
                 type: 'number',
+                enabled: true,
             },
         ],
     },

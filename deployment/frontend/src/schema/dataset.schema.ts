@@ -137,7 +137,7 @@ export const DatasetSchema = z
             .string()
             .min(1, { message: 'Description is required' }),
         notes: z.string().optional().nullable(),
-        wri_data: z.boolean().optional().nullable(),
+        wri_data: z.boolean().default(false),
         featured_dataset: z.boolean().optional().nullable(),
         featured_image: z.string().optional().nullable(),
         signedUrl: z

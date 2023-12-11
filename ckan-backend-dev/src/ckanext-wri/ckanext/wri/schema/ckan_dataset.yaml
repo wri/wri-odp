@@ -20,6 +20,12 @@ dataset_fields:
   output_validators: boolean_validator
   preset: checkbox
 
+- field_name: rw_dataset
+  label: RW Dataset
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
 - field_name: title
   label: Title
   preset: title
@@ -205,6 +211,9 @@ resource_fields:
 - field_name: url
   label: URL
   preset: resource_url_upload
+
+- field_name: rw_id
+  label: RW ID
 
 - field_name: name
   label: Name

@@ -323,6 +323,7 @@ function AddDataFile({
                             </Tab>
                             <Tab
                                 id="tabLayer"
+                                disabled={watch('rw_dataset') === false}
                                 onClick={() =>
                                     setValue(`resources.${index}.type`, 'layer')
                                 }
@@ -340,17 +341,23 @@ function AddDataFile({
                                         <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                         <div
                                             className={classNames(
-                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col',
                                                 selected ? 'font-bold' : ''
                                             )}
                                         >
                                             Build a layer
+                                            {watch('rw_dataset') === false && (
+                                                <span>
+                                                    Toggle WRI Data to enable
+                                                </span>
+                                            )}
                                         </div>
                                     </span>
                                 )}
                             </Tab>
                             <Tab
                                 id="tabLayerRaw"
+                                disabled={watch('rw_dataset') === false}
                                 onClick={() =>
                                     setValue(
                                         `resources.${index}.type`,
@@ -371,11 +378,16 @@ function AddDataFile({
                                         <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                         <div
                                             className={classNames(
-                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col',
                                                 selected ? 'font-bold' : ''
                                             )}
                                         >
                                             Build a layer (RAW)
+                                            {watch('rw_dataset') === false && (
+                                                <span>
+                                                    Toggle WRI Data to enable
+                                                </span>
+                                            )}
                                         </div>
                                     </span>
                                 )}

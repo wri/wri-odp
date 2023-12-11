@@ -244,7 +244,7 @@ export function Preview({
                                 Data files
                             </h3>
                             <div>
-                                {watch('resources').map((resource) => (
+                                {watch('resources').filter(resource => resource.type !== 'layer' && resource.type !== 'layer-raw' ).map((resource) => (
                                     <Datafile
                                         key={resource.resourceId}
                                         name={

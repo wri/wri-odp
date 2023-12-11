@@ -57,8 +57,6 @@ export function BuildALayer({
         },
     })
 
-    console.log('LAYER OBJ VALUES', layerFormObj.getValues())
-
     const convertToRaw = () => {
         formObj.setValue(`resources.${index}.type`, 'layer-raw')
         const layerObjRaw = getRawObjFromApiSpec(
@@ -75,9 +73,8 @@ export function BuildALayer({
 
     const updatePreview = () => {
         syncValues()
-        setPreview(
-            convertFormToLayerObj(layerSchema.parse(layerFormObj.getValues()))
-        )
+        console.log('UPDATING PREVIEW', layerFormObj.getValues())
+        setPreview(convertFormToLayerObj(layerFormObj.getValues()))
     }
 
     const {

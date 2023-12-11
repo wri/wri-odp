@@ -26,6 +26,7 @@ import { convertBytes } from '@/utils/convertBytes'
 import { useDataDictionary } from '@/utils/getDataDictionary'
 import { Field } from 'tableschema'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
 export function AddDataFile({
     remove,
@@ -39,6 +40,7 @@ export function AddDataFile({
     formObj: UseFormReturn<DatasetFormType>
 }) {
     const { setValue, watch } = formObj
+    console.log(watch())
     const datafile = watch(`resources.${index}`)
     const uploadInputRef = useRef<HTMLInputElement>(null)
     const { isLoading: dataDictionaryLoading } = useDataDictionary(
@@ -283,6 +285,7 @@ export function AddDataFile({
                                 </Tab>
                                 <Tab
                                     id="tabLayer"
+                                    disabled={watch('rw_dataset') === false}
                                     onClick={() =>
                                         setValue(
                                             `resources.${index}.type`,
@@ -303,16 +306,24 @@ export function AddDataFile({
                                             <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                             <div
                                                 className={classNames(
-                                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col',
                                                     selected ? 'font-bold' : ''
                                                 )}
                                             >
                                                 Build a layer
+                                                {watch('rw_dataset') ===
+                                                    false && (
+                                                    <span>
+                                                        Toggle WRI Data to
+                                                        enable
+                                                    </span>
+                                                )}
                                             </div>
                                         </span>
                                     )}
                                 </Tab>
                                 <Tab
+                                    disabled={watch('rw_dataset') === false}
                                     id="tabLayerRaw"
                                     onClick={() =>
                                         setValue(
@@ -334,11 +345,18 @@ export function AddDataFile({
                                             <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                             <div
                                                 className={classNames(
-                                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col',
                                                     selected ? 'font-bold' : ''
                                                 )}
                                             >
                                                 Build a layer (Raw)
+                                                {watch('rw_dataset') ===
+                                                    false && (
+                                                    <span>
+                                                        Toggle WRI Data to
+                                                        enable
+                                                    </span>
+                                                )}
                                             </div>
                                         </span>
                                     )}
