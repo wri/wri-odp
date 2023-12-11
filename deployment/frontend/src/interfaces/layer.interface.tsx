@@ -17,10 +17,16 @@ export interface Render {
   layers?: Record<string, string | number | boolean | unknown>[];
 }
 
+export type Provider = {
+  type: 'carto' | string
+  options: Record<string, unknown>
+  layers: any[]
+};
+
 export interface layerConfigSpec {
   type: LayerType;
   render?: any;
-  source: Partial<Source>;
+  source: Partial<Source & { provider: Provider }>;
   [key: string]:
     | Record<string, string | number | boolean | unknown>
     | string
