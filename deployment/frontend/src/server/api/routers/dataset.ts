@@ -581,6 +581,7 @@ export const DatasetRouter = createTRPCRouter({
                     const layerObj = await getLayerRw(r.url)
                     if (r.url_type === 'layer') return {...r, layerObj: convertLayerObjToForm(layerObj)}
                     if (r.url_type === 'layer-raw') return {...r, layerObjRaw: getRawObjFromApiSpec(layerObj)}
+                    return r
                 })
             )
             return { ...dataset, resources }

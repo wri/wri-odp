@@ -16,7 +16,7 @@ import { Facets } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
 import { Resource } from '@/interfaces/dataset.interface'
-import { RwResponse, isRwError } from '@/interfaces/rw.interface'
+import { RwDatasetResp, RwErrorResponse, RwResponse, isRwError } from '@/interfaces/rw.interface'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -524,7 +524,7 @@ export async function getOneDataset(
                 },
             }
         )
-        const datasetRw: RwResponse = await rwRes.json()
+        const datasetRw: RwDatasetResp | RwErrorResponse = await rwRes.json()
         if (isRwError(datasetRw))
             throw Error(
                 `Error resource at the Resource Watch API - (${JSON.stringify(
