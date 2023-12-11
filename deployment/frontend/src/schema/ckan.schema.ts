@@ -49,10 +49,16 @@ export interface Activity {
     object_id?: string
     activity_type: string
     user_data?: User
-    data: Record<string, {
-        title?: string, owner_org?: string, groups: {
-        id: string
-    }[] }>
+    data: Record<
+        string,
+        {
+            title?: string
+            owner_org?: string
+            groups: {
+                id: string
+            }[]
+        }
+    >
 }
 
 export interface ActivityDisplay {
@@ -96,12 +102,17 @@ export interface WriDataset extends Dataset {
     citation?: string
     function?: string
     isopen?: boolean
+    rw_id?: string
     learn_more?: string
     restrictions?: string
     open_in: OpenIn[]
     extras?: Extra[]
     spatial?: any
     spatial_address?: string
+    connectorUrl?: string
+    connectorType?: string
+    provider?: string
+    tableName?: string
 }
 
 export interface Extra {

@@ -1,35 +1,23 @@
-import { Fragment, useEffect } from 'react'
+import { Fragment } from 'react'
 import { Button } from '@/components/_shared/Button'
 import { InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
-import {
-    ChevronDownIcon,
-    ExclamationCircleIcon,
-    PlusCircleIcon,
-} from '@heroicons/react/24/outline'
-import {
-    FieldArrayWithId,
-    FieldValues,
-    Path,
-    UseFormReturn,
-    useFieldArray,
-    useForm,
-    useFormContext,
-} from 'react-hook-form'
+import { ChevronDownIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
+import { Path, useFieldArray, useFormContext } from 'react-hook-form'
 import { match } from 'ts-pattern'
-import { z } from 'zod'
 import {
     filterOperationOptions,
     rampTypes,
     renderTypeOptions,
 } from '../../../../formOptions'
 import { Disclosure, Switch, Transition } from '@headlessui/react'
-import { LayerFormType } from '../layer.schema'
+import { FilterFormType, LayerFormType } from '../layer.schema'
 import { useState } from 'react'
 import classNames from '@/utils/classnames'
 import { useColumns } from '../useColumns'
 import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
+import { Accordion } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion'
 
 interface InteractionFormProps {
     onNext: () => void
@@ -76,7 +64,7 @@ function ItemsArray() {
     const { control, register, watch } = formObj
     const { fields, append, remove } = useFieldArray({
         control,
-        name: 'render.layers',
+        name: 'layerConfig.render.layers',
     })
 
     const RenderCirclePaint = (index: number) => (
@@ -87,7 +75,7 @@ function ItemsArray() {
                 labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
                 <ColorPicker
-                    name={`render.layers.${index}.paint.circle-color`}
+                    name={`layerConfig.render.layers.${index}.paint.circle-color`}
                 />
             </InputGroup>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -98,7 +86,7 @@ function ItemsArray() {
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.circle-radius`,
+                            `layerConfig.render.layers.${index}.paint.circle-radius`,
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) => {
@@ -108,6 +96,7 @@ function ItemsArray() {
                             }
                         )}
                         defaultValue={1}
+                        step="any"
                         type="number"
                     />
                 </InputGroup>
@@ -118,7 +107,7 @@ function ItemsArray() {
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.circle-opacity`,
+                            `layerConfig.render.layers.${index}.paint.circle-opacity`,
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) =>
@@ -126,6 +115,7 @@ function ItemsArray() {
                             }
                         )}
                         defaultValue={1}
+                        step="any"
                         type="number"
                     />
                 </InputGroup>
@@ -140,7 +130,9 @@ function ItemsArray() {
                 className="sm:grid-cols-1 gap-x-2"
                 labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
-                <ColorPicker name={`render.layers.${index}.paint.fill-color`} />
+                <ColorPicker
+                    name={`layerConfig.render.layers.${index}.paint.fill-color`}
+                />
             </InputGroup>
             <InputGroup
                 label="Fill Opacity"
@@ -148,12 +140,16 @@ function ItemsArray() {
                 labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
                 <Input
-                    {...register(`render.layers.${index}.paint.fill-opacity`, {
-                        valueAsNumber: true,
-                        setValueAs: (v) =>
-                            v === '' ? undefined : parseFloat(v),
-                    })}
+                    {...register(
+                        `layerConfig.render.layers.${index}.paint.fill-opacity`,
+                        {
+                            valueAsNumber: true,
+                            setValueAs: (v) =>
+                                v === '' ? undefined : parseFloat(v),
+                        }
+                    )}
                     defaultValue={1}
+                    step="any"
                     type="number"
                 />
             </InputGroup>
@@ -167,7 +163,9 @@ function ItemsArray() {
                 className="sm:grid-cols-1 gap-x-2"
                 labelClassName="sm:text-start xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
             >
-                <ColorPicker name={`render.layers.${index}.paint.line-color`} />
+                <ColorPicker
+                    name={`layerConfig.render.layers.${index}.paint.line-color`}
+                />
             </InputGroup>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <InputGroup
@@ -177,7 +175,7 @@ function ItemsArray() {
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.line-width`,
+                            `layerConfig.render.layers.${index}.paint.line-width`,
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) =>
@@ -185,6 +183,7 @@ function ItemsArray() {
                             }
                         )}
                         defaultValue={1}
+                        step="any"
                         type="number"
                     />
                 </InputGroup>
@@ -195,7 +194,7 @@ function ItemsArray() {
                 >
                     <Input
                         {...register(
-                            `render.layers.${index}.paint.line-opacity`,
+                            `layerConfig.render.layers.${index}.paint.line-opacity`,
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) =>
@@ -203,6 +202,7 @@ function ItemsArray() {
                             }
                         )}
                         defaultValue={1}
+                        step="any"
                         type="number"
                     />
                 </InputGroup>
@@ -224,7 +224,7 @@ function ItemsArray() {
                                 >
                                     <SimpleSelect
                                         formObj={formObj}
-                                        name={`render.layers.${index}.type`}
+                                        name={`layerConfig.render.layers.${index}.type`}
                                         placeholder="Select the type of render"
                                         options={renderTypeOptions}
                                     />
@@ -237,7 +237,7 @@ function ItemsArray() {
                                     <Input
                                         defaultValue={'layer0'}
                                         {...register(
-                                            `render.layers.${index}.source-layer`
+                                            `layerConfig.render.layers.${index}.source-layer`
                                         )}
                                         type="text"
                                     />
@@ -245,7 +245,7 @@ function ItemsArray() {
                             </div>
                         </Accordion>
                         <Accordion text="Paint Properties">
-                            {match(watch('render.layers')[index])
+                            {match(watch('layerConfig.render.layers')[index])
                                 .with({ type: { value: 'circle' } }, () =>
                                     RenderCirclePaint(index)
                                 )
@@ -301,7 +301,7 @@ function FilterExpressions({ layerIdx }: { layerIdx: number }) {
     const { control, register, watch } = formObj
     const { fields, append, remove } = useFieldArray({
         control,
-        name: `render.layers.${layerIdx}.filter`,
+        name: `layerConfig.render.layers.${layerIdx}.filter`,
     })
     return (
         <div className="flex flex-col gap-y-4 pb-4">
@@ -318,7 +318,7 @@ function FilterExpressions({ layerIdx }: { layerIdx: number }) {
                     append({
                         operation: { value: '==', label: 'Equals to' },
                         column: { value: '', label: '' },
-                        value: null,
+                        value: '',
                     })
                 }
                 type="button"
@@ -344,20 +344,28 @@ function FilterExpression({
 }) {
     const formObj = useFormContext<LayerFormType>()
     const { control, register, watch } = formObj
-    if (watch(`render.layers.${layerIdx}.filter.${filterIdx}`) === 'all')
+    if (
+        watch(`layerConfig.render.layers.${layerIdx}.filter.${filterIdx}`) ===
+        'all'
+    )
         return <></>
     const columns = useColumns(
-        watch('source.provider.type.value'),
+        watch('layerConfig.source.provider.type.value'),
         watch('connectorUrl') as string,
         !!watch('connectorUrl')
     )
+
+    const filterExpression: FilterFormType = watch(
+        `layerConfig.render.layers.${layerIdx}.filter.${filterIdx}`
+    ) as FilterFormType
+    console.log('FILTER EXPRESSION', filterExpression)
     return (
         <Accordion text={`Filter ${filterIdx}`}>
             <div className="py-4 flex flex-col gap-y-2">
                 <InputGroup label="Operation">
                     <SimpleSelect
                         formObj={formObj}
-                        name={`render.layers.${layerIdx}.filter.${filterIdx}.operation`}
+                        name={`layerConfig.render.layers.${layerIdx}.filter.${filterIdx}.operation`}
                         placeholder="Select filter operation"
                         options={filterOperationOptions}
                     />
@@ -374,20 +382,27 @@ function FilterExpression({
                         }
                         placeholder="Select column to match"
                         formObj={formObj}
-                        name={`render.layers.${layerIdx}.filter.${filterIdx}.column`}
+                        name={`layerConfig.render.layers.${layerIdx}.filter.${filterIdx}.column`}
                     />
                 </InputGroup>
                 <InputGroup label="Value">
                     <Input
                         {...register(
-                            `render.layers.${layerIdx}.filter.${filterIdx}.value`,
+                            `layerConfig.render.layers.${layerIdx}.filter.${filterIdx}.value`,
                             {
-                                valueAsNumber: true,
-                                setValueAs: (v) =>
-                                    v === '' ? undefined : parseFloat(v),
+                                valueAsNumber:
+                                    filterExpression.operation.value !== '==',
+                                setValueAs: (v) => {
+                                    if (
+                                        filterExpression.operation.value ===
+                                        '=='
+                                    )
+                                        return v
+                                    return v === '' ? undefined : parseFloat(v)
+                                },
                             }
                         )}
-                        type="number"
+                        type="text"
                     />
                 </InputGroup>
             </div>
@@ -409,9 +424,9 @@ function ColorPicker({
     name,
 }: {
     name:
-        | `render.layers.${number}.paint.fill-color`
-        | `render.layers.${number}.paint.circle-color`
-        | `render.layers.${number}.paint.line-color`
+        | `layerConfig.render.layers.${number}.paint.fill-color`
+        | `layerConfig.render.layers.${number}.paint.circle-color`
+        | `layerConfig.render.layers.${number}.paint.line-color`
 }) {
     const formObj = useFormContext<LayerFormType>()
     const { register, watch } = formObj
@@ -447,12 +462,7 @@ function ColorPicker({
                 <RampObj name={name} />
             ) : (
                 <div className="pb-8">
-                    <input
-                        type="color"
-                        className="col-span-1 h-[40px] w-[40px] rounded shadow"
-                        defaultValue={''}
-                        {...register(name)}
-                    />
+                    <Input type="text" defaultValue={''} {...register(name)} />
                 </div>
             )}
         </div>
@@ -463,9 +473,9 @@ function RampObj({
     name,
 }: {
     name:
-        | `render.layers.${number}.paint.fill-color`
-        | `render.layers.${number}.paint.circle-color`
-        | `render.layers.${number}.paint.line-color`
+        | `layerConfig.render.layers.${number}.paint.fill-color`
+        | `layerConfig.render.layers.${number}.paint.circle-color`
+        | `layerConfig.render.layers.${number}.paint.line-color`
 }) {
     const formObj = useFormContext<LayerFormType>()
     const { control, register, watch } = formObj
@@ -474,7 +484,7 @@ function RampObj({
         name: `${name}.output`,
     })
     const columns = useColumns(
-        watch('source.provider.type.value'),
+        watch('layerConfig.source.provider.type.value'),
         watch('connectorUrl') as string,
         !!watch('connectorUrl')
     )
@@ -538,6 +548,7 @@ function RampObj({
                                         v === '' ? undefined : parseFloat(v),
                                 }
                             )}
+                            step="any"
                             type="number"
                         />
                     </InputGroup>
@@ -559,47 +570,5 @@ function RampObj({
                 </span>
             </button>
         </div>
-    )
-}
-
-export function Accordion({
-    text,
-    children,
-}: {
-    text: string
-    children: React.ReactNode
-}) {
-    return (
-        <Disclosure
-            as="div"
-            className="border-b border-r border-stone-200 shadow"
-        >
-            {({ open }) => (
-                <>
-                    <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
-                        <div className="flex h-16 w-full items-center gap-x-2">
-                            {text}
-                        </div>
-                        <ChevronDownIcon
-                            className={`${
-                                open ? 'rotate-180 transform  transition' : ''
-                            } h-5 w-5 text-black`}
-                        />
-                    </Disclosure.Button>
-                    <Transition
-                        enter="transition duration-100 ease-out"
-                        enterFrom="transform scale-95 opacity-0"
-                        enterTo="transform scale-100 opacity-100"
-                        leave="transition duration-75 ease-out"
-                        leaveFrom="transform scale-100 opacity-100"
-                        leaveTo="transform scale-95 opacity-0"
-                    >
-                        <Disclosure.Panel className="border-t-2 border-amber-400 bg-white p-4 text-sm text-gray-500">
-                            {children}
-                        </Disclosure.Panel>
-                    </Transition>
-                </>
-            )}
-        </Disclosure>
     )
 }

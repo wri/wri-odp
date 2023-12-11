@@ -9,7 +9,7 @@ export function Steps({ state }: { state: string }) {
         {
             name: 'Render',
             state: 'setRenderConfig',
-            enabled: watch('source.provider.type')?.value === 'carto',
+            enabled: watch('layerConfig.source.provider.type')?.value === 'carto',
         },
         { name: 'Legend', state: 'setLegendConfig', enabled: true },
         { name: 'Interaction', state: 'setInteractionConfig', enabled: true },
