@@ -81,7 +81,7 @@ export const notificationRouter = createTRPCRouter({
             payload.is_unread = input.is_unread;
           }
          
-          const response = await fetch(`${env.CKAN_URL}/api/action/notification_update`,
+          const response = await fetch(`${env.CKAN_URL}/api/3/action/notification_update`,
             {
               method: "POST",
               headers: {
@@ -101,6 +101,34 @@ export const notificationRouter = createTRPCRouter({
         }
         ));
         return response;
+      }
+      catch (e) {
+          let error =
+              'Something went wrong please contact the system administrator'
+          if (e instanceof Error) error = e.message
+          throw Error(replaceNames(error, true))
+      }
+     }),
+  createNotification: protectedProcedure
+    .input(NotificationInput)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/notification_create`,
+          {
+            method: "POST",
+            headers: {
+              "Authorization": ctx.session.user.apikey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(input),
+          })
+        const data = (await response.json()) as CkanResponse<NotificationType>;
+        if (!data.success && data.error) {
+            if (data.error.message)
+                  throw Error(replaceNames(data.error.message, true))
+            throw Error(replaceNames(JSON.stringify(data.error), true))
+        }
+        return data.result;
       }
       catch (e) {
           let error =
