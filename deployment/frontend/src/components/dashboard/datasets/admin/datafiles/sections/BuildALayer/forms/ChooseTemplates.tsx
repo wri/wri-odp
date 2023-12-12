@@ -33,6 +33,10 @@ export function ChooseTemplates(props: IProps) {
         const templateLayer: APILayerSpec = {
             id: id,
             ...attributes,
+            application: ['data-explorer'],
+            protected: false,
+            published: false,
+            env: 'staging',
         }
         if (templateLayer.layerConfig.type === 'vector') {
             const account =
@@ -45,7 +49,6 @@ export function ChooseTemplates(props: IProps) {
 
     const setTemplate = (layerObj: APILayerSpec) => {
         const formObj = convertLayerObjToForm(layerObj)
-        console.log(formObj)
         reset(formObj)
         setOpen(false)
     }
