@@ -82,7 +82,7 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
                 className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                 rowMain={
                   <div className='flex flex-col sm:flex-row pl-3 sm:pl-5  gap-x-14 gap-y-4'>
-                    <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} />
+                    <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} defaultImg='/images/placeholders/teams/teamdefault.png' />
                     <div className='font-normal text-[14px] text-wri-black sm:self-center sm:ml-auto sm:mr-[40%] lg:mr-[60%]'>{team.capacity}</div>
                   </div>
                 }
@@ -170,8 +170,8 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
 
 
 
-export default function UserCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
+export default function UserCard({username}: {username: string}) {
+  const [query, setQuery] = useState<SearchInput>({ search: username ?? '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.user.getAllUsers.useQuery({ search: '', page: { start: 0, rows: 100 } })
   const [open, setOpen] = useState(false)
   const router = useRouter()
@@ -228,10 +228,6 @@ export default function UserCard() {
                     key={user.id}
                     className={`pr-6`}
                     rowMain={<TeamProfile user={user as IUser} />}
-                    linkButton={{
-                      label: "View user",
-                      link: "#",
-                    }}
                     controlButtons={[
                       {
                         label: "Edit",

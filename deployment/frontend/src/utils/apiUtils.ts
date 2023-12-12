@@ -15,7 +15,10 @@ import type { SearchInput } from '@/schema/search.schema'
 import { Facets } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
-import {Resource} from '@/interfaces/dataset.interface'
+import { Resource } from '@/interfaces/dataset.interface'
+import nodemailer from 'nodemailer';
+import { randomBytes } from 'crypto';
+import { RwDatasetResp, RwErrorResponse, RwResponse, isRwError } from '@/interfaces/rw.interface'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -465,21 +468,19 @@ export function activityDetails(activity: Activity): ActivityDisplay {
     if (object === 'user') description = title
     const time = timeAgo(activity.timestamp)
 
-    let orgId = '';
-    let packageId = '';
-    let groupId = '';
-    let packageGroup: string[] = [];
+    let orgId = ''
+    let packageId = ''
+    let groupId = ''
+    let packageGroup: string[] = []
     if (object === 'package') {
         orgId = activity.data?.package?.owner_org as string
         packageId = activity.object_id as string
         //get all groups id
         const groups = activity.data?.package?.groups as { id: string }[]
         packageGroup = groups.map((group) => group.id)
-    }
-    else if (object === 'team') {
+    } else if (object === 'team') {
         orgId = activity.object_id as string
-    }
-    else if (object === 'topic') {
+    } else if (object === 'topic') {
         groupId = activity.object_id as string
     }
     return {
@@ -515,6 +516,28 @@ export async function getOneDataset(
         if (dataset.error.message) throw Error(dataset.error.message)
         throw Error(JSON.stringify(dataset.error))
     }
+    if (dataset.result.rw_id) {
+        const rwRes = await fetch(
+            `https://api.resourcewatch.org/v1/dataset/${dataset.result.rw_id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${env.RW_API_KEY}`,
+                },
+            }
+        )
+        const datasetRw: RwDatasetResp | RwErrorResponse = await rwRes.json()
+        if (isRwError(datasetRw))
+            throw Error(
+                `Error resource at the Resource Watch API - (${JSON.stringify(
+                    datasetRw.errors
+                )})`
+            )
+        dataset.result.connectorType = datasetRw.data.attributes.connectorType
+        dataset.result.connectorUrl = datasetRw.data.attributes.connectorUrl
+        dataset.result.provider = datasetRw.data.attributes.provider
+        dataset.result.tableName = datasetRw.data.attributes.tableName
+    }
     return {
         ...dataset.result,
         open_in: dataset.result.open_in
@@ -523,13 +546,18 @@ export async function getOneDataset(
         spatial: dataset.result.spatial
             ? JSON.parse(dataset.result.spatial)
             : null,
-        resources: dataset.result.resources.map((r) => ({
-            ...r,
-            _extra: {
-                is_layer: r.url?.startsWith('https://api.resourcewatch'),
-                rw_layer_id: r.url ? r.url.split('/').at(-1) : null,
-            },
-        } as Resource)),
+        resources: dataset.result.resources.map(
+            (r) =>
+                ({
+                    ...r,
+                    _extra: {
+                        is_layer: r.url?.startsWith(
+                            'https://api.resourcewatch'
+                        ),
+                        rw_layer_id: r.url ? r.url.split('/').at(-1) : null,
+                    },
+                }) as Resource
+        ),
     }
 }
 
@@ -862,4 +890,125 @@ export async function deleteGroupMember({
         console.error(e)
         return false
     }
+}
+
+export async function getDatasetDetails({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+   const user = session?.user
+    const datasetRes = await fetch(
+        `${env.CKAN_URL}/api/action/package_show?id=${id}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${user?.apikey ?? ''}`,
+            },
+        }
+    )
+    const dataset: CkanResponse<WriDataset> = await datasetRes.json()
+    if (!dataset.success && dataset.error) {
+        if (dataset.error.message) throw Error(dataset.error.message)
+        throw Error(JSON.stringify(dataset.error))
+    }
+    return dataset.result
+}
+
+function cryptoRandomFloat(): number {
+    return randomBytes(4).readUInt32BE(0) / 0xffffffff;
+}
+
+export async function getRandomUsernameFromEmail(email: string): Promise<string> {
+    const localpart = email.split('@')[0] as string;
+    const cleanedLocalpart = localpart.replace(/[^\w]/g, '-').toLowerCase();
+
+    const maxNameCreationAttempts = 100;
+
+    const checkUsernameExists = async (username: string): Promise<boolean> => {
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/user_show?q=${username}`);
+        const userData = (await response.json()) as CkanResponse<User>;
+        return !!userData.result;
+    };
+
+    for (let i = 0; i < maxNameCreationAttempts; i++) {
+        const randomNumber = cryptoRandomFloat();
+        const randomSuffix = Math.floor(randomNumber * 10000);
+        const randomName = `${cleanedLocalpart}-${randomSuffix}`;
+
+        const userExists = await checkUsernameExists(randomName);
+
+        if (!userExists) {
+            return randomName;
+        }
+    }
+
+    return cleanedLocalpart; 
+}
+
+export function generateRandomPassword(length: number): string {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+";
+    let password = "";
+
+    for (let i = 0; i < length; i++) {
+        const randomNumber = cryptoRandomFloat();
+        const randomIndex = Math.floor(randomNumber * charset.length);
+        password += charset.charAt(randomIndex);
+    }
+
+    return password;
+}
+
+export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const transporter = nodemailer.createTransport({
+        host: env.SMTP_SERVER,
+        port: Number(env.SMTP_PORT) || 0,
+        secure: false,
+        auth: {
+            user: env.SMTP_USER,
+            pass: env.SMTP_PASSWORD,
+        },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    await transporter.sendMail({
+        from: env.SMTP_FROM,
+        to,
+        subject,
+        html,
+    });
+}
+
+export function generateEmail(email: string, password: string, username: string): string {
+    return `
+        <p>Hi there,</p>
+        <p>You have been invited to join the WRI OpenData Platform. Please use the following credentials to log in to ${env.NEXTAUTH_URL}:</p>
+        <p>Username: ${username}</p>
+        <p>Email: ${email}</p>
+        <p>Password: ${password}</p>
+        <p>Once you log in, remember to change your password</p>
+        <p>Thanks!</p>
+    `;
+}
+
+export function generateInviteEmail(email: string,
+    password: string,
+    username: string,
+    orgName: string,
+    role: string
+    ): string {
+    return `
+        <p>Hi there,</p>
+        <p>You have been invited to join the WRI OpenData Platform and you have been added to the team ${orgName} 
+        with the following role: ${role}.</p>
+        <p>Please use the following credentials to log in to ${env.NEXTAUTH_URL}:</p>
+        <p>Username: ${username}</p>
+        <p>Email: ${email}</p>
+        <p>Password: ${password}</p>
+        <p>Once you log in, remember to change your password</p>
+        <p>Thanks!</p>
+    `;
 }

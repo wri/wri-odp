@@ -6,7 +6,13 @@ const sourceSchema = z
     .object({
         provider: z.object({
             type: z.object({
-                value: z.enum(['gee', 'carto', 'wms', 'featureservice', 'other']),
+                value: z.enum([
+                    'gee',
+                    'carto',
+                    'wms',
+                    'featureservice',
+                    'other',
+                ]),
                 label: z.string(),
             }),
             account: z.string().optional().nullable(),
@@ -62,21 +68,15 @@ const numericExpression = z
     })
 
 const filterExpression = z.object({
-    operation: z
-        .object({
-            value: z.enum(['==', '<=', '>=', '>', '<']),
-            label: z.string(),
-        })
-        .optional()
-        .nullable(),
-    column: z
-        .object({
-            value: z.string(),
-            label: z.string(),
-        })
-        .optional()
-        .nullable(),
-    value: z.coerce.number().optional().nullable(),
+    operation: z.object({
+        value: z.enum(['==', '<=', '>=', '>', '<']),
+        label: z.string(),
+    }),
+    column: z.object({
+        value: z.string(),
+        label: z.string(),
+    }),
+    value: z.union([z.string(), z.number(), z.literal(NaN)]),
 })
 
 const rampObj = z
@@ -197,10 +197,7 @@ const legendsSchema = z.object({
     type: z.enum(['basic', 'choropleth', 'gradient']),
     items: z.array(
         z.object({
-            color: z
-                .string()
-                .length(7, 'It needs to be 7 characters long')
-                .regex(/^#/, 'Must start with #'),
+            color: z.string().regex(/^#/, 'Must start with #'),
             name: z.string(),
         })
     ),
@@ -220,34 +217,55 @@ const interactionConfigSchema = z.object({
     ),
 })
 
+export const rawLayerSchema = z.object({
+    id: z.string().uuid().optional().nullable().or(emptyStringToUndefined),
+    generalConfig: z.any().optional().nullable(),
+    layerConfig: z.any().optional().nullable(),
+    interactionConfig: z.any().optional().nullable(),
+    legendConfig: z.any().optional().nullable(),
+})
+
 export const layerSchema = z
     .object({
         id: z.string().uuid().optional().nullable().or(emptyStringToUndefined),
         name: z.string().default(''),
         slug: z.string().default(''),
         default: z.boolean().default(false),
+        dataset: z.string().optional(),
+        applicationConfig: z.any().optional().nullable(),
+        staticImageConfig: z.any().optional().nullable(),
+        published: z.boolean().default(false),
+        protected: z.boolean().default(false),
+        thumbnailUrl: z.string().optional().or(emptyStringToUndefined),
+        env: z.string().default('staging'),
+        application: z.array(z.string()).default(['data-explorer']),
         description: z.string().default(''),
+        provider: z.string().default('cartodb'),
+        type: z.string().default('layer'),
+        iso: z.array(z.string()).default([]),
         account: z.string().optional().nullable().or(emptyStringToUndefined),
-        type: z.object({
-            value: z.enum(['raster', 'vector', 'geojson', 'deck']),
-            label: z.string(),
+        layerConfig: z.object({
+            type: z.object({
+                value: z.enum(['raster', 'vector', 'geojson', 'deck']),
+                label: z.string(),
+            }),
+            source: sourceSchema.optional().nullable(),
+            render: renderSchema.optional().nullable(),
         }),
         connectorUrl: z.string().url().optional().nullable(),
         legendConfig: legendsSchema.optional().nullable(),
-        source: sourceSchema.optional().nullable(),
-        render: renderSchema.optional().nullable(),
         interactionConfig: interactionConfigSchema.optional().nullable(),
     })
     .refine(
         (obj) => {
             if (
-                obj.type.value === 'raster' &&
-                obj.source?.provider.type.value === 'wms'
+                obj.layerConfig.type.value === 'raster' &&
+                obj.layerConfig.source?.provider.type.value === 'wms'
             )
                 return (
-                    obj.type.value === 'raster' &&
-                    obj.source?.tiles &&
-                    obj.source?.tiles.length > 0
+                    obj.layerConfig.type.value === 'raster' &&
+                    obj.layerConfig.source?.tiles &&
+                    obj.layerConfig.source?.tiles.length > 0
                 )
             return true
         },
@@ -258,8 +276,10 @@ export const layerSchema = z
     )
 
 export type ColorPatternType = z.infer<typeof colorPattern>
+export type RawLayerFormType = z.infer<typeof rawLayerSchema>
 export type LayerFormType = z.infer<typeof layerSchema>
 export type SourceFormType = z.infer<typeof sourceSchema>
 export type RenderFormType = z.infer<typeof renderSchema>
 export type LegendsFormType = z.infer<typeof legendsSchema>
+export type FilterFormType = z.infer<typeof filterExpression>
 export type InteractionFormType = z.infer<typeof interactionConfigSchema>

@@ -3,6 +3,7 @@ import {
     ChartBarIcon,
     ChevronLeftIcon,
     ExclamationTriangleIcon,
+    InformationCircleIcon,
     GlobeAltIcon,
     TableCellsIcon,
 } from '@heroicons/react/20/solid'
@@ -25,6 +26,14 @@ import { useSession } from 'next-auth/react'
 import { DefaultTooltip } from '../_shared/Tooltip'
 import { PencilSquareIcon } from '@heroicons/react/24/solid'
 import { useRouter } from 'next/router'
+import { api } from '@/utils/api'
+import notify from '@/utils/notify'
+import Modal from '@/components/_shared/Modal'
+import { LoaderButton } from '@/components/_shared/Button'
+import { Dialog } from '@headlessui/react'
+import { useState } from 'react'
+import Spinner from '../_shared/Spinner'
+import { ErrorAlert } from '@/components/_shared/Alerts'
 
 function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     const session = useSession()
@@ -108,6 +117,38 @@ function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
 }
 
 export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
+    const [open, setOpen] = useState(false)
+    const [fopen, setFOpen] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const { data, isLoading, refetch } = api.dataset.isFavoriteDataset.useQuery(
+        dataset?.id as string
+    )
+    const addToFavorites = api.dataset.followDataset.useMutation({
+        onSuccess: async (data) => {
+            await refetch()
+            setOpen(false)
+            notify(
+                `Successfully added the ${
+                    dataset?.title ?? dataset?.name
+                } dataset to your favorites`,
+                'success'
+            )
+        },
+        onError: (error) => setErrorMessage(error.message),
+    })
+    const removeFromFavorites = api.dataset.unFollowDataset.useMutation({
+        onSuccess: async (data) => {
+            await refetch()
+            setFOpen(false)
+            notify(
+                `Successfully removed the ${
+                    dataset?.title ?? dataset?.name
+                } dataset from your favorites`,
+                'error'
+            )
+        },
+        onError: (error) => setErrorMessage(error.message),
+    })
     const session = useSession()
     const created_at = new Date(dataset?.metadata_created ?? '')
     const last_updated = new Date(dataset?.metadata_modified ?? '')
@@ -141,12 +182,34 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                         <OpenInButton open_in={dataset?.open_in ?? []} />
                     </div>
                     <div className="flex items-center gap-x-2">
-                        <DefaultTooltip
-                            content="Add to favorites"
-                            side="bottom"
-                        >
-                            <StarIcon className="cursor-pointer h-6 w-6" />
-                        </DefaultTooltip>
+                        {isLoading ? (
+                            <Spinner className="w-2 h-2" />
+                        ) : data !== undefined && data ? (
+                            <DefaultTooltip
+                                content="remove from favorites"
+                                side="bottom"
+                            >
+                                <button
+                                    className="p-0 m-0 "
+                                    onClick={() => setFOpen(true)}
+                                >
+                                    <StarIcon className="cursor-pointer h-6 w-6 text-wri-gold" />
+                                </button>
+                            </DefaultTooltip>
+                        ) : (
+                            <DefaultTooltip
+                                content="Add to favorites"
+                                side="bottom"
+                            >
+                                <button
+                                    className="p-0 m-0 "
+                                    onClick={() => setOpen(true)}
+                                >
+                                    <StarIcon className="cursor-pointer h-6 w-6 " />
+                                </button>
+                            </DefaultTooltip>
+                        )}
+
                         <DefaultTooltip content="Edit" side="bottom">
                             <Link
                                 href={`/dashboard/datasets/${dataset?.name}/edit`}
@@ -155,6 +218,116 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                             </Link>
                         </DefaultTooltip>
                     </div>
+                    {open && (
+                        <Modal
+                            open={open}
+                            setOpen={setOpen}
+                            className="sm:w-full sm:max-w-lg"
+                            key="add-to-favorites"
+                        >
+                            <div className="sm:flex sm:items-start">
+                                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                                    <InformationCircleIcon
+                                        className="h-6 w-6 text-green-600"
+                                        aria-hidden="true"
+                                    />
+                                </div>
+                                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                    <Dialog.Title
+                                        as="h3"
+                                        className="text-base font-semibold leading-6 text-gray-900"
+                                    >
+                                        Add to favorites
+                                    </Dialog.Title>
+                                    <div className="mt-2">
+                                        <p className="text-sm text-gray-500">
+                                            Are you sure you want to add{' '}
+                                            {dataset?.title ?? dataset?.name} to
+                                            your favorites?
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                                <LoaderButton
+                                    variant="light"
+                                    className="bg-wri-gold "
+                                    onClick={() => {
+                                        addToFavorites.mutate(
+                                            dataset?.id as string
+                                        )
+                                    }}
+                                    loading={addToFavorites.isLoading}
+                                >
+                                    Add
+                                </LoaderButton>
+                                <Button
+                                    variant="outline"
+                                    type="button"
+                                    onClick={() => setOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                            </div>
+                        </Modal>
+                    )}
+                    {fopen && (
+                        <Modal
+                            open={fopen}
+                            setOpen={setFOpen}
+                            className="sm:w-full sm:max-w-lg"
+                            key="add-to-favorites"
+                        >
+                            <div className="sm:flex sm:items-start">
+                                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                    <ExclamationTriangleIcon
+                                        className="h-6 w-6 text-red-600"
+                                        aria-hidden="true"
+                                    />
+                                </div>
+                                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                    <Dialog.Title
+                                        as="h3"
+                                        className="text-base font-semibold leading-6 text-gray-900"
+                                    >
+                                        Remove from favorites
+                                    </Dialog.Title>
+                                    <div className="mt-2">
+                                        <p className="text-sm text-gray-500">
+                                            Are you sure you want to remove{' '}
+                                            {dataset?.title ?? dataset?.name}{' '}
+                                            from your favorites?
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                                <LoaderButton
+                                    variant="destructive"
+                                    onClick={() => {
+                                        removeFromFavorites.mutate(
+                                            dataset?.id as string
+                                        )
+                                    }}
+                                    loading={removeFromFavorites.isLoading}
+                                >
+                                    Remove
+                                </LoaderButton>
+                                <Button
+                                    variant="outline"
+                                    type="button"
+                                    onClick={() => setFOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                            </div>
+                        </Modal>
+                    )}
+                    {errorMessage && (
+                        <div className="py-4">
+                            <ErrorAlert text={errorMessage} />
+                        </div>
+                    )}
                 </div>
             )}
             <div className="px-4 sm:px-6">
@@ -287,7 +460,12 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                     {dataset?.resources &&
                         dataset?.resources.filter((resource) => resource.format)
                             .length > 0 && (
-                            <div className={classNames("flex gap-x-2 border-zinc-300", session.data?.user ? 'border-l pl-3' : '')}>
+                            <div
+                                className={classNames(
+                                    'flex gap-x-2 border-zinc-300',
+                                    session.data?.user ? 'border-l pl-3' : ''
+                                )}
+                            >
                                 {dataset?.resources
                                     .filter((resource) => resource.format)
                                     .map((resource) => (
