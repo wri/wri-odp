@@ -1,21 +1,14 @@
 export const democracy_index = {
-    id: 'c3340efd-4a1c-40d6-9106-5157632a3dba',
     name: '2014 Overall Environmental Democracy Index Score',
     slug: 'overall-environmental-democracy-index-score',
-    dataset: '0b9f0100-ce5b-430f-ad8f-3363efa05481',
     description:
         'The environmental democracy index aims to assess the state of national laws that protect transparency, participation, and justice in environmental decision-making. The index is calculated by combining 75 legal indicators that are scored on a range from 0 (worst) to 3 (best), producing an overall score that falls within this same range. These indicators test both the extent of provisions that promote environmental democracy as well as the ability to enforce these provisions as a legal right for the public. The data being shown represent the laws in place in 2014.',
-    application: ['rw'],
+    application: ['data-explorer'],
     iso: [],
     provider: 'cartodb',
     type: 'layer',
-    userId: '5980838ae24e6a1dae3dd446',
-    default: true,
-    protected: false,
-    published: true,
     thumbnailUrl:
         'https://s3.amazonaws.com/wri-api-backups/resourcewatch/prod/thumbnails/929ffb0b-9a13-4617-9a60-9f7c9a83090f-1643736539945.png',
-    env: 'production',
     layerConfig: {
         type: 'vector',
         source: {

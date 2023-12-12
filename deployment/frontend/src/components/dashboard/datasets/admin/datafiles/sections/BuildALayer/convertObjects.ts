@@ -24,7 +24,7 @@ export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
         env: formData.env ?? 'staging',
         protected: formData.protected ?? false,
         iso: formData.iso ?? [],
-        application: formData.application ?? ['rw'],
+        application: formData.application ?? ['data-explorer'],
         id: formData.id ?? uuidv4(),
         interactionConfig: formData.interactionConfig
             ? {

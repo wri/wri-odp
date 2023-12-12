@@ -47,7 +47,7 @@ async function createDatasetRw(dataset: DatasetFormType) {
         provider: dataset.provider,
         published: false,
         env: 'staging',
-        application: ['rw'],
+        application: ['data-explorer'],
     }
     if (dataset.provider === 'gee') {
         rwDataset.tableName = dataset.tableName
