@@ -1,11 +1,25 @@
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/api/trpc'
+import {
+    createTRPCRouter,
+    protectedProcedure,
+    publicProcedure,
+} from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { getGroups, getGroup, searchHierarchy, getUserGroups, findAllNameInTree } from '@/utils/apiUtils'
+import {
+    getGroups,
+    getGroup,
+    searchHierarchy,
+    getUserGroups,
+    findAllNameInTree,
+} from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
-import type { FolloweeList, GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import type {
+    FolloweeList,
+    GroupTree,
+    GroupsmDetails,
+} from '@/schema/ckan.schema'
 import { searchArrayForKeyword } from '@/utils/general'
-import type { CkanResponse } from '@/schema/ckan.schema'
+import type { CkanResponse, User } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 
@@ -18,23 +32,35 @@ export const TopicRouter = createTRPCRouter({
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             let groupTree: GroupTree[] = []
-            const allGroups = (await getUserGroups({ apiKey: ctx.session.user.apikey, userId: ctx.session.user.id }))!
-            const topic2Image = allGroups.reduce((acc, org) => {
-                acc[org.id] = org.image_display_url!
-                return acc
-            }
-                , {} as Record<string, string>)
+            const allGroups = (await getUserGroups({
+                apiKey: ctx.session.user.apikey,
+                userId: ctx.session.user.id,
+            }))!
+            const topic2Image = allGroups.reduce(
+                (acc, org) => {
+                    acc[org.id] = org.image_display_url!
+                    return acc
+                },
+                {} as Record<string, string>
+            )
             if (input.search) {
-                groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, q: input.search, group_type: 'group' })
-            }
-            else {
+                groupTree = await searchHierarchy({
+                    isSysadmin: ctx.session.user.sysadmin,
+                    apiKey: ctx.session.user.apikey,
+                    q: input.search,
+                    group_type: 'group',
+                })
+            } else {
                 if (ctx.session.user.sysadmin) {
                     groupTree = await getGroups({
                         apiKey: ctx.session.user.apikey,
                     })
-                }
-                else {
-                    groupTree = await searchHierarchy({ isSysadmin: ctx.session.user.sysadmin, apiKey: ctx.session.user.apikey, group_type: 'group' })
+                } else {
+                    groupTree = await searchHierarchy({
+                        isSysadmin: ctx.session.user.sysadmin,
+                        apiKey: ctx.session.user.apikey,
+                        group_type: 'group',
+                    })
                 }
             }
 
@@ -67,13 +93,16 @@ export const TopicRouter = createTRPCRouter({
                     },
                 }
             )
-            const _userTopics: CkanResponse<Group[]> = await userTopicsRes.json()
-            if (!_userTopics.success && _userTopics.error) throw Error(replaceNames(_userTopics.error.message))
+            const _userTopics: CkanResponse<Group[]> =
+                await userTopicsRes.json()
+            if (!_userTopics.success && _userTopics.error)
+                throw Error(replaceNames(_userTopics.error.message))
             userTopics = _userTopics.result.map((topic) => topic.name)
         }
         const tree: CkanResponse<TopicHierarchy[]> =
             await topicHierarchyRes.json()
-        if (!tree.success && tree.error) throw Error(replaceNames(tree.error.message))
+        if (!tree.success && tree.error)
+            throw Error(replaceNames(tree.error.message))
         return { hierarchy: tree.result, userTopics }
     }),
     getAllTopics: protectedProcedure.query(async ({ ctx }) => {
@@ -90,7 +119,8 @@ export const TopicRouter = createTRPCRouter({
             }
         )
         const topics: CkanResponse<Group[]> = await topicRes.json()
-        if (!topics.success && topics.error) throw Error(replaceNames(topics.error.message))
+        if (!topics.success && topics.error)
+            throw Error(replaceNames(topics.error.message))
         return topics.result.filter((topic) => topic.state === 'active')
     }),
     editTopic: protectedProcedure
@@ -98,6 +128,15 @@ export const TopicRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const user = ctx.session.user
+                if (input.members) {
+                    input.users = []
+                    for (const member of input.members) {
+                        input.users.push({
+                            name: member.user.value,
+                            capacity: member.capacity.value,
+                        })
+                    }
+                }
                 const body = JSON.stringify({
                     ...input,
                     groups:
@@ -118,7 +157,8 @@ export const TopicRouter = createTRPCRouter({
                 )
                 const topic: CkanResponse<Group> = await topicRes.json()
                 if (!topic.success && topic.error) {
-                    if (topic.error.message) throw Error(replaceNames(topic.error.message))
+                    if (topic.error.message)
+                        throw Error(replaceNames(topic.error.message))
                     throw Error(replaceNames(JSON.stringify(topic.error)))
                 }
                 return topic.result
@@ -144,7 +184,8 @@ export const TopicRouter = createTRPCRouter({
             )
             const topic: CkanResponse<Topic & { groups: Topic[] }> =
                 await topicRes.json()
-            if (!topic.success && topic.error) throw Error(replaceNames(topic.error.message))
+            if (!topic.success && topic.error)
+                throw Error(replaceNames(topic.error.message))
             return {
                 ...topic.result,
                 parent: topic.result.groups[0]?.name ?? null,
@@ -167,13 +208,33 @@ export const TopicRouter = createTRPCRouter({
             )
             const topic: CkanResponse<Topic> = await topicRes.json()
             if (!topic.success && topic.error) {
-                if (topic.error.message) throw Error(replaceNames(topic.error.message))
+                if (topic.error.message)
+                    throw Error(replaceNames(topic.error.message))
                 throw Error(replaceNames(JSON.stringify(topic.error)))
             }
             console.log(topic)
             return {
                 ...topic.result,
             }
+        }),
+    getTopicUsers: protectedProcedure
+        .input(z.object({ id: z.string(), capacity: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const membersListRes = await fetch(
+                `${env.CKAN_URL}/api/action/member_list?id=${input.id}${
+                    input.capacity ? `&capacity=${input.capacity}` : ''
+                }&object_type=user`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const membersList: CkanResponse<string[][]> =
+                await membersListRes.json()
+            return membersList.result
         }),
     createTopic: protectedProcedure
         .input(TopicSchema)
@@ -200,7 +261,8 @@ export const TopicRouter = createTRPCRouter({
                 )
                 const topic: CkanResponse<Group> = await topicRes.json()
                 if (!topic.success && topic.error) {
-                    if (topic.error.message) throw Error(replaceNames(topic.error.message))
+                    if (topic.error.message)
+                        throw Error(replaceNames(topic.error.message))
                     throw Error(replaceNames(JSON.stringify(topic.error)))
                 }
                 return topic.result
@@ -226,51 +288,64 @@ export const TopicRouter = createTRPCRouter({
                 }
             )
             const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error) throw Error(replaceNames(data.error.message))
+            if (!data.success && data.error)
+                throw Error(replaceNames(data.error.message))
             return data
         }),
     getGeneralTopics: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             let groupTree: GroupTree[] = []
-            const allGroups = (await getUserGroups({ apiKey: ctx?.session?.user.apikey ?? "", userId: "" }))!
-            const topicDetails = allGroups.reduce((acc, org) => {
-                acc[org.id] = {
-                    img_url: org.image_display_url,
-                    description: org.description,
-                    package_count: org.package_count,
-                }
-                return acc
-            }
-                , {} as Record<string, GroupsmDetails>)
+            const allGroups = (await getUserGroups({
+                apiKey: ctx?.session?.user.apikey ?? '',
+                userId: '',
+            }))!
+            const topicDetails = allGroups.reduce(
+                (acc, org) => {
+                    acc[org.id] = {
+                        img_url: org.image_display_url,
+                        description: org.description,
+                        package_count: org.package_count,
+                    }
+                    return acc
+                },
+                {} as Record<string, GroupsmDetails>
+            )
             if (input.search) {
-                groupTree = await searchHierarchy({ isSysadmin: true, apiKey: ctx?.session?.user.apikey ?? "", q: input.search, group_type: 'group' })
+                groupTree = await searchHierarchy({
+                    isSysadmin: true,
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    q: input.search,
+                    group_type: 'group',
+                })
                 if (input.tree) {
                     let groupFetchTree = groupTree[0] as GroupTree
-                    const findTree = findNameInTree(groupFetchTree, input.search)
+                    const findTree = findNameInTree(
+                        groupFetchTree,
+                        input.search
+                    )
                     if (findTree) {
                         groupFetchTree = findTree
                     }
                     groupTree = [groupFetchTree]
                 }
                 if (input.allTree) {
-                     
                     const filterTree = groupTree.flatMap((group) => {
                         const search = input.search.toLowerCase()
-                        if ( group.name.toLowerCase().includes(search) || group.title?.toLowerCase().includes(search) ) return [group]
+                        if (
+                            group.name.toLowerCase().includes(search) ||
+                            group.title?.toLowerCase().includes(search)
+                        )
+                            return [group]
                         const findtree = findAllNameInTree(group, search)
                         return findtree
                     })
                     groupTree = filterTree
                 }
-                
-            }
-            else {
-                
+            } else {
                 groupTree = await getGroups({
-                    apiKey: ctx?.session?.user.apikey ?? "",
+                    apiKey: ctx?.session?.user.apikey ?? '',
                 })
-                
             }
 
             const result = groupTree
@@ -280,7 +355,7 @@ export const TopicRouter = createTRPCRouter({
                 count: result.length,
             }
         }),
-     getTopicV2: protectedProcedure
+    getTopicV2: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ ctx, input }) => {
             const user = ctx.session.user
@@ -293,33 +368,128 @@ export const TopicRouter = createTRPCRouter({
                     },
                 }
             )
-            const topic: CkanResponse<Group> =
-                await topicRes.json()
-            if (!topic.success && topic.error) throw Error(replaceNames(topic.error.message))
+            const topic: CkanResponse<Group> = await topicRes.json()
+            if (!topic.success && topic.error)
+                throw Error(replaceNames(topic.error.message))
             return {
-                topic: topic.result
+                topic: topic.result,
             }
         }),
-     
-    getFollowedTopics: protectedProcedure
-        .query(async ({ ctx }) => {
 
-            const response = await fetch(`${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`, {
+    getFollowedTopics: protectedProcedure.query(async ({ ctx }) => {
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
+            {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `${ctx.session.user.apikey}`,
                 },
-            })
-            const data = (await response.json()) as CkanResponse<FolloweeList[]>
-            if (!data.success && data.error) throw Error(data.error.message)
-            const result = data.result.reduce((acc, item) => {
-                if (item.type === 'group') {
-                    const t = item.dict as Group;
-                    acc.push(t);
+            }
+        )
+        const data = (await response.json()) as CkanResponse<FolloweeList[]>
+        if (!data.success && data.error) throw Error(data.error.message)
+        const result = data.result.reduce((acc, item) => {
+            if (item.type === 'group') {
+                const t = item.dict as Group
+                acc.push(t)
+            }
+            return acc
+        }, [] as Group[])
+        return result
+    }),
+    getPossibleMembers: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
                 }
-                return acc;
-            }, [] as Group[]);
-            return result
-         })
-     
+            )
+            const topic: CkanResponse<Topic & { groups: Topic[] }> =
+                await topicRes.json()
+            console.log(`TOPIC: ${JSON.stringify(topic)}`)
+            if (!topic.success && topic.error) {
+                if (topic.error.message)
+                    throw Error(replaceNames(topic.error.message))
+                throw Error(replaceNames(JSON.stringify(topic.error)))
+            }
+            const topicUsers = topic?.result?.users?.map(
+                (user) => user.name
+            ) as string[]
+            const usersRes = await fetch(
+                `${env.CKAN_URL}/api/action/user_list?all_fields=True&limit=1000`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const users: CkanResponse<User[]> = await usersRes.json()
+            if (!users.success && users.error) {
+                if (users.error.message)
+                    throw Error(replaceNames(users.error.message))
+                throw Error(replaceNames(JSON.stringify(users.error)))
+            }
+
+            return users.result.filter(
+                (user) => user.name && !topicUsers.includes(user.name)
+            )
+        }),
+    getCurrentMembers: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const topic: CkanResponse<Topic & { groups: Topic[] }> =
+                await topicRes.json()
+            if (!topic.success && topic.error) {
+                if (topic.error.message)
+                    throw Error(replaceNames(topic.error.message, true))
+                throw Error(replaceNames(JSON.stringify(topic.error), true))
+            }
+
+            return topic.result.users
+        }),
+    removeMember: protectedProcedure
+        .input(z.object({ id: z.string(), username: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/member_delete`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                    body: JSON.stringify({
+                        id: input.id,
+                        object: input.username,
+                        object_type: 'user',
+                    }),
+                }
+            )
+            const topic: CkanResponse<Topic & { groups: Topic[] }> =
+                await topicRes.json()
+            if (!topic.success && topic.error) {
+                if (topic.error.message)
+                    throw Error(replaceNames(topic.error.message, true))
+                throw Error(replaceNames(JSON.stringify(topic.error), true))
+            }
+            return topic.result
+        }),
 })

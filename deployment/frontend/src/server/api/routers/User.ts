@@ -271,5 +271,18 @@ export const UserRouter = createTRPCRouter({
       const data = (await response.json()) as CkanResponse<User>;
       if (!data.success && data.error) throw Error(data.error.message)
       return data.result
-     })
+     }),
+
+  getPossibleMembers: protectedProcedure
+    .input(z.string())
+    .query(async ({input,  ctx }) => {
+      const orgMembers = (await getOrgDetails({ orgId: input, apiKey: ctx.session.user.apikey }))!;
+      const allUsers = (await getAllUsers({ apiKey: ctx.session.user.apikey }))!;
+      const orgUsers = orgMembers.users?.map((user) => user.name);
+      const nonOrgUsers = allUsers.filter((user) => !orgUsers?.includes(user.name!));
+      return {
+        users: nonOrgUsers
+      }
+    })
+
 });

@@ -11,10 +11,13 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import TopicForm from './TopicForm'
 import { useRouter } from 'next/router'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
+import { Dialog, Tab } from '@headlessui/react'
 import Modal from '@/components/_shared/Modal'
 import Link from 'next/link'
 import { RouterOutput } from '@/server/api/root'
+import { Fragment } from 'react'
+import { Members } from '../metadata/Members'
+import classNames from '@/utils/classnames'
 
 type TopicOutput = RouterOutput["topics"]["getTopic"];
 
@@ -38,6 +41,17 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                 value: topic.groups[0]?.name ?? '',
                 label: topic.groups[0]?.name ?? '',
             },
+            members: topic.users?.map((member) => ({
+                user: {
+                    value: member.name,
+                    label: member.name,
+                },
+                topic_id: topic.id,
+                capacity: {
+                    value: (member as any).capacity,
+                    label: (member as any).capacity,
+                },
+            })),
         },
         resolver: zodResolver(TopicSchema),
     })
@@ -70,6 +84,11 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
             setErrorMessage(error.message)
         },
     })
+
+    const tabs = [
+        { name: 'Metadata', enabled: true },
+        { name: 'Members', enabled: true },
+    ]
 
     return (
         <>
@@ -129,34 +148,84 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                         Delete Topic
                     </Button>
                 </div>
-
-                <form
-                    onSubmit={formObj.handleSubmit((data) => {
-                        editTopic.mutate(data)
-                    })}
-                >
-                    <div className="w-full py-8 border-b border-blue-800 shadow">
-                        <div className="px-2 sm:px-8">
-                            <TopicForm formObj={formObj} editing={true} />
-                            <div className="col-span-full flex justify-end gap-x-4">
-                                <Button type="button" variant="outline">
-                                    <Link href="/dashboard/teams">Cancel</Link>
-                                </Button>
-                                <LoaderButton
-                                    loading={editTopic.isLoading}
-                                    type="submit"
-                                >
-                                    Save
-                                </LoaderButton>
+                <Tab.Group>
+                    <div>
+                        <Tab.List
+                            className="max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
+                            aria-label="Tabs"
+                        >
+                            <div className="flex-col justify-start flex sm:flex-row gap-y-4 sm:gap-x-8 sm:border-b-2 border-gray-300 w-full">
+                                {tabs
+                                    .filter((tab) => tab.enabled)
+                                    .map((tab) => (
+                                        <Tab as={Fragment}>
+                                            {({ selected }) => (
+                                                <div
+                                                    key={tab.name}
+                                                    className={classNames(
+                                                        'sm:px-8 cursor-pointer border-b-2 sm:border-none text-black text-[22px] font-normal font-acumin whitespace-nowrap',
+                                                        selected
+                                                            ? 'border-wri-green sm:border-solid text-wri-dark-green sm:border-b-2 -mb-px'
+                                                            : 'text-black'
+                                                    )}
+                                                    aria-current={
+                                                        selected
+                                                            ? 'page'
+                                                            : undefined
+                                                    }
+                                                >
+                                                    {tab.name}
+                                                </div>
+                                            )}
+                                        </Tab>
+                                    ))}
                             </div>
-                        </div>
+                        </Tab.List>
+                        <Tab.Panels>
+                            <Tab.Panel>
+                                <form
+                                    onSubmit={formObj.handleSubmit((data) => {
+                                        editTopic.mutate(data)
+                                    })}
+                                >
+                                    <div className="w-full py-8 border-b border-blue-800 shadow">
+                                        <div className="px-2 sm:px-8">
+                                            <TopicForm formObj={formObj} editing={true} />
+                                        </div>
+                                    </div>
+                                    {errorMessage && (
+                                        <div className="py-4">
+                                            <ErrorAlert text={errorMessage} />
+                                        </div>
+                                    )}
+                                </form>
+                            </Tab.Panel>
+                            <Tab.Panel
+                                as="div"
+                                className="flex flex-col gap-y-12 mt-8"
+                            >
+                                <Members
+                                    topic={topic}
+                                    formObj={formObj}
+                                />
+                            </Tab.Panel>
+                        </Tab.Panels>
                     </div>
-                    {errorMessage && (
-                        <div className="py-4">
-                            <ErrorAlert text={errorMessage} />
-                        </div>
-                    )}
-                </form>
+                </Tab.Group>
+                <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-6 xxl:px-0">
+                    <Button type="button" variant="outline">
+                        <Link href="/dashboard/topics">Cancel</Link>
+                    </Button>
+                    <LoaderButton
+                        loading={editTopic.isLoading}
+                        type="submit"
+                        onClick={formObj.handleSubmit((data) => {
+                            editTopic.mutate(data)
+                        })}
+                    >
+                        Save
+                    </LoaderButton>
+                </div>
             </Container>
         </>
     )
