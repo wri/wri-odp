@@ -17,7 +17,7 @@ import {
     searchHierarchy,
     findAllNameInTree,
 } from '@/utils/apiUtils'
-import { findNameInTree } from '@/utils/apiUtils'
+import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
 import { json } from 'stream/consumers'
 
 export const teamRouter = createTRPCRouter({
@@ -64,15 +64,25 @@ export const teamRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const user = ctx.session.user
-                if (input.members) {
-                    input.users = []
-                    for (const member of input.members) {
-                        input.users.push({
-                            name: member.user.value,
-                            capacity: member.capacity.value,
-                        })
-                    }
+                var newMembers = []
+                for (const member of input.members) {
+                    newMembers.push({
+                        name: member.user.value,
+                        capacity: member.capacity.value,
+                    })
                 }
+                try {
+                    sendMemberNotifications(
+                        user.id,
+                        newMembers,
+                        input.users,
+                        input.id,
+                        'team'
+                    )
+                } catch (e) {
+                    console.log(e)
+                }
+                input.users = newMembers
                 const body = JSON.stringify({
                     ...input,
                     image_display_url: input.image_url

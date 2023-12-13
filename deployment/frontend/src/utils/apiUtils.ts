@@ -16,9 +16,20 @@ import { Facets } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
 import { Resource } from '@/interfaces/dataset.interface'
-import nodemailer from 'nodemailer';
-import { randomBytes } from 'crypto';
-import { RwDatasetResp, RwErrorResponse, RwResponse, isRwError } from '@/interfaces/rw.interface'
+import nodemailer from 'nodemailer'
+import { randomBytes } from 'crypto'
+import {
+    RwDatasetResp,
+    RwErrorResponse,
+    RwResponse,
+    isRwError,
+} from '@/interfaces/rw.interface'
+import Team from '@/interfaces/team.interface'
+import Topic from '@/interfaces/topic.interface'
+import { create } from 'lodash'
+import { api } from '@/utils/api'
+import { json } from 'stream/consumers'
+import type { NewNotificationInputType } from "@/schema/notification.schema"
 
 export async function searchHierarchy({
     isSysadmin,
@@ -769,7 +780,7 @@ export async function getDatasetDetails({
     id: string
     session: Session | null
 }) {
-   const user = session?.user
+    const user = session?.user
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/package_show?id=${id}`,
         {
@@ -788,50 +799,59 @@ export async function getDatasetDetails({
 }
 
 function cryptoRandomFloat(): number {
-    return randomBytes(4).readUInt32BE(0) / 0xffffffff;
+    return randomBytes(4).readUInt32BE(0) / 0xffffffff
 }
 
-export async function getRandomUsernameFromEmail(email: string): Promise<string> {
-    const localpart = email.split('@')[0] as string;
-    const cleanedLocalpart = localpart.replace(/[^\w]/g, '-').toLowerCase();
+export async function getRandomUsernameFromEmail(
+    email: string
+): Promise<string> {
+    const localpart = email.split('@')[0] as string
+    const cleanedLocalpart = localpart.replace(/[^\w]/g, '-').toLowerCase()
 
-    const maxNameCreationAttempts = 100;
+    const maxNameCreationAttempts = 100
 
     const checkUsernameExists = async (username: string): Promise<boolean> => {
-        const response = await fetch(`${env.CKAN_URL}/api/3/action/user_show?q=${username}`);
-        const userData = (await response.json()) as CkanResponse<User>;
-        return !!userData.result;
-    };
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/user_show?q=${username}`
+        )
+        const userData = (await response.json()) as CkanResponse<User>
+        return !!userData.result
+    }
 
     for (let i = 0; i < maxNameCreationAttempts; i++) {
-        const randomNumber = cryptoRandomFloat();
-        const randomSuffix = Math.floor(randomNumber * 10000);
-        const randomName = `${cleanedLocalpart}-${randomSuffix}`;
+        const randomNumber = cryptoRandomFloat()
+        const randomSuffix = Math.floor(randomNumber * 10000)
+        const randomName = `${cleanedLocalpart}-${randomSuffix}`
 
-        const userExists = await checkUsernameExists(randomName);
+        const userExists = await checkUsernameExists(randomName)
 
         if (!userExists) {
-            return randomName;
+            return randomName
         }
     }
 
-    return cleanedLocalpart; 
+    return cleanedLocalpart
 }
 
 export function generateRandomPassword(length: number): string {
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+";
-    let password = "";
+    const charset =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+'
+    let password = ''
 
     for (let i = 0; i < length; i++) {
-        const randomNumber = cryptoRandomFloat();
-        const randomIndex = Math.floor(randomNumber * charset.length);
-        password += charset.charAt(randomIndex);
+        const randomNumber = cryptoRandomFloat()
+        const randomIndex = Math.floor(randomNumber * charset.length)
+        password += charset.charAt(randomIndex)
     }
 
-    return password;
+    return password
 }
 
-export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+export async function sendEmail(
+    to: string,
+    subject: string,
+    html: string
+): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const transporter = nodemailer.createTransport({
         host: env.SMTP_SERVER,
@@ -841,7 +861,7 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
             user: env.SMTP_USER,
             pass: env.SMTP_PASSWORD,
         },
-    });
+    })
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     await transporter.sendMail({
@@ -849,10 +869,14 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
         to,
         subject,
         html,
-    });
+    })
 }
 
-export function generateEmail(email: string, password: string, username: string): string {
+export function generateEmail(
+    email: string,
+    password: string,
+    username: string
+): string {
     return `
         <p>Hi there,</p>
         <p>You have been invited to join the WRI OpenData Platform. Please use the following credentials to log in to ${env.NEXTAUTH_URL}:</p>
@@ -861,15 +885,16 @@ export function generateEmail(email: string, password: string, username: string)
         <p>Password: ${password}</p>
         <p>Once you log in, remember to change your password</p>
         <p>Thanks!</p>
-    `;
+    `
 }
 
-export function generateInviteEmail(email: string,
+export function generateInviteEmail(
+    email: string,
     password: string,
     username: string,
     orgName: string,
     role: string
-    ): string {
+): string {
     return `
         <p>Hi there,</p>
         <p>You have been invited to join the WRI OpenData Platform and you have been added to the team ${orgName} 
@@ -880,5 +905,189 @@ export function generateInviteEmail(email: string,
         <p>Password: ${password}</p>
         <p>Once you log in, remember to change your password</p>
         <p>Thanks!</p>
-    `;
+    `
+}
+
+export async function sendMemberNotifications(
+    currentUserId: string,
+    newMembers: User[],
+    existingMembers: User[],
+    teamOrTopicId: any,
+    objectType: string
+): Promise<void> {
+    const addedMembers = findAddedMembers(newMembers, existingMembers)
+    const removedMembers = findRemovedMembers(newMembers, existingMembers)
+    const updatedMembers = findUpdatedMembers(newMembers, existingMembers)
+
+    for (const user of addedMembers) {
+        await sendNotification(
+            user,
+            `member_added_${user.capacity}`,
+            objectType,
+            teamOrTopicId,
+            currentUserId
+        )
+    }
+
+    for (const user of removedMembers) {
+        await sendNotification(
+            user,
+            `member_removed_${user.capacity}`,
+            objectType,
+            teamOrTopicId,
+            currentUserId
+        )
+    }
+
+    for (const user of updatedMembers) {
+        await sendNotification(
+            user,
+            `member_updated_${user.capacity}`,
+            objectType,
+            teamOrTopicId,
+            currentUserId
+        )
+    }
+}
+
+async function sendNotification(
+    user: User,
+    changeType: string,
+    objectType: string,
+    teamOrTopicId: string,
+    currentUserId: string
+) {
+    if (user.name !== undefined) {
+        const userObj = await getUser({
+            userId: user.name,
+            apiKey: env.SYS_ADMIN_API_KEY,
+        })
+        if (userObj && userObj.id !== undefined) {
+            const notification = await createNotification(
+                userObj.id,
+                currentUserId,
+                changeType,
+                objectType,
+                teamOrTopicId,
+                true
+            )
+            console.log(`notification: ${JSON.stringify(notification)}`)
+        }
+    }
+}
+
+function findAddedMembers(newMembers: User[], existingMembers: User[]): User[] {
+    const existingIds = new Set(existingMembers.map((user) => user.name))
+    return newMembers.filter((user) => !existingIds.has(user.name))
+}
+
+function findRemovedMembers(
+    newMembers: User[],
+    existingMembers: User[]
+): User[] {
+    const newIds = new Set(newMembers.map((user) => user.name))
+    return existingMembers.filter((user) => !newIds.has(user.name))
+}
+
+function findUpdatedMembers(
+    newMembers: User[],
+    existingMembers: User[]
+): User[] {
+    const existingIdMap = new Map(
+        existingMembers.map((user) => [user.name, user])
+    )
+    return newMembers.filter((user) => {
+        const existingUser = existingIdMap.get(user.name)
+        return existingUser && user.capacity !== existingUser.capacity
+    })
+}
+
+async function createNotification(
+    recipient_id: string,
+    sender_id: string,
+    activity_type: string,
+    object_type: string,
+    object_id: string,
+    is_unread: boolean
+) {
+    try {
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/notification_create`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${env.SYS_ADMIN_API_KEY}`,
+                },
+                body: JSON.stringify({
+                    recipient_id,
+                    sender_id,
+                    activity_type,
+                    object_type,
+                    object_id,
+                    is_unread,
+                }),
+            }
+        )
+        const data =
+            (await response.json()) as CkanResponse<NewNotificationInputType>
+        if (!data.success && data.error) {
+            if (data.error.message) throw Error(data.error.message)
+            throw Error(JSON.stringify(data.error))
+        }
+        return data.result
+    } catch (e) {
+        console.error(e)
+        return null
+    }
+}
+
+export async function getTeamDetails({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const user = session?.user
+    const teamRes = await fetch(
+        `${env.CKAN_URL}/api/action/organization_show?id=${id}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${user?.apikey ?? ''}`,
+            },
+        }
+    )
+    const team: CkanResponse<Team> = await teamRes.json()
+    if (!team.success && team.error) {
+        if (team.error.message) throw Error(team.error.message)
+        throw Error(JSON.stringify(team.error))
+    }
+    return team.result
+}
+
+export async function getTopicDetails({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const user = session?.user
+    const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/group_show?id=${id}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${user?.apikey ?? ''}`,
+            },
+        }
+    )
+    const topic: CkanResponse<Topic> = await topicRes.json()
+    if (!topic.success && topic.error) {
+        if (topic.error.message) throw Error(topic.error.message)
+        throw Error(JSON.stringify(topic.error))
+    }
+    return topic.result
 }

@@ -25,7 +25,7 @@ import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 
 import { TopicSchema } from '@/schema/topic.schema'
 import { replaceNames } from '@/utils/replaceNames'
-import { findNameInTree } from '@/utils/apiUtils'
+import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
 
 export const TopicRouter = createTRPCRouter({
     getUsersTopics: protectedProcedure
@@ -128,15 +128,25 @@ export const TopicRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const user = ctx.session.user
-                if (input.members) {
-                    input.users = []
-                    for (const member of input.members) {
-                        input.users.push({
-                            name: member.user.value,
-                            capacity: member.capacity.value,
-                        })
-                    }
+                var newMembers = []
+                for (const member of input.members) {
+                    newMembers.push({
+                        name: member.user.value,
+                        capacity: member.capacity.value,
+                    })
                 }
+                try {
+                    sendMemberNotifications(
+                        user.id,
+                        newMembers,
+                        input.users,
+                        input.id,
+                        'topic'
+                    )
+                } catch (e) {
+                    console.log(e)
+                }
+                input.users = newMembers
                 const body = JSON.stringify({
                     ...input,
                     groups:

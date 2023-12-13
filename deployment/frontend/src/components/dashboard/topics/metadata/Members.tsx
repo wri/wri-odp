@@ -58,7 +58,7 @@ export function Members({
                             type="button"
                             onClick={() =>
                                 append({
-                                    topic_id: topic.id,
+                                    topic_id: topic.id as string,
                                     user: {
                                         value: '',
                                         label: '',
