@@ -3,20 +3,15 @@ const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
 const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
 
-// lgtm [js/insecure-randomness]
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const teamOne = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const teamTwo = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}_2`;
 const topicOne = `${uuid()}${Cypress.env("GROUP_SUFFIX")}`;
 const topicTwo = `${uuid()}${Cypress.env("GROUP_SUFFIX")}_2`;
-// lgtm [js/insecure-randomness]
 const adminUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_admin`;
-// lgtm [js/insecure-randomness]
 const editorUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_editor`;
-// lgtm [js/insecure-randomness]
 const normalUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_member`;
-// lgtm [js/insecure-randomness]
 const switchUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_switch`;
 const adminUserPassword = "test1234";
 const editorUserPassword = "test1234";
@@ -73,7 +68,6 @@ describe("Can add and remove members from team", () => {
     cy.visit(`/dashboard/teams/${teamOne}/edit`);
     cy.contains("Members").click();
 
-    // lgtm [js/insecure-randomness]
     const expectedUsers = [
       { username: adminUser, role: "Admin" },
       { username: editorUser, role: "Editor" },
@@ -265,7 +259,6 @@ describe("Can add and remove members from team", () => {
     cy.visit(`/dashboard/topics/${topicOne}/edit`);
     cy.contains("Members").click();
 
-    // lgtm [js/insecure-randomness]
     const expectedUsers = [
       { username: adminUser, role: "Admin" },
       { username: editorUser, role: "Editor" },
