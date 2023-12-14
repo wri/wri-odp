@@ -422,7 +422,6 @@ export const TopicRouter = createTRPCRouter({
             )
             const topic: CkanResponse<Topic & { groups: Topic[] }> =
                 await topicRes.json()
-            console.log(`TOPIC: ${JSON.stringify(topic)}`)
             if (!topic.success && topic.error) {
                 if (topic.error.message)
                     throw Error(replaceNames(topic.error.message))
