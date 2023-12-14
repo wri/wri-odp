@@ -51,6 +51,11 @@ Cypress.Commands.add("login", (username, password) => {
   });
 });
 
+Cypress.Commands.add("logout", () => {
+  cy.get("#nav-user-menu").click();
+  cy.get(':nth-child(3) > .px-2').click();
+});
+
 Cypress.Commands.add("createDatasetWithoutFile", (name) => {
   cy.visit({ url: "/dataset" }).then((resp) => {
     const datasetName = name || getRandomDatasetName();
@@ -431,6 +436,17 @@ Cypress.Commands.add("createUserApi", (name, email, password) => {
       name: name,
       email: email,
       password: password,
+    },
+  });
+});
+
+Cypress.Commands.add("deleteUserApi", (name) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("user_delete"),
+    headers: headers,
+    body: {
+      id: name,
     },
   });
 });

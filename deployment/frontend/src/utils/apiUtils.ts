@@ -971,7 +971,6 @@ async function sendNotification(
                 teamOrTopicId,
                 true
             )
-            console.log(`notification: ${JSON.stringify(notification)}`)
         }
     }
 }

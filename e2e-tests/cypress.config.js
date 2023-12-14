@@ -11,6 +11,7 @@ export default defineConfig({
     ORG_NAME_SUFFIX: '-organization-test',
     DATASET_NAME_SUFFIX: '-dataset-test',
     GROUP_SUFFIX: '-group-test',
+    USER_NAME_SUFFIX: '-user-test',
   },
   e2e: {
     baseUrl: 'http://localhost:3000',
