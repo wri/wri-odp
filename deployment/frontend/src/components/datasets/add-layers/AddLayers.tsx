@@ -1,11 +1,123 @@
 import classNames from '@/utils/classnames'
 import { Tab } from '@headlessui/react'
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import SearchPanel from './SearchPanel'
 import FiltersPanel from './FiltersPanel'
+import { SearchInput } from '@/schema/search.schema'
+import { Filter } from '@/interfaces/search.interface'
+import { api } from '@/utils/api'
+import Spinner from '@/components/_shared/Spinner'
+import Pagination from '../Pagination'
 
 export default function AddLayers() {
     const addLayerTabs = [{ name: 'Search' }, { name: 'Filters' }]
+
+    /**
+     * Query used to show results
+     *
+     */
+    const [query, setQuery] = useState<SearchInput>({
+        search: '',
+        page: { start: 0, rows: 10 },
+        sortBy: 'relevance desc',
+    })
+
+    const [filters, setFilters] = useState<Filter[]>([])
+
+    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
+
+    /*
+     * Whenever filters is updated, update the query's fq
+     *
+     */
+    useEffect(() => {
+        const keys = [...new Set(filters.map((f) => f.key))].filter(
+            (key) => key != 'search'
+        )
+
+        const fq: any = {}
+        let extLocationQ = ''
+        let extAddressQ = ''
+
+        keys.forEach((key) => {
+            let keyFq
+
+            const keyFilters = filters.filter((f) => f.key == key)
+            if ((key as string) == 'temporal_coverage_start') {
+                if (keyFilters.length > 0) {
+                    const temporalCoverageStart = keyFilters[0]
+                    const temporalCoverageEnd = filters.find(
+                        (f) => f.key == 'temporal_coverage_end'
+                    )?.value
+
+                    keyFq = `[${temporalCoverageStart?.value} TO *]`
+
+                    if (temporalCoverageEnd) {
+                        keyFq = `[* TO ${temporalCoverageEnd}]`
+                    }
+                }
+            } else if ((key as string) == 'temporal_coverage_end') {
+                if (keyFilters.length > 0) {
+                    const temporalCoverageEnd = keyFilters[0]
+                    const temporalCoverageStart = filters.find(
+                        (f) => f.key == 'temporal_coverage_start'
+                    )?.value
+
+                    keyFq = `[* TO ${temporalCoverageEnd?.value}]`
+
+                    if (temporalCoverageStart) {
+                        keyFq = `[${temporalCoverageStart} TO *]`
+                    }
+                }
+            } else if (
+                key === 'metadata_modified_since' ||
+                key === 'metadata_modified_before'
+            ) {
+                const metadataModifiedSinceFilter = filters.find(
+                    (f) => f.key === 'metadata_modified_since'
+                )
+                const metadataModifiedSince = metadataModifiedSinceFilter
+                    ? metadataModifiedSinceFilter.value + 'T00:00:00Z'
+                    : '*'
+
+                const metadataModifiedBeforeFilter = filters.find(
+                    (f) => f.key === 'metadata_modified_before'
+                )
+                const metadataModifiedBefore = metadataModifiedBeforeFilter
+                    ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
+                    : '*'
+
+                fq[
+                    'metadata_modified'
+                ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+            } else if (key == 'spatial') {
+                const coordinates = keyFilters[0]?.value
+                const address = keyFilters[0]?.label
+
+                // @ts-ignore
+                if (coordinates) extLocationQ = coordinates.reverse().join(',')
+                if (address) extAddressQ = address
+            } else {
+                keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
+            }
+
+            if (keyFq) fq[key as string] = keyFq
+        })
+
+        delete fq.metadata_modified_since
+        delete fq.metadata_modified_before
+        delete fq.spatial
+
+        setQuery((prev) => {
+            return {
+                ...prev,
+                fq,
+                search: filters.find((e) => e?.key == 'search')?.value ?? '',
+                extLocationQ,
+                extAddressQ,
+            }
+        })
+    }, [filters])
 
     return (
         <Tab.Group>
@@ -29,10 +141,30 @@ export default function AddLayers() {
             </Tab.List>
             <Tab.Panels>
                 <Tab.Panel>
-                    <SearchPanel />
+                    {data && !isLoading && (
+                        <>
+                            <SearchPanel
+                                filters={filters}
+                                setFilters={setFilters}
+                                data={data}
+                                setQuery={setQuery}
+                            />
+
+                            <Pagination
+                                setQuery={setQuery}
+                                query={query}
+                                data={data}
+                            />
+                        </>
+                    )}
+                    {isLoading && (
+                        <div className="w-full flex justify-center">
+                            <Spinner />
+                        </div>
+                    )}
                 </Tab.Panel>
                 <Tab.Panel>
-                    <FiltersPanel />
+                    <FiltersPanel filters={filters} setFilters={setFilters} />
                 </Tab.Panel>
             </Tab.Panels>
         </Tab.Group>

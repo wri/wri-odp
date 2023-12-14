@@ -29,7 +29,12 @@ export function DataFiles({
     dataset: WriDataset
     index: Index
 }) {
-    const { addLayerGroup, removeLayerGroup } = useActiveLayerGroups()
+    const {
+        addLayerGroup,
+        removeLayerGroup,
+        addLayerToLayerGroup,
+        removeLayerFromLayerGroup,
+    } = useActiveLayerGroups()
     const { data: activeLayers } = useLayersFromRW()
     const datafiles = dataset?.resources
     const [q, setQ] = useState('')
@@ -64,10 +69,10 @@ export function DataFiles({
                                         (l) => l.id == r?._extra?.rw_layer_id
                                     )
                                 ) {
-                                    addLayerGroup({
-                                        layers: [r._extra.rw_layer_id],
-                                        datasetId: dataset.id,
-                                    })
+                                    addLayerToLayerGroup(
+                                        r._extra.rw_layer_id,
+                                        dataset.id
+                                    )
                                 }
                             })
                         }}
@@ -80,10 +85,10 @@ export function DataFiles({
                         onClick={() => {
                             dataset.resources.forEach((r) => {
                                 if (r._extra?.is_layer) {
-                                    removeLayerGroup({
-                                        layers: [r._extra.rw_layer_id],
-                                        datasetId: dataset.id,
-                                    })
+                                    removeLayerFromLayerGroup(
+                                        r._extra.rw_layer_id,
+                                        dataset.id
+                                    )
                                 }
                             })
                         }}
@@ -113,7 +118,10 @@ function DatafileCard({
     dataset: WriDataset
 }) {
     const { data: activeLayers } = useLayersFromRW()
-    const { addLayerGroup, removeLayerGroup } = useActiveLayerGroups()
+    const {
+        removeLayerFromLayerGroup,
+        addLayerToLayerGroup,
+    } = useActiveLayerGroups()
     const created_at = new Date(datafile?.created ?? '')
     const last_updated = new Date(datafile?.metadata_modified ?? '')
     const options = {
@@ -167,14 +175,13 @@ function DatafileCard({
                                             onClick={() => {
                                                 if (
                                                     datafile._extra?.rw_layer_id
-                                                )
-                                                    removeLayerGroup({
-                                                        layers: [
-                                                            datafile?._extra
-                                                                ?.rw_layer_id,
-                                                        ],
-                                                        datasetId: dataset.id,
-                                                    })
+                                                ) {
+                                                    removeLayerFromLayerGroup(
+                                                        datafile._extra
+                                                            ?.rw_layer_id,
+                                                        dataset.id
+                                                    )
+                                                }
                                             }}
                                         >
                                             <span className="mt-1">
@@ -186,17 +193,15 @@ function DatafileCard({
                                             variant="outline"
                                             size="sm"
                                             onClick={() => {
-                                                console.log(activeLayers)
                                                 if (
                                                     datafile._extra?.rw_layer_id
-                                                )
-                                                    addLayerGroup({
-                                                        layers: [
-                                                            datafile._extra
-                                                                .rw_layer_id,
-                                                        ],
-                                                        datasetId: dataset.id,
-                                                    })
+                                                ) {
+                                                    addLayerToLayerGroup(
+                                                        datafile._extra
+                                                            .rw_layer_id,
+                                                        dataset.id
+                                                    )
+                                                }
                                             }}
                                         >
                                             <span>Show Layer</span>

@@ -79,8 +79,9 @@ export const useLayerGroupsFromRW = () => {
 
 export const useLayersFromRW = () => {
   const result = useLayerGroupsFromRW();
+
   if (result.data) {
-    const data: APILayerSpec[] = result.data.reduce(
+    const data: APILayerSpec[] = result.data.filter(lg => lg.layers?.length > 0).reduce(
       (acc: any, layerGroup: any) => {
         return [...acc, ...layerGroup.layers];
       },

@@ -13,12 +13,17 @@ import {
     ClockIcon,
     MapPinIcon,
 } from '@heroicons/react/24/outline'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Map from '@/components/_shared/map/Map'
 import Link from 'next/link'
 import { WriDataset } from '@/schema/ckan.schema'
 import { getFormatColor } from '@/utils/formatColors'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { useActiveLayerGroups } from '@/utils/storeHooks'
+import { ActiveLayerGroup } from '@/interfaces/state.interface'
+import { Index } from 'flexsearch'
+import Layer from '@/components/_shared/map/Layer'
+import {APILayerSpec} from '@/interfaces/layer.interface'
 
 export function RelatedDatasets({
     datasets,
@@ -54,17 +59,65 @@ export default function DatasetCard({
     dataset: WriDataset
     original?: string
 }) {
+    const [layers, setLayers] = useState<APILayerSpec[]>([])
+
+    const { activeLayerGroups, replaceLayersForLayerGroup } =
+        useActiveLayerGroups()
+
     const [addDatasetModalOpen, setAddDatasetModalOpen] = useState(false)
     const [selectedDataFileNames, setSelectedDataFileNames] = useState<
         Array<string>
     >([])
 
-    const dataFiles = [...new Array(20).keys()].map((i) => ({
-        name: `data-file-${i}`,
-        title: `Data File ${i}`,
-        format: `TIFF`,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem malesuada magna mollis euismod. Aenean lacinia.`,
-    }))
+    useEffect(() => {
+        let countdown = 10
+        Promise.all(
+            selectedDataFileNames.map(async (dfId) => {
+                const df = dataFiles.find((df) => df.id == dfId)
+                const layer = df?.url?.split('/').at(-1)
+                const response = await fetch(
+                    `https://api.resourcewatch.org/v1/layer/${layer}`
+                )
+                const layerData = await response.json()
+                const { id, attributes } = layerData.data
+                return {
+                    id: id,
+                    ...attributes,
+                    layerConfig: {
+                        ...attributes.layerConfig,
+                        zIndex: countdown,
+                        visibility:
+                            layers.length > 1 ? attributes.default : true,
+                    },
+                    active: layers.length > 1 ? attributes.default : true,
+                }
+            })
+        ).then((layers) => {
+            setLayers(layers)
+        })
+    }, [selectedDataFileNames])
+
+    const dataFiles = dataset.resources.filter(
+        (r) => r.url?.startsWith('https://api.resourcewatch')
+    )
+
+    const [q, setQ] = useState('')
+    const index = new Index({
+        tokenize: 'full',
+    })
+    dataFiles?.forEach((resource) => {
+        index.add(
+            resource.id,
+            `${resource.description} ${resource.format} ${resource.url} ${resource.name}`
+        )
+    })
+
+    const filteredDatafiles =
+        q !== ''
+            ? dataFiles?.filter((datafile) =>
+                  index.search(q).includes(datafile.id)
+              )
+            : dataFiles
 
     const created_at = new Date(dataset?.metadata_created ?? '')
     const last_updated = new Date(dataset?.metadata_modified ?? '')
@@ -131,18 +184,30 @@ export default function DatasetCard({
                 )}
             </div>
             {dataset.resources.filter(
-                (resource) => resource.url_type === 'layer'
+                (resource) =>
+                    resource._extra?.is_layer ||
+                    resource.url?.startsWith('https://api.resourcewatch')
             ).length > 0 && (
                 <Button
                     className="mt-4"
-                    variant="outline"
+                    variant={
+                        activeLayerGroups.some(
+                            (lg: ActiveLayerGroup) => lg.datasetId == dataset.id
+                        )
+                            ? 'light'
+                            : 'outline'
+                    }
                     size="sm"
                     onClick={(e) => {
                         e.stopPropagation()
                         setAddDatasetModalOpen(true)
                     }}
                 >
-                    Add to map
+                    {activeLayerGroups.some(
+                        (lg: ActiveLayerGroup) => lg.datasetId == dataset.id
+                    )
+                        ? 'Active'
+                        : 'Add to map'}
                 </Button>
             )}
             <Modal
@@ -152,7 +217,7 @@ export default function DatasetCard({
             >
                 <div className="w-full h-full flex gap-x-4 flex-wrap lg:flex-nowrap">
                     <div className="basis-full lg:basis-1/2">
-                        <h2 className="text-2xl">{'<Name of Dataset>'}</h2>
+                        <h2 className="text-2xl">{dataset.title}</h2>
                         <p className="text-base font-light wri-light-gray mt-2">
                             Select one or more data files to be added.
                         </p>
@@ -161,13 +226,15 @@ export default function DatasetCard({
                             <input
                                 className="block w-full rounded-md border-b border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
                                 placeholder="Search data files"
+                                onChange={(e) => setQ(e.target.value)}
+                                value={q}
                             />
                             <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
                         </div>
                         <div>
                             <div className="flex justify-between">
                                 <span className="text-base">
-                                    {dataFiles.length} Data Files,{' '}
+                                    {filteredDatafiles.length} Data Files,{' '}
                                     {selectedDataFileNames.length} Data Files
                                     Selected
                                 </span>
@@ -176,7 +243,7 @@ export default function DatasetCard({
                                         className="underline mr-3"
                                         onClick={() =>
                                             setSelectedDataFileNames(
-                                                dataFiles.map((df) => df.name)
+                                                dataFiles.map((df) => df.id)
                                             )
                                         }
                                     >
@@ -193,13 +260,13 @@ export default function DatasetCard({
                                 </div>
                             </div>
                             <div className="flex flex-col mt-2 max-h-[500px] overflow-y-scroll">
-                                {dataFiles.map((df, i) => {
+                                {filteredDatafiles.map((df, i) => {
                                     return (
                                         <button
                                             className={classNames(
                                                 `text-left p-5 py-6 shadow border-b-[2px] border-b-wri-green flex justify-between items-center transition-all`,
                                                 selectedDataFileNames.includes(
-                                                    df.name
+                                                    df.id
                                                 )
                                                     ? 'bg-[#EFF5F7]'
                                                     : ''
@@ -208,20 +275,18 @@ export default function DatasetCard({
                                                 setSelectedDataFileNames(
                                                     (prev) => {
                                                         if (
-                                                            prev.includes(
-                                                                df.name
-                                                            )
+                                                            prev.includes(df.id)
                                                         ) {
                                                             return [
                                                                 ...prev,
                                                             ].filter(
                                                                 (i) =>
-                                                                    i != df.name
+                                                                    i != df.id
                                                             )
                                                         } else {
                                                             return [
                                                                 ...prev,
-                                                                df.name,
+                                                                df.id,
                                                             ]
                                                         }
                                                     }
@@ -230,20 +295,23 @@ export default function DatasetCard({
                                         >
                                             <div className="basis-4/5">
                                                 <div className="flex">
-                                                    <span
-                                                        className={classNames(
-                                                            'mr-2 hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',
-                                                            getFormatColor(
-                                                                df.format
-                                                            )
-                                                        )}
-                                                    >
-                                                        <span className="my-auto">
-                                                            {df.format}
+                                                    {df.format && (
+                                                        <span
+                                                            className={classNames(
+                                                                'mr-2 hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',
+                                                                getFormatColor(
+                                                                    df.format ??
+                                                                        ''
+                                                                )
+                                                            )}
+                                                        >
+                                                            <span className="my-auto">
+                                                                {df.format}
+                                                            </span>
                                                         </span>
-                                                    </span>
+                                                    )}
                                                     <h2 className="text-lg">
-                                                        {df.title}
+                                                        {df.name}
                                                     </h2>
                                                 </div>
                                                 <p className="text-sm font-light mt-2">
@@ -252,14 +320,34 @@ export default function DatasetCard({
                                             </div>
                                             <div>
                                                 {selectedDataFileNames.includes(
-                                                    df.name
+                                                    df.id
                                                 ) && <CheckIcon />}
                                             </div>
                                         </button>
                                     )
                                 })}
                             </div>
-                            <Button className="float-right my-5">
+                            <Button
+                                onClick={() => {
+                                    const layerIds = dataFiles
+                                        .filter((df) =>
+                                            selectedDataFileNames.includes(
+                                                df.id
+                                            )
+                                        )
+                                        .map((df) => df?.url?.split('/').at(-1))
+                                        .filter((l) => l != undefined)
+
+                                    replaceLayersForLayerGroup(
+                                        // @ts-ignore
+                                        layerIds,
+                                        dataset.id
+                                    )
+
+                                    setAddDatasetModalOpen(false)
+                                }}
+                                className="float-right my-5"
+                            >
                                 Add to map
                             </Button>
                         </div>
@@ -267,7 +355,7 @@ export default function DatasetCard({
                     <div className="basis-full lg:basis-1/2 mt-10 lg:mt-0">
                         <div className="lg:-mt-6 lg:-mr-6 h-[calc(100%+50px)]">
                             <Map
-                                layers={[]}
+                                layers={layers}
                                 showControls={false}
                                 showLegends={false}
                                 mapHeight="100%"

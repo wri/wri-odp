@@ -1,4 +1,9 @@
-import { useIsDrawing, useMapState } from '@/utils/storeHooks'
+import {
+    useIsAddingLayers,
+    useIsDrawing,
+    useIsEmbeddingMap,
+    useMapState,
+} from '@/utils/storeHooks'
 import { useEffect, useRef, useState } from 'react'
 import ReactMapGL, { type MapRef } from 'react-map-gl'
 import LayerManager from './LayerManager'
@@ -15,14 +20,14 @@ export default function Map({
     showControls = true,
     showLegends = true,
     mapHeight = 'calc(100vh - 63px)',
-    onClickAddLayers = () => {},
 }: {
     layers: APILayerSpec[]
     showControls?: boolean
     showLegends?: boolean
     mapHeight?: string
-    onClickAddLayers?: () => void
 }) {
+    const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers()
+    const { isEmbedding } = useIsEmbeddingMap()
     const { setViewState, viewState } = useMapState()
     const mapRef = useRef<MapRef | null>(null)
     const mapTooltipRef = useRef<TooltipRef | null>(null)
@@ -44,8 +49,6 @@ export default function Map({
         return () => ro.disconnect()
     }, [])
 
-    console.log('LAYERS', layers)
-    console.log('ACTIVE LAYERS', activeLayersIds)
     return (
         <div ref={mapContainerRef} className="h-full" id="map">
             <ReactMapGL
@@ -78,12 +81,18 @@ export default function Map({
                                     mapRef={mapRef}
                                     mapContainerRef={mapContainerRef}
                                 />
-                                <button
-                                    onClick={onClickAddLayers}
-                                    className="absolute bg-[#FFD271] hover:bg-opacity-90 transition-all px-6 py-3 text-base font-semibold top-5 z-20 left-1/2 -translate-x-[50%]"
-                                >
-                                    + Add layers
-                                </button>
+                                {!isEmbedding && (
+                                    <button
+                                        onClick={() => {
+                                            setIsAddingLayers(!isAddingLayers)
+                                        }}
+                                        className="absolute bg-[#FFD271] hover:bg-opacity-90 transition-all px-6 py-3 text-base font-semibold top-5 z-20 left-1/2 -translate-x-[50%]"
+                                    >
+                                        {!isAddingLayers
+                                            ? '+ Add layers'
+                                            : 'Go back to dataset metadata'}
+                                    </button>
+                                )}
                             </>
                         )}
 

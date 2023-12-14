@@ -7,13 +7,7 @@ import { Dispatch, SetStateAction } from 'react'
 import { useRouter } from 'next/router'
 import { WriDataset } from '@/schema/ckan.schema'
 
-export default function Visualizations({
-    setIsAddLayers,
-    dataset,
-}: {
-    setIsAddLayers: Dispatch<SetStateAction<boolean>>
-    dataset: WriDataset
-}) {
+export default function Visualizations({ dataset }: { dataset: WriDataset }) {
     const router = useRouter()
     const tabs = [
         { name: 'Map View' },
@@ -39,7 +33,7 @@ export default function Visualizations({
                 </Tab.List>
                 <Tab.Panels>
                     <Tab.Panel>
-                        <MapView setIsAddLayers={setIsAddLayers} />
+                        <MapView />
                     </Tab.Panel>
                     <Tab.Panel>
                         <TabularView />
