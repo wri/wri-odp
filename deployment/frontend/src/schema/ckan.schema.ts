@@ -39,7 +39,8 @@ export interface User {
     number_created_packages?: number
     apikey?: string
     email?: string
-    image_display_url?: string
+    image_display_url?: string,
+    capacity?: string,
 }
 
 export interface Activity {
@@ -190,4 +191,13 @@ export interface GroupsmDetails {
     img_url: string
     description: string
     package_count: number
+}
+
+export interface Member {
+    id: string
+    name: string
+    email: string
+    role: string
+    team: string
+    teamId: string
 }

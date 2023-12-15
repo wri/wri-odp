@@ -2,85 +2,20 @@ export const hdi = {
     id: 'a26606ad-3b16-4a4d-be7f-f2640a5c81e2',
     name: '2015 Human Development Index',
     slug: 'human-development-index',
-    dataset: 'bea122ce-1e4b-465d-8b7b-fa11aadd20f7',
     description:
         'A composite index measuring average achievement in 3 basic dimensions of human development: a long and healthy life, knowledge, and a decent standard of living. 2015 Index scores are displayed.',
-    application: ['rw'],
+    application: ['data-explorer'],
     iso: [],
     provider: 'cartodb',
     type: 'layer',
     thumbnailUrl:
         'https://s3.amazonaws.com/wri-api-backups/resourcewatch/prod/thumbnails/00b9c036-38ea-4ece-a00f-ca315e25e0e0-1643743980009.png',
-    userId: '5980838ae24e6a1dae3dd446',
-    default: true,
-    protected: false,
-    published: true,
-    env: 'production',
     layerConfig: {
         timelineLabel: '2015',
         order: 2015,
         timeline: true,
+        type: "vector",
         account: 'wri-rw',
-        body: {
-            maxzoom: 18,
-            layers: [
-                {
-                    type: 'mapnik',
-                    options: {
-                        sql: 'SELECT wri.cartodb_id, wri.the_geom_webmercator, data.rw_country_name, data.rw_country_code, data.datetime, data.yr_data FROM soc_004_human_development_index data LEFT OUTER JOIN wri_countries_a wri ON data.rw_country_code = wri.iso_a3 WHERE EXTRACT(YEAR FROM data.datetime) = 2015 and data.yr_data is not null',
-                        cartocss:
-                            '#soc_004_human_development_index {polygon-opacity:1; line-width:0.5; line-color:#FFF; line-opacity:1;} [yr_data>=0.85]{polygon-fill:#253494;} [yr_data>=0.75][yr_data<0.85]{polygon-fill:#2c7fb8;} [yr_data>=0.7][yr_data<0.75]{polygon-fill:#41b6c4;} [yr_data>=0.5][yr_data<0.7]{polygon-fill:#a1dab4;} [yr_data<0.5]{polygon-fill:#ffffcc;}',
-                        cartocss_version: '2.3.0',
-                    },
-                },
-            ],
-            vectorLayers: [
-                {
-                    paint: {
-                        'fill-color': [
-                            'step',
-                            ['to-number', ['get', 'yr_data']],
-                            '#ffffcc',
-                            0.5,
-                            '#a1dab4',
-                            0.7,
-                            '#41b6c4',
-                            0.75,
-                            '#2c7fb8',
-                            0.85,
-                            '#253494',
-                        ],
-                        'fill-opacity': 1,
-                    },
-                    'source-layer': 'layer0',
-                    type: 'fill',
-                    filter: ['all'],
-                },
-                {
-                    paint: {
-                        'line-width': 0.5,
-                        'line-color': '#fff',
-                        'line-opacity': 0.8,
-                    },
-                    'source-layer': 'layer0',
-                    type: 'line',
-                    filter: ['all'],
-                },
-            ],
-        },
-        layerType: 'vector',
-        type: 'vector',
-        lmMetadata: {
-            version: '4.0',
-            'legacy-keys': [
-                'order',
-                'timeline',
-                'body',
-                'layerType',
-                'timelineLabel',
-                'account',
-            ],
-        },
         source: {
             type: 'vector',
             provider: {

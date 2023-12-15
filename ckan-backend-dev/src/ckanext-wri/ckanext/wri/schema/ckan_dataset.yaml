@@ -131,6 +131,10 @@ dataset_fields:
   output_validators: boolean_validator
   preset: checkbox
 
+- field_name: rw_id
+  label: RW ID
+  validators: ignore_missing
+
 - field_name: featured_image
   label: Featured Image
   form_placeholder: eg. http://example.com/featured_image.png

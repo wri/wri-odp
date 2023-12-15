@@ -1,100 +1,17 @@
 export const temperature = {
-    id: 'eb22d3f8-343c-4981-ab11-f0c2e091896a',
     name: 'Urban Daytime Temperature Difference from Surrounding Area (°C)',
     slug: 'Urban-Daytime-Temperature-Difference-from-Surrounding-Area-degreeC_4',
-    dataset: 'f05fde43-ce5a-4910-83b1-85dafd39bfbb',
     description:
         'The difference in average summer daytime maximum land surface temperatures between urban areas and surrounding 10-kilometer buffers for the year 2013.',
-    application: ['rw'],
+    application: ['data-explorer'],
     iso: [],
     provider: 'cartodb',
     type: 'layer',
-    userId: '5ba001878e311b7e3718740f',
-    default: true,
-    protected: false,
-    published: true,
     thumbnailUrl:
         'https://s3.amazonaws.com/wri-api-backups/resourcewatch/prod/thumbnails/eb22d3f8-343c-4981-ab11-f0c2e091896a-1644338760798.png',
-    env: 'production',
     layerConfig: {
         account: 'wri-rw',
-        body: {
-            maxzoom: 18,
-            layers: [
-                {
-                    type: 'mapnik',
-                    options: {
-                        sql: 'SELECT * FROM cit_015_urban_heat_island_effect',
-                        cartocss:
-                            '#cit_015_urban_heat_island_effect {polygon-opacity:1;} [d_t_diff>3]{polygon-fill:#d53e4f;} [d_t_diff>=2][d_t_diff<3]{polygon-fill:#f46d43;} [d_t_diff>=1][d_t_diff<2]{polygon-fill:#fdae61;} [d_t_diff>=0.25][d_t_diff<1]{polygon-fill:#fee08b;} [d_t_diff>=-0.25][d_t_diff<0.25]{polygon-fill:#ffffbf;} [d_t_diff>=-1][d_t_diff<-0.25]{polygon-fill:#e6f598;} [d_t_diff>=-2][d_t_diff<-1]{polygon-fill:#abdda4;} [d_t_diff>=-3][d_t_diff<-2]{polygon-fill:#66c2a5;} [d_t_diff<-3]{polygon-fill:#3288bd;}',
-                        cartocss_version: '2.3.0',
-                    },
-                },
-            ],
-            vectorLayers: [
-                {
-                    paint: {
-                        'fill-color': [
-                            'interpolate-lab',
-                            ['linear'],
-                            ['to-number', ['get', 'd_t_diff']],
-                            -3,
-                            '#3288bd',
-                            -2,
-                            '#66c2a5',
-                            -1,
-                            '#abdda4',
-                            0,
-                            '#ffffbf',
-                            1,
-                            '#fdae61',
-                            2,
-                            '#f46d43',
-                            3,
-                            '#d53e4f',
-                        ],
-                        'fill-opacity': 1,
-                    },
-                    'source-layer': 'layer0',
-                    type: 'fill',
-                    filter: ['all'],
-                },
-                {
-                    paint: {
-                        'line-width': 0.5,
-                        'line-color': [
-                            'interpolate-lab',
-                            ['linear'],
-                            ['to-number', ['get', 'd_t_diff']],
-                            -3,
-                            '#3288bd',
-                            -2,
-                            '#66c2a5',
-                            -1,
-                            '#abdda4',
-                            0,
-                            '#ffffbf',
-                            1,
-                            '#fdae61',
-                            2,
-                            '#f46d43',
-                            3,
-                            '#d53e4f',
-                        ],
-                        'line-opacity': 0.5,
-                    },
-                    'source-layer': 'layer0',
-                    type: 'line',
-                    filter: ['all'],
-                },
-            ],
-        },
-        layerType: 'vector',
-        type: 'vector',
-        lmMetadata: {
-            version: '4.0',
-            'legacy-keys': ['account', 'layerType', 'body'],
-        },
+        type: "vector",
         source: {
             type: 'vector',
             provider: {
@@ -253,6 +170,4 @@ export const temperature = {
     },
     applicationConfig: {},
     staticImageConfig: {},
-    createdAt: '2019-10-23T16:00:11.884Z',
-    updatedAt: '2022-02-08T16:46:00.738Z',
 }

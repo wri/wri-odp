@@ -8,7 +8,7 @@ import { teamRouter } from './routers/teams'
 import { uploadsRouter } from './routers/uploads'
 import { authRouter } from './routers/auth.router'
 import { tagsRouter } from "./routers/tags";
-import { notificationRouter } from "./routers/notificaftion";
+import { notificationRouter } from "./routers/notification";
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 
 /**

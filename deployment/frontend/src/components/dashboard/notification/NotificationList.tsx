@@ -60,18 +60,20 @@ export default function NotificationList() {
                 }
             />
             <div className=" w-full">
-                {paginatedData.data?.length === 0
-                    ? 'No notifications found'
-                    : paginatedData.data?.map((notification, index) => {
-                          return (
-                              <NotificationCard
-                                  key={index}
-                                  rowProfile={notification}
-                                  selected={selected}
-                                  setSelected={setSelected}
-                              />
-                          )
-                      })}
+                {paginatedData.data?.length === 0 ? (
+                    <div className="pl-4 sm:pl-6 py-4">No notifications</div>
+                ) : (
+                    paginatedData.data?.map((notification, index) => {
+                        return (
+                            <NotificationCard
+                                key={index}
+                                rowProfile={notification}
+                                selected={selected}
+                                setSelected={setSelected}
+                            />
+                        )
+                    })
+                )}
             </div>
         </section>
     )
