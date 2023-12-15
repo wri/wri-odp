@@ -178,6 +178,8 @@ describe("Can add and remove members from team", () => {
 
     cy.contains("button", "Save").click();
 
+    cy.wait(1000);
+
     cy.logout();
     cy.login(switchUser, switchUserPassword);
     cy.visit("/dashboard/notifications");
@@ -368,6 +370,8 @@ describe("Can add and remove members from team", () => {
       });
 
     cy.contains("button", "Save").click();
+
+    cy.wait(1000);
 
     cy.logout();
     cy.login(switchUser, switchUserPassword);
