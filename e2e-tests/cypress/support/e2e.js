@@ -53,7 +53,7 @@ Cypress.Commands.add("login", (username, password) => {
 
 Cypress.Commands.add("logout", () => {
   cy.get("#nav-user-menu").click();
-  cy.get(':nth-child(3) > .px-2').as("menuItem");
+  cy.get(':nth-child(3) > .px-2').should("be.visible").as("menuItem");
   cy.get("@menuItem").click();
 });
 
