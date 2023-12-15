@@ -1,11 +1,11 @@
 import { Tab } from '@headlessui/react'
 import { VisualizationTabs } from './VisualizationTabs'
 import MapView from './MapView'
-import TabularView from './TabularView'
 import ChartView from './ChartView'
 import { Dispatch, SetStateAction } from 'react'
 import { useRouter } from 'next/router'
 import { WriDataset } from '@/schema/ckan.schema'
+import { DataExplorer } from '@/components/data-explorer/DataExplorer'
 
 export default function Visualizations({
     setIsAddLayers,
@@ -22,7 +22,7 @@ export default function Visualizations({
     ]
 
     return (
-        <div>
+        <div className='h-full grow flex flex-col'>
             <Tab.Group
                 onChange={(index) => {
                     router.replace(
@@ -37,12 +37,12 @@ export default function Visualizations({
                 <Tab.List as="nav" className="flex  w-full">
                     <VisualizationTabs tabs={tabs} />
                 </Tab.List>
-                <Tab.Panels>
+                <Tab.Panels className="grow flex flex-col">
                     <Tab.Panel>
                         <MapView setIsAddLayers={setIsAddLayers} />
                     </Tab.Panel>
-                    <Tab.Panel>
-                        <TabularView />
+                    <Tab.Panel className="h-full grow flex flex-col justify-center">
+                        <DataExplorer datasetId="4272db62-5a42-47d1-89b3-9501be874940" />
                     </Tab.Panel>
                     <Tab.Panel>
                         <ChartView />

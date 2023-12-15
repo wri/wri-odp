@@ -121,7 +121,7 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
     const [fopen, setFOpen] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const { data, isLoading, refetch } = api.dataset.isFavoriteDataset.useQuery(
-        dataset?.id as string
+        dataset?.id as string, { retry: false }
     )
     const addToFavorites = api.dataset.followDataset.useMutation({
         onSuccess: async (data) => {

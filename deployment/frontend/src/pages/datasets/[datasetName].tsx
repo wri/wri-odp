@@ -133,11 +133,11 @@ export default function DatasetPage(
     })
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
         { id: datasetName },
-        { enabled: !!session.data?.user.apikey }
+        { enabled: !!session.data?.user.apikey, retry: false }
     )
     const issues = api.dataset.getDatasetIssues.useQuery(
         { id: datasetName },
-        { enabled: !!session.data?.user.apikey }
+        { enabled: !!session.data?.user.apikey, retry: false }
     )
 
     const links = [
