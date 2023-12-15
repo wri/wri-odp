@@ -30,3 +30,14 @@ export const NotificationInput = z.object({
 })
 
 export type NotificationInputType = z.infer<typeof NotificationInput>;
+
+export const NewNotificationInput = z.object({
+  recipient_id: z.string(),
+  sender_id: z.string(),
+  activity_type: z.string(),
+  object_type: z.string(),
+  object_id: z.string(),
+  is_unread: z.boolean().optional(),
+})
+
+export type NewNotificationInputType = z.infer<typeof NewNotificationInput>;
