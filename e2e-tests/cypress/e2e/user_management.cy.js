@@ -26,6 +26,7 @@ const userField =
 const roleField =
   "button.relative.text-left.block.w-full.rounded-md.border-0.px-5.py-3.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.placeholder\\:text-gray-400.focus\\:border-b-2.focus\\:border-blue-800.focus\\:bg-slate-100.focus\\:ring-0.focus\\:ring-offset-0.sm\\:text-sm.sm\\:leading-6";
 
+
 describe("Can add and remove members from teams and topics", () => {
   before(() => {
     cy.createOrganizationAPI(teamOne);
