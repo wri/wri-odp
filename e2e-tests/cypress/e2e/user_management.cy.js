@@ -113,6 +113,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.logout();
     cy.login(adminUser, adminUserPassword);
     cy.visit("/dashboard/notifications");
+    cy.wait(20000);
     cy.contains(ckanUserName);
     cy.contains(" added you as a member (admin) in the team");
     cy.contains(teamOne);
@@ -120,6 +121,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.logout();
     cy.login(editorUser, editorUserPassword);
     cy.visit("/dashboard/notifications");
+    cy.wait(20000);
     cy.contains(ckanUserName);
     cy.contains(" added you as a member (editor) in the team");
     cy.contains(teamOne);
@@ -127,6 +129,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.logout();
     cy.login(normalUser, normalUserPassword);
     cy.visit("/dashboard/notifications");
+    cy.wait(20000);
     cy.contains(ckanUserName);
     cy.contains(" added you as a member in the team");
     cy.contains(teamOne);
@@ -308,6 +311,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.logout();
     cy.login(adminUser, adminUserPassword);
     cy.visit("/dashboard/notifications");
+    cy.wait(20000);
     cy.contains(ckanUserName);
     cy.contains(" added you as a member (admin) in the topic");
     cy.contains(topicOne);
@@ -315,6 +319,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.logout();
     cy.login(editorUser, editorUserPassword);
     cy.visit("/dashboard/notifications");
+    cy.wait(20000);
     cy.contains(ckanUserName);
     cy.contains(" added you as a member (editor) in the topic");
     cy.contains(topicOne);
@@ -322,6 +327,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.logout();
     cy.login(normalUser, normalUserPassword);
     cy.visit("/dashboard/notifications");
+    cy.wait(20000);
     cy.contains(ckanUserName);
     cy.contains(" added you as a member in the topic");
     cy.contains(topicOne);
