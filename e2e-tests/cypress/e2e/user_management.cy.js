@@ -22,7 +22,7 @@ const editorUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const normalUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const switchUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 
-describe("Can add and remove members from team", () => {
+describe("Can add and remove members from teams and topics", () => {
   before(() => {
     cy.createOrganizationAPI(teamOne);
     cy.createOrganizationAPI(teamTwo);
