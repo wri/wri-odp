@@ -21,6 +21,10 @@ const adminUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const editorUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const normalUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const switchUserEmail = Math.random().toString(36).slice(2) + "@test.com";
+const userField =
+  "input.relative.text-left.block.w-full.rounded-md.border-0.px-5.py-3.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.placeholder\\:text-gray-400.focus\\:border-b-2.focus\\:border-blue-800.focus\\:bg-slate-100.focus\\:ring-0.focus\\:ring-offset-0.sm\\:text-sm.sm\\:leading-6.max-w-\\[70rem\\]";
+const roleField =
+  "button.relative.text-left.block.w-full.rounded-md.border-0.px-5.py-3.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.placeholder\\:text-gray-400.focus\\:border-b-2.focus\\:border-blue-800.focus\\:bg-slate-100.focus\\:ring-0.focus\\:ring-offset-0.sm\\:text-sm.sm\\:leading-6";
 
 describe("Can add and remove members from teams and topics", () => {
   before(() => {
@@ -37,102 +41,69 @@ describe("Can add and remove members from teams and topics", () => {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
-  it("Add members to a team", () => {
-    cy.visit(`/dashboard/teams/${teamOne}/edit`);
-    cy.contains("Members").click();
-    cy.contains("span", "Add another member").click();
-    var userField =
-      "input.relative.text-left.block.w-full.rounded-md.border-0.px-5.py-3.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.placeholder\\:text-gray-400.focus\\:border-b-2.focus\\:border-blue-800.focus\\:bg-slate-100.focus\\:ring-0.focus\\:ring-offset-0.sm\\:text-sm.sm\\:leading-6.max-w-\\[70rem\\]";
-    var roleField =
-      "button.relative.text-left.block.w-full.rounded-md.border-0.px-5.py-3.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.placeholder\\:text-gray-400.focus\\:border-b-2.focus\\:border-blue-800.focus\\:bg-slate-100.focus\\:ring-0.focus\\:ring-offset-0.sm\\:text-sm.sm\\:leading-6";
-    cy.get(userField)
-      .last()
-      .click()
-      .type(adminUser + "{enter}");
-    cy.get(roleField).last().click().focused().type("A{enter}");
+  function addUser(user, role) {
     cy.contains("span", "Add another member").click();
     cy.get(userField)
       .last()
       .click()
-      .type(editorUser + "{enter}");
-    cy.get(roleField).last().click().focused().type("E{enter}");
-    cy.contains("span", "Add another member").click();
-    cy.get(userField)
+      .type(user + "{enter}");
+    cy.get(roleField)
       .last()
       .click()
       .focused()
-      .type(normalUser + "{enter}");
-    cy.get(roleField).last().click().focused().type("M{enter}");
+      .type(role.charAt(0) + "{enter}");
+  }
+
+  function verifyUserNotified(user, role, userPassword, team) {
+    cy.logout();
+    cy.login(user, userPassword);
+    cy.visit("/dashboard/notifications");
+    cy.contains(ckanUserName);
+    if (role === "member") {
+      cy.contains(` added you as a member in the team`);
+    } else {
+      cy.contains(` added you as a member (${role}) in the team`);
+    }
+    cy.contains(team);
+  }
+
+  it("Add admin user to a team", () => {
+    cy.visit(`/dashboard/teams/${teamOne}/edit`);
+    cy.contains("Members").click();
+
+    addUser(adminUser, "Admin");
+
     cy.contains("button", "Save").click();
 
     cy.wait(1000);
 
+    verifyUserNotified(adminUser, "admin", adminUserPassword, teamOne);
+  });
+
+  it("Add editor user to a team", () => {
     cy.visit(`/dashboard/teams/${teamOne}/edit`);
     cy.contains("Members").click();
 
-    const expectedUsers = [
-      { username: adminUser, role: "Admin" },
-      { username: editorUser, role: "Editor" },
-      { username: normalUser, role: "Member" },
-    ];
+    addUser(editorUser, "Editor");
 
-    const foundUsers = [];
+    cy.contains("button", "Save").click();
 
-    cy.get(
-      ".flex.flex-col.gap-y-4 .grid.grow.grid-cols-1.items-start.gap-x-24.md\\:grid-cols-2"
-    )
-      .should("have.length.gt", 0)
-      .each(($memberContainer, index) => {
-        cy.wrap($memberContainer).within(() => {
-          cy.get('input[role="combobox"]')
-            .invoke("val")
-            .then((userValue) => {
-              cy.get('button[aria-haspopup="listbox"]')
-                .invoke("text")
-                .then((capacityValue) => {
-                  const foundUser = expectedUsers.find(
-                    (user) => user.username === userValue
-                  );
+    cy.wait(1000);
 
-                  if (foundUser) {
-                    expect(capacityValue.trim()).to.equal(foundUser.role);
-                    foundUsers.push(foundUser.username);
-                  } else {
-                    cy.log(`User ${userValue} is not in expectedUsers`);
-                  }
-                });
-            });
-        });
-      })
-      .then(() => {
-        expectedUsers.forEach((user) => {
-          expect(foundUsers).to.include(user.username);
-        });
-      });
+    verifyUserNotified(editorUser, "editor", editorUserPassword, teamOne);
+  });
 
-    cy.logout();
-    cy.login(adminUser, adminUserPassword);
-    cy.visit("/dashboard/notifications");
-    cy.wait(20000);
-    cy.contains(ckanUserName);
-    cy.contains(" added you as a member (admin) in the team");
-    cy.contains(teamOne);
+  it("Add normal user to a team", () => {
+    cy.visit(`/dashboard/teams/${teamOne}/edit`);
+    cy.contains("Members").click();
 
-    cy.logout();
-    cy.login(editorUser, editorUserPassword);
-    cy.visit("/dashboard/notifications");
-    cy.wait(20000);
-    cy.contains(ckanUserName);
-    cy.contains(" added you as a member (editor) in the team");
-    cy.contains(teamOne);
+    addUser(normalUser, "Member");
 
-    cy.logout();
-    cy.login(normalUser, normalUserPassword);
-    cy.visit("/dashboard/notifications");
-    cy.wait(20000);
-    cy.contains(ckanUserName);
-    cy.contains(" added you as a member in the team");
-    cy.contains(teamOne);
+    cy.contains("button", "Save").click();
+
+    cy.wait(1000);
+
+    verifyUserNotified(normalUser, "member", normalUserPassword, teamOne);
   });
 
   it("Switch team member roles", () => {
@@ -235,102 +206,43 @@ describe("Can add and remove members from teams and topics", () => {
       });
   });
 
-  it("Add members to a topic", () => {
-    cy.visit(`/dashboard/topics/${topicOne}/edit`);
+  it("Add admin user to a topic", () => {
+    cy.visit(`/dashboard/topics/${topicTwo}/edit`);
     cy.contains("Members").click();
-    cy.contains("span", "Add another member").click();
-    var userField =
-      "input.relative.text-left.block.w-full.rounded-md.border-0.px-5.py-3.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.placeholder\\:text-gray-400.focus\\:border-b-2.focus\\:border-blue-800.focus\\:bg-slate-100.focus\\:ring-0.focus\\:ring-offset-0.sm\\:text-sm.sm\\:leading-6.max-w-\\[70rem\\]";
-    var roleField =
-      "button.relative.text-left.block.w-full.rounded-md.border-0.px-5.py-3.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.placeholder\\:text-gray-400.focus\\:border-b-2.focus\\:border-blue-800.focus\\:bg-slate-100.focus\\:ring-0.focus\\:ring-offset-0.sm\\:text-sm.sm\\:leading-6";
-    cy.get(userField)
-      .last()
-      .click()
-      .type(adminUser + "{enter}");
-    cy.get(roleField).last().click().focused().type("A{enter}");
-    cy.contains("span", "Add another member").click();
-    cy.get(userField)
-      .last()
-      .click()
-      .type(editorUser + "{enter}");
-    cy.get(roleField).last().click().focused().type("E{enter}");
-    cy.contains("span", "Add another member").click();
-    cy.get(userField)
-      .last()
-      .click()
-      .focused()
-      .type(normalUser + "{enter}");
-    cy.get(roleField).last().click().focused().type("M{enter}");
+
+    addUser(adminUser, "Admin");
+
     cy.contains("button", "Save").click();
 
     cy.wait(1000);
 
-    cy.visit(`/dashboard/topics/${topicOne}/edit`);
+    verifyUserNotified(adminUser, "admin", adminUserPassword, topicTwo);
+  });
+
+  it("Add editor user to a topic", () => {
+    cy.visit(`/dashboard/topics/${topicTwo}/edit`);
     cy.contains("Members").click();
 
-    const expectedUsers = [
-      { username: adminUser, role: "Admin" },
-      { username: editorUser, role: "Editor" },
-      { username: normalUser, role: "Member" },
-    ];
+    addUser(editorUser, "Editor");
 
-    const foundUsers = [];
+    cy.contains("button", "Save").click();
 
-    cy.get(
-      ".flex.flex-col.gap-y-4 .grid.grow.grid-cols-1.items-start.gap-x-24.md\\:grid-cols-2"
-    )
-      .should("have.length.gt", 0)
-      .each(($memberContainer, index) => {
-        cy.wrap($memberContainer).within(() => {
-          cy.get('input[role="combobox"]')
-            .invoke("val")
-            .then((userValue) => {
-              cy.get('button[aria-haspopup="listbox"]')
-                .invoke("text")
-                .then((capacityValue) => {
-                  const foundUser = expectedUsers.find(
-                    (user) => user.username === userValue
-                  );
+    cy.wait(1000);
 
-                  if (foundUser) {
-                    expect(capacityValue.trim()).to.equal(foundUser.role);
-                    foundUsers.push(foundUser.username);
-                  } else {
-                    cy.log(`User ${userValue} is not in expectedUsers`);
-                  }
-                });
-            });
-        });
-      })
-      .then(() => {
-        expectedUsers.forEach((user) => {
-          expect(foundUsers).to.include(user.username);
-        });
-      });
+    verifyUserNotified(editorUser, "editor", editorUserPassword, topicTwo);
+  });
 
-    cy.logout();
-    cy.login(adminUser, adminUserPassword);
-    cy.visit("/dashboard/notifications");
-    cy.wait(20000);
-    cy.contains(ckanUserName);
-    cy.contains(" added you as a member (admin) in the topic");
-    cy.contains(topicOne);
+  it("Add normal user to a topic", () => {
+    cy.visit(`/dashboard/topics/${topicTwo}/edit`);
+    cy.contains("Members").click();
 
-    cy.logout();
-    cy.login(editorUser, editorUserPassword);
-    cy.visit("/dashboard/notifications");
-    cy.wait(20000);
-    cy.contains(ckanUserName);
-    cy.contains(" added you as a member (editor) in the topic");
-    cy.contains(topicOne);
+    addUser(normalUser, "Member");
 
-    cy.logout();
-    cy.login(normalUser, normalUserPassword);
-    cy.visit("/dashboard/notifications");
-    cy.wait(20000);
-    cy.contains(ckanUserName);
-    cy.contains(" added you as a member in the topic");
-    cy.contains(topicOne);
+    cy.contains("button", "Save").click();
+
+    cy.wait(1000);
+
+    verifyUserNotified(normalUser, "member", normalUserPassword, topicTwo);
   });
 
   it("Switch topic member roles", () => {
