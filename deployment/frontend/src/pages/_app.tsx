@@ -66,8 +66,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     if (!activeLayerGroups?.length && dataset) {
         const layers = dataset?.resources
-            .filter((r: any) => r?._extra?.is_layer)
-            .map((r: any) => r?._extra?.rw_layer_id)
+            .filter((r: any) => r?.format == "Layer")
+            .map((r: any) => r?.rw_id)
 
         if (layers) {
             activeLayerGroups.push({

@@ -20,6 +20,7 @@ export default function AddLayers() {
         search: '',
         page: { start: 0, rows: 10 },
         sortBy: 'relevance desc',
+        fq: { res_format: 'Layer' },
     })
 
     const [filters, setFilters] = useState<Filter[]>([])
@@ -111,7 +112,7 @@ export default function AddLayers() {
         setQuery((prev) => {
             return {
                 ...prev,
-                fq,
+                fq: { ...fq, res_format: 'Layer' },
                 search: filters.find((e) => e?.key == 'search')?.value ?? '',
                 extLocationQ,
                 extAddressQ,
@@ -130,10 +131,18 @@ export default function AddLayers() {
                                     selected
                                         ? 'border-wri-green text-wri-green'
                                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                                    'whitespace-nowrap border-b-2 px-6 font-acumin font-semibold transition'
+                                    'whitespace-nowrap border-b-2 px-6 font-acumin font-semibold transition flex gap-x-1'
                                 )}
                             >
-                                {tab.name}
+                                {tab.name}{' '}
+                                {tab.name == 'Filters' &&
+                                    filters.length > 0 && (
+                                        <div className="flex justify-center items-center mt-[0.2rem]">
+                                            <span className="h-3 w-3 p-2 bg-wri-gold text-white font-bold text-xs rounded-full flex items-center justify-center">
+                                                {filters.length}
+                                            </span>
+                                        </div>
+                                    )}
                             </button>
                         )}
                     </Tab>

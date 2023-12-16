@@ -3,7 +3,6 @@ import type {
     Group,
     Organization,
     User as CkanUser,
-    Resource,
 } from '@portaljs/ckan'
 
 type Only<T, U> = {

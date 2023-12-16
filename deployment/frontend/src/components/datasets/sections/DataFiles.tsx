@@ -64,15 +64,10 @@ export function DataFiles({
                         onClick={() => {
                             dataset.resources.forEach((r) => {
                                 if (
-                                    r._extra?.is_layer &&
-                                    !activeLayers.some(
-                                        (l) => l.id == r?._extra?.rw_layer_id
-                                    )
+                                    r.format == 'Layer' &&
+                                    !activeLayers.some((l) => l.id == r?.rw_id)
                                 ) {
-                                    addLayerToLayerGroup(
-                                        r._extra.rw_layer_id,
-                                        dataset.id
-                                    )
+                                    addLayerToLayerGroup(r.rw_id, dataset.id)
                                 }
                             })
                         }}
@@ -84,9 +79,9 @@ export function DataFiles({
                         className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                         onClick={() => {
                             dataset.resources.forEach((r) => {
-                                if (r._extra?.is_layer) {
+                                if (r.format == 'Layer') {
                                     removeLayerFromLayerGroup(
-                                        r._extra.rw_layer_id,
+                                        r.rw_id,
                                         dataset.id
                                     )
                                 }
@@ -118,10 +113,8 @@ function DatafileCard({
     dataset: WriDataset
 }) {
     const { data: activeLayers } = useLayersFromRW()
-    const {
-        removeLayerFromLayerGroup,
-        addLayerToLayerGroup,
-    } = useActiveLayerGroups()
+    const { removeLayerFromLayerGroup, addLayerToLayerGroup } =
+        useActiveLayerGroups()
     const created_at = new Date(datafile?.created ?? '')
     const last_updated = new Date(datafile?.metadata_modified ?? '')
     const options = {
@@ -164,7 +157,7 @@ function DatafileCard({
                             </Disclosure.Button>
                         </div>
                         <div className="flex gap-x-2">
-                            {datafile?._extra?.is_layer && (
+                            {datafile?.rw_id && (
                                 <>
                                     {activeLayers.some(
                                         (a) => datafile.url?.endsWith(a.id)
@@ -173,12 +166,9 @@ function DatafileCard({
                                             variant="light"
                                             size="sm"
                                             onClick={() => {
-                                                if (
-                                                    datafile._extra?.rw_layer_id
-                                                ) {
+                                                if (datafile.rw_id) {
                                                     removeLayerFromLayerGroup(
-                                                        datafile._extra
-                                                            ?.rw_layer_id,
+                                                        datafile?.rw_id,
                                                         dataset.id
                                                     )
                                                 }
@@ -193,12 +183,9 @@ function DatafileCard({
                                             variant="outline"
                                             size="sm"
                                             onClick={() => {
-                                                if (
-                                                    datafile._extra?.rw_layer_id
-                                                ) {
+                                                if (datafile.rw_id) {
                                                     addLayerToLayerGroup(
-                                                        datafile._extra
-                                                            .rw_layer_id,
+                                                        datafile.rw_id,
                                                         dataset.id
                                                     )
                                                 }

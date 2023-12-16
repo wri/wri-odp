@@ -57,10 +57,6 @@ export interface Resource {
     url_type?: string
     key?: string
     schema?: { value: DataDictionaryFormType }
-    _extra?: {
-        rw_layer_id: string
-        is_layer: boolean
-    }
 }
 
 export interface DatasetListQueryOptions {

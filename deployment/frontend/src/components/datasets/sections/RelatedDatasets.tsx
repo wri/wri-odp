@@ -23,7 +23,7 @@ import { useActiveLayerGroups } from '@/utils/storeHooks'
 import { ActiveLayerGroup } from '@/interfaces/state.interface'
 import { Index } from 'flexsearch'
 import Layer from '@/components/_shared/map/Layer'
-import {APILayerSpec} from '@/interfaces/layer.interface'
+import { APILayerSpec } from '@/interfaces/layer.interface'
 
 export function RelatedDatasets({
     datasets,
@@ -183,11 +183,8 @@ export default function DatasetCard({
                     </DefaultTooltip>
                 )}
             </div>
-            {dataset.resources.filter(
-                (resource) =>
-                    resource._extra?.is_layer ||
-                    resource.url?.startsWith('https://api.resourcewatch')
-            ).length > 0 && (
+            {dataset.resources.filter((resource) => resource.format == 'Layer')
+                .length > 0 && (
                 <Button
                     className="mt-4"
                     variant={

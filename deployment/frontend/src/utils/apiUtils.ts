@@ -29,7 +29,7 @@ import Topic from '@/interfaces/topic.interface'
 import { create } from 'lodash'
 import { api } from '@/utils/api'
 import { json } from 'stream/consumers'
-import type { NewNotificationInputType } from "@/schema/notification.schema"
+import type { NewNotificationInputType } from '@/schema/notification.schema'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -557,18 +557,6 @@ export async function getOneDataset(
         spatial: dataset.result.spatial
             ? JSON.parse(dataset.result.spatial)
             : null,
-        resources: dataset.result.resources.map(
-            (r) =>
-                ({
-                    ...r,
-                    _extra: {
-                        is_layer: r.url?.startsWith(
-                            'https://api.resourcewatch'
-                        ),
-                        rw_layer_id: r.url ? r.url.split('/').at(-1) : null,
-                    },
-                }) as Resource
-        ),
     }
 }
 
