@@ -1012,7 +1012,9 @@ export async function generateMemberEmail(
             const role = actionType[2]
             const action = actionType[1]
             if (action === 'removed') {
-                subMsg = `${action} you as a member (${role}) from the ${notification.object_type}`
+                subMsg = `${action} you as a member${
+                    role !== 'member' ? ` (${role})` : ''
+                } from the ${notification.object_type}`
                 subject = `Membership role ${action} from ${notification.object_type} ${teamOrTopicTitle}`
                 msg = `${senderUserLink} ${subMsg} ${objectLink}`
             } else if (action === 'added') {
@@ -1031,7 +1033,7 @@ export async function generateMemberEmail(
 
     const body = `
         <p>Hi ${recipientUsername},</p>
-        <p>${msg}</p>
+        <p>${msg}.</p>
         <p>Have a great day!</p>
         <p>Sent by the <a href="${env.NEXTAUTH_URL}">WRI OpenData Platform</a></p>
     `

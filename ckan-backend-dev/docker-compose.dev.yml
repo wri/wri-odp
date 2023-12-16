@@ -52,7 +52,6 @@ services:
         - SMTP_USER=${SMTP_USER}
         - SMTP_PASSWORD=${SMTP_PASSWORD}
         - SMTP_FROM=${SMTP_FROM}
-    ports:
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
@@ -148,3 +147,13 @@ services:
     volumes:
       - ./ckan/setup/create_minio_bucket.sh:/srv/app/create_minio_bucket.sh
     command: ["-c", "/srv/app/create_minio_bucket.sh"]
+
+  smtp:
+    container_name: ${SMTP_CONTAINER_NAME}
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8025/"]

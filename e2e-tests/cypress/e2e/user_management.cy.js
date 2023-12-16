@@ -112,21 +112,21 @@ describe("Can add and remove members from team", () => {
     cy.login(adminUser, adminUserPassword);
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
-    cy.contains(" added you as a member (admin) to the team");
+    cy.contains(" added you as a member (admin) in the team");
     cy.contains(teamOne);
 
     cy.logout();
     cy.login(editorUser, editorUserPassword);
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
-    cy.contains(" added you as a member (editor) to the team");
+    cy.contains(" added you as a member (editor) in the team");
     cy.contains(teamOne);
 
     cy.logout();
     cy.login(normalUser, normalUserPassword);
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
-    cy.contains(" added you as a member (member) to the team");
+    cy.contains(" added you as a member in the team");
     cy.contains(teamOne);
   });
 
@@ -305,21 +305,21 @@ describe("Can add and remove members from team", () => {
     cy.login(adminUser, adminUserPassword);
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
-    cy.contains(" added you as a member (admin) to the topic");
+    cy.contains(" added you as a member (admin) in the topic");
     cy.contains(topicOne);
 
     cy.logout();
     cy.login(editorUser, editorUserPassword);
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
-    cy.contains(" added you as a member (editor) to the topic");
+    cy.contains(" added you as a member (editor) in the topic");
     cy.contains(topicOne);
 
     cy.logout();
     cy.login(normalUser, normalUserPassword);
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
-    cy.contains(" added you as a member (member) to the topic");
+    cy.contains(" added you as a member in the topic");
     cy.contains(topicOne);
   });
 
