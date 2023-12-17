@@ -34,6 +34,7 @@ import { Dialog } from '@headlessui/react'
 import { useState } from 'react'
 import Spinner from '../_shared/Spinner'
 import { ErrorAlert } from '@/components/_shared/Alerts'
+import { TabularResource } from './visualizations/Visualizations'
 
 function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     const session = useSession()
@@ -116,12 +117,21 @@ function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     )
 }
 
-export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
+export function DatasetHeader({
+    dataset,
+    setTabularResource,
+    tabularResource,
+}: {
+    dataset?: WriDataset
+    setTabularResource: (tabularResource: TabularResource | null) => void
+    tabularResource: TabularResource | null
+}) {
     const [open, setOpen] = useState(false)
     const [fopen, setFOpen] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const { data, isLoading, refetch } = api.dataset.isFavoriteDataset.useQuery(
-        dataset?.id as string, { retry: false }
+        dataset?.id as string,
+        { retry: false }
     )
     const addToFavorites = api.dataset.followDataset.useMutation({
         onSuccess: async (data) => {
@@ -498,6 +508,26 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                             Technical Notes
                         </div>
                     </a>
+                )}
+                {dataset?.provider && dataset?.rw_id && (
+                    <div className='py-4'>
+                        {tabularResource && tabularResource.id === dataset.rw_id ? (
+                            <Button size="sm" onClick={() => setTabularResource(null)}>
+                                Remove Tabular View
+                            </Button>
+                        ) : (
+                            <Button size="sm"
+                                onClick={() =>
+                                    setTabularResource({
+                                        provider: dataset.provider as string,
+                                        id: dataset.rw_id as string,
+                                    })
+                                }
+                            >
+                                Add Tabular View
+                            </Button>
+                        )}
+                    </div>
                 )}
             </div>
         </div>

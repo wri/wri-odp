@@ -9,9 +9,10 @@ import {
 } from '@tanstack/react-table'
 import { useFields, useNumberOfRows, useTableData } from './queryHooks'
 import Spinner from '../_shared/Spinner'
+import { TabularResource } from '../datasets/visualizations/Visualizations'
 
 interface DataExplorerProps {
-    datasetId: string
+    tabularResource: TabularResource
 }
 
 export interface Filter {
@@ -19,8 +20,8 @@ export interface Filter {
     value: string
 }
 
-export function DataExplorer({ datasetId }: DataExplorerProps) {
-    const { data: tableData } = useFields(datasetId)
+export function DataExplorer({ tabularResource }: DataExplorerProps) {
+    const { data: tableData } = useFields(tabularResource)
     if (!tableData) return (
         <div className="bg-lima-700 my-auto flex w-full flex-col items-center justify-center overflow-hidden opacity-75 h-full">
             <Spinner className="text-wri-green w-12 h-12" />
@@ -33,22 +34,23 @@ export function DataExplorer({ datasetId }: DataExplorerProps) {
         <DataExplorerInner
             tableName={tableData.tableName}
             columns={tableData.columns}
-            datasetId={datasetId}
+            tabularResource={tabularResource}
         />
     )
 }
 
 export interface DataExplorerInnerProps {
     tableName: string
-    datasetId: string
+    tabularResource: TabularResource
     columns: { key: string; name: string }[]
 }
 
 function DataExplorerInner({
     tableName,
     columns,
-    datasetId,
+    tabularResource,
 }: DataExplorerInnerProps) {
+    const { id: datasetId, provider } = tabularResource
     const cols = useMemo(() => columns ?? [], [columns])
     const [pagination, setPagination] = useState<PaginationState>({
         pageIndex: 0,
@@ -61,12 +63,14 @@ function DataExplorerInner({
     const { data: numOfRows } = useNumberOfRows({
         tableName,
         datasetId,
+        provider,
         filters: columnFilters,
         setPageCount,
     })
 
     const { data: tableData, isLoading } = useTableData({
         tableName,
+        provider,
         pagination,
         sorting,
         datasetId,
@@ -81,6 +85,7 @@ function DataExplorerInner({
             pageSize: pagination.pageSize,
         },
         sorting,
+        provider,
         datasetId,
         filters: columnFilters,
         columns: columns.map((c) => c.key),

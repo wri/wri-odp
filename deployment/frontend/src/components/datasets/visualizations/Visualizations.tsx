@@ -7,22 +7,29 @@ import { useRouter } from 'next/router'
 import { WriDataset } from '@/schema/ckan.schema'
 import { DataExplorer } from '@/components/data-explorer/DataExplorer'
 
+export type TabularResource = {
+    provider: string
+    id: string
+}
+
 export default function Visualizations({
     setIsAddLayers,
     dataset,
+    tabularResource,
 }: {
     setIsAddLayers: Dispatch<SetStateAction<boolean>>
     dataset: WriDataset
+    tabularResource: TabularResource | null
 }) {
     const router = useRouter()
     const tabs = [
-        { name: 'Map View' },
-        { name: 'Tabular View' },
-        { name: 'Chart View' },
-    ]
+        { name: 'Map View', enabled: true },
+        { name: 'Tabular View', enabled: !!tabularResource },
+        { name: 'Chart View', enabled: true },
+    ].filter((tab) => tab.enabled)
 
     return (
-        <div className='h-full grow flex flex-col'>
+        <div className="h-full grow flex flex-col">
             <Tab.Group
                 onChange={(index) => {
                     router.replace(
@@ -41,9 +48,13 @@ export default function Visualizations({
                     <Tab.Panel>
                         <MapView setIsAddLayers={setIsAddLayers} />
                     </Tab.Panel>
-                    <Tab.Panel className="h-full grow flex flex-col justify-center">
-                        <DataExplorer datasetId="4272db62-5a42-47d1-89b3-9501be874940" />
-                    </Tab.Panel>
+                    {tabularResource && (
+                        <Tab.Panel className="h-full grow flex flex-col justify-center">
+                            <DataExplorer
+                                tabularResource={tabularResource}
+                            />
+                        </Tab.Panel>
+                    )}
                     <Tab.Panel>
                         <ChartView />
                     </Tab.Panel>
