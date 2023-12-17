@@ -5,19 +5,23 @@ import {
     LegendItemButtonLayers,
     LegendItemButtonOpacity,
     LegendItemButtonVisibility,
-    LegendItemTypes,
     LegendItemTimeStep,
     Icons,
     // @ts-ignore
 } from 'vizzuality-components/dist/bundle'
+
+import { LegendItemTypes } from '@/components/vizzuality/components'
 import { LegendsFormType, SourceFormType } from '../layer.schema'
+import LegendItemTypesList from '@/components/vizzuality/components/legend/components/legend-item-types/LegendItemTypesList'
 export function Legends({ layerObj }: { layerObj: any }) {
     if (!layerObj) return <></>
+
     const lg = {
         id: 'sample-id',
         dataset: 'sample-dataset',
         layers: [layerObj],
     }
+
     return (
         <div className="c-legend-map">
             <Icons />
@@ -37,7 +41,7 @@ export function Legends({ layerObj }: { layerObj: any }) {
                     onChangeVisibility={() => console.log('Info')}
                     onChangeLayer={() => console.log('Info')}
                 >
-                    <LegendItemTypes />
+                    <LegendItemTypesList />
                     <LegendItemTimeStep
                         defaultStyles={LEGEND_TIMELINE_PROPERTIES}
                         handleChange={() => console.log('Change')}

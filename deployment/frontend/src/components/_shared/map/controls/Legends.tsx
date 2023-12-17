@@ -8,11 +8,12 @@ import {
     LegendItemButtonLayers,
     LegendItemButtonOpacity,
     LegendItemButtonVisibility,
-    LegendItemTypes,
     LegendItemTimeStep,
     Icons,
     // @ts-ignore
 } from 'vizzuality-components'
+
+import { LegendItemTypes } from '@/components/vizzuality/components'
 
 // @ts-ignore
 import { LegendItemTimeline } from 'old-vizzuality-components'
