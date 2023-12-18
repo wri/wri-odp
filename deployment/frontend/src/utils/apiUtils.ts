@@ -603,6 +603,34 @@ export async function upsertCollaborator(
     return collaborator.result
 }
 
+export async function deleteCollaborator(
+    _collaborator: { package_id: string; user_id: string },
+    session: Session
+) {
+    const user = session.user
+    const collaboratorRes = await fetch(
+        `${env.CKAN_URL}/api/action/package_collaborator_delete`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${user?.apikey ?? ''}`,
+            },
+            body: JSON.stringify({
+                ..._collaborator,
+                id: _collaborator.package_id,
+            }),
+        }
+    )
+    const collaborator: CkanResponse<Collaborator> =
+        await collaboratorRes.json()
+    if (!collaborator.success && collaborator.error) {
+        if (collaborator.error.message) throw Error(collaborator.error.message)
+        throw Error(JSON.stringify(collaborator.error))
+    }
+    return collaborator.result
+}
+
 export function timeAgo(timestamp: string): string {
     const currentDate = new Date()
     const date = new Date(timestamp)
@@ -932,8 +960,12 @@ export async function generateMemberEmail(
     let msg = ''
     let subject = ''
     let subMsg = ''
+    let portalUrl = env.NEXTAUTH_URL ?? ''
+    if (portalUrl.endsWith('/')) {
+        portalUrl = portalUrl.slice(0, -1)
+    }
 
-    const senderUserLink = `<a href="${env.NEXTAUTH_URL}/users/${senderUser.name}">${senderUsername}</a>`
+    const senderUserLink = `<a href="${portalUrl}/dashboard/users?q=${senderUser.name}">${senderUsername}</a>`
 
     if (notification.object_type === 'dataset') {
         const dataset = await fetch(
@@ -947,7 +979,7 @@ export async function generateMemberEmail(
         const datasetData = (await dataset.json()) as CkanResponse<WriDataset>
         const datasetName = datasetData.result.name
         const datasetTitle = datasetData.result.title ?? datasetName
-        const datasetLink = `<a href="${env.NEXTAUTH_URL}/datasets/${datasetName}">${datasetTitle}</a>`
+        const datasetLink = `<a href="${portalUrl}/datasets/${datasetName}">${datasetTitle}</a>`
 
         if (actionType[0] === 'collaborator') {
             const role = actionType[2]
@@ -1004,7 +1036,7 @@ export async function generateMemberEmail(
         >
         const teamOrTopicName = teamOrTopicData.result.name
         const teamOrTopicTitle = teamOrTopicData.result.title ?? teamOrTopicName
-        const objectLink = `<a href="${env.NEXTAUTH_URL}/${
+        const objectLink = `<a href="${portalUrl}/${
             notification.object_type === 'team' ? 'teams' : 'topics'
         }/${teamOrTopicData.result.name}">${teamOrTopicTitle}</a>`
 
@@ -1035,7 +1067,7 @@ export async function generateMemberEmail(
         <p>Hi ${recipientUsername},</p>
         <p>${msg}.</p>
         <p>Have a great day!</p>
-        <p>Sent by the <a href="${env.NEXTAUTH_URL}">WRI OpenData Platform</a></p>
+        <p>Sent by the <a href="${portalUrl}">WRI OpenData Platform</a></p>
     `
 
     return {
