@@ -453,22 +453,29 @@ export const DatasetRouter = createTRPCRouter({
                         )
                     })
                 )
-                for (const existingCollaborator of existingCollaborators) {
-                    if (
-                        !newCollaborators.some(
-                            (newCollaborator) =>
-                                newCollaborator.name ===
-                                existingCollaborator.name
-                        )
-                    ) {
-                        await deleteCollaborator(
-                            {
-                                package_id: input.id ?? '',
-                                user_id: existingCollaborator.name,
-                            },
-                            ctx.session
-                        )
-                    }
+                try {
+                    await Promise.all(
+                        existingCollaborators
+                            .filter(
+                                (existingCollaborator) =>
+                                    !newCollaborators.some(
+                                        (newCollaborator) =>
+                                            newCollaborator.name ===
+                                            existingCollaborator.name
+                                    )
+                            )
+                            .map((existingCollaborator) =>
+                                deleteCollaborator(
+                                    {
+                                        package_id: input.id ?? '',
+                                        user_id: existingCollaborator.name,
+                                    },
+                                    ctx.session
+                                )
+                            )
+                    )
+                } catch (e) {
+                    console.log(e)
                 }
                 return { ...dataset.result, collaborators }
             } catch (e) {
