@@ -92,6 +92,7 @@ export function useNumberOfRows({
     return api.rw.getNumberOfRows.useQuery(
         {
             datasetId,
+            provider,
             tableName: tableName ?? '',
             filters: filters as {
                 id: string

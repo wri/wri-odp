@@ -77,6 +77,7 @@ function DataExplorerInner({
         columns: columns.map((c) => c.key),
         filters: columnFilters,
     })
+    console.log(tableData)
 
     const _prefetchData = useTableData({
         tableName,

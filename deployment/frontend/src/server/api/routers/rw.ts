@@ -2,7 +2,7 @@ import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
 import { z } from 'zod'
 
 export interface NumOfRowsResponse {
-    data: Array<{ count: number }>
+    data: Array<{ count: number } | number>
 }
 
 export interface DataResponse {
@@ -78,18 +78,19 @@ export const rwRouter = createTRPCRouter({
             const tableDataRes = await fetch(url)
             const tableData: DataResponse = await tableDataRes.json()
             const data = tableData.data
-            console.log('DATA', data)
             if (provider === 'cartodb')
                 return data.slice(
                     pagination.pageIndex * pagination.pageSize,
                     data.length
                 )
+            return data
         }),
     getNumberOfRows: publicProcedure
         .input(
             z.object({
                 tableName: z.string(),
                 datasetId: z.string(),
+                provider: z.string(),
                 filters: z.array(
                     z.object({
                         id: z.string(),
@@ -103,7 +104,7 @@ export const rwRouter = createTRPCRouter({
         )
         .query(async ({ input }) => {
             try {
-                const { datasetId, tableName, filters } = input
+                const { datasetId, tableName, filters, provider } = input
                 const filtersSql =
                     filters.length > 0
                         ? 'WHERE ' +
@@ -124,6 +125,10 @@ export const rwRouter = createTRPCRouter({
                     }
                 )
                 const numRows: NumOfRowsResponse = await numRowsRes.json()
+                console.log('NUM OF ROWS', numRows)
+                if (typeof numRows.data[0] === 'number') {
+                    return numRows.data[0]
+                }
                 if (numRows.data[0]) {
                     return numRows.data[0].count
                 }
