@@ -27,7 +27,6 @@ export default function LegendForm({
         name: 'legendConfig.items',
     })
     const onSubmit = () => onNext()
-    console.log('LEGENDS', fields)
     return (
         <>
             <form
@@ -85,11 +84,16 @@ export default function LegendForm({
                             key={field.id}
                             {...register(`legendConfig.items.${index}.color`)}
                         />
-                        <div className="lg:col-span-1 col-span-2 pl-8 lg:pl-0">
-                            <button type="button" onClick={() => remove(index)}>
-                                <MinusCircleIcon className="h-6 w-6 text-red-500" />
-                            </button>
-                        </div>
+                        <DefaultTooltip content="Remove item">
+                            <div className="lg:col-span-1 col-span-2 pl-8 lg:pl-0">
+                                <button
+                                    type="button"
+                                    onClick={() => remove(index)}
+                                >
+                                    <MinusCircleIcon className="h-6 w-6 text-red-500" />
+                                </button>
+                            </div>
+                        </DefaultTooltip>
                     </div>
                 ))}
             </div>

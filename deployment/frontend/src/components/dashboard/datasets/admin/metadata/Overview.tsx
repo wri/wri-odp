@@ -324,6 +324,7 @@ export function OverviewForm({
                                                 <span>
                                                     Go to the{' '}
                                                     <a
+                                                        target="_blank"
                                                         className="text-blue-800 underline"
                                                         target="_blank"
                                                         href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
@@ -340,6 +341,7 @@ export function OverviewForm({
                                     }
                                     type="text"
                                 />
+                                <ErrorDisplay name="provider" errors={errors} />
                             </InputGroup>
                             <InputGroup label="Table Name">
                                 <Input
@@ -357,6 +359,7 @@ export function OverviewForm({
                                                 <span>
                                                     Go to the{' '}
                                                     <a
+                                                        target="_blank"
                                                         className="text-blue-800 underline"
                                                         target="_blank"
                                                         href="https://resource-watch.github.io/doc-api/reference.html#google-earth-engine"
