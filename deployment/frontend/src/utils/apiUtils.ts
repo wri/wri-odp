@@ -603,6 +603,34 @@ export async function upsertCollaborator(
     return collaborator.result
 }
 
+export async function deleteCollaborator(
+    _collaborator: { package_id: string; user_id: string },
+    session: Session
+) {
+    const user = session.user
+    const collaboratorRes = await fetch(
+        `${env.CKAN_URL}/api/action/package_collaborator_delete`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${user?.apikey ?? ''}`,
+            },
+            body: JSON.stringify({
+                ..._collaborator,
+                id: _collaborator.package_id,
+            }),
+        }
+    )
+    const collaborator: CkanResponse<Collaborator> =
+        await collaboratorRes.json()
+    if (!collaborator.success && collaborator.error) {
+        if (collaborator.error.message) throw Error(collaborator.error.message)
+        throw Error(JSON.stringify(collaborator.error))
+    }
+    return collaborator.result
+}
+
 export function timeAgo(timestamp: string): string {
     const currentDate = new Date()
     const date = new Date(timestamp)

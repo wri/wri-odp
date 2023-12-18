@@ -12,6 +12,7 @@ import {
     getOneDataset,
     getAllUsers,
     upsertCollaborator,
+    deleteCollaborator,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -38,7 +39,12 @@ import {
     getRawObjFromApiSpec,
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
 import { APILayerSpec } from '@/interfaces/layer.interface'
-import { RwLayerResp, RwResponse, isRwError, RwErrorResponse } from '@/interfaces/rw.interface'
+import {
+    RwLayerResp,
+    RwResponse,
+    isRwError,
+    RwErrorResponse,
+} from '@/interfaces/rw.interface'
 import { sendMemberNotifications } from '@/utils/apiUtils'
 
 async function createDatasetRw(dataset: DatasetFormType) {
@@ -170,10 +176,12 @@ export async function fetchDatasetCollaborators(
                 Authorization: `${userApiKey ?? ''}`,
             },
         }
-    );
-    const collaborators: CkanResponse<Collaborator[]> = await collaboratorsRes.json()
+    )
+    const collaborators: CkanResponse<Collaborator[]> =
+        await collaboratorsRes.json()
     if (!collaborators.success && collaborators.error) {
-        if (collaborators.error.message) throw Error(collaborators.error.message)
+        if (collaborators.error.message)
+            throw Error(collaborators.error.message)
         throw Error(JSON.stringify(collaborators.error))
     }
 
@@ -199,7 +207,6 @@ export async function fetchDatasetCollaborators(
 
     return collaboratorsWithDetails
 }
-
 
 export const DatasetRouter = createTRPCRouter({
     createDataset: protectedProcedure
@@ -300,13 +307,18 @@ export const DatasetRouter = createTRPCRouter({
         .input(DatasetSchema)
         .mutation(async ({ ctx, input }) => {
             const user = ctx.session.user
-            const existingCollaboratorsDetails = await fetchDatasetCollaborators(
-                input.id ?? '', ctx.session.user.apikey, env.SYS_ADMIN_API_KEY
+            const existingCollaboratorsDetails =
+                await fetchDatasetCollaborators(
+                    input.id ?? '',
+                    ctx.session.user.apikey,
+                    env.SYS_ADMIN_API_KEY
+                )
+            const newCollaborators = input.collaborators.map(
+                (collaborator) => ({
+                    name: collaborator.user.label.toLowerCase(),
+                    capacity: collaborator.capacity.label.toLowerCase(),
+                })
             )
-            const newCollaborators = input.collaborators.map((collaborator) => ({
-                name: collaborator.user.label.toLowerCase(),
-                capacity: collaborator.capacity.label.toLowerCase(),
-            }))
             const existingCollaborators = existingCollaboratorsDetails.map(
                 (existingCollaborator) => ({
                     name: existingCollaborator.name,
@@ -322,8 +334,7 @@ export const DatasetRouter = createTRPCRouter({
                     input.id ?? '',
                     'dataset'
                 )
-            }
-            catch (e) {
+            } catch (e) {
                 console.log(e)
             }
             const resourcesWithoutLayer = input.resources.filter(
@@ -442,6 +453,23 @@ export const DatasetRouter = createTRPCRouter({
                         )
                     })
                 )
+                for (const existingCollaborator of existingCollaborators) {
+                    if (
+                        !newCollaborators.some(
+                            (newCollaborator) =>
+                                newCollaborator.name ===
+                                existingCollaborator.name
+                        )
+                    ) {
+                        await deleteCollaborator(
+                            {
+                                package_id: input.id ?? '',
+                                user_id: existingCollaborator.name,
+                            },
+                            ctx.session
+                        )
+                    }
+                }
                 return { ...dataset.result, collaborators }
             } catch (e) {
                 let error =
@@ -620,8 +648,16 @@ export const DatasetRouter = createTRPCRouter({
                         return r
                     if (!r.url) return r
                     const layerObj = await getLayerRw(r.url)
-                    if (r.url_type === 'layer') return {...r, layerObj: convertLayerObjToForm(layerObj)}
-                    if (r.url_type === 'layer-raw') return {...r, layerObjRaw: getRawObjFromApiSpec(layerObj)}
+                    if (r.url_type === 'layer')
+                        return {
+                            ...r,
+                            layerObj: convertLayerObjToForm(layerObj),
+                        }
+                    if (r.url_type === 'layer-raw')
+                        return {
+                            ...r,
+                            layerObjRaw: getRawObjFromApiSpec(layerObj),
+                        }
                     return r
                 })
             )
@@ -787,7 +823,7 @@ export const DatasetRouter = createTRPCRouter({
             if (!data.success && data.error) throw Error(data.error.message)
             return data
         }),
-    
+
     followDataset: protectedProcedure
         .input(z.string())
         .mutation(async ({ input, ctx }) => {
@@ -796,7 +832,7 @@ export const DatasetRouter = createTRPCRouter({
                 {
                     method: 'POST',
                     body: JSON.stringify({
-                        id: input
+                        id: input,
                     }),
                     headers: {
                         Authorization: ctx.session.user.apikey,
@@ -816,7 +852,7 @@ export const DatasetRouter = createTRPCRouter({
                 {
                     method: 'POST',
                     body: JSON.stringify({
-                        id: input
+                        id: input,
                     }),
                     headers: {
                         Authorization: ctx.session.user.apikey,
@@ -830,26 +866,26 @@ export const DatasetRouter = createTRPCRouter({
         }),
     isFavoriteDataset: protectedProcedure
         .input(z.string())
-        .query(async ({input, ctx }) => {
-        const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${ctx.session.user.apikey}`,
-                },
-            }
-        )
-        const data = (await response.json()) as CkanResponse<FolloweeList[]>
-        if (!data.success && data.error) throw Error(data.error.message)
-        const result = data.result.reduce((acc, item) => {
-            if (item.type === 'dataset') {
-                const t = item.dict as WriDataset
-                acc.push(t)
-            }
-            return acc
-        }, [] as WriDataset[])
+        .query(async ({ input, ctx }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${ctx.session.user.apikey}`,
+                    },
+                }
+            )
+            const data = (await response.json()) as CkanResponse<FolloweeList[]>
+            if (!data.success && data.error) throw Error(data.error.message)
+            const result = data.result.reduce((acc, item) => {
+                if (item.type === 'dataset') {
+                    const t = item.dict as WriDataset
+                    acc.push(t)
+                }
+                return acc
+            }, [] as WriDataset[])
 
-        return result.some((dataset) => dataset.id === input)
-    }),
+            return result.some((dataset) => dataset.id === input)
+        }),
 })
