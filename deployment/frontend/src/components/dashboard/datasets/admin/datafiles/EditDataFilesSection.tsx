@@ -16,7 +16,6 @@ export function EditDataFilesSection({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
         })
-    console.log(fields)
     return (
         <>
             {fields.map((field, index) =>

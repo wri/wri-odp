@@ -14,6 +14,7 @@ import { PencilIcon } from '@heroicons/react/24/outline'
 type DatasetMembers = RouterOutput['dataset']['getDatasetCollaborators']
 
 export function Members({ members }: { members: DatasetMembers }) {
+  console.log('MEMBERS', members)
     return (
         <>
             <Table>

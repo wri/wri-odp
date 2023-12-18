@@ -31,8 +31,6 @@ export default function Visualizations({
         { name: 'Chart View', enabled: true },
     ]
 
-    console.log('tabularResource', tabularResource)
-    console.log('prevTabularResource', prevTabularResource)
     if (!tabularResource && prevTabularResource) {
         setPrevTabularResource(null)
         setSelectedIndex(selectedIndex === 2 ? 2 : 0)

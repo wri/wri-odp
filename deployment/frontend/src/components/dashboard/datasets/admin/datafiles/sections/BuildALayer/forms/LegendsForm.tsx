@@ -23,11 +23,11 @@ export default function LegendForm({
 }) {
     const formObj = useFormContext<LayerFormType>()
     const { handleSubmit, register, watch, control } = formObj
-    const useFieldArrayObj = useFieldArray({
-        control,
+    const { append, fields, remove } = useFieldArray({
         name: 'legendConfig.items',
     })
     const onSubmit = () => onNext()
+    console.log('LEGENDS', fields)
     return (
         <>
             <form
@@ -43,7 +43,7 @@ export default function LegendForm({
                                     formObj.watch('legendConfig'),
                                     formObj.watch('layerConfig.render')
                                 ).forEach((color) => {
-                                    useFieldArrayObj.append({
+                                    append({
                                         name: 'Item',
                                         color: color ?? '#000000',
                                     })
@@ -68,45 +68,9 @@ export default function LegendForm({
                             <option value="gradient">Gradient</option>
                         </select>
                     </div>
-                    <ItemsArray
-                        register={register}
-                        useFieldArrayObj={useFieldArrayObj}
-                    />
-                </div>
-                <div className="col-span-full flex justify-end space-x-2">
-                    <Button
-                        variant="outline"
-                        onClick={() => onPrev()}
-                        type="button"
-                    >
-                        Back
-                    </Button>
-                    <Button type="button" onClick={() => onNext()}>
-                        Next: Interaction
-                    </Button>
-                </div>
-            </form>
-        </>
-    )
-}
-
-function ItemsArray({
-    register,
-    useFieldArrayObj,
-}: {
-    register: UseFormRegister<LayerFormType>
-    useFieldArrayObj: UseFieldArrayReturn<
-        LayerFormType,
-        'legendConfig.items',
-        'id'
-    >
-}) {
-    const { append, fields, remove } = useFieldArrayObj
-    return (
-        <>
             <div className="flex flex-col gap-y-4 max-h-[315px] overflow-y-auto">
                 {fields.map((field, index) => (
-                    <div className="grid grid-cols-12 items-center justify-start gap-x-2">
+                    <div key={field.id} className="grid grid-cols-12 items-center justify-start gap-x-2">
                         <label className="lg:col-span-2 col-span-full lg:text-right text-left font-acumin text-lg font-normal leading-tight text-black">
                             Item {index + 1}
                         </label>
@@ -139,6 +103,20 @@ function ItemsArray({
                     Add another item
                 </span>
             </button>
+                </div>
+                <div className="col-span-full flex justify-end space-x-2">
+                    <Button
+                        variant="outline"
+                        onClick={() => onPrev()}
+                        type="button"
+                    >
+                        Back
+                    </Button>
+                    <Button type="button" onClick={() => onNext()}>
+                        Next: Interaction
+                    </Button>
+                </div>
+            </form>
         </>
     )
 }

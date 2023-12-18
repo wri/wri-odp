@@ -290,6 +290,17 @@ Cypress.Commands.add("createResourceAPI", (dataset, resource) => {
   });
 });
 
+Cypress.Commands.add("datapusherSubmit", (resource_id) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("datapusher_submit"),
+    headers: headers,
+    body: {
+      resource_id,
+    },
+  });
+});
+
 Cypress.Commands.add("updateResourceRecord", (resource) => {
   const request = cy.request({
     method: "POST",
