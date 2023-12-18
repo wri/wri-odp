@@ -326,7 +326,6 @@ export function OverviewForm({
                                                     <a
                                                         target="_blank"
                                                         className="text-blue-800 underline"
-                                                        target="_blank"
                                                         href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
                                                     >
                                                         {' '}
@@ -361,7 +360,6 @@ export function OverviewForm({
                                                     <a
                                                         target="_blank"
                                                         className="text-blue-800 underline"
-                                                        target="_blank"
                                                         href="https://resource-watch.github.io/doc-api/reference.html#google-earth-engine"
                                                     >
                                                         {' '}
