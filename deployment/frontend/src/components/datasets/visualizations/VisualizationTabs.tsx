@@ -10,7 +10,7 @@ export function VisualizationTabs({
     return (
         <>
             {tabs.map((tab, i) => (
-                <Tab as={Fragment} disabled={!tab.enabled} key={`visualization-tab-${tab.name}`}>
+                <Tab as={Fragment} key={`visualization-tab-${tab.name}`}>
                     {({ selected }: { selected: boolean }) => (
                         <button
                             className={classNames(
