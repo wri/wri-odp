@@ -51,7 +51,7 @@ function Notification({ items }: { items: NotificationType }) {
                     </Link>
                     {items?.msg}{' '}
                     <Link
-                        href={`/datasets/${items?.objectIdName}`}
+                        href={`/${items?.object_type}s/${items?.objectIdName}`}
                         className="group-hover:underline"
                     >
                         {items?.object_name}

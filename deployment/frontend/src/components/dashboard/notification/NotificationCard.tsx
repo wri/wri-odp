@@ -84,7 +84,7 @@ function Card({
                             </Link>
                             {rowProfile?.msg}{' '}
                             <Link
-                                href={`/datasets/${rowProfile?.objectIdName}`}
+                                href={`/${rowProfile?.object_type}s/${rowProfile?.objectIdName}`}
                                 className="group-hover:underline"
                             >
                                 {rowProfile?.object_name}

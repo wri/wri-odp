@@ -29,7 +29,10 @@ import Topic from '@/interfaces/topic.interface'
 import { create } from 'lodash'
 import { api } from '@/utils/api'
 import { json } from 'stream/consumers'
-import type { NewNotificationInputType } from "@/schema/notification.schema"
+import type {
+    NewNotificationInputType,
+    NotificationType,
+} from '@/schema/notification.schema'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -863,13 +866,18 @@ export async function sendEmail(
         },
     })
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    await transporter.sendMail({
-        from: env.SMTP_FROM,
-        to,
-        subject,
-        html,
-    })
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        await transporter.sendMail({
+            from: env.SMTP_FROM,
+            to,
+            subject,
+            html,
+        })
+    } catch (error) {
+        console.error(error)
+        throw error
+    }
 }
 
 export function generateEmail(
@@ -908,6 +916,134 @@ export function generateInviteEmail(
     `
 }
 
+export async function generateMemberEmail(
+    senderUser: User,
+    recipientUser: User,
+    notification: NotificationType
+): Promise<{ subject: string; body: string }> {
+    const actionType = notification.activity_type.split('_')
+    const senderUsername = senderUser.fullname
+        ? senderUser.fullname
+        : senderUser.name
+    const recipientUsername = recipientUser.fullname
+        ? recipientUser.fullname
+        : recipientUser.name
+
+    let msg = ''
+    let subject = ''
+    let subMsg = ''
+
+    const senderUserLink = `<a href="${env.NEXTAUTH_URL}/users/${senderUser.name}">${senderUsername}</a>`
+
+    if (notification.object_type === 'dataset') {
+        const dataset = await fetch(
+            `${env.CKAN_URL}/api/3/action/package_show?id=${notification.object_id}`,
+            {
+                headers: {
+                    Authorization: env.SYS_ADMIN_API_KEY,
+                },
+            }
+        )
+        const datasetData = (await dataset.json()) as CkanResponse<WriDataset>
+        const datasetName = datasetData.result.name
+        const datasetTitle = datasetData.result.title ?? datasetName
+        const datasetLink = `<a href="${env.NEXTAUTH_URL}/datasets/${datasetName}">${datasetTitle}</a>`
+
+        if (actionType[0] === 'collaborator') {
+            const role = actionType[2]
+            const action = actionType[1]
+            if (action === 'removed') {
+                subMsg = `${action} you as a collaborator (${role}) from the dataset`
+                subject = `Collaborator role ${action} from dataset ${datasetTitle}`
+                msg = `${senderUserLink} ${subMsg} ${datasetLink}`
+            } else if (action === 'added') {
+                subMsg = `${action} you as a collaborator (${role}) for the dataset`
+                subject = `Collaborator role ${action} for dataset ${datasetTitle}`
+                msg = `${senderUserLink} ${action} ${subMsg} ${datasetLink}`
+            } else if (action === 'updated') {
+                subMsg = `${action} your collaborator role to "${role}" for the dataset`
+                subject = `Collaborator role ${action} for dataset ${datasetTitle}`
+                msg = `${senderUserLink} ${action} ${subMsg} ${datasetLink}`
+            }
+        }
+    } else if (
+        notification.object_type === 'team' ||
+        notification.object_type === 'topic'
+    ) {
+        const actionType = notification.activity_type.split('_')
+        let teamOrTopic
+
+        if (notification.object_type === 'team') {
+            teamOrTopic = await fetch(
+                `${env.CKAN_URL}/api/3/action/organization_show?id=${notification.object_id}`,
+                {
+                    headers: {
+                        Authorization: env.SYS_ADMIN_API_KEY,
+                    },
+                }
+            )
+        } else if (notification.object_type === 'topic') {
+            teamOrTopic = await fetch(
+                `${env.CKAN_URL}/api/3/action/group_show?id=${notification.object_id}`,
+                {
+                    headers: {
+                        Authorization: env.SYS_ADMIN_API_KEY,
+                    },
+                }
+            )
+        }
+
+        if (!teamOrTopic) {
+            throw new Error(
+                `Could not find team or topic with id ${notification.object_id}`
+            )
+        }
+
+        const teamOrTopicData = (await teamOrTopic.json()) as CkanResponse<
+            Team | Topic
+        >
+        const teamOrTopicName = teamOrTopicData.result.name
+        const teamOrTopicTitle = teamOrTopicData.result.title ?? teamOrTopicName
+        const objectLink = `<a href="${env.NEXTAUTH_URL}/${
+            notification.object_type === 'team' ? 'teams' : 'topics'
+        }/${teamOrTopicData.result.name}">${teamOrTopicTitle}</a>`
+
+        if (actionType[0] === 'member') {
+            const role = actionType[2]
+            const action = actionType[1]
+            if (action === 'removed') {
+                subMsg = `${action} you as a member${
+                    role !== 'member' ? ` (${role})` : ''
+                } from the ${notification.object_type}`
+                subject = `Membership role ${action} from ${notification.object_type} ${teamOrTopicTitle}`
+                msg = `${senderUserLink} ${subMsg} ${objectLink}`
+            } else if (action === 'added') {
+                subMsg = `${action} you as a member${
+                    role !== 'member' ? ` (${role})` : ''
+                } in the ${notification.object_type}`
+                subject = `Membership role ${action} to ${notification.object_type} ${teamOrTopicTitle}`
+                msg = `${senderUserLink} ${subMsg} ${objectLink}`
+            } else if (action === 'updated') {
+                subMsg = `${action} your member role to "${role}" in the ${notification.object_type}`
+                subject = `Membership role ${action} in ${notification.object_type} ${teamOrTopicTitle}`
+                msg = `${senderUserLink} ${subMsg} ${objectLink}`
+            }
+        }
+    }
+
+    const body = `
+        <p>Hi ${recipientUsername},</p>
+        <p>${msg}.</p>
+        <p>Have a great day!</p>
+        <p>Sent by the <a href="${env.NEXTAUTH_URL}">WRI OpenData Platform</a></p>
+    `
+
+    return {
+        subject: subject,
+        body: body,
+    }
+}
+
 export async function sendMemberNotifications(
     currentUserId: string,
     newMembers: User[],
@@ -918,11 +1054,14 @@ export async function sendMemberNotifications(
     const addedMembers = findAddedMembers(newMembers, existingMembers)
     const removedMembers = findRemovedMembers(newMembers, existingMembers)
     const updatedMembers = findUpdatedMembers(newMembers, existingMembers)
+    const sendType = ['team', 'topic'].includes(objectType)
+        ? 'member'
+        : 'collaborator'
 
     for (const user of addedMembers) {
         await sendNotification(
             user,
-            `member_added_${user.capacity}`,
+            `${sendType}_added_${user.capacity}`,
             objectType,
             teamOrTopicId,
             currentUserId
@@ -932,7 +1071,7 @@ export async function sendMemberNotifications(
     for (const user of removedMembers) {
         await sendNotification(
             user,
-            `member_removed_${user.capacity}`,
+            `${sendType}_removed_${user.capacity}`,
             objectType,
             teamOrTopicId,
             currentUserId
@@ -942,7 +1081,7 @@ export async function sendMemberNotifications(
     for (const user of updatedMembers) {
         await sendNotification(
             user,
-            `member_updated_${user.capacity}`,
+            `${sendType}_updated_${user.capacity}`,
             objectType,
             teamOrTopicId,
             currentUserId
@@ -955,7 +1094,8 @@ async function sendNotification(
     changeType: string,
     objectType: string,
     teamOrTopicId: string,
-    currentUserId: string
+    currentUserId: string,
+    includeEmail = true
 ) {
     if (user.name !== undefined) {
         const userObj = await getUser({
@@ -971,6 +1111,24 @@ async function sendNotification(
                 teamOrTopicId,
                 true
             )
+            if (includeEmail) {
+                const senderUserObj = await getUser({
+                    userId: currentUserId,
+                    apiKey: env.SYS_ADMIN_API_KEY,
+                })
+                if (senderUserObj) {
+                    const email = await generateMemberEmail(
+                        userObj,
+                        senderUserObj,
+                        notification as NotificationType
+                    )
+                    await sendEmail(
+                        userObj.email ?? '',
+                        email.subject,
+                        email.body
+                    )
+                }
+            }
         }
     }
 }
