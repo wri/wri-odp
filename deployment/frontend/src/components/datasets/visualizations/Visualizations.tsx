@@ -2,7 +2,7 @@ import { Tab } from '@headlessui/react'
 import { VisualizationTabs } from './VisualizationTabs'
 import MapView from './MapView'
 import ChartView from './ChartView'
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { WriDataset } from '@/schema/ckan.schema'
 import { DataExplorer } from '@/components/data-explorer/DataExplorer'
@@ -22,15 +22,30 @@ export default function Visualizations({
     tabularResource: TabularResource | null
 }) {
     const router = useRouter()
+    const [prevTabularResource, setPrevTabularResource] =
+        useState(tabularResource)
+    const [selectedIndex, setSelectedIndex] = useState(0)
     const tabs = [
         { name: 'Map View', enabled: true },
         { name: 'Tabular View', enabled: !!tabularResource },
         { name: 'Chart View', enabled: true },
-    ].filter((tab) => tab.enabled)
+    ]
+
+    console.log('tabularResource', tabularResource)
+    console.log('prevTabularResource', prevTabularResource)
+    if (!tabularResource && prevTabularResource) {
+        setPrevTabularResource(null)
+        setSelectedIndex(selectedIndex === 2 ? 2 : 0)
+    }
+    if (tabularResource && !prevTabularResource) {
+        setPrevTabularResource(tabularResource)
+        setSelectedIndex(1)
+    }
 
     return (
         <div className="h-full grow flex flex-col">
             <Tab.Group
+                selectedIndex={selectedIndex}
                 onChange={(index) => {
                     router.replace(
                         {
@@ -39,6 +54,7 @@ export default function Visualizations({
                         undefined,
                         { shallow: true }
                     )
+                    setSelectedIndex(index)
                 }}
             >
                 <Tab.List as="nav" className="flex  w-full">
@@ -48,13 +64,11 @@ export default function Visualizations({
                     <Tab.Panel>
                         <MapView setIsAddLayers={setIsAddLayers} />
                     </Tab.Panel>
-                    {tabularResource && (
-                        <Tab.Panel className="h-full grow flex flex-col justify-center">
-                            <DataExplorer
-                                tabularResource={tabularResource}
-                            />
-                        </Tab.Panel>
-                    )}
+                    <Tab.Panel className="h-full grow flex flex-col justify-center">
+                        {tabularResource && (
+                            <DataExplorer tabularResource={tabularResource} />
+                        )}
+                    </Tab.Panel>
                     <Tab.Panel>
                         <ChartView />
                     </Tab.Panel>

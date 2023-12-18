@@ -145,10 +145,7 @@ export default function DatasetPage(
     )
 
     const [tabularResource, setTabularResource] =
-        useState<TabularResource | null>({
-            provider: 'datastore',
-            id: '68563b73-f09a-4b93-b8ce-7aa87ebc68d4',
-        })
+        useState<TabularResource | null>(null)
 
     const index = new Index({
         tokenize: 'full',
@@ -232,8 +229,8 @@ export default function DatasetPage(
                         ) : (
                             <>
                                 <DatasetHeader
-                                    tabularResource={tabularResource}
                                     dataset={datasetData}
+                                    tabularResource={tabularResource}
                                     setTabularResource={setTabularResource}
                                 />
                                 <div className="px-4 sm:px-6">
@@ -255,6 +252,12 @@ export default function DatasetPage(
                                                     <DataFiles
                                                         dataset={datasetData}
                                                         index={index}
+                                                        tabularResource={
+                                                            tabularResource
+                                                        }
+                                                        setTabularResource={
+                                                            setTabularResource
+                                                        }
                                                     />
                                                 </Tab.Panel>
                                                 <Tab.Panel as="div">
