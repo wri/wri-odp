@@ -5,7 +5,6 @@ import type { IRowProfile } from '../_shared/RowProfile'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { NotificationType } from '@/schema/notification.schema'
 import Image from 'next/image'
-import { set } from 'lodash'
 import Link from 'next/link'
 
 function Card({
@@ -85,7 +84,7 @@ function Card({
                             </Link>
                             {rowProfile?.msg}{' '}
                             <Link
-                                href={`/datasets/${rowProfile?.objectIdName}`}
+                                href={`/${rowProfile?.object_type}s/${rowProfile?.objectIdName}`}
                                 className="group-hover:underline"
                             >
                                 {rowProfile?.object_name}
@@ -123,6 +122,9 @@ export default function NotificationCard({
                     setSelected={setSelected}
                 />
             }
+            className={`${
+                selected.includes(rowProfile.id) ? 'bg-slate-100' : ''
+            }`}
         />
     )
 }

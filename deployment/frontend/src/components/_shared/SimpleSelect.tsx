@@ -43,11 +43,12 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
             control={control}
             name={name}
             defaultValue={
-                options.find((option) => option.default) ?? {
+                options.find((option) => option.default) ??
+                ({
                     value: '',
                     label: '',
-                } as PathValue<T, Path<T> & Option<V>>
-              }
+                } as PathValue<T, Path<T> & Option<V>>)
+            }
             render={({ field: { onChange: setSelected, value: selected } }) => (
                 <Listbox
                     value={selected}
@@ -83,6 +84,9 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                     >
                                         {selected && selected.label
                                             ? selected.label
+                                                  .charAt(0)
+                                                  .toUpperCase() +
+                                              selected.label.slice(1)
                                             : placeholder}
                                     </span>
                                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">

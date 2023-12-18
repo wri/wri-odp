@@ -30,3 +30,4 @@ The table of contents in the READMEs are generated using generated using [DocToc
 Then, to update the table of contents in a markdown file, for example, `README.md`, run:
 
     doctoc README.md
+
