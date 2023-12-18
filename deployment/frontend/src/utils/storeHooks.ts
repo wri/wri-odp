@@ -15,6 +15,15 @@ export const useIsEmbeddingMap = () => {
     return { isEmbedding }
 }
 
+export const useThreshold = () => {
+    const { threshold, setThreshold } = useStore((store) => ({
+        threshold: store.mapView.threshold,
+        setThreshold: store.setThreshold,
+    }))
+
+    return { threshold, setThreshold }
+}
+
 export const useIsAddingLayers = () => {
     const { isAddingLayers, setIsAddingLayers } = useStore((store) => ({
         isAddingLayers: store.mapView.isAddingLayers,

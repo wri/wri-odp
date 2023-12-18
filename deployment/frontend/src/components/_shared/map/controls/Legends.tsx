@@ -18,6 +18,7 @@ import { LegendItemTypes } from '@/components/vizzuality/components'
 // @ts-ignore
 import { LegendItemTimeline } from 'old-vizzuality-components'
 import { type ActiveLayerGroup } from '@/interfaces/state.interface'
+import LegendItemButtonThreshold from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonThreshold'
 
 export function Legends() {
     const { data: layerGroups } = useLayerGroupsFromRW()
@@ -70,6 +71,7 @@ export function Legends() {
                                 toolbar={
                                     <LegendItemToolbar>
                                         <LegendItemButtonLayers />
+                                        {/* <LegendItemButtonThreshold /> */}
                                         <LegendItemButtonOpacity />
                                         <LegendItemButtonVisibility />
                                     </LegendItemToolbar>

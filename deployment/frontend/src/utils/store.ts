@@ -22,11 +22,6 @@ type UseStoreState = typeof initializeStore extends (
     ? T
     : never
 
-interface _State {
-    dataset: null
-    mapView: State & Layers
-}
-
 const getDefaultInitialState = () => {
     const initialState: State = {
         dataset: null,
@@ -57,6 +52,7 @@ const getDefaultInitialState = () => {
                 options: {} as Record<string, unknown>,
             },
             isDrawing: undefined,
+            threshold: 30,
         },
     }
     return initialState
@@ -78,6 +74,10 @@ export const initializeStore = (preloadedState: any = {}) => {
                 },
             },
             (set, get) => ({
+                setThreshold: (threshold: number) => {
+                    const prev = get()
+                    set({ ...prev, mapView: { ...prev.mapView, threshold } })
+                },
                 setIsEmbedding: (isEmbedding: boolean) => {
                     const prev = get()
                     set({

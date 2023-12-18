@@ -6,7 +6,7 @@ import type {
 } from "@vizzuality/layer-manager";
 import omit from "lodash/omit";
 
-export class GeeProvider implements ProviderMaker {
+export class GfwProvider implements ProviderMaker {
   public name = "gfw";
 
   private getTilerUrl = (layer: LayerSpec): string | Error => {
