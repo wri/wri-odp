@@ -154,9 +154,14 @@ describe("Create dataset", () => {
 
   it("Should show the new member", () => {
     cy.visit("/datasets/" + dataset);
-    cy.contains("Collaborators").click();
-    cy.contains(user_email_2);
-  });
+    cy.contains('Collaborators').click()
+    cy.contains(user_email_2)
+    cy.logout();
+    cy.login(user_2, "test_user_2");
+    cy.visit("/dashboard/notifications");
+    cy.contains(ckanUserName);
+    cy.contains(" added you as a collaborator (member) for the dataset");
+  })
 
   after(() => {
     cy.deleteOrganizationAPI(org);

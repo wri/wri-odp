@@ -1,50 +1,52 @@
 import {
     UseFieldArrayRemove,
-    UseFormRegister,
     UseFormReturn,
     useFieldArray,
 } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { DatasetFormType } from '@/schema/dataset.schema'
 import { api } from '@/utils/api'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { MinusCircleIcon } from '@heroicons/react/24/outline'
-import { InputGroup } from './InputGroup'
+import { InputGroup } from '../../datasets/admin/metadata/InputGroup'
 import { match, P } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
 import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { capacityOptions } from '../formOptions'
-import { WriDataset } from '@/schema/ckan.schema'
+import { capacityOptions } from '../../datasets/admin/formOptions'
 import notify from '@/utils/notify'
+import { RouterOutput } from '@/server/api/root'
+import { TopicFormType } from '@/schema/topic.schema'
+import { watch } from 'fs'
 
-export function Collaborators({
-    dataset,
+type TopicOutput = RouterOutput['topics']['getTopic']
+
+export function Members({
+    topic,
     formObj,
 }: {
-    dataset: WriDataset
-    formObj: UseFormReturn<DatasetFormType>
+    topic: TopicOutput
+    formObj: UseFormReturn<TopicFormType>
 }) {
-    const { control, watch, register } = formObj
-    const { fields, append, prepend, remove, swap, move, insert } =
-        useFieldArray({
-            control, // control props comes from useForm (optional: if you are using FormContext)
-            name: 'collaborators',
-        })
+    const { control } = formObj
+    const { fields, append, remove } = useFieldArray({
+        control, // control props comes from useForm (optional: if you are using FormContext)
+        name: 'members',
+    })
+
     return (
         <div className="mx-auto w-full max-w-[1380px] sm:px-6 xxl:px-0">
             <div className="w-full border-b border-blue-800 bg-white shadow">
                 <div className="col-span-full flex w-full justify-between border-b border-stone-50 py-5 px-4 sm:px-6">
                     <h3 className="flex w-full items-center gap-x-2 font-acumin text-xl font-semibold text-blue-800">
-                        Collaborators
+                        Members
                     </h3>
                 </div>
                 <div className="py-4">
                     <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 pb-8">
                         <div className="flex flex-col gap-y-4">
                             {fields.map((field, index) => (
-                                <CollaboratorForm
-                                    dataset={dataset}
+                                <MemberForm
+                                    topic={topic}
                                     key={field.id}
                                     index={index}
                                     remove={remove}
@@ -53,10 +55,10 @@ export function Collaborators({
                             ))}
                         </div>
                         <button
-              type="button"
+                            type="button"
                             onClick={() =>
                                 append({
-                                    package_id: dataset.id,
+                                    topic_id: topic.id as string,
                                     user: {
                                         value: '',
                                         label: '',
@@ -71,8 +73,7 @@ export function Collaborators({
                         >
                             <PlusCircleIcon className="h-5 w-5 text-amber-400 mt-6" />
                             <span className="font-['Acumin Pro SemiCondensed'] text-lg font-normal leading-tight text-black mt-6">
-                                Add {fields.length > 0 ? 'another' : ''}{' '}
-                                collaborator
+                                Add {fields.length > 0 ? 'another' : ''} member
                             </span>
                         </button>
                     </div>
@@ -82,28 +83,19 @@ export function Collaborators({
     )
 }
 
-export function CollaboratorForm({
+export function MemberForm({
     formObj,
     index,
     remove,
-    dataset,
+    topic,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<TopicFormType>
     index: number
     remove: UseFieldArrayRemove
-    dataset: WriDataset
+    topic: any
 }) {
-    const { register, watch } = formObj
-    const allUsers = api.dataset.getPossibleCollaborators.useQuery()
-    const removeCollaborator = api.dataset.removeCollaborator.useMutation({
-        onSuccess: async () => {
-            notify(`Successfully removed the collaborator`, 'success')
-            remove(index)
-        },
-        onError: (error) => {
-            notify(`Couldnt remove collaborator: ${error.message}`, 'error')
-        },
-    })
+    const allUsers = api.topics.getPossibleMembers.useQuery(topic)
+
     return (
         <div className="flex items-center gap-x-2">
             <div className="grid grow grid-cols-1 items-start gap-x-24 md:grid-cols-2">
@@ -122,25 +114,12 @@ export function CollaboratorForm({
                         ))
                         .with({ isSuccess: true, data: P.select() }, (data) => (
                             <SimpleCombobox
-                                name={`collaborators.${index}.user`}
+                                name={`members.${index}.user`}
                                 formObj={formObj}
-                                options={data
-                                    .filter(
-                                        (user) =>
-                                            user.id !== dataset.creator_user_id
-                                    )
-                                    .filter(
-                                        (user) =>
-                                            !watch('collaborators').some(
-                                                (collaborator) =>
-                                                    collaborator.user.value ===
-                                                    user.id
-                                            )
-                                    )
-                                    .map((user) => ({
-                                        label: user.name,
-                                        value: user.id,
-                                    }))}
+                                options={data.map((user) => ({
+                                    value: user.id,
+                                    label: user.name,
+                                }))}
                                 placeholder="Select a user"
                             />
                         ))
@@ -153,13 +132,13 @@ export function CollaboratorForm({
                 <InputGroup label="Capacity">
                     <SimpleSelect
                         formObj={formObj}
-                        name={`collaborators.${index}.capacity`}
+                        name={`members.${index}.capacity`}
                         placeholder="Select capacity"
                         options={capacityOptions}
                     />
                 </InputGroup>
             </div>
-            <DefaultTooltip content="Remove collaborator">
+            <DefaultTooltip content="Remove member">
                 <MinusCircleIcon
                     onClick={() => remove(index)}
                     className="h-5 w-5 text-red-600"
