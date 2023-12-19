@@ -47,7 +47,6 @@ export const env = createEnv({
      * `NEXT_PUBLIC_`.
      */
     client: {
-        NEXT_PUBLIC_CKAN_URL: z.string(),
     },
 
     /**
@@ -60,7 +59,6 @@ export const env = createEnv({
         NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
         NEXTAUTH_URL: process.env.NEXTAUTH_URL,
         CKAN_URL: process.env.CKAN_URL,
-        NEXT_PUBLIC_CKAN_URL: process.env.NEXT_PUBLIC_CKAN_URL,
         S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
         S3_SECRET_KEY_ID: process.env.S3_SECRET_KEY_ID,
         S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
