@@ -29,7 +29,6 @@ export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
     close();
   }, [layers?.length]);
 
-  console.log("layers", layers)
   const onClickLayer = useCallback(
     ({
       features,
@@ -88,7 +87,6 @@ export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
     [layers]
   );
 
-  console.log(layersInfo)
   return !!coordinates ? (
     <Popup
       {...coordinates}

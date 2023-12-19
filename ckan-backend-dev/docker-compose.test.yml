@@ -44,6 +44,7 @@ services:
         - NEXTAUTH_SECRET=secret
         - NEXTAUTH_URL=http://localhost:3000
         - CKAN_URL=http://ckan-dev:5000
+        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000
         - AZURE_AD_CLIENT_ID="ffffffff-ffff-ffff-ffff-ffffffffffff"
         - AZURE_AD_CLIENT_SECRET="ffffffff-ffff-ffff-ffff-ffffffffffff"
         - AZURE_AD_TENANT_ID="ffffffff-ffff-ffff-ffff-ffffffffffff"

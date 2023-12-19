@@ -59,7 +59,6 @@ const providers: Record<string, ProviderMaker["handleData"]> = {
 };
 
 const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
-  console.log("layers", layers)
   const { current: map } = useMap();
   const { currentLayers } = useLayerStates();
   const parsedLayers = useMemo(

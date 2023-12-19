@@ -40,6 +40,7 @@ ckan:
       CKAN___SCHEMING__GROUP_SCHEMAS: ckanext.scheming:custom_group_with_status.json
       CKAN___SCHEMING__PRESETS: ckanext.wri.schema:presets.json
       CKANEXT__AUTH__INCLUDE_FRONTEND_LOGIN_TOKEN: "True"
+      CKAN__DATASTORE__SQLSEARCH__ENABLED: "True"
     hpa:
       enable: true
       minReplicas: 2

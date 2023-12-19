@@ -29,6 +29,7 @@ import { Provider, useCreateStore } from '@/utils/store'
 import { type LayerState } from '@/interfaces/state.interface'
 import { decodeMapParam } from '@/utils/urlEncoding'
 import SyncUrl from '@/components/_shared/map/SyncUrl'
+import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -123,7 +124,9 @@ export default function DatasetPage(
         { id: datasetName },
         { retry: 0, initialData: dataset }
     )
+
     if (!datasetData && datasetError) router.replace('/datasets/404')
+
     const relatedDatasets = api.dataset.getAllDataset.useQuery({
         fq: {
             groups:
@@ -131,39 +134,23 @@ export default function DatasetPage(
                 '',
         },
     })
+
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
         { id: datasetName },
-        { enabled: !!session.data?.user.apikey }
+        { enabled: !!session.data?.user.apikey, retry: false }
     )
     const issues = api.dataset.getDatasetIssues.useQuery(
         { id: datasetName },
-        { enabled: !!session.data?.user.apikey }
+        { enabled: !!session.data?.user.apikey, retry: false }
     )
 
-    const links = [
-        { label: 'Explore Data', url: '/search', current: false },
-        {
-            label: datasetData?.title ?? datasetData?.name ?? '',
-            url: `/datasets/${datasetData?.title ?? datasetData?.name ?? ''}`,
-            current: true,
-        },
-    ]
-    if (isLoading || !datasetData) {
-        return (
-            <>
-                <Header />
-                <Breadcrumbs links={links} />
-                <div className="flex flex-col items-center justify-center w-full h-[90vh]">
-                    <Spinner /> Loading
-                </div>
-            </>
-        )
-    }
+    const [tabularResource, setTabularResource] =
+        useState<TabularResource | null>(null)
 
     const index = new Index({
         tokenize: 'full',
     })
-    datasetData.resources?.forEach((resource) => {
+    datasetData?.resources?.forEach((resource) => {
         index.add(
             resource.id,
             `${resource.description} ${resource.format} ${resource.url} ${resource.title}`
@@ -186,7 +173,7 @@ export default function DatasetPage(
     const tabs = [
         { name: 'Data files', enabled: true },
         { name: 'About', enabled: true },
-        { name: 'Methodology', enabled: !!datasetData.methodology },
+        { name: 'Methodology', enabled: !!datasetData?.methodology },
         { name: 'Related Datasets', enabled: true },
         { name: 'Contact', enabled: true },
         { name: 'API', enabled: true },
@@ -200,6 +187,27 @@ export default function DatasetPage(
             enabled: issues.data && issues.data.length > 0,
         },
     ]
+
+    const links = [
+        { label: 'Explore Data', url: '/search', current: false },
+        {
+            label: datasetData?.title ?? datasetData?.name ?? '',
+            url: `/datasets/${datasetData?.title ?? datasetData?.name ?? ''}`,
+            current: true,
+        },
+    ]
+
+    if (isLoading || !datasetData) {
+        return (
+            <>
+                <Header />
+                <Breadcrumbs links={links} />
+                <div className="flex flex-col items-center justify-center w-full h-[90vh]">
+                    <Spinner /> Loading
+                </div>
+            </>
+        )
+    }
 
     return (
         <>
@@ -220,7 +228,11 @@ export default function DatasetPage(
                             </div>
                         ) : (
                             <>
-                                <DatasetHeader dataset={datasetData} />
+                                <DatasetHeader
+                                    dataset={datasetData}
+                                    tabularResource={tabularResource}
+                                    setTabularResource={setTabularResource}
+                                />
                                 <div className="px-4 sm:px-6">
                                     <Tab.Group as="div">
                                         <Tab.List
@@ -240,6 +252,12 @@ export default function DatasetPage(
                                                     <DataFiles
                                                         dataset={datasetData}
                                                         index={index}
+                                                        tabularResource={
+                                                            tabularResource
+                                                        }
+                                                        setTabularResource={
+                                                            setTabularResource
+                                                        }
                                                     />
                                                 </Tab.Panel>
                                                 <Tab.Panel as="div">
@@ -320,6 +338,7 @@ export default function DatasetPage(
                         <LazyViz
                             setIsAddLayers={setIsAddLayers}
                             dataset={datasetData}
+                            tabularResource={tabularResource}
                         />
                     }
                 />
