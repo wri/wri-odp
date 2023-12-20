@@ -1,8 +1,7 @@
 import { Tab } from '@headlessui/react'
 import { VisualizationTabs } from './VisualizationTabs'
 import MapView from './MapView'
-import ChartView from './ChartView'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { useRouter } from 'next/router'
 import { WriDataset } from '@/schema/ckan.schema'
 import { DataExplorer } from '@/components/data-explorer/DataExplorer'
@@ -28,7 +27,6 @@ export default function Visualizations({
     const tabs = [
         { name: 'Map View', enabled: true },
         { name: 'Tabular View', enabled: !!tabularResource },
-        { name: 'Chart View', enabled: true },
     ]
 
     if (!tabularResource && prevTabularResource) {
@@ -66,9 +64,6 @@ export default function Visualizations({
                         {tabularResource && (
                             <DataExplorer tabularResource={tabularResource} />
                         )}
-                    </Tab.Panel>
-                    <Tab.Panel>
-                        <ChartView />
                     </Tab.Panel>
                 </Tab.Panels>
             </Tab.Group>
