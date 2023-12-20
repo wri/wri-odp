@@ -6,9 +6,7 @@ import {
 } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import {
-    getUserOrganizations,
     getAllDatasetFq,
-    getUserGroups,
     getOneDataset,
     getAllUsers,
     upsertCollaborator,
@@ -46,6 +44,7 @@ import {
     RwErrorResponse,
 } from '@/interfaces/rw.interface'
 import { sendMemberNotifications } from '@/utils/apiUtils'
+import { TRPCError } from '@trpc/server'
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -180,9 +179,14 @@ export async function fetchDatasetCollaborators(
     const collaborators: CkanResponse<Collaborator[]> =
         await collaboratorsRes.json()
     if (!collaborators.success && collaborators.error) {
+        if (collaboratorsRes.status === 403)
+            throw new TRPCError({
+                code: 'FORBIDDEN',
+                message: 'You are not authorized to perform this action',
+            })
         if (collaborators.error.message)
-            throw Error(collaborators.error.message)
-        throw Error(JSON.stringify(collaborators.error))
+            throw new TRPCError({code: 'BAD_REQUEST', message: collaborators.error.message})
+        throw new TRPCError({code: 'BAD_REQUEST', message: JSON.stringify(collaborators.error)})
     }
 
     const collaboratorsWithDetails = await Promise.all(

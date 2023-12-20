@@ -28,6 +28,7 @@ import { getServerAuthSession } from '@/server/auth'
 import { Provider, useCreateStore } from '@/utils/store'
 import { type LayerState } from '@/interfaces/state.interface'
 import { decodeMapParam } from '@/utils/urlEncoding'
+import { match } from 'ts-pattern'
 import SyncUrl from '@/components/_shared/map/SyncUrl'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
 
@@ -128,16 +129,23 @@ export default function DatasetPage(
     if (!datasetData && datasetError) router.replace('/datasets/404')
 
     const relatedDatasets = api.dataset.getAllDataset.useQuery({
-        fq: {
-            groups:
-                datasetData?.groups?.map((group) => group.name).join(' OR ') ??
-                '',
-        },
+        fq:
+            datasetData?.groups && datasetData.groups.length > 0
+                ? {
+                      groups:
+                          datasetData?.groups
+                              ?.map((group) => group.name)
+                              .join(' OR ') ?? '',
+                  }
+                : {},
     })
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
         { id: datasetName },
-        { enabled: !!session.data?.user.apikey, retry: false }
+        {
+            enabled: !!session.data?.user.apikey,
+            retry: false,
+        }
     )
     const issues = api.dataset.getDatasetIssues.useQuery(
         { id: datasetName },
@@ -179,7 +187,7 @@ export default function DatasetPage(
         { name: 'API', enabled: true },
         {
             name: 'Collaborators',
-            enabled: collaborators.data && collaborators.data.length > 0,
+            enabled: collaborators.data,
         },
         {
             name: 'Issues',
@@ -303,17 +311,15 @@ export default function DatasetPage(
                                                 <Tab.Panel as="div">
                                                     <API />
                                                 </Tab.Panel>
-                                                {collaborators.data &&
-                                                    collaborators.data.length >
-                                                        0 && (
-                                                        <Tab.Panel as="div">
-                                                            <Members
-                                                                members={
-                                                                    collaborators.data
-                                                                }
-                                                            />
-                                                        </Tab.Panel>
-                                                    )}
+                                                {collaborators.data && (
+                                                    <Tab.Panel as="div">
+                                                        <Members
+                                                            members={
+                                                                collaborators.data
+                                                            }
+                                                        />
+                                                    </Tab.Panel>
+                                                )}
                                                 {issues.data &&
                                                     issues.data.length > 0 && (
                                                         <Tab.Panel as="div">

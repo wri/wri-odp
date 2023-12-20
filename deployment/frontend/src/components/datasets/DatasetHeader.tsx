@@ -129,9 +129,10 @@ export function DatasetHeader({
     const [open, setOpen] = useState(false)
     const [fopen, setFOpen] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const session = useSession()
     const { data, isLoading, refetch } = api.dataset.isFavoriteDataset.useQuery(
         dataset?.id as string,
-        { retry: false }
+        { retry: false, enabled: !!session.data?.user }
     )
     const addToFavorites = api.dataset.followDataset.useMutation({
         onSuccess: async (data) => {
@@ -159,7 +160,6 @@ export function DatasetHeader({
         },
         onError: (error) => setErrorMessage(error.message),
     })
-    const session = useSession()
     const created_at = new Date(dataset?.metadata_created ?? '')
     const last_updated = new Date(dataset?.metadata_modified ?? '')
     const options = {
@@ -501,7 +501,7 @@ export function DatasetHeader({
                         href={dataset?.technical_notes}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-x-1 pt-4"
+                        className="flex items-center gap-x-1 pt-4 w-fit"
                     >
                         <LinkIcon className="h-4 w-4 text-wri-green" />
                         <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
