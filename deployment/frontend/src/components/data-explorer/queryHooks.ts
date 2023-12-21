@@ -19,7 +19,7 @@ export function useFields({ id, provider }: TabularResource) {
     if (provider === 'datastore') {
         return useQuery(['fields', id], async () => {
             const fieldsRes = await fetch(
-                `https://wri.dev.ckan.datopian.com/api/3/action/datastore_info`,
+                `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/datastore_info`,
                 {
                     method: 'POST',
                     headers: {
