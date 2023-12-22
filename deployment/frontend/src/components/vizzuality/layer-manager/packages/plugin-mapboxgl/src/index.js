@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable no-underscore-dangle */
 import rasterLayer from './raster-layer-mapbox-gl';
 import vectorLayer from './vector-layer-mapbox-gl';

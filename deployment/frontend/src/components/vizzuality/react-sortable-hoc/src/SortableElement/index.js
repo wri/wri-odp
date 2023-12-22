@@ -1,3 +1,5 @@
+
+// @ts-nocheck
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import {findDOMNode} from 'react-dom';

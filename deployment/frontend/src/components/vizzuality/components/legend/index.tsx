@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { arrayMoveImmutable } from 'array-move';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';

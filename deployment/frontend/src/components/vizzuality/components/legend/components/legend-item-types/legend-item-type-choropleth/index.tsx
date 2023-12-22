@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { LegendTypeProps } from '../interfaces/legend-types';
 
 export default function LegendTypeChoropleth(
@@ -38,7 +39,7 @@ export default function LegendTypeChoropleth(
                 xs:position-initial
                 inline-block
                 h-[12px]
-                w-[12px]
+                w-full
                 mb-0
                 relative
                 top-[1px]

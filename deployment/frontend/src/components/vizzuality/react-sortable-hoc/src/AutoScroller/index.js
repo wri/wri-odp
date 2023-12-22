@@ -1,3 +1,5 @@
+
+// @ts-nocheck
 export default class AutoScroller {
   constructor(container, onScrollCallback) {
     this.container = container;

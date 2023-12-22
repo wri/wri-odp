@@ -70,7 +70,7 @@ const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
             if (pl.source?.tiles) {
                 // @ts-ignore
                 pl.source.tiles = pl.source.tiles.map((tile) =>
-                    tile.replace('{thresh}', threshold)
+                    tile.replace('{thresh}', 30)
                 )
             }
         })

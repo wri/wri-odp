@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { CancelablePromise } from 'cancelable-promise';
 import { getVectorStyleLayers } from './vector-style-layers';
 

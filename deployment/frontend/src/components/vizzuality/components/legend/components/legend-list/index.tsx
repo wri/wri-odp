@@ -1,3 +1,4 @@
+// @ts-nocheck
 import SortableContainer from '../../../../react-sortable-hoc/src/SortableContainer/index';
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';

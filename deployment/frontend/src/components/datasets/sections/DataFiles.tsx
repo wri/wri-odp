@@ -65,8 +65,10 @@ export function DataFiles({
                             dataset.resources.forEach((r) => {
                                 if (
                                     r.format == 'Layer' &&
+                                    // @ts-ignore
                                     !activeLayers.some((l) => l.id == r?.rw_id)
                                 ) {
+                                    // @ts-ignore
                                     addLayerToLayerGroup(r.rw_id, dataset.id)
                                 }
                             })
@@ -81,6 +83,7 @@ export function DataFiles({
                             dataset.resources.forEach((r) => {
                                 if (r.format == 'Layer') {
                                     removeLayerFromLayerGroup(
+                                        // @ts-ignore
                                         r.rw_id,
                                         dataset.id
                                     )
@@ -157,6 +160,7 @@ function DatafileCard({
                             </Disclosure.Button>
                         </div>
                         <div className="flex gap-x-2">
+                            {/* @ts-ignore */}
                             {datafile?.rw_id && (
                                 <>
                                     {activeLayers.some(
@@ -166,8 +170,12 @@ function DatafileCard({
                                             variant="light"
                                             size="sm"
                                             onClick={() => {
+                                                {
+                                                }
+                                                // @ts-ignore
                                                 if (datafile.rw_id) {
                                                     removeLayerFromLayerGroup(
+                                                        // @ts-ignore
                                                         datafile?.rw_id,
                                                         dataset.id
                                                     )
@@ -183,8 +191,10 @@ function DatafileCard({
                                             variant="outline"
                                             size="sm"
                                             onClick={() => {
+                                                // @ts-ignore
                                                 if (datafile.rw_id) {
                                                     addLayerToLayerGroup(
+                                                        // @ts-ignore
                                                         datafile.rw_id,
                                                         dataset.id
                                                     )

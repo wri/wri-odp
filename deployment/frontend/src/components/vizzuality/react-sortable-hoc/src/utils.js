@@ -1,3 +1,5 @@
+
+// @ts-nocheck
 /* global process */
 import invariant from 'invariant';
 

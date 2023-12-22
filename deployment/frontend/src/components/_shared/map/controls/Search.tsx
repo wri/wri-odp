@@ -108,7 +108,7 @@ export default function Search({
         if (
             !isEmpty(bounds) &&
             !!bounds.bbox &&
-            bounds.bbox.every((b) => typeof b === 'number')
+            bounds.bbox.every((b: any) => typeof b === 'number')
         ) {
             handleFitBounds()
         }

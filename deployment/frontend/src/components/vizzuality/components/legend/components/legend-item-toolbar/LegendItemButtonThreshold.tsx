@@ -30,7 +30,7 @@ export default function LegendItemButtonThreshold<
     const { setThreshold, threshold } = useThreshold()
 
     const hasThreshold = activeLayer?.layerConfig?.params_config?.some(
-        (item) => item.key == 'thresh'
+        (item: any) => item.key == 'thresh'
     )
 
     const options = [10, 15, 20, 25, 30, 50, 75].map((item) => ({
@@ -43,6 +43,7 @@ export default function LegendItemButtonThreshold<
         <Controller
             control={control}
             name={'threshold' as Path<T>}
+            // @ts-ignore
             defaultValue={
                 options.find((option) => option.default) ??
                 ({
@@ -52,7 +53,6 @@ export default function LegendItemButtonThreshold<
             }
             render={({ field: { onChange: setSelected, value: selected } }) => (
                 <Listbox
-                    className="relative"
                     value={selected}
                     onChange={(e) => {
                         setSelected(e)

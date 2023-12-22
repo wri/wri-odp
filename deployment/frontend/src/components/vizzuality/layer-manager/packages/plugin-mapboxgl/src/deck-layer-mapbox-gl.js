@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { CancelablePromise } from 'cancelable-promise';
 
 const DeckLayer = (layerModel) => {

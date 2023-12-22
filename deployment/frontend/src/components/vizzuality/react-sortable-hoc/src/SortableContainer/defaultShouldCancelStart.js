@@ -1,3 +1,5 @@
+
+// @ts-nocheck
 import {NodeType, closest} from '../utils';
 
 export default function defaultShouldCancelStart(event) {

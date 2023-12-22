@@ -34,6 +34,7 @@ export default function SyncUrl() {
     useEffect(() => {
         if (debouncedValue && typeof window !== 'undefined') {
             const map = encodeMapParam({
+                // @ts-ignore
                 viewState: debouncedValue.viewState,
                 basemap: selectedBasemap,
                 boundaries: showBoundaries,

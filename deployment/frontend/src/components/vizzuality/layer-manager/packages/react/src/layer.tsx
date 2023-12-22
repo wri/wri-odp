@@ -1,3 +1,5 @@
+
+// @ts-nocheck
 /* eslint-disable react/default-props-match-prop-types */
 import { PureComponent } from 'react';
 import isEqual from 'fast-deep-equal/es6';

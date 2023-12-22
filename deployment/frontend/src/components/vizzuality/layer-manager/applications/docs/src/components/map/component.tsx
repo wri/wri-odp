@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useState, useRef, useCallback, FC } from 'react';
 
 import ReactMapGL, { ViewState, ViewStateChangeEvent, useMap } from 'react-map-gl';

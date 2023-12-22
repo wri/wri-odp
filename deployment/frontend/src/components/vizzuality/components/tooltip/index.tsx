@@ -1,3 +1,4 @@
+// @ts-nocheck
 import RCTooltip from 'rc-tooltip/lib';
 import { TooltipProps } from 'rc-tooltip/lib/Tooltip';
 

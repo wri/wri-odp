@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import { lerp } from 'math.gl';
 

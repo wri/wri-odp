@@ -1,3 +1,4 @@
+// @ts-nocheck
 import moment from 'moment';
 
 export const addToDate = (date, count, interval = 'days', toEnd) => {

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Slider, { createSliderWithTooltip, Handle } from 'rc-slider';

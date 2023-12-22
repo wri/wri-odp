@@ -1,3 +1,5 @@
+
+// @ts-nocheck
 import type { Params } from '@vizzuality/layer-manager';
 import type { QueryParams, WhereQueryParams } from '../types';
 

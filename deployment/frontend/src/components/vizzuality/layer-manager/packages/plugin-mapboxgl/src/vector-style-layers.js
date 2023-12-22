@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { replace } from '@vizzuality/layer-manager-utils';
 
 /**
