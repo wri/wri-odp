@@ -1,9 +1,8 @@
 import z from 'zod'
 
-const filterSchema = z
+export const filterObj = z
     .object({
-        column: z.string(),
-        operator: z.object({
+        operation: z.object({
             value: z.enum([
                 '=',
                 '!=',
@@ -21,13 +20,18 @@ const filterSchema = z
             label: z.string(),
         }),
         value: z.string(),
+        link: z.string().nullable(),
     })
     .transform((data) => {
-        if (['>', '<', '>=', '<='].includes(data.operator.value)) {
+        if (['>', '<', '>=', '<='].includes(data.operation.value)) {
             return { ...data, value: parseFloat(data.value) }
         }
         return data
     })
+
+export const filterSchema = z.object({
+  filters: z.array(filterObj),
+})
 
 const sortSchema = z.object({
     column: z.string(),
@@ -40,7 +44,7 @@ const paginationSchema = z.object({
 })
 
 export const querySchema = z.object({
-    filters: z.array(filterSchema),
+    filters: filterSchema,
     sort: z.array(sortSchema),
     pagination: paginationSchema,
     tableName: z.string(),
@@ -48,3 +52,5 @@ export const querySchema = z.object({
 
 export type QueryFormType = z.infer<typeof querySchema>
 export type PaginationType = z.infer<typeof paginationSchema>
+export type FilterFormType = z.infer<typeof filterSchema>
+export type FilterObjType = z.infer<typeof filterObj>

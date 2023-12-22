@@ -9,6 +9,8 @@ import { useQuery } from 'react-query'
 import { TabularResource } from '../datasets/visualizations/Visualizations'
 import { env } from '@/env.mjs'
 import { CkanResponse } from '@/schema/ckan.schema'
+import { FilterObjType } from './search.schema'
+import { DataExplorerColumnFilter } from './DataExplorer'
 
 export interface FieldsResponse {
     tableName: string
@@ -68,7 +70,7 @@ export function useNumberOfRows({
 }: {
     tableName: string
     datasetId: string
-    filters: ColumnFilter[]
+    filters: DataExplorerColumnFilter[]
     provider: string
     setPageCount: (updater: Updater<number>) => void
 }) {
@@ -76,10 +78,7 @@ export function useNumberOfRows({
         return api.datastore.getNumberOfRows.useQuery(
             {
                 resourceId: tableName,
-                filters: filters as {
-                    id: string
-                    value: { operation: string; value: string }
-                }[],
+                filters
             },
             {
                 keepPreviousData: true,
@@ -96,7 +95,7 @@ export function useNumberOfRows({
             tableName: tableName ?? '',
             filters: filters as {
                 id: string
-                value: { operation: string; value: string }
+                value: FilterObjType[]
             }[],
         },
         {
@@ -136,7 +135,7 @@ export function useTableData({
                 sorting,
                 filters: filters as {
                     id: string
-                    value: { operation: string; value: string }
+                    value: FilterObjType[]
                 }[],
             },
             {
@@ -155,7 +154,7 @@ export function useTableData({
             sorting,
             filters: filters as {
                 id: string
-                value: { operation: string; value: string }
+                value: FilterObjType[]
             }[],
         },
         {
