@@ -19,6 +19,7 @@ import { LegendItemTypes } from '@/components/vizzuality/components'
 import { LegendItemTimeline } from 'old-vizzuality-components'
 import { type ActiveLayerGroup } from '@/interfaces/state.interface'
 import LegendItemButtonThreshold from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonThreshold'
+import LegendItemTypesList from '@/components/vizzuality/components/legend/components/legend-item-types/LegendItemTypesList'
 
 export function Legends() {
     const { data: layerGroups } = useLayerGroupsFromRW()
@@ -118,7 +119,7 @@ export function Legends() {
                                     console.log(layer)
                                 }
                             >
-                                <LegendItemTypes />
+                                <LegendItemTypesList />
                                 <LegendItemTimeStep
                                     defaultStyles={LEGEND_TIMELINE_PROPERTIES}
                                     handleChange={() => console.log('Change')}
