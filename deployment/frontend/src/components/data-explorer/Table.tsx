@@ -359,11 +359,13 @@ function FilterColumn({ column }: { column: Column<any, unknown> }) {
             {({ open }) => (
                 <>
                     <Popover.Button>
-                        {open || column.getIsFiltered() ? (
-                            <FunnelIconSolid className="w-4 h-4" />
-                        ) : (
-                            <FunnelIconOutline className="w-4 h-4" />
-                        )}
+                        <DefaultTooltip content="Filter">
+                            {open || column.getIsFiltered() ? (
+                                <FunnelIconSolid className="w-4 h-4" />
+                            ) : (
+                                <FunnelIconOutline className="w-4 h-4" />
+                            )}
+                        </DefaultTooltip>
                     </Popover.Button>
                     <Transition
                         as={Fragment}

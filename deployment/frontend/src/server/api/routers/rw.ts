@@ -107,26 +107,24 @@ export const rwRouter = createTRPCRouter({
         .query(async ({ input }) => {
             try {
                 const { datasetId, tableName, filters, provider } = input
-                const filtersSql =
-                    filters.length > 0
-                        ? 'WHERE ' +
-                          filters
-                              .map(
-                                  (filter) =>
-                                      `( ${filter.value
-                                          .filter((v) => v.value !== '')
-                                          .map(
-                                              (v) =>
-                                                  `${filter.id} ${
-                                                      v.operation.value
-                                                  } '${v.value}' ${
-                                                      v.link ?? ''
-                                                  } `
-                                          )
-                                          .join('')} )`
-                              )
-                              .join(' AND ')
-                        : ''
+            const filtersSql =
+                filters.length > 0
+                    ? 'WHERE ' +
+                      filters
+                          .map(
+                              (filter) =>
+                                  `( ${filter.value
+                                      .filter((v) => v.value !== '')
+                                      .map(
+                                          (v) =>
+                                              `${filter.id} ${
+                                                  v.operation.value
+                                              } '${v.value}' ${v.link ?? ''} `
+                                      )
+                                      .join('')} )`
+                          )
+                          .join(' AND ')
+                    : ''
                 const numRowsRes = await fetch(
                     `https://api.resourcewatch.org/v1/query/${datasetId}?sql=SELECT COUNT(*) FROM ${tableName} ${filtersSql}`,
                     {
