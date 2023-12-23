@@ -22,12 +22,6 @@ export const filterObj = z
         value: z.string(),
         link: z.string().nullable(),
     })
-    .transform((data) => {
-        if (['>', '<', '>=', '<='].includes(data.operation.value)) {
-            return { ...data, value: parseFloat(data.value) }
-        }
-        return data
-    })
 
 export const filterSchema = z.object({
   filters: z.array(filterObj),

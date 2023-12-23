@@ -3,6 +3,8 @@ import {
     Table as TableType,
     Column,
     Header,
+    Updater,
+    VisibilityState,
 } from '@tanstack/react-table'
 import {
     ChevronLeftIcon,
@@ -22,7 +24,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { DefaultTooltip } from '../_shared/Tooltip'
 import { match } from 'ts-pattern'
-import { Popover, Transition } from '@headlessui/react'
+import { Menu, Popover, Transition } from '@headlessui/react'
 import { DebouncedInput } from '../_shared/SimpleInput'
 import {
     Controller,
@@ -44,7 +46,7 @@ type TableProps = {
     columnFilters: DataExplorerColumnFilter[]
 }
 
-export function Pagination({
+export function TopBar({
     table,
     numOfRows,
 }: {
@@ -60,33 +62,140 @@ export function Pagination({
                 <TableCellsIcon className="w-5 h-5 mr-2 text-blue-800" />
                 {numOfColumns} columns, {numOfRows} rows
             </span>
-            <div className="flex items-center gap-x-3">
-                <span className="flex text-sm">
-                    {pageIndex * pageSize + 1} - {(pageIndex + 1) * pageSize} of{' '}
-                    {numOfRows}
-                </span>
-                <button
-                    className={`w-4 h-4 ${
-                        !table.getCanPreviousPage()
-                            ? 'opacity-25'
-                            : 'opacity-100'
-                    }`}
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    <ChevronLeftIcon />
-                </button>
-                <button
-                    className={`w-4 h-4 ${
-                        !table.getCanNextPage() ? 'opacity-25' : 'opacity-100'
-                    }`}
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    <ChevronRightIcon />
-                </button>
+            <div>
+                <div className="flex items-center gap-x-3">
+                    <ToggleColumns table={table} />
+                    <span className="flex text-sm">
+                        {pageIndex * pageSize + 1} -{' '}
+                        {(pageIndex + 1) * pageSize} of {numOfRows}
+                    </span>
+                    <button
+                        className={`w-4 h-4 ${
+                            !table.getCanPreviousPage()
+                                ? 'opacity-25'
+                                : 'opacity-100'
+                        }`}
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        <ChevronLeftIcon />
+                    </button>
+                    <button
+                        className={`w-4 h-4 ${
+                            !table.getCanNextPage()
+                                ? 'opacity-25'
+                                : 'opacity-100'
+                        }`}
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        <ChevronRightIcon />
+                    </button>
+                </div>
             </div>
         </>
+    )
+}
+
+export function ToggleColumns({ table }: { table: TableType<any> }) {
+    const [q, setQ] = useState('')
+
+    const filteredItems =
+        q === ''
+            ? table.getAllLeafColumns()
+            : table.getAllLeafColumns().filter((column) => {
+                  return column.id.toLowerCase().includes(q.toLowerCase())
+              })
+    return (
+        <Popover as="div" className="relative inline-block text-left">
+            <Popover.Button>
+                <Button className="flex items-center justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs ">
+                    Show Columns
+                </Button>
+            </Popover.Button>
+            <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+            >
+                <Popover.Panel className="absolute overflow-hidden max-h-[200px] overflow-y-auto right-0 z-10 mt-2 py-4 w-64 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div className="px-4 pb-2">
+                        <div className="relative w-full rounded-md">
+                            <input
+                                className="shadow-wri-small block w-full rounded-md border-0 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 disabled:bg-gray-100 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm min-w-0"
+                                onChange={(e) => setQ(e.target.value)}
+                                value={q}
+                            />
+                            <div className="z-10 absolute inset-y-0 right-0 flex items-center pr-3">
+                                <DefaultTooltip content="Clear input">
+                                    <button
+                                        onClick={() => setQ('')}
+                                        className="w-4 h-4"
+                                    >
+                                        <XCircleIcon className="text-gray-400" />
+                                    </button>
+                                </DefaultTooltip>
+                            </div>
+                        </div>
+                    </div>
+                    {q === '' && (
+                        <div className="relative flex items-start px-4">
+                            <div className="flex h-6 items-center">
+                                <input
+                                    {...{
+                                        type: 'checkbox',
+                                        checked: table.getIsAllColumnsVisible(),
+                                        onChange:
+                                            table.getToggleAllColumnsVisibilityHandler(),
+                                    }}
+                                    name="toggle-all"
+                                    className="h-4 w-4 rounded border-gray-300 text-blue-800 focus:ring-blue-800"
+                                />
+                            </div>
+                            <div className="ml-3 text-sm leading-6">
+                                <label
+                                    htmlFor="toggle-all"
+                                    className="font-medium text-gray-900"
+                                >
+                                    Toggle All
+                                </label>
+                            </div>
+                        </div>
+                    )}
+                    {filteredItems.map((column) => (
+                        <div
+                            key={column.id}
+                            className="relative flex items-start px-4"
+                        >
+                            <div className="flex h-6 items-center">
+                                <input
+                                    {...{
+                                        type: 'checkbox',
+                                        checked: column.getIsVisible(),
+                                        onChange:
+                                            column.getToggleVisibilityHandler(),
+                                    }}
+                                    name={column.id}
+                                    className="h-4 w-4 rounded border-gray-300 text-blue-800 focus:ring-blue-800"
+                                />
+                            </div>
+                            <div className="ml-3 text-sm leading-6">
+                                <label
+                                    htmlFor={column.id}
+                                    className="font-medium text-gray-900 truncate"
+                                >
+                                    {column.id}
+                                </label>
+                            </div>
+                        </div>
+                    ))}
+                </Popover.Panel>
+            </Transition>
+        </Popover>
     )
 }
 

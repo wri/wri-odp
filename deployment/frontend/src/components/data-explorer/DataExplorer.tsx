@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ListOfFilters, Pagination, Table } from './Table'
+import { ListOfFilters, Table, TopBar } from './Table'
 import {
     ColumnFilter,
     ColumnFiltersState,
@@ -8,6 +8,7 @@ import {
     PaginationState,
     Updater,
     useReactTable,
+    VisibilityState,
 } from '@tanstack/react-table'
 import { useFields, useNumberOfRows, useTableData } from './queryHooks'
 import Spinner from '../_shared/Spinner'
@@ -65,18 +66,22 @@ function DataExplorerInner({
         pageIndex: 0,
         pageSize: 10,
     })
+    const [pageCount, setPageCount] = useState<number>(0)
+
     const [sorting, setSorting] = useState<ColumnSort[]>([])
+
     const [columnFilters, setColumnFilters] = useState<
         DataExplorerColumnFilter[]
     >([])
-    const [columnPinning, setColumnPinning] = useState({})
     const filteredColumns = columnFilters
         .map((filter) => ({
             ...filter,
             value: filter.value.filter((v) => v.value !== ''),
         }))
         .filter((filter) => filter.value.length > 0)
-    const [pageCount, setPageCount] = useState<number>(0)
+
+    const [columnPinning, setColumnPinning] = useState({})
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
     const { data: numOfRows } = useNumberOfRows({
         tableName,
@@ -140,18 +145,22 @@ function DataExplorerInner({
         ) => void,
         pageCount,
         onColumnPinningChange: setColumnPinning,
-
+        onColumnVisibilityChange: setColumnVisibility,
         state: {
             pagination,
             sorting,
             columnPinning,
+            columnVisibility,
             columnFilters: filteredColumns,
         },
     })
     return (
         <div className={`w-full relative grow flex flex-col gap-y-2 mt-6`}>
             <div className="flex flex-row justify-between items-center px-6">
-                <Pagination table={table} numOfRows={numOfRows} />
+                <TopBar
+                    table={table}
+                    numOfRows={numOfRows}
+                />
             </div>
             <div className="flex flex-row justify-between px-6">
                 <ListOfFilters
