@@ -199,14 +199,8 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
     )
 }
 
-export function Table({
-    table,
-    numOfRows,
-    isLoading,
-    columnFilters,
-}: TableProps) {
+export function Table({ table, isLoading }: TableProps) {
     const numOfColumns = table.getAllColumns().length
-    const [isSplit, setIsSplit] = useState(true)
     return (
         <div className="max-w-full grow flex border-t border-gray-200">
             <table className="block border-r border-gray-200 shadow">
@@ -406,9 +400,9 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
     })
     const { watch } = formObj
     useEffect(() => {
-        const subscription = watch((value, { name, type }) =>
+        const subscription = watch((value, { name, type }) => {
             column.setFilterValue(value.filters)
-        )
+        })
         return () => subscription.unsubscribe()
     }, [watch])
 
@@ -463,20 +457,24 @@ export default function Filters() {
                                 value: '=',
                             },
                             {
-                                label: 'Like',
-                                value: 'like',
+                                label: 'Not equal',
+                                value: '!=',
                             },
                             {
                                 label: 'Greater than',
                                 value: '>',
                             },
                             {
+                                label: 'Greater or equal than',
+                                value: '>=',
+                            },
+                            {
                                 label: 'Smaller than',
                                 value: '<',
                             },
                             {
-                                label: 'Different',
-                                value: '!=',
+                                label: 'Smaller or equal than',
+                                value: '<=',
                             },
                         ]}
                         placeholder="Select a filter"

@@ -66,6 +66,12 @@ function DataExplorerInner({
         pageIndex: 0,
         pageSize: 10,
     })
+    const resetPagination = () => {
+        setPagination({
+            pageIndex: 0,
+            pageSize: 10,
+        })
+    }
     const [pageCount, setPageCount] = useState<number>(0)
 
     const [sorting, setSorting] = useState<ColumnSort[]>([])
@@ -81,7 +87,9 @@ function DataExplorerInner({
         .filter((filter) => filter.value.length > 0)
 
     const [columnPinning, setColumnPinning] = useState({})
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+        {}
+    )
 
     const { data: numOfRows } = useNumberOfRows({
         tableName,
@@ -154,13 +162,11 @@ function DataExplorerInner({
             columnFilters: filteredColumns,
         },
     })
+    if (pageCount < pagination.pageIndex) resetPagination()
     return (
         <div className={`w-full relative grow flex flex-col gap-y-2 mt-6`}>
             <div className="flex flex-row justify-between items-center px-6">
-                <TopBar
-                    table={table}
-                    numOfRows={numOfRows}
-                />
+                <TopBar table={table} numOfRows={numOfRows ?? 0} />
             </div>
             <div className="flex flex-row justify-between px-6">
                 <ListOfFilters
