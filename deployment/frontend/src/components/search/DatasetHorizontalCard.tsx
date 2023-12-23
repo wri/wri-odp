@@ -34,9 +34,9 @@ export default function DatasetHorizontalCard({
         ...new Set(dataset.resources.map((r) => r.format).filter((f) => f)),
     ]
 
-    const hasMapView = dataset.resources.some((r) => r.format == 'Layer')
+    const hasMapView = dataset?.resources?.some((r) => r.format == 'Layer')
 
-    const hasTabularView = dataset.resources.some((r) => r.datastore_active)
+    const hasTabularView = dataset?.resources?.some((r) => r.datastore_active)
 
     return (
         <Link href={`/datasets/${dataset.name}`}>

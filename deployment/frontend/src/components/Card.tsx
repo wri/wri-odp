@@ -11,9 +11,9 @@ import Link from 'next/link'
 
 export default function Card({ dataset }: { dataset: WriDataset }) {
 
-    const hasMapView = dataset.resources.some((r) => r.format == 'Layer')
+    const hasMapView = dataset?.resources?.some((r) => r.format == 'Layer')
 
-    const hasTabularView = dataset.resources.some((r) => r.datastore_active)
+    const hasTabularView = dataset?.resources?.some((r) => r.datastore_active)
 
     return (
         <Link

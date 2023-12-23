@@ -13,9 +13,9 @@ export default function HighlightCard({
 }: {
     highlight: WriDataset
 }) {
-    const hasMapView = highlight.resources.some((r) => r.format == 'Layer')
+    const hasMapView = highlight?.resources?.some((r) => r.format == 'Layer')
 
-    const hasTabularView = highlight.resources.some((r) => r.datastore_active)
+    const hasTabularView = highlight?.resources?.some((r) => r.datastore_active)
 
     return (
         <Link

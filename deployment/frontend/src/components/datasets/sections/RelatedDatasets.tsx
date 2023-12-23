@@ -127,9 +127,9 @@ export default function DatasetCard({
         day: 'numeric',
     } as const
 
-    const hasMapView = dataset.resources.some((r) => r.format == 'Layer')
+    const hasMapView = dataset?.resources?.some((r) => r.format == 'Layer')
 
-    const hasTabularView = dataset.resources.some((r) => r.datastore_active)
+    const hasTabularView = dataset?.resources?.some((r) => r.datastore_active)
 
     return (
         <div className="font-acumin gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100">
