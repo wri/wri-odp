@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "composite": false,
+    "rootDir": "."
+  },
+  "include": ["src", "types.d.ts"]
+}

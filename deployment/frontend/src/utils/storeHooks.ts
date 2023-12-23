@@ -1,104 +1,145 @@
-import { shallow } from "zustand/shallow";
-import { useStore } from "./store";
+import { shallow } from 'zustand/shallow'
+import { useStore } from './store'
+
+export const useDataset = () => {
+    const { dataset } = useStore((store) => ({ dataset: store.dataset }))
+
+    return { dataset }
+}
+
+export const useIsEmbeddingMap = () => {
+    const { isEmbedding } = useStore((store) => ({
+        isEmbedding: store.mapView.isEmbedding,
+    }))
+
+    return { isEmbedding }
+}
+
+export const useThreshold = () => {
+    const { threshold, setThreshold } = useStore((store) => ({
+        threshold: store.mapView.threshold,
+        setThreshold: store.setThreshold,
+    }))
+
+    return { threshold, setThreshold }
+}
+
+export const useIsAddingLayers = () => {
+    const { isAddingLayers, setIsAddingLayers } = useStore((store) => ({
+        isAddingLayers: store.mapView.isAddingLayers,
+        setIsAddingLayers: store.setIsAddingLayers,
+    }))
+
+    return { isAddingLayers, setIsAddingLayers }
+}
 
 export const useMapState = () => {
-  const { viewState, setViewState } = useStore(
-    (store) => ({
-      viewState: store.viewState,
-      setViewState: store.setViewState,
-    }),
-    shallow
-  );
+    const { viewState, setViewState } = useStore(
+        (store) => ({
+            viewState: store.mapView.viewState,
+            setViewState: store.setViewState,
+        }),
+        shallow
+    )
 
-  return { viewState, setViewState };
-};
+    return { viewState, setViewState }
+}
 
 export const useBasemap = () => {
-  const { selectedBasemap, setBasemap } = useStore(
-    (store) => ({
-      selectedBasemap: store.basemap,
-      setBasemap: store.setBaseMap,
-    }),
-    shallow
-  );
+    const { selectedBasemap, setBasemap } = useStore(
+        (store) => ({
+            selectedBasemap: store.mapView.basemap,
+            setBasemap: store.setBaseMap,
+        }),
+        shallow
+    )
 
-  return { selectedBasemap, setBasemap };
-};
+    return { selectedBasemap, setBasemap }
+}
 
 export const useIsDrawing = () => {
-  const { isDrawing, setIsDrawing } = useStore(
-    (store) => ({
-      isDrawing: store.isDrawing,
-      setIsDrawing: store.setIsDrawing,
-    }),
-    shallow
-  );
+    const { isDrawing, setIsDrawing } = useStore(
+        (store) => ({
+            isDrawing: store.mapView.isDrawing,
+            setIsDrawing: store.setIsDrawing,
+        }),
+        shallow
+    )
 
-  return { isDrawing, setIsDrawing };
-};
+    return { isDrawing, setIsDrawing }
+}
 
 export const useLabels = () => {
-  const { selectedLabels, setLabels } = useStore(
-    (store) => ({
-      selectedLabels: store.labels,
-      setLabels: store.setLabels,
-    }),
-    shallow
-  );
+    const { selectedLabels, setLabels } = useStore(
+        (store) => ({
+            selectedLabels: store.mapView.labels,
+            setLabels: store.setLabels,
+        }),
+        shallow
+    )
 
-  return { selectedLabels, setLabels };
-};
+    return { selectedLabels, setLabels }
+}
 
 export const useBoundaries = () => {
-  const { showBoundaries, setShowBoundaries } = useStore(
-    (store) => ({
-      showBoundaries: store.boundaries,
-      setShowBoundaries: store.setBoundaries,
-    }),
-    shallow
-  );
+    const { showBoundaries, setShowBoundaries } = useStore(
+        (store) => ({
+            showBoundaries: store.mapView.boundaries,
+            setShowBoundaries: store.setBoundaries,
+        }),
+        shallow
+    )
 
-  return { showBoundaries, setShowBoundaries };
-};
+    return { showBoundaries, setShowBoundaries }
+}
 
 export const useActiveLayerGroups = () => {
-  const {
-    activeLayerGroups,
-    replaceLayersGroups,
-    updateLayerGroup,
-    addLayerGroup,
-    removeLayerGroup,
-  } = useStore((store) => ({
-    activeLayerGroups: store.activeLayerGroups,
-    replaceLayersGroups: store.replaceLayerGroups,
-    updateLayerGroup: store.updateLayerGroup,
-    addLayerGroup: store.addLayerGroup,
-    removeLayerGroup: store.removeLayerGroup,
-  }));
+    const {
+        activeLayerGroups,
+        replaceLayersGroups,
+        updateLayerGroup,
+        addLayerGroup,
+        removeLayerGroup,
+        removeLayerFromLayerGroup,
+        addLayerToLayerGroup,
+        replaceLayersForLayerGroup,
+    } = useStore((store) => ({
+        activeLayerGroups: store.mapView.activeLayerGroups,
+        replaceLayersGroups: store.replaceLayerGroups,
+        updateLayerGroup: store.updateLayerGroup,
+        addLayerGroup: store.addLayerGroup,
+        removeLayerGroup: store.removeLayerGroup,
+        removeLayerFromLayerGroup: store.removeLayerFromLayerGroup,
+        addLayerToLayerGroup: store.addLayerToLayerGroup,
+        replaceLayersForLayerGroup: store.replaceLayersForLayerGroup,
+    }))
 
-  return {
-    activeLayerGroups,
-    replaceLayersGroups,
-    updateLayerGroup,
-    addLayerGroup,
-    removeLayerGroup,
-  };
-};
+    return {
+        activeLayerGroups,
+        replaceLayersGroups,
+        updateLayerGroup,
+        addLayerGroup,
+        removeLayerGroup,
+        removeLayerFromLayerGroup,
+        addLayerToLayerGroup,
+        replaceLayersForLayerGroup,
+    }
+}
 
 export const useLayerStates = () => {
-  const { currentLayers, updateLayerState } = useStore((store) => ({
-    currentLayers: store.layers,
-    updateLayerState: store.updateLayerState,
-  }));
+    const { currentLayers, updateLayerState } = useStore((store) => ({
+        currentLayers: store.mapView.layers,
+        updateLayerState: store.updateLayerState,
+    }))
 
-  return { currentLayers, updateLayerState };
-};
+    return { currentLayers, updateLayerState }
+}
 
 export const useBounds = () => {
-  const { bounds, setBounds } = useStore((store) => ({
-    bounds: store.bounds,
-    setBounds: store.setBounds,
-  }));
+    const { bounds, setBounds } = useStore((store) => ({
+        bounds: store.mapView.bounds,
+        setBounds: store.setBounds,
+    }))
 
-  return { bounds, setBounds };
-};
+    return { bounds, setBounds }
+}

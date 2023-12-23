@@ -26,7 +26,8 @@ export default function Controls({
                 }}
             />
             <Download />
-            <Export /> */}
+            */}
+            <Export />
         </div>
     )
 }

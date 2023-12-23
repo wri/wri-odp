@@ -34,7 +34,12 @@ export function DataFiles({
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
 }) {
-    const { addLayerGroup, removeLayerGroup } = useActiveLayerGroups()
+    const {
+        addLayerGroup,
+        removeLayerGroup,
+        addLayerToLayerGroup,
+        removeLayerFromLayerGroup,
+    } = useActiveLayerGroups()
     const { data: activeLayers } = useLayersFromRW()
     const datafiles = dataset?.resources
     const [q, setQ] = useState('')
@@ -64,15 +69,12 @@ export function DataFiles({
                         onClick={() => {
                             dataset.resources.forEach((r) => {
                                 if (
-                                    r._extra?.is_layer &&
-                                    !activeLayers.some(
-                                        (l) => l.id == r?._extra?.rw_layer_id
-                                    )
+                                    r.format == 'Layer' &&
+                                    // @ts-ignore
+                                    !activeLayers.some((l) => l.id == r?.rw_id)
                                 ) {
-                                    addLayerGroup({
-                                        layers: [r._extra.rw_layer_id],
-                                        datasetId: dataset.id,
-                                    })
+                                    // @ts-ignore
+                                    addLayerToLayerGroup(r.rw_id, dataset.id)
                                 }
                             })
                         }}
@@ -84,11 +86,12 @@ export function DataFiles({
                         className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                         onClick={() => {
                             dataset.resources.forEach((r) => {
-                                if (r._extra?.is_layer) {
-                                    removeLayerGroup({
-                                        layers: [r._extra.rw_layer_id],
-                                        datasetId: dataset.id,
-                                    })
+                                if (r.format == 'Layer') {
+                                    removeLayerFromLayerGroup(
+                                        // @ts-ignore
+                                        r.rw_id,
+                                        dataset.id
+                                    )
                                 }
                             })
                         }}
@@ -124,7 +127,8 @@ function DatafileCard({
     tabularResource: TabularResource | null
 }) {
     const { data: activeLayers } = useLayersFromRW()
-    const { addLayerGroup, removeLayerGroup } = useActiveLayerGroups()
+    const { removeLayerFromLayerGroup, addLayerToLayerGroup } =
+        useActiveLayerGroups()
     const created_at = new Date(datafile?.created ?? '')
     const last_updated = new Date(datafile?.metadata_modified ?? '')
     const options = {
@@ -167,7 +171,8 @@ function DatafileCard({
                             </Disclosure.Button>
                         </div>
                         <div className="flex gap-x-2">
-                            {datafile?._extra?.is_layer && (
+                            {/* @ts-ignore */}
+                            {datafile?.rw_id && (
                                 <>
                                     {activeLayers.some(
                                         (a) => datafile.url?.endsWith(a.id)
@@ -176,16 +181,16 @@ function DatafileCard({
                                             variant="light"
                                             size="sm"
                                             onClick={() => {
-                                                if (
-                                                    datafile._extra?.rw_layer_id
-                                                )
-                                                    removeLayerGroup({
-                                                        layers: [
-                                                            datafile?._extra
-                                                                ?.rw_layer_id,
-                                                        ],
-                                                        datasetId: dataset.id,
-                                                    })
+                                                {
+                                                }
+                                                // @ts-ignore
+                                                if (datafile.rw_id) {
+                                                    removeLayerFromLayerGroup(
+                                                        // @ts-ignore
+                                                        datafile?.rw_id,
+                                                        dataset.id
+                                                    )
+                                                }
                                             }}
                                         >
                                             <span className="mt-1">
@@ -197,17 +202,14 @@ function DatafileCard({
                                             variant="outline"
                                             size="sm"
                                             onClick={() => {
-                                                console.log(activeLayers)
-                                                if (
-                                                    datafile._extra?.rw_layer_id
-                                                )
-                                                    addLayerGroup({
-                                                        layers: [
-                                                            datafile._extra
-                                                                .rw_layer_id,
-                                                        ],
-                                                        datasetId: dataset.id,
-                                                    })
+                                                // @ts-ignore
+                                                if (datafile.rw_id) {
+                                                    addLayerToLayerGroup(
+                                                        // @ts-ignore
+                                                        datafile.rw_id,
+                                                        dataset.id
+                                                    )
+                                                }
                                             }}
                                         >
                                             <span>Show Layer</span>

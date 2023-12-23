@@ -105,6 +105,7 @@ async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     r.title = title
     r.description = description
     r.rw_id = layerRw.data.id
+    r.format = "Layer"
     return r
 }
 
@@ -134,6 +135,7 @@ async function editLayerRw(r: ResourceFormType) {
             const description = layerRw.data.attributes.description
             r.title = title
             r.description = description
+            r.format = "Layer"
             return r
         }
     } catch (e) {

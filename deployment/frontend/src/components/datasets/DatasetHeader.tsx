@@ -476,23 +476,27 @@ export function DatasetHeader({
                                     session.data?.user ? 'border-l pl-3' : ''
                                 )}
                             >
-                                {dataset?.resources
-                                    .filter((resource) => resource.format)
-                                    .map((resource) => (
-                                        <span
-                                            key={resource.id}
-                                            className={classNames(
-                                                'flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black',
-                                                getFormatColor(
-                                                    resource.format ?? ''
-                                                )
-                                            )}
-                                        >
-                                            <span className="my-auto">
-                                                {resource.format?.toUpperCase()}
-                                            </span>
+                                {[
+                                    ...new Set(
+                                        dataset?.resources
+                                            .filter(
+                                                (resource) => resource.format
+                                            )
+                                            .map((resource) => resource.format)
+                                    ),
+                                ].map((format, i) => (
+                                    <span
+                                        key={'format-pill-' + format}
+                                        className={classNames(
+                                            'flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black',
+                                            getFormatColor(format ?? '')
+                                        )}
+                                    >
+                                        <span className="my-auto">
+                                            {format?.toUpperCase()}
                                         </span>
-                                    ))}
+                                    </span>
+                                ))}
                             </div>
                         )}
                 </div>

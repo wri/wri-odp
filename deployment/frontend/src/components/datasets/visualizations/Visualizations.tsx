@@ -3,7 +3,6 @@ import { VisualizationTabs } from './VisualizationTabs'
 import MapView from './MapView'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useRouter } from 'next/router'
-import { WriDataset } from '@/schema/ckan.schema'
 import { DataExplorer } from '@/components/data-explorer/DataExplorer'
 
 export type TabularResource = {
@@ -12,12 +11,8 @@ export type TabularResource = {
 }
 
 export default function Visualizations({
-    setIsAddLayers,
-    dataset,
     tabularResource,
 }: {
-    setIsAddLayers: Dispatch<SetStateAction<boolean>>
-    dataset: WriDataset
     tabularResource: TabularResource | null
 }) {
     const router = useRouter()
@@ -58,7 +53,7 @@ export default function Visualizations({
                 </Tab.List>
                 <Tab.Panels className="grow flex flex-col">
                     <Tab.Panel>
-                        <MapView setIsAddLayers={setIsAddLayers} />
+                        <MapView />
                     </Tab.Panel>
                     <Tab.Panel className="h-full grow flex flex-col justify-center">
                         {tabularResource && (
