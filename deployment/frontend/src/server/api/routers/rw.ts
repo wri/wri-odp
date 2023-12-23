@@ -1,3 +1,4 @@
+import { filterObj } from '@/components/data-explorer/search.schema'
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
 import { z } from 'zod'
 
@@ -30,10 +31,7 @@ export const rwRouter = createTRPCRouter({
                 filters: z.array(
                     z.object({
                         id: z.string(),
-                        value: z.object({
-                            operation: z.string(),
-                            value: z.string(),
-                        }),
+                        value: z.array(filterObj),
                     })
                 ),
             })
@@ -65,10 +63,17 @@ export const rwRouter = createTRPCRouter({
                 filters.length > 0
                     ? 'WHERE ' +
                       filters
-                          .filter((filter) => filter.value.value !== '')
                           .map(
                               (filter) =>
-                                  `${filter.id} ${filter.value.operation} '${filter.value.value}'`
+                                  `( ${filter.value
+                                      .filter((v) => v.value !== '')
+                                      .map(
+                                          (v) =>
+                                              `${filter.id} ${
+                                                  v.operation.value
+                                              } '${v.value}' ${v.link ?? ''} `
+                                      )
+                                      .join('')} )`
                           )
                           .join(' AND ')
                     : ''
@@ -94,10 +99,7 @@ export const rwRouter = createTRPCRouter({
                 filters: z.array(
                     z.object({
                         id: z.string(),
-                        value: z.object({
-                            operation: z.string(),
-                            value: z.string(),
-                        }),
+                        value: z.array(filterObj),
                     })
                 ),
             })
@@ -105,17 +107,24 @@ export const rwRouter = createTRPCRouter({
         .query(async ({ input }) => {
             try {
                 const { datasetId, tableName, filters, provider } = input
-                const filtersSql =
-                    filters.length > 0
-                        ? 'WHERE ' +
-                          filters
-                              .filter((filter) => filter.value.value !== '')
-                              .map(
-                                  (filter) =>
-                                      `${filter.id} ${filter.value.operation} '${filter.value.value}'`
-                              )
-                              .join(' AND ')
-                        : ''
+            const filtersSql =
+                filters.length > 0
+                    ? 'WHERE ' +
+                      filters
+                          .map(
+                              (filter) =>
+                                  `( ${filter.value
+                                      .filter((v) => v.value !== '')
+                                      .map(
+                                          (v) =>
+                                              `${filter.id} ${
+                                                  v.operation.value
+                                              } '${v.value}' ${v.link ?? ''} `
+                                      )
+                                      .join('')} )`
+                          )
+                          .join(' AND ')
+                    : ''
                 const numRowsRes = await fetch(
                     `https://api.resourcewatch.org/v1/query/${datasetId}?sql=SELECT COUNT(*) FROM ${tableName} ${filtersSql}`,
                     {
@@ -125,7 +134,6 @@ export const rwRouter = createTRPCRouter({
                     }
                 )
                 const numRows: NumOfRowsResponse = await numRowsRes.json()
-                console.log('NUM OF ROWS', numRows)
                 if (typeof numRows.data[0] === 'number') {
                     return numRows.data[0]
                 }

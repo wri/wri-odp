@@ -41,10 +41,10 @@ export function DebouncedInput({
     debounce = 500,
     ...props
 }: {
-    value: string | number
-    onChange: (value: string | number) => void
+    value: string
+    onChange: (value: string) => void
     debounce?: number
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
+} & InputProps & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
     const [value, setValue] = React.useState(initialValue)
 
     React.useEffect(() => {

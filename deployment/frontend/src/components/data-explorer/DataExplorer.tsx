@@ -1,15 +1,19 @@
 import { useMemo, useState } from 'react'
-import { Table } from './Table'
+import { ListOfFilters, Table, TopBar } from './Table'
 import {
     ColumnFilter,
+    ColumnFiltersState,
     ColumnSort,
     getCoreRowModel,
     PaginationState,
+    Updater,
     useReactTable,
+    VisibilityState,
 } from '@tanstack/react-table'
 import { useFields, useNumberOfRows, useTableData } from './queryHooks'
 import Spinner from '../_shared/Spinner'
 import { TabularResource } from '../datasets/visualizations/Visualizations'
+import { FilterObjType } from './search.schema'
 
 interface DataExplorerProps {
     tabularResource: TabularResource
@@ -22,14 +26,15 @@ export interface Filter {
 
 export function DataExplorer({ tabularResource }: DataExplorerProps) {
     const { data: tableData } = useFields(tabularResource)
-    if (!tableData) return (
-        <div className="bg-lima-700 my-auto flex w-full flex-col items-center justify-center overflow-hidden opacity-75 h-full">
-            <Spinner className="text-wri-green w-12 h-12" />
-            <h2 className="text-center text-xl font-semibold text-wri-green">
-                Loading...
-            </h2>
-        </div>
-    )
+    if (!tableData)
+        return (
+            <div className="bg-lima-700 my-auto flex w-full flex-col items-center justify-center overflow-hidden opacity-75 h-full">
+                <Spinner className="text-wri-green w-12 h-12" />
+                <h2 className="text-center text-xl font-semibold text-wri-green">
+                    Loading...
+                </h2>
+            </div>
+        )
     return (
         <DataExplorerInner
             tableName={tableData.tableName}
@@ -45,6 +50,11 @@ export interface DataExplorerInnerProps {
     columns: { key: string; name: string }[]
 }
 
+export interface DataExplorerColumnFilter {
+    id: string
+    value: FilterObjType[]
+}
+
 function DataExplorerInner({
     tableName,
     columns,
@@ -56,28 +66,53 @@ function DataExplorerInner({
         pageIndex: 0,
         pageSize: 10,
     })
-    const [sorting, setSorting] = useState<ColumnSort[]>([])
-    const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([])
+    const resetPagination = () => {
+        setPagination({
+            pageIndex: 0,
+            pageSize: 10,
+        })
+    }
     const [pageCount, setPageCount] = useState<number>(0)
+
+    const [sorting, setSorting] = useState<ColumnSort[]>([])
+
+    const [columnFilters, setColumnFilters] = useState<
+        DataExplorerColumnFilter[]
+    >([])
+    const filteredColumns = columnFilters
+        .map((filter) => ({
+            ...filter,
+            value: filter.value.filter((v) => v.value !== ''),
+        }))
+        .filter((filter) => filter.value.length > 0)
+
+    const [columnPinning, setColumnPinning] = useState({})
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+        {}
+    )
 
     const { data: numOfRows } = useNumberOfRows({
         tableName,
         datasetId,
         provider,
-        filters: columnFilters,
+        filters: filteredColumns,
         setPageCount,
     })
 
-    const { data: tableData, isLoading } = useTableData({
+    const {
+        data: tableData,
+        isLoading,
+        isPreviousData,
+        isFetching,
+    } = useTableData({
         tableName,
         provider,
         pagination,
         sorting,
         datasetId,
         columns: columns.map((c) => c.key),
-        filters: columnFilters,
+        filters: filteredColumns,
     })
-    console.log(tableData)
 
     const _prefetchData = useTableData({
         tableName,
@@ -88,7 +123,7 @@ function DataExplorerInner({
         sorting,
         provider,
         datasetId,
-        filters: columnFilters,
+        filters: filteredColumns,
         columns: columns.map((c) => c.key),
         enabled: !isLoading,
     })
@@ -113,15 +148,43 @@ function DataExplorerInner({
         manualSorting: true,
         onSortingChange: setSorting,
         manualFiltering: true,
-        onColumnFiltersChange: setColumnFilters,
+        onColumnFiltersChange: setColumnFilters as (
+            filters: Updater<ColumnFiltersState>
+        ) => void,
         pageCount,
+        onColumnPinningChange: setColumnPinning,
+        onColumnVisibilityChange: setColumnVisibility,
         state: {
             pagination,
             sorting,
-            columnFilters: (
-                columnFilters as { id: string; value: Filter }[]
-            ).filter((f) => f.value.value !== ''),
+            columnPinning,
+            columnVisibility,
+            columnFilters: filteredColumns,
         },
     })
-    return <Table table={table} numOfRows={numOfRows ?? 0} isLoading={isLoading} />
+    if (pageCount < pagination.pageIndex) resetPagination()
+    return (
+        <div className={`w-full relative grow flex flex-col gap-y-2 mt-6`}>
+            <div className="flex flex-row justify-between items-center px-6">
+                <TopBar table={table} numOfRows={numOfRows ?? 0} />
+            </div>
+            <div className="flex flex-row justify-between px-6">
+                <ListOfFilters
+                    filters={filteredColumns}
+                    setFilters={setColumnFilters}
+                />
+            </div>
+            <div className="flex flex-col grow">
+                {isFetching && isPreviousData && (
+                    <span className="w-full h-1.5 animate-pulse-fast bg-blue-400" />
+                )}
+                <Table
+                    table={table}
+                    numOfRows={numOfRows ?? 0}
+                    isLoading={isLoading}
+                    columnFilters={columnFilters}
+                />
+            </div>
+        </div>
+    )
 }

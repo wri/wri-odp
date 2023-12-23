@@ -2,6 +2,7 @@ import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import { z } from 'zod'
 import { CkanResponse } from '@/schema/ckan.schema'
+import { filterObj } from '@/components/data-explorer/search.schema'
 
 export type DataResponse = CkanResponse<{
     sql: string
@@ -28,22 +29,13 @@ export const datastoreRouter = createTRPCRouter({
                 filters: z.array(
                     z.object({
                         id: z.string(),
-                        value: z.object({
-                            operation: z.string(),
-                            value: z.string(),
-                        }),
+                        value: z.array(filterObj),
                     })
                 ),
             })
         )
         .query(async ({ input }) => {
-            const {
-                pagination,
-                resourceId,
-                columns,
-                sorting,
-                filters,
-            } = input
+            const { pagination, resourceId, columns, sorting, filters } = input
             const paginationSql = `LIMIT ${
                 pagination.pageIndex * pagination.pageSize + pagination.pageSize
             }`
@@ -61,10 +53,17 @@ export const datastoreRouter = createTRPCRouter({
                 filters.length > 0
                     ? 'WHERE ' +
                       filters
-                          .filter((filter) => filter.value.value !== '')
                           .map(
                               (filter) =>
-                                  `"${filter.id}" ${filter.value.operation} '${filter.value.value}'`
+                                  `( ${filter.value
+                                      .filter((v) => v.value !== '')
+                                      .map(
+                                          (v) =>
+                                              `${filter.id} ${
+                                                  v.operation.value
+                                              } '${v.value}' ${v.link ?? ''} `
+                                      )
+                                      .join('')} )`
                           )
                           .join(' AND ')
                     : ''
@@ -76,7 +75,6 @@ export const datastoreRouter = createTRPCRouter({
             )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${paginationSql}`
             const tableDataRes = await fetch(url)
             const tableData: DataResponse = await tableDataRes.json()
-            console.log('TABLE DATA', tableData.result.records)
             if (!tableData.success && tableData.error) {
                 if (tableData.error.message)
                     throw Error(tableData.error.message)
@@ -92,10 +90,7 @@ export const datastoreRouter = createTRPCRouter({
                 filters: z.array(
                     z.object({
                         id: z.string(),
-                        value: z.object({
-                            operation: z.string(),
-                            value: z.string(),
-                        }),
+                        value: z.array(filterObj),
                     })
                 ),
             })
@@ -107,24 +102,29 @@ export const datastoreRouter = createTRPCRouter({
                     filters.length > 0
                         ? 'WHERE ' +
                           filters
-                              .filter((filter) => filter.value.value !== '')
                               .map(
                                   (filter) =>
-                                      `"${filter.id}" ${filter.value.operation} '${filter.value.value}'`
+                                      `( ${filter.value
+                                          .filter((v) => v.value !== '')
+                                          .map(
+                                              (v) =>
+                                                  `${filter.id} ${
+                                                      v.operation.value
+                                                  } '${v.value}' ${
+                                                      v.link ?? ''
+                                                  } `
+                                          )
+                                          .join('')} )`
                               )
                               .join(' AND ')
                         : ''
                 const url = `${env.CKAN_URL}/api/action/datastore_search_sql?sql=SELECT COUNT(*) FROM "${resourceId}" ${filtersSql}`
-                const numRowsRes = await fetch(
-                    url,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                )
+                const numRowsRes = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
                 const numRows: DataResponse = await numRowsRes.json()
-                console.log('NUM ROWS', numRows)
                 if (!numRows.success && numRows.error) {
                     if (numRows.error.message)
                         throw Error(numRows.error.message)
