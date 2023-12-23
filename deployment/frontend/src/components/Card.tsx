@@ -10,6 +10,11 @@ import { WriDataset } from '@/schema/ckan.schema'
 import Link from 'next/link'
 
 export default function Card({ dataset }: { dataset: WriDataset }) {
+
+    const hasMapView = dataset.resources.some((r) => r.format == 'Layer')
+
+    const hasTabularView = dataset.resources.some((r) => r.datastore_active)
+
     return (
         <Link
             href={`datasets/${dataset.name}`}
@@ -45,7 +50,7 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                     dataset.temporal_coverage_end) ? (
                     <div className="border-l border-wri-black h-4  mx-2"></div>
                 ) : null}
-                {dataset.spatial_address&& (
+                {dataset.spatial_address && (
                     <div className="flex ">
                         <div className="w-4 h-4 relative">
                             <Image
@@ -61,15 +66,21 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                 )}
             </div>
             <div className="mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black">
-                <div className="rounded-full bg-stone-100 p-1">
-                    <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                </div>
-                <div className="rounded-full bg-stone-100 p-1">
-                    <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                </div>
-                <div className="rounded-full bg-stone-100 p-1">
-                    <TableCellsIcon className="h-5 w-5 text-green-600" />
-                </div>
+                {false && (
+                    <div className="rounded-full bg-stone-100 p-1">
+                        <ChartBarIcon className="h-5 w-5 text-blue-700" />
+                    </div>
+                )}
+                {hasMapView && (
+                    <div className="rounded-full bg-stone-100 p-1">
+                        <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
+                    </div>
+                )}
+                {hasTabularView && (
+                    <div className="rounded-full bg-stone-100 p-1">
+                        <TableCellsIcon className="h-5 w-5 text-green-600" />
+                    </div>
+                )}
             </div>
         </Link>
     )

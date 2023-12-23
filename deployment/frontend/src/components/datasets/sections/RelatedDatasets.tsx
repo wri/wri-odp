@@ -126,6 +126,11 @@ export default function DatasetCard({
         month: 'short',
         day: 'numeric',
     } as const
+
+    const hasMapView = dataset.resources.some((r) => r.format == 'Layer')
+
+    const hasTabularView = dataset.resources.some((r) => r.datastore_active)
+
     return (
         <div className="font-acumin gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100">
             <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green">
@@ -165,15 +170,21 @@ export default function DatasetCard({
                         dataset.cautions ? 'border-r border-black' : ''
                     )}
                 >
-                    <div className="rounded-full bg-stone-100 p-1">
-                        <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                    </div>
-                    <div className="rounded-full bg-stone-100 p-1">
-                        <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                    </div>
-                    <div className="rounded-full bg-stone-100 p-1">
-                        <TableCellsIcon className="h-5 w-5 text-green-600" />
-                    </div>
+                    {false && (
+                        <div className="rounded-full bg-stone-100 p-1">
+                            <ChartBarIcon className="h-5 w-5 text-blue-700" />
+                        </div>
+                    )}
+                    {hasMapView && (
+                        <div className="rounded-full bg-stone-100 p-1">
+                            <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
+                        </div>
+                    )}
+                    {hasTabularView && (
+                        <div className="rounded-full bg-stone-100 p-1">
+                            <TableCellsIcon className="h-5 w-5 text-green-600" />
+                        </div>
+                    )}
                 </div>
                 {dataset.cautions && (
                     <DefaultTooltip content="This dataset contains cautions">

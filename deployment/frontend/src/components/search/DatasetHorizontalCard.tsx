@@ -34,6 +34,10 @@ export default function DatasetHorizontalCard({
         ...new Set(dataset.resources.map((r) => r.format).filter((f) => f)),
     ]
 
+    const hasMapView = dataset.resources.some((r) => r.format == 'Layer')
+
+    const hasTabularView = dataset.resources.some((r) => r.datastore_active)
+
     return (
         <Link href={`/datasets/${dataset.name}`}>
             <div className="grid gap-y-3 border-b-2 border-wri-green bg-white p-5 mb-2 shadow-wri transition hover:bg-slate-100 lg:grid-cols-5">
@@ -126,20 +130,28 @@ export default function DatasetHorizontalCard({
                     <div className="mt-4 flex justify-start gap-x-3">
                         <div
                             className={`flex justify-start gap-x-3 ${
-                                dataset.cautions || !dataset.technical_notes
+                                (dataset.cautions ||
+                                    !dataset.technical_notes) &&
+                                (hasMapView || hasTabularView)
                                     ? 'border-r border-black'
                                     : ''
                             } pr-3`}
                         >
-                            <div className="rounded-full bg-stone-100 p-1">
-                                <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                            </div>
-                            <div className="rounded-full bg-stone-100 p-1">
-                                <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                            </div>
-                            <div className="rounded-full bg-stone-100 p-1">
-                                <TableCellsIcon className="h-5 w-5 text-green-600" />
-                            </div>
+                            {false && (
+                                <div className="rounded-full bg-stone-100 p-1">
+                                    <ChartBarIcon className="h-5 w-5 text-blue-700" />
+                                </div>
+                            )}
+                            {hasMapView && (
+                                <div className="rounded-full bg-stone-100 p-1">
+                                    <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
+                                </div>
+                            )}
+                            {hasTabularView && (
+                                <div className="rounded-full bg-stone-100 p-1">
+                                    <TableCellsIcon className="h-5 w-5 text-green-600" />
+                                </div>
+                            )}
                         </div>
                         {dataset.cautions && (
                             <div className="rounded-full bg-stone-100 p-1 w-7 h-7">
