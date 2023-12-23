@@ -216,6 +216,18 @@ export const DatasetSchema = z
     )
     .refine(
         (obj) => {
+            if (!obj.rw_dataset) return true
+            if (obj.rw_dataset && !obj.connectorUrl) return false
+            return true
+        },
+        {
+            message:
+                'ConnectorUrl is required for RW datasets',
+            path: ['connectorUrl'],
+        }
+    )
+    .refine(
+        (obj) => {
             if (obj.visibility_type.value !== 'public') return true
             if (!obj.technical_notes) return false
             return true

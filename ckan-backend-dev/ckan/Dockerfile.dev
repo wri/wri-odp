@@ -94,4 +94,6 @@ RUN ckan config-tool ${CKAN_INI} "api_token.jwt.algorithm = RS256" && \
     ckan config-tool ${CKAN_INI} "api_token.jwt.encode.secret = file:${APP_DIR}/jwtRS256.key" && \
     ckan config-tool ${CKAN_INI} "api_token.jwt.decode.secret = file:${APP_DIR}/jwtRS256.key.pub"
 
+COPY docker-entrypoint.d/* /docker-entrypoint.d/
+
 CMD ["sh", "-c", "${APP_DIR}/start_ckan_development.sh"]

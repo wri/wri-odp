@@ -55,7 +55,7 @@ function LeftNode({
             <div className="flex h-6 items-center">
                 <DefaultTooltip content="Select all">
                     <input
-                        id="notificatoin"
+                        id="notification"
                         aria-describedby="notifications-checkbox"
                         name="notifications"
                         type="checkbox"

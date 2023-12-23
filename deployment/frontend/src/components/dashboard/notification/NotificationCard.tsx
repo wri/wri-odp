@@ -41,7 +41,7 @@ function Card({
             <div className="flex items-center">
                 <DefaultTooltip content="mark as read">
                     <input
-                        id="notificatoin"
+                        id="notification"
                         aria-describedby="notifications-checkbox"
                         name="notifications"
                         type="checkbox"
@@ -84,7 +84,7 @@ function Card({
                             </Link>
                             {rowProfile?.msg}{' '}
                             <Link
-                                href={`/datasets/${rowProfile?.objectIdName}`}
+                                href={`/${rowProfile?.object_type}s/${rowProfile?.objectIdName}`}
                                 className="group-hover:underline"
                             >
                                 {rowProfile?.object_name}

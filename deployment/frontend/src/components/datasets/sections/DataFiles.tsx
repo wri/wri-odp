@@ -21,13 +21,18 @@ import { useState } from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import { useActiveLayerGroups } from '@/utils/storeHooks'
+import { TabularResource } from '../visualizations/Visualizations'
 
 export function DataFiles({
     dataset,
     index,
+    setTabularResource,
+    tabularResource,
 }: {
     dataset: WriDataset
     index: Index
+    setTabularResource: (tabularResource: TabularResource | null) => void
+    tabularResource: TabularResource | null
 }) {
     const {
         addLayerGroup,
@@ -98,6 +103,8 @@ export function DataFiles({
             <div className="flex flex-col gap-y-4">
                 {filteredDatafiles?.map((datafile) => (
                     <DatafileCard
+                        tabularResource={tabularResource}
+                        setTabularResource={setTabularResource}
                         key={datafile.id}
                         datafile={datafile}
                         dataset={dataset}
@@ -111,9 +118,13 @@ export function DataFiles({
 function DatafileCard({
     datafile,
     dataset,
+    setTabularResource,
+    tabularResource,
 }: {
     datafile: Resource
     dataset: WriDataset
+    setTabularResource: (tabularResource: TabularResource | null) => void
+    tabularResource: TabularResource | null
 }) {
     const { data: activeLayers } = useLayersFromRW()
     const { removeLayerFromLayerGroup, addLayerToLayerGroup } =
@@ -206,6 +217,35 @@ function DatafileCard({
                                     )}
                                 </>
                             )}
+                            {datafile.datastore_active && (
+                                <>
+                                    {tabularResource &&
+                                    tabularResource.id === datafile.id ? (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                setTabularResource(null)
+                                            }
+                                        >
+                                            Remove Tabular View
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                setTabularResource({
+                                                    provider: 'datastore',
+                                                    id: datafile.id as string,
+                                                })
+                                            }
+                                        >
+                                            Add Tabular View
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+
                             <Disclosure.Button>
                                 <ChevronDownIcon
                                     className={`${

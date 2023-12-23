@@ -63,7 +63,13 @@ export const notificationRouter = createTRPCRouter({
                     if (actionType[0] === 'collaborator') {
                         const role = actionType[2]
                         const action = actionType[1]
-                        msg = ` ${action} you as a collaborator (${role}) to the ${notification.object_type}`
+                        if (action === 'removed') {
+                            msg = ` ${action} you as a collaborator (${role}) from the dataset`
+                        } else if (action === 'added') {
+                            msg = ` ${action} you as a collaborator (${role}) for the dataset`
+                        } else if (action === 'updated') {
+                            msg = ` ${action} your collaborator status to "${role}" for the dataset`
+                        }
                     } else {
                         if (notification.activity_type.includes(' ')) {
                             msg = ` ${notification.activity_type} `
@@ -101,7 +107,9 @@ export const notificationRouter = createTRPCRouter({
                         if (action === 'removed') {
                             msg = ` ${action} you as a member (${role}) from the ${notification.object_type}`
                         } else if (action === 'added') {
-                            msg = ` ${action} you as a member (${role}) to the ${notification.object_type}`
+                            msg = ` ${action} you as a member${
+                                role !== 'member' ? ` (${role})` : ''
+                            } in the ${notification.object_type}`
                         } else if (action === 'updated') {
                             msg = ` ${action} your member status to "${role}" in the ${notification.object_type}`
                         }

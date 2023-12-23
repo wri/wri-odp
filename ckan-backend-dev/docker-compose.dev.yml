@@ -39,20 +39,7 @@ services:
     build:
       context: ../deployment/frontend/
       args:
-        - NEXTAUTH_SECRET=secret
-        - NEXTAUTH_URL=http://localhost:3000
-        - CKAN_URL=http://ckan-dev:5000
-        - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
-        - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
-        - S3_BUCKET_NAME=ckan
-        - S3_BUCKET_REGION=us-east-1
-        - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
-        - SMTP_SERVER=${SMTP_SERVER}
-        - SMTP_PORT=${SMTP_PORT}
-        - SMTP_USER=${SMTP_USER}
-        - SMTP_PASSWORD=${SMTP_PASSWORD}
-        - SMTP_FROM=${SMTP_FROM}
-    ports:
+        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
@@ -61,12 +48,19 @@ services:
       - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
       - S3_BUCKET_NAME=ckan
       - S3_BUCKET_REGION=us-east-1
+      - RW_API_KEY=${RW_API_KEY}
+      - AZURE_AD_TENANT_ID=${AZURE_AD_TENANT_ID}
+      - AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}
+      - AZURE_AD_CLIENT_SECRET=${AZURE_AD_CLIENT_SECRET}
       - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
       - SMTP_SERVER=${SMTP_SERVER}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM=${SMTP_FROM}
+    depends_on:
+      ckan-dev:
+        condition: service_healthy
     ports:
       - "0.0.0.0:3000:3000"
     healthcheck:
@@ -148,3 +142,13 @@ services:
     volumes:
       - ./ckan/setup/create_minio_bucket.sh:/srv/app/create_minio_bucket.sh
     command: ["-c", "/srv/app/create_minio_bucket.sh"]
+
+  smtp:
+    container_name: ${SMTP_CONTAINER_NAME}
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8025/"]

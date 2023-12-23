@@ -164,9 +164,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         { name: 'Data Files', enabled: true },
         { name: 'Collaborators', enabled: canEditCollaborators },
     ]
-    console.log('Errors', formObj.formState.errors)
-    console.log('Dataset', dataset)
-    console.log('New Dataset', formObj.watch())
+
     return (
         <>
             <Tab.Group>

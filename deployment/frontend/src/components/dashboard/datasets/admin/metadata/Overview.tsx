@@ -253,6 +253,7 @@ export function OverviewForm({
                                                 <span>
                                                     Go to the{' '}
                                                     <a
+                                                        target="_blank"
                                                         className="text-blue-800 underline"
                                                         href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
                                                     >
@@ -266,6 +267,10 @@ export function OverviewForm({
                                             <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                         </DefaultTooltip>
                                     }
+                                />
+                                <ErrorDisplay
+                                    name="connectorUrl"
+                                    errors={errors}
                                 />
                             </InputGroup>
                             <InputGroup label="Connector Type">
@@ -284,6 +289,7 @@ export function OverviewForm({
                                                 <span>
                                                     Go to the{' '}
                                                     <a
+                                                        target="_blank"
                                                         className="text-blue-800 underline"
                                                         href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
                                                     >
@@ -297,6 +303,10 @@ export function OverviewForm({
                                             <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                         </DefaultTooltip>
                                     }
+                                />
+                                <ErrorDisplay
+                                    name="connectorType"
+                                    errors={errors}
                                 />
                             </InputGroup>
                             <InputGroup label="Provider">
@@ -314,6 +324,7 @@ export function OverviewForm({
                                                 <span>
                                                     Go to the{' '}
                                                     <a
+                                                        target="_blank"
                                                         className="text-blue-800 underline"
                                                         href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
                                                     >
@@ -329,6 +340,7 @@ export function OverviewForm({
                                     }
                                     type="text"
                                 />
+                                <ErrorDisplay name="provider" errors={errors} />
                             </InputGroup>
                             <InputGroup label="Table Name">
                                 <Input
@@ -346,6 +358,7 @@ export function OverviewForm({
                                                 <span>
                                                     Go to the{' '}
                                                     <a
+                                                        target="_blank"
                                                         className="text-blue-800 underline"
                                                         href="https://resource-watch.github.io/doc-api/reference.html#google-earth-engine"
                                                     >
