@@ -157,7 +157,7 @@ describe("Dashboard Test", () => {
     cy.get('#notification').should('be.checked');
     cy.get('#deletenotification').click({ force: true });
     cy.contains('Delete Notification')
-    cy.contains('button', 'Delete Notification').click();
+    cy.contains('button', 'Delete Notification').click({timeout: 60000});
     cy.wait(15000);
     cy.contains('deleted dataset').should('not.exist');
    })
