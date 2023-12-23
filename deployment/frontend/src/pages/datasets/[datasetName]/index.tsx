@@ -295,12 +295,7 @@ export default function DatasetPage(
                         </>
                     )
                 }
-                rhs={
-                    <LazyViz
-                        dataset={datasetData}
-                        tabularResource={tabularResource}
-                    />
-                }
+                rhs={<LazyViz tabularResource={tabularResource} />}
             />
         </>
     )
