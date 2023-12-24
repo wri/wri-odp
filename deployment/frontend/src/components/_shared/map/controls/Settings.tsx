@@ -14,7 +14,7 @@ export default function Settings({
 }) {
     const [open, setOpen] = useState(false)
     return (
-        <IconButton onClick={() => setOpen(true)}>
+        <IconButton tooltip='Map settings' onClick={() => setOpen(true)}>
             <SettingsIcon />
             <Modal open={open} setOpen={setOpen} className="max-w-[36rem]">
                 <h2 className="font-['Acumin Pro SemiCondensed'] text-3xl font-normal text-black mb-5">
