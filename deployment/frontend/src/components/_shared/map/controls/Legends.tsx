@@ -20,6 +20,7 @@ import { LegendItemTimeline } from 'old-vizzuality-components'
 import { type ActiveLayerGroup } from '@/interfaces/state.interface'
 import LegendItemButtonThreshold from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonThreshold'
 import LegendItemTypesList from '@/components/vizzuality/components/legend/components/legend-item-types/LegendItemTypesList'
+import LegendItemButtonRemoveLayer from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonRemoveLayer'
 
 export function Legends() {
     const { data: layerGroups } = useLayerGroupsFromRW()
@@ -75,6 +76,7 @@ export function Legends() {
                                         <LegendItemButtonThreshold />
                                         <LegendItemButtonOpacity />
                                         <LegendItemButtonVisibility />
+                                        <LegendItemButtonRemoveLayer />
                                     </LegendItemToolbar>
                                 }
                                 onChangeInfo={() => console.log('Info')}

@@ -65,19 +65,19 @@ export default function LegendItemButtonThreshold<
                     {({ open }) => (
                         <>
                             <div className="relative">
-                                <Listbox.Button
-                                    id={'threshold'}
-                                    className={classNames(
-                                        'relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6'
-                                    )}
-                                >
-                                    <DefaultTooltip content="Threshold">
+                                <DefaultTooltip content="Threshold">
+                                    <Listbox.Button
+                                        id={'threshold'}
+                                        className={classNames(
+                                            'relative text-left block w-full rounded-md border-0 px-5 py-3 hover:text-gray-900 text-gray-600 placeholder:text-gray-400 sm:text-sm sm:leading-6'
+                                        )}
+                                    >
                                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center">
                                             <AdjustmentsVerticalIcon className="w-4 mr-1" />
                                             {selected.label}
                                         </span>
-                                    </DefaultTooltip>
-                                </Listbox.Button>
+                                    </Listbox.Button>
+                                </DefaultTooltip>
 
                                 <div className="absolute bottom-[300px] right-[65px]">
                                     <Transition

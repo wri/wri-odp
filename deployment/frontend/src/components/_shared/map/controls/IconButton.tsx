@@ -12,7 +12,7 @@ export default function IconButton({
     ...props
 }: IconButtonProps) {
     return (
-        <DefaultTooltip content={tooltip}>
+        <DefaultTooltip side="left" content={tooltip}>
             <button
                 {...props}
                 className={`${
