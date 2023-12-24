@@ -52,7 +52,6 @@ const getDefaultInitialState = () => {
                 options: {} as Record<string, unknown>,
             },
             isDrawing: undefined,
-            threshold: 30,
         },
     }
     return initialState

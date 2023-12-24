@@ -54,6 +54,7 @@ export async function getLayersFromRW(
                 zIndex: countdown - index,
                 visibility: layers.length > 1 ? attributes.default : true,
                 ...currentLayer,
+                _ogSource: attributes.layerConfig.source
               },
               active: layers.length > 1 ? attributes.default : true,
             };

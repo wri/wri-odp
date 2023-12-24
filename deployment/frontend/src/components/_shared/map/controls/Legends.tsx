@@ -72,7 +72,7 @@ export function Legends() {
                                 toolbar={
                                     <LegendItemToolbar>
                                         <LegendItemButtonLayers />
-                                        {/* <LegendItemButtonThreshold /> */}
+                                        <LegendItemButtonThreshold />
                                         <LegendItemButtonOpacity />
                                         <LegendItemButtonVisibility />
                                     </LegendItemToolbar>
@@ -101,6 +101,17 @@ export function Legends() {
                                             'undefined'
                                             ? false
                                             : !layerState?.visibility
+                                    )
+                                }}
+                                onChangeThreshold={(layer: any, threshold: number) => {
+                                    const layerState = currentLayers.get(
+                                        layer.id
+                                    )
+                                    updateLayerState(layer.id, 'active', true)
+                                    updateLayerState(
+                                        layer.id,
+                                        'threshold',
+                                        threshold
                                     )
                                 }}
                                 onChangeLayer={(layer: APILayerSpec) => {

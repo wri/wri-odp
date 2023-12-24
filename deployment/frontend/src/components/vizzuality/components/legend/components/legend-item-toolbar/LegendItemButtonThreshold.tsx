@@ -13,7 +13,6 @@ import {
     UseFormReturn,
     useForm,
 } from 'react-hook-form'
-import { useThreshold } from '@/utils/storeHooks'
 
 export interface Option<V> {
     label: string
@@ -25,9 +24,10 @@ export default function LegendItemButtonThreshold<
     T extends FieldValues,
     V extends Object,
 >(props: any) {
+    const { onChangeThreshold } = props;
+
     const { activeLayer } = props
     const { control } = useForm()
-    const { setThreshold, threshold } = useThreshold()
 
     const hasThreshold = activeLayer?.layerConfig?.params_config?.some(
         (item: any) => item.key == 'thresh'
@@ -36,7 +36,7 @@ export default function LegendItemButtonThreshold<
     const options = [10, 15, 20, 25, 30, 50, 75].map((item) => ({
         label: `>${item}%`,
         value: item,
-        default: item == threshold
+        default: item == activeLayer.threshold 
     }))
 
     return hasThreshold ? (
@@ -56,7 +56,7 @@ export default function LegendItemButtonThreshold<
                     value={selected}
                     onChange={(e) => {
                         setSelected(e)
-                        setThreshold(e.value)
+                        onChangeThreshold(activeLayer, e.value)
                     }}
                 >
                     {({ open }) => (
@@ -69,11 +69,12 @@ export default function LegendItemButtonThreshold<
                                     )}
                                 >
                                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center">
-                                        <AdjustmentsVerticalIcon className="w-4" />
+                                        <AdjustmentsVerticalIcon className="w-4 mr-1" />
+                                        {selected.label}
                                     </span>
                                 </Listbox.Button>
 
-                                <div className="absolute bottom-[300px] left-[20px]">
+                                <div className="absolute bottom-[300px] right-[65px]">
                                     <Transition
                                         show={open}
                                         as={Fragment}
@@ -81,7 +82,7 @@ export default function LegendItemButtonThreshold<
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"
                                     >
-                                        <Listbox.Options className="fixed z-50 mt-1 max-h-60 w-full auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                        <Listbox.Options className="fixed z-50 mt-1 max-h-64 auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                             {options.map((option) => (
                                                 <Listbox.Option
                                                     key={option.value}

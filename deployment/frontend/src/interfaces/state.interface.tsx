@@ -13,7 +13,6 @@ export interface State {
         activeLayerGroups: ActiveLayerGroup[]
         bounds: Bounds
         isDrawing: boolean | undefined
-        threshold: number | undefined,
         layersParsed: Array<[string, LayerState]>
     } & Layers
 }
@@ -45,6 +44,7 @@ export interface LayerState {
     active?: boolean
     zIndex?: number
     opacity?: number
+    threshold?: number
 }
 
 export type Labels = 'dark' | 'light' | 'none'
