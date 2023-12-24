@@ -13,6 +13,7 @@ import {
     UseFormReturn,
     useForm,
 } from 'react-hook-form'
+import { DefaultTooltip, Tooltip } from '@/components/_shared/Tooltip'
 
 export interface Option<V> {
     label: string
@@ -24,7 +25,7 @@ export default function LegendItemButtonThreshold<
     T extends FieldValues,
     V extends Object,
 >(props: any) {
-    const { onChangeThreshold } = props;
+    const { onChangeThreshold } = props
 
     const { activeLayer } = props
     const { control } = useForm()
@@ -36,7 +37,9 @@ export default function LegendItemButtonThreshold<
     const options = [10, 15, 20, 25, 30, 50, 75].map((item) => ({
         label: `>${item}%`,
         value: item,
-        default: item == activeLayer.threshold 
+        default: activeLayer.threshold
+            ? item == activeLayer.threshold
+            : item == 30,
     }))
 
     return hasThreshold ? (
@@ -68,10 +71,12 @@ export default function LegendItemButtonThreshold<
                                         'relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6'
                                     )}
                                 >
-                                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center">
-                                        <AdjustmentsVerticalIcon className="w-4 mr-1" />
-                                        {selected.label}
-                                    </span>
+                                    <DefaultTooltip content="Threshold">
+                                        <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center">
+                                            <AdjustmentsVerticalIcon className="w-4 mr-1" />
+                                            {selected.label}
+                                        </span>
+                                    </DefaultTooltip>
                                 </Listbox.Button>
 
                                 <div className="absolute bottom-[300px] right-[65px]">

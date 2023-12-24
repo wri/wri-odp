@@ -68,6 +68,10 @@ const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
         const parsedLayers = parseLayers(layers, currentLayers)
 
         parsedLayers.forEach((pl) => {
+            if (!pl.threshold) {
+              pl.threshold = 30;
+            }
+
             // @ts-ignore
             if (pl.source.tiles) {
                 // @ts-ignore
@@ -75,6 +79,7 @@ const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
                     tile.replace('{thresh}', pl.threshold)
                 )
             }
+
         })
 
         return parsedLayers
