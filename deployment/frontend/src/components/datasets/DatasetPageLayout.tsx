@@ -19,7 +19,11 @@ export default function DatasetPageLayout({
     const ref = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (ref.current && ref.current.clientHeight && typeof window !== undefined) {
+        if (
+            ref.current &&
+            ref.current.clientHeight &&
+            typeof window !== undefined
+        ) {
             const _90vh = document.documentElement.clientHeight * 0.9
             setLhsMaxHeight(`${Math.max(ref.current.clientHeight, _90vh)}px`)
             return
@@ -27,7 +31,7 @@ export default function DatasetPageLayout({
     }, [rhs])
 
     return (
-        <div className="flex flex-wrap lg:flex-nowrap lg:max-w-screen">
+        <div className="flex min-h-screen h-full flex-wrap lg:flex-nowrap lg:max-w-screen">
             <Disclosure defaultOpen>
                 {({ open }) => (
                     <>
@@ -115,11 +119,12 @@ export default function DatasetPageLayout({
                         </Disclosure.Button>
                         <Disclosure.Panel
                             as="div"
-                            className={`min-w-[100%] lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col border-l border-gray-200 @container`}
+                            className={`min-w-[100%] items-stretch min-h-screen lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col border-l border-gray-200 @container`}
                         >
                             <div
-                            ref={ref}
-                className="w-full overflow-x-hidden">
+                                ref={ref}
+                                className="w-full flex flex-col overflow-x-hidden grow h-full min-h-full"
+                            >
                                 {rhs}
                             </div>
                         </Disclosure.Panel>

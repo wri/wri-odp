@@ -21,15 +21,25 @@ import { useState } from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import { useActiveLayerGroups } from '@/utils/storeHooks'
+import { TabularResource } from '../visualizations/Visualizations'
 
 export function DataFiles({
     dataset,
     index,
+    setTabularResource,
+    tabularResource,
 }: {
     dataset: WriDataset
     index: Index
+    setTabularResource: (tabularResource: TabularResource | null) => void
+    tabularResource: TabularResource | null
 }) {
-    const { addLayerGroup, removeLayerGroup } = useActiveLayerGroups()
+    const {
+        addLayerGroup,
+        removeLayerGroup,
+        addLayerToLayerGroup,
+        removeLayerFromLayerGroup,
+    } = useActiveLayerGroups()
     const { data: activeLayers } = useLayersFromRW()
     const datafiles = dataset?.resources
     const [q, setQ] = useState('')
@@ -59,15 +69,12 @@ export function DataFiles({
                         onClick={() => {
                             dataset.resources.forEach((r) => {
                                 if (
-                                    r._extra?.is_layer &&
-                                    !activeLayers.some(
-                                        (l) => l.id == r?._extra?.rw_layer_id
-                                    )
+                                    r.format == 'Layer' &&
+                                    // @ts-ignore
+                                    !activeLayers.some((l) => l.id == r?.rw_id)
                                 ) {
-                                    addLayerGroup({
-                                        layers: [r._extra.rw_layer_id],
-                                        datasetId: dataset.id,
-                                    })
+                                    // @ts-ignore
+                                    addLayerToLayerGroup(r.rw_id, dataset.id)
                                 }
                             })
                         }}
@@ -79,11 +86,12 @@ export function DataFiles({
                         className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                         onClick={() => {
                             dataset.resources.forEach((r) => {
-                                if (r._extra?.is_layer) {
-                                    removeLayerGroup({
-                                        layers: [r._extra.rw_layer_id],
-                                        datasetId: dataset.id,
-                                    })
+                                if (r.format == 'Layer') {
+                                    removeLayerFromLayerGroup(
+                                        // @ts-ignore
+                                        r.rw_id,
+                                        dataset.id
+                                    )
                                 }
                             })
                         }}
@@ -95,6 +103,8 @@ export function DataFiles({
             <div className="flex flex-col gap-y-4">
                 {filteredDatafiles?.map((datafile) => (
                     <DatafileCard
+                        tabularResource={tabularResource}
+                        setTabularResource={setTabularResource}
                         key={datafile.id}
                         datafile={datafile}
                         dataset={dataset}
@@ -108,12 +118,17 @@ export function DataFiles({
 function DatafileCard({
     datafile,
     dataset,
+    setTabularResource,
+    tabularResource,
 }: {
     datafile: Resource
     dataset: WriDataset
+    setTabularResource: (tabularResource: TabularResource | null) => void
+    tabularResource: TabularResource | null
 }) {
     const { data: activeLayers } = useLayersFromRW()
-    const { addLayerGroup, removeLayerGroup } = useActiveLayerGroups()
+    const { removeLayerFromLayerGroup, addLayerToLayerGroup } =
+        useActiveLayerGroups()
     const created_at = new Date(datafile?.created ?? '')
     const last_updated = new Date(datafile?.metadata_modified ?? '')
     const options = {
@@ -156,7 +171,8 @@ function DatafileCard({
                             </Disclosure.Button>
                         </div>
                         <div className="flex gap-x-2">
-                            {datafile?._extra?.is_layer && (
+                            {/* @ts-ignore */}
+                            {datafile?.rw_id && (
                                 <>
                                     {activeLayers.some(
                                         (a) => datafile.url?.endsWith(a.id)
@@ -165,16 +181,16 @@ function DatafileCard({
                                             variant="light"
                                             size="sm"
                                             onClick={() => {
-                                                if (
-                                                    datafile._extra?.rw_layer_id
-                                                )
-                                                    removeLayerGroup({
-                                                        layers: [
-                                                            datafile?._extra
-                                                                ?.rw_layer_id,
-                                                        ],
-                                                        datasetId: dataset.id,
-                                                    })
+                                                {
+                                                }
+                                                // @ts-ignore
+                                                if (datafile.rw_id) {
+                                                    removeLayerFromLayerGroup(
+                                                        // @ts-ignore
+                                                        datafile?.rw_id,
+                                                        dataset.id
+                                                    )
+                                                }
                                             }}
                                         >
                                             <span className="mt-1">
@@ -186,17 +202,14 @@ function DatafileCard({
                                             variant="outline"
                                             size="sm"
                                             onClick={() => {
-                                                console.log(activeLayers)
-                                                if (
-                                                    datafile._extra?.rw_layer_id
-                                                )
-                                                    addLayerGroup({
-                                                        layers: [
-                                                            datafile._extra
-                                                                .rw_layer_id,
-                                                        ],
-                                                        datasetId: dataset.id,
-                                                    })
+                                                // @ts-ignore
+                                                if (datafile.rw_id) {
+                                                    addLayerToLayerGroup(
+                                                        // @ts-ignore
+                                                        datafile.rw_id,
+                                                        dataset.id
+                                                    )
+                                                }
                                             }}
                                         >
                                             <span>Show Layer</span>
@@ -204,6 +217,35 @@ function DatafileCard({
                                     )}
                                 </>
                             )}
+                            {datafile.datastore_active && (
+                                <>
+                                    {tabularResource &&
+                                    tabularResource.id === datafile.id ? (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                setTabularResource(null)
+                                            }
+                                        >
+                                            Remove Tabular View
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                setTabularResource({
+                                                    provider: 'datastore',
+                                                    id: datafile.id as string,
+                                                })
+                                            }
+                                        >
+                                            Add Tabular View
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+
                             <Disclosure.Button>
                                 <ChevronDownIcon
                                     className={`${

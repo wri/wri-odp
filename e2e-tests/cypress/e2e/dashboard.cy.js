@@ -137,9 +137,11 @@ describe("Dashboard Test", () => {
    it("should test notification page", () => {
     cy.visit("/dashboard/notifications")
     cy.contains('deleted dataset')
-    cy.get('#notificatoin').check();
-    cy.get('#notificatoin').should('be.checked');
+    cy.get('#notification').check({ force: true });
+    cy.get('#notification').should('be.checked');
     cy.get('input[type="checkbox"]').should('be.checked');
+
+    cy.wait(15000);
 
     cy.get('#markedaction').click({ force: true });
     cy.contains('Mark as read')
@@ -151,7 +153,8 @@ describe("Dashboard Test", () => {
   })
   it("should delete notification", () => {
     cy.visit("/dashboard/notifications")
-    cy.get('#notificatoin').check();
+    cy.get('#notification').check({ force: true });
+    cy.get('#notification').should('be.checked');
     cy.get('#deletenotification').click({ force: true });
     cy.contains('Delete Notification')
     cy.contains('button', 'Delete Notification').click();

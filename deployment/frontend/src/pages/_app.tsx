@@ -1,7 +1,8 @@
 import { type Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
-import { type AppType } from 'next/app'
+import { AppProps, type AppType } from 'next/app'
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
+import { Provider, useCreateStore } from '@/utils/store'
 import { useState } from 'react'
 
 import 'react-toastify/dist/ReactToastify.css'
@@ -16,6 +17,7 @@ import '@/styles/globals.scss'
 import '@/styles/rte.css'
 import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
+import { LayerState } from '@/interfaces/state.interface'
 
 const acumin = localFont({
     src: [
@@ -42,11 +44,48 @@ const acumin = localFont({
     ],
     variable: '--font-acumin',
 })
+
 const MyApp: AppType<{ session: Session | null }> = ({
     Component,
     pageProps: { session, ...pageProps },
-}) => {
+}: AppProps) => {
     const [queryClient] = useState(() => new QueryClient())
+    const { initialZustandState, dataset } = pageProps
+
+    const newLayersState = new Map()
+    if (initialZustandState && initialZustandState?.mapView?.layersParsed) {
+        initialZustandState.mapView?.layersParsed?.forEach(
+            (layer: [string, LayerState]) => {
+                newLayersState.set(layer[0], layer[1])
+            }
+        )
+    }
+
+    let activeLayerGroups =
+        initialZustandState?.mapView?.activeLayerGroups || []
+
+    if (!activeLayerGroups?.length && dataset) {
+        const layers = dataset?.resources
+            .filter((r: any) => r?.format == "Layer")
+            .map((r: any) => r?.rw_id)
+
+        if (layers) {
+            activeLayerGroups.push({
+                layers: layers || [],
+                datasetId: dataset.id,
+            })
+        }
+    }
+    const createStore = useCreateStore({
+        ...initialZustandState,
+        mapView: {
+            ...initialZustandState?.mapView,
+            basemap: initialZustandState?.mapView?.basemap ?? 'dark',
+            layers: newLayersState,
+            activeLayerGroups,
+        },
+    })
+
     return (
         <QueryClientProvider client={queryClient}>
             <DefaultSeo titleTemplate="%s - WRI ODP" />
@@ -54,12 +93,14 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 /* @ts-ignore */
                 state={pageProps.dehydratedState}
             >
-                <SessionProvider session={session}>
-                    <ReactToastContainer />
-                    <main className={`${acumin.variable} font-sans`}>
-                        <Component {...pageProps} />
-                    </main>
-                </SessionProvider>
+                <Provider createStore={createStore}>
+                    <SessionProvider session={session}>
+                        <ReactToastContainer />
+                        <main className={`${acumin.variable} font-sans`}>
+                            <Component {...pageProps} />
+                        </main>
+                    </SessionProvider>
+                </Provider>
             </Hydrate>
         </QueryClientProvider>
     )

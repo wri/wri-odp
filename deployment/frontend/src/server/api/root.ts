@@ -8,7 +8,9 @@ import { teamRouter } from './routers/teams'
 import { uploadsRouter } from './routers/uploads'
 import { authRouter } from './routers/auth.router'
 import { tagsRouter } from "./routers/tags";
-import { notificationRouter } from "./routers/notificaftion";
+import { rwRouter } from "./routers/rw";
+import { datastoreRouter } from "./routers/datastore";
+import { notificationRouter } from "./routers/notification";
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 
 /**
@@ -27,6 +29,8 @@ export const appRouter = createTRPCRouter({
   teams: teamRouter,
   tags: tagsRouter,
   notification: notificationRouter,
+  rw: rwRouter,
+  datastore: datastoreRouter,
 });
 
 // export type definition of API

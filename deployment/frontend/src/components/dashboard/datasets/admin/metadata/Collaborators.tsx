@@ -69,8 +69,8 @@ export function Collaborators({
                             }
                             className="ml-auto flex items-center justify-end gap-x-1"
                         >
-                            <PlusCircleIcon className="h-5 w-5 text-amber-400" />
-                            <span className="font-['Acumin Pro SemiCondensed'] text-lg font-normal leading-tight text-black">
+                            <PlusCircleIcon className="h-5 w-5 text-amber-400 mt-6" />
+                            <span className="font-['Acumin Pro SemiCondensed'] text-lg font-normal leading-tight text-black mt-6">
                                 Add {fields.length > 0 ? 'another' : ''}{' '}
                                 collaborator
                             </span>
@@ -160,21 +160,10 @@ export function CollaboratorForm({
                 </InputGroup>
             </div>
             <DefaultTooltip content="Remove collaborator">
-                {removeCollaborator.isLoading ? (
-                    <Spinner />
-                ) : (
-                    <MinusCircleIcon
-                        onClick={() =>
-                            removeCollaborator.mutate({
-                                user_id:
-                                    watch('collaborators')[index]?.user.value ??
-                                    '',
-                                id: dataset.id,
-                            })
-                        }
-                        className="h-5 w-5 text-red-600"
-                    />
-                )}
+                <MinusCircleIcon
+                    onClick={() => remove(index)}
+                    className="h-5 w-5 text-red-600"
+                />
             </DefaultTooltip>
         </div>
     )

@@ -34,6 +34,7 @@ import { Dialog } from '@headlessui/react'
 import { useState } from 'react'
 import Spinner from '../_shared/Spinner'
 import { ErrorAlert } from '@/components/_shared/Alerts'
+import { TabularResource } from './visualizations/Visualizations'
 
 function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     const session = useSession()
@@ -116,12 +117,22 @@ function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     )
 }
 
-export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
+export function DatasetHeader({
+    dataset,
+    setTabularResource,
+    tabularResource,
+}: {
+    dataset?: WriDataset
+    setTabularResource: (tabularResource: TabularResource | null) => void
+    tabularResource: TabularResource | null
+}) {
     const [open, setOpen] = useState(false)
     const [fopen, setFOpen] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const session = useSession()
     const { data, isLoading, refetch } = api.dataset.isFavoriteDataset.useQuery(
-        dataset?.id as string
+        dataset?.id as string,
+        { retry: false, enabled: !!session.data?.user }
     )
     const addToFavorites = api.dataset.followDataset.useMutation({
         onSuccess: async (data) => {
@@ -149,7 +160,6 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
         },
         onError: (error) => setErrorMessage(error.message),
     })
-    const session = useSession()
     const created_at = new Date(dataset?.metadata_created ?? '')
     const last_updated = new Date(dataset?.metadata_modified ?? '')
     const options = {
@@ -466,23 +476,27 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                                     session.data?.user ? 'border-l pl-3' : ''
                                 )}
                             >
-                                {dataset?.resources
-                                    .filter((resource) => resource.format)
-                                    .map((resource) => (
-                                        <span
-                                            key={resource.id}
-                                            className={classNames(
-                                                'flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black',
-                                                getFormatColor(
-                                                    resource.format ?? ''
-                                                )
-                                            )}
-                                        >
-                                            <span className="my-auto">
-                                                {resource.format?.toUpperCase()}
-                                            </span>
+                                {[
+                                    ...new Set(
+                                        dataset?.resources
+                                            .filter(
+                                                (resource) => resource.format
+                                            )
+                                            .map((resource) => resource.format)
+                                    ),
+                                ].map((format, i) => (
+                                    <span
+                                        key={'format-pill-' + format}
+                                        className={classNames(
+                                            'flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black',
+                                            getFormatColor(format ?? '')
+                                        )}
+                                    >
+                                        <span className="my-auto">
+                                            {format?.toUpperCase()}
                                         </span>
-                                    ))}
+                                    </span>
+                                ))}
                             </div>
                         )}
                 </div>
@@ -491,13 +505,33 @@ export function DatasetHeader({ dataset }: { dataset?: WriDataset }) {
                         href={dataset?.technical_notes}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-x-1 pt-4"
+                        className="flex items-center gap-x-1 pt-4 w-fit"
                     >
                         <LinkIcon className="h-4 w-4 text-wri-green" />
                         <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
                             Technical Notes
                         </div>
                     </a>
+                )}
+                {dataset?.provider && dataset?.rw_id && (
+                    <div className='py-4'>
+                        {tabularResource && tabularResource.id === dataset.rw_id ? (
+                            <Button size="sm" onClick={() => setTabularResource(null)}>
+                                Remove Tabular View
+                            </Button>
+                        ) : (
+                            <Button size="sm"
+                                onClick={() =>
+                                    setTabularResource({
+                                        provider: dataset.provider as string,
+                                        id: dataset.rw_id as string,
+                                    })
+                                }
+                            >
+                                Add Tabular View
+                            </Button>
+                        )}
+                    </div>
                 )}
             </div>
         </div>
