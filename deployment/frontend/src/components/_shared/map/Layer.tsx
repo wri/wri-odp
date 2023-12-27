@@ -9,7 +9,7 @@ import LayerManager, { LayerSpec } from '@vizzuality/layer-manager'
 
 export type LayerProps = LayerSpec & {
     layerManager: LayerManager
-}
+} & { threshold?: number }
 
 class Layer extends PureComponent<LayerProps> {
     // eslint-disable-next-line react/static-property-placement
