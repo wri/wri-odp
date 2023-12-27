@@ -13,6 +13,10 @@ export default function HighlightCard({
 }: {
     highlight: WriDataset
 }) {
+    const hasMapView = highlight?.resources?.some((r) => r.format == 'Layer')
+
+    const hasTabularView = highlight?.resources?.some((r) => r.datastore_active)
+
     return (
         <Link
             href={`/datasets/${highlight.name}`}
@@ -67,15 +71,21 @@ export default function HighlightCard({
                 ) : null}
             </div>
             <div className="px-4 mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black">
-                <div className="rounded-full bg-stone-100 p-1">
-                    <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                </div>
-                <div className="rounded-full bg-stone-100 p-1">
-                    <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                </div>
-                <div className="rounded-full bg-stone-100 p-1">
-                    <TableCellsIcon className="h-5 w-5 text-green-600" />
-                </div>
+                {false && (
+                    <div className="rounded-full bg-stone-100 p-1">
+                        <ChartBarIcon className="h-5 w-5 text-blue-700" />
+                    </div>
+                )}
+                {hasMapView && (
+                    <div className="rounded-full bg-stone-100 p-1">
+                        <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
+                    </div>
+                )}
+                {hasTabularView && (
+                    <div className="rounded-full bg-stone-100 p-1">
+                        <TableCellsIcon className="h-5 w-5 text-green-600" />
+                    </div>
+                )}
             </div>
         </Link>
     )

@@ -5,10 +5,10 @@ export default function LegendItemTypesList(props: any) {
 
     const legendConfigOg = props?.activeLayer?.legendConfig
     if (legendConfigOg) {
-        if (!Array.isArray(legendConfigOg)) {
-            legendConfigs = [legendConfigOg]
+        if (legendConfigOg.type == 'multiple') {
+            legendConfigs = legendConfigOg.items
         } else {
-            legendConfigs = legendConfigOg
+            legendConfigs = [legendConfigOg]
         }
     }
 

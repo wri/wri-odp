@@ -13,7 +13,7 @@ import {
     UseFormReturn,
     useForm,
 } from 'react-hook-form'
-import { useThreshold } from '@/utils/storeHooks'
+import { DefaultTooltip, Tooltip } from '@/components/_shared/Tooltip'
 
 export interface Option<V> {
     label: string
@@ -25,9 +25,10 @@ export default function LegendItemButtonThreshold<
     T extends FieldValues,
     V extends Object,
 >(props: any) {
+    const { onChangeThreshold } = props
+
     const { activeLayer } = props
     const { control } = useForm()
-    const { setThreshold, threshold } = useThreshold()
 
     const hasThreshold = activeLayer?.layerConfig?.params_config?.some(
         (item: any) => item.key == 'thresh'
@@ -36,7 +37,9 @@ export default function LegendItemButtonThreshold<
     const options = [10, 15, 20, 25, 30, 50, 75].map((item) => ({
         label: `>${item}%`,
         value: item,
-        default: item == threshold
+        default: activeLayer.threshold
+            ? item == activeLayer.threshold
+            : item == 30,
     }))
 
     return hasThreshold ? (
@@ -56,24 +59,27 @@ export default function LegendItemButtonThreshold<
                     value={selected}
                     onChange={(e) => {
                         setSelected(e)
-                        setThreshold(e.value)
+                        onChangeThreshold(activeLayer, e.value)
                     }}
                 >
                     {({ open }) => (
                         <>
                             <div className="relative">
-                                <Listbox.Button
-                                    id={'threshold'}
-                                    className={classNames(
-                                        'relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6'
-                                    )}
-                                >
-                                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center">
-                                        <AdjustmentsVerticalIcon className="w-4" />
-                                    </span>
-                                </Listbox.Button>
+                                <DefaultTooltip content="Threshold">
+                                    <Listbox.Button
+                                        id={'threshold'}
+                                        className={classNames(
+                                            'relative text-left block w-full rounded-md border-0 px-5 py-3 hover:text-gray-900 text-gray-600 placeholder:text-gray-400 sm:text-sm sm:leading-6'
+                                        )}
+                                    >
+                                        <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center">
+                                            <AdjustmentsVerticalIcon className="w-4 mr-1" />
+                                            {selected.label}
+                                        </span>
+                                    </Listbox.Button>
+                                </DefaultTooltip>
 
-                                <div className="absolute bottom-[300px] left-[20px]">
+                                <div className="absolute bottom-[300px] right-[65px]">
                                     <Transition
                                         show={open}
                                         as={Fragment}
@@ -81,7 +87,7 @@ export default function LegendItemButtonThreshold<
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"
                                     >
-                                        <Listbox.Options className="fixed z-50 mt-1 max-h-60 w-full auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                        <Listbox.Options className="fixed z-50 mt-1 max-h-64 auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                             {options.map((option) => (
                                                 <Listbox.Option
                                                     key={option.value}

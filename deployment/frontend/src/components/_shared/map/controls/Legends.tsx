@@ -19,6 +19,8 @@ import { LegendItemTypes } from '@/components/vizzuality/components'
 import { LegendItemTimeline } from 'old-vizzuality-components'
 import { type ActiveLayerGroup } from '@/interfaces/state.interface'
 import LegendItemButtonThreshold from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonThreshold'
+import LegendItemTypesList from '@/components/vizzuality/components/legend/components/legend-item-types/LegendItemTypesList'
+import LegendItemButtonRemoveLayer from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonRemoveLayer'
 
 export function Legends() {
     const { data: layerGroups } = useLayerGroupsFromRW()
@@ -71,9 +73,10 @@ export function Legends() {
                                 toolbar={
                                     <LegendItemToolbar>
                                         <LegendItemButtonLayers />
-                                        {/* <LegendItemButtonThreshold /> */}
+                                        <LegendItemButtonThreshold />
                                         <LegendItemButtonOpacity />
                                         <LegendItemButtonVisibility />
+                                        <LegendItemButtonRemoveLayer />
                                     </LegendItemToolbar>
                                 }
                                 onChangeInfo={() => console.log('Info')}
@@ -102,6 +105,17 @@ export function Legends() {
                                             : !layerState?.visibility
                                     )
                                 }}
+                                onChangeThreshold={(layer: any, threshold: number) => {
+                                    const layerState = currentLayers.get(
+                                        layer.id
+                                    )
+                                    updateLayerState(layer.id, 'active', true)
+                                    updateLayerState(
+                                        layer.id,
+                                        'threshold',
+                                        threshold
+                                    )
+                                }}
                                 onChangeLayer={(layer: APILayerSpec) => {
                                     lg.layers.forEach(
                                         (_layer: APILayerSpec) => {
@@ -118,7 +132,7 @@ export function Legends() {
                                     console.log(layer)
                                 }
                             >
-                                <LegendItemTypes />
+                                <LegendItemTypesList />
                                 <LegendItemTimeStep
                                     defaultStyles={LEGEND_TIMELINE_PROPERTIES}
                                     handleChange={() => console.log('Change')}

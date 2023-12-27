@@ -124,6 +124,7 @@ export default function Search({
                 )}
             ></div>
             <IconButton
+                tooltip='Geolocation search'
                 type="button"
                 className="search-control--btn "
                 onClick={() => handleSearchInput(!showSearchInput)}

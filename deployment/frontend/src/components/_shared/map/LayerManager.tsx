@@ -8,25 +8,28 @@ import CartoProvider from '@vizzuality/layer-manager-provider-carto'
 import { TileProvider } from '@/utils/providers/tileProvider'
 import { GeeProvider } from '@/utils/providers/geeProvider'
 import { APILayerSpec } from '@/interfaces/layer.interface'
-import { useLayerStates, useThreshold } from '@/utils/storeHooks'
+import { useLayerStates } from '@/utils/storeHooks'
 import { LayerState } from '@/interfaces/state.interface'
 import { useMemo } from 'react'
 
 export const parseLayers = (
     layers: APILayerSpec[],
     layerStates: Map<string, LayerState>
-): LayerSpec[] => {
+): any[] => {
     return layers.map((layer): LayerSpec => {
         const { id, layerConfig } = layer
+
         const layerState = layerStates.get(id)
         let layerProps: any = pick(layerConfig, [
             'deck',
             'images',
             'interactivity',
             'opacity',
+            'threshold',
             'params',
             'sqlParams',
             'source',
+            '_ogSource',
             'type',
             'render',
             'visibility',
@@ -60,19 +63,23 @@ const providers: Record<string, ProviderMaker['handleData']> = {
 
 const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
     const { current: map } = useMap()
-    const { threshold } = useThreshold()
     const { currentLayers } = useLayerStates()
     const parsedLayers = useMemo(() => {
         const parsedLayers = parseLayers(layers, currentLayers)
 
         parsedLayers.forEach((pl) => {
+            if (!pl.threshold) {
+              pl.threshold = 30;
+            }
+
             // @ts-ignore
-            if (pl.source?.tiles) {
+            if (pl.source.tiles) {
                 // @ts-ignore
-                pl.source.tiles = pl.source.tiles.map((tile) =>
-                    tile.replace('{thresh}', 30)
+                pl.source.tiles = pl._ogSource.tiles.map((tile: any) =>
+                    tile.replace('{thresh}', pl.threshold)
                 )
             }
+
         })
 
         return parsedLayers

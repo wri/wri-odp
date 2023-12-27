@@ -167,6 +167,11 @@ export function DatasetHeader({
         month: 'short',
         day: 'numeric',
     } as const
+
+    const hasMapView = dataset?.resources.some((r) => r.format == 'Layer')
+
+    const hasTabularView = dataset?.resources.some((r) => r.datastore_active)
+
     return (
         <div className="flex w-full flex-col pb-10 font-acumin">
             {!session.data?.user ? (
@@ -346,15 +351,21 @@ export function DatasetHeader({
                         className="flex justify-start gap-x-3
             "
                     >
-                        <div className="rounded-full bg-stone-100 p-1">
-                            <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                        </div>
-                        <div className="rounded-full bg-stone-100 p-1">
-                            <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                        </div>
-                        <div className="rounded-full bg-stone-100 p-1">
-                            <TableCellsIcon className="h-5 w-5 text-green-600" />
-                        </div>
+                        {false && (
+                            <div className="rounded-full bg-stone-100 p-1">
+                                <ChartBarIcon className="h-5 w-5 text-blue-700" />
+                            </div>
+                        )}
+                        {hasMapView && (
+                            <div className="rounded-full bg-stone-100 p-1">
+                                <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
+                            </div>
+                        )}
+                        {hasTabularView && (
+                            <div className="rounded-full bg-stone-100 p-1">
+                                <TableCellsIcon className="h-5 w-5 text-green-600" />
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="flex max-w-[560px] flex-col gap-y-2">
@@ -514,13 +525,18 @@ export function DatasetHeader({
                     </a>
                 )}
                 {dataset?.provider && dataset?.rw_id && (
-                    <div className='py-4'>
-                        {tabularResource && tabularResource.id === dataset.rw_id ? (
-                            <Button size="sm" onClick={() => setTabularResource(null)}>
+                    <div className="py-4">
+                        {tabularResource &&
+                        tabularResource.id === dataset.rw_id ? (
+                            <Button
+                                size="sm"
+                                onClick={() => setTabularResource(null)}
+                            >
                                 Remove Tabular View
                             </Button>
                         ) : (
-                            <Button size="sm"
+                            <Button
+                                size="sm"
                                 onClick={() =>
                                     setTabularResource({
                                         provider: dataset.provider as string,
