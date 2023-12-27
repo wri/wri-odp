@@ -47,7 +47,6 @@ class Layer extends PureComponent<LayerProps> {
         const {
             type,
             source,
-            _ogSource,
             render,
             params,
             sqlParams,
