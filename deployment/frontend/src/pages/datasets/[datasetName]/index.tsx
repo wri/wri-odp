@@ -285,6 +285,9 @@ export default function DatasetPage(
                                                         <Issues
                                                             issues={issues.data}
                                                             index={indexIssues}
+                                                            datasetName={
+                                                                datasetData.name
+                                                            }
                                                         />
                                                     </Tab.Panel>
                                                 )}

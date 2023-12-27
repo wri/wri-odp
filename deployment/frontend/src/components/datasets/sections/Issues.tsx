@@ -8,13 +8,22 @@ import { Issue } from '@/schema/ckan.schema'
 import { Disclosure, Transition } from '@headlessui/react'
 import { Index } from 'flexsearch'
 import classNames from '@/utils/classnames'
+import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import type { CommentIssueType } from '@/schema/issue.schema'
+import { CommentSchema } from '@/schema/issue.schema'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
+import { Button, LoaderButton } from '@/components/_shared/Button'
 
 export default function Issues({
     issues,
     index,
+    datasetName,
 }: {
     issues: Issue[]
     index: Index
+    datasetName: string
 }) {
     const [q, setQ] = useState('')
     const filteredIssues =
@@ -35,20 +44,46 @@ export default function Issues({
             <div className="flex flex-col gap-x-3 gap-y-3">
                 <span className="mb-1">{filteredIssues.length} Issues</span>
                 {filteredIssues.map((issue, index) => (
-                    <IssueCard key={index} issue={issue} />
+                    <IssueCard
+                        key={index}
+                        issue={issue}
+                        datasetName={datasetName}
+                    />
                 ))}
             </div>
         </section>
     )
 }
 
-function IssueCard({ issue }: { issue: Issue }) {
+function IssueCard({
+    issue,
+    datasetName,
+}: {
+    issue: Issue
+    datasetName: string
+}) {
+    const [isOpenDelete, setOpenDelete] = useState(false)
+    const [isOpenClose, setOpenClose] = useState(false)
     const created_at = new Date(issue.created ?? '')
     const options = {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
     } as const
+    const formObj = useForm<CommentIssueType>({
+        resolver: zodResolver(CommentSchema),
+        mode: 'onBlur',
+        defaultValues: {
+            issue_number: issue.number,
+            dataset_id: datasetName,
+            comment: '',
+        },
+    })
+
+    const OnSubmit = (data: CommentIssueType) => {
+        if (!isOpenClose || !isOpenDelete) {
+        }
+    }
     return (
         <Disclosure
             as="div"
@@ -128,6 +163,45 @@ function IssueCard({ issue }: { issue: Issue }) {
                             </div>
                         </li>
                     ))}
+
+                    <form
+                        className=" border-t-2 mt-3 pt-3 flex flex-col w-full divide-x-2"
+                        onSubmit={formObj.handleSubmit(OnSubmit)}
+                    >
+                        <SimpleEditor
+                            formObj={formObj}
+                            name="comment"
+                            defaultValue=""
+                        />
+                        <div className="flex ml-auto gap-x-2 mt-2">
+                            <Button
+                                variant="destructive"
+                                className="rounded-md"
+                                onClick={() => {
+                                    setOpenDelete(true)
+                                }}
+                                id={issue.id.toString()}
+                            >
+                                Delete
+                            </Button>
+                            <Button
+                                className=" bg-wri-gray border-2 rounded-md"
+                                onClick={() => {
+                                    setOpenClose(true)
+                                }}
+                                id={issue.id.toString()}
+                            >
+                                close
+                            </Button>
+                            <LoaderButton
+                                loading={false}
+                                type="submit"
+                                className="rounded-md"
+                            >
+                                Comment
+                            </LoaderButton>
+                        </div>
+                    </form>
                 </Disclosure.Panel>
             </Transition>
         </Disclosure>

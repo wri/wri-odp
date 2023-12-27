@@ -45,6 +45,7 @@ import {
 } from '@/interfaces/rw.interface'
 import { sendMemberNotifications } from '@/utils/apiUtils'
 import { TRPCError } from '@trpc/server'
+import { CommentSchema } from '@/schema/issue.schema'
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -901,4 +902,73 @@ export const DatasetRouter = createTRPCRouter({
 
             return result.some((dataset) => dataset.id === input)
         }),
+    createIssueComment: protectedProcedure
+        .input(CommentSchema)
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_comment_create`,
+                {
+                    method: "POST",
+                    body: JSON.stringify(input),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                })
+            
+            const data = (await response.json()) as CkanResponse<null>
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
+        }),
+    
+    CloseOpenIssue: protectedProcedure
+        .input(CommentSchema)
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_update`, {
+                method: "POST",
+                body: JSON.stringify(input),
+                headers: {
+                    Authorization: ctx.session.user.apikey,
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            const data = (await response.json()) as CkanResponse<null>
+            if (!data.success && data.error) throw Error(data.error.message)
+            
+            console.log("data: ", data)
+
+            const responseComment = await fetch(`${env.CKAN_URL}/api/3/action/issue_comment_create`,
+                {
+                    method: "POST",
+                    body: JSON.stringify(input),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                })
+            
+            const dataComment = (await responseComment.json()) as CkanResponse<null>
+            if (!dataComment.success && dataComment.error) throw Error(dataComment.error.message)
+            return dataComment
+        }),
+    
+    deleteIssue: protectedProcedure
+        .input(CommentSchema)
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_delete`,
+                    {
+                        method: "POST",
+                        body: JSON.stringify(input),
+                        headers: {
+                            Authorization: ctx.session.user.apikey,
+                            'Content-Type': 'application/json',
+                        },
+                })
+            
+            
+            const data = (await response.json()) as CkanResponse<null>
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
+        }),
+    
 })
