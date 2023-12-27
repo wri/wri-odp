@@ -15,7 +15,7 @@ import { useMemo } from 'react'
 export const parseLayers = (
     layers: APILayerSpec[],
     layerStates: Map<string, LayerState>
-): LayerSpec[] => {
+): any[] => {
     return layers.map((layer): LayerSpec => {
         const { id, layerConfig } = layer
 
