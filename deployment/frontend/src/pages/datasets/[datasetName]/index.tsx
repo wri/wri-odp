@@ -192,7 +192,9 @@ export default function DatasetPage(
             />
             <Header />
             <Breadcrumbs links={links} />
-            {isApprovalRequest && <ApprovalRequestCard />}
+            {isApprovalRequest && (
+                <ApprovalRequestCard datasetName={datasetData.name} />
+            )}
             <DatasetPageLayout
                 lhs={
                     isAddingLayers ? (

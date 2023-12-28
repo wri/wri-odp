@@ -45,7 +45,7 @@ import {
 } from '@/interfaces/rw.interface'
 import { sendMemberNotifications } from '@/utils/apiUtils'
 import { TRPCError } from '@trpc/server'
-import { CommentSchema } from '@/schema/issue.schema'
+import { CommentSchema, IssueSchema } from '@/schema/issue.schema'
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -949,13 +949,31 @@ export const DatasetRouter = createTRPCRouter({
             
             const dataComment = (await responseComment.json()) as CkanResponse<null>
             if (!dataComment.success && dataComment.error) throw Error(dataComment.error.message)
-            return dataComment
+            return input.status
         }),
     
     deleteIssue: protectedProcedure
         .input(CommentSchema)
         .mutation(async ({ input, ctx }) => {
             const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_delete`,
+                    {
+                        method: "POST",
+                        body: JSON.stringify(input),
+                        headers: {
+                            Authorization: ctx.session.user.apikey,
+                            'Content-Type': 'application/json',
+                        },
+                })
+            
+            
+            const data = (await response.json()) as CkanResponse<null>
+            if (!data.success && data.error) throw Error(data.error.message)
+            return input.issue_number
+        }),
+    createIssue: protectedProcedure
+        .input(IssueSchema)
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_create`,
                     {
                         method: "POST",
                         body: JSON.stringify(input),

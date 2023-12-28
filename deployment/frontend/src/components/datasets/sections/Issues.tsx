@@ -13,8 +13,15 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { CommentIssueType } from '@/schema/issue.schema'
 import { CommentSchema } from '@/schema/issue.schema'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
+import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import { Button, LoaderButton } from '@/components/_shared/Button'
+import { api } from '@/utils/api'
+import notify from '@/utils/notify'
+import Modal from '@/components/_shared/Modal'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Dialog } from '@headlessui/react'
+import SimpleSelect from '@/components/_shared/SimpleSelect'
+import { ErrorAlert } from '@/components/_shared/Alerts'
 
 export default function Issues({
     issues,
@@ -25,11 +32,13 @@ export default function Issues({
     index: Index
     datasetName: string
 }) {
+    const [issueState, setIssueState] = useState<'open' | 'closed'>('open')
     const [q, setQ] = useState('')
     const filteredIssues =
         q !== ''
             ? issues?.filter((issue) => index.search(q).includes(issue.id))
             : issues
+
     return (
         <section id="issues">
             <div className="relative pb-5">
@@ -41,15 +50,43 @@ export default function Issues({
                 />
                 <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[15px] right-4" />
             </div>
-            <div className="flex flex-col gap-x-3 gap-y-3">
-                <span className="mb-1">{filteredIssues.length} Issues</span>
-                {filteredIssues.map((issue, index) => (
-                    <IssueCard
-                        key={index}
-                        issue={issue}
-                        datasetName={datasetName}
-                    />
-                ))}
+            <div className="flex flex-col gap-x-3 gap-y-3 min-h-[10rem]">
+                <div className="flex flex-col sm:flex-row gap-y-3">
+                    <span className="mb-1">
+                        {
+                            filteredIssues.filter(
+                                (issue) => issue.status === issueState
+                            ).length
+                        }{' '}
+                        Issues
+                    </span>
+
+                    <div className="ml-auto w-36 ">
+                        <SimpleSelect
+                            name="issuestate"
+                            placeholder="Open"
+                            maxWidth="xl:max-w-[28rem]"
+                            options={[
+                                { value: 'open', label: 'Open' },
+                                { value: 'closed', label: 'Closed' },
+                            ]}
+                            onChange={(data) => {
+                                const state = data as 'closed' | 'open'
+                                setIssueState(state)
+                            }}
+                        />
+                    </div>
+                </div>
+
+                {filteredIssues
+                    .filter((issue) => issue.status === issueState)
+                    .map((issue, index) => (
+                        <IssueCard
+                            key={issue.number}
+                            issue={issue}
+                            datasetName={datasetName}
+                        />
+                    ))}
             </div>
         </section>
     )
@@ -64,6 +101,7 @@ function IssueCard({
 }) {
     const [isOpenDelete, setOpenDelete] = useState(false)
     const [isOpenClose, setOpenClose] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const created_at = new Date(issue.created ?? '')
     const options = {
         year: 'numeric',
@@ -79,24 +117,67 @@ function IssueCard({
             comment: '',
         },
     })
+    const { errors } = formObj.formState
+
+    const utils = api.useUtils()
+    const commentIssueApi = api.dataset.createIssueComment.useMutation({
+        onSuccess: async (data) => {
+            await utils.dataset.getDatasetIssues.invalidate({
+                id: datasetName,
+            })
+            notify(`Comment successfully added`, 'success')
+            formObj.reset()
+        },
+        onError: (error) => setErrorMessage(error.message),
+    })
+
+    const closeOpenIssueApi = api.dataset.CloseOpenIssue.useMutation({
+        onSuccess: async (data) => {
+            await utils.dataset.getDatasetIssues.invalidate({
+                id: datasetName,
+            })
+            setOpenClose(false)
+            notify(`Issue successfully ${data}`, 'success')
+        },
+        onError: (error) => setErrorMessage(error.message),
+    })
+
+    const deleteIssueApi = api.dataset.deleteIssue.useMutation({
+        onSuccess: async (data) => {
+            await utils.dataset.getDatasetIssues.invalidate({
+                id: datasetName,
+            })
+            setOpenDelete(false)
+            notify(`Issue #${data} successfully deleted`, 'error')
+        },
+        onError: (error) => setErrorMessage(error.message),
+    })
 
     const OnSubmit = (data: CommentIssueType) => {
-        if (!isOpenClose || !isOpenDelete) {
+        if (!isOpenClose && !isOpenDelete) {
+            commentIssueApi.mutate(data)
         }
     }
+
     return (
         <Disclosure
             as="div"
             className={classNames(
-                'flex flex-col relative font-acumin gap-y-1 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100',
-                issue.comments.length > 0 ? 'cursor-pointer' : ''
+                'flex flex-col relative font-acumin gap-y-1 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100 cursor-pointer'
             )}
         >
-            <Disclosure.Button as="div" disabled={issue.comments.length === 0}>
+            <Disclosure.Button as="div">
                 <div className="relative">
-                    <h3 className="font-semibold text-[1.125rem]">
-                        {issue.title}
-                    </h3>
+                    <div className="flex gap-x-2">
+                        <h3 className="font-semibold text-[1.125rem]">
+                            {issue.title}
+                        </h3>
+                        {issue.status === 'closed' && (
+                            <div className=" bg-red-500 text-white text-[10px] font-thin rounded-sm my-auto px-[1.5px]">
+                                closed
+                            </div>
+                        )}
+                    </div>
                     {issue.comment_count > 0 && (
                         <div className="flex absolute right-8 sm:top-[40%] gap-x-1 items-center">
                             <ChatBubbleLeftIcon className="w-5 h-5 text-blue-800" />
@@ -157,9 +238,12 @@ function IssueCard({
                                         </time>
                                     </p>
                                 </div>
-                                <p className="mt-1 line-clamp-2 text-sm leading-6 text-gray-600">
-                                    {comment.comment}
-                                </p>
+                                <p
+                                    className="mt-1 line-clamp-2 text-sm leading-6 text-gray-600"
+                                    dangerouslySetInnerHTML={{
+                                        __html: comment.comment,
+                                    }}
+                                ></p>
                             </div>
                         </li>
                     ))}
@@ -168,6 +252,7 @@ function IssueCard({
                         className=" border-t-2 mt-3 pt-3 flex flex-col w-full divide-x-2"
                         onSubmit={formObj.handleSubmit(OnSubmit)}
                     >
+                        <ErrorDisplay name="comment" errors={errors} />
                         <SimpleEditor
                             formObj={formObj}
                             name="comment"
@@ -191,17 +276,146 @@ function IssueCard({
                                 }}
                                 id={issue.id.toString()}
                             >
-                                close
+                                {issue.status === 'open' ? 'Close' : 'Re-open'}
                             </Button>
                             <LoaderButton
-                                loading={false}
+                                loading={commentIssueApi.isLoading}
                                 type="submit"
                                 className="rounded-md"
                             >
                                 Comment
                             </LoaderButton>
                         </div>
+                        {errorMessage && (
+                            <div className="py-4">
+                                <ErrorAlert text={errorMessage} />
+                            </div>
+                        )}
                     </form>
+                    <Modal
+                        open={isOpenDelete}
+                        setOpen={setOpenDelete}
+                        className="sm:w-full sm:max-w-lg"
+                        id="delete"
+                    >
+                        <div className="sm:flex sm:items-start">
+                            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                <ExclamationTriangleIcon
+                                    className="h-6 w-6 text-red-600"
+                                    aria-hidden="true"
+                                />
+                            </div>
+                            <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                <Dialog.Title
+                                    as="h3"
+                                    className="text-base font-semibold leading-6 text-gray-900"
+                                >
+                                    Delete Issue
+                                </Dialog.Title>
+                                <div className="mt-2">
+                                    <p className="text-sm text-gray-500">
+                                        Are you sure you want to delete this
+                                        Issue?
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                            <LoaderButton
+                                variant="destructive"
+                                loading={deleteIssueApi.isLoading}
+                                onClick={() => {
+                                    deleteIssueApi.mutate(formObj.getValues())
+                                }}
+                                id={issue.number.toString()}
+                            >
+                                Delete Issue
+                            </LoaderButton>
+                            <Button
+                                variant="outline"
+                                type="button"
+                                onClick={() => setOpenDelete(false)}
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+                    </Modal>
+                    <Modal
+                        open={isOpenClose}
+                        setOpen={setOpenClose}
+                        className="sm:w-full sm:max-w-lg"
+                        id="openclose"
+                    >
+                        <div className="sm:flex sm:items-start">
+                            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                <ExclamationTriangleIcon
+                                    className="h-6 w-6 text-red-600"
+                                    aria-hidden="true"
+                                />
+                            </div>
+                            <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                <Dialog.Title
+                                    as="h3"
+                                    className="text-base font-semibold leading-6 text-gray-900"
+                                >
+                                    {issue.status === 'open'
+                                        ? 'Close'
+                                        : 'Re-open'}{' '}
+                                    Issue
+                                </Dialog.Title>
+                                <div className="mt-2">
+                                    <p className="text-sm text-gray-500">
+                                        Are you sure you want to{' '}
+                                        {issue.status === 'open'
+                                            ? 'close'
+                                            : 're-open'}{' '}
+                                        this Issue?
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                            <LoaderButton
+                                variant="destructive"
+                                loading={closeOpenIssueApi.isLoading}
+                                onClick={() => {
+                                    if (
+                                        formObj.getValues('comment').trim() !==
+                                        ''
+                                    ) {
+                                        const payload = {
+                                            ...formObj.getValues(),
+                                            status:
+                                                issue.status === 'open'
+                                                    ? 'closed'
+                                                    : 'open',
+                                        }
+
+                                        closeOpenIssueApi.mutate(payload)
+                                    } else {
+                                        // Handle the case when the 'comment' field is empty
+                                        formObj.setError('comment', {
+                                            type: 'manual',
+                                            message:
+                                                'Comment must not be empty',
+                                        })
+                                        setOpenClose(false)
+                                    }
+                                }}
+                                id={issue.number.toString()}
+                            >
+                                {issue.status === 'open' ? 'Close' : 'Re-open'}{' '}
+                                Issue
+                            </LoaderButton>
+                            <Button
+                                variant="outline"
+                                type="button"
+                                onClick={() => setOpenClose(false)}
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+                    </Modal>
                 </Disclosure.Panel>
             </Transition>
         </Disclosure>
