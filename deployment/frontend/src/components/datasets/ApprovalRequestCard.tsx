@@ -85,12 +85,14 @@ export default function ApprovalRequestCard({
                     >
                         <ErrorDisplay name="title" errors={errors} />
                         <input
+                            id="title"
                             className="w-full h-12 bg-white rounded-sm border border-[#E5E5E5] mt-4 p-4"
                             placeholder="Title"
                             {...formObj.register('title')}
                         />
                         <ErrorDisplay name="description" errors={errors} />
                         <textarea
+                            id="description"
                             className="w-full h-40 bg-white rounded-sm border border-[#E5E5E5] mt-4 p-4"
                             placeholder="Description..."
                             {...formObj.register('description')}
@@ -100,6 +102,7 @@ export default function ApprovalRequestCard({
                                 variant="destructive"
                                 type="submit"
                                 loading={createIssueApi.isLoading}
+                                id="reject"
                             >
                                 {' '}
                                 Reject and send feedback

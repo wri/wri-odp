@@ -282,6 +282,7 @@ function IssueCard({
                                 loading={commentIssueApi.isLoading}
                                 type="submit"
                                 className="rounded-md"
+                                id={issue.number.toString()}
                             >
                                 Comment
                             </LoaderButton>
@@ -296,7 +297,6 @@ function IssueCard({
                         open={isOpenDelete}
                         setOpen={setOpenDelete}
                         className="sm:w-full sm:max-w-lg"
-                        id="delete"
                     >
                         <div className="sm:flex sm:items-start">
                             <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -344,7 +344,6 @@ function IssueCard({
                         open={isOpenClose}
                         setOpen={setOpenClose}
                         className="sm:w-full sm:max-w-lg"
-                        id="openclose"
                     >
                         <div className="sm:flex sm:items-start">
                             <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
