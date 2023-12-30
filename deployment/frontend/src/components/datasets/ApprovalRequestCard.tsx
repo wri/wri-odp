@@ -13,8 +13,12 @@ import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 export default function ApprovalRequestCard({
     datasetName,
+    owner_org,
+    creator_id,
 }: {
     datasetName: string
+    owner_org: string | null
+    creator_id: string | null
 }) {
     const [open, setOpen] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -28,6 +32,8 @@ export default function ApprovalRequestCard({
             title: '',
             description: '',
             dataset_id: datasetName,
+            owner_org: owner_org,
+            creator_id: creator_id,
         },
     })
 

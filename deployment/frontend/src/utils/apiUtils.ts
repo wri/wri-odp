@@ -9,6 +9,7 @@ import type {
     GroupTree,
     Collaborator,
     GroupsmDetails,
+    WriUser,
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
@@ -1179,7 +1180,7 @@ function findUpdatedMembers(
     })
 }
 
-async function createNotification(
+export async function createNotification(
     recipient_id: string,
     sender_id: string,
     activity_type: string,
@@ -1267,4 +1268,99 @@ export async function getTopicDetails({
         throw Error(JSON.stringify(topic.error))
     }
     return topic.result
+}
+
+export async function getRecipient({
+  owner_org,
+  session,
+}: {
+  owner_org: string;
+  session: Session;
+}): Promise<string[]> {
+  try {
+    const response = await fetch(
+      `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
+      {
+        headers: {
+          Authorization: `${session.user?.apikey ?? ''}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch organization information: ${response.statusText}`);
+    }
+
+    const responseData = (await response.json()) as CkanResponse<WriOrganization | null>
+    const organization: WriOrganization | null =
+        responseData.success === true ? responseData.result : null
+
+    if (organization) {
+      const members = organization.users!;
+
+      // Filter members to include only admins and editors
+      const adminAndEditorMembers = members.filter(
+        (member) => member.capacity === 'admin' || member.capacity === 'editor'
+      );
+
+      // Extract member IDs into an array
+      const memberIds = adminAndEditorMembers.map((member) => member.id!);
+
+      return memberIds;
+    } else {
+      throw new Error(`Failed to fetch organization information: ${responseData.error?.message}`);
+    }
+  } catch (error) {
+    console.error(`Error in getRecipient function`);
+    throw error;
+  }
+}
+
+export async function sendIssueOrCommentNotigication({
+    owner_org,
+    creator_id,
+    dataset_id,
+    session,
+    title,
+    action
+}: {
+        owner_org: string | null;
+        creator_id: string | null;
+        dataset_id: string;
+        session: Session,
+        title: string,
+        action: string
+    }) {
+    try {
+        let recipientIds: string[] = []
+
+        if (owner_org) {
+            recipientIds = await getRecipient({owner_org: owner_org, session: session})
+        }
+        else if (creator_id) {
+            recipientIds = [creator_id]
+        }
+
+        if (recipientIds.length > 0) {
+            const titleNotification = title.split(" ").join("nbsp;")
+            const notificationPromises = recipientIds
+                .filter((recipientId) => recipientId !== session.user.id)
+                .map((recipientId) => {
+                return createNotification(
+                    recipientId,
+                    session.user.id,
+                     `issue_${action}_${titleNotification}`,
+                    'dataset',
+                    dataset_id,
+                    true
+                );
+            });
+
+            await Promise.all(notificationPromises);
+        }
+    } catch (error) {
+        console.error(error);
+        throw Error("Error in sending issue /comment notification");
+    }
 }

@@ -27,10 +27,14 @@ export default function Issues({
     issues,
     index,
     datasetName,
+    owner_org,
+    creator_id,
 }: {
     issues: Issue[]
     index: Index
     datasetName: string
+    owner_org: string | null
+    creator_id: string | null
 }) {
     const [issueState, setIssueState] = useState<'open' | 'closed'>('open')
     const [q, setQ] = useState('')
@@ -85,6 +89,8 @@ export default function Issues({
                             key={issue.number}
                             issue={issue}
                             datasetName={datasetName}
+                            owner_org={owner_org}
+                            creator_id={creator_id}
                         />
                     ))}
             </div>
@@ -95,9 +101,13 @@ export default function Issues({
 function IssueCard({
     issue,
     datasetName,
+    owner_org,
+    creator_id,
 }: {
     issue: Issue
     datasetName: string
+    owner_org: string | null
+    creator_id: string | null
 }) {
     const [isOpenDelete, setOpenDelete] = useState(false)
     const [isOpenClose, setOpenClose] = useState(false)
@@ -115,6 +125,9 @@ function IssueCard({
             issue_number: issue.number,
             dataset_id: datasetName,
             comment: '',
+            owner_org: owner_org,
+            creator_id: creator_id,
+            issuetitle: issue.title,
         },
     })
     const { errors } = formObj.formState
@@ -251,6 +264,7 @@ function IssueCard({
                     <form
                         className=" border-t-2 mt-3 pt-3 flex flex-col w-full divide-x-2"
                         onSubmit={formObj.handleSubmit(OnSubmit)}
+                        id={issue.number.toString()}
                     >
                         <ErrorDisplay name="comment" errors={errors} />
                         <SimpleEditor

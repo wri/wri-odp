@@ -11,6 +11,9 @@ import {
     getAllUsers,
     upsertCollaborator,
     deleteCollaborator,
+    getRecipient,
+    createNotification,
+    sendIssueOrCommentNotigication
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -46,6 +49,7 @@ import {
 import { sendMemberNotifications } from '@/utils/apiUtils'
 import { TRPCError } from '@trpc/server'
 import { CommentSchema, IssueSchema } from '@/schema/issue.schema'
+import { throws } from 'assert'
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -917,6 +921,21 @@ export const DatasetRouter = createTRPCRouter({
             
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(data.error.message)
+
+             try {
+                await sendIssueOrCommentNotigication({
+                    owner_org: input.owner_org,
+                    creator_id: input.creator_id,
+                    dataset_id: input.dataset_id,
+                    session: ctx.session,
+                    title: input.issuetitle,
+                    action: "commented"
+                })
+            }
+            catch (error) {
+                console.log(error)
+                throw Error("Error in sending issue /comment notification")
+            }
             return data
         }),
     
@@ -934,8 +953,6 @@ export const DatasetRouter = createTRPCRouter({
 
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(data.error.message)
-            
-            console.log("data: ", data)
 
             const responseComment = await fetch(`${env.CKAN_URL}/api/3/action/issue_comment_create`,
                 {
@@ -949,6 +966,21 @@ export const DatasetRouter = createTRPCRouter({
             
             const dataComment = (await responseComment.json()) as CkanResponse<null>
             if (!dataComment.success && dataComment.error) throw Error(dataComment.error.message)
+
+            try {
+                await sendIssueOrCommentNotigication({
+                    owner_org: input.owner_org,
+                    creator_id: input.creator_id,
+                    dataset_id: input.dataset_id,
+                    session: ctx.session,
+                    title: input.issuetitle,
+                    action: input.status!
+                })
+            }
+            catch (error) {
+                console.log(error)
+                throw Error("Error in sending issue /comment notification")
+            }
             return input.status
         }),
     
@@ -968,6 +1000,20 @@ export const DatasetRouter = createTRPCRouter({
             
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(data.error.message)
+             try {
+                await sendIssueOrCommentNotigication({
+                    owner_org: input.owner_org,
+                    creator_id: input.creator_id,
+                    dataset_id: input.dataset_id,
+                    session: ctx.session,
+                    title: input.issuetitle,
+                    action: "deleted"
+                })
+            }
+            catch (error) {
+                console.log(error)
+                throw Error("Error in sending issue /comment notification")
+            }
             return input.issue_number
         }),
     createIssue: protectedProcedure
@@ -986,6 +1032,21 @@ export const DatasetRouter = createTRPCRouter({
             
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(data.error.message)
+
+            try {
+                await sendIssueOrCommentNotigication({
+                    owner_org: input.owner_org,
+                    creator_id: input.creator_id,
+                    dataset_id: input.dataset_id,
+                    session: ctx.session,
+                    title: input.title,
+                    action: "created"
+                })
+            }
+            catch (error) {
+                console.log(error)
+                throw Error("Error in sending issue /comment notification")
+            }
             return data
         }),
     

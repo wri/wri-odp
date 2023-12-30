@@ -193,7 +193,11 @@ export default function DatasetPage(
             <Header />
             <Breadcrumbs links={links} />
             {isApprovalRequest && (
-                <ApprovalRequestCard datasetName={datasetData.name} />
+                <ApprovalRequestCard
+                    datasetName={datasetData.name}
+                    owner_org={datasetData?.owner_org || null}
+                    creator_id={datasetData?.creator_user_id || null}
+                />
             )}
             <DatasetPageLayout
                 lhs={
@@ -289,6 +293,14 @@ export default function DatasetPage(
                                                             index={indexIssues}
                                                             datasetName={
                                                                 datasetData.name
+                                                            }
+                                                            owner_org={
+                                                                datasetData?.owner_org ||
+                                                                null
+                                                            }
+                                                            creator_id={
+                                                                datasetData?.creator_user_id ||
+                                                                null
                                                             }
                                                         />
                                                     </Tab.Panel>
