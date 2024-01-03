@@ -153,7 +153,7 @@ describe("Dashboard Test", () => {
   })
   
   it("Should have issues", () => {
-    cy.visit("/datasets/" + dataset + "?approval=true")
+    cy.visit("/datasets/" + datasetName + "?approval=true")
     cy.contains("Reject request").click()
     cy.get("textarea[id=description]").type("Test");
     cy.get("input[id=title]").type("Test");
