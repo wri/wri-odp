@@ -151,6 +151,28 @@ describe("Dashboard Test", () => {
     cy.get('#unreadn').should('not.exist');
 
   })
+  
+  it("Should have issues", () => {
+    cy.visit("/datasets/" + dataset + "?approval=true")
+    cy.contains("Reject request").click()
+    cy.get("textarea[id=description]").type("Test");
+    cy.get("input[id=title]").type("Test");
+    cy.get("button[id=reject]").click();
+
+    cy.contains("Issues").click();
+    cy.contains("Test");
+    cy.contains("Test").click();
+    cy.get(".tiptap.ProseMirror").type("issue comment");
+    cy.get("button").contains("Comment").click();
+    cy.contains("issue comment");
+
+    // delete issue
+    cy.get("button").contains("Delete").click();
+    cy.contains("Delete Issue");
+    cy.get("button").contains("Delete Issue").click();
+    
+  })
+
   it("should delete notification", () => {
     cy.visit("/dashboard/notifications")
     cy.get('#notification').check({ force: true });
@@ -160,7 +182,7 @@ describe("Dashboard Test", () => {
     cy.contains('button', 'Delete Notification').click();
     cy.wait(15000);
     cy.contains('deleted dataset').should('not.exist');
-   })
+  })
 
 
   after(() => {
