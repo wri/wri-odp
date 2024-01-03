@@ -67,6 +67,8 @@ jobs:
         working-directory: ./ckan-backend-dev
       - name: Initialize the ckanext-issues table
         run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
+      - name: Update the ckanext-issues table
+        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesupdate"
       - name: Initialize the notification table
         run: docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
       - name: Cypress Install and CKAN setup
