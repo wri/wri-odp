@@ -11,7 +11,8 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@e7a47e72ec40c0dc8e160df6377134445aa4ad5c#egg=ckanext-auth' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-data-api.git@d8dbe35bf4c074575bc5511de9527c4e7cb8e33e#egg=ckanext-data-api'
 
 USER root
 
@@ -53,7 +54,7 @@ RUN for d in $APP_DIR/patches/*; do \
 USER ckan
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
-ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
+ENV CKAN__PLUGINS image_view text_view webpage_view data_api resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 
