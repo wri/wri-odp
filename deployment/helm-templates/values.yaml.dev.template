@@ -101,6 +101,44 @@ ckan:
     env:
       SITE_TITLE: WRI ODP
     targetPort: 3000
+  hasura:
+    enable: true
+    resources:
+      limits:
+        memory: 2G
+        cpu: 1200m
+      requests:
+        memory: 1.6G
+        cpu: 200m
+    hpa:
+      enable: false
+    image:
+      repository: hasura/graphql-engine
+      tag: "latest"
+    env:
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: "anon"
+  dataAPI:
+    enable: true
+    hpa:
+      enable: false
+    image:
+      repository: luccasmmg/data-api
+      digest: sha256:73bf8caeb54b18cbe2f838e07c90c9d85dfdb8a46b43debe3332ee41fe152a07
+    imagePullPolicy: IfNotPresent
+    env:
+      DEFAULT_ROW_LIMIT: "100"
+    livenessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /
+        port: 3000
+        scheme: HTTP
+      initialDelaySeconds: 240
+      periodSeconds: 60
+      successThreshold: 1
+      timeoutSeconds: 60
   general:
     autoscaling:
       enable: false
@@ -129,6 +167,18 @@ ckan:
           }
         }
     hosts:
+      - host: wri.dev.console.datopian.com
+        isExternal: false
+        paths:
+          - path: /(.*)
+            port: 80
+            service: wri-dev-hasura-svc
+      - host: wri.dev.data.datopian.com
+        isExternal: false
+        paths:
+          - path: /(.*)
+            port: 80
+            service: wri-dev-data-api-svc
       - host: wri.dev.ckan.datopian.com
         isExternal: false
         paths:
@@ -148,8 +198,14 @@ ckan:
           - wri.dev.ckan.datopian.com
         secretName: wri.dev.ckan.datopian.com
       - hosts:
+          - wri.dev.data.datopian.com
+        secretName: wri.dev.data.datopian.com
+      - hosts:
           - wri.dev.frontend.datopian.com
         secretName: wri.dev.frontend.datopian.com
+      - hosts:
+          - wri.dev.console.datopian.com
+        secretName: wri.dev.console.datopian.com
   solr:
     enable: false
     image:
