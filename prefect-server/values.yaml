@@ -1,0 +1,10 @@
+ingress:
+  enabled: true
+  host:
+    hostname: wri.dev.prefect.datopian.com
+    path: /
+    pathType: ImplementationSpecific
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: cert-manager
+
