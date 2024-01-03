@@ -348,7 +348,7 @@ function AddDataFile({
                                             Build a layer
                                             {watch('rw_dataset') === false && (
                                                 <span>
-                                                    Toggle WRI Data to enable
+                                                    Toggle RW Data to enable
                                                 </span>
                                             )}
                                         </div>
@@ -385,7 +385,7 @@ function AddDataFile({
                                             Build a layer (RAW)
                                             {watch('rw_dataset') === false && (
                                                 <span>
-                                                    Toggle WRI Data to enable
+                                                    Toggle RW Data to enable
                                                 </span>
                                             )}
                                         </div>
