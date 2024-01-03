@@ -62,6 +62,7 @@ export const ResourceSchema = z
         (obj) => {
             if (obj.type !== 'link') return true
             if (!obj.url) return false
+            return true
         },
         {
             message: 'URL are required for resource of type link',
