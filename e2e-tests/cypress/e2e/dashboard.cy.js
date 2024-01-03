@@ -158,7 +158,6 @@ describe("Dashboard Test", () => {
     cy.get("textarea[id=description]").type("Test");
     cy.get("input[id=title]").type("Test");
     cy.get("button[id=reject]").click();
-    cy.wait(15000);
     cy.contains("Issues").click();
     cy.contains("Test");
     cy.contains("Test").click();
