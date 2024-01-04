@@ -60,6 +60,9 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM=${SMTP_FROM}
+    depends_on:
+      ckan-dev:
+        condition: service_healthy
     ports:
       - "0.0.0.0:3000:3000"
     healthcheck:
