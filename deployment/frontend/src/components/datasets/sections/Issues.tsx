@@ -8,7 +8,7 @@ import { Issue } from '@/schema/ckan.schema'
 import { Disclosure, Transition } from '@headlessui/react'
 import { Index } from 'flexsearch'
 import classNames from '@/utils/classnames'
-import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
+import { SimpleEditorV2 } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditorV2'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { CommentIssueType } from '@/schema/issue.schema'
@@ -18,10 +18,14 @@ import { Button, LoaderButton } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import {
+    ExclamationTriangleIcon,
+    InformationCircleIcon,
+} from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { ErrorAlert } from '@/components/_shared/Alerts'
+import { Console } from 'console'
 
 export default function Issues({
     issues,
@@ -111,6 +115,7 @@ function IssueCard({
 }) {
     const [isOpenDelete, setOpenDelete] = useState(false)
     const [isOpenClose, setOpenClose] = useState(false)
+    const [isSubmitting, setIsubmiting] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const created_at = new Date(issue.created ?? '')
     const options = {
@@ -139,9 +144,12 @@ function IssueCard({
                 id: datasetName,
             })
             notify(`Comment successfully added`, 'success')
-            formObj.reset()
+            setIsubmiting(false)
         },
-        onError: (error) => setErrorMessage(error.message),
+        onError: (error) => {
+            setIsubmiting(false)
+            setErrorMessage(error.message)
+        },
     })
 
     const closeOpenIssueApi = api.dataset.CloseOpenIssue.useMutation({
@@ -168,7 +176,9 @@ function IssueCard({
 
     const OnSubmit = (data: CommentIssueType) => {
         if (!isOpenClose && !isOpenDelete) {
+            setIsubmiting(true)
             commentIssueApi.mutate(data)
+            formObj.resetField('comment')
         }
     }
 
@@ -267,10 +277,11 @@ function IssueCard({
                         id={issue.number.toString()}
                     >
                         <ErrorDisplay name="comment" errors={errors} />
-                        <SimpleEditor
+                        <SimpleEditorV2
                             formObj={formObj}
                             name="comment"
                             defaultValue=""
+                            isSubmitting={isSubmitting}
                         />
                         <div className="flex ml-auto gap-x-2 mt-2">
                             <Button
@@ -361,10 +372,17 @@ function IssueCard({
                     >
                         <div className="sm:flex sm:items-start">
                             <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                <ExclamationTriangleIcon
-                                    className="h-6 w-6 text-red-600"
-                                    aria-hidden="true"
-                                />
+                                {issue.status === 'open' ? (
+                                    <ExclamationTriangleIcon
+                                        className="h-6 w-6 text-red-600"
+                                        aria-hidden="true"
+                                    />
+                                ) : (
+                                    <InformationCircleIcon
+                                        className="h-6 w-6 text-green-600"
+                                        aria-hidden="true"
+                                    />
+                                )}
                             </div>
                             <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                                 <Dialog.Title
@@ -389,7 +407,11 @@ function IssueCard({
                         </div>
                         <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
                             <LoaderButton
-                                variant="destructive"
+                                variant={
+                                    issue.status === 'open'
+                                        ? 'destructive'
+                                        : 'light'
+                                }
                                 loading={closeOpenIssueApi.isLoading}
                                 onClick={() => {
                                     if (
