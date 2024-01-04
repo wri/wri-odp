@@ -169,6 +169,35 @@ async function getLayerRw(layerUrl: string) {
     return { ...layerRw.data.attributes, id: layerRw.data.id }
 }
 
+async function fetchDatasetCollabIds(
+    datasetId: string,
+    userApiKey: string
+) {
+    const res  = await  fetch(
+        `${env.CKAN_URL}/api/3/action/package_collaborator_list?id=${datasetId}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${userApiKey ?? ''}`,
+            },
+        }
+    )
+    const collaborators = (await res.json()) as CkanResponse<Collaborator[]>
+    if (!collaborators.success && collaborators.error) {
+        if (res.status === 403)
+            throw new TRPCError({
+                code: 'FORBIDDEN',
+                message: 'You are not authorized to perform this action',
+            })
+        if (collaborators.error.message)
+            throw new TRPCError({code: 'BAD_REQUEST', message: collaborators.error.message})
+        throw new TRPCError({code: 'BAD_REQUEST', message: JSON.stringify(collaborators.error)})
+    }
+
+    return collaborators.result.map((collaborator) => collaborator.user_id)
+    
+}
+
 export async function fetchDatasetCollaborators(
     datasetId: string,
     userApiKey: string,
@@ -922,10 +951,16 @@ export const DatasetRouter = createTRPCRouter({
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(data.error.message)
 
-             try {
+            try {
+                const collab =  await fetchDatasetCollabIds(
+                    input.dataset_id,
+                    ctx.session.user.apikey,
+                )
+                console.log("COLLAB IDS: ", collab)
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
                     creator_id: input.creator_id,
+                    collaborator_id: collab,
                     dataset_id: input.dataset_id,
                     session: ctx.session,
                     title: input.issuetitle,
@@ -968,9 +1003,14 @@ export const DatasetRouter = createTRPCRouter({
             if (!dataComment.success && dataComment.error) throw Error(dataComment.error.message)
 
             try {
+                const collab =  await fetchDatasetCollabIds(
+                    input.dataset_id,
+                    ctx.session.user.apikey,
+                )
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
                     creator_id: input.creator_id,
+                    collaborator_id: collab,
                     dataset_id: input.dataset_id,
                     session: ctx.session,
                     title: input.issuetitle,
@@ -1000,10 +1040,16 @@ export const DatasetRouter = createTRPCRouter({
             
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(data.error.message)
-             try {
+            try {
+                 // get dataset collaborators id
+                const collab =  await fetchDatasetCollabIds(
+                    input.dataset_id,
+                    ctx.session.user.apikey,
+                )
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
                     creator_id: input.creator_id,
+                    collaborator_id: collab,
                     dataset_id: input.dataset_id,
                     session: ctx.session,
                     title: input.issuetitle,
@@ -1034,9 +1080,14 @@ export const DatasetRouter = createTRPCRouter({
             if (!data.success && data.error) throw Error(JSON.stringify(data.error))
 
             try {
+                const collab =  await fetchDatasetCollabIds(
+                    input.dataset_id,
+                    ctx.session.user.apikey,
+                )
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
                     creator_id: input.creator_id,
+                    collaborator_id: collab,
                     dataset_id: input.dataset_id,
                     session: ctx.session,
                     title: input.title,

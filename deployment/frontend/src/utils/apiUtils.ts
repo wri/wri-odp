@@ -1320,6 +1320,7 @@ export async function getRecipient({
 export async function sendIssueOrCommentNotigication({
     owner_org,
     creator_id,
+    collaborator_id,
     dataset_id,
     session,
     title,
@@ -1327,6 +1328,7 @@ export async function sendIssueOrCommentNotigication({
 }: {
         owner_org: string | null;
         creator_id: string | null;
+        collaborator_id: string[] | null;
         dataset_id: string;
         session: Session,
         title: string,
@@ -1340,6 +1342,10 @@ export async function sendIssueOrCommentNotigication({
         }
         else if (creator_id) {
             recipientIds = [creator_id]
+        }
+
+        if (collaborator_id) {
+            recipientIds = recipientIds.concat(collaborator_id)
         }
 
         if (recipientIds.length > 0) {
