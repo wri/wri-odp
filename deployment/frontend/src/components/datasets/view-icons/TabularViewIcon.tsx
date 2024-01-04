@@ -3,9 +3,8 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { TableCellsIcon } from '@heroicons/react/20/solid'
 
 export default function TabularViewIcon({ dataset }: { dataset: WriDataset }) {
-    const hasTabularView = dataset?.resources?.some(
-        (r) => r.datastore_active || r.rw_id
-    )
+    const hasTabularView =
+        dataset?.rw_id || dataset?.resources?.some((r) => r.datastore_active)
 
     return hasTabularView ? (
         <DefaultTooltip content="Tabular view">
