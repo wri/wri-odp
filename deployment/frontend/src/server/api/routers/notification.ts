@@ -46,6 +46,7 @@ export const notificationRouter = createTRPCRouter({
                     userId: notification.sender_id,
                     apiKey: ctx.session.user.apikey,
                 })
+                
                 user_data = user_data === undefined ? null : user_data
                 let objectName = ''
                 let objectIdName = ''
@@ -70,7 +71,27 @@ export const notificationRouter = createTRPCRouter({
                         } else if (action === 'updated') {
                             msg = ` ${action} your collaborator status to "${role}" for the dataset`
                         }
-                    } else {
+                    }
+                    else if (actionType[0] === 'issue') {
+                        const action = actionType[1]
+                        if (action === 'created') {
+                            msg = ` ${action} an issue (${actionType[2]?.split('nbsp;')?.join(' ')} ) for the dataset`
+                        }
+                        else if (action === 'commented') {
+                            msg = ` ${action} on an issue (${actionType[2]?.split('nbsp;')?.join(' ')} ) for the dataset`
+                        }
+                        else if (action === 'closed') {
+                             msg = ` ${action} an issue (${actionType[2]?.split('nbsp;')?.join(' ')} ) for the dataset`
+                        }
+                        else if (action === 'open') {
+                             msg = ` re-${action} an issue (${actionType[2]?.split('nbsp;')?.join(' ')} ) for the dataset`
+                        }
+                        else if (action === "deleted") {
+                             msg = ` ${action} an issue (${actionType[2]?.split('nbsp;')?.join(' ')} ) for the dataset`
+                        }
+                        
+                    }
+                    else {
                         if (notification.activity_type.includes(' ')) {
                             msg = ` ${notification.activity_type} `
                         } else {
