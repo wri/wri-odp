@@ -4,15 +4,10 @@ import { Disclosure, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import {
     ArrowPathIcon,
-    ArrowTopRightOnSquareIcon,
-    ClockIcon,
     FingerPrintIcon,
-    LightBulbIcon,
     MagnifyingGlassIcon,
-    MapPinIcon,
 } from '@heroicons/react/24/outline'
 import { DownloadButton } from './datafiles/Download'
-import { LearnMoreButton } from './datafiles/LearnMore'
 import { OpenInButton } from './datafiles/OpenIn'
 import { Resource } from '@/interfaces/dataset.interface'
 import { getFormatColor } from '@/utils/formatColors'

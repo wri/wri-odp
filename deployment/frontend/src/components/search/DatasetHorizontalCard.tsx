@@ -22,6 +22,8 @@ import Chip from '../_shared/Chip'
 import { useSession } from 'next-auth/react'
 import { visibilityTypeLabels } from '@/utils/constants'
 import { getFormatColor, formatColors } from '@/utils/formatColors'
+import TabularViewIcon from '../datasets/view-icons/TabularViewIcon'
+import MapViewIcon from '../datasets/view-icons/MapViewIcon'
 
 export default function DatasetHorizontalCard({
     dataset,
@@ -36,14 +38,16 @@ export default function DatasetHorizontalCard({
 
     const hasMapView = dataset?.resources?.some((r) => r.format == 'Layer')
 
-    const hasTabularView = dataset?.resources?.some((r) => r.datastore_active)
+    const hasTabularView = dataset?.resources?.some(
+        (r) => r.datastore_active || r.rw_id
+    )
 
     return (
         <Link href={`/datasets/${dataset.name}`}>
             <div className="grid gap-y-3 border-b-2 border-wri-green bg-white p-5 mb-2 shadow-wri transition hover:bg-slate-100 lg:grid-cols-5">
                 <div className="col-span-full lg:col-span-4">
                     <div className="pr-4">
-                        <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green line-clamp-1">
+                        <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green line-clamp-1 h-3">
                             {dataset.organization?.title.toUpperCase()}
                         </p>
 
@@ -127,7 +131,7 @@ export default function DatasetHorizontalCard({
                             )}
                         </div>
                     </div>
-                    <div className="mt-4 flex justify-start gap-x-3">
+                    <div className="mt-4 flex justify-start gap-x-3 h-7">
                         <div
                             className={`flex justify-start gap-x-3 ${
                                 (dataset.cautions ||
@@ -142,16 +146,8 @@ export default function DatasetHorizontalCard({
                                     <ChartBarIcon className="h-5 w-5 text-blue-700" />
                                 </div>
                             )}
-                            {hasMapView && (
-                                <div className="rounded-full bg-stone-100 p-1">
-                                    <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                                </div>
-                            )}
-                            {hasTabularView && (
-                                <div className="rounded-full bg-stone-100 p-1">
-                                    <TableCellsIcon className="h-5 w-5 text-green-600" />
-                                </div>
-                            )}
+                            <MapViewIcon dataset={dataset} />
+                            <TabularViewIcon dataset={dataset} />
                         </div>
                         {dataset.cautions && (
                             <div className="rounded-full bg-stone-100 p-1 w-7 h-7">

@@ -1,20 +1,12 @@
 import React from 'react'
-import {
-    ChartBarIcon,
-    GlobeAltIcon,
-    TableCellsIcon,
-} from '@heroicons/react/20/solid'
-import { ClockIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import { ChartBarIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import { WriDataset } from '@/schema/ckan.schema'
 import Link from 'next/link'
+import MapViewIcon from './datasets/view-icons/MapViewIcon'
+import TabularViewIcon from './datasets/view-icons/TabularViewIcon'
 
 export default function Card({ dataset }: { dataset: WriDataset }) {
-
-    const hasMapView = dataset?.resources?.some((r) => r.format == 'Layer')
-
-    const hasTabularView = dataset?.resources?.some((r) => r.datastore_active)
-
     return (
         <Link
             href={`datasets/${dataset.name}`}
@@ -65,22 +57,14 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                     </div>
                 )}
             </div>
-            <div className="mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black">
+            <div className="mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black h-7">
                 {false && (
                     <div className="rounded-full bg-stone-100 p-1">
                         <ChartBarIcon className="h-5 w-5 text-blue-700" />
                     </div>
                 )}
-                {hasMapView && (
-                    <div className="rounded-full bg-stone-100 p-1">
-                        <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                    </div>
-                )}
-                {hasTabularView && (
-                    <div className="rounded-full bg-stone-100 p-1">
-                        <TableCellsIcon className="h-5 w-5 text-green-600" />
-                    </div>
-                )}
+                <MapViewIcon dataset={dataset} />
+                <TabularViewIcon dataset={dataset} />
             </div>
         </Link>
     )
