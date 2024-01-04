@@ -25,7 +25,6 @@ import {
 import { Dialog } from '@headlessui/react'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { ErrorAlert } from '@/components/_shared/Alerts'
-import { Console } from 'console'
 
 export default function Issues({
     issues,
