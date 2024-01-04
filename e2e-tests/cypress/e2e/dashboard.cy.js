@@ -7,11 +7,11 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const datasetName = `${uuid()}${Cypress.env('DATASET_NAME_SUFFIX')}`;
+const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 const parentOrg2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const datasetName2 = `${uuid()}${Cypress.env('DATASET_NAME_SUFFIX')}`;
+const datasetName2 = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 const group = `${uuid()}${Cypress.env("GROUP_SUFFIX")}`;
 const user = `${uuid()}-user`;
@@ -21,150 +21,156 @@ const userfullname = `${uuid()}-fullname`;
 describe("Dashboard Test", () => {
   let senderid;
   let receiverid;
-  let datasetid
+  let datasetid;
 
   before(() => {
     cy.createOrganizationAPI(parentOrg);
-    cy.createDatasetAPI(parentOrg, datasetName, true)
+    cy.createDatasetAPI(parentOrg, datasetName, true);
 
     cy.createOrganizationAPI(parentOrg2);
-    cy.createDatasetAPI(parentOrg2, datasetName2, true)
+    cy.createDatasetAPI(parentOrg2, datasetName2, true);
 
-    cy.createGroupAPI(group)
-    cy.createUserApi(user, email, 'test1234')
+    cy.createGroupAPI(group);
+    cy.createUserApi(user, email, "test1234");
 
-    cy.userMetadata(user).as('sender')
-    
-    cy.userMetadata(ckanUserName).as('reciever')
+    cy.userMetadata(user).as("sender");
 
-    
-    cy.datasetMetadata(datasetName).as('dataset')
+    cy.userMetadata(ckanUserName).as("reciever");
 
-    cy.get('@reciever').then((reciever) => {
-      cy.get('@sender').then((sender) => {
-        cy.get('@dataset').then((dataset) => {
-          cy.addNotificationApi(reciever.id, sender.id, dataset.id, "new dataset");
-          cy.addNotificationApi(reciever.id, sender.id, dataset.id, "changed dataset");
-          cy.addNotificationApi(reciever.id, sender.id, dataset.id, "deleted dataset");
+    cy.datasetMetadata(datasetName).as("dataset");
+
+    cy.get("@reciever").then((reciever) => {
+      cy.get("@sender").then((sender) => {
+        cy.get("@dataset").then((dataset) => {
+          cy.addNotificationApi(
+            reciever.id,
+            sender.id,
+            dataset.id,
+            "new dataset",
+          );
+          cy.addNotificationApi(
+            reciever.id,
+            sender.id,
+            dataset.id,
+            "changed dataset",
+          );
+          cy.addNotificationApi(
+            reciever.id,
+            sender.id,
+            dataset.id,
+            "deleted dataset",
+          );
         });
       });
     });
-
   });
 
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
- 
   it("Should test dataset page", () => {
-    cy.visit("/dashboard/datasets")
-    cy.get('#alldataset').should('exist');
-    cy.get('#alldataset').find('div').should('have.length.greaterThan', 0);
+    cy.visit("/dashboard/datasets");
+    cy.get("#alldataset").should("exist");
+    cy.get("#alldataset").find("div").should("have.length.greaterThan", 0);
 
-    cy.get('input[type="search"]').type(datasetName).type('{enter}');
+    cy.get('input[type="search"]').type(datasetName).type("{enter}");
 
-    cy.contains('div', datasetName).should('exist', { timeout: 15000});
-    cy.get('button#rowshow').first().click();
-    cy.contains(parentOrg)
-  })
+    cy.contains("div", datasetName).should("exist", { timeout: 15000 });
+    cy.get("button#rowshow").first().click();
+    cy.contains(parentOrg);
+  });
 
   it("Should test activity stream", () => {
-    cy.visit('/dashboard/activity-stream')
+    cy.visit("/dashboard/activity-stream");
     cy.contains(`${ckanUserName} created the package ${datasetName}`);
-    cy.get('[id^="headlessui-listbox-button"]').first().click();;
-    cy.contains('[role="option"]', 'new').click();
+    cy.get('[id^="headlessui-listbox-button"]').first().click();
+    cy.contains('[role="option"]', "new").click();
     cy.contains(`${ckanUserName} created the package ${datasetName}`);
-  })
+  });
   it("Should test activity stream select", () => {
-    cy.visit('/dashboard/activity-stream')
+    cy.visit("/dashboard/activity-stream");
     cy.contains(`${ckanUserName} created the package ${datasetName}`);
     cy.get('[id^="headlessui-listbox-button"]').eq(1).click();
-    cy.contains('[role="option"]', 'teams').click();
+    cy.contains('[role="option"]', "teams").click();
     cy.get('[id^="headlessui-listbox-button"]').eq(2).click();
     cy.contains('[role="option"]', `${parentOrg}`).click();
     cy.contains(`${ckanUserName} created the package ${datasetName}`);
-  })
+  });
 
   it("Should test user form", () => {
-    cy.visit(`/dashboard/users/edit/${user}`)
+    cy.visit(`/dashboard/users/edit/${user}`);
     cy.get('input[name="fullname"]').type(userfullname);
     cy.get('button[type="submit"]').click();
-    cy.contains(`Successfully updated user: ${user}`)
-  })
+    cy.contains(`Successfully updated user: ${user}`);
+  });
 
   it("Should test Users page", () => {
-    cy.visit("/dashboard/users")
-    cy.get('input[type="search"]').type(user).type('{enter}');
-    cy.contains(user)
+    cy.visit("/dashboard/users");
+    cy.get('input[type="search"]').type(user).type("{enter}");
+    cy.contains(user);
     cy.get(`button#delete-tooltip-${user}`).first().click({ force: true });
     cy.get(`button#${user}`).click();
-
-  })
+  });
   it("Should test teams page", () => {
-    cy.visit("dashboard/teams")
-    cy.get('input[type="search"]').type(parentOrg).type('{enter}');
-    cy.contains(parentOrg, { timeout: 15000})
-  })
+    cy.visit("dashboard/teams");
+    cy.get('input[type="search"]').type(parentOrg).type("{enter}");
+    cy.contains(parentOrg, { timeout: 15000 });
+  });
 
   it("should delete dataset", () => {
-    cy.visit("/dashboard/datasets")
-    cy.get('input[type="search"]').type(datasetName2).type('{enter}');
-    cy.contains(datasetName2).should('exist', { timeout: 15000});
-    cy.get(`button#delete-tooltip-${datasetName2}`).first().click({ force: true });
+    cy.visit("/dashboard/datasets");
+    cy.get('input[type="search"]').type(datasetName2).type("{enter}");
+    cy.contains(datasetName2).should("exist", { timeout: 15000 });
+    cy.get(`button#delete-tooltip-${datasetName2}`)
+      .first()
+      .click({ force: true });
     cy.get(`button#${datasetName2}`).click();
-    cy.contains(`Successfully deleted the ${datasetName2} dataset`)
-
-  })
+    cy.contains(`Successfully deleted the ${datasetName2} dataset`);
+  });
   it("should delete Team", () => {
-    cy.visit("/dashboard/teams")
-    cy.get('input[type="search"]').type(parentOrg2).type('{enter}');
-    cy.contains(parentOrg2).should('exist', { timeout: 15000});
-    cy.get(`button#delete-tooltip-${parentOrg2}`).first().click({ force: true });
+    cy.visit("/dashboard/teams");
+    cy.get('input[type="search"]').type(parentOrg2).type("{enter}");
+    cy.contains(parentOrg2).should("exist", { timeout: 15000 });
+    cy.get(`button#delete-tooltip-${parentOrg2}`)
+      .first()
+      .click({ force: true });
     cy.get(`button#${parentOrg2}`).click();
-    cy.contains(`Successfully deleted the ${parentOrg2} team`)
-  })
+    cy.contains(`Successfully deleted the ${parentOrg2} team`);
+  });
 
   it("should delete topic", () => {
-    cy.visit("/dashboard/topics")
-    cy.get('input[type="search"]').type(group).type('{enter}');
-    cy.contains(group).should('exist', { timeout: 15000});
+    cy.visit("/dashboard/topics");
+    cy.get('input[type="search"]').type(group).type("{enter}");
+    cy.contains(group).should("exist", { timeout: 15000 });
     cy.get(`button#delete-tooltip-${group}`).first().click({ force: true });
     cy.get(`button#${group}`).click();
-    cy.contains(`Successfully deleted the ${group} topic`)
-  })
+    cy.contains(`Successfully deleted the ${group} topic`);
+  });
 
-   it("should test notification page", () => {
-    cy.visit("/dashboard/notifications")
-    cy.contains('deleted dataset')
-    cy.get('#notification').check({ force: true });
-    cy.get('#notification').should('be.checked');
-    cy.get('input[type="checkbox"]').should('be.checked');
-
-    cy.wait(15000);
-
-    cy.get('#markedaction').click({ force: true });
-    cy.contains('Mark as read')
-    cy.get('#markasread').click({ force: true });
-    cy.get(`button#readNotification`).click()
-    cy.wait(15000);
-    cy.get('#unreadn').should('not.exist');
-
-  })
+  it("should test notification page", () => {
+    cy.viewport(1440, 900)
+    cy.visit("/dashboard/notifications");
+    cy.contains("deleted dataset");
+    cy.get("#select_all_notifications").click();
+    cy.get("#markedaction").click();
+    cy.contains("Mark as read")    
+    cy.get("#markasread").as('btn').click();
+    cy.contains("button", "Update Notification").click({ force: true });
+    cy.get("#unreadn").should("not.exist");
+  });
   it("should delete notification", () => {
-    cy.visit("/dashboard/notifications")
-    cy.get('#notification').check({ force: true });
-    cy.get('#notification').should('be.checked');
-    cy.get('#deletenotification').click({ force: true });
-    cy.contains('Delete Notification')
-    cy.contains('button', 'Delete Notification').click({timeout: 60000});
-    cy.wait(15000);
-    cy.contains('deleted dataset').should('not.exist');
-   })
-
+    cy.visit("/dashboard/notifications");
+    cy.get("#select_all_notifications").check();
+    cy.get("#select_all_notifications").should("be.checked");
+    cy.get("#deletenotification").click();
+    cy.contains("Delete Notification");
+    cy.contains("button", "Delete Notification").click({ force: true });
+    cy.contains("deleted dataset").should("not.exist");
+  });
 
   after(() => {
-    cy.deleteDatasetAPI(datasetName)
+    cy.deleteDatasetAPI(datasetName);
     cy.deleteOrganizationAPI(parentOrg);
   });
 });

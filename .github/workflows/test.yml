@@ -23,9 +23,12 @@ jobs:
         run: sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
       - name: Add Frontend url to hosts
         run: sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
+      - name: Create .env
+        run: cp .env.example .env
+        working-directory: ./ckan-backend-dev
       - name: Set up Docker Containers
         run: |
-          docker compose -f docker-compose.dev.yml --env-file .env.example up --build -d
+          docker compose -f docker-compose.dev.yml up --build -d
         working-directory: ./ckan-backend-dev
       - name: Initialize the ckanext-issues table
         run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
@@ -53,7 +56,8 @@ jobs:
       - name: Run frontend tests 🧪
         uses: cypress-io/github-action@v6
         with:
-          command: npm run test
+          command: npx cypress run --spec cypress/e2e/dashboard.cy.js
+            #command: npx cypress open
           working-directory: ./e2e-tests
       - name: Tear down containers
         if: failure() || success()

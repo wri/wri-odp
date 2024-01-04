@@ -41,7 +41,6 @@ function Card({
             <div className="flex items-center">
                 <DefaultTooltip content="mark as read">
                     <input
-                        id="notification"
                         aria-describedby="notifications-checkbox"
                         name="notifications"
                         type="checkbox"

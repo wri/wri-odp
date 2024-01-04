@@ -42,10 +42,8 @@ export default function NotificationList() {
         return <Spinner className="mx-auto" />
     }
 
-    console.log('paginated data: ', paginatedData.data)
-
     return (
-        <section id="notifications" className="max-w-8xl w-full mt-2">
+        <section className="max-w-8xl w-full mt-2">
             <NotificationHeader
                 setSelected={setSelected}
                 selected={selected}
