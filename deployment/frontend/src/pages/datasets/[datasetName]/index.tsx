@@ -146,6 +146,12 @@ export default function DatasetPage(
         })
     }
 
+    const openIssueLength =
+        issues.data &&
+        issues.data.filter((issue) => issue.status === 'open').length
+            ? issues.data.filter((issue) => issue.status === 'open').length
+            : undefined
+
     const tabs = [
         { name: 'Data files', enabled: true },
         { name: 'About', enabled: true },
@@ -159,7 +165,7 @@ export default function DatasetPage(
         },
         {
             name: 'Issues',
-            count: issues.data ? issues.data.length : undefined,
+            count: openIssueLength,
             enabled: issues.data && issues.data.length > 0,
         },
     ]
