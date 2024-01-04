@@ -113,6 +113,10 @@ jobs:
           name: cypress-screenshots
           path: /home/runner/work/wri-odp/wri-odp/e2e-tests/cypress/screenshots
           if-no-files-found: ignore
+      - name: Print Error Logs
+        if: failure()
+        run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
+        working-directory: ./ckan-backend-dev
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev
