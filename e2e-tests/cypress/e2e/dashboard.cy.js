@@ -154,7 +154,7 @@ describe("Dashboard Test", () => {
     cy.contains("deleted dataset");
     cy.get("#select_all_notifications").click();
     cy.get("#markedaction").click();
-    cy.get("#markasread").as("btn").click();
+    cy.get("#markasread").should('be.visible').click();
     cy.contains("button", "Update Notification").click({ force: true });
     cy.get("#unreadn").should("not.exist");
   });
