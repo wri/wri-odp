@@ -81,6 +81,13 @@ function LeftNode({
                     </button>
                 </DefaultTooltip>
             </div>
+            <button
+                className="hidden"
+                id="markasread_hidden"
+                onClick={() => setOpenMarkAsRead(true)}
+            >
+                Mark as read
+            </button>
             <div className="">
                 <Menu
                     as="div"
