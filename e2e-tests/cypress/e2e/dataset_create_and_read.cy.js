@@ -114,8 +114,37 @@ describe("Create dataset", () => {
     cy.contains(user);
   });
 
+  it("Edit metadata", () => {
+    cy.visit("/dashboard/datasets/" + dataset + "/edit");
+    cy.get("input[name=title]")
+      .clear()
+      .type(dataset + " EDITED");
+    cy.get("input[name=url]")
+      .clear()
+      .type("https://google.com" + ".br");
+    cy.contains("More Details").click();
+    cy.get(".tiptap.ProseMirror").eq(1).type("EDITED");
+    cy.get(".tiptap.ProseMirror").eq(2).type("EDITED");
+    cy.contains("Data Files").click();
+    cy.get("#remove_0_datafile").click();
+    cy.wait(5000);
+    cy.get("button").contains("Add another data file").click();
+    cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/logo_2.jpg", {
+      force: true,
+    });
+    cy.get('input[name="resources.1.title"]').clear().type("jpg image");
+    cy.contains("Collaborators").click();
+    cy.get("button").contains("Add another collaborator").click();
+    cy.get("input").eq(1).click().type(user_2);
+    cy.get("li").contains(user_2).click();
+    cy.get("button").contains("Update Dataset").click();
+    cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
+      timeout: 30000,
+    });
+  });
+
   it(
-    "Edit metadata",
+    "Should show the basic information edited",
     {
       retries: {
         runMode: 5,
@@ -123,43 +152,12 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.visit("/dashboard/datasets/" + dataset + "/edit");
-      cy.get("input[name=title]")
-        .clear()
-        .type(dataset + " EDITED");
-      cy.get("input[name=url]")
-        .clear()
-        .type("https://google.com" + ".br");
-      cy.contains("More Details").click();
-      cy.get(".tiptap.ProseMirror").eq(1).type("EDITED");
-      cy.get(".tiptap.ProseMirror").eq(2).type("EDITED");
-      cy.contains("Data Files").click();
-      cy.get("#remove_0_datafile").click();
-      cy.wait(5000);
-      cy.get("button").contains("Add another data file").click();
-      cy.get("input[type=file]")
-        .eq(0)
-        .selectFile("cypress/fixtures/logo_2.jpg", {
-          force: true,
-        });
-      cy.get('input[name="resources.1.title"]').clear().type("jpg image");
-      cy.contains("Collaborators").click();
-      cy.get("button").contains("Add another collaborator").click();
-      cy.get("input").eq(1).click().type(user_2);
-      cy.get("li").contains(user_2).click();
-      cy.get("button").contains("Update Dataset").click();
-      cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
-        timeout: 30000,
-      });
+      cy.visit("/datasets/" + dataset);
+      cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
+      cy.contains("Data files").click();
+      cy.contains("JPEG");
     },
   );
-
-  it("Should show the basic information edited", () => {
-    cy.visit("/datasets/" + dataset);
-    cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
-    cy.contains("Data files").click();
-    cy.contains("JPEG");
-  });
 
   it("Should show the new member", () => {
     cy.visit("/datasets/" + dataset);
