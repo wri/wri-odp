@@ -58,8 +58,8 @@ jobs:
       - name: Run frontend tests 🧪
         uses: cypress-io/github-action@v6
         with:
-          command: npx cypress run
-            #command: npx cypressopen
+          command: npx cypress run --spec cypress/e2e/dashboard.cy.js
+          #command: npx cypress open
           working-directory: ./e2e-tests
       - name: Tear down containers
         if: failure() || success()

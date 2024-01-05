@@ -149,31 +149,32 @@ describe("Dashboard Test", () => {
   });
 
   it("should test notification page", () => {
-    cy.viewport(1440, 900)
+    cy.viewport(1440, 900);
     cy.visit("/dashboard/notifications");
     cy.contains("deleted dataset");
     cy.get("#select_all_notifications").click();
     cy.get("#markedaction").click();
-    cy.contains("Mark as read")    
-    cy.get("#markasread").as('btn').click();
+    cy.contains("Mark as read");
+    cy.get("#markasread").as("btn").click();
     cy.contains("button", "Update Notification").click({ force: true });
     cy.get("#unreadn").should("not.exist");
   });
 
   it("should delete notification", () => {
     cy.visit("/dashboard/notifications");
-    cy.get("#select_all_notifications").check();
-    cy.get("#select_all_notifications").should("be.checked");
+    cy.get('input[aria-label="mark as read deleted dataset"]').check();
+    cy.get('input[aria-label="mark as read deleted dataset"]').should(
+      "be.checked",
+    );
     cy.get("#deletenotification").click();
     cy.contains("Delete Notification");
     cy.contains("button", "Delete Notification").click({ force: true });
     cy.contains("deleted dataset").should("not.exist");
   });
 
-  
   it("Should have issues", () => {
-    cy.visit("/datasets/" + datasetName + "?approval=true")
-    cy.contains("Reject request").click()
+    cy.visit("/datasets/" + datasetName + "?approval=true");
+    cy.contains("Reject request").click();
     cy.get("textarea[id=description]").type("Test");
     cy.get("input[id=title]").type("Test");
     cy.get("button[id=reject]").click();
@@ -188,8 +189,7 @@ describe("Dashboard Test", () => {
     cy.get("button").contains("Delete").click();
     cy.contains("Delete Issue");
     cy.get("button").contains("Delete Issue").click();
-    
-  })
+  });
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);

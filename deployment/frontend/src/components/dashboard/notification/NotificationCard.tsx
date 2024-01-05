@@ -42,6 +42,7 @@ function Card({
                 <DefaultTooltip content="mark as read">
                     <input
                         aria-describedby="notifications-checkbox"
+                        aria-label={`mark as read ${rowProfile?.msg}`}
                         name="notifications"
                         type="checkbox"
                         className="h-4 w-4  rounded  bg-white "
