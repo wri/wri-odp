@@ -11,6 +11,7 @@ import { IssueSchema } from '@/schema/issue.schema'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
+import { SimpleEditor } from '../dashboard/datasets/admin/metadata/RTE/SimpleEditor'
 export default function ApprovalRequestCard({
     datasetName,
     owner_org,
@@ -97,11 +98,18 @@ export default function ApprovalRequestCard({
                             {...formObj.register('title')}
                         />
                         <ErrorDisplay name="description" errors={errors} />
-                        <textarea
+                        {/* <textarea
                             id="description"
                             className="w-full h-40 bg-white rounded-sm border border-[#E5E5E5] mt-4 p-4"
                             placeholder="Description..."
                             {...formObj.register('description')}
+                        /> */}
+                        <SimpleEditor
+                            formObj={formObj}
+                            name="description"
+                            defaultValue=""
+                            className="w-full h-40  border-[#E5E5E5] mt-4 "
+                            placeholder="Description..."
                         />
                         <div className="flex justify-end mt-4">
                             <LoaderButton
