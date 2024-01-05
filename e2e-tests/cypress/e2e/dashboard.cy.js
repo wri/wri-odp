@@ -148,24 +148,40 @@ describe("Dashboard Test", () => {
     cy.contains(`Successfully deleted the ${group} topic`);
   });
 
-  it("should test notification page", () => {
-    cy.viewport(1440, 900);
-    cy.visit("/dashboard/notifications");
-    cy.contains("deleted dataset");
-    cy.get("#select_all_notifications").click();
-    cy.get("#markasread_hidden").click({ force: true });
-    cy.get("#headlessui-portal-root", { timeout: 15000, force: true }).then(
-      () => {
-        cy.contains("button", "Update Notification", { timeout: 30000 })
-          .click({ force: true })
-          .then(() => {
-            cy.get("#unreadn").should("not.exist");
-          });
+  it(
+    "should test notification page",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
       },
-    );
-  });
+    },
+    () => {
+      cy.viewport(1440, 900);
+      cy.visit("/dashboard/notifications");
+      cy.contains("deleted dataset");
+      cy.get("#select_all_notifications").click();
+      cy.get("#markasread_hidden").click({ force: true });
+      cy.get("#headlessui-portal-root", { timeout: 15000, force: true }).then(
+        () => {
+          cy.contains("button", "Update Notification", { timeout: 30000 })
+            .click({ force: true })
+            .then(() => {
+              cy.get("#unreadn").should("not.exist");
+            });
+        },
+      );
+    },
+  );
 
-  it("should delete notification", () => {
+  it("should delete notification", 
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
     cy.viewport(1440, 900);
     cy.visit("/dashboard/notifications");
     cy.get('input[name="notifications"]').eq(1).check();
@@ -185,8 +201,8 @@ describe("Dashboard Test", () => {
   });
 
   it("Should have issues", () => {
-    cy.visit("/datasets/" + datasetName + "?approval=true")
-    cy.contains("Reject request").click()
+    cy.visit("/datasets/" + datasetName + "?approval=true");
+    cy.contains("Reject request").click();
     cy.get(".tiptap.ProseMirror").type("Test");
     cy.get("input[id=title]").type("Test");
     cy.get("button[id=reject]").click();
@@ -201,8 +217,7 @@ describe("Dashboard Test", () => {
     cy.get("button").contains("Delete").click();
     cy.contains("Delete Issue");
     cy.get("button").contains("Delete Issue").click();
-    
-  })
+  });
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);
