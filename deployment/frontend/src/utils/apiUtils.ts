@@ -547,14 +547,22 @@ export async function getOneDataset(
         dataset.result.provider = datasetRw.data.attributes.provider
         dataset.result.tableName = datasetRw.data.attributes.tableName
     }
+
+    let spatial = null
+    if (dataset.result.spatial) {
+        try {
+            spatial = JSON.parse(dataset.result.spatial)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     return {
         ...dataset.result,
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
-        spatial: dataset.result.spatial
-            ? JSON.parse(dataset.result.spatial)
-            : null,
+        spatial
     }
 }
 
