@@ -154,17 +154,23 @@ describe("Dashboard Test", () => {
     cy.contains("deleted dataset");
     cy.get("#select_all_notifications").click();
     cy.get("#markasread_hidden").click({ force: true });
-    cy.contains("button", "Update Notification").click({ force: true });
-    cy.get("#unreadn").should("not.exist");
+    cy.get("#headlessui-portal-root", { timeout: 15000, force: true }).then(
+      (elem) => {
+        elem
+          .contains("button", "Update Notification")
+          .click({ force: true })
+          .then(() => {
+            cy.get("#unreadn").should("not.exist");
+          });
+      },
+    );
   });
 
   it("should delete notification", () => {
     cy.viewport(1440, 900);
     cy.visit("/dashboard/notifications");
     cy.get('input[name="notifications"]').eq(1).check();
-    cy.get('input[name="notifications"]').eq(1).should(
-      "be.checked",
-    );
+    cy.get('input[name="notifications"]').eq(1).should("be.checked");
     cy.get("#deletenotification").click();
     cy.contains("Delete Notification");
     cy.contains("button", "Delete Notification").click({ force: true });
