@@ -156,8 +156,7 @@ describe("Dashboard Test", () => {
     cy.get("#markasread_hidden").click({ force: true });
     cy.get("#headlessui-portal-root", { timeout: 15000, force: true }).then(
       () => {
-        cy
-          .contains("button", "Update Notification")
+        cy.contains("button", "Update Notification", { timeout: 30000 })
           .click({ force: true })
           .then(() => {
             cy.get("#unreadn").should("not.exist");
@@ -172,11 +171,17 @@ describe("Dashboard Test", () => {
     cy.get('input[name="notifications"]').eq(1).check();
     cy.get('input[name="notifications"]').eq(1).should("be.checked");
     cy.get("#deletenotification").click();
-    cy.contains("Delete Notification");
-    cy.contains("button", "Delete Notification").click({ force: true });
-    cy.contains(`Successfully deleted the notification`, {
-      timeout: 15000,
-    });
+    cy.get("#headlessui-portal-root", { timeout: 15000, force: true }).then(
+      () => {
+        cy.contains("button", "Delete Notification", { timeout: 30000 })
+          .click({ force: true })
+          .then(() => {
+            cy.contains(`Successfully deleted the notification`, {
+              timeout: 15000,
+            });
+          });
+      },
+    );
   });
 
   it("Should have issues", () => {

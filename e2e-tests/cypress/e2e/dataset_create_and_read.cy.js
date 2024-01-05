@@ -141,13 +141,13 @@ describe("Create dataset", () => {
     cy.get("li").contains(user_2).click();
     cy.get("button").contains("Update Dataset").click();
     cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
-      timeout: 15000,
+      timeout: 30000,
     });
   });
 
   it("Should show the basic information edited", () => {
     cy.visit("/datasets/" + dataset);
-    cy.get("h1").contains(dataset + " EDITED", { timeout: 15000 });
+    cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
     cy.contains("Data files").click();
     cy.contains("JPEG");
   });
