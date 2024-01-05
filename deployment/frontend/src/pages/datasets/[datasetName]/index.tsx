@@ -146,6 +146,12 @@ export default function DatasetPage(
         })
     }
 
+    const openIssueLength =
+        issues.data &&
+        issues.data.filter((issue) => issue.status === 'open').length
+            ? issues.data.filter((issue) => issue.status === 'open').length
+            : undefined
+
     const tabs = [
         { name: 'Data files', enabled: true },
         { name: 'About', enabled: true },
@@ -159,7 +165,7 @@ export default function DatasetPage(
         },
         {
             name: 'Issues',
-            count: issues.data ? issues.data.length : undefined,
+            count: openIssueLength,
             enabled: issues.data && issues.data.length > 0,
         },
     ]
@@ -192,7 +198,13 @@ export default function DatasetPage(
             />
             <Header />
             <Breadcrumbs links={links} />
-            {isApprovalRequest && <ApprovalRequestCard />}
+            {isApprovalRequest && (
+                <ApprovalRequestCard
+                    datasetName={datasetData.name}
+                    owner_org={datasetData?.owner_org || null}
+                    creator_id={datasetData?.creator_user_id || null}
+                />
+            )}
             <DatasetPageLayout
                 lhs={
                     isAddingLayers ? (
@@ -285,6 +297,17 @@ export default function DatasetPage(
                                                         <Issues
                                                             issues={issues.data}
                                                             index={indexIssues}
+                                                            datasetName={
+                                                                datasetData.name
+                                                            }
+                                                            owner_org={
+                                                                datasetData?.owner_org ||
+                                                                null
+                                                            }
+                                                            creator_id={
+                                                                datasetData?.creator_user_id ||
+                                                                null
+                                                            }
                                                         />
                                                     </Tab.Panel>
                                                 )}

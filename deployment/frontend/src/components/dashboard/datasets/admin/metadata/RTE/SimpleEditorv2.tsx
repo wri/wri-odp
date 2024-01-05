@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 // => Tiptap packages
-import Placeholder from '@tiptap/extension-placeholder'
 import { useEditor, EditorContent, Editor, BubbleMenu } from '@tiptap/react'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -30,7 +29,7 @@ interface TEditorProps {
     onChange(body: string): void
     initialContent?: string | null
     className: string
-    placeholder?: string
+    isSubmitting?: boolean
 }
 
 interface ControlleRTEEditorProps<T extends FieldValues> {
@@ -38,15 +37,15 @@ interface ControlleRTEEditorProps<T extends FieldValues> {
     name: Path<T>
     defaultValue?: PathValue<T, Path<T>>
     className?: string
-    placeholder?: string
+    isSubmitting?: boolean
 }
 
-export function SimpleEditor<T extends FieldValues>({
+export function SimpleEditorV2<T extends FieldValues>({
     formObj,
     name,
     defaultValue,
-    placeholder,
     className,
+    isSubmitting,
 }: ControlleRTEEditorProps<T>) {
     const { control, watch } = formObj
     return (
@@ -54,15 +53,19 @@ export function SimpleEditor<T extends FieldValues>({
             control={control}
             name={name}
             render={({ field: { onChange, value } }) => (
-                <TipTapEditor
-                    placeholder={placeholder}
-                    className={className ?? ''}
-                    value={value}
-                    initialContent={watch(name) ?? ''}
-                    onChange={(value) => {
-                        onChange(value)
-                    }}
-                />
+                <>
+                    {!isSubmitting && (
+                        <TipTapEditor
+                            className={className ?? ''}
+                            value={value}
+                            isSubmitting={isSubmitting}
+                            initialContent={watch(name) ?? ''}
+                            onChange={(value) => {
+                                onChange(value)
+                            }}
+                        />
+                    )}
+                </>
             )}
         />
     )
@@ -73,7 +76,7 @@ function TipTapEditor({
     onChange,
     initialContent,
     className,
-    placeholder,
+    isSubmitting,
 }: TEditorProps) {
     const editor = useEditor({
         onUpdate({ editor }) {
@@ -94,12 +97,14 @@ function TipTapEditor({
             Italic,
             Strike,
             Code,
-            Placeholder.configure({
-                // Use a placeholder:
-                placeholder: placeholder ?? '',
-            }),
         ],
     }) as Editor
+
+    useEffect(() => {
+        if (isSubmitting) {
+            editor.commands.setContent('')
+        }
+    }, [isSubmitting, editor])
 
     const [modalIsOpen, setIsOpen] = useState(false)
     const [url, setUrl] = useState<string>('')
