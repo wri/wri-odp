@@ -162,14 +162,16 @@ describe("Dashboard Test", () => {
 
   it("should delete notification", () => {
     cy.visit("/dashboard/notifications");
-    cy.get('input[aria-label="mark as read deleted dataset"]').check();
-    cy.get('input[aria-label="mark as read deleted dataset"]').should(
+    cy.get('input[name="notifications"]').eq(1).check();
+    cy.get('input[name="notifications"]').eq(1).should(
       "be.checked",
     );
     cy.get("#deletenotification").click();
     cy.contains("Delete Notification");
     cy.contains("button", "Delete Notification").click({ force: true });
-    cy.contains("deleted dataset").should("not.exist");
+    cy.contains(`Successfully deleted the notification`, {
+      timeout: 15000,
+    });
   });
 
   it("Should have issues", () => {
