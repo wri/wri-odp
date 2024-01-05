@@ -32,6 +32,8 @@ jobs:
         working-directory: ./ckan-backend-dev
       - name: Initialize the ckanext-issues table
         run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
+      - name: Update the ckanext-issues table
+        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesupdate"
       - name: Initialize the notification table
         run: docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
       - name: Create sysadmin API for Authorization
@@ -56,8 +58,8 @@ jobs:
       - name: Run frontend tests 🧪
         uses: cypress-io/github-action@v6
         with:
-          command: npx cypress run --spec cypress/e2e/dashboard.cy.js
-            #command: npx cypress open
+          command: npx cypress run
+            #command: npx cypressopen
           working-directory: ./e2e-tests
       - name: Tear down containers
         if: failure() || success()
