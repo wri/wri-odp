@@ -155,8 +155,8 @@ describe("Dashboard Test", () => {
     cy.get("#select_all_notifications").click();
     cy.get("#markasread_hidden").click({ force: true });
     cy.get("#headlessui-portal-root", { timeout: 15000, force: true }).then(
-      (elem) => {
-        elem
+      () => {
+        cy
           .contains("button", "Update Notification")
           .click({ force: true })
           .then(() => {
