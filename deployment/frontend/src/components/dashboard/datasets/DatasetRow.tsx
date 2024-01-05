@@ -81,14 +81,17 @@ export default function DatasetRow({
     className,
     dataset,
     handleOpenModal,
+    authorized,
 }: {
     className?: string
     dataset: WriDataset
+    authorized?: boolean
     handleOpenModal: (dataset: WriDataset) => void
 }) {
     const router = useRouter()
     return (
         <Row
+            authorized={authorized}
             className={`pr-2 sm:pr-4 ${className ? className : ''}`}
             rowMain={<DatasetCardProfile dataset={dataset} />}
             controlButtons={[
