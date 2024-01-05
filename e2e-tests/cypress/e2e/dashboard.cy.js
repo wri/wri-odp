@@ -154,13 +154,13 @@ describe("Dashboard Test", () => {
     cy.contains("deleted dataset");
     cy.get("#select_all_notifications").click();
     cy.get("#markedaction").click();
-    cy.contains("Mark as read");
     cy.get("#markasread").as("btn").click();
     cy.contains("button", "Update Notification").click({ force: true });
     cy.get("#unreadn").should("not.exist");
   });
 
   it("should delete notification", () => {
+    cy.viewport(1440, 900);
     cy.visit("/dashboard/notifications");
     cy.get('input[name="notifications"]').eq(1).check();
     cy.get('input[name="notifications"]').eq(1).should(

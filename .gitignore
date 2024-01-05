@@ -169,3 +169,5 @@ integration-tests/cypress.json
 
 ckan-backend-dev/src/ckan*
 !ckan-backend-dev/src/ckanext-wri
+
+test_tests.sh
