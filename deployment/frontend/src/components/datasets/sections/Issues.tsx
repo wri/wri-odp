@@ -153,7 +153,7 @@ function IssueCard({
         },
     })
 
-    const closeOpenIssueApi = api.dataset.CloseOpenIssue.useMutation({
+    const closeOpenIssueApi = api.dataset.closeOpenIssue.useMutation({
         onSuccess: async (data) => {
             await utils.dataset.getDatasetIssues.invalidate({
                 id: datasetName,
