@@ -4,8 +4,6 @@ import {
     ChevronLeftIcon,
     ExclamationTriangleIcon,
     InformationCircleIcon,
-    GlobeAltIcon,
-    TableCellsIcon,
 } from '@heroicons/react/20/solid'
 import { Button } from '../_shared/Button'
 import {
@@ -13,7 +11,6 @@ import {
     ClockIcon,
     FingerPrintIcon,
     LinkIcon,
-    MapPinIcon,
     StarIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
@@ -25,7 +22,6 @@ import { getFormatColor } from '@/utils/formatColors'
 import { useSession } from 'next-auth/react'
 import { DefaultTooltip } from '../_shared/Tooltip'
 import { PencilSquareIcon } from '@heroicons/react/24/solid'
-import { useRouter } from 'next/router'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import Modal from '@/components/_shared/Modal'
@@ -35,6 +31,8 @@ import { useState } from 'react'
 import Spinner from '../_shared/Spinner'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { TabularResource } from './visualizations/Visualizations'
+import TabularViewIcon from './view-icons/TabularViewIcon'
+import MapViewIcon from './view-icons/MapViewIcon'
 
 function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     const session = useSession()
@@ -167,10 +165,6 @@ export function DatasetHeader({
         month: 'short',
         day: 'numeric',
     } as const
-
-    const hasMapView = dataset?.resources.some((r) => r.format == 'Layer')
-
-    const hasTabularView = dataset?.resources.some((r) => r.datastore_active)
 
     return (
         <div className="flex w-full flex-col pb-10 font-acumin">
@@ -347,26 +341,20 @@ export function DatasetHeader({
             )}
             <div className="px-4 sm:px-6">
                 <div className="mb-4 flex justify-start gap-x-3">
-                    <div
-                        className="flex justify-start gap-x-3
+                    {dataset && (
+                        <div
+                            className="flex justify-start gap-x-3
             "
-                    >
-                        {false && (
-                            <div className="rounded-full bg-stone-100 p-1">
-                                <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                            </div>
-                        )}
-                        {hasMapView && (
-                            <div className="rounded-full bg-stone-100 p-1">
-                                <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                            </div>
-                        )}
-                        {hasTabularView && (
-                            <div className="rounded-full bg-stone-100 p-1">
-                                <TableCellsIcon className="h-5 w-5 text-green-600" />
-                            </div>
-                        )}
-                    </div>
+                        >
+                            {false && (
+                                <div className="rounded-full bg-stone-100 p-1">
+                                    <ChartBarIcon className="h-5 w-5 text-blue-700" />
+                                </div>
+                            )}
+                            <MapViewIcon dataset={dataset} />
+                            <TabularViewIcon dataset={dataset} />
+                        </div>
+                    )}
                 </div>
                 <div className="flex max-w-[560px] flex-col gap-y-2">
                     <h2 className="text-xs font-bold uppercase leading-none tracking-wide text-green-700">

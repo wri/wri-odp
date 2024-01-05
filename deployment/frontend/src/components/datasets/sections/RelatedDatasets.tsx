@@ -4,9 +4,7 @@ import classNames from '@/utils/classnames'
 import {
     ChartBarIcon,
     ExclamationTriangleIcon,
-    GlobeAltIcon,
     MagnifyingGlassIcon,
-    TableCellsIcon,
 } from '@heroicons/react/20/solid'
 import {
     ArrowPathIcon,
@@ -24,6 +22,8 @@ import { ActiveLayerGroup } from '@/interfaces/state.interface'
 import { Index } from 'flexsearch'
 import Layer from '@/components/_shared/map/Layer'
 import { APILayerSpec } from '@/interfaces/layer.interface'
+import MapViewIcon from '../view-icons/MapViewIcon'
+import TabularViewIcon from '../view-icons/TabularViewIcon'
 
 export function RelatedDatasets({
     datasets,
@@ -127,10 +127,6 @@ export default function DatasetCard({
         day: 'numeric',
     } as const
 
-    const hasMapView = dataset?.resources?.some((r) => r.format == 'Layer')
-
-    const hasTabularView = dataset?.resources?.some((r) => r.datastore_active)
-
     return (
         <div className="font-acumin gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100">
             <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green">
@@ -175,16 +171,8 @@ export default function DatasetCard({
                             <ChartBarIcon className="h-5 w-5 text-blue-700" />
                         </div>
                     )}
-                    {hasMapView && (
-                        <div className="rounded-full bg-stone-100 p-1">
-                            <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                        </div>
-                    )}
-                    {hasTabularView && (
-                        <div className="rounded-full bg-stone-100 p-1">
-                            <TableCellsIcon className="h-5 w-5 text-green-600" />
-                        </div>
-                    )}
+                    <MapViewIcon dataset={dataset} />
+                    <TabularViewIcon dataset={dataset} />
                 </div>
                 {dataset.cautions && (
                     <DefaultTooltip content="This dataset contains cautions">

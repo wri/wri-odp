@@ -16,20 +16,15 @@ import type { SearchInput } from '@/schema/search.schema'
 import { Facets } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
-import { Resource } from '@/interfaces/dataset.interface'
 import nodemailer from 'nodemailer'
 import { randomBytes } from 'crypto'
 import {
     RwDatasetResp,
     RwErrorResponse,
-    RwResponse,
     isRwError,
 } from '@/interfaces/rw.interface'
 import Team from '@/interfaces/team.interface'
 import Topic from '@/interfaces/topic.interface'
-import { create } from 'lodash'
-import { api } from '@/utils/api'
-import { json } from 'stream/consumers'
 import type {
     NewNotificationInputType,
     NotificationType,
@@ -553,14 +548,22 @@ export async function getOneDataset(
         dataset.result.provider = datasetRw.data.attributes.provider
         dataset.result.tableName = datasetRw.data.attributes.tableName
     }
+
+    let spatial = null
+    if (dataset.result.spatial) {
+        try {
+            spatial = JSON.parse(dataset.result.spatial)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     return {
         ...dataset.result,
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
-        spatial: dataset.result.spatial
-            ? JSON.parse(dataset.result.spatial)
-            : null,
+        spatial
     }
 }
 
