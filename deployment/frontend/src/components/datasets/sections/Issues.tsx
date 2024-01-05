@@ -85,17 +85,19 @@ export default function Issues({
                     </div>
                 </div>
 
-                {filteredIssues
-                    .filter((issue) => issue.status === issueState)
-                    .map((issue, index) => (
-                        <IssueCard
-                            key={issue.number}
-                            issue={issue}
-                            datasetName={datasetName}
-                            owner_org={owner_org}
-                            creator_id={creator_id}
-                        />
-                    ))}
+                <div className="  max-h-[60vh] overflow-auto w-full h-full flex flex-col gap-x-3 gap-y-3">
+                    {filteredIssues
+                        .filter((issue) => issue.status === issueState)
+                        .map((issue, index) => (
+                            <IssueCard
+                                key={issue.number}
+                                issue={issue}
+                                datasetName={datasetName}
+                                owner_org={owner_org}
+                                creator_id={creator_id}
+                            />
+                        ))}
+                </div>
             </div>
         </section>
     )
@@ -151,7 +153,7 @@ function IssueCard({
         },
     })
 
-    const closeOpenIssueApi = api.dataset.CloseOpenIssue.useMutation({
+    const closeOpenIssueApi = api.dataset.closeOpenIssue.useMutation({
         onSuccess: async (data) => {
             await utils.dataset.getDatasetIssues.invalidate({
                 id: datasetName,
@@ -208,9 +210,12 @@ function IssueCard({
                             </div>
                         </div>
                     )}
-                    <p className="font-light text-base w-full sm:w-[80%] text-[#1A1919]">
-                        {issue.description}
-                    </p>
+                    <p
+                        className="font-light text-base w-full sm:w-[80%] text-[#1A1919]"
+                        dangerouslySetInnerHTML={{
+                            __html: issue.description,
+                        }}
+                    ></p>
                     <div className="flex items-center gap-x-1 ">
                         <ClockIcon className="w-4 h-4 text-blue-800" />
                         <div className=" font-light text-[0.875rem] mt-2">

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 // => Tiptap packages
+import Placeholder from '@tiptap/extension-placeholder'
 import { useEditor, EditorContent, Editor, BubbleMenu } from '@tiptap/react'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -29,6 +30,7 @@ interface TEditorProps {
     onChange(body: string): void
     initialContent?: string | null
     className: string
+    placeholder?: string
 }
 
 interface ControlleRTEEditorProps<T extends FieldValues> {
@@ -36,12 +38,14 @@ interface ControlleRTEEditorProps<T extends FieldValues> {
     name: Path<T>
     defaultValue?: PathValue<T, Path<T>>
     className?: string
+    placeholder?: string
 }
 
 export function SimpleEditor<T extends FieldValues>({
     formObj,
     name,
     defaultValue,
+    placeholder,
     className,
 }: ControlleRTEEditorProps<T>) {
     const { control, watch } = formObj
@@ -51,6 +55,7 @@ export function SimpleEditor<T extends FieldValues>({
             name={name}
             render={({ field: { onChange, value } }) => (
                 <TipTapEditor
+                    placeholder={placeholder}
                     className={className ?? ''}
                     value={value}
                     initialContent={watch(name) ?? ''}
@@ -68,6 +73,7 @@ function TipTapEditor({
     onChange,
     initialContent,
     className,
+    placeholder,
 }: TEditorProps) {
     const editor = useEditor({
         onUpdate({ editor }) {
@@ -88,6 +94,10 @@ function TipTapEditor({
             Italic,
             Strike,
             Code,
+            Placeholder.configure({
+                // Use a placeholder:
+                placeholder: placeholder ?? '',
+            }),
         ],
     }) as Editor
 

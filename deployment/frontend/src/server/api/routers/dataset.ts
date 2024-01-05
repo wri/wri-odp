@@ -974,7 +974,7 @@ export const DatasetRouter = createTRPCRouter({
             return data
         }),
     
-    CloseOpenIssue: protectedProcedure
+    closeOpenIssue: protectedProcedure
         .input(CommentSchema)
         .mutation(async ({ input, ctx }) => {
             const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_update`, {

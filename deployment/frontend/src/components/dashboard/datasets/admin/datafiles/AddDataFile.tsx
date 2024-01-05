@@ -314,7 +314,7 @@ export function AddDataFile({
                                                 {watch('rw_dataset') ===
                                                     false && (
                                                     <span>
-                                                        Toggle WRI Data to
+                                                        Toggle RW Data to
                                                         enable
                                                     </span>
                                                 )}
@@ -353,7 +353,7 @@ export function AddDataFile({
                                                 {watch('rw_dataset') ===
                                                     false && (
                                                     <span>
-                                                        Toggle WRI Data to
+                                                        Toggle RW Data to
                                                         enable
                                                     </span>
                                                 )}
