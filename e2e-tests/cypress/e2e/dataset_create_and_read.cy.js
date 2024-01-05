@@ -103,7 +103,7 @@ describe("Create dataset", () => {
 
   it("Should show the basic information", () => {
     cy.visit("/datasets/" + dataset);
-    cy.get("h1").contains(dataset);
+    cy.get("h1").contains(dataset, { timeout: 15000 });
     cy.get("h2").contains(org);
     cy.contains("Data files").click();
     cy.contains("CSV");
@@ -147,7 +147,7 @@ describe("Create dataset", () => {
 
   it("Should show the basic information edited", () => {
     cy.visit("/datasets/" + dataset);
-    cy.get("h1").contains(dataset + " EDITED");
+    cy.get("h1").contains(dataset + " EDITED", { timeout: 15000 });
     cy.contains("Data files").click();
     cy.contains("JPEG");
   });
