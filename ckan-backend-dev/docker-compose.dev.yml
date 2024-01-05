@@ -32,6 +32,10 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
     image: ${CKAN_IMAGE}
 
   frontend:

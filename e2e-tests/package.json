@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "open": "cypress open",
-    "test": "cypress run"
+    "test": "cypress run --browser chrome"
   },
   "author": "",
   "license": "ISC",
