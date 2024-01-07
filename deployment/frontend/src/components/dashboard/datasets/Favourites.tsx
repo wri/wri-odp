@@ -37,7 +37,6 @@ export default function Favourite() {
         },
         onError: (error) => setErrorMessage(error.message),
     })
-
     const processedData = useQuery(
         ['processedData', data, query],
         () => {
