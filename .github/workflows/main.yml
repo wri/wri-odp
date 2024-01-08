@@ -65,10 +65,8 @@ jobs:
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d \
           ckan-dev datapusher db solr redis minio minio-setup
         working-directory: ./ckan-backend-dev
-      - name: Initialize the ckanext-issues table
-        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
-      - name: Initialize the notification table
-        run: docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
+      - name: Initialize the Extensions
+        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
