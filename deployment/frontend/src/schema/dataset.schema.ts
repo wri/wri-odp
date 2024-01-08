@@ -97,7 +97,9 @@ export const DatasetSchema = z
         application: z.string().optional().nullable(),
         technical_notes: z
             .string()
-            .url()
+            .url({
+                message: 'Invalid URL. Use the format https://www.website.com',
+            })
             .optional()
             .nullable()
             .or(emptyStringToUndefined),
@@ -156,7 +158,9 @@ export const DatasetSchema = z
         reason_for_adding: z.string().optional().nullable(),
         learn_more: z
             .string()
-            .url()
+            .url({
+                message: 'Invalid URL. Use the format https://www.website.com',
+            })
             .optional()
             .nullable()
             .or(emptyStringToUndefined),
@@ -171,7 +175,9 @@ export const DatasetSchema = z
         open_in: z.array(
             z.object({
                 title: z.string(),
-                url: z.string().url(),
+                url: z
+                    .string()
+                    .url('Invalid URL. Use the format https://www.website.com'),
             })
         ),
         resources: z.array(ResourceSchema),
@@ -198,8 +204,7 @@ export const DatasetSchema = z
             return true
         },
         {
-            message:
-                'Connector Type is required for RW datasets',
+            message: 'Connector Type is required for RW datasets',
             path: ['connectorType'],
         }
     )
@@ -210,8 +215,7 @@ export const DatasetSchema = z
             return true
         },
         {
-            message:
-                'Provider is required for RW datasets',
+            message: 'Provider is required for RW datasets',
             path: ['provider'],
         }
     )
@@ -222,8 +226,7 @@ export const DatasetSchema = z
             return true
         },
         {
-            message:
-                'ConnectorUrl is required for RW datasets',
+            message: 'ConnectorUrl is required for RW datasets',
             path: ['connectorUrl'],
         }
     )
