@@ -196,7 +196,7 @@ export default function Layout({
           <>
             <Disclosure.Panel
               as="div"
-              className="hidden w-[20%] min-w-[20%] lg:z-10 lg:flex lg:flex-col "
+              className="hidden w-full max-w-[300px] lg:z-10 lg:flex lg:flex-col "
             >
               {/* Sidebar component, swap this element with another sidebar if you like */}
               <div className="flex grow flex-col gap-y-5  pb-4  bg-wri-green">
