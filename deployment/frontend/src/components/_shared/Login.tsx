@@ -130,7 +130,7 @@ function SignInForm({
                         <div className="grow shrink basis-auto">
                             <input
                                 type="text"
-                                placeholder="Username"
+                                placeholder="Username or Email"
                                 className=" focus:outline-none  placeholder:text-xs placeholder:font-light placeholder:text-[#353535] text-xs font-light w-full !border-none"
                                 {...register('username')}
                             />
