@@ -125,7 +125,7 @@ ckan:
       enable: false
     image:
       repository: viderum/data-api
-      digest: sha256:ceb0b9b1845cc11c1bb641a73ea2bcf9e4cca2cb84412c32ae5b70c5564160bb
+      digest: sha256:234567e740e0f05b19d0603d7c7adb9702bd67e3cc522aca15357f978cd3d5e8
     imagePullPolicy: IfNotPresent
     env:
       DEFAULT_ROW_LIMIT: "100"
