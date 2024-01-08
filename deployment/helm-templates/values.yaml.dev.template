@@ -124,8 +124,8 @@ ckan:
     hpa:
       enable: false
     image:
-      repository: luccasmmg/data-api
-      digest: sha256:73bf8caeb54b18cbe2f838e07c90c9d85dfdb8a46b43debe3332ee41fe152a07
+      repository: viderum/data-api
+      digest: sha256:234567e740e0f05b19d0603d7c7adb9702bd67e3cc522aca15357f978cd3d5e8
     imagePullPolicy: IfNotPresent
     env:
       DEFAULT_ROW_LIMIT: "100"
