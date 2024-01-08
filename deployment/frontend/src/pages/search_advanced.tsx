@@ -139,7 +139,7 @@ export default function SearchPage({
                 fq,
                 search: filters.find((e) => e?.key == 'search')?.value ?? '',
                 extLocationQ,
-                extAddressQ
+                extAddressQ,
             }
         })
     }, [filters])
@@ -207,7 +207,12 @@ export default function SearchPage({
                     }
                 </FilteredSearchLayout>
             )}
-            <Footer />
+            <Footer
+                links={{
+                    primary: { title: 'Explore Teams', href: '/teams' },
+                    secondary: { title: 'Explore Topics', href: '/topics' },
+                }}
+            />
         </>
     )
 }

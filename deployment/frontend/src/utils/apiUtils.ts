@@ -9,26 +9,22 @@ import type {
     GroupTree,
     Collaborator,
     GroupsmDetails,
+    WriUser,
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
 import { Facets } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
-import { Resource } from '@/interfaces/dataset.interface'
 import nodemailer from 'nodemailer'
 import { randomBytes } from 'crypto'
 import {
     RwDatasetResp,
     RwErrorResponse,
-    RwResponse,
     isRwError,
 } from '@/interfaces/rw.interface'
 import Team from '@/interfaces/team.interface'
 import Topic from '@/interfaces/topic.interface'
-import { create } from 'lodash'
-import { api } from '@/utils/api'
-import { json } from 'stream/consumers'
 import type {
     NewNotificationInputType,
     NotificationType,
@@ -552,14 +548,22 @@ export async function getOneDataset(
         dataset.result.provider = datasetRw.data.attributes.provider
         dataset.result.tableName = datasetRw.data.attributes.tableName
     }
+
+    let spatial = null
+    if (dataset.result.spatial) {
+        try {
+            spatial = JSON.parse(dataset.result.spatial)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     return {
         ...dataset.result,
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
-        spatial: dataset.result.spatial
-            ? JSON.parse(dataset.result.spatial)
-            : null,
+        spatial
     }
 }
 
@@ -1179,7 +1183,7 @@ function findUpdatedMembers(
     })
 }
 
-async function createNotification(
+export async function createNotification(
     recipient_id: string,
     sender_id: string,
     activity_type: string,
@@ -1267,4 +1271,105 @@ export async function getTopicDetails({
         throw Error(JSON.stringify(topic.error))
     }
     return topic.result
+}
+
+export async function getRecipient({
+  owner_org,
+  session,
+}: {
+  owner_org: string;
+  session: Session;
+}): Promise<string[]> {
+  try {
+    const response = await fetch(
+      `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
+      {
+        headers: {
+          Authorization: `${session.user?.apikey ?? ''}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch organization information: ${response.statusText}`);
+    }
+
+    const responseData = (await response.json()) as CkanResponse<WriOrganization | null>
+    const organization: WriOrganization | null =
+        responseData.success === true ? responseData.result : null
+
+    if (organization) {
+      const members = organization.users!;
+
+      // Filter members to include only admins and editors
+      const adminAndEditorMembers = members.filter(
+        (member) => member.capacity === 'admin' || member.capacity === 'editor'
+      );
+
+      // Extract member IDs into an array
+      const memberIds = adminAndEditorMembers.map((member) => member.id!);
+
+      return memberIds;
+    } else {
+      throw new Error(`Failed to fetch organization information: ${responseData.error?.message}`);
+    }
+  } catch (error) {
+    console.error(`Error in getRecipient function`);
+    throw error;
+  }
+}
+
+export async function sendIssueOrCommentNotigication({
+    owner_org,
+    creator_id,
+    collaborator_id,
+    dataset_id,
+    session,
+    title,
+    action
+}: {
+        owner_org: string | null;
+        creator_id: string | null;
+        collaborator_id: string[] | null;
+        dataset_id: string;
+        session: Session,
+        title: string,
+        action: string
+    }) {
+    try {
+        let recipientIds: string[] = []
+
+        if (owner_org) {
+            recipientIds = await getRecipient({owner_org: owner_org, session: session})
+        }
+        else if (creator_id) {
+            recipientIds = [creator_id]
+        }
+
+        if (collaborator_id) {
+            recipientIds = recipientIds.concat(collaborator_id)
+        }
+
+        if (recipientIds.length > 0) {
+            const titleNotification = title.split(" ").join("nbsp;")
+            const notificationPromises = recipientIds
+                .filter((recipientId) => recipientId !== session.user.id)
+                .map((recipientId) => {
+                return createNotification(
+                    recipientId,
+                    session.user.id,
+                     `issue_${action}_${titleNotification}`,
+                    'dataset',
+                    dataset_id,
+                    true
+                );
+            });
+
+            await Promise.all(notificationPromises);
+        }
+    } catch (error) {
+        console.error(error);
+        throw Error("Error in sending issue /comment notification");
+    }
 }

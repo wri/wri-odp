@@ -97,7 +97,7 @@ def test_location_search():
 
     search_1 = get_action('package_search')(
         context=context,
-        data_dict={'ext_location_q': '10,10', 'ext_address_q': ""}
+        data_dict={'ext_location_q': '10,10', 'ext_address_q': "test"}
     )['results']
 
     assert len(search_1) == 0

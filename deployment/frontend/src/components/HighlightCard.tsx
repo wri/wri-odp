@@ -1,22 +1,16 @@
 import React from 'react'
 import Image from 'next/image'
-import {
-    ChartBarIcon,
-    GlobeAltIcon,
-    TableCellsIcon,
-} from '@heroicons/react/20/solid'
+import { ChartBarIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import { WriDataset } from '@/schema/ckan.schema'
+import MapViewIcon from './datasets/view-icons/MapViewIcon'
+import TabularViewIcon from './datasets/view-icons/TabularViewIcon'
 
 export default function HighlightCard({
     highlight,
 }: {
     highlight: WriDataset
 }) {
-    const hasMapView = highlight?.resources?.some((r) => r.format == 'Layer')
-
-    const hasTabularView = highlight?.resources?.some((r) => r.datastore_active)
-
     return (
         <Link
             href={`/datasets/${highlight.name}`}
@@ -66,26 +60,18 @@ export default function HighlightCard({
                                 fill
                             />
                         </div>
-                        <div className="ml-1 w-fit h-[14px]">Sub-regional</div>
+                        <div className="ml-1 w-fit h-[14px] line-clamp-1">{highlight.spatial_address}</div>
                     </div>
                 ) : null}
             </div>
-            <div className="px-4 mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black">
+            <div className="px-4 mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black h-7">
                 {false && (
                     <div className="rounded-full bg-stone-100 p-1">
                         <ChartBarIcon className="h-5 w-5 text-blue-700" />
                     </div>
                 )}
-                {hasMapView && (
-                    <div className="rounded-full bg-stone-100 p-1">
-                        <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                    </div>
-                )}
-                {hasTabularView && (
-                    <div className="rounded-full bg-stone-100 p-1">
-                        <TableCellsIcon className="h-5 w-5 text-green-600" />
-                    </div>
-                )}
+                <MapViewIcon dataset={highlight} />
+                <TabularViewIcon dataset={highlight} />
             </div>
         </Link>
     )

@@ -55,11 +55,11 @@ function LeftNode({
             <div className="flex h-6 items-center">
                 <DefaultTooltip content="Select all">
                     <input
-                        id="notification"
+                        id="select_all_notifications"
                         aria-describedby="notifications-checkbox"
                         name="notifications"
                         type="checkbox"
-                        className="h-4 w-4  rounded  bg-white "
+                        className="h-4 w-4 rounded bg-white"
                         onChange={(e) => {
                             if (e.target.checked) {
                                 setSelected(data.map((item) => item.id))
@@ -81,6 +81,13 @@ function LeftNode({
                     </button>
                 </DefaultTooltip>
             </div>
+            <button
+                className="hidden"
+                id="markasread_hidden"
+                onClick={() => setOpenMarkAsRead(true)}
+            >
+                Mark as read
+            </button>
             <div className="">
                 <Menu
                     as="div"
@@ -109,10 +116,9 @@ function LeftNode({
                                 <div className="px-2 pr-2 py-3 ">
                                     <Menu.Item
                                         as={'button'}
-                                        id="markasread"
                                         onClick={() => setOpenMarkAsRead(true)}
                                     >
-                                        <div>Mark as read</div>
+                                        <div id="markasread">Mark as read</div>
                                     </Menu.Item>
                                 </div>
                             </div>

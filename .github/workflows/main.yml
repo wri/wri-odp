@@ -62,8 +62,7 @@ jobs:
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d \
-          ckan-dev datapusher db solr redis minio minio-setup
+          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
       - name: Initialize the Extensions
         run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
@@ -82,6 +81,12 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
+      - name: Initialize the ckanext-issues table
+        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
+      - name: Update the ckanext-issues table
+        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesupdate"
+      - name: Initialize the notification table
+        run: docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
       - name: Print Logs
         run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
@@ -109,6 +114,10 @@ jobs:
           name: cypress-screenshots
           path: /home/runner/work/wri-odp/wri-odp/e2e-tests/cypress/screenshots
           if-no-files-found: ignore
+      - name: Print Error Logs
+        if: failure()
+        run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
+        working-directory: ./ckan-backend-dev
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev

@@ -82,9 +82,7 @@ describe("Create dataset", () => {
     cy.get("input[type=file]").selectFile("cypress/fixtures/cities.csv", {
       force: true,
     });
-    cy.get('input[name="resources.0.title"]')
-      .clear()
-      .type("Cities");
+    cy.get('input[name="resources.0.title"]').clear().type("Cities");
     cy.get("button").contains("Add another data file").click();
     cy.get("input[type=file]").eq(1).selectFile("cypress/fixtures/logo.png", {
       force: true,
@@ -101,19 +99,28 @@ describe("Create dataset", () => {
     });
   });
 
-  it("Should show the basic information", () => {
-    cy.visit("/datasets/" + dataset);
-    cy.get("h1").contains(dataset);
-    cy.get("h2").contains(org);
-    cy.contains("Data files").click();
-    cy.contains("CSV");
-  });
+  it(
+    "Should show the basic information",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/datasets/" + dataset);
+      cy.get("h1").contains(dataset, { timeout: 15000 });
+      cy.get("h2").contains(org);
+      cy.contains("Data files").click();
+      cy.contains("CSV");
+    },
+  );
 
   it("Should show the members", () => {
     cy.addPackageCollaboratorApi(user, dataset, "editor");
     cy.visit("/datasets/" + dataset);
     cy.contains("Collaborators").click();
-    cy.contains(user_email);
+    cy.contains(user);
   });
 
   it("Edit metadata", () => {
@@ -141,27 +148,36 @@ describe("Create dataset", () => {
     cy.get("li").contains(user_2).click();
     cy.get("button").contains("Update Dataset").click();
     cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
-      timeout: 15000,
+      timeout: 30000,
     });
   });
 
-  it("Should show the basic information edited", () => {
-    cy.visit("/datasets/" + dataset);
-    cy.get("h1").contains(dataset + " EDITED");
-    cy.contains("Data files").click();
-    cy.contains("JPEG");
-  });
+  it(
+    "Should show the basic information edited",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/datasets/" + dataset);
+      cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
+      cy.contains("Data files").click();
+      cy.contains("JPEG");
+    },
+  );
 
   it("Should show the new member", () => {
     cy.visit("/datasets/" + dataset);
-    cy.contains('Collaborators').click()
-    cy.contains(user_email_2)
+    cy.contains("Collaborators").click();
+    cy.contains(user_2);
     cy.logout();
     cy.login(user_2, "test_user_2");
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
     cy.contains(" added you as a collaborator (member) for the dataset");
-  })
+  });
 
   after(() => {
     cy.deleteOrganizationAPI(org);

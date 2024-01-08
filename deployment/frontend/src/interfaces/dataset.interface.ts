@@ -57,6 +57,7 @@ export interface Resource {
     url_type?: string
     key?: string
     schema?: { value: DataDictionaryFormType }
+    rw_id?: string
 }
 
 export interface DatasetListQueryOptions {
