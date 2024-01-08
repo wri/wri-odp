@@ -27,6 +27,22 @@ describe("Login modal", () => {
     cy.get("#nav-user-menu").should("be.visible", { timeout: 10000});
   });
 
+  it("can be used to sign in with an email", () => {
+    cy.visit({ url: "/" });
+    cy.get("#nav-login-button").click();
+    cy.get("#login-modal").as("login-modal");
+
+    cy.userMetadata(ckanUserName).as("user");
+    cy.get("@user").then((user) => {
+      cy.get("@login-modal").get('input[name="username"]').type(user.email);
+      cy.get("@login-modal").get('input[name="password"]').type(ckanUserPassword);
+
+      cy.get("button#login-button").click({ force: true });
+
+      cy.get("#nav-user-menu").should("be.visible", { timeout: 10000});
+    })
+  });
+
   it("can be used to request a password reset link", () => {
     cy.visit({ url: "/" });
     cy.get("#nav-login-button").click();
