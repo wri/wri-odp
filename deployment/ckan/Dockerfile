@@ -11,8 +11,7 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@fff325e0238334b54f23a392bb0682a5abc3da3f#egg=ckanext-auth' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-data-api.git@d8dbe35bf4c074575bc5511de9527c4e7cb8e33e#egg=ckanext-data-api'
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
 
 USER root
 
