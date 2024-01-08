@@ -81,12 +81,8 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
-      - name: Initialize the ckanext-issues table
-        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
-      - name: Update the ckanext-issues table
-        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesupdate"
-      - name: Initialize the notification table
-        run: docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
+      - name: Initialize the Extensions
+        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Print Logs
         run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
