@@ -79,7 +79,7 @@ jobs:
       - name: Set up Frontend Docker Container
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
-        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build --no-recreate -d frontend
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
       - name: Initialize the ckanext-issues table
         run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
