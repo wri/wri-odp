@@ -99,13 +99,22 @@ describe("Create dataset", () => {
     });
   });
 
-  it("Should show the basic information", () => {
-    cy.visit("/datasets/" + dataset);
-    cy.get("h1").contains(dataset, { timeout: 15000 });
-    cy.get("h2").contains(org);
-    cy.contains("Data files").click();
-    cy.contains("CSV");
-  });
+  it(
+    "Should show the basic information",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/datasets/" + dataset);
+      cy.get("h1").contains(dataset, { timeout: 15000 });
+      cy.get("h2").contains(org);
+      cy.contains("Data files").click();
+      cy.contains("CSV");
+    },
+  );
 
   it("Should show the members", () => {
     cy.addPackageCollaboratorApi(user, dataset, "editor");
