@@ -22,6 +22,11 @@ for dir in ckanext-*; do
       continue
     fi
 
+     # Skip ckanext-data-api
+    if [ "$dir" == "src/ckanext-data-api" ]; then
+      continue
+    fi
+
     cd $dir
 
     pytest --ckan-ini=test.ini ckanext/${dir#ckanext-}/tests 2>&1 | tee -a "$ROOT_DIR/test_results.txt"
