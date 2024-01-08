@@ -11,7 +11,7 @@ import Link from 'next/link'
 
 function ActivityStreamUser({ activity }: { activity: activity }) {
   return (
-    <div className=' hover:bg-slate-100 p-2 mb-2 pb-2 rounded-md'>
+    <div className=' hover:bg-slate-100 mb-2 pb-2 pt-2 px-2 rounded-md'>
       <ActivityStreamCard activity={activity} />
     </div>
   )
@@ -28,7 +28,7 @@ export default function UserActivityStreams({ drag }: { drag: boolean }) {
           </div>
         ) : ""
       }
-      <div className='flex px-2 mb-4 border-b-[0.3px] border-b-gray-100'>
+      <div className='flex px-2 mb-6 pb-2 border-b-[0.3px] border-b-gray-100'>
         <p className='font-normal text-[20px]'>Activity Stream</p>
         <Link href="/dashboard/activity-stream" className='ml-auto flex items-center font-semibold gap-x-1 text-[14px] text-wri-green'><span>See all</span> <ArrowRightIcon className='w-4 h-4 mb-1' /></Link>
       </div>
