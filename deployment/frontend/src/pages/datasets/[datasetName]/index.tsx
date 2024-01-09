@@ -1,35 +1,36 @@
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
 import Header from '@/components/_shared/Header'
+import Spinner from '@/components/_shared/Spinner'
+import ApprovalRequestCard from '@/components/datasets/ApprovalRequestCard'
 import { DatasetHeader } from '@/components/datasets/DatasetHeader'
 import DatasetPageLayout from '@/components/datasets/DatasetPageLayout'
 import { DatasetTabs } from '@/components/datasets/DatasetTabs'
+import AddLayers from '@/components/datasets/add-layers/AddLayers'
 import { API } from '@/components/datasets/sections/API'
 import { About } from '@/components/datasets/sections/About'
 import { Contact } from '@/components/datasets/sections/Contact'
 import { DataFiles } from '@/components/datasets/sections/DataFiles'
+import Issues from '@/components/datasets/sections/Issues'
 import { Members } from '@/components/datasets/sections/Members'
 import { Methodology } from '@/components/datasets/sections/Methodology'
 import { RelatedDatasets } from '@/components/datasets/sections/RelatedDatasets'
-import { Tab } from '@headlessui/react'
-import { useState } from 'react'
-import AddLayers from '@/components/datasets/add-layers/AddLayers'
-import Issues from '@/components/datasets/sections/Issues'
-import ApprovalRequestCard from '@/components/datasets/ApprovalRequestCard'
-import { useRouter } from 'next/router'
+import { getServerAuthSession } from '@/server/auth'
 import { api } from '@/utils/api'
-import dynamic from 'next/dynamic'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import Spinner from '@/components/_shared/Spinner'
+import { getAllDatasetFq, getOneDataset } from '@/utils/apiUtils'
+import { Tab } from '@headlessui/react'
 import { Index } from 'flexsearch'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { useSession } from 'next-auth/react'
 import { NextSeo } from 'next-seo'
-import { getOneDataset } from '@/utils/apiUtils'
-import { getServerAuthSession } from '@/server/auth'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 
-import { decodeMapParam } from '@/utils/urlEncoding'
 import SyncUrl from '@/components/_shared/map/SyncUrl'
-import { useIsAddingLayers } from '@/utils/storeHooks'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
+import { useIsAddingLayers } from '@/utils/storeHooks'
+import { decodeMapParam } from '@/utils/urlEncoding'
+import {WriDataset} from '@/schema/ckan.schema'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -57,6 +58,28 @@ export async function getServerSideProps(
     try {
         const dataset = await getOneDataset(datasetName, session)
 
+        let relatedDatasets: WriDataset[] = []
+        if (dataset.groups?.length) {
+            let groupDatasets = await getAllDatasetFq({
+                apiKey: session?.user.apikey ?? '',
+                query: { search: '', page: { start: 0, rows: 50 } },
+                fq:
+                    dataset?.groups && dataset.groups.length > 0
+                        ? `groups:
+                          ${
+                              dataset?.groups
+                                  ?.map((group) => group.name)
+                                  .join(' OR ') ?? ''
+                          }
+                  `
+                        : '',
+            })
+
+            relatedDatasets = groupDatasets.datasets.filter(
+                (d) => d.id != dataset.id
+            )
+        }
+
         return {
             props: {
                 dataset: {
@@ -64,7 +87,11 @@ export async function getServerSideProps(
                     spatial: dataset.spatial ?? null,
                 },
                 datasetName,
-                initialZustandState: { dataset, mapView: mapState },
+                initialZustandState: {
+                    dataset,
+                    relatedDatasets,
+                    mapView: mapState,
+                },
             },
         }
     } catch {
@@ -98,18 +125,6 @@ export default function DatasetPage(
         { retry: 0, initialData: dataset }
     )
     if (!datasetData && datasetError) router.replace('/datasets/404')
-
-    const relatedDatasets = api.dataset.getAllDataset.useQuery({
-        fq:
-            datasetData?.groups && datasetData.groups.length > 0
-                ? {
-                      groups:
-                          datasetData?.groups
-                              ?.map((group) => group.name)
-                              .join(' OR ') ?? '',
-                  }
-                : {},
-    })
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
         { id: datasetName },
@@ -258,21 +273,7 @@ export default function DatasetPage(
                                                 </Tab.Panel>
                                             )}
                                             <Tab.Panel as="div">
-                                                <RelatedDatasets
-                                                    original={datasetData.name}
-                                                    datasets={
-                                                        datasetData?.groups &&
-                                                        datasetData.groups
-                                                            .length > 0 &&
-                                                        relatedDatasets.data
-                                                            ? relatedDatasets.data.datasets.filter(
-                                                                  (dataset) =>
-                                                                      dataset.name !==
-                                                                      datasetData.name
-                                                              )
-                                                            : []
-                                                    }
-                                                />
+                                                <RelatedDatasets />
                                             </Tab.Panel>
                                             <Tab.Panel as="div">
                                                 <Contact

@@ -57,7 +57,7 @@ export function Legends() {
                         return (
                             <LegendListItem
                                 index={i}
-                                key={i}
+                                key={`legend-list-item-${i}`}
                                 layerGroup={{
                                     ...lg,
                                     layers: lg.layers.map((l: APILayerSpec) => {

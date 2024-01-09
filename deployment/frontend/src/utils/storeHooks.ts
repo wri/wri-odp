@@ -7,6 +7,14 @@ export const useDataset = () => {
     return { dataset }
 }
 
+export const useRelatedDatasets = () => {
+    const { relatedDatasets } = useStore((store) => ({
+        relatedDatasets: store.relatedDatasets,
+    }))
+
+    return { relatedDatasets }
+}
+
 export const useIsEmbeddingMap = () => {
     const { isEmbedding } = useStore((store) => ({
         isEmbedding: store.mapView.isEmbedding,

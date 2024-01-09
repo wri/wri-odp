@@ -11,8 +11,6 @@ import {
     getAllUsers,
     upsertCollaborator,
     deleteCollaborator,
-    getRecipient,
-    createNotification,
     sendIssueOrCommentNotigication
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
@@ -21,7 +19,6 @@ import type {
     Collaborator,
     Issue,
     WriDataset,
-    WriUser,
     FolloweeList,
 } from '@/schema/ckan.schema'
 import {
@@ -620,7 +617,7 @@ export const DatasetRouter = createTRPCRouter({
 
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session?.user.apikey ?? '',
-                fq: fq,
+                fq: `${fq}${input.appendRawFq ?? ""}`,
                 query: input,
                 facetFields: input.facetFields,
                 sortBy: input.sortBy,

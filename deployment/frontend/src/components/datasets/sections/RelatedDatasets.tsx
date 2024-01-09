@@ -1,37 +1,27 @@
 import { Button } from '@/components/_shared/Button'
 import Modal from '@/components/_shared/Modal'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import Map from '@/components/_shared/map/Map'
+import { APILayerSpec } from '@/interfaces/layer.interface'
+import { ActiveLayerGroup } from '@/interfaces/state.interface'
+import { WriDataset } from '@/schema/ckan.schema'
 import classNames from '@/utils/classnames'
+import { getFormatColor } from '@/utils/formatColors'
+import { useActiveLayerGroups, useRelatedDatasets } from '@/utils/storeHooks'
 import {
     ChartBarIcon,
     ExclamationTriangleIcon,
     MagnifyingGlassIcon,
 } from '@heroicons/react/20/solid'
-import {
-    ArrowPathIcon,
-    ClockIcon,
-    MapPinIcon,
-} from '@heroicons/react/24/outline'
-import { useEffect, useState } from 'react'
-import Map from '@/components/_shared/map/Map'
-import Link from 'next/link'
-import { WriDataset } from '@/schema/ckan.schema'
-import { getFormatColor } from '@/utils/formatColors'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { useActiveLayerGroups } from '@/utils/storeHooks'
-import { ActiveLayerGroup } from '@/interfaces/state.interface'
+import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { Index } from 'flexsearch'
-import Layer from '@/components/_shared/map/Layer'
-import { APILayerSpec } from '@/interfaces/layer.interface'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import MapViewIcon from '../view-icons/MapViewIcon'
 import TabularViewIcon from '../view-icons/TabularViewIcon'
 
-export function RelatedDatasets({
-    datasets,
-    original,
-}: {
-    datasets: WriDataset[]
-    original: string
-}) {
+export function RelatedDatasets() {
+    const { relatedDatasets: datasets } = useRelatedDatasets()
     if (datasets.length === 0) {
         return (
             <div className="flex flex-col gap-y-4 py-2">
@@ -41,38 +31,37 @@ export function RelatedDatasets({
     }
     return (
         <div className="flex flex-col gap-y-4 py-2">
-            {datasets.map((dataset) => (
-                <DatasetCard
-                    key={dataset.name}
-                    dataset={dataset}
-                    original={original}
-                />
+            {datasets.map((dataset: WriDataset) => (
+                <DatasetCard key={`related-dataset-card-${dataset.name}`} dataset={dataset} />
             ))}
         </div>
     )
 }
 
-export default function DatasetCard({
-    dataset,
-    original,
-}: {
-    dataset: WriDataset
-    original?: string
-}) {
-    const [layers, setLayers] = useState<APILayerSpec[]>([])
-
+export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
     const { activeLayerGroups, replaceLayersForLayerGroup } =
         useActiveLayerGroups()
 
+    const activeLayerGroup = activeLayerGroups.find(
+        (lg: any) => lg.datasetId == dataset.id
+    )
+
+    const activeDataFiles = dataset.resources.filter(
+        (df: any) => activeLayerGroup?.layers?.includes(df.rw_id)
+    )
+
+    const activeDataFilesIds = activeDataFiles.map((df) => df.id)
+
+    const [layers, setLayers] = useState<APILayerSpec[]>([])
     const [addDatasetModalOpen, setAddDatasetModalOpen] = useState(false)
-    const [selectedDataFileNames, setSelectedDataFileNames] = useState<
+    const [selectedDataFileIds, setSelectedDataFileIds] = useState<
         Array<string>
-    >([])
+    >(activeDataFilesIds || [])
 
     useEffect(() => {
         let countdown = 10
         Promise.all(
-            selectedDataFileNames.map(async (dfId) => {
+            selectedDataFileIds.map(async (dfId) => {
                 const df = dataFiles.find((df) => df.id == dfId)
                 const layer = df?.url?.split('/').at(-1)
                 const response = await fetch(
@@ -95,11 +84,9 @@ export default function DatasetCard({
         ).then((layers) => {
             setLayers(layers)
         })
-    }, [selectedDataFileNames])
+    }, [selectedDataFileIds])
 
-    const dataFiles = dataset.resources.filter(
-        (r) => r.url?.startsWith('https://api.resourcewatch')
-    )
+    const dataFiles = dataset.resources.filter((r) => r.rw_id)
 
     const [q, setQ] = useState('')
     const index = new Index({
@@ -231,14 +218,14 @@ export default function DatasetCard({
                             <div className="flex justify-between">
                                 <span className="text-base">
                                     {filteredDatafiles.length} Data Files,{' '}
-                                    {selectedDataFileNames.length} Data Files
+                                    {selectedDataFileIds.length} Data Files
                                     Selected
                                 </span>
                                 <div className="text-sm">
                                     <button
                                         className="underline mr-3"
                                         onClick={() =>
-                                            setSelectedDataFileNames(
+                                            setSelectedDataFileIds(
                                                 dataFiles.map((df) => df.id)
                                             )
                                         }
@@ -248,7 +235,7 @@ export default function DatasetCard({
                                     <button
                                         className="underline"
                                         onClick={() =>
-                                            setSelectedDataFileNames([])
+                                            setSelectedDataFileIds([])
                                         }
                                     >
                                         Clear
@@ -261,14 +248,14 @@ export default function DatasetCard({
                                         <button
                                             className={classNames(
                                                 `text-left p-5 py-6 shadow border-b-[2px] border-b-wri-green flex justify-between items-center transition-all`,
-                                                selectedDataFileNames.includes(
+                                                selectedDataFileIds.includes(
                                                     df.id
                                                 )
                                                     ? 'bg-[#EFF5F7]'
                                                     : ''
                                             )}
                                             onClick={() => {
-                                                setSelectedDataFileNames(
+                                                setSelectedDataFileIds(
                                                     (prev) => {
                                                         if (
                                                             prev.includes(df.id)
@@ -315,7 +302,7 @@ export default function DatasetCard({
                                                 </p>
                                             </div>
                                             <div>
-                                                {selectedDataFileNames.includes(
+                                                {selectedDataFileIds.includes(
                                                     df.id
                                                 ) && <CheckIcon />}
                                             </div>
@@ -324,12 +311,11 @@ export default function DatasetCard({
                                 })}
                             </div>
                             <Button
+                                id="add-to-map-modal-btn"
                                 onClick={() => {
                                     const layerIds = dataFiles
                                         .filter((df) =>
-                                            selectedDataFileNames.includes(
-                                                df.id
-                                            )
+                                            selectedDataFileIds.includes(df.id)
                                         )
                                         .map((df) => df?.url?.split('/').at(-1))
                                         .filter((l) => l != undefined)
@@ -344,7 +330,9 @@ export default function DatasetCard({
                                 }}
                                 className="float-right my-5"
                             >
-                                Add to map
+                                {activeDataFilesIds.length > 0
+                                    ? 'Update map'
+                                    : 'Add to map'}
                             </Button>
                         </div>
                     </div>
