@@ -9,6 +9,7 @@ export const searchSchema = z.object({
         })
         .default({ start: 0, rows: 50 }),
     fq: z.record(z.string()).optional(),
+    appendRawFq: z.string().optional(),
     facetFields: z.array(z.string()).optional(),
     sortBy: z.string().default("relevance asc").optional(),
     extLocationQ: z.string().optional(),

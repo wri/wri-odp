@@ -8,9 +8,11 @@ import { Filter } from '@/interfaces/search.interface'
 import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner'
 import Pagination from '../Pagination'
+import { useDataset } from '@/utils/storeHooks'
 
 export default function AddLayers() {
     const addLayerTabs = [{ name: 'Search' }, { name: 'Filters' }]
+    const { dataset } = useDataset()
 
     /**
      * Query used to show results
@@ -21,6 +23,7 @@ export default function AddLayers() {
         page: { start: 0, rows: 10 },
         sortBy: 'relevance desc',
         fq: { res_format: 'Layer' },
+        appendRawFq: ` -id:(${dataset.id})`
     })
 
     const [filters, setFilters] = useState<Filter[]>([])
