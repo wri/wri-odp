@@ -311,6 +311,7 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                                 })}
                             </div>
                             <Button
+                                id="add-to-map-modal-btn"
                                 onClick={() => {
                                     const layerIds = dataFiles
                                         .filter((df) =>
