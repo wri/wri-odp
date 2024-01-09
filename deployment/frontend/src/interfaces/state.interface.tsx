@@ -3,6 +3,7 @@ import { ViewState } from 'react-map-gl'
 
 export interface State {
     dataset: WriDataset | null
+    relatedDatasets: WriDataset[] | null,
     mapView: {
         isEmbedding: boolean,
         isAddingLayers?: boolean,

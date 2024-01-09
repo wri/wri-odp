@@ -3,7 +3,6 @@ import {
     Basemap,
     Labels,
     LayerState,
-    Layers,
     State,
     Bounds,
 } from '@/interfaces/state.interface'
@@ -25,6 +24,7 @@ type UseStoreState = typeof initializeStore extends (
 const getDefaultInitialState = () => {
     const initialState: State = {
         dataset: null,
+        relatedDatasets: null,
         mapView: {
             isEmbedding: false,
             isAddingLayers: false,
