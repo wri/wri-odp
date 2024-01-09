@@ -13,7 +13,7 @@ import { NotificationType } from '@/schema/notification.schema'
 
 function Notification({ items }: { items: NotificationType }) {
     return (
-        <div className="flex flex-col sm:flex-row gap-x-4 group hover:bg-slate-100 p-2 px-3 py-4 mb-2 pb-2 rounded-md">
+        <div className="flex flex-col sm:flex-row gap-x-4 group hover:bg-slate-100 p-2 pt-2 px-3 pb-3 mb-2 rounded-md">
             <div className="flex gap-x-3">
                 {items?.is_unread ? (
                     <DefaultTooltip content="unread">
@@ -90,7 +90,7 @@ export default function Notifications({ drag }: { drag: boolean }) {
             ) : (
                 ''
             )}
-            <div className="flex px-2 mb-4 border-b-[0.3px] border-b-gray-100">
+            <div className="flex px-2 mb-6 pb-2 border-b-[0.3px] border-b-gray-100">
                 <div className="flex gap-x-2">
                     <p className="font-normal text-[20px]">Notifications </p>
                     {isLoading ? (

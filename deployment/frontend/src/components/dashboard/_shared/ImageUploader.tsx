@@ -104,7 +104,7 @@ export function ImageUploader({
                         <img
                             src={defaultImage}
                             alt=""
-                            className="absolute inset-0 z-9 h-full w-full object-cover"
+                            className="absolute inset-0 z-9 h-full w-full object-contain"
                         />
                         <div className="bg-white bg-opacity-0 transition group-hover:bg-opacity-90 absolute inset-0 group:z-10 h-full w-full object-cover" />
                     </>
@@ -114,7 +114,7 @@ export function ImageUploader({
                         <img
                             src={presignedGetUrl.data}
                             alt=""
-                            className="absolute inset-0 z-9 h-full w-full object-cover"
+                            className="absolute inset-0 z-9 h-full w-full object-contain"
                         />
                         <div className="bg-white bg-opacity-0 transition group-hover:bg-opacity-90 absolute inset-0 group:z-10 h-full w-full object-cover" />
                     </>

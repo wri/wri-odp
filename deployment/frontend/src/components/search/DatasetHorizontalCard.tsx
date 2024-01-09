@@ -169,9 +169,9 @@ export default function DatasetHorizontalCard({
                                         <TooltipTrigger>
                                             <ExclamationCircleIcon className="h-5 w-5 text-red-600" />
                                         </TooltipTrigger>
-                                        <TooltipContent className="bg-neutral-200">
+                                        <TooltipContent className="bg-neutral-200 ">
                                             <p>
-                                                This dataset is not approved by
+                                                Not approved by
                                                 RDI
                                             </p>
                                         </TooltipContent>

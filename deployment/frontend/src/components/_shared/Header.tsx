@@ -52,7 +52,7 @@ export default function Header() {
         <section className="w-full shadow">
             <section
                 id="header"
-                className="w-full py-10 px-4 sm:px-6 xxl:px-0 max-w-[1380px] mx-auto flex font-acumin items-baseline"
+                className="w-full py-10 px-4 sm:px-6 xxl:px-12  mx-auto flex font-acumin items-baseline"
             >
                 <Link href="/" className=" w-fit sm:w-52 h-fit">
                     <Image
