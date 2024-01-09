@@ -32,7 +32,7 @@ export function RelatedDatasets() {
     return (
         <div className="flex flex-col gap-y-4 py-2">
             {datasets.map((dataset: WriDataset) => (
-                <DatasetCard key={dataset.name} dataset={dataset} />
+                <DatasetCard key={`related-dataset-card-${dataset.name}`} dataset={dataset} />
             ))}
         </div>
     )
