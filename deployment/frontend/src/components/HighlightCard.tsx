@@ -24,7 +24,7 @@ export default function HighlightCard({
                     className="object-cover"
                 />
             </div>
-            <div className="px-4 z-10 -mt-6 w-[70%] bg-white pb-2 pt-4 text-[0.938rem] font-bold text-wri-green line-clamp-1 h-[3em]">
+            <div className="px-4 z-10 -mt-6 w-[70%] bg-white pb-2 pt-4 text-[0.938rem] font-bold text-wri-green line-clamp-1 h-[2.5em]">
                 {highlight.organization?.title}
             </div>
             <h2 className="px-4 text-wri-black text-2xl font-bold w-[80%] line-clamp-2 h-[2.5em]">

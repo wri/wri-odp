@@ -30,6 +30,7 @@ import SyncUrl from '@/components/_shared/map/SyncUrl'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
 import { useIsAddingLayers } from '@/utils/storeHooks'
 import { decodeMapParam } from '@/utils/urlEncoding'
+import {WriDataset} from '@/schema/ckan.schema'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -57,24 +58,27 @@ export async function getServerSideProps(
     try {
         const dataset = await getOneDataset(datasetName, session)
 
-        let groupDatasets = await getAllDatasetFq({
-            apiKey: session?.user.apikey ?? '',
-            query: { search: '', page: { start: 0, rows: 50 } },
-            fq:
-                dataset?.groups && dataset.groups.length > 0
-                    ? `groups:
+        let relatedDatasets: WriDataset[] = []
+        if (dataset.groups?.length) {
+            let groupDatasets = await getAllDatasetFq({
+                apiKey: session?.user.apikey ?? '',
+                query: { search: '', page: { start: 0, rows: 50 } },
+                fq:
+                    dataset?.groups && dataset.groups.length > 0
+                        ? `groups:
                           ${
                               dataset?.groups
                                   ?.map((group) => group.name)
                                   .join(' OR ') ?? ''
                           }
                   `
-                    : '',
-        })
+                        : '',
+            })
 
-        const relatedDatasets = groupDatasets.datasets.filter(
-            (d) => d.id != dataset.id
-        )
+            relatedDatasets = groupDatasets.datasets.filter(
+                (d) => d.id != dataset.id
+            )
+        }
 
         return {
             props: {
