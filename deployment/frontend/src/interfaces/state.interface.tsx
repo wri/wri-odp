@@ -2,6 +2,7 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { ViewState } from 'react-map-gl'
 
 export interface State {
+    vizIndex: number
     dataset: WriDataset | null
     mapView: {
         isEmbedding: boolean,

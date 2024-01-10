@@ -1,6 +1,14 @@
 import { shallow } from 'zustand/shallow'
 import { useStore } from './store'
 
+export const useVizIndex = () => {
+    const { vizIndex, setVizIndex } = useStore((store) => ({
+        vizIndex: store.vizIndex,
+        setVizIndex: store.setVizIndex,
+    }))
+    return { vizIndex, setVizIndex }
+}
+
 export const useDataset = () => {
     const { dataset } = useStore((store) => ({ dataset: store.dataset }))
 

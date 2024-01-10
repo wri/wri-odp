@@ -3,6 +3,9 @@ import { VisualizationTabs } from './VisualizationTabs'
 import MapView from './MapView'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useRouter } from 'next/router'
+import {
+    useVizIndex,
+} from '@/utils/storeHooks'
 import { DataExplorer } from '@/components/data-explorer/DataExplorer'
 
 export type TabularResource = {
@@ -18,7 +21,7 @@ export default function Visualizations({
     const router = useRouter()
     const [prevTabularResource, setPrevTabularResource] =
         useState(tabularResource)
-    const [selectedIndex, setSelectedIndex] = useState(0)
+    const { vizIndex, setVizIndex } = useVizIndex()
     const tabs = [
         { name: 'Map View', enabled: true },
         { name: 'Tabular View', enabled: !!tabularResource },
@@ -26,27 +29,18 @@ export default function Visualizations({
 
     if (!tabularResource && prevTabularResource) {
         setPrevTabularResource(null)
-        setSelectedIndex(selectedIndex === 2 ? 2 : 0)
+        setVizIndex(selectedIndex === 2 ? 2 : 0)
     }
     if (tabularResource && !prevTabularResource) {
         setPrevTabularResource(tabularResource)
-        setSelectedIndex(1)
+        setVizIndex(1)
     }
 
     return (
         <div className="h-full grow flex flex-col">
             <Tab.Group
-                selectedIndex={selectedIndex}
-                onChange={(index) => {
-                    router.replace(
-                        {
-                            query: { ...router.query, index },
-                        },
-                        undefined,
-                        { shallow: true }
-                    )
-                    setSelectedIndex(index)
-                }}
+                selectedIndex={vizIndex}
+                onChange={setVizIndex}
             >
                 <Tab.List as="nav" className="flex  w-full">
                     <VisualizationTabs tabs={tabs} />
