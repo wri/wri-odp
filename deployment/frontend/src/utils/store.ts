@@ -23,6 +23,7 @@ type UseStoreState = typeof initializeStore extends (
 
 const getDefaultInitialState = () => {
     const initialState: State = {
+        vizIndex: 0,
         dataset: null,
         relatedDatasets: null,
         mapView: {
@@ -73,6 +74,10 @@ export const initializeStore = (preloadedState: any = {}) => {
                 },
             },
             (set, get) => ({
+                setVizIndex: (vizIndex: number) => {
+                    const prev = get()
+                    set({ ...prev, vizIndex })
+                },
                 setThreshold: (threshold: number) => {
                     const prev = get()
                     set({ ...prev, mapView: { ...prev.mapView, threshold } })
