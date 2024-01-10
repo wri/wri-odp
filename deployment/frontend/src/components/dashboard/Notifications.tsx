@@ -96,7 +96,11 @@ export default function Notifications({ drag }: { drag: boolean }) {
                     {isLoading ? (
                         <Spinner className="w-2 h-2" />
                     ) : data?.length ? (
-                        <DefaultTooltip content={`3 unread`}>
+                        <DefaultTooltip
+                            content={`${
+                                data.filter((item) => item.is_unread).length
+                            } unread`}
+                        >
                             <div className="rounded-full my-auto w-4 h-4 bg-wri-gold font-bold text-[11px] flex justify-center items-center">
                                 {data.filter((item) => item.is_unread).length}
                             </div>
