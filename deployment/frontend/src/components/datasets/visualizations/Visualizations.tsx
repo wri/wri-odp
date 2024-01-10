@@ -29,7 +29,7 @@ export default function Visualizations({
 
     if (!tabularResource && prevTabularResource) {
         setPrevTabularResource(null)
-        setVizIndex(selectedIndex === 2 ? 2 : 0)
+        setVizIndex(vizIndex === 2 ? 2 : 0)
     }
     if (tabularResource && !prevTabularResource) {
         setPrevTabularResource(tabularResource)
