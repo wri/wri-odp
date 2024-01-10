@@ -38,7 +38,6 @@ export function Members({ members }: { members: DatasetMembers }) {
                             <TableHead className="font-acumin text-xs font-semibold text-black">
                                 Role
                             </TableHead>
-                            <TableHead></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -52,10 +51,9 @@ export function Members({ members }: { members: DatasetMembers }) {
                                         <img
                                             className="absolute inset-0 h-full w-full object-cover rounded-full"
                                             src={
-                                                user.image_display_url !== ''
-                                                    ? user.image_display_url
-                                                    : user.gravatar_url ??
-                                                      '/images/placeholders/user/userdefault.png'
+                                                (user?.image_display_url as string)
+                                                    ? user?.image_display_url
+                                                    : `https://gravatar.com/avatar/${user?.email_hash}?s=270&d=identicon`
                                             }
                                             alt=""
                                         />
@@ -68,20 +66,11 @@ export function Members({ members }: { members: DatasetMembers }) {
                                 <TableCell className="capitalize">
                                     {user.capacity}
                                 </TableCell>
-                                <TableCell className="flex justify-end">
-                                    <PencilIcon className="mr-4 h-5 w-5 text-black" />
-                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             )}{' '}
-            <button className="ml-auto mt-4 flex items-center justify-end gap-x-1">
-                <PlusCircleIcon className="h-5 w-5 text-amber-400" />
-                <span className="font-['Acumin Pro SemiCondensed'] text-lg font-normal leading-tight text-black">
-                    Add another collaborator
-                </span>
-            </button>
         </>
     )
 }
