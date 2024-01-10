@@ -10,7 +10,7 @@ import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
 import { searchSchema } from '@/schema/search.schema'
-import type { GroupTree, GroupsmDetails, User } from '@/schema/ckan.schema'
+import type { GroupTree, GroupsmDetails, User, WriOrganization } from '@/schema/ckan.schema'
 import {
     getGroups,
     getAllOrganizations,
@@ -132,7 +132,7 @@ export const teamRouter = createTRPCRouter({
                 }
             )
             const team: CkanResponse<
-                Organization & { groups: Organization[] }
+                WriOrganization & { groups: Organization[] }
             > = await teamRes.json()
             return {
                 ...team.result,
