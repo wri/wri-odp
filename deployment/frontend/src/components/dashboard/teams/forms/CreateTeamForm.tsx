@@ -30,7 +30,17 @@ export default function CreateTeamForm() {
             router.push('/dashboard/teams')
             formObj.reset()
         },
-        onError: (error) => setErrorMessage(error.message),
+        onError: (error) => {
+            let errorMessage = error.message
+            if (
+                error.message.includes('Team name already exists in database')
+            ) {
+                errorMessage =
+                    'Team name already exists in database or there is a topic with this name'
+            }
+
+            setErrorMessage(errorMessage)
+        },
     })
 
     const {
