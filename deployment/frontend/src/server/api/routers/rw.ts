@@ -1,5 +1,7 @@
+import { FieldsResponse } from '@/components/data-explorer/queryHooks'
 import { filterObj } from '@/components/data-explorer/search.schema'
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
+import { a } from 'vitest/dist/suite-SvxfaIxW'
 import { z } from 'zod'
 
 export interface NumOfRowsResponse {
@@ -11,6 +13,29 @@ export interface DataResponse {
 }
 
 export const rwRouter = createTRPCRouter({
+    getFields: publicProcedure
+        .input(
+            z.object({
+                id: z.string(),
+            })
+        )
+        .query(async ({ input }) => {
+            const hiddenFields = ['the_geom', 'the_geom_webmercator']
+            const fieldsRes = await fetch(
+                `https://api.resourcewatch.org/v1/fields/${input.id}`
+            )
+            const fields: FieldsResponse = await fieldsRes.json()
+            const columns = {
+                tableName: fields.tableName,
+                columns: Object.keys(fields.fields)
+                    .filter((field) => !hiddenFields.includes(field))
+                    .map((field) => ({
+                        name: field,
+                        key: field,
+                    })),
+            }
+            return columns
+        }),
     getData: publicProcedure
         .input(
             z.object({
@@ -107,24 +132,26 @@ export const rwRouter = createTRPCRouter({
         .query(async ({ input }) => {
             try {
                 const { datasetId, tableName, filters, provider } = input
-            const filtersSql =
-                filters.length > 0
-                    ? 'WHERE ' +
-                      filters
-                          .map(
-                              (filter) =>
-                                  `( ${filter.value
-                                      .filter((v) => v.value !== '')
-                                      .map(
-                                          (v) =>
-                                              `${filter.id} ${
-                                                  v.operation.value
-                                              } '${v.value}' ${v.link ?? ''} `
-                                      )
-                                      .join('')} )`
-                          )
-                          .join(' AND ')
-                    : ''
+                const filtersSql =
+                    filters.length > 0
+                        ? 'WHERE ' +
+                          filters
+                              .map(
+                                  (filter) =>
+                                      `( ${filter.value
+                                          .filter((v) => v.value !== '')
+                                          .map(
+                                              (v) =>
+                                                  `${filter.id} ${
+                                                      v.operation.value
+                                                  } '${v.value}' ${
+                                                      v.link ?? ''
+                                                  } `
+                                          )
+                                          .join('')} )`
+                              )
+                              .join(' AND ')
+                        : ''
                 const numRowsRes = await fetch(
                     `https://api.resourcewatch.org/v1/query/${datasetId}?sql=SELECT COUNT(*) FROM ${tableName} ${filtersSql}`,
                     {
