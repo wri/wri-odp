@@ -113,7 +113,8 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def get_dataset_labels(self, dataset_obj: model.Package) -> list[str]:
         visibility_type = dataset_obj.extras.get('visibility_type', '')
-        if dataset_obj.state == u'active' and visibility_type == "public":
+        is_draft = dataset_obj.get('draft', False)
+        if dataset_obj.state == u'active' and visibility_type == "public" and is_draft is not True:
             return [u'public']
 
         if authz.check_config_permission('allow_dataset_collaborators'):
@@ -124,7 +125,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
         if dataset_obj.owner_org and visibility_type in ["private"]:
             labels.append(u'member-%s' % dataset_obj.owner_org)
-        elif visibility_type == "internal":
+        elif visibility_type == "internal" and is_draft is not True:
             labels.append(u'authenticated')
         else: # Draft
             labels.append(u'creator-%s' % dataset_obj.creator_user_id)
