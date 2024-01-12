@@ -113,8 +113,8 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def get_dataset_labels(self, dataset_obj: model.Package) -> list[str]:
         visibility_type = dataset_obj.extras.get('visibility_type', '')
-        is_draft = dataset_obj.get('draft', False)
-        if dataset_obj.state == u'active' and visibility_type == "public" and is_draft is not True:
+        is_draft = dataset_obj.extras.get('draft', False)
+        if dataset_obj.state == u'active' and visibility_type == "public" and is_draft != 'true':
             return [u'public']
 
         if authz.check_config_permission('allow_dataset_collaborators'):
