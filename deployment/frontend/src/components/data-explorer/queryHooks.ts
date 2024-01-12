@@ -43,21 +43,8 @@ export function useFields({ id, provider }: TabularResource) {
             }
         })
     }
-    const hiddenFields = ['the_geom', 'the_geom_webmercator']
-    return useQuery(['fields', id], async () => {
-        const fieldsRes = await fetch(
-            `https://api.resourcewatch.org/v1/fields/${id}`
-        )
-        const fields: FieldsResponse = await fieldsRes.json()
-        return {
-            tableName: fields.tableName,
-            columns: Object.keys(fields.fields)
-                .filter((field) => !hiddenFields.includes(field))
-                .map((field) => ({
-                    name: field,
-                    key: field,
-                })),
-        }
+    return api.rw.getFields.useQuery({
+        id,
     })
 }
 
@@ -78,7 +65,7 @@ export function useNumberOfRows({
         return api.datastore.getNumberOfRows.useQuery(
             {
                 resourceId: tableName,
-                filters
+                filters,
             },
             {
                 keepPreviousData: true,
