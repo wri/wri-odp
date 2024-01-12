@@ -1036,7 +1036,7 @@ export const DatasetRouter = createTRPCRouter({
             
             
             const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error) throw Error(data.error.message)
+            if (!data.success && data.error) throw Error(JSON.stringify(data.error))
             try {
                  // get dataset collaborators id
                 const collab =  await fetchDatasetCollabIds(

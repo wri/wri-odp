@@ -32,12 +32,14 @@ export default function Issues({
     datasetName,
     owner_org,
     creator_id,
+    authorized,
 }: {
     issues: Issue[]
     index: Index
     datasetName: string
     owner_org: string | null
     creator_id: string | null
+    authorized: boolean
 }) {
     const [issueState, setIssueState] = useState<'open' | 'closed'>('open')
     const [q, setQ] = useState('')
@@ -95,6 +97,7 @@ export default function Issues({
                                 datasetName={datasetName}
                                 owner_org={owner_org}
                                 creator_id={creator_id}
+                                authorized={authorized}
                             />
                         ))}
                 </div>
@@ -108,11 +111,13 @@ function IssueCard({
     datasetName,
     owner_org,
     creator_id,
+    authorized,
 }: {
     issue: Issue
     datasetName: string
     owner_org: string | null
     creator_id: string | null
+    authorized: boolean
 }) {
     const [isOpenDelete, setOpenDelete] = useState(false)
     const [isOpenClose, setOpenClose] = useState(false)
@@ -286,27 +291,37 @@ function IssueCard({
                             name="comment"
                             defaultValue=""
                             isSubmitting={isSubmitting}
+                            className=" min-h-[200px]"
                         />
                         <div className="flex ml-auto gap-x-2 mt-2">
-                            <Button
-                                variant="destructive"
-                                className="rounded-md"
-                                onClick={() => {
-                                    setOpenDelete(true)
-                                }}
-                                id={issue.id.toString()}
-                            >
-                                Delete
-                            </Button>
-                            <Button
-                                className=" bg-wri-gray border-2 rounded-md"
-                                onClick={() => {
-                                    setOpenClose(true)
-                                }}
-                                id={issue.id.toString()}
-                            >
-                                {issue.status === 'open' ? 'Close' : 'Re-open'}
-                            </Button>
+                            {authorized ? (
+                                <>
+                                    <Button
+                                        variant="destructive"
+                                        className="rounded-md"
+                                        onClick={() => {
+                                            setOpenDelete(true)
+                                        }}
+                                        id={issue.id.toString()}
+                                    >
+                                        Delete
+                                    </Button>
+                                    <Button
+                                        className=" bg-wri-gray border-2 rounded-md"
+                                        onClick={() => {
+                                            setOpenClose(true)
+                                        }}
+                                        id={issue.id.toString()}
+                                    >
+                                        {issue.status === 'open'
+                                            ? 'Close'
+                                            : 'Re-open'}
+                                    </Button>
+                                </>
+                            ) : (
+                                ''
+                            )}
+
                             <LoaderButton
                                 loading={commentIssueApi.isLoading}
                                 type="submit"

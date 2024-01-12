@@ -30,7 +30,8 @@ import SyncUrl from '@/components/_shared/map/SyncUrl'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
 import { useIsAddingLayers } from '@/utils/storeHooks'
 import { decodeMapParam } from '@/utils/urlEncoding'
-import {WriDataset} from '@/schema/ckan.schema'
+import { WriDataset } from '@/schema/ckan.schema'
+import { User } from '@portaljs/ckan'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -135,6 +136,11 @@ export default function DatasetPage(
         { enabled: !!session.data?.user.apikey, retry: false }
     )
 
+    const teamsDetails = api.teams.getTeam.useQuery(
+        { id: datasetData?.owner_org! },
+        { enabled: !!datasetData, retry: false }
+    )
+
     const [tabularResource, setTabularResource] =
         useState<TabularResource | null>(null)
 
@@ -166,6 +172,26 @@ export default function DatasetPage(
         issues.data.filter((issue) => issue.status === 'open').length
             ? issues.data.filter((issue) => issue.status === 'open').length
             : undefined
+
+    let teamAuthorized: boolean | undefined = undefined
+    let generalAuthorized = false
+
+    if (
+        datasetData &&
+        session.data?.user.id !== datasetData.creator_user_id &&
+        session.data?.user.sysadmin === false
+    ) {
+        teamAuthorized = !!(
+            teamsDetails.data &&
+            teamsDetails.data?.users?.find(
+                (user) =>
+                    user.id === session.data?.user.id &&
+                    (user.capacity === 'admin' || user.capacity === 'editor')
+            )
+        )
+    } else {
+        generalAuthorized = true
+    }
 
     const tabs = [
         { name: 'Data files', enabled: true },
@@ -308,6 +334,10 @@ export default function DatasetPage(
                                                             creator_id={
                                                                 datasetData?.creator_user_id ||
                                                                 null
+                                                            }
+                                                            authorized={
+                                                                teamAuthorized ||
+                                                                generalAuthorized
                                                             }
                                                         />
                                                     </Tab.Panel>

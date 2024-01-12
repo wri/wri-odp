@@ -30,7 +30,17 @@ export default function CreateTopicForm() {
             router.push('/dashboard/topics')
             formObj.reset()
         },
-        onError: (error) => setErrorMessage(error.message),
+        onError: (error) => {
+            let errorMessage = error.message
+            if (
+                error.message.includes('Topic name already exists in database')
+            ) {
+                errorMessage =
+                    'Topic name already exists in database or there is a team with this name'
+            }
+
+            setErrorMessage(errorMessage)
+        },
     })
 
     const {
