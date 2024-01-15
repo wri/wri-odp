@@ -25,11 +25,9 @@ if [ -d "src_extensions/ckanext-wri" ]; then
     echo "ckanext-wri: Failed" >> "$ROOT_DIR/test_summary.txt"
   fi
 
-  cd ..
-
 fi
 
-cd ../src
+cd $ROOT_DIR/src
 
 for dir in ckanext-*; do
   if [ -d "$dir" ]; then
@@ -53,8 +51,6 @@ for dir in ckanext-*; do
 
   fi
 done
-
-cd ..
 
 cat "$ROOT_DIR/test_summary.txt"
 
