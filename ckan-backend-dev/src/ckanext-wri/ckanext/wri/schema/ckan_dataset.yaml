@@ -6,6 +6,23 @@ about_url: http://github.com/ckan/ckanext-scheming
 
 dataset_fields:
 
+- field_name: approval_status
+  label: Approval Status
+  preset: select
+  choices:
+  - value: pending
+    label: Pending
+  - value: approved
+    label: Approved
+  - value: rejected
+    label: Rejected
+
+- field_name: draft
+  label: Draft
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
 - field_name: spatial_address
   label: Spatial address
   validators: ignore_missing
@@ -111,8 +128,6 @@ dataset_fields:
   label: Visibility Type
   preset: select
   choices:
-  - value: draft
-    label: Draft
   - value: private
     label: Private
   - value: internal

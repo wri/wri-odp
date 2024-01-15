@@ -37,7 +37,7 @@ def test_location_search():
         # 'temporal_coverage_end': '2011',
         'update_frequency': 'annually',
         'citation': 'Citation information',
-        'visibility_type': 'draft',
+        'visibility_type': 'public',
         'license_id': 'cc-by-4.0',
         'featured_dataset': True,
         'short_description': 'A short description of the dataset',

@@ -7,7 +7,13 @@ ckan -c production.ini notificationdb
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "Failed to initialize custom tables"
+    echo "Failed to initialize the notification table"
+fi
+
+ckan -c production.ini pendingdatasetsdb
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "Failed to initialize the pending datasets table"
     exit $EXIT_CODE
 fi
 

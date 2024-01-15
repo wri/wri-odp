@@ -7,9 +7,10 @@ from ckan import model, logic, authz
 from ckan.types import Action, AuthFunction, Context
 from ckan.lib.search import SearchError
 from ckanext.wri.logic.auth import auth as auth
-from ckanext.wri.logic.action.create import notification_create
-from ckanext.wri.logic.action.update import notification_update
-from ckanext.wri.logic.action.get import package_search, notification_get_all
+from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
+from ckanext.wri.logic.action.update import notification_update, pending_dataset_update
+from ckanext.wri.logic.action.get import package_search, notification_get_all, pending_dataset_show, pending_diff_show
+from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
 
 import logging
@@ -34,7 +35,7 @@ class WriPlugin(plugins.SingletonPlugin):
         toolkit.add_resource("assets", "wri")
 
     def get_commands(self):
-        """CLI commands - Creates notifications data tables"""
+        """CLI commands - Creates custom data tables"""
         import click
 
         @click.command()
@@ -43,14 +44,24 @@ class WriPlugin(plugins.SingletonPlugin):
             from ckanext.wri.model import setup
             setup()
 
-        return [notificationdb]
+        @click.command()
+        def pendingdatasetsdb():
+            """Creates pending datasets table"""
+            from ckanext.wri.model import setup_pending_datasets
+            setup_pending_datasets()
+
+        return [notificationdb, pendingdatasetsdb]
 
     # IAuth
 
     def get_auth_functions(self) -> dict[str, AuthFunction]:
         return {
             'notification_get_all': auth.notification_get_all,
-            'notification_create': auth.notification_create
+            'notification_create': auth.notification_create,
+            'pending_dataset_create': auth.pending_dataset_create,
+            'pending_dataset_show': auth.pending_dataset_show,
+            'pending_dataset_update': auth.pending_dataset_update,
+            'pending_dataset_delete': auth.pending_dataset_delete,
         }
 
     # IValidators
@@ -90,15 +101,20 @@ class WriPlugin(plugins.SingletonPlugin):
             'password_reset': action.password_reset,
             'notification_get_all': notification_get_all,
             'notification_create': notification_create,
-            'notification_update': notification_update
-
+            'notification_update': notification_update,
+            'pending_dataset_create': pending_dataset_create,
+            'pending_dataset_show': pending_dataset_show,
+            'pending_dataset_update': pending_dataset_update,
+            'pending_dataset_delete': pending_dataset_delete,
+            'pending_diff_show': pending_diff_show,
         }
 
     # IPermissionLabels
 
     def get_dataset_labels(self, dataset_obj: model.Package) -> list[str]:
         visibility_type = dataset_obj.extras.get('visibility_type', '')
-        if dataset_obj.state == u'active' and visibility_type == "public":
+        is_draft = dataset_obj.extras.get('draft', False)
+        if dataset_obj.state == u'active' and visibility_type == "public" and is_draft != 'true':
             return [u'public']
 
         if authz.check_config_permission('allow_dataset_collaborators'):
@@ -109,7 +125,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
         if dataset_obj.owner_org and visibility_type in ["private"]:
             labels.append(u'member-%s' % dataset_obj.owner_org)
-        elif visibility_type == "internal":
+        elif visibility_type == "internal" and is_draft is not True:
             labels.append(u'authenticated')
         else: # Draft
             labels.append(u'creator-%s' % dataset_obj.creator_user_id)
