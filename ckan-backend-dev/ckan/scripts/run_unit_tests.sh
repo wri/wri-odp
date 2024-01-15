@@ -46,7 +46,7 @@ cd $ROOT_DIR/src
 for dir in ckanext-*; do
   if [ -d "$dir" ]; then
     # Skip ckanext-envvars
-    if [ "$dir" == "ckanext-envvars" || "$dir" == "ckanext-wri" ]; then
+    if [ "$dir" == "ckanext-envvars" ] || [ "$dir" == "ckanext-wri" ]; then
       continue
     fi
 
