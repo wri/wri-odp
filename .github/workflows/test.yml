@@ -36,6 +36,8 @@ jobs:
         run: docker exec ckan-wri sh -c "ckan -c production.ini issuesupdate"
       - name: Initialize the notification table
         run: docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
+      - name: Initialize the pending datasets table
+        run: docker exec ckan-wri sh -c "ckan -c production.ini pendingdatasetsdb"
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Print Logs

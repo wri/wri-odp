@@ -132,3 +132,69 @@ def default_get_notification_schema(
         "is_unread":[ignore_empty, ignore_missing],
         "state": [ignore_empty, ignore_missing]
     }
+
+@validator_args
+def default_create_pending_dataset_schema(
+    not_missing: Validator,
+    not_empty: Validator,
+    unicode_safe: Validator,
+) -> Schema:
+    return {
+        "package_id": [
+            not_missing,
+            not_empty,
+            unicode_safe,
+        ],
+        "package_data": [
+            not_missing,
+            not_empty,
+            unicode_safe,
+        ],
+    }
+
+@validator_args
+def default_update_pending_dataset_schema(
+    not_missing: Validator,
+    not_empty: Validator,
+    unicode_safe: Validator,
+) -> Schema:
+    return {
+        "package_id": [
+            not_missing,
+            not_empty,
+            unicode_safe,
+        ],
+        "package_data": [
+            not_missing,
+            not_empty,
+            unicode_safe,
+        ],
+    }
+
+@validator_args
+def default_get_pending_dataset_schema(
+    not_missing: Validator,
+    not_empty: Validator,
+    unicode_safe: Validator,
+) -> Schema:
+    return {
+        "package_id": [
+            not_missing,
+            not_empty,
+            unicode_safe,
+        ],
+    }
+
+@validator_args
+def default_delete_pending_dataset_schema(
+    not_missing: Validator,
+    not_empty: Validator,
+    unicode_safe: Validator,
+) -> Schema:
+    return {
+        "package_id": [
+            not_missing,
+            not_empty,
+            unicode_safe,
+        ],
+    }

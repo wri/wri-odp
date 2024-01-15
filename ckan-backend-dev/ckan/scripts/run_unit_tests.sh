@@ -13,12 +13,40 @@ echo "Test Summary" > "$ROOT_DIR/test_summary.txt"
 #     echo "CKAN Core: Failed" >> test_summary.txt
 # fi
 
-cd src
+if [ -d "src_extensions/ckanext-wri" ]; then
+  cd src_extensions/ckanext-wri
+
+  pytest --ckan-ini=test.ini ckanext/wri/tests 2>&1 | tee -a "$ROOT_DIR/test_results.txt"
+  PYTEST_EXIT_CODE=${PIPESTATUS[0]}
+
+  if [ $PYTEST_EXIT_CODE -eq 0 ]; then
+    echo "ckanext-wri: Passed" >> "$ROOT_DIR/test_summary.txt"
+  else
+    echo "ckanext-wri: Failed" >> "$ROOT_DIR/test_summary.txt"
+  fi
+
+fi
+
+if [ -d "$ROOT_DIR/src/ckanext-wri" ]; then
+  cd $ROOT_DIR/src/ckanext-wri
+
+  pytest --ckan-ini=test.ini ckanext/wri/tests 2>&1 | tee -a "$ROOT_DIR/test_results.txt"
+  PYTEST_EXIT_CODE=${PIPESTATUS[0]}
+
+  if [ $PYTEST_EXIT_CODE -eq 0 ]; then
+    echo "ckanext-wri: Passed" >> "$ROOT_DIR/test_summary.txt"
+  else
+    echo "ckanext-wri: Failed" >> "$ROOT_DIR/test_summary.txt"
+  fi
+
+fi
+
+cd $ROOT_DIR/src
 
 for dir in ckanext-*; do
   if [ -d "$dir" ]; then
     # Skip ckanext-envvars
-    if [ "$dir" == "ckanext-envvars" ]; then
+    if [ "$dir" == "ckanext-envvars" ] || [ "$dir" == "ckanext-wri" ]; then
       continue
     fi
 
@@ -37,24 +65,6 @@ for dir in ckanext-*; do
 
   fi
 done
-
-cd ..
-
-if [ -d "src_extensions/ckanext-wri" ]; then
-  cd src_extensions/ckanext-wri
-
-  pytest --ckan-ini=test.ini ckanext/wri/tests 2>&1 | tee -a "$ROOT_DIR/test_results.txt"
-  PYTEST_EXIT_CODE=${PIPESTATUS[0]}
-
-  if [ $PYTEST_EXIT_CODE -eq 0 ]; then
-    echo "ckanext-wri: Passed" >> "$ROOT_DIR/test_summary.txt"
-  else
-    echo "ckanext-wri: Failed" >> "$ROOT_DIR/test_summary.txt"
-  fi
-
-  cd ..
-
-fi
 
 cat "$ROOT_DIR/test_summary.txt"
 
