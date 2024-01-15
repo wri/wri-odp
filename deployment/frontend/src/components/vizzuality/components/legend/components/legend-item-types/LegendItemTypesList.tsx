@@ -12,6 +12,8 @@ export default function LegendItemTypesList(props: any) {
         }
     }
 
+    legendConfigs = legendConfigs.filter((lc: any) => lc.type)
+
     return legendConfigs.map((lc: any, i: number) => (
         <LegendItemTypes
             {...{

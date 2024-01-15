@@ -35,7 +35,7 @@ def test_search_queries():
         # 'temporal_coverage_end': '2011',
         'update_frequency': 'annually',
         'citation': 'Citation information',
-        'visibility_type': 'draft',
+        'visibility_type': 'public',
         'license_id': 'cc-by-4.0',
         'featured_dataset': True,
         'short_description': 'A short description of the dataset',
@@ -79,7 +79,7 @@ def test_search_queries():
 
     # Test that correct queries return the dataset
     for field in fields_to_test:
-        if field == 'featured_dataset' or field == 'wri_data':
+        if field in ['featured_dataset', 'wri_data', 'draft']:
             result = get_action('package_search')(
                 context=context,
                 data_dict={'q': f'{field}:{dataset[field]}'}
@@ -97,7 +97,7 @@ def test_search_queries():
 
     # Test that incorrect queries do not return the dataset
     for field in fields_to_test:
-        if field == 'featured_dataset' or field == 'wri_data':
+        if field in ['featured_dataset', 'wri_data', 'draft']:
             result = get_action('package_search')(
                 context=context,
                 data_dict={'q': f'{field}:false'}
