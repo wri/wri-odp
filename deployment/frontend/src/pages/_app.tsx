@@ -1,10 +1,10 @@
 import { type Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
-import { type AppType } from 'next/app'
+import { AppProps, type AppType } from 'next/app'
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { useState } from 'react'
 import { Provider, useCreateStore } from '@/utils/store'
-import { type LayerState } from '@/interfaces/state.interface'
+import { useState } from 'react'
+
 import 'react-toastify/dist/ReactToastify.css'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
@@ -17,6 +17,7 @@ import '@/styles/globals.scss'
 import '@/styles/rte.css'
 import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
+import { LayerState } from '@/interfaces/state.interface'
 
 const acumin = localFont({
     src: [
@@ -43,30 +44,48 @@ const acumin = localFont({
     ],
     variable: '--font-acumin',
 })
+
 const MyApp: AppType<{ session: Session | null }> = ({
     Component,
     pageProps: { session, ...pageProps },
-}) => {
+}: AppProps) => {
+    const [queryClient] = useState(() => new QueryClient())
+    const { initialZustandState, dataset } = pageProps
+
     const newLayersState = new Map()
-    if (
-        //@ts-ignore
-        pageProps.initialZustandState &&
-        //@ts-ignore
-        pageProps.initialZustandState.layersParsed
-    ) {
-        //@ts-ignore
-        pageProps.initialZustandState.layersParsed?.forEach(
+    if (initialZustandState && initialZustandState?.mapView?.layersParsed) {
+        initialZustandState.mapView?.layersParsed?.forEach(
             (layer: [string, LayerState]) => {
                 newLayersState.set(layer[0], layer[1])
             }
         )
     }
+
+    let activeLayerGroups =
+        initialZustandState?.mapView?.activeLayerGroups || []
+
+    if (!activeLayerGroups?.length && dataset) {
+        const layers = dataset?.resources
+            .filter((r: any) => r?.format == "Layer")
+            .map((r: any) => r?.rw_id)
+
+        if (layers) {
+            activeLayerGroups.push({
+                layers: layers || [],
+                datasetId: dataset.id,
+            })
+        }
+    }
     const createStore = useCreateStore({
-        //@ts-ignore
-        ...pageProps.initialZustandState,
-        layers: newLayersState,
+        ...initialZustandState,
+        mapView: {
+            ...initialZustandState?.mapView,
+            basemap: initialZustandState?.mapView?.basemap ?? 'dark',
+            layers: newLayersState,
+            activeLayerGroups,
+        },
     })
-    const [queryClient] = useState(() => new QueryClient())
+
     return (
         <QueryClientProvider client={queryClient}>
             <DefaultSeo titleTemplate="%s - WRI ODP" />

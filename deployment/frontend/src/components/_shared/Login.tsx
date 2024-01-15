@@ -76,6 +76,20 @@ function SignInForm({
     const error =
         errorMessage || errors.username?.message || errors.password?.message
 
+    const handleAzureSignIn = async () => {
+        setIsLoading(true)
+        try {
+            await signIn('azure-ad', {
+                callbackUrl: '/dashboard',
+                redirect: false,
+            })
+        } catch (error) {
+            console.error('Azure AD Sign-in error:', error)
+            setErrorMessage('Azure AD Sign-in failed')
+        }
+        setIsLoading(false)
+    }
+
     return (
         <>
             <div className=" text-center">
@@ -106,7 +120,7 @@ function SignInForm({
                                 console.log(signInStatus)
                                 setErrorMessage(signInStatus.error)
                             } else {
-                                notify("Sign in successful")
+                                notify('Sign in successful')
                                 onSignIn ? onSignIn() : router.reload()
                             }
                         })(data)
@@ -116,7 +130,7 @@ function SignInForm({
                         <div className="grow shrink basis-auto">
                             <input
                                 type="text"
-                                placeholder="Username"
+                                placeholder="Username or Email"
                                 className=" focus:outline-none  placeholder:text-xs placeholder:font-light placeholder:text-[#353535] text-xs font-light w-full !border-none"
                                 {...register('username')}
                             />
@@ -169,14 +183,18 @@ function SignInForm({
                 <div className="text-wri-black ">or</div>
                 <div className="font-light text-[0.875rem] border border-1 border-wri-gray w-20 h-0" />
             </div>
-            <div className="flex  mt-8 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 ">
+            <button
+                type="button"
+                className="flex  mt-8 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 cursor-pointer"
+                onClick={handleAzureSignIn}
+            >
                 <div className="w-4 h-4 relative my-auto">
-                    <Image src="/images/wri_logo.png" alt="comment" fill />
+                    <Image src="/images/wri_logo.png" alt="WRI Logo" fill />
                 </div>
                 <div className="ml-2 w-fit font-semibold text-base text-wri-black ">
                     Sign In with your WRI Credentials
                 </div>
-            </div>
+            </button>
         </>
     )
 }

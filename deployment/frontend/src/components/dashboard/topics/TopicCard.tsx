@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SearchHeader from '../_shared/SearchHeader'
 import RowProfile from '../_shared/RowProfile';
 import Row from '../_shared/Row';
@@ -15,12 +15,14 @@ import { useRouter } from 'next/router'
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
+import { useQuery } from 'react-query';
 
 
-function TopicProfile({ team }: { team: GroupTree }) {
+function TopicProfile({ team, topic2Image }: { team: GroupTree, topic2Image: Record<string, string> }) {
   const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
   const TopicProfile = team as IRowProfile
   TopicProfile.description = description
+  TopicProfile.image_display_url = topic2Image[team.id]
   return (
     <div className='flex py-5 pl-2' >
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] ' isPad profile={team} defaultImg='/images/placeholders/topics/topicsdefault.png' />
@@ -28,10 +30,11 @@ function TopicProfile({ team }: { team: GroupTree }) {
   )
 }
 
-function SubTopicProfile({ team }: { team: GroupTree }) {
+function SubTopicProfile({ team, topic2Image }: { team: GroupTree, topic2Image: Record<string, string> }) {
   const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
   const TopicProfile = team as IRowProfile
   TopicProfile.description = description
+  TopicProfile.image_display_url = topic2Image[team.id]
   return (
     <div className='flex py-5 pl-3 sm:pl-5' >
       <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} defaultImg='/images/placeholders/topics/topicsdefault.png' />
@@ -39,14 +42,19 @@ function SubTopicProfile({ team }: { team: GroupTree }) {
   )
 }
 
-function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTree[] | undefined, highlighted?: boolean }) {
+function SubCardProfile({ teams, highlighted, topic2Image }:
+  {
+    teams: IRowProfile[] | GroupTree[] | undefined,
+    highlighted?: boolean,
+    topic2Image: Record<string, string>
+  }) {
   const utils = api.useUtils()
   const [open, setOpen] = useState(false)
   const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
   const router = useRouter()
   const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
     onSuccess: async (data) => {
-      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 10 } })
+      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 10000 } })
       setOpen(false)
       notify(`Successfully deleted the ${selectedTopic?.name} topic`, 'error')
     }
@@ -55,6 +63,12 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
   const handleOpenModal = (topic: GroupTree) => {
     setSelectedTopic(topic)
     setOpen(true)
+  }
+
+  const Topic = (team: GroupTree) => {
+    const TeamProfile = team as IRowProfile
+    TeamProfile.image_display_url = topic2Image[team.id]
+    return TeamProfile
   }
 
   if (!teams || teams.length === 0) return (<></>)
@@ -74,7 +88,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
                       groupStyle="group/item group-hover/item:visible "
                       className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                       rowMain={
-                        <SubTopicProfile team={team as GroupTree} />
+                        <SubTopicProfile team={team as GroupTree} topic2Image={topic2Image} />
                       }
                       linkButton={{
                         label: "View topic",
@@ -105,7 +119,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
                         },
                       ]}
                       isDropDown
-                      rowSub={<SubCardProfile teams={(team as GroupTree).children} />}
+                      rowSub={<SubCardProfile teams={(team as GroupTree).children} topic2Image={topic2Image} />}
                     />
                   </>
 
@@ -118,7 +132,7 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
                       className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                       rowMain={
                         <div className='flex pl-4 sm:pl-6  '>
-                          <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} defaultImg='/images/placeholders/topics/topicsdefault.png' />
+                          <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={Topic(team as GroupTree)} defaultImg='/images/placeholders/topics/topicsdefault.png' />
                         </div>
                       }
                       linkButton={{
@@ -212,7 +226,8 @@ function SubCardProfile({ teams, highlighted }: { teams: IRowProfile[] | GroupTr
 
 
 export default function TopicCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10000 } })
+  const [pagination, setPagination] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
   const [open, setOpen] = useState(false)
   const router = useRouter()
@@ -230,21 +245,35 @@ export default function TopicCard() {
     setOpen(true)
   }
 
+  const ProcessedTopic = useQuery(['paginatedTopics', data, pagination], () => {
+    if (!data) return { topics: [], topic2Image: {}, count: 0 };
+    const topics = data?.topics.slice(pagination.page.start, pagination.page.start + pagination.page.rows)
+    const topic2Image = data?.topic2Image
+    return { topics, topic2Image, count: data?.count }
+  }, {
+    enabled: !!data
+  })
+
+  useEffect(() => {
+    setPagination({ search: '', page: { start: 0, rows: 10 } })
+
+  }, [query.search])
+
 
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
-      <SearchHeader leftStyle=' sm:pr-2 sm:pl-12' rightStyle=' px-2 sm:pr-6' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
+      <SearchHeader leftStyle=' sm:pr-2 sm:pl-12' rightStyle=' px-2 sm:pr-6' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setPagination} query={pagination} isLoading={ProcessedTopic.isLoading} count={ProcessedTopic.data?.count} />} />
       <div className='w-full'>
         {
-          isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
-            data?.topics.map((topic, index) => {
+          isLoading || ProcessedTopic.isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
+            ProcessedTopic.data?.topics.map((topic, index) => {
               return (
                 <div key={topic.name}>
                   <Row
                     key={index}
                     className={`pr-6`}
                     highlighted={topic?.highlighted}
-                    rowMain={<TopicProfile team={topic} />}
+                    rowMain={<TopicProfile team={topic} topic2Image={data?.topic2Image as Record<string, string>} />}
                     linkButton={{
                       label: "View topic",
                       link: `../topics/${topic.name}`,
@@ -273,7 +302,7 @@ export default function TopicCard() {
                         onClick: () => handleOpenModal(topic)
                       },
                     ]}
-                    rowSub={<SubCardProfile teams={topic.children} highlighted={topic?.highlighted} />}
+                    rowSub={<SubCardProfile teams={topic.children} highlighted={topic?.highlighted} topic2Image={data?.topic2Image as Record<string, string>} />}
                     isDropDown
                   />
                 </div>

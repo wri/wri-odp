@@ -21,17 +21,24 @@ import Spinner from '@/components/_shared/Spinner'
 import classNames from '@/utils/classnames'
 import { env } from '@/env.mjs'
 import MulText from '../MulText'
+import {
+    languageOptions,
+    updateFrequencyOptions,
+    visibilityOptions,
+} from '../formOptions'
 
 export function OverviewForm({
     formObj,
+    editing = false,
 }: {
     formObj: UseFormReturn<DatasetFormType>
+    editing?: boolean
 }) {
     const {
         register,
         setValue,
         watch,
-        formState: { errors },
+        formState: { errors, defaultValues },
     } = formObj
 
     const possibleOwners = api.teams.getAllTeams.useQuery()
@@ -62,6 +69,7 @@ export function OverviewForm({
                     <InputGroup label="Url" required>
                         <Input
                             {...register('name')}
+                            disabled={editing}
                             placeholder="name-of-dataset"
                             type="text"
                             className="pl-[5.2rem] sm:pl-[5rem] md:pl-[4.9rem] lg:pl-[4.8rem]"
@@ -74,7 +82,7 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup label="Source">
                         <Input
-                            {...register('source')}
+                            {...register('url')}
                             placeholder="ex. https://source/to/original/data"
                             type="text"
                             icon={
@@ -83,7 +91,7 @@ export function OverviewForm({
                                 </DefaultTooltip>
                             }
                         />
-                        <ErrorDisplay name="source" errors={errors} />
+                        <ErrorDisplay name="url" errors={errors} />
                     </InputGroup>
                     <InputGroup label="Language">
                         <SimpleSelect
@@ -91,12 +99,7 @@ export function OverviewForm({
                             formObj={formObj}
                             name="language"
                             placeholder="Language"
-                            initialValue={watch('language') ?? null}
-                            options={[
-                                { value: 'en', label: 'English' },
-                                { value: 'fr', label: 'French' },
-                                { value: 'pt', label: 'Portuguese' },
-                            ]}
+                            options={languageOptions}
                         />
                     </InputGroup>
                     <InputGroup label="Team">
@@ -121,7 +124,6 @@ export function OverviewForm({
                                         formObj={formObj}
                                         name="team"
                                         id="team"
-                                        initialValue={watch('team') ?? null}
                                         options={[
                                             {
                                                 label: 'No team',
@@ -195,7 +197,11 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup
                         label="Technical Notes"
-                        required={watch('visibility_type').value === 'public'}
+                        required={
+                            watch('visibility_type')?.value
+                                ? watch('visibility_type').value === 'public'
+                                : false
+                        }
                     >
                         <Input
                             {...register('technical_notes')}
@@ -204,6 +210,172 @@ export function OverviewForm({
                         />
                         <ErrorDisplay name="technical_notes" errors={errors} />
                     </InputGroup>
+                    <div className="relative flex justify-end">
+                        <div className="flex h-6 items-center">
+                            <input
+                                id="rw_dataset"
+                                aria-describedby="comments-description"
+                                {...register('rw_dataset')}
+                                type="checkbox"
+                                className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
+                            />
+                        </div>
+                        <div className="ml-3 text-sm leading-6">
+                            <label
+                                htmlFor="rw_dataset"
+                                className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
+                            >
+                                RW Dataset
+                                <DefaultTooltip content="Settings this will create an equivalent dataset in the Resource Watch API, required if you want to show Mapbox Layers">
+                                    <InformationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
+                                </DefaultTooltip>
+                            </label>
+                        </div>
+                    </div>
+                    <div className="flex justify-end">
+                        <ErrorDisplay name="rw_dataset" errors={errors} />
+                    </div>
+                    {watch(`rw_dataset`) && (
+                        <>
+                            <InputGroup label="Connector URL">
+                                <Input
+                                    {...register('connectorUrl')}
+                                    placeholder="https://wri-01.carto.com/tables/wdpa_protected_areas/table"
+                                    type="text"
+                                    disabled={
+                                        editing &&
+                                        !!defaultValues?.connectorUrl &&
+                                        defaultValues?.connectorUrl !== ''
+                                    }
+                                    icon={
+                                        <DefaultTooltip
+                                            content={
+                                                <span>
+                                                    Go to the{' '}
+                                                    <a
+                                                        target="_blank"
+                                                        className="text-blue-800 underline"
+                                                        href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
+                                                    >
+                                                        {' '}
+                                                        RW API Docs
+                                                    </a>{' '}
+                                                    for more information
+                                                </span>
+                                            }
+                                        >
+                                            <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                        </DefaultTooltip>
+                                    }
+                                />
+                                <ErrorDisplay
+                                    name="connectorUrl"
+                                    errors={errors}
+                                />
+                            </InputGroup>
+                            <InputGroup label="Connector Type">
+                                <Input
+                                    {...register('connectorType')}
+                                    placeholder="rest"
+                                    type="text"
+                                    disabled={
+                                        editing &&
+                                        !!defaultValues?.connectorType &&
+                                        defaultValues?.connectorType !== ''
+                                    }
+                                    icon={
+                                        <DefaultTooltip
+                                            content={
+                                                <span>
+                                                    Go to the{' '}
+                                                    <a
+                                                        target="_blank"
+                                                        className="text-blue-800 underline"
+                                                        href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
+                                                    >
+                                                        {' '}
+                                                        RW API Docs
+                                                    </a>{' '}
+                                                    for more information
+                                                </span>
+                                            }
+                                        >
+                                            <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                        </DefaultTooltip>
+                                    }
+                                />
+                                <ErrorDisplay
+                                    name="connectorType"
+                                    errors={errors}
+                                />
+                            </InputGroup>
+                            <InputGroup label="Provider">
+                                <Input
+                                    {...register('provider')}
+                                    placeholder="cartodb"
+                                    disabled={
+                                        editing &&
+                                        !!defaultValues?.provider &&
+                                        defaultValues?.provider !== ''
+                                    }
+                                    icon={
+                                        <DefaultTooltip
+                                            content={
+                                                <span>
+                                                    Go to the{' '}
+                                                    <a
+                                                        target="_blank"
+                                                        className="text-blue-800 underline"
+                                                        href="https://resource-watch.github.io/doc-api/reference.html#carto-datasets"
+                                                    >
+                                                        {' '}
+                                                        RW API Docs
+                                                    </a>{' '}
+                                                    for more information
+                                                </span>
+                                            }
+                                        >
+                                            <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                        </DefaultTooltip>
+                                    }
+                                    type="text"
+                                />
+                                <ErrorDisplay name="provider" errors={errors} />
+                            </InputGroup>
+                            <InputGroup label="Table Name">
+                                <Input
+                                    {...register('tableName')}
+                                    placeholder="users/resourcewatch_wri/dataset_name"
+                                    type="text"
+                                    disabled={
+                                        editing &&
+                                        !!defaultValues?.tableName &&
+                                        defaultValues?.tableName !== ''
+                                    }
+                                    icon={
+                                        <DefaultTooltip
+                                            content={
+                                                <span>
+                                                    Go to the{' '}
+                                                    <a
+                                                        target="_blank"
+                                                        className="text-blue-800 underline"
+                                                        href="https://resource-watch.github.io/doc-api/reference.html#google-earth-engine"
+                                                    >
+                                                        {' '}
+                                                        RW API Docs
+                                                    </a>{' '}
+                                                    for more information
+                                                </span>
+                                            }
+                                        >
+                                            <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                        </DefaultTooltip>
+                                    }
+                                />
+                            </InputGroup>
+                        </>
+                    )}
                 </div>
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup label="Tags">
@@ -295,34 +467,7 @@ export function OverviewForm({
                             name="update_frequency"
                             id="update_frequency"
                             placeholder="Select update frequency"
-                            options={[
-                                {
-                                    value: 'biannually',
-                                    label: 'Biannually',
-                                },
-                                {
-                                    value: 'quarterly',
-                                    label: 'Quarterly',
-                                },
-                                {
-                                    value: 'daily',
-                                    label: 'Daily',
-                                },
-                                {
-                                    value: 'hourly',
-                                    label: 'Hourly',
-                                },
-                                {
-                                    value: 'as_needed',
-                                    label: 'As needed',
-                                },
-                                {
-                                    value: 'monthly',
-                                    label: 'Monthly',
-                                },
-                                { value: 'weekly', label: 'Weekly' },
-                                { value: 'annually', label: 'Annually' },
-                            ]}
+                            options={updateFrequencyOptions}
                         />
                         <ErrorDisplay name="update_frequency" errors={errors} />
                     </InputGroup>
@@ -345,14 +490,7 @@ export function OverviewForm({
                             name="visibility_type"
                             id="visibility_type"
                             formObj={formObj}
-                            options={[
-                                { value: 'public', label: 'Public' },
-                                { value: 'internal', label: 'Internal Use' },
-                                {
-                                    value: 'private',
-                                    label: 'Private',
-                                },
-                            ]}
+                            options={visibilityOptions}
                         />
                     </InputGroup>
                     <InputGroup label="License">
@@ -378,9 +516,6 @@ export function OverviewForm({
                                         name="license_id"
                                         id="license"
                                         formObj={formObj}
-                                        initialValue={
-                                            watch('license_id') ?? null
-                                        }
                                         options={data.map((license) => ({
                                             label: license.title,
                                             value: license.id,
@@ -430,9 +565,13 @@ export function OverviewForm({
                             <ImageUploader
                                 clearImage={() => {
                                     setValue('featured_image', '')
-                                    setValue('signedUrl', '')
+                                    setValue('signedUrl', undefined)
                                 }}
-                                defaultImage={watch('signedUrl') ?? null}
+                                defaultImage={
+                                    watch('signedUrl') ??
+                                    watch('featured_image') ??
+                                    null
+                                }
                                 onPresignedUrlSuccess={(url: string) => {
                                     setValue('signedUrl', url)
                                 }}

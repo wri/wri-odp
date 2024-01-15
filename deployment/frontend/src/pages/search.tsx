@@ -68,7 +68,15 @@ export default function SearchPage() {
                     title="Recently updated"
                 />
             )}
-            <Footer />
+            <Footer
+                links={{
+                    primary: { title: 'Explore Topics', href: '/topics' },
+                    secondary: {
+                        title: 'Advanced Search',
+                        href: '/search_advanced',
+                    },
+                }}
+            />
         </>
     )
 }

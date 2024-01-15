@@ -105,6 +105,7 @@ export default function Draw({
     return (
         <>
             <IconButton
+                tooltip="Draw"
                 className={`${isDrawing ? "" : ""
                     }`}
                 onClick={() => toggleDrawing()}

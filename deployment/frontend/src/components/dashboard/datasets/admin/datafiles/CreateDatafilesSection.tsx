@@ -16,7 +16,7 @@ import { useMemo, useRef, useState } from 'react'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import { DataFileAccordion } from './DatafileAccordion'
-import { match } from 'ts-pattern'
+import { P, match } from 'ts-pattern'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
 import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import Uppy, { UppyFile } from '@uppy/core'
@@ -26,6 +26,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { convertBytes } from '@/utils/convertBytes'
 import { useDataDictionary } from '@/utils/getDataDictionary'
 import { Field } from 'tableschema'
+import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 
 export function CreateDataFilesSection({
     formObj,
@@ -57,7 +58,8 @@ export function CreateDataFilesSection({
                             title: '',
                             type: 'empty',
                             format: '',
-                            dataDictionary: [],
+                            schema: [],
+                            layerObj: null,
                         })
                     }
                     className="ml-auto flex items-center justify-end gap-x-1"
@@ -85,6 +87,7 @@ function AddDataFile({
 }) {
     const { setValue, watch } = formObj
     const datafile = watch(`resources.${index}`)
+    console.log(datafile)
     const uploadInputRef = useRef<HTMLInputElement>(null)
     const { isLoading: dataDictionaryLoading } = useDataDictionary(
         watch(`resources.${index}.fileBlob`),
@@ -100,7 +103,7 @@ function AddDataFile({
                         default: 'NULL',
                     })
                 )
-                setValue(`resources.${index}.dataDictionary`, dataDictionary)
+                setValue(`resources.${index}.schema`, dataDictionary)
             }
         },
         watch(`resources.${index}.fileBlob`)?.type === 'text/csv'
@@ -231,7 +234,7 @@ function AddDataFile({
                                     </button>
                                 </>
                             ))
-                            .with('layer', () => (
+                            .with(P.union('layer', 'layer-raw'), () => (
                                 <>
                                     <div className="flex items-center gap-x-2">
                                         <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
@@ -255,121 +258,179 @@ function AddDataFile({
                     </div>
                 }
             >
-                <Tab.Group
-                    selectedIndex={match(datafile.type)
-                        .with('empty', () => 0)
-                        .with('upload', () => 1)
-                        .with('link', () => 2)
-                        .with('layer', () => 3)
-                        .otherwise(() => 0)}
-                >
-                    <Tab.List
-                        as="div"
-                        className={classNames(
-                            'grid max-w-[35rem] grid-cols-2 sm:grid-cols-3 gap-3 py-4',
-                            datafile.type === 'upload' ? 'hidden' : ''
-                        )}
+                <div className="px-4 py-8">
+                    <Tab.Group
+                        selectedIndex={match(datafile.type)
+                            .with('empty', () => 0)
+                            .with('upload', () => 1)
+                            .with('link', () => 2)
+                            .with('layer', () => 3)
+                            .with('layer-raw', () => 4)
+                            .otherwise(() => 0)}
                     >
-                        <Tab className="hidden" id="tabEmpty"></Tab>
-                        <Tab
-                            onClick={() => uploadInputRef.current?.click()}
-                            id="tabUpload"
+                        <Tab.List
+                            as="div"
                             className={classNames(
-                                'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                'grid max-w-[50rem] grid-cols-2 lg:grid-cols-4 gap-3 py-4',
                                 datafile.type === 'upload' ? 'hidden' : ''
                             )}
                         >
-                            <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                            <div
+                            <Tab className="hidden" id="tabEmpty"></Tab>
+                            <Tab
+                                onClick={() => uploadInputRef.current?.click()}
+                                id="tabUpload"
                                 className={classNames(
-                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
+                                    'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                    datafile.type === 'upload' ? 'hidden' : ''
                                 )}
                             >
-                                Upload a file
-                            </div>
-                        </Tab>
-                        <Tab
-                            id="tabLink"
-                            onClick={() =>
-                                setValue(`resources.${index}.type`, 'link')
-                            }
-                        >
-                            {({ selected }) => (
-                                <span
+                                <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                <div
                                     className={classNames(
-                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                        selected ? 'bg-amber-400' : '',
-                                        datafile.type === 'upload'
-                                            ? 'hidden'
-                                            : ''
+                                        'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
                                     )}
                                 >
-                                    <LinkIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                    <div
-                                        className={classNames(
-                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
-                                            selected ? 'font-bold' : ''
-                                        )}
-                                    >
-                                        Link External File
-                                    </div>
-                                </span>
-                            )}
-                        </Tab>
-                        <Tab
-                            id="tabLayer"
-                            onClick={() =>
-                                setValue(`resources.${index}.type`, 'layer')
-                            }
-                        >
-                            {({ selected }) => (
-                                <span
-                                    className={classNames(
-                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                        selected ? 'bg-amber-400' : '',
-                                        datafile.type === 'upload'
-                                            ? 'hidden'
-                                            : ''
-                                    )}
-                                >
-                                    <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                    <div
-                                        className={classNames(
-                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
-                                            selected ? 'font-bold' : ''
-                                        )}
-                                    >
-                                        Build a layer
-                                    </div>
-                                </span>
-                            )}
-                        </Tab>
-                    </Tab.List>
-                    <Tab.Panels as="div" className="mt-2">
-                        <Tab.Panel className="hidden"></Tab.Panel>
-                        <Tab.Panel>
-                            <UploadForm
-                                formObj={formObj}
-                                index={index}
-                                dataDictionaryLoading={dataDictionaryLoading}
-                                removeFile={() =>
-                                    setValue(`resources.${index}`, {
-                                        resourceId: uuidv4(),
-                                        title: '',
-                                        type: 'empty',
-                                        dataDictionary: [],
-                                    })
+                                    Upload a file
+                                </div>
+                            </Tab>
+                            <Tab
+                                id="tabLink"
+                                onClick={() =>
+                                    setValue(`resources.${index}.type`, 'link')
                                 }
-                            />
-                        </Tab.Panel>
-                        <Tab.Panel>
-                            <LinkExternalForm formObj={formObj} index={index} />
-                        </Tab.Panel>
-                        <Tab.Panel>
-                            <BuildALayer />
-                        </Tab.Panel>
-                    </Tab.Panels>
-                </Tab.Group>
+                            >
+                                {({ selected }) => (
+                                    <span
+                                        className={classNames(
+                                            'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                            selected ? 'bg-amber-400' : '',
+                                            datafile.type === 'upload'
+                                                ? 'hidden'
+                                                : ''
+                                        )}
+                                    >
+                                        <LinkIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                        <div
+                                            className={classNames(
+                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                selected ? 'font-bold' : ''
+                                            )}
+                                        >
+                                            Link External File
+                                        </div>
+                                    </span>
+                                )}
+                            </Tab>
+                            <Tab
+                                id="tabLayer"
+                                disabled={watch('rw_dataset') === false}
+                                onClick={() =>
+                                    setValue(`resources.${index}.type`, 'layer')
+                                }
+                            >
+                                {({ selected }) => (
+                                    <span
+                                        className={classNames(
+                                            'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                            selected ? 'bg-amber-400' : '',
+                                            datafile.type === 'upload'
+                                                ? 'hidden'
+                                                : ''
+                                        )}
+                                    >
+                                        <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                        <div
+                                            className={classNames(
+                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col',
+                                                selected ? 'font-bold' : ''
+                                            )}
+                                        >
+                                            Build a layer
+                                            {watch('rw_dataset') === false && (
+                                                <span>
+                                                    Toggle RW Data to enable
+                                                </span>
+                                            )}
+                                        </div>
+                                    </span>
+                                )}
+                            </Tab>
+                            <Tab
+                                id="tabLayerRaw"
+                                disabled={watch('rw_dataset') === false}
+                                onClick={() =>
+                                    setValue(
+                                        `resources.${index}.type`,
+                                        'layer-raw'
+                                    )
+                                }
+                            >
+                                {({ selected }) => (
+                                    <span
+                                        className={classNames(
+                                            'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                            selected ? 'bg-amber-400' : '',
+                                            datafile.type === 'upload'
+                                                ? 'hidden'
+                                                : ''
+                                        )}
+                                    >
+                                        <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                        <div
+                                            className={classNames(
+                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col',
+                                                selected ? 'font-bold' : ''
+                                            )}
+                                        >
+                                            Build a layer (RAW)
+                                            {watch('rw_dataset') === false && (
+                                                <span>
+                                                    Toggle RW Data to enable
+                                                </span>
+                                            )}
+                                        </div>
+                                    </span>
+                                )}
+                            </Tab>
+                        </Tab.List>
+                        <Tab.Panels as="div" className="mt-2">
+                            <Tab.Panel className="hidden"></Tab.Panel>
+                            <Tab.Panel>
+                                <UploadForm
+                                    formObj={formObj}
+                                    index={index}
+                                    dataDictionaryLoading={
+                                        dataDictionaryLoading
+                                    }
+                                    removeFile={() =>
+                                        setValue(`resources.${index}`, {
+                                            resourceId: uuidv4(),
+                                            title: '',
+                                            type: 'empty',
+                                            schema: [],
+                                            layerObj: null,
+                                        })
+                                    }
+                                />
+                            </Tab.Panel>
+                            <Tab.Panel>
+                                <LinkExternalForm
+                                    formObj={formObj}
+                                    index={index}
+                                />
+                            </Tab.Panel>
+                            <Tab.Panel>
+                                <BuildALayer formObj={formObj} index={index} />
+                            </Tab.Panel>
+                            <Tab.Panel>
+                                <BuildALayerRaw
+                                    formObj={formObj}
+                                    index={index}
+                                />
+                            </Tab.Panel>
+                        </Tab.Panels>
+                    </Tab.Group>
+                </div>
             </DataFileAccordion>
         </>
     )

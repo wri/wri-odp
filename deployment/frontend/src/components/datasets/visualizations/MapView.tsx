@@ -1,22 +1,17 @@
 import Map from '@/components/_shared/map/Map'
 import { useLayersFromRW } from '@/utils/queryHooks'
-import { useActiveLayerGroups } from '@/utils/storeHooks'
-import { Dispatch, SetStateAction, useEffect } from 'react'
 
 export default function MapView({
-    setIsAddLayers,
+    isEmbedding = false,
 }: {
-    setIsAddLayers: Dispatch<SetStateAction<boolean>>
+    isEmbedding?: boolean
 }) {
     const { data: activeLayers } = useLayersFromRW()
-    const { addLayerGroup } = useActiveLayerGroups()
 
-    useEffect(() => {
-        addLayerGroup({
-            layers: ['74306f01-3baa-4256-9cdc-694080cf6b13'],
-            datasetId: '',
-        })
-    }, [])
-
-    return <Map layers={activeLayers} onClickAddLayers={() => setIsAddLayers(prev => !prev)} />
+    return (
+        <Map
+            layers={activeLayers}
+            mapHeight={isEmbedding ? '100vh' : 'calc(100vh - 63px)'}
+        />
+    )
 }

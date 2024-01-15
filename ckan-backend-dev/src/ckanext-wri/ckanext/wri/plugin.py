@@ -1,11 +1,16 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.plugins as lib_plugins
-
 import ckanext.wri.logic.action as action
 import ckanext.wri.logic.validators as wri_validators
-from ckanext.wri.logic.action.get import package_search
 from ckan import model, logic, authz
+from ckan.types import Action, AuthFunction, Context
+from ckan.lib.search import SearchError
+from ckanext.wri.logic.auth import auth as auth
+from ckanext.wri.logic.action.create import notification_create
+from ckanext.wri.logic.action.update import notification_update
+from ckanext.wri.logic.action.get import package_search, notification_get_all
+from ckanext.wri.search import SolrSpatialFieldSearchBackend
 
 import logging
 log = logging.getLogger(__name__)
@@ -15,8 +20,11 @@ class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IFacets)
+    plugins.implements(plugins.IClick)
+    plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IPermissionLabels)
+    plugins.implements(plugins.IPackageController, inherit=True)
 
     # IConfigurer
 
@@ -24,6 +32,26 @@ class WriPlugin(plugins.SingletonPlugin):
         toolkit.add_template_directory(config_, "templates")
         toolkit.add_public_directory(config_, "public")
         toolkit.add_resource("assets", "wri")
+
+    def get_commands(self):
+        """CLI commands - Creates notifications data tables"""
+        import click
+
+        @click.command()
+        def notificationdb():
+            """Creates notification data tables"""
+            from ckanext.wri.model import setup
+            setup()
+
+        return [notificationdb]
+
+    # IAuth
+
+    def get_auth_functions(self) -> dict[str, AuthFunction]:
+        return {
+            'notification_get_all': auth.notification_get_all,
+            'notification_create': auth.notification_create
+        }
 
     # IValidators
 
@@ -59,7 +87,10 @@ class WriPlugin(plugins.SingletonPlugin):
     def get_actions(self):
         return {
             'package_search': package_search,
-            'password_reset': action.password_reset
+            'password_reset': action.password_reset,
+            'notification_get_all': notification_get_all,
+            'notification_create': notification_create,
+            'notification_update': notification_update
 
         }
 
@@ -105,4 +136,48 @@ class WriPlugin(plugins.SingletonPlugin):
             labels.extend('collaborator-%s' % d['package_id'] for d in datasets)
 
         return labels
+
+    # IPackageController
+
+    def before_index(self, pkg_dict):
+        return self.before_dataset_index(pkg_dict)
+
+    def before_search(self, search_params):
+        return self.before_dataset_search(search_params)
+
+    def before_dataset_index(self, pkg_dict):
+        if not pkg_dict.get('spatial'):
+            return pkg_dict
+
+        pkg_dict = SolrSpatialFieldSearchBackend().index_dataset(pkg_dict)
+
+        # Coupled resources are URL -> uuid links, they are not needed in SOLR
+        # and might be huge if there are lot of coupled resources
+        pkg_dict.pop('coupled-resource', None)
+        pkg_dict.pop('extras_coupled-resource', None)
+
+        # spatial field is geojson coordinate data, not needed in SOLR either
+        pkg_dict.pop('extras_spatial', None)
+        pkg_dict.pop('spatial', None)
+
+        return pkg_dict
+
+    def before_dataset_search(self, search_params):
+        input_point = search_params.get('extras', {}).get('ext_location_q', None)
+        input_address = search_params.get('extras', {}).get('ext_address_q', None)
+
+        point = [] 
+        if input_point:
+            point = input_point.split(",")
+
+            if len(point) == 2:
+                point = { "y": float(point[0]), "x": float(point[1]) }
+            else:
+                raise SearchError('Wrong point provided')
+
+        if point or input_address:
+            search_params = SolrSpatialFieldSearchBackend().search_params(
+                point, input_address, search_params)
+
+        return search_params
 

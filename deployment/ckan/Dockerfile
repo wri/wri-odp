@@ -9,12 +9,31 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@auth-object-return-token#egg=ckanext-auth' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@fff325e0238334b54f23a392bb0682a5abc3da3f#egg=ckanext-auth' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
 
-
 USER root
+
+# Required by shapely dependency
+RUN apk --update add build-base libxslt-dev python3-dev 
+
+RUN apk add --virtual .build-deps \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        gcc libc-dev geos-dev geos && \
+    runDeps="$(scanelf --needed --nobanner --recursive /usr/local \
+    | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+    | xargs -r apk info --installed \
+    | sort -u)" && \
+    apk add --virtual .rundeps $runDeps
+
+RUN geos-config --cflags
+
+RUN pip install --disable-pip-version-check Shapely==2.0.1
+
+RUN apk del build-base python3-dev && \
+    rm -rf /var/cache/apk/*
 
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py

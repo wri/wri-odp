@@ -1,19 +1,45 @@
-FROM node:18
+FROM --platform=linux/amd64 node:16-alpine3.17 AS deps
+RUN apk add --no-cache libc6-compat openssl1.1-compat
+WORKDIR /app
 
-# Create app directory
-WORKDIR /usr/src/app
+COPY package.json package-lock.json* ./
 
+RUN npm ci -f
+
+FROM --platform=linux/amd64 node:16-alpine3.17 AS builder
 ARG NEXTAUTH_SECRET
 ARG NEXTAUTH_URL
 ARG CKAN_URL
-
+ARG NEXT_PUBLIC_CKAN_URL
+ARG AZURE_AD_CLIENT_ID
+ARG AZURE_AD_CLIENT_SECRET
+ARG AZURE_AD_TENANT_ID
+ARG RW_API_KEY
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# You can setup env vars here or via `.env` file
-
-RUN npm ci -f
 RUN SKIP_ENV_VALIDATION=1 npm run build
-EXPOSE 3000
 
-# For staging/production please use `yarn start` command.
-CMD [ "npm", "run", "start"]
+FROM --platform=linux/amd64 node:16-alpine3.17 AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/next.config.mjs ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+EXPOSE 3000
+ENV PORT 3000
+
+CMD ["node", "server.js"]

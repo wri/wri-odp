@@ -10,9 +10,9 @@ env:
   PROJECT_NAME: wri-odp
   BRANCH_NAME: staging
 permissions:
-      id-token: write
-      contents: read
-      security-events: write
+  id-token: write
+  contents: read
+  security-events: write
 jobs:
   buildandtest:
     name: Build and Scan Image with Integration Tests
@@ -55,17 +55,17 @@ jobs:
           --build-arg NEXTAUTH_SECRET=${{ secrets.STAGING_FRONTEND_NEXTAUTH_SECRET }} \
           --build-arg NEXTAUTH_URL=${{ secrets.STAGING_FRONTEND_NEXTAUTH_URL }} \
           --build-arg CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d \
-          ckan-dev datapusher db solr redis minio minio-setup
+          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
-      - name: Initialize the ckanext-issues table
-        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
+      - name: Initialize the Extensions
+        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
@@ -80,6 +80,11 @@ jobs:
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
+        working-directory: ./ckan-backend-dev
+      - name: Initialize the Extensions
+        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
+      - name: Print Logs
+        run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and Frontend setup
         uses: cypress-io/github-action@v6
@@ -104,7 +109,11 @@ jobs:
         with:
           name: cypress-screenshots
           path: /home/runner/work/wri-odp/wri-odp/e2e-tests/cypress/screenshots
-          if-no-files-found: ignore 
+          if-no-files-found: ignore
+      - name: Print Error Logs
+        if: failure()
+        run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
+        working-directory: ./ckan-backend-dev
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev
@@ -188,7 +197,7 @@ jobs:
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
           IMAGE_TAG: ${{ github.sha }}
-        run: |    
+        run: |
           cd deployment
           curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
           bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml

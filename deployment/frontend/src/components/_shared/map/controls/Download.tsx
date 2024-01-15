@@ -27,7 +27,7 @@ export function Download() {
             .map((feature) => feature.properties);
         alert(JSON.stringify(features));
     }
-    return <IconButton onClick={() => getFeatures()}><DownloadIcon /></IconButton>;
+    return <IconButton tooltip="Download" onClick={() => getFeatures()}><DownloadIcon /></IconButton>;
 }
 
 function isDataLayer(

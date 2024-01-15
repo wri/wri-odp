@@ -51,6 +51,12 @@ Cypress.Commands.add("login", (username, password) => {
   });
 });
 
+Cypress.Commands.add("logout", () => {
+  cy.get("#nav-user-menu").click();
+  cy.get(":nth-child(3) > .px-2").should("be.visible").as("menuItem");
+  cy.get("@menuItem").click();
+});
+
 Cypress.Commands.add("createDatasetWithoutFile", (name) => {
   cy.visit({ url: "/dataset" }).then((resp) => {
     const datasetName = name || getRandomDatasetName();
@@ -241,51 +247,56 @@ Cypress.Commands.add("deleteOrganizationAPI", (name) => {
   });
 });
 
-Cypress.Commands.add('createDatasetAPI', (organization, name, isSubscribable, otherFields) => {
-  const request = cy.request({
-    method: 'POST',
-    url: apiUrl('package_create'),
-    headers: headers,
-    body: {
-      owner_org: organization,
-      name: name,
-      author: "datopian",
-      license_id : "notspecified",
-      tags: [{"display_name": "subscriable", "name": "subscriable"}],
-      ...otherFields
-    },
-  })
+Cypress.Commands.add(
+  "createDatasetAPI",
+  (organization, name, isSubscribable, otherFields) => {
+    const request = cy.request({
+      method: "POST",
+      url: apiUrl("package_create"),
+      headers: headers,
+      body: {
+        owner_org: organization,
+        name: name,
+        author: "datopian",
+        license_id: "notspecified",
+        tags: [{ display_name: "subscriable", name: "subscriable" }],
+        ...otherFields,
+      },
+    });
 
-  if (!isSubscribable) {
-    request.then((response) => {
-      const datasetId = response.body.result.id
-      cy.request({
-        method: 'POST',
-        url: dataSubscriptionApiUrl(`nonsubscribable_datasets/${datasetId}`),
-        headers: headers,
-      })
-    })
+    if (!isSubscribable) {
+      request.then((response) => {
+        const datasetId = response.body.result.id;
+        cy.request({
+          method: "POST",
+          url: dataSubscriptionApiUrl(`nonsubscribable_datasets/${datasetId}`),
+          headers: headers,
+        });
+      });
+    }
   }
-})
+);
 
-Cypress.Commands.add("createResourceAPI", (dataset, resource) => {
+Cypress.Commands.add("createResourceAPI", (datasetId, resource) => {
   const request = cy.request({
     method: "POST",
-    url: apiUrl("datastore_create"),
+    url: apiUrl("resource_create"),
     headers: headers,
     body: {
-      resource: {
-        package_id: dataset,
-        name: resource,
-        format: "CSV",
-      },
-      records: [
-        {
-          name: " Jhon Mayer",
-          age: 29,
-        },
-      ],
+      package_id: datasetId,
+      ...resource,
       force: "True",
+    },
+  });
+});
+
+Cypress.Commands.add("datapusherSubmit", (resource_id) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("datapusher_submit"),
+    headers: headers,
+    body: {
+      resource_id,
     },
   });
 });
@@ -435,28 +446,106 @@ Cypress.Commands.add("createUserApi", (name, email, password) => {
   });
 });
 
-Cypress.Commands.add("addPackageCollaboratorApi", (username, packageId, capacity) => {
+Cypress.Commands.add("deleteUserApi", (name) => {
   const request = cy.request({
     method: "POST",
-    url: apiUrl("package_collaborator_create"),
+    url: apiUrl("user_delete"),
     headers: headers,
     body: {
-      id: packageId,
-      user_id: username,
-      capacity: capacity,
+      id: name,
     },
   });
 });
 
-Cypress.Commands.add("addPackageIssueApi", (packageId, issueTitle, issueDescription) => {
-  const request = cy.request({
-    method: "POST",
-    url: apiUrl("issue_create"),
-    headers: headers,
-    body: {
-      dataset_id: packageId,
-      title: issueTitle,
-      description: issueDescription,
-    },
-  });
+Cypress.Commands.add(
+  "addPackageCollaboratorApi",
+  (username, packageId, capacity) => {
+    const request = cy.request({
+      method: "POST",
+      url: apiUrl("package_collaborator_create"),
+      headers: headers,
+      body: {
+        id: packageId,
+        user_id: username,
+        capacity: capacity,
+      },
+    });
+  }
+);
+
+Cypress.Commands.add(
+  "addPackageIssueApi",
+  (packageId, issueTitle, issueDescription) => {
+    const request = cy.request({
+      method: "POST",
+      url: apiUrl("issue_create"),
+      headers: headers,
+      body: {
+        dataset_id: packageId,
+        title: issueTitle,
+        description: issueDescription,
+      },
+    });
+  }
+);
+
+Cypress.Commands.add(
+  "addNotificationApi",
+  (recipient, sender, object_id, activity_type) => {
+    cy.request({
+      method: "POST",
+      url: apiUrl("notification_create"),
+      headers: headers,
+      body: {
+        recipient_id: recipient,
+        sender_id: sender,
+        activity_type: activity_type,
+        object_id: object_id,
+        object_type: "dataset",
+      },
+    });
+  }
+);
+
+Cypress.Commands.add("userMetadata", (name) => {
+  return cy
+    .request({
+      method: "GET",
+      url: apiUrl("user_show"),
+      headers: headers,
+      qs: {
+        id: name,
+      },
+    })
+    .then((res) => {
+      return res.body.result;
+    });
 });
+
+// Cypress.Commands.add("addNotificationApi", async ( object_id) => {
+
+//   const dataset = await cy.request({
+//     method: "GET",
+//     url: apiUrl("package_show"),
+//     headers: headers,
+//     qs: {
+//       id: object_id,
+//     },
+//   });
+
+//   const dataset_id = dataset.body.result.id;
+//   console.log(dataset_id);
+
+//   cy.request({
+//     method: "POST",
+//     url: apiUrl("notification_create"),
+//     headers: headers,
+//     body: {
+//       recipient_id: "2b6f6d69-5f13-4091-8131-2182be659ea1",
+//       sender_id: "b53a31a7-55f0-425b-bd6e-db9a20b517c6",
+//       activity_type: "deleted dataset",
+//       object_id: dataset_id,
+//       object_type: "dataset"
+//     },
+//   });
+// });

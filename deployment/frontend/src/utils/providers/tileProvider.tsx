@@ -11,7 +11,7 @@ export class TileProvider implements ProviderMaker {
 
   private getTilerUrl = (layer: LayerSpec): string | Error => {
     //@ts-ignore
-    return layer.source.tiles[0];
+    return layer.source.tiles[0].replace("{thresh}", layer.threshold);
   };
 
   public handleData = (

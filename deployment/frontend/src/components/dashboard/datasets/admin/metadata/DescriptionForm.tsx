@@ -43,7 +43,7 @@ export function DescriptionForm({
                             </DefaultTooltip>
                         </div>
                     }
-                    className="mb-2 flex-col items-start whitespace-nowrap sm:grid-cols-1 grid-cols-1 sm:flex-col sm:items-start sm:gap-y-2"
+                    className="mb-2 flex  flex-col items-start whitespace-nowrap sm:flex-col"
                 >
                     <TextArea
                         placeholder=""

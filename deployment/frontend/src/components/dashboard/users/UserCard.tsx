@@ -13,6 +13,8 @@ import Modal from '@/components/_shared/Modal';
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
+import { useQuery } from 'react-query';
+import { useRouter } from 'next/router'
 
 
 type IUser = {
@@ -53,7 +55,7 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
   const [selectedTeam, setSelectedTeam] = useState<{ name?: string } | null>(null);
   const removeMember = api.user.deleteMember.useMutation({
     onSuccess: async (data) => {
-      await utils.user.getAllUsers.invalidate({ search: '', page: { start: 0, rows: 10 } })
+      await utils.user.getAllUsers.invalidate({ search: '', page: { start: 0, rows: 100 } })
       setOpen(false)
       notify(`Successfully deleted user from ${selectedTeam?.name} team`, 'error')
     },
@@ -80,7 +82,7 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
                 className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                 rowMain={
                   <div className='flex flex-col sm:flex-row pl-3 sm:pl-5  gap-x-14 gap-y-4'>
-                    <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} />
+                    <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={team as IRowProfile} defaultImg='/images/placeholders/teams/teamdefault.png' />
                     <div className='font-normal text-[14px] text-wri-black sm:self-center sm:ml-auto sm:mr-[40%] lg:mr-[60%]'>{team.capacity}</div>
                   </div>
                 }
@@ -168,10 +170,11 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
 
 
 
-export default function UserCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
-  const { data, isLoading, refetch } = api.user.getAllUsers.useQuery(query)
+export default function UserCard({username}: {username: string}) {
+  const [query, setQuery] = useState<SearchInput>({ search: username ?? '', page: { start: 0, rows: 10 } })
+  const { data, isLoading, refetch } = api.user.getAllUsers.useQuery({ search: '', page: { start: 0, rows: 100 } })
   const [open, setOpen] = useState(false)
+  const router = useRouter()
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const datasetUser = api.user.deleteUser.useMutation({
     onSuccess: async (data) => {
@@ -181,29 +184,50 @@ export default function UserCard() {
     },
   })
 
+  const processedData = useQuery(['processedUser', data, query], () => {
+    if (!data) return { users: [], count: 0 };
+    const searchTerm = query.search.toLowerCase();
+    const users = data.users;
+    let filteredData = users;
+    if (searchTerm) {
+      filteredData = users
+        .filter(user => user.title?.toLowerCase().includes(searchTerm))
+        .sort((a, b) => {
+          const titleA = a.title?.toLowerCase() || '';
+          const titleB = b.title?.toLowerCase() || '';
+
+          return titleA.localeCompare(titleB);
+        });
+    }
+    const start = query.page.start;
+    const rows = query.page.rows;
+    const slicedData = filteredData.slice(start, start + rows);
+    return { users: slicedData, count: filteredData.length };
+  }, {
+    enabled: !!data, // Only run the query when data is available
+  });
+
+
   const handleOpenModal = (user: IUser) => {
     setSelectedUser(user);
     setOpen(true);
   };
 
+
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
       <SearchHeader leftStyle='px-2 sm:pr-2 sm:pl-12' rightStyle='px-2 sm:pr-6' placeholder='Find a user' setQuery={setQuery} query={query}
-        Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={data?.count} />} />
+        Pagination={<Pagination setQuery={setQuery} query={query} isLoading={processedData.isLoading} count={processedData.data?.count} />} />
       <div className='w-full'>
         {
-          isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
-            data?.users.map((user, index) => {
+          isLoading || processedData.isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
+            processedData.data?.users.map((user, index) => {
               return (
                 <div key={user.id}>
                   <Row
                     key={user.id}
                     className={`pr-6`}
                     rowMain={<TeamProfile user={user as IUser} />}
-                    linkButton={{
-                      label: "View user",
-                      link: "#",
-                    }}
                     controlButtons={[
                       {
                         label: "Edit",
@@ -213,7 +237,7 @@ export default function UserCard() {
                           id: `edit-tooltip-${user.title}`,
                           content: "Edit user"
                         },
-                        onClick: () => { }
+                        onClick: async () => { router.push(`/dashboard/users/edit/${user.title}`) }
                       },
                       {
                         label: "Delete", color: 'bg-red-600 hover:bg-red-500',

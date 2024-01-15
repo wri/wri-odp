@@ -1,5 +1,9 @@
 import { Dataset } from '@/interfaces/dataset.interface'
-import type { Group, Organization, User as CkanUser } from '@portaljs/ckan'
+import type {
+    Group,
+    Organization,
+    User as CkanUser,
+} from '@portaljs/ckan'
 
 type Only<T, U> = {
     [P in keyof T]: T[P]
@@ -34,7 +38,8 @@ export interface User {
     number_created_packages?: number
     apikey?: string
     email?: string
-    image_display_url?: string
+    image_display_url?: string,
+    capacity?: string,
 }
 
 export interface Activity {
@@ -44,7 +49,16 @@ export interface Activity {
     object_id?: string
     activity_type: string
     user_data?: User
-    data: Record<string, { title?: string }>
+    data: Record<
+        string,
+        {
+            title?: string
+            owner_org?: string
+            groups: {
+                id: string
+            }[]
+        }
+    >
 }
 
 export interface ActivityDisplay {
@@ -54,6 +68,10 @@ export interface ActivityDisplay {
     action: string
     timestamp: string
     actionType: string
+    orgId?: string
+    packageId?: string
+    groupId?: string
+    packageGroup?: string[]
 }
 
 export interface WriDataset extends Dataset {
@@ -61,23 +79,40 @@ export interface WriDataset extends Dataset {
     technical_notes?: string
     temporal_coverage_start: string
     temporal_coverage_end: string
-    update_frequency?: string
-    visibility_type?: 'public' | 'private' | 'internal' | 'draft'
+    update_frequency:
+        | 'annually'
+        | 'biannually'
+        | 'quarterly'
+        | 'monthly'
+        | 'weekly'
+        | 'daily'
+        | 'as_needed'
+        | 'hourly'
+    visibility_type: 'public' | 'private' | 'internal' | 'draft'
     short_description?: string
     project?: string
     reason_for_adding?: string
     featured_dataset?: boolean
     wri_data?: boolean
+    creator_user_id: string
+    language?: string
     featured_image?: string
     application?: string
     cautions?: string
     citation?: string
     function?: string
     isopen?: boolean
+    rw_id?: string
     learn_more?: string
     restrictions?: string
     open_in: OpenIn[]
     extras?: Extra[]
+    spatial?: any
+    spatial_address?: string
+    connectorUrl?: string
+    connectorType?: string
+    provider?: string
+    tableName?: string
 }
 
 export interface Extra {
@@ -143,4 +178,25 @@ export interface Comment {
     visibility: string
     abuse_status: string
     user: WriUser
+}
+
+export interface FolloweeList {
+    type: string
+    display_name: string
+    dict: WriDataset | WriOrganization | WriUser | Group
+}
+
+export interface GroupsmDetails {
+    img_url: string
+    description: string
+    package_count: number
+}
+
+export interface Member {
+    id: string
+    name: string
+    email: string
+    role: string
+    team: string
+    teamId: string
 }

@@ -1,12 +1,10 @@
 import React from 'react'
 import Image from 'next/image'
-import {
-    ChartBarIcon,
-    GlobeAltIcon,
-    TableCellsIcon,
-} from '@heroicons/react/20/solid'
+import { ChartBarIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import { WriDataset } from '@/schema/ckan.schema'
+import MapViewIcon from './datasets/view-icons/MapViewIcon'
+import TabularViewIcon from './datasets/view-icons/TabularViewIcon'
 
 export default function HighlightCard({
     highlight,
@@ -26,7 +24,7 @@ export default function HighlightCard({
                     className="object-cover"
                 />
             </div>
-            <div className="px-4 z-10 -mt-6 w-[70%] bg-white pb-2 pt-4 text-[0.938rem] font-bold text-wri-green line-clamp-1 h-[3em]">
+            <div className="px-4 z-10 -mt-6 w-[70%] bg-white pb-2 pt-4 text-[0.938rem] font-bold text-wri-green line-clamp-1 h-[2.5em]">
                 {highlight.organization?.title}
             </div>
             <h2 className="px-4 text-wri-black text-2xl font-bold w-[80%] line-clamp-2 h-[2.5em]">
@@ -48,12 +46,12 @@ export default function HighlightCard({
                         </div>
                     </div>
                 ) : null}
-                {(highlight as any).location &&
+                {highlight.spatial_address &&
                 (highlight.temporal_coverage_start ||
                     highlight.temporal_coverage_end) ? (
                     <div className="border-l border-wri-black h-4  mx-2"></div>
                 ) : null}
-                {(highlight as any).location ? (
+                {highlight.spatial_address ? (
                     <div className="flex ">
                         <div className="w-4 h-4 relative">
                             <Image
@@ -62,20 +60,18 @@ export default function HighlightCard({
                                 fill
                             />
                         </div>
-                        <div className="ml-1 w-fit h-[14px]">Sub-regional</div>
+                        <div className="ml-1 w-fit h-[14px] line-clamp-1">{highlight.spatial_address}</div>
                     </div>
                 ) : null}
             </div>
-            <div className="px-4 mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black">
-                <div className="rounded-full bg-stone-100 p-1">
-                    <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                </div>
-                <div className="rounded-full bg-stone-100 p-1">
-                    <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                </div>
-                <div className="rounded-full bg-stone-100 p-1">
-                    <TableCellsIcon className="h-5 w-5 text-green-600" />
-                </div>
+            <div className="px-4 mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black h-7">
+                {false && (
+                    <div className="rounded-full bg-stone-100 p-1">
+                        <ChartBarIcon className="h-5 w-5 text-blue-700" />
+                    </div>
+                )}
+                <MapViewIcon dataset={highlight} />
+                <TabularViewIcon dataset={highlight} />
             </div>
         </Link>
     )

@@ -10,6 +10,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { env } from '@/env.mjs'
 import type { CkanResponse } from '@/schema/ckan.schema'
 import { Organization } from '@portaljs/ckan'
+import AzureAdProvider from 'next-auth/providers/azure-ad'
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -52,11 +53,53 @@ export const authOptions: NextAuthOptions = {
         newUser: '/',
     },
     callbacks: {
-        jwt({ token, user }) {
+        async jwt({ token, user, account }) {
             if (user) {
                 token.apikey = user.apikey
                 // token.teams = user.teams
                 token.sysadmin = user.sysadmin
+            }
+            if (account?.provider === 'azure-ad') {
+                if (account && account.access_token) {
+                    const userRes = await fetch(
+                        `${process.env.CKAN_URL}/api/3/action/user_login`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                from_azure: true,
+                                email: user?.email,
+                                name: user?.name,
+                                id_token: account?.id_token,
+                            }),
+                        }
+                    )
+
+                    const validUser: CkanResponse<
+                        User & { frontend_token: string }
+                    > = await userRes.json()
+
+                    if ((validUser.result as any).errors) {
+                        // TODO: error from the response should be sent to the client, but it's not working
+                        throw new Error(
+                            (validUser.result as any).error_summary.auth
+                        )
+                    }
+
+                    user = {
+                        ...user,
+                        ...validUser.result,
+                        image:
+                            user?.image ??
+                            (validUser.result as any)?.image ??
+                            '',
+                        apikey: validUser.result.frontend_token,
+                    }
+
+                    return { ...token, ...user, sub: validUser.result.id }
+                }
             }
             return token
         },
@@ -65,6 +108,7 @@ export const authOptions: NextAuthOptions = {
                 ...session,
                 user: {
                     ...session.user,
+                    name: token.name ? token.name : '',
                     apikey: token.apikey ? token.apikey : '',
                     // teams: token.teams ? token.teams : { name: '', id: '' },
                     sysadmin: token?.sysadmin,
@@ -134,7 +178,7 @@ export const authOptions: NextAuthOptions = {
                         const orgList: CkanResponse<Organization[]> =
                             await orgListRes.json()
 
-                        console.log('Org list', orgList)
+                        // console.log('Org list', orgList)
                         return {
                             ...user.result,
                             image: '',
@@ -153,6 +197,11 @@ export const authOptions: NextAuthOptions = {
                     throw e
                 }
             },
+        }),
+        AzureAdProvider({
+            clientId: env.AZURE_AD_CLIENT_ID ?? '',
+            clientSecret: env.AZURE_AD_CLIENT_SECRET?.toString() ?? '',
+            tenantId: env.AZURE_AD_TENANT_ID ?? '',
         }),
     ],
 }

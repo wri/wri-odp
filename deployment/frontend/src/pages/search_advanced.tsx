@@ -11,10 +11,10 @@ import SortBy from '@/components/search/SortBy'
 import { Filter } from '@/interfaces/search.interface'
 import { SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
-import notify from '@/utils/notify'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import {NextSeo} from 'next-seo'
 
 export function getServerSideProps({ query }: { query: any }) {
     const initialFilters = query.search
@@ -62,6 +62,8 @@ export default function SearchPage({
         )
 
         const fq: any = {}
+        let extLocationQ = ''
+        let extAddressQ = ''
 
         keys.forEach((key) => {
             let keyFq
@@ -114,6 +116,13 @@ export default function SearchPage({
                 fq[
                     'metadata_modified'
                 ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+            } else if (key == 'spatial') {
+                const coordinates = keyFilters[0]?.value
+                const address = keyFilters[0]?.label
+
+                // @ts-ignore
+                if (coordinates) extLocationQ = coordinates.reverse().join(',')
+                if (address) extAddressQ = address
             } else {
                 keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             }
@@ -123,12 +132,15 @@ export default function SearchPage({
 
         delete fq.metadata_modified_since
         delete fq.metadata_modified_before
+        delete fq.spatial
 
         setQuery((prev) => {
             return {
                 ...prev,
                 fq,
                 search: filters.find((e) => e?.key == 'search')?.value ?? '',
+                extLocationQ,
+                extAddressQ,
             }
         })
     }, [filters])
@@ -157,6 +169,7 @@ export default function SearchPage({
     return (
         <>
             <Header />
+            <NextSeo title="Advanced Search" />
             <Search filters={filters} setFilters={setFilters} />
             {session.status == 'loading' && (
                 <div className="flex w-full justify-center mt-20">
@@ -196,7 +209,12 @@ export default function SearchPage({
                     }
                 </FilteredSearchLayout>
             )}
-            <Footer />
+            <Footer
+                links={{
+                    primary: { title: 'Explore Teams', href: '/teams' },
+                    secondary: { title: 'Explore Topics', href: '/topics' },
+                }}
+            />
         </>
     )
 }

@@ -1,10 +1,24 @@
-import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
+import {
+    createTRPCRouter,
+    protectedProcedure,
+    publicProcedure,
+} from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { CkanResponse } from '@/schema/ckan.schema'
+import { CkanResponse, Collaborator } from '@/schema/ckan.schema'
 import { Organization } from '@portaljs/ckan'
 import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
+import { searchSchema } from '@/schema/search.schema'
+import type { GroupTree, GroupsmDetails, User, WriOrganization } from '@/schema/ckan.schema'
+import {
+    getGroups,
+    getAllOrganizations,
+    searchHierarchy,
+    findAllNameInTree,
+} from '@/utils/apiUtils'
+import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
+import { json } from 'stream/consumers'
 
 export const teamRouter = createTRPCRouter({
     getAllTeams: protectedProcedure.query(async ({ ctx }) => {
@@ -50,6 +64,25 @@ export const teamRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const user = ctx.session.user
+                var newMembers = []
+                for (const member of input.members) {
+                    newMembers.push({
+                        name: member.user.value,
+                        capacity: member.capacity.value,
+                    })
+                }
+                try {
+                    sendMemberNotifications(
+                        user.id,
+                        newMembers,
+                        input.users,
+                        input.id,
+                        'team'
+                    )
+                } catch (e) {
+                    console.log(e)
+                }
+                input.users = newMembers
                 const body = JSON.stringify({
                     ...input,
                     image_display_url: input.image_url
@@ -99,7 +132,7 @@ export const teamRouter = createTRPCRouter({
                 }
             )
             const team: CkanResponse<
-                Organization & { groups: Organization[] }
+                WriOrganization & { groups: Organization[] }
             > = await teamRes.json()
             return {
                 ...team.result,
@@ -132,6 +165,25 @@ export const teamRouter = createTRPCRouter({
             return {
                 ...team.result,
             }
+        }),
+    getTeamUsers: protectedProcedure
+        .input(z.object({ id: z.string(), capacity: z.string().optional() }))
+        .query(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const membersListRes = await fetch(
+                `${env.CKAN_URL}/api/action/member_list?id=${input.id}${
+                    input.capacity ? `&capacity=${input.capacity}` : ''
+                }&object_type=user`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const membersList: CkanResponse<string[][]> =
+                await membersListRes.json()
+            return membersList.result
         }),
     createTeam: protectedProcedure
         .input(TeamSchema)
@@ -191,5 +243,171 @@ export const teamRouter = createTRPCRouter({
             if (!data.success && data.error)
                 throw Error(replaceNames(data.error.message, true))
             return data
+        }),
+    getGeneralTeam: publicProcedure
+        .input(searchSchema)
+        .query(async ({ input, ctx }) => {
+            let groupTree: GroupTree[] = []
+            const allGroups = (await getAllOrganizations({
+                apiKey: ctx?.session?.user.apikey ?? '',
+            }))!
+
+            const teamDetails = allGroups.reduce(
+                (acc, org) => {
+                    acc[org.id] = {
+                        img_url: org.image_display_url ?? '',
+                        description: org.description ?? '',
+                        package_count: org.package_count,
+                    }
+                    return acc
+                },
+                {} as Record<string, GroupsmDetails>
+            )
+
+            if (input.search) {
+                groupTree = await searchHierarchy({
+                    isSysadmin: true,
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    q: input.search,
+                    group_type: 'organization',
+                })
+
+                if (input.tree) {
+                    let groupFetchTree = groupTree[0] as GroupTree
+                    const findTree = findNameInTree(
+                        groupFetchTree,
+                        input.search
+                    )
+                    if (findTree) {
+                        groupFetchTree = findTree
+                    }
+                    groupTree = [groupFetchTree]
+                }
+
+                if (input.allTree) {
+                    const filterTree = groupTree.flatMap((group) => {
+                        const search = input.search.toLowerCase()
+                        if (
+                            group.name.toLowerCase().includes(search) ||
+                            group.title?.toLowerCase().includes(search)
+                        )
+                            return [group]
+                        const findtree = findAllNameInTree(group, input.search)
+                        return findtree
+                    })
+
+                    groupTree = filterTree
+                }
+            } else {
+                groupTree = await getGroups({
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    group_type: 'organization',
+                })
+            }
+
+            const result = groupTree
+            return {
+                teams: result,
+                teamsDetails: teamDetails,
+                count: result.length,
+            }
+        }),
+    getPossibleMembers: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ ctx, input }) => {
+            console.log(input)
+            const user = ctx.session.user
+            const teamRes = await fetch(
+                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const team: CkanResponse<
+                Organization & { groups: Organization[] }
+            > = await teamRes.json()
+            if (!team.success && team.error) {
+                if (team.error.message)
+                    throw Error(replaceNames(team.error.message, true))
+                throw Error(replaceNames(JSON.stringify(team.error), true))
+            }
+            const teamUsers = team?.result?.users?.map(
+                (user) => user.name
+            ) as string[]
+            const usersRes = await fetch(
+                `${env.CKAN_URL}/api/action/user_list?all_fields=True&limit=1000`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const users: CkanResponse<User[]> = await usersRes.json()
+            if (!users.success && users.error) {
+                if (users.error.message)
+                    throw Error(replaceNames(users.error.message, true))
+                throw Error(replaceNames(JSON.stringify(users.error), true))
+            }
+
+            return users.result.filter(
+                (user) => user.name && !teamUsers.includes(user.name)
+            )
+        }),
+    getCurrentMembers: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const teamRes = await fetch(
+                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                }
+            )
+            const team: CkanResponse<
+                Organization & { groups: Organization[] }
+            > = await teamRes.json()
+            if (!team.success && team.error) {
+                if (team.error.message)
+                    throw Error(replaceNames(team.error.message, true))
+                throw Error(replaceNames(JSON.stringify(team.error), true))
+            }
+
+            return team.result.users
+        }),
+    removeMember: protectedProcedure
+        .input(z.object({ id: z.string(), username: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const user = ctx.session.user
+            const teamRes = await fetch(
+                `${env.CKAN_URL}/api/action/member_delete`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                    body: JSON.stringify({
+                        id: input.id,
+                        object: input.username,
+                        object_type: 'user',
+                    }),
+                }
+            )
+            const team: CkanResponse<
+                Organization & { groups: Organization[] }
+            > = await teamRes.json()
+            if (!team.success && team.error) {
+                if (team.error.message)
+                    throw Error(replaceNames(team.error.message, true))
+                throw Error(replaceNames(JSON.stringify(team.error), true))
+            }
+            return team.result
         }),
 })

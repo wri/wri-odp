@@ -19,6 +19,7 @@ const config = {
     ignoreDuringBuilds: true,
   },
   reactStrictMode: true,
+  output: "standalone",
 
 
   /**
@@ -31,7 +32,7 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ['wri.dev.ckan.datopian.com', 'test-bucket-wri.s3.ap-northeast-1.amazonaws.com', 'ckan-dev', 'gravatar.com'],
+    domains: ['wri.dev.ckan.datopian.com', 'test-bucket-wri.s3.ap-northeast-1.amazonaws.com', 'ckan-dev', 'gravatar.com', 's3.amazonaws.com'],
   },
 };
 

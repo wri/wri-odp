@@ -1,13 +1,10 @@
 import React from 'react'
-import {
-    ChartBarIcon,
-    GlobeAltIcon,
-    TableCellsIcon,
-} from '@heroicons/react/20/solid'
-import { ClockIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import { ChartBarIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import { WriDataset } from '@/schema/ckan.schema'
 import Link from 'next/link'
+import MapViewIcon from './datasets/view-icons/MapViewIcon'
+import TabularViewIcon from './datasets/view-icons/TabularViewIcon'
 
 export default function Card({ dataset }: { dataset: WriDataset }) {
     return (
@@ -40,12 +37,12 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                     <div className="h-4 mt-4" />
                 )}
 
-                {(dataset as any).location &&
+                {dataset.spatial_address &&
                 (dataset.temporal_coverage_start ||
                     dataset.temporal_coverage_end) ? (
                     <div className="border-l border-wri-black h-4  mx-2"></div>
                 ) : null}
-                {(dataset as any).location && (
+                {dataset.spatial_address && (
                     <div className="flex ">
                         <div className="w-4 h-4 relative">
                             <Image
@@ -55,21 +52,19 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                             />
                         </div>
                         <div className="ml-1 w-fit h-[14px]">
-                            {(dataset as any).location}
+                            {dataset.spatial_address}
                         </div>
                     </div>
                 )}
             </div>
-            <div className="mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black">
-                <div className="rounded-full bg-stone-100 p-1">
-                    <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                </div>
-                <div className="rounded-full bg-stone-100 p-1">
-                    <GlobeAltIcon className="h-5 w-5 text-emerald-700" />
-                </div>
-                <div className="rounded-full bg-stone-100 p-1">
-                    <TableCellsIcon className="h-5 w-5 text-green-600" />
-                </div>
+            <div className="mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black h-7">
+                {false && (
+                    <div className="rounded-full bg-stone-100 p-1">
+                        <ChartBarIcon className="h-5 w-5 text-blue-700" />
+                    </div>
+                )}
+                <MapViewIcon dataset={dataset} />
+                <TabularViewIcon dataset={dataset} />
             </div>
         </Link>
     )

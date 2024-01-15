@@ -24,6 +24,15 @@ import {
 } from '@/schema/dataset.schema'
 import { formatDate } from '@/utils/formatDate'
 import { convertBytes } from '@/utils/convertBytes'
+import { PreviewMap } from '../datafiles/sections/BuildALayer/BuildALayerSection'
+import {
+    convertFormToLayerObj,
+    getApiSpecFromRawObj,
+} from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
+import {
+    LayerFormType,
+    RawLayerFormType,
+} from '../datafiles/sections/BuildALayer/layer.schema'
 
 export function Preview({
     formObj,
@@ -50,7 +59,7 @@ export function Preview({
                             <dl className="flex flex-col gap-y-6">
                                 <SimpleDescription
                                     label="Source"
-                                    text={watch('source') ?? '_'}
+                                    text={watch('url') ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="Language"
@@ -116,6 +125,15 @@ export function Preview({
                                 <SimpleDescription
                                     label="License"
                                     text={watch('license_id')?.label ?? '_'}
+                                />
+                                <SimpleDescription
+                                    label="Location"
+                                    text={
+                                        watch('spatial_address') ||
+                                        watch('spatial')
+                                            ? 'Yes'
+                                            : '_'
+                                    }
                                 />
                             </dl>
                         </div>
@@ -226,7 +244,8 @@ export function Preview({
                                     <FullDescription label="Methodology">
                                         <div
                                             dangerouslySetInnerHTML={{
-                                                __html: watch('methodology') ?? '_',
+                                                __html:
+                                                    watch('methodology') ?? '_',
                                             }}
                                         ></div>
                                     </FullDescription>
@@ -244,18 +263,20 @@ export function Preview({
                                     <Datafile
                                         key={resource.resourceId}
                                         name={
-                                            resource.name ?? resource.url ?? '-'
+                                            resource.name ?? resource.url ?? resource.title ?? '-'
                                         }
                                         title={resource.title ?? '-'}
                                         type={resource.type ?? 'empty'}
                                         format={resource.format ?? '-'}
                                         size={resource.size ?? null}
+                                        layerObj={resource.layerObj ?? null}
+                                        layerObjRaw={
+                                            resource.layerObjRaw ?? null
+                                        }
                                         description={
                                             resource.description ?? '-'
                                         }
-                                        dataDictionary={
-                                            resource.dataDictionary ?? []
-                                        }
+                                        dataDictionary={resource.schema ?? []}
                                     />
                                 ))}
                             </div>
@@ -355,13 +376,15 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
 }
 
 interface DatafilePreviewProps {
-    type: 'link' | 'upload' | 'layer' | 'empty'
+    type: 'link' | 'upload' | 'layer' | 'empty' | 'layer-raw'
     name: string
     title: string
     format: string
     description: string
     size: number | null
     dataDictionary: DataDictionaryFormType
+    layerObj: LayerFormType | null
+    layerObjRaw: RawLayerFormType | null
 }
 
 function Datafile({
@@ -372,6 +395,8 @@ function Datafile({
     description,
     size,
     dataDictionary,
+    layerObj,
+    layerObjRaw,
 }: DatafilePreviewProps) {
     return (
         <Disclosure>
@@ -441,16 +466,20 @@ function Datafile({
                         <Disclosure.Panel>
                             <div className="grid sm:grid-cols-2 gap-4 bg-slate-100 p-6">
                                 <SimpleDescription label="Title" text={title} />
-                                <SimpleDescription
-                                    label="Format"
-                                    text={format}
-                                />
-                                <div className="col-span-full">
-                                    <SimpleDescription
-                                        label="Description"
-                                        text={description}
-                                    />
-                                </div>
+                                {type !== 'layer' && type !== 'layer-raw' && (
+                                    <>
+                                        <SimpleDescription
+                                            label="Format"
+                                            text={format}
+                                        />
+                                        <div className="col-span-full">
+                                            <SimpleDescription
+                                                label="Description"
+                                                text={description}
+                                            />
+                                        </div>
+                                    </>
+                                )}
                                 {type === 'upload' &&
                                     dataDictionary.length > 0 && (
                                         <div className="col-span-full">
@@ -459,6 +488,27 @@ function Datafile({
                                             />
                                         </div>
                                     )}
+                                {type === 'layer' && layerObj && (
+                                    <div className="col-span-full">
+                                        <PreviewMap
+                                            layerFormObj={convertFormToLayerObj(
+                                                layerObj
+                                            )}
+                                        />
+                                    </div>
+                                )}
+                                {type === 'layer-raw' && layerObjRaw && (
+                                    <div className="col-span-full">
+                                        <PreviewMap
+                                            layerFormObj={{
+                                                ...getApiSpecFromRawObj(
+                                                    layerObjRaw
+                                                ),
+                                                id: 'sample-id',
+                                            }}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </Disclosure.Panel>
                     </Transition>
