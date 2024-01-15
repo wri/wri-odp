@@ -2,7 +2,7 @@ name: "Test cost splitting"
 on:
   push:
     branches:
-      - dev
+      - staging
 defaults:
   run:
     shell: bash
