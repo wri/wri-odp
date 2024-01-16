@@ -5,6 +5,7 @@ volumes:
   pg_data:
   solr_data:
   minio_data:
+  prefect:
 
 services:
 
@@ -76,6 +77,19 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
+
+  prefect:
+    image: prefecthq/prefect:2.11.5-python3.11
+    restart: always
+    volumes:
+      - prefect:/root/.prefect
+    env_file:
+      - .env
+    entrypoint: ["/opt/prefect/entrypoint.sh", "prefect", "server", "start"]
+    ports:
+      - 4200:4200
+    depends_on:
+      - db
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}
