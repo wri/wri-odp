@@ -30,9 +30,9 @@ Once this is done you will possibly have three things
 
 The code can be seen in 
 
-- https://github.com/wri/wri-odp/blob/staging/scripts/cost-splitting/script.py
-- https://github.com/wri/wri-odp/blob/staging/scripts/cost-splitting/lib.py
-- https://github.com/wri/wri-odp/blob/staging/.github/workflows/cost-splitting-report.yml
+- https://github.com/wri/wri-odp/blob/prod/scripts/cost-splitting/script.py
+- https://github.com/wri/wri-odp/blob/prod/scripts/cost-splitting/lib.py
+- https://github.com/wri/wri-odp/blob/prod/.github/workflows/cost-splitting-report.yml
 
 It will basically 
 
@@ -60,4 +60,4 @@ Besides this there are two more caveats
 
 We are testing mostly the logic that decides the percentage costs, we use `moto` whic is a library that allows us to mock S3 Services, we then put two files with the "hello world" content, which takes exactly 11 bytes and then check if those results match what we expect
 
-The test files can be found in https://github.com/wri/wri-odp/blob/staging/scripts/cost-splitting/test_script.py
+The test files can be found in https://github.com/wri/wri-odp/blob/prod/scripts/cost-splitting/test_script.py

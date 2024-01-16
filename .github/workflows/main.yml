@@ -2,13 +2,13 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - staging
+      - prod
   pull_request:
     branches:
-      - staging
+      - prod
 env:
   PROJECT_NAME: wri-odp
-  BRANCH_NAME: staging
+  BRANCH_NAME: prod
 permissions:
       id-token: write
       contents: read
@@ -52,9 +52,9 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
-          --build-arg NEXTAUTH_SECRET=${{ secrets.STAGING_FRONTEND_NEXTAUTH_SECRET }} \
-          --build-arg NEXTAUTH_URL=${{ secrets.STAGING_FRONTEND_NEXTAUTH_URL }} \
-          --build-arg CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
+          --build-arg NEXTAUTH_SECRET=${{ secrets.PROD_FRONTEND_NEXTAUTH_SECRET }} \
+          --build-arg NEXTAUTH_URL=${{ secrets.PROD_FRONTEND_NEXTAUTH_URL }} \
+          --build-arg CKAN_URL=${{ secrets.PROD_FRONTEND_CKAN_URL }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Set up Docker Containers
