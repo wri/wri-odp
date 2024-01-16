@@ -178,6 +178,7 @@ export default function ApprovalRow({
         <Row
             className={`sm:pr-4 ${className ? className : ''}`}
             rowMain={<Card approvalInfo={approvalInfo} />}
+            authorized={true}
             controlButtons={[
                 {
                     label: 'Approve',

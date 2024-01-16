@@ -14,7 +14,8 @@ import {
     sendIssueOrCommentNotigication,
     getUser,
     sendGroupNotification,
-    getOnePendingDataset
+    getOnePendingDataset,
+    getUserOrganizations
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -1104,9 +1105,23 @@ export const DatasetRouter = createTRPCRouter({
     getPendingDatasets: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
+            let fq = 'approval_status:pending+draft:true'
+
+            if (input._isUserSearch) {
+                fq += `+creator_user_id:${ctx.session.user.id}`
+            }
+
+            if (!ctx.session.user.sysadmin || !input._isUserSearch) {
+                const organizations = await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey });
+                let orgsFq = `organization:(${organizations?.map(org => org.name).join(" OR ")})`;
+                
+                if (organizations.length > 0) {
+                    fq = `${fq}+${orgsFq}`
+                 }
+            }
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session.user.apikey,
-                fq: `approval_status:pending`, // TODO: Vverify if organization admin can only see this and sysadmin
+                fq: fq, // TODO: Vverify if organization admin can only see this and sysadmin
                 query: input,
             }))!
 

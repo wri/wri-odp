@@ -12,16 +12,19 @@ import { Dialog } from '@headlessui/react'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { SearchInput } from '@/schema/search.schema'
 import Pagination from '@/components/dashboard/_shared/Pagination'
+import { useSession } from 'next-auth/react'
 
 export default function Approvallist() {
+    const { data: session } = useSession()
     const [rejectOpen, setRejectOpen] = useState(false)
     const [approveOpen, setApproveOpen] = useState(false)
     const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const { data: userIdentity, isLoading: isLoadingIUser } =
+        api.user.getUserCapacity.useQuery()
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
-        _isUserSearch: true,
         sortBy: 'metadata_modified desc',
     })
     const { data, isLoading, refetch } =
@@ -46,6 +49,19 @@ export default function Approvallist() {
             setRejectOpen(true)
         }
     }
+
+    if (!session?.user.sysadmin && isLoadingIUser) {
+        return <Spinner className="mx-auto my-2" />
+    }
+
+    if (!session?.user.sysadmin && userIdentity && !userIdentity.isOrgAdmin) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                You are not authorized to access this page
+            </div>
+        )
+    }
+
     //TODO: might need to change ApprovalHeader and Approval Row to make use of table
     // layout incase of styling misalignment
     return (
