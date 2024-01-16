@@ -33,6 +33,7 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import { TabularResource } from './visualizations/Visualizations'
 import TabularViewIcon from './view-icons/TabularViewIcon'
 import MapViewIcon from './view-icons/MapViewIcon'
+import ToggleVersion from './ToogleVersion'
 
 function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     const session = useSession()
@@ -119,8 +120,14 @@ export function DatasetHeader({
     dataset,
     setTabularResource,
     tabularResource,
+    diffFields,
+    isCurrentVersion,
+    setIsCurrentVersion,
 }: {
     dataset?: WriDataset
+    isCurrentVersion?: boolean
+    diffFields: string[]
+    setIsCurrentVersion: React.Dispatch<React.SetStateAction<boolean>>
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
 }) {
@@ -166,6 +173,15 @@ export function DatasetHeader({
         day: 'numeric',
     } as const
 
+    const higlighted = (field: string) => {
+        if (diffFields && isCurrentVersion) {
+            if (diffFields.includes(field)) {
+                return 'bg-yellow-200'
+            }
+        }
+        return ''
+    }
+
     return (
         <div className="flex w-full flex-col pb-10 font-acumin">
             {!session.data?.user ? (
@@ -191,6 +207,12 @@ export function DatasetHeader({
                         <OpenInButton open_in={dataset?.open_in ?? []} />
                     </div>
                     <div className="flex items-center gap-x-2">
+                        {diffFields.length > 0 && (
+                            <ToggleVersion
+                                enabled={isCurrentVersion!}
+                                setEnabled={setIsCurrentVersion}
+                            />
+                        )}
                         {isLoading ? (
                             <Spinner className="w-2 h-2" />
                         ) : data !== undefined && data ? (
@@ -357,20 +379,38 @@ export function DatasetHeader({
                     )}
                 </div>
                 <div className="flex max-w-[560px] flex-col gap-y-2">
-                    <h2 className="text-xs font-bold uppercase leading-none tracking-wide text-green-700">
+                    <h2
+                        className={`text-xs font-bold uppercase leading-none tracking-wide text-green-700 ${higlighted(
+                            'organization.title'
+                        )} `}
+                    >
                         {dataset?.organization?.title ?? 'No Team'}
                     </h2>
                     <div className="flex items-center gap-x-3">
-                        <h1 className="w-fit text-3xl font-bold text-black">
+                        <h1
+                            className={`w-fit text-3xl font-bold text-black ${
+                                dataset?.title
+                                    ? higlighted('title')
+                                    : higlighted('name')
+                            }  `}
+                        >
                             {dataset?.title ?? dataset?.name}{' '}
                         </h1>
                         {session?.data?.user && (
-                            <span className="rounded-full h-fit text-sm lg:text-xs px-2 py-y border border-gray-400 capitalize">
+                            <span
+                                className={`rounded-full h-fit text-sm lg:text-xs px-2 py-y border border-gray-400 capitalize ${higlighted(
+                                    'visibility_type'
+                                )}`}
+                            >
                                 {dataset?.visibility_type}
                             </span>
                         )}
                     </div>
-                    <p className=" text-justify text-base font-light leading-snug text-stone-900">
+                    <p
+                        className={`text-justify text-base font-light leading-snug text-stone-900 ${higlighted(
+                            'short_description'
+                        )}`}
+                    >
                         {dataset?.short_description ?? 'No description'}
                     </p>
                     <div className="flex flex-wrap gap-4 py-4">
@@ -392,7 +432,11 @@ export function DatasetHeader({
                         <div className="flex gap-x-1">
                             <ArrowPathIcon className="h-5 w-5 text-blue-800" />
                             <div>
-                                <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
+                                <div
+                                    className={`whitespace-nowrap text-sm font-semibold text-neutral-700 ${higlighted(
+                                        'metadata_modified'
+                                    )}`}
+                                >
                                     Last Updated
                                 </div>
                                 <div className="text-sm font-light text-stone-900">
@@ -409,7 +453,14 @@ export function DatasetHeader({
                             <div className="flex gap-x-1">
                                 <ClockIcon className="h-5 w-5 text-blue-800" />
                                 <div>
-                                    <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
+                                    <div
+                                        className={`whitespace-nowrap text-sm font-semibold text-neutral-700 ${
+                                            higlighted(
+                                                'temporal_coverage_start'
+                                            ) ??
+                                            higlighted('temporal_coverage_end')
+                                        }`}
+                                    >
                                         Temporal coverage
                                     </div>
                                     <div className="text-sm font-light text-stone-900">
@@ -427,7 +478,11 @@ export function DatasetHeader({
                     <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-x-3 rounded-sm bg-cyan-700 bg-opacity-10 p-3">
                         <ExclamationTriangleIcon className="col-span-1 grow max-h-8 max-w-8 text-yellow-600 sm:h-12 sm:w-12" />
                         <div className="col-span-11">
-                            <span className=" font-acumin text-sm font-semibold leading-none text-black">
+                            <span
+                                className={` font-acumin text-sm font-semibold leading-none text-black ${higlighted(
+                                    'cautions'
+                                )}`}
+                            >
                                 Caution:{' '}
                             </span>
                             <div
@@ -451,13 +506,21 @@ export function DatasetHeader({
                     )}
                     {session.data?.user ? (
                         dataset?.technical_notes ? (
-                            <div className="flex items-center rounded-[3px] border border-green-500 bg-green-500">
+                            <div
+                                className={`flex items-center rounded-[3px] border border-green-500 bg-green-500 ${higlighted(
+                                    'technical_notes'
+                                )}`}
+                            >
                                 <div className="px-2 font-acumin text-xs font-medium text-white">
                                     RDI approved
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex items-center rounded-[3px] border border-orange-400 bg-orange-400">
+                            <div
+                                className={`flex items-center rounded-[3px] border border-orange-400 bg-orange-400 ${higlighted(
+                                    'technical_notes'
+                                )}`}
+                            >
                                 <div className="px-2 font-acumin text-xs font-medium text-white">
                                     Awaiting RDI approval
                                 </div>
@@ -506,7 +569,11 @@ export function DatasetHeader({
                         rel="noopener noreferrer"
                         className="flex items-center gap-x-1 pt-4 w-fit"
                     >
-                        <LinkIcon className="h-4 w-4 text-wri-green" />
+                        <LinkIcon
+                            className={`h-4 w-4 text-wri-green ${higlighted(
+                                'technical_notes'
+                            )}`}
+                        />
                         <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
                             Technical Notes
                         </div>

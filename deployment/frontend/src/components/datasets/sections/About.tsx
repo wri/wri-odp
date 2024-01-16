@@ -4,7 +4,23 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { LinkIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 
-export function About({ dataset }: { dataset: WriDataset }) {
+export function About({
+    dataset,
+    isCurrentVersion,
+    diffFields,
+}: {
+    dataset: WriDataset
+    isCurrentVersion?: boolean
+    diffFields: string[]
+}) {
+    const higlighted = (field: string) => {
+        if (diffFields && isCurrentVersion) {
+            if (diffFields.includes(field)) {
+                return 'bg-yellow-200'
+            }
+        }
+        return ''
+    }
     return (
         <div className="flex flex-col gap-y-4 py-2">
             <div className="font-acumin text-base font-normal text-black">
@@ -17,20 +33,35 @@ export function About({ dataset }: { dataset: WriDataset }) {
                     rel="noopener noreferrer"
                     className="inline-flex gap-x-1 font-acumin text-sm font-semibold text-wri-green"
                 >
-                    <LinkIcon className="h-4 w-4" />
+                    <LinkIcon
+                        className={`h-4 w-4  ${higlighted('technical_notes')}`}
+                    />
                     Technical Notes
                 </a>
             )}
-            <div className="flex flex-wrap gap-[0.35rem]">
-                {dataset.tags?.map((tag) => (
-                    <Pill text={tag.display_name ?? tag.name} />
+            <div className={'flex flex-wrap gap-[0.35rem]'}>
+                {dataset.tags?.map((tag, index) => (
+                    <Pill
+                        key={index}
+                        text={tag.display_name ?? tag.name}
+                        className={`
+                        ${
+                            higlighted(`tags[${index}].display_name`) ??
+                            higlighted(`tags[${index}].name`)
+                        }
+                    `}
+                    />
                 ))}
             </div>
             <div className="flex flex-col gap-y-2">
                 {dataset.project && (
                     <div className="flex items-center gap-x-1">
                         <>
-                            <dt className="font-acumin text-sm font-semibold text-neutral-700">
+                            <dt
+                                className={`font-acumin text-sm font-semibold text-neutral-700 ${higlighted(
+                                    'project'
+                                )}`}
+                            >
                                 {' '}
                                 Project:
                             </dt>
@@ -48,9 +79,15 @@ export function About({ dataset }: { dataset: WriDataset }) {
                                 Topics:{' '}
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
-                                {dataset.groups
-                                    .map((topic, topicIdx) => <Link href={`/topics/${topic.name}`}>{topic.display_name}{dataset.groups && topicIdx !== dataset.groups?.length - 1 ? ', ' : ''}</Link>)
-                                    }
+                                {dataset.groups.map((topic, topicIdx) => (
+                                    <Link href={`/topics/${topic.name}`}>
+                                        {topic.display_name}
+                                        {dataset.groups &&
+                                        topicIdx !== dataset.groups?.length - 1
+                                            ? ', '
+                                            : ''}
+                                    </Link>
+                                ))}
                             </dd>
                         </>
                     </div>
@@ -58,7 +95,11 @@ export function About({ dataset }: { dataset: WriDataset }) {
                 {dataset.license_title && (
                     <div className="flex items-center gap-x-1">
                         <>
-                            <dt className="font-acumin text-sm font-semibold text-neutral-700">
+                            <dt
+                                className={`font-acumin text-sm font-semibold text-neutral-700 ${higlighted(
+                                    'license_title'
+                                )}`}
+                            >
                                 License:{' '}
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
@@ -84,7 +125,11 @@ export function About({ dataset }: { dataset: WriDataset }) {
                 <div>
                     {dataset.citation && (
                         <>
-                            <h3 className="font-acumin text-base font-normal text-black">
+                            <h3
+                                className={`font-acumin text-base font-normal text-black ${higlighted(
+                                    'citation'
+                                )}`}
+                            >
                                 Citation
                             </h3>
                             <p className="text-justify font-acumin text-sm font-light text-stone-900">
@@ -95,7 +140,11 @@ export function About({ dataset }: { dataset: WriDataset }) {
                 </div>
                 {dataset?.notes && (
                     <div>
-                        <h3 className="font-acumin text-base font-normal text-black">
+                        <h3
+                            className={`font-acumin text-base font-normal text-black ${higlighted(
+                                'notes'
+                            )}`}
+                        >
                             About
                         </h3>
                         <TextWithReadMore
@@ -117,7 +166,11 @@ export function About({ dataset }: { dataset: WriDataset }) {
                 )}
                 {dataset?.reason_for_adding && (
                     <div>
-                        <h3 className="font-acumin text-base font-normal text-black">
+                        <h3
+                            className={`font-acumin text-base font-normal text-black ${higlighted(
+                                'reason_for_adding'
+                            )}`}
+                        >
                             Reasons for adding
                         </h3>
                         <TextWithReadMore
@@ -139,7 +192,11 @@ export function About({ dataset }: { dataset: WriDataset }) {
                 )}
                 {dataset?.restrictions && (
                     <div>
-                        <h3 className="font-acumin text-base font-normal text-black">
+                        <h3
+                            className={`font-acumin text-base font-normal text-black ${higlighted(
+                                'restrictions'
+                            )}`}
+                        >
                             Restrictions
                         </h3>
                         <TextWithReadMore
@@ -164,9 +221,11 @@ export function About({ dataset }: { dataset: WriDataset }) {
     )
 }
 
-function Pill({ text }: { text: string }) {
+function Pill({ text, className }: { text: string; className?: string }) {
     return (
-        <div className="rounded-sm border border-blue-800 bg-white px-3 py-[0.35rem] text-xs">
+        <div
+            className={`rounded-sm border border-blue-800 bg-white px-3 py-[0.35rem] text-xs ${className}`}
+        >
             {text}
         </div>
     )

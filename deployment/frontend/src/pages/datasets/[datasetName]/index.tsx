@@ -16,7 +16,11 @@ import { Methodology } from '@/components/datasets/sections/Methodology'
 import { RelatedDatasets } from '@/components/datasets/sections/RelatedDatasets'
 import { getServerAuthSession } from '@/server/auth'
 import { api } from '@/utils/api'
-import { getAllDatasetFq, getOneDataset } from '@/utils/apiUtils'
+import {
+    getAllDatasetFq,
+    getOneDataset,
+    getOnePendingDataset,
+} from '@/utils/apiUtils'
 import { Tab } from '@headlessui/react'
 import { Index } from 'flexsearch'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
@@ -32,6 +36,7 @@ import { useIsAddingLayers } from '@/utils/storeHooks'
 import { decodeMapParam } from '@/utils/urlEncoding'
 import { WriDataset } from '@/schema/ckan.schema'
 import { User } from '@portaljs/ckan'
+import { record, string } from 'zod'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -57,7 +62,21 @@ export async function getServerSideProps(
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
     try {
-        const dataset = await getOneDataset(datasetName, session)
+        const prevdataset = await getOneDataset(datasetName, session)
+        const pendingDataset = await getOnePendingDataset(
+            prevdataset.id,
+            session
+        )
+        let dataset: WriDataset = prevdataset
+
+        const pendingExist =
+            pendingDataset && Object.keys(pendingDataset).length > 0
+                ? true
+                : false
+
+        if (pendingExist) {
+            dataset = pendingDataset
+        }
 
         let relatedDatasets: WriDataset[] = []
         if (dataset.groups?.length) {
@@ -81,13 +100,44 @@ export async function getServerSideProps(
             )
         }
 
+        let prevRelatedDatasets: WriDataset[] = []
+        if (pendingExist) {
+            if (prevdataset.groups?.length) {
+                let groupDatasets = await getAllDatasetFq({
+                    apiKey: session?.user.apikey ?? '',
+                    query: { search: '', page: { start: 0, rows: 50 } },
+                    fq:
+                        prevdataset?.groups && prevdataset.groups.length > 0
+                            ? `groups:
+                              ${
+                                  prevdataset?.groups
+                                      ?.map((group) => group.name)
+                                      .join(' OR ') ?? ''
+                              }
+                      `
+                            : '',
+                })
+
+                prevRelatedDatasets = groupDatasets.datasets.filter(
+                    (d) => d.id != prevdataset.id
+                )
+            }
+        }
+
+        console.log('DATASET: ', pendingDataset)
         return {
             props: {
                 dataset: {
                     ...dataset,
                     spatial: dataset.spatial ?? null,
                 },
+                prevdataset: {
+                    ...prevdataset,
+                    spatial: prevdataset.spatial ?? null,
+                },
+                pendingExist: pendingExist,
                 datasetName,
+                datasetId: dataset.id,
                 initialZustandState: {
                     dataset,
                     relatedDatasets,
@@ -109,22 +159,46 @@ export async function getServerSideProps(
 export default function DatasetPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const { dataset } = props
-
+    const { dataset, prevdataset } = props
+    const [isCurrentVersion, setIsCurrentVersion] = useState<boolean>(false)
     const datasetName = props.datasetName as string
+    const datasetId = props.datasetId!
+    const pendingExist = props.pendingExist!
     const router = useRouter()
     const { query } = router
     const isApprovalRequest = query?.approval === 'true'
     const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers()
     const session = useSession()
+
     const {
         data: datasetData,
         error: datasetError,
         isLoading,
-    } = api.dataset.getOneDataset.useQuery(
-        { id: datasetName },
+    } = api.dataset.getOneActualOrPendingDataset.useQuery(
+        { id: datasetId, isPending: pendingExist },
         { retry: 0, initialData: dataset }
     )
+
+    const {
+        data: prevDatasetData,
+        error: prevDatasetError,
+        isLoading: isLoadingPrev,
+        fetchStatus,
+    } = api.dataset.getOneDataset.useQuery(
+        { id: datasetName },
+        { retry: 0, initialData: prevdataset, enabled: !!pendingExist }
+    )
+
+    const { data: diffData, isLoading: isLoadingDiff } =
+        api.dataset.showPendingDiff.useQuery(
+            {
+                id: datasetId,
+            },
+            {
+                enabled: !!pendingExist,
+                retry: 0,
+            }
+        )
     if (!datasetData && datasetError) router.replace('/datasets/404')
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
@@ -219,7 +293,39 @@ export default function DatasetPage(
         },
     ]
 
-    if (isLoading || !datasetData) {
+    let diffFields: string[] = []
+
+    if (pendingExist && diffData) {
+        diffFields = Object.keys(diffData)
+    }
+
+    let resourceDiffValues: Array<
+        Record<string, { old_value: string; new_value: string }>
+    > = []
+    if (pendingExist && diffData) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const resourceDiff = Object.keys(diffData).reduce(
+            (previous, current) => {
+                if (current.includes('resource')) {
+                    const resource = current.split('.')[0]!
+                    const field = current.split('.')[1]!
+                    return {
+                        ...previous,
+                        [resource]: {
+                            ...previous[resource],
+                            [field]: diffData[current],
+                        },
+                    }
+                }
+                return previous
+            },
+            {} as Record<string, Record<string, never>>
+        )
+
+        resourceDiffValues = Object.values(resourceDiff)
+    }
+
+    if (isLoading || !datasetData || isLoadingPrev || isLoadingDiff) {
         return (
             <>
                 <Header />
@@ -255,9 +361,16 @@ export default function DatasetPage(
                     ) : (
                         <>
                             <DatasetHeader
-                                dataset={datasetData}
+                                dataset={
+                                    isCurrentVersion
+                                        ? prevDatasetData
+                                        : datasetData
+                                }
                                 tabularResource={tabularResource}
                                 setTabularResource={setTabularResource}
+                                isCurrentVersion={isCurrentVersion}
+                                diffFields={diffFields}
+                                setIsCurrentVersion={setIsCurrentVersion}
                             />
                             <div className="px-4 sm:px-6">
                                 <Tab.Group as="div">
@@ -276,7 +389,11 @@ export default function DatasetPage(
                                         <Tab.Panels as="div">
                                             <Tab.Panel as="div">
                                                 <DataFiles
-                                                    dataset={datasetData}
+                                                    dataset={
+                                                        isCurrentVersion
+                                                            ? prevDatasetData
+                                                            : datasetData
+                                                    }
                                                     index={index}
                                                     tabularResource={
                                                         tabularResource
@@ -284,10 +401,26 @@ export default function DatasetPage(
                                                     setTabularResource={
                                                         setTabularResource
                                                     }
+                                                    isCurrentVersion={
+                                                        isCurrentVersion
+                                                    }
+                                                    diffFields={
+                                                        resourceDiffValues
+                                                    }
                                                 />
                                             </Tab.Panel>
                                             <Tab.Panel as="div">
-                                                <About dataset={datasetData} />
+                                                <About
+                                                    dataset={
+                                                        isCurrentVersion
+                                                            ? prevDatasetData
+                                                            : datasetData
+                                                    }
+                                                    isCurrentVersion={
+                                                        isCurrentVersion
+                                                    }
+                                                    diffFields={diffFields}
+                                                />
                                             </Tab.Panel>
                                             {datasetData.methodology && (
                                                 <Tab.Panel as="div">

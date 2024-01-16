@@ -11,7 +11,10 @@ import {
     getAllUsers,
     upsertCollaborator,
     deleteCollaborator,
-    sendIssueOrCommentNotigication
+    sendIssueOrCommentNotigication,
+    getUser,
+    sendGroupNotification,
+    getOnePendingDataset
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -20,6 +23,7 @@ import type {
     Issue,
     WriDataset,
     FolloweeList,
+    PendingDataset,
 } from '@/schema/ckan.schema'
 import {
     DatasetFormType,
@@ -1097,5 +1101,274 @@ export const DatasetRouter = createTRPCRouter({
             }
             return data
         }),
+    getPendingDatasets: protectedProcedure
+        .input(searchSchema)
+        .query(async ({ input, ctx }) => {
+            const dataset = (await getAllDatasetFq({
+                apiKey: ctx.session.user.apikey,
+                fq: `approval_status:pending`, // TODO: Vverify if organization admin can only see this and sysadmin
+                query: input,
+            }))!
+
+            // using getUser function, get user details per dataset
+            const resultdata = await Promise.all(
+                dataset.datasets.map(async (dataset) => {
+                    const user = await getUser({ userId: dataset.creator_user_id, apiKey: ctx.session.user.apikey })
+                    const issuesRes = await fetch(
+                        `${env.CKAN_URL}/api/action/issue_search?dataset_id=${dataset.id}`,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `${ctx.session.user.apikey}`,
+                            },
+                        }
+                    )
+                    const issues: CkanResponse<{ count: number; results: Issue[] }> =
+                        await issuesRes.json()
+                    if (!issues.success && issues.error) {
+                        if (issues.error.message) throw Error(issues.error.message)
+                        throw Error(JSON.stringify(issues.error))
+                    }
+                    console.log("ISSUES: ", issues)
+                    return {
+                        ...dataset,
+                        user: user,
+                        issue_count: issues.result.count,
+                    }
+                })
+            )
+            return {
+                datasets: resultdata as WriDataset[],
+                count: dataset.count,
+            }
+        }),
+    
+    approvePendingDataset: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ input, ctx }) => {
+             const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${input.id}`,
+                {
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const data = (await response.json()) as CkanResponse<PendingDataset>
+            if (!data.success && data.error) throw Error(JSON.stringify(data.error))
+            
+            let submittedDataset: WriDataset;
+            if (data.result && Object.keys(data.result.package_data).length > 0) {
+                submittedDataset = data.result.package_data
+                submittedDataset.approval_status = "approved"
+                submittedDataset.draft = true
+            }
+            else {
+                // fetch dataset from package_show
+                const datasetRes = await fetch(
+                    `${env.CKAN_URL}/api/action/package_show?id=${input.id}`,
+                    {
+                        headers: {
+                            Authorization: ctx.session.user.apikey,
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                )
+                const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
+                if (!dataset.success && dataset.error) throw Error(JSON.stringify(dataset.error))
+                submittedDataset = dataset.result
+                submittedDataset.approval_status = "approved"
+                submittedDataset.draft = true
+            }
+
+            // delete pending dataset
+            const deleteResponse = await fetch(
+                `${env.CKAN_URL}/api/3/action/pending_dataset_delete`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ id: input.id }),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const deleteData = (await deleteResponse.json()) as CkanResponse<null>
+            if (!deleteData.success && deleteData.error) throw Error(JSON.stringify(deleteData.error))
+
+            // create dataset
+            // TODO before create ensure layers make a call to RW API to ensure layers are created
+            const datasetRes = await fetch(
+                    `${env.CKAN_URL}/api/action/package_create`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${ctx.session.user.apikey}`,
+                        },
+                        body: JSON.stringify(submittedDataset),
+                    }
+                )
+            const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
+            if (!dataset.success && dataset.error) {
+                if (dataset.error.message)
+                    throw Error(dataset.error.message)
+                throw Error(JSON.stringify(dataset.error))
+            }
+
+            
+
+            // send notification to user
+            try {
+                 // get dataset collaborators id
+                const collab =  await fetchDatasetCollabIds(
+                   dataset.result.id,
+                    ctx.session.user.apikey,
+                )
+                await sendGroupNotification({
+                    owner_org:  dataset.result.owner_org? dataset.result.owner_org : null,
+                    creator_id:  dataset.result.creator_user_id,
+                    collaborator_id: collab,
+                    dataset_id: dataset.result.id,
+                    session: ctx.session,
+                    action: "approved_dataset"
+                })
+            }
+            catch (error) {
+                console.log(error)
+                throw Error("Error in sending issue /comment notification")
+            }
+        }),
+    //create pending dataset, only takes in dataset id, and JSon object
+    createPendingDataset: protectedProcedure
+        .input(z.object({ id: z.string(), data: z.string() }))
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/pending_dataset_create`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        package_id: input.id,
+                        package_data: JSON.parse(input.data) as WriDataset,
+                    }),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const data = (await response.json()) as CkanResponse<PendingDataset>
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
+        }),
+     updatePendingDataset: protectedProcedure
+        .input(z.object({ id: z.string(), data: z.string() }))
+        .mutation(async ({ input, ctx }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/pending_dataset_update`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        package_id: input.id,
+                        package_data: JSON.parse(input.data) as WriDataset & {last_modified: string},
+                    }),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const data = (await response.json()) as CkanResponse<PendingDataset>
+            if (!data.success && data.error) throw Error(data.error.message)
+            return data
+        }),
+    // show pending dataset, only takes in dataset id
+    showPendingDataset: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/pending_dataset_show?id=${input.id}`,
+                {
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const data = (await response.json()) as CkanResponse<PendingDataset>
+            if (!data.success && data.error) throw Error(data.error.message)
+            const dataset = data.result.package_data
+    
+            let spatial = null
+            if (dataset.spatial) {
+                try {
+                    spatial = JSON.parse(dataset.spatial)
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+            
+            return {
+                ...data.result.package_data,
+                open_in: dataset.open_in ? Object.values(dataset.open_in) : [],
+                spatial
+            }
+        }),
+    
+    getOneActualOrPendingDataset: publicProcedure
+        .input(z.object({ id: z.string(), isPending: z.boolean() }))
+        .query(async ({ input, ctx }) => {
+            let dataset: WriDataset;
+            if (input.isPending) {
+                dataset = await getOnePendingDataset(input.id, ctx.session)
+            }
+            else {
+                dataset = await getOneDataset(input.id, ctx.session)
+            }
+            const resources = await Promise.all(
+                dataset.resources.map(async (r) => {
+                    if (r.url_type === 'upload' || r.url_type === 'link')
+                        return r
+                    if (!r.url) return r
+                    const layerObj = await getLayerRw(r.url)
+                    if (r.url_type === 'layer')
+                        return {
+                            ...r,
+                            layerObj: convertLayerObjToForm(layerObj),
+                        }
+                    if (r.url_type === 'layer-raw')
+                        return {
+                            ...r,
+                            layerObjRaw: getRawObjFromApiSpec(layerObj),
+                        }
+                    return r
+                })
+            )
+            return { ...dataset, resources }
+
+         }),
+    
+    // show pending diff
+    showPendingDiff: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/pending_diff_show?package_id=${input.id}`,
+                {
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const packageData = (await response.json()) as CkanResponse<Record<string, Record<string, never>>>
+            if (!packageData.success && packageData.error) {
+                if (packageData.error.message) throw Error(packageData.error.message)
+                throw Error(JSON.stringify(packageData.error))
+            }
+            return packageData.result
+        }),
+    
     
 })
