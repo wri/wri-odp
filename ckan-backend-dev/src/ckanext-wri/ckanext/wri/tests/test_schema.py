@@ -35,8 +35,9 @@ def test_package_create():
         "temporal_coverage_end": "2011",
         "update_frequency": "annually",
         "citation": "Citation information",
-        "visibility_type": "draft",
+        "visibility_type": "public",
         "license_id": "cc-by-4.0",
+        "draft": False,
         "featured_dataset": True,
         "short_description": "A short description of the dataset",
         "notes": "Some useful notes about the data",
@@ -85,6 +86,7 @@ def test_package_create():
     assert result["citation"] == dataset["citation"]
     assert result["visibility_type"] == dataset["visibility_type"]
     assert result["license_id"] == dataset["license_id"]
+    assert result["draft"] is False
     assert result["featured_dataset"] is True
     assert result["short_description"] == dataset["short_description"]
     assert result["notes"] == dataset["notes"]
