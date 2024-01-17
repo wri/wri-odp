@@ -27,7 +27,7 @@ DATASTORE_URLS = {
 
 
 @flow(log_prints=True)
-def push_to_datastore(resource_id: str):
+def push_to_datastore(resource_id = "test_id"):
     logger = get_run_logger()
     qsv_bin = "/home/luccas/.cargo/bin/qsvdp"
     file_bin = "/usr/bin/file"
