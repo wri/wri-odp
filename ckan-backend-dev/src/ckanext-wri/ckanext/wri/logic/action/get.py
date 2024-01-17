@@ -479,15 +479,19 @@ def pending_diff_show(context: Context, data_dict: DataDict):
     dataset_diff = None
 
     try:
-        pending_dataset = PendingDatasets.get(package_id=package_id).get("package_data")
-        existing_dataset = get_action("package_show")(context, {"id": package_id})
-        dataset_diff = _diff(existing_dataset, pending_dataset)
+        pending_dataset = PendingDatasets.get(package_id=package_id)
+        log.error("===============pending dataset=================")
+        log.error(pending_dataset)
+        if pending_dataset is not None:
+            pending_dataset = pending_dataset.get("package_data")
+            existing_dataset = get_action("package_show")(context, {"id": package_id})
+            dataset_diff = _diff(existing_dataset, pending_dataset)
     except Exception as e:
         log.error(e)
         raise tk.ValidationError(e)
 
     if not dataset_diff:
-        dataset_diff = None
+        dataset_diff = {}
         # raise logic.NotFound(
         #     _("Diff not found for Pending Dataset: {}".format(package_id))
         # )

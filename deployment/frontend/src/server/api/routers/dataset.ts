@@ -1422,11 +1422,18 @@ export const DatasetRouter = createTRPCRouter({
                     },
                 }
             )
+            
             const packageData = (await response.json()) as CkanResponse<Record<string, { old_value: string; new_value: string }>>
+            
             if (!packageData.success && packageData.error) {
                 if (packageData.error.message) throw Error(packageData.error.message)
                 throw Error(JSON.stringify(packageData.error))
             }
+
+            if (Object.keys(packageData.result).length === 0) {
+                return null
+             }
+
             return packageData.result
         }),
     

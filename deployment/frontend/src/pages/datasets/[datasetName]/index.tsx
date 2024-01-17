@@ -205,8 +205,7 @@ export default function DatasetPage(
         }
     )
     if (!datasetData && datasetError) {
-        // router.replace('/datasets/404')
-        console.log('FAILED')
+        router.replace('/datasets/404')
     }
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
