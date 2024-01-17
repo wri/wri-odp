@@ -124,6 +124,10 @@ export async function getServerSideProps(
             }
         }
 
+        if (!dataset?.resources) {
+            dataset.resources = []
+        }
+
         return {
             props: {
                 dataset: {
@@ -168,10 +172,6 @@ export default function DatasetPage(
     const isApprovalRequest = query?.approval === 'true'
     const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers()
     const session = useSession()
-
-    // console.log('DATASET: ', dataset)
-    // console.log('PREVDATASET: ', prevdataset)
-    // console.log('PENDING EXIST: ', pendingExist)
 
     const {
         data: datasetData,

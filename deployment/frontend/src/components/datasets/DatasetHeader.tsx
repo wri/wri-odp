@@ -381,7 +381,7 @@ export function DatasetHeader({
                 <div className="flex max-w-[560px] flex-col gap-y-2">
                     <h2
                         className={`text-xs font-bold uppercase leading-none tracking-wide text-green-700 ${higlighted(
-                            'organization.title'
+                            'organization'
                         )} `}
                     >
                         {dataset?.organization?.title ?? 'No Team'}
