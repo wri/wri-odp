@@ -583,7 +583,13 @@ export async function getOnePendingDataset(
         }
     )
     const data = (await response.json()) as CkanResponse<PendingDataset>
-    if (!data.success && data.error) throw Error(data.error.message)
+    if (!data.success && data.error) {
+        const erroInfo = JSON.stringify(data.error).toLowerCase()
+        if (erroInfo.includes('not found')) {
+            return null
+         }
+        throw Error(JSON.stringify(data.error))
+    }
     const dataset = data.result.package_data
     
     let spatial = null

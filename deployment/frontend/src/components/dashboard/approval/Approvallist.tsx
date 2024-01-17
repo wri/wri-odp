@@ -13,6 +13,7 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import { SearchInput } from '@/schema/search.schema'
 import Pagination from '@/components/dashboard/_shared/Pagination'
 import { useSession } from 'next-auth/react'
+import notify from '@/utils/notify'
 
 export default function Approvallist() {
     const { data: session } = useSession()
@@ -34,8 +35,17 @@ export default function Approvallist() {
         onSuccess: async (data) => {
             await refetch()
             setApproveOpen(false)
+            notify(
+                `Successfully approved the dataset ${
+                    selectDataset?.name ?? selectDataset?.title
+                }`,
+                'success'
+            )
         },
-        onError: (error) => setErrorMessage(error.message),
+        onError: (error) => {
+            setErrorMessage(error.message)
+            setApproveOpen(false)
+        },
     })
 
     const handleOpenModal = (

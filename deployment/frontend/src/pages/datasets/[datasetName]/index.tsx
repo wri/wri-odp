@@ -74,7 +74,7 @@ export async function getServerSideProps(
                 ? true
                 : false
 
-        if (pendingExist) {
+        if (pendingExist && pendingDataset) {
             dataset = pendingDataset
         }
 
@@ -124,7 +124,6 @@ export async function getServerSideProps(
             }
         }
 
-        console.log('DATASET: ', pendingDataset)
         return {
             props: {
                 dataset: {
@@ -170,6 +169,10 @@ export default function DatasetPage(
     const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers()
     const session = useSession()
 
+    // console.log('DATASET: ', dataset)
+    // console.log('PREVDATASET: ', prevdataset)
+    // console.log('PENDING EXIST: ', pendingExist)
+
     const {
         data: datasetData,
         error: datasetError,
@@ -183,28 +186,34 @@ export default function DatasetPage(
         data: prevDatasetData,
         error: prevDatasetError,
         isLoading: isLoadingPrev,
-        fetchStatus,
     } = api.dataset.getOneDataset.useQuery(
         { id: datasetName },
         { retry: 0, initialData: prevdataset, enabled: !!pendingExist }
     )
 
-    const { data: diffData, isLoading: isLoadingDiff } =
-        api.dataset.showPendingDiff.useQuery(
-            {
-                id: datasetId,
-            },
-            {
-                enabled: !!pendingExist,
-                retry: 0,
-            }
-        )
-    if (!datasetData && datasetError) router.replace('/datasets/404')
+    const {
+        data: diffData,
+        isLoading: isLoadingDiff,
+        fetchStatus,
+    } = api.dataset.showPendingDiff.useQuery(
+        {
+            id: datasetId,
+        },
+        {
+            enabled: !!pendingExist,
+            retry: 0,
+        }
+    )
+    if (!datasetData && datasetError) {
+        // router.replace('/datasets/404')
+        console.log('FAILED')
+    }
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
         { id: datasetName },
         { enabled: !!session.data?.user.apikey, retry: false }
     )
+
     const issues = api.dataset.getDatasetIssues.useQuery(
         { id: datasetName },
         { enabled: !!session.data?.user.apikey, retry: false }
@@ -293,7 +302,7 @@ export default function DatasetPage(
         },
     ]
 
-    let diffFields: string[] = []
+    let diffFields: string[] | never[] = []
 
     if (pendingExist && diffData) {
         diffFields = Object.keys(diffData)
@@ -303,29 +312,36 @@ export default function DatasetPage(
         Record<string, { old_value: string; new_value: string }>
     > = []
     if (pendingExist && diffData) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const resourceDiff = Object.keys(diffData).reduce(
-            (previous, current) => {
-                if (current.includes('resource')) {
-                    const resource = current.split('.')[0]!
-                    const field = current.split('.')[1]!
-                    return {
-                        ...previous,
-                        [resource]: {
-                            ...previous[resource],
-                            [field]: diffData[current],
-                        },
-                    }
+        let resourceDiff: Record<
+            string,
+            Record<string, { old_value: string; new_value: string }>
+        > = {}
+
+        for (const current in diffData) {
+            if (current.includes('resource')) {
+                const resource = current.split('.')[0]!
+                const field = current.split('.')[1]!
+
+                if (!resourceDiff[resource]) {
+                    resourceDiff[resource] = {}
                 }
-                return previous
-            },
-            {} as Record<string, Record<string, never>>
-        )
+
+                resourceDiff = {
+                    ...resourceDiff,
+                    [resource]: {
+                        ...resourceDiff[resource],
+                        [field]: diffData[current]!,
+                    },
+                }
+            }
+        }
 
         resourceDiffValues = Object.values(resourceDiff)
     }
 
-    if (isLoading || !datasetData || isLoadingPrev || isLoadingDiff) {
+    const shouldLoad = pendingExist ? isLoadingDiff : false
+    console.log('SHOULD LOAD: ', prevDatasetData)
+    if (isLoading || !datasetData || isLoadingPrev || shouldLoad) {
         return (
             <>
                 <Header />
@@ -336,6 +352,8 @@ export default function DatasetPage(
             </>
         )
     }
+
+    console.log('QUERY: ', diffFields)
 
     return (
         <>
@@ -350,6 +368,8 @@ export default function DatasetPage(
                     datasetName={datasetData.name}
                     owner_org={datasetData?.owner_org || null}
                     creator_id={datasetData?.creator_user_id || null}
+                    datasetId={datasetData.id}
+                    diffField={diffFields}
                 />
             )}
             <DatasetPageLayout
@@ -389,6 +409,7 @@ export default function DatasetPage(
                                         <Tab.Panels as="div">
                                             <Tab.Panel as="div">
                                                 <DataFiles
+                                                    //@ts-ignore
                                                     dataset={
                                                         isCurrentVersion
                                                             ? prevDatasetData
@@ -411,6 +432,7 @@ export default function DatasetPage(
                                             </Tab.Panel>
                                             <Tab.Panel as="div">
                                                 <About
+                                                    //@ts-ignore
                                                     dataset={
                                                         isCurrentVersion
                                                             ? prevDatasetData

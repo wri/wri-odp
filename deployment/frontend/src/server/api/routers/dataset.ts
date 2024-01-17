@@ -51,7 +51,7 @@ import {
 import { sendMemberNotifications } from '@/utils/apiUtils'
 import { TRPCError } from '@trpc/server'
 import { CommentSchema, IssueSchema } from '@/schema/issue.schema'
-import { throws } from 'assert'
+
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -1111,7 +1111,7 @@ export const DatasetRouter = createTRPCRouter({
                 fq += `+creator_user_id:${ctx.session.user.id}`
             }
 
-            if (!ctx.session.user.sysadmin || !input._isUserSearch) {
+            if (!ctx.session.user.sysadmin && !input._isUserSearch) {
                 const organizations = await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey });
                 let orgsFq = `organization:(${organizations?.map(org => org.name).join(" OR ")})`;
                 
@@ -1171,13 +1171,13 @@ export const DatasetRouter = createTRPCRouter({
                 }
             )
             const data = (await response.json()) as CkanResponse<PendingDataset>
-            if (!data.success && data.error) throw Error(JSON.stringify(data.error))
+            if (!data.success && data.error) throw Error(JSON.stringify(data.error).concat("pending_dataset_show"))
             
             let submittedDataset: WriDataset;
             if (data.result && Object.keys(data.result.package_data).length > 0) {
                 submittedDataset = data.result.package_data
                 submittedDataset.approval_status = "approved"
-                submittedDataset.draft = true
+                submittedDataset.draft = false
             }
             else {
                 // fetch dataset from package_show
@@ -1191,10 +1191,10 @@ export const DatasetRouter = createTRPCRouter({
                     }
                 )
                 const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
-                if (!dataset.success && dataset.error) throw Error(JSON.stringify(dataset.error))
+                if (!dataset.success && dataset.error) throw Error(JSON.stringify(dataset.error).concat("package_show"))
                 submittedDataset = dataset.result
                 submittedDataset.approval_status = "approved"
-                submittedDataset.draft = true
+                submittedDataset.draft = false
             }
 
             // delete pending dataset
@@ -1202,20 +1202,21 @@ export const DatasetRouter = createTRPCRouter({
                 `${env.CKAN_URL}/api/3/action/pending_dataset_delete`,
                 {
                     method: 'POST',
-                    body: JSON.stringify({ id: input.id }),
+                    body: JSON.stringify({ package_id: input.id}),
                     headers: {
-                        Authorization: ctx.session.user.apikey,
+                        Authorization: `${env.SYS_ADMIN_API_KEY}`,
                         'Content-Type': 'application/json',
                     },
                 }
             )
+
             const deleteData = (await deleteResponse.json()) as CkanResponse<null>
-            if (!deleteData.success && deleteData.error) throw Error(JSON.stringify(deleteData.error))
+            if (!deleteData.success && deleteData.error) throw Error(JSON.stringify(deleteData.error).concat("pending_delete"))
 
             // create dataset
             // TODO before create ensure layers make a call to RW API to ensure layers are created
             const datasetRes = await fetch(
-                    `${env.CKAN_URL}/api/action/package_create`,
+                    `${env.CKAN_URL}/api/action/package_update`,
                     {
                         method: 'POST',
                         headers: {
@@ -1228,9 +1229,48 @@ export const DatasetRouter = createTRPCRouter({
             const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
             if (!dataset.success && dataset.error) {
                 if (dataset.error.message)
-                    throw Error(dataset.error.message)
-                throw Error(JSON.stringify(dataset.error))
+                    throw Error(JSON.stringify(dataset.error).concat("package_update"))
+                throw Error(JSON.stringify(dataset.error).concat("package_update"))
             }
+
+            // get and close all dataset issues
+            const issuesRes = await fetch(
+                `${env.CKAN_URL}/api/action/issue_search?dataset_id=${dataset.result.id}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${ctx.session.user.apikey}`,
+                    },
+                }
+            )
+            const issues: CkanResponse<{ count: number; results: Issue[] }> =
+                await issuesRes.json()
+            if (!issues.success && issues.error) {
+                if (issues.error.message) throw Error(issues.error.message)
+                throw Error(JSON.stringify(issues.error))
+            }
+
+            await Promise.all(
+                issues.result.results.map(async (issue) => {
+                    const inputData = {
+                        issue_number: issue.number,
+                        dataset_id: dataset.result.id,
+                        status: "closed",
+                    }
+                    const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_update`, {
+                        method: "POST",
+                        body: JSON.stringify(inputData),
+                        headers: {
+                            Authorization: ctx.session.user.apikey,
+                            'Content-Type': 'application/json',
+                        },
+                    })
+
+                    const data = (await response.json()) as CkanResponse<null>
+                    if (!data.success && data.error) throw Error(data.error.message)
+                    return issue
+                })
+            )
 
             
 
@@ -1254,6 +1294,7 @@ export const DatasetRouter = createTRPCRouter({
                 console.log(error)
                 throw Error("Error in sending issue /comment notification")
             }
+            return dataset.result
         }),
     //create pending dataset, only takes in dataset id, and JSon object
     createPendingDataset: protectedProcedure
@@ -1334,12 +1375,16 @@ export const DatasetRouter = createTRPCRouter({
     getOneActualOrPendingDataset: publicProcedure
         .input(z.object({ id: z.string(), isPending: z.boolean() }))
         .query(async ({ input, ctx }) => {
-            let dataset: WriDataset;
+            let dataset: WriDataset | null;
             if (input.isPending) {
                 dataset = await getOnePendingDataset(input.id, ctx.session)
             }
             else {
                 dataset = await getOneDataset(input.id, ctx.session)
+            }
+
+            if (!dataset) {
+                return null
             }
             const resources = await Promise.all(
                 dataset.resources.map(async (r) => {
@@ -1377,7 +1422,7 @@ export const DatasetRouter = createTRPCRouter({
                     },
                 }
             )
-            const packageData = (await response.json()) as CkanResponse<Record<string, Record<string, never>>>
+            const packageData = (await response.json()) as CkanResponse<Record<string, { old_value: string; new_value: string }>>
             if (!packageData.success && packageData.error) {
                 if (packageData.error.message) throw Error(packageData.error.message)
                 throw Error(JSON.stringify(packageData.error))

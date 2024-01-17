@@ -40,6 +40,7 @@ export const notificationRouter = createTRPCRouter({
         )
 
         const data = (await response.json()) as CkanResponse<NotificationType[]>
+        
         const activities = await Promise.all(
             data.result.map(async (notification: NotificationType) => {
                 let user_data = await getUser({

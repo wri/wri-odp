@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { Switch } from '@headlessui/react'
 import { DefaultTooltip } from '../_shared/Tooltip'
-
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
+import classNames from '@/utils/classnames'
 
 export default function ToggleVersion({
     enabled,

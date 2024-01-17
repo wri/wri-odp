@@ -58,7 +58,7 @@ function filteredDataset(dataset: WriDataset) {
 
 function Card({ approvalInfo }: { approvalInfo: WriDataset }) {
     const user = approvalInfo.user as User
-    user.name = user.email
+    user.name = user.email ?? user.name
     user.image_display_url = user?.image_display_url
         ? user?.image_display_url
         : `https://gravatar.com/avatar/${user?.email_hash}?s=270&d=identicon`
@@ -101,60 +101,87 @@ function SubCardProfile({
     data,
 }: {
     isLoading: boolean
-    diff: Record<string, Record<string, never>>
+    diff: Record<string, { old_value: string; new_value: string }>
     data: WriDataset
 }) {
     if (isLoading) return <Spinner className="mx-auto my-2" />
-
-    console.log('diff: ', diff)
+    console.log('Diff data: ', diff)
     return (
         <div className=" mx-auto w-4/5 my-4 max-h-[300px] overflow-auto">
-            <Table>
-                <TableHeader>
-                    <TableRow className="bg-neutral-50">
-                        <TableHead className="font-acumin text-xs font-semibold text-black">
-                            Field Name
-                        </TableHead>
-                        <TableHead className="font-acumin text-xs font-semibold text-black">
-                            New value
-                        </TableHead>
-                        <TableHead className="font-acumin text-xs font-semibold text-black">
-                            Old value
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {Object.keys(diff).length > 0
-                        ? Object.keys(diff).map((key) => {
-                              return (
-                                  <TableRow key={key} className="border-0">
-                                      <TableCell className="font-acumin text-xs font-normal text-black">
-                                          {key}
-                                      </TableCell>
-                                      <TableCell className="font-acumin text-xs font-normal text-black">
-                                          {diff[key]?.old_value}
-                                      </TableCell>
-                                      <TableCell className="font-acumin text-xs font-normal text-black">
-                                          {diff[key]?.new_value}
-                                      </TableCell>
-                                  </TableRow>
-                              )
-                          })
-                        : filteredDataset(data).map((key, index) => {
-                              return (
-                                  <TableRow key={index} className="border-0">
-                                      <TableCell className="font-acumin text-xs font-normal text-black">
-                                          {key.title}
-                                      </TableCell>
-                                      <TableCell className="font-acumin text-xs font-normal text-black">
-                                          {key.description}
-                                      </TableCell>
-                                      <TableCell className="font-acumin text-xs font-normal text-black"></TableCell>
-                                  </TableRow>
-                              )
-                          })}
-                </TableBody>
-            </Table>
+            {diff ? (
+                <>
+                    <p className="mb-3">Version Table:</p>
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-neutral-50">
+                                <TableHead className="font-acumin text-xs font-semibold text-black">
+                                    Field Name
+                                </TableHead>
+                                <TableHead className="font-acumin text-xs font-semibold text-black">
+                                    New value
+                                </TableHead>
+                                <TableHead className="font-acumin text-xs font-semibold text-black">
+                                    Old value
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {Object.keys(diff).length > 0 &&
+                                Object.keys(diff).map((key) => {
+                                    return (
+                                        <TableRow
+                                            key={key}
+                                            className="border-0"
+                                        >
+                                            <TableCell className="font-acumin text-xs font-normal text-black">
+                                                {key}
+                                            </TableCell>
+                                            <TableCell className="font-acumin text-xs font-normal text-black">
+                                                {diff[key]?.old_value}
+                                            </TableCell>
+                                            <TableCell className="font-acumin text-xs font-normal text-black">
+                                                {diff[key]?.new_value}
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })}
+                        </TableBody>
+                    </Table>
+                </>
+            ) : (
+                <>
+                    <p className="mb-3">
+                        No changes were made to this dataset. Table shows the
+                        current values.
+                    </p>
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-neutral-50">
+                                <TableHead className="font-acumin text-xs font-semibold text-black">
+                                    Field Name
+                                </TableHead>
+                                <TableHead className="font-acumin text-xs font-semibold text-black">
+                                    value
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {filteredDataset(data).map((key, index) => {
+                                return (
+                                    <TableRow key={index} className="border-0">
+                                        <TableCell className="font-acumin text-xs font-normal text-black">
+                                            {key.title}
+                                        </TableCell>
+                                        <TableCell className="font-acumin text-xs font-normal text-black">
+                                            {key.description}
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            })}
+                        </TableBody>
+                    </Table>
+                </>
+            )}
         </div>
     )
 }
@@ -174,6 +201,7 @@ export default function ApprovalRow({
     const { data, isLoading } = api.dataset.showPendingDiff.useQuery({
         id: approvalInfo.id,
     })
+
     return (
         <Row
             className={`sm:pr-4 ${className ? className : ''}`}

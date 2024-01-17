@@ -487,9 +487,10 @@ def pending_diff_show(context: Context, data_dict: DataDict):
         raise tk.ValidationError(e)
 
     if not dataset_diff:
-        raise logic.NotFound(
-            _("Diff not found for Pending Dataset: {}".format(package_id))
-        )
+        dataset_diff = None
+        # raise logic.NotFound(
+        #     _("Diff not found for Pending Dataset: {}".format(package_id))
+        # )
 
     return dataset_diff
 
