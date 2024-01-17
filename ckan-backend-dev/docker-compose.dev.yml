@@ -5,7 +5,6 @@ volumes:
   pg_data:
   solr_data:
   minio_data:
-  prefect:
 
 services:
 
@@ -79,17 +78,27 @@ services:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
 
   prefect:
+    container_name: prefect-server
+    entrypoint: ["/opt/prefect/entrypoint.sh", "prefect", "server", "start"]
     image: prefecthq/prefect:2.11.5-python3.11
     restart: always
-    volumes:
-      - prefect:/root/.prefect
     env_file:
       - .env
-    entrypoint: ["/opt/prefect/entrypoint.sh", "prefect", "server", "start"]
     ports:
-      - 4200:4200
+      - "0.0.0.0:4200:4200"
     depends_on:
-      - db
+      ckan-dev:
+        condition: service_healthy
+
+  my-datapusher:
+    container_name: my-datapusher
+    build:
+      context: ../datapusher
+    restart: always
+    environment:
+      - PREFECT_API_URL=http://prefect:4200/api
+    depends_on:
+      - prefect
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}
