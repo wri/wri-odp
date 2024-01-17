@@ -129,8 +129,8 @@ class WriPlugin(plugins.SingletonPlugin):
             labels.append(u'member-%s' % dataset_obj.owner_org)
         elif visibility_type == "internal" and not is_draftTrue:
             labels.append(u'authenticated')
-        elif (visibility_type == "public" or visibility_type == "internal" ) and is_draftTrue:
-             labels.append(u'authenticated')
+        elif (visibility_type == "public" or visibility_type == "internal" ) and is_draftTrue and dataset_obj.owner_org:
+             labels.append(u'member-%s' % dataset_obj.owner_org)
         else: # Draft
             labels.append(u'creator-%s' % dataset_obj.creator_user_id)
 
