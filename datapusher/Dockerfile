@@ -5,6 +5,4 @@ WORKDIR /app
 COPY . .
 RUN pip3 install -r requirements.txt
 
-EXPOSE 4200
-
 CMD [ "python", "main.py" ]
