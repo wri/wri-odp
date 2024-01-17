@@ -6,12 +6,12 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { env } from '@/env.mjs'
 import s3 from '@/server/s3'
 import { v4 as uuidv4 } from 'uuid'
+import { slugify } from '@/utils/slugify'
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    const fileId = uuidv4()
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { filePath, filename, fileHash, contentType } = JSON.parse(
         req.body as string
@@ -22,13 +22,15 @@ export default async function handler(
         _filePath = _filePath.replace('ckan/', '')
     }
     const extension = filename.split('.').pop()
+    const _filename = filename.split('.')[0]
+    const key = slugify(`${_filename}-${uuidv4()}`)
     const signedUrl = await getSignedUrl(
         s3,
         new PutObjectCommand({
             Bucket: env.S3_BUCKET_NAME,
             Key: filePath
-                ? `${_filePath}/${fileId}.${extension}`
-                : `resources/${fileHash}/${fileId}.${extension}`,
+                ? `${_filePath}/${key}.${extension}`
+                : `resources/${fileHash}/${key}.${extension}`,
             ContentType: contentType as string,
         }),
         { expiresIn: 3600 }
