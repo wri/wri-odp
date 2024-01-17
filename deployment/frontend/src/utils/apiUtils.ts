@@ -29,6 +29,7 @@ import type {
     NewNotificationInputType,
     NotificationType,
 } from '@/schema/notification.schema'
+import {View} from '@/interfaces/dataset.interface'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -1372,4 +1373,33 @@ export async function sendIssueOrCommentNotigication({
         console.error(error);
         throw Error("Error in sending issue /comment notification");
     }
+}
+
+export async function getResourceViews({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_list?id=${id}`,
+        { headers }
+    )
+    const views: CkanResponse<View[]> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
 }

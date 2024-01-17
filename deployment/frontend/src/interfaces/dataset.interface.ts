@@ -1,5 +1,6 @@
 import { DataDictionaryFormType } from '@/schema/dataset.schema'
 import { Activity, Group, Organization } from '@portaljs/ckan'
+import { PlotParams } from 'react-plotly.js'
 
 export interface Dataset {
     author?: string
@@ -58,6 +59,7 @@ export interface Resource {
     key?: string
     schema?: { value: DataDictionaryFormType }
     rw_id?: string
+    _views?: View[]
 }
 
 export interface DatasetListQueryOptions {
@@ -82,4 +84,17 @@ export interface Tag {
     name: string
     state: 'active'
     vocabulary_id?: string
+}
+
+export interface View {
+    title: string
+    description: string
+    view_type: 'chart'
+    config: ChartViewConfig // | ...
+}
+
+export interface ChartViewConfig {
+    provider: 'datastore' | 'rw'
+    id: string
+    props: PlotParams
 }

@@ -3,10 +3,9 @@ import { VisualizationTabs } from './VisualizationTabs'
 import MapView from './MapView'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useRouter } from 'next/router'
-import {
-    useVizIndex,
-} from '@/utils/storeHooks'
+import { useVizIndex } from '@/utils/storeHooks'
 import { DataExplorer } from '@/components/data-explorer/DataExplorer'
+import ChartView from './ChartView'
 
 export type TabularResource = {
     provider: string
@@ -25,6 +24,7 @@ export default function Visualizations({
     const tabs = [
         { name: 'Map View', enabled: true },
         { name: 'Tabular View', enabled: !!tabularResource },
+        { name: 'Chart View', enabled: true }, // TODO: verify this
     ]
 
     if (!tabularResource && prevTabularResource) {
@@ -38,10 +38,7 @@ export default function Visualizations({
 
     return (
         <div className="h-full grow flex flex-col">
-            <Tab.Group
-                selectedIndex={vizIndex}
-                onChange={setVizIndex}
-            >
+            <Tab.Group selectedIndex={vizIndex} onChange={setVizIndex}>
                 <Tab.List as="nav" className="flex  w-full">
                     <VisualizationTabs tabs={tabs} />
                 </Tab.List>
@@ -53,6 +50,9 @@ export default function Visualizations({
                         {tabularResource && (
                             <DataExplorer tabularResource={tabularResource} />
                         )}
+                    </Tab.Panel>
+                    <Tab.Panel>
+                        <ChartView />
                     </Tab.Panel>
                 </Tab.Panels>
             </Tab.Group>
