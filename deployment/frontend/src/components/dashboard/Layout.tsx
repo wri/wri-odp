@@ -72,13 +72,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const { data: session } = useSession()
     const { data, isLoading } = api.notification.getAllNotifications.useQuery()
+    const { data: pendingData, isLoading: isLoadingPending } =
+        api.dataset.getPendingDatasets.useQuery({
+            search: '',
+            page: { start: 0, rows: 100 },
+            sortBy: 'metadata_modified desc',
+        })
     const { data: userIdentity, isLoading: isLoadingIUser } =
         api.user.getUserCapacity.useQuery()
-
-    // if (!session?.user.sysadmin ) {
-    //     console.log('ISSS ADMIN: ', userIdentity?.isOrgAdmin)
-    //     routes = routes.filter((item) => !item.isSysAdmin)
-    // }
 
     const navigation = routes.map((item) => {
         const isPath = asPath.split('/dashboard')[1]
@@ -203,6 +204,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                                     {
                                                                                         item.name
                                                                                     }
+                                                                                    {isLoadingPending ? (
+                                                                                        <Spinner className="w-2 h-2" />
+                                                                                    ) : pendingData
+                                                                                          ?.datasets
+                                                                                          ?.length ? (
+                                                                                        <div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
+                                                                                            {
+                                                                                                pendingData?.datasets?.filter(
+                                                                                                    (
+                                                                                                        item
+                                                                                                    ) =>
+                                                                                                        item.issue_count
+                                                                                                )
+                                                                                                    .length
+                                                                                            }
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        ''
+                                                                                    )}
                                                                                 </div>
                                                                             </Link>
                                                                         </li>
@@ -324,10 +344,32 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                         }
                                                                         className="flex w-full justify-center items-center gap-x-2"
                                                                     >
-                                                                        <div className="font-normal text-[1.125rem]">
-                                                                            {
-                                                                                item.name
-                                                                            }
+                                                                        <div className="font-normal flex flex-row gap-x-1 text-[1.125rem]">
+                                                                            <div>
+                                                                                {
+                                                                                    item.name
+                                                                                }
+                                                                            </div>
+                                                                            {isLoadingPending ? (
+                                                                                <Spinner className="w-2 h-2" />
+                                                                            ) : pendingData
+                                                                                  ?.datasets
+                                                                                  ?.length ? (
+                                                                                <div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
+                                                                                    {
+                                                                                        pendingData?.datasets?.filter(
+                                                                                            (
+                                                                                                item
+                                                                                            ) =>
+                                                                                                item.issue_count ==
+                                                                                                0
+                                                                                        )
+                                                                                            .length
+                                                                                    }
+                                                                                </div>
+                                                                            ) : (
+                                                                                ''
+                                                                            )}
                                                                         </div>
                                                                     </Link>
                                                                 </li>

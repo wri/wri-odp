@@ -82,6 +82,11 @@ export default function ApprovalRequestCard({
             await utils.dataset.getDatasetIssues.invalidate({
                 id: datasetName,
             })
+            await utils.dataset.getPendingDatasets.invalidate({
+                search: '',
+                page: { start: 0, rows: 10 },
+                sortBy: 'metadata_modified desc',
+            })
             formObj.reset()
             setOpen(false)
             notify('Issue successfully created', 'success')

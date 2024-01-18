@@ -39,6 +39,16 @@ export default function RejectApproval({
             await utils.dataset.getDatasetIssues.invalidate({
                 id: dataset.name,
             })
+            await utils.dataset.getPendingDatasets.invalidate({
+                search: '',
+                page: { start: 0, rows: 100 },
+                sortBy: 'metadata_modified desc',
+            })
+            await utils.dataset.getPendingDatasets.invalidate({
+                search: '',
+                page: { start: 0, rows: 10 },
+                sortBy: 'metadata_modified desc',
+            })
             formObj.reset()
             setRejectOpen()
             notify(`Dataset ${dataset.title} is successfully rejected`, 'error')

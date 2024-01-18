@@ -67,7 +67,7 @@ function Card({ approvalInfo }: { approvalInfo: WriDataset }) {
     return (
         <div className="flex flex-col sm:flex-row gap-y-3 sm:items-center  py-2 pt-4 sm:pt-2 sm:pl-6 w-full  font-normal text-[15px]">
             {approvalInfo.issue_count == 0 ? (
-                <DefaultTooltip content="no rejection message" side="bottom">
+                <DefaultTooltip content="pending" side="bottom">
                     <div className="w-2 h-2 rounded-full bg-wri-gold my-auto hidden sm:block"></div>
                 </DefaultTooltip>
             ) : (
