@@ -21,6 +21,7 @@ export default function Approvallist() {
     const [approveOpen, setApproveOpen] = useState(false)
     const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const utils = api.useUtils()
     const { data: userIdentity, isLoading: isLoadingIUser } =
         api.user.getUserCapacity.useQuery()
     const [query, setQuery] = useState<SearchInput>({
@@ -34,6 +35,11 @@ export default function Approvallist() {
     const approveDataset = api.dataset.approvePendingDataset.useMutation({
         onSuccess: async (data) => {
             await refetch()
+            await utils.dataset.getPendingDatasets.invalidate({
+                search: '',
+                page: { start: 0, rows: 100 },
+                sortBy: 'metadata_modified desc',
+            })
             setApproveOpen(false)
             notify(
                 `Successfully approved the dataset ${

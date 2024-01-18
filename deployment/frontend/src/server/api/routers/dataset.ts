@@ -870,6 +870,28 @@ export const DatasetRouter = createTRPCRouter({
             )
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(data.error.message)
+
+            const deleteResponse = await fetch(
+                `${env.CKAN_URL}/api/3/action/pending_dataset_delete`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ package_id: input}),
+                    headers: {
+                        Authorization: `${env.SYS_ADMIN_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+
+            const deleteData = (await deleteResponse.json()) as CkanResponse<null>
+            if (!deleteData.success && deleteData.error) {
+
+                const error = JSON.stringify(deleteData.error).toLowerCase()
+                if (!error.includes("not found")) {
+                    throw Error(JSON.stringify(deleteData.error))
+                }
+                
+            }
             return data
         }),
 

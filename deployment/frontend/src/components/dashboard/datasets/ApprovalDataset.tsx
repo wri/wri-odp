@@ -22,10 +22,16 @@ export default function ApprovalDataset() {
         api.dataset.getPendingDatasets.useQuery(query)
     const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
     const [open, setOpen] = useState(false)
+    const utils = api.useUtils()
 
     const datasetDelete = api.dataset.deleteDataset.useMutation({
         onSuccess: async (data) => {
             await refetch()
+            await utils.dataset.getPendingDatasets.invalidate({
+                search: '',
+                page: { start: 0, rows: 100 },
+                sortBy: 'metadata_modified desc',
+            })
             setOpen(false)
             notify(
                 `Successfully deleted the ${
