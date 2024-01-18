@@ -79,13 +79,22 @@ services:
 
   prefect:
     container_name: prefect-server
-    entrypoint: ["/opt/prefect/entrypoint.sh", "prefect", "server", "start"]
-    image: prefecthq/prefect:2.11.5-python3.11
+    build:
+      context: ./prefect-server
     restart: always
-    env_file:
-      - .env
+    environment:
+      - PREFECT_UI_URL=http://127.0.0.1:4200/api
+      - PREFECT_API_URL=http://127.0.0.1:4200/api
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://ckandbuser:ckandbpassword@db/prefect
     ports:
       - "0.0.0.0:4200:4200"
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:4200"]
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
     depends_on:
       ckan-dev:
         condition: service_healthy
@@ -98,7 +107,8 @@ services:
     environment:
       - PREFECT_API_URL=http://prefect:4200/api
     depends_on:
-      - prefect
+      prefect:
+        condition: service_healthy
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}

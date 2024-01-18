@@ -2,7 +2,7 @@ import json
 import tempfile
 import time
 from datasize import DataSize
-from prefect import flow, get_run_logger
+from prefect import flow, get_run_logger, serve
 from models import GetResource, Resource
 from config import config
 
@@ -27,7 +27,7 @@ DATASTORE_URLS = {
 
 
 @flow(log_prints=True)
-def push_to_datastore(resource_id = "test_id"):
+def push_to_datastore(resource_id, api_key):
     logger = get_run_logger()
     qsv_bin = "/home/luccas/.cargo/bin/qsvdp"
     file_bin = "/usr/bin/file"
@@ -35,7 +35,7 @@ def push_to_datastore(resource_id = "test_id"):
     get_resource = GetResource(
         resource_id=resource_id,
         ckan_url="http://ckan-dev:5000",
-        api_key="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJqdGkiOiJXNk9vMVdzVlZCVHJVbXlIREgwVVJOMWhWMTZDU3UySW1LRy1fY3NmdFk0IiwiaWF0IjoxNzA0ODIwNDI3fQ.eOxSzNEZfDR3UBHGgKTCmp5t2ohgPOk98tEIefLs2ZkwKtsaKNnXCK3_GzfiAjUbfpohOlx2D72tFdyBVy-qK-8AcUS3h28gnuCiHUTmy2M2IZ4g5fEGfLyzB3jxToTRnyXsE92ohxemX_L-xjf70iKkiECER_1_YB_-KfthH42pGjCPyLW3e0BpxHa88_XL11HCDosnSWnNT_m1iRZctW67RLuhEWsMDBpPjJFWqUf-BjPLs3LYrs2OjWAR-DDiG8S7sx8slMYF641WeoDOvMxMV1R-w6ZMxJidfovxyggkrcmEBEpL7TzXZekDNYkirrPj80hXirgw_Y9boKtRjg",
+        api_key=api_key
     )
     resource = get_resource_metadata(get_resource)
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -103,4 +103,10 @@ def push_to_datastore(resource_id = "test_id"):
 
 
 if __name__ == "__main__":
-    push_to_datastore.serve(name="datapusher")
+    datastore_deployment = push_to_datastore.to_deployment(
+        name="datapusher",
+        parameters={"resource_id": "test_id", "api_key": "api_key"},
+        enforce_parameter_schema=False,
+        is_schedule_active=False,
+    )
+    serve(datastore_deployment)

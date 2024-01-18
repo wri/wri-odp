@@ -1,5 +1,5 @@
 import time
-from prefect import get_run_logger
+from prefect import get_run_logger, task
 import psycopg2
 from psycopg2 import sql
 from config import config
@@ -7,6 +7,7 @@ from config import config
 from helpers import get_package, send_resource_to_datastore, update_resource
 from models import Resource
 
+@task()
 def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_url: str, headers_dicts, record_count: int, datetimecols_list, headers_cardinality, headers):
     logger = get_run_logger()
     # ============================================================
