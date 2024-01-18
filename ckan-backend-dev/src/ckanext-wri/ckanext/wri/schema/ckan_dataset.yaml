@@ -6,6 +6,43 @@ about_url: http://github.com/ckan/ckanext-scheming
 
 dataset_fields:
 
+- field_name: approval_status
+  label: Approval Status
+  preset: select
+  choices:
+  - value: pending
+    label: Pending
+  - value: approved
+    label: Approved
+  - value: rejected
+    label: Rejected
+
+- field_name: draft
+  label: Draft
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
+- field_name: spatial_address
+  label: Spatial address
+  validators: ignore_missing
+
+- field_name: spatial
+  label: Spatial
+  validators: ignore_missing
+
+- field_name: wri_data
+  label: WRI Data
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
+- field_name: rw_dataset
+  label: RW Dataset
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
 - field_name: title
   label: Title
   preset: title
@@ -25,18 +62,20 @@ dataset_fields:
 
 - field_name: language
   label: Language
+  form_placeholder: eg. en
   validators: iso_language_code
 
 - field_name: owner_org
   label: Team
   preset: dataset_organization
 
-- field_name: projects
-  label: Projects
-  preset: multiple_text
+- field_name: project
+  label: Project
+  form_placeholder: eg. Project Name
 
 - field_name: application
   label: Application
+  form_placeholder: eg. Application Name
 
 - field_name: technical_notes
   label: Technical Notes
@@ -49,9 +88,15 @@ dataset_fields:
   preset: tag_string_autocomplete
   form_placeholder: eg. economy, mental health, government
 
-- field_name: temporal_coverage
-  label: Temporal Coverage
-  form_placeholder: eg. 2010/2011
+- field_name: temporal_coverage_start
+  label: Temporal Coverage Start
+  form_placeholder: eg. 2010
+  validators: ignore_missing year_validator
+
+- field_name: temporal_coverage_end
+  label: Temporal Coverage End
+  form_placeholder: eg. 2011
+  validators: ignore_missing year_validator
 
 - field_name: update_frequency
   label: Update Frequency
@@ -83,8 +128,6 @@ dataset_fields:
   label: Visibility Type
   preset: select
   choices:
-  - value: draft
-    label: Draft
   - value: private
     label: Private
   - value: internal
@@ -102,6 +145,15 @@ dataset_fields:
   validators: boolean_validator
   output_validators: boolean_validator
   preset: checkbox
+
+- field_name: rw_id
+  label: RW ID
+  validators: ignore_missing
+
+- field_name: featured_image
+  label: Featured Image
+  form_placeholder: eg. http://example.com/featured_image.png
+  validators: ignore_missing
 
 - field_name: short_description
   label: Short Description
@@ -163,16 +215,24 @@ dataset_fields:
   form_snippet: markdown.html
   form_placeholder: eg. This data should be used with caution because...
 
-- field_name: summary
-  label: Summary
+- field_name: methodology
+  label: Methodology
   form_snippet: markdown.html
-  form_placeholder: eg. A short summary of the dataset
+  form_placeholder: eg. A short methodology of the dataset
+
+- field_name: open_in
+  label: Open In
+  form_placeholder: 'eg. {"title": "External site", "url": "http://example.com"}'
+  preset: json_object
 
 resource_fields:
 
 - field_name: url
   label: URL
   preset: resource_url_upload
+
+- field_name: rw_id
+  label: RW ID
 
 - field_name: name
   label: Name
@@ -186,3 +246,7 @@ resource_fields:
 - field_name: format
   label: Format
   preset: resource_format_autocomplete
+
+- field_name: schema
+  label: Schema
+  preset: json_object

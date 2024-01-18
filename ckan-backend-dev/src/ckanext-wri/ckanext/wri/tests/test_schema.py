@@ -1,15 +1,9 @@
 import pytest
 
-from ckanapi import RemoteCKAN
-
 from ckan.logic import NotFound, get_action, ValidationError
-from ckan.common import config
-import ckan.lib.navl.dictization_functions as df
 from ckan import model
 import ckan.tests.factories as factories
 from ckan.logic import get_action
-
-Invalid = df.Invalid
 
 
 @pytest.mark.usefixtures(u"with_plugins", u"test_request_context")
@@ -32,16 +26,18 @@ def test_package_create():
         "url": "http://example.com/dataset.json",
         "language": "en",
         "owner_org": organization_dict["id"],
-        "projects": ["wri", "gfw"],
+        "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
         "application": "rw",
         "groups": [{"id": group_dict["id"]}],
         "technical_notes": "http://example.com/technical_notes.pdf",
         "tag_string": "economy,mental health,government",
-        "temporal_coverage": "2007-2021",
+        "temporal_coverage_start": "2007",
+        "temporal_coverage_end": "2011",
         "update_frequency": "annually",
         "citation": "Citation information",
-        "visibility_type": "draft",
+        "visibility_type": "public",
         "license_id": "cc-by-4.0",
+        "draft": False,
         "featured_dataset": True,
         "short_description": "A short description of the dataset",
         "notes": "Some useful notes about the data",
@@ -54,7 +50,7 @@ def test_package_create():
         "reason_for_adding": "This data is being added because...",
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
-        "summary": "A short summary of the dataset"
+        "methodology": "A short methodology of the dataset"
     }
 
     try:
@@ -77,18 +73,20 @@ def test_package_create():
     assert result["url"] == dataset["url"]
     assert result["language"] == dataset["language"]
     assert result["owner_org"] == organization_dict["id"]
-    assert result["projects"] == dataset["projects"]
+    assert result["project"] == dataset["project"]
     assert result["application"] == dataset["application"]
     assert result["groups"][0]["name"] == group_dict["name"]
     assert result["technical_notes"] == dataset["technical_notes"]
     assert all(
         tag["name"] in tag_string for tag in result["tags"]
     )
-    assert result["temporal_coverage"] == dataset["temporal_coverage"]
+    assert result["temporal_coverage_start"] == dataset["temporal_coverage_start"]
+    assert result["temporal_coverage_end"] == dataset["temporal_coverage_end"]
     assert result["update_frequency"] == dataset["update_frequency"]
     assert result["citation"] == dataset["citation"]
     assert result["visibility_type"] == dataset["visibility_type"]
     assert result["license_id"] == dataset["license_id"]
+    assert result["draft"] is False
     assert result["featured_dataset"] is True
     assert result["short_description"] == dataset["short_description"]
     assert result["notes"] == dataset["notes"]
@@ -101,7 +99,7 @@ def test_package_create():
     assert result["reason_for_adding"] == dataset["reason_for_adding"]
     assert result["learn_more"] == dataset["learn_more"]
     assert result["cautions"] == dataset["cautions"]
-    assert result["summary"] == dataset["summary"]
+    assert result["methodology"] == dataset["methodology"]
 
     invalid_urls = ["invalid_url_1", "invalid_url_2", "invalid_url_3"]
 

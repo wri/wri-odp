@@ -32,7 +32,43 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
     image: ${CKAN_IMAGE}
+
+  frontend:
+    container_name: wri-frontend
+    build:
+      context: ../deployment/frontend/
+      args:
+        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000
+    environment:
+      - NEXTAUTH_SECRET=secret
+      - NEXTAUTH_URL=http://localhost:3000
+      - CKAN_URL=http://ckan-dev:5000
+      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+      - S3_BUCKET_NAME=ckan
+      - S3_BUCKET_REGION=us-east-1
+      - RW_API_KEY=${RW_API_KEY}
+      - AZURE_AD_TENANT_ID=${AZURE_AD_TENANT_ID}
+      - AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}
+      - AZURE_AD_CLIENT_SECRET=${AZURE_AD_CLIENT_SECRET}
+      - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM}
+    depends_on:
+      ckan-dev:
+        condition: service_healthy
+    ports:
+      - "0.0.0.0:3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
 
   datapusher:
     container_name: ${DATAPUSHER_CONTAINER_NAME}
@@ -45,6 +81,8 @@ services:
     container_name: ${POSTGRESQL_CONTAINER_NAME}
     build:
       context: postgresql/
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -66,7 +104,10 @@ services:
     image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
     volumes:
       - solr_data:/var/solr
+      - ./ckan/setup/schema.xml:/opt/solr/server/solr/configsets/ckan/conf/managed-schema
     restart: unless-stopped
+    ports:
+      - "8983:8983"
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8983/solr/"]
 
@@ -105,3 +146,13 @@ services:
     volumes:
       - ./ckan/setup/create_minio_bucket.sh:/srv/app/create_minio_bucket.sh
     command: ["-c", "/srv/app/create_minio_bucket.sh"]
+
+  smtp:
+    container_name: ${SMTP_CONTAINER_NAME}
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8025/"]
