@@ -128,6 +128,57 @@ export default function DatasetRow({
     )
 }
 
+export function ApprovalDatasetRow({
+    className,
+    dataset,
+    handleOpenModal,
+    authorized,
+}: {
+    className?: string
+    dataset: WriDataset
+    authorized?: boolean
+    handleOpenModal: (dataset: WriDataset) => void
+}) {
+    const router = useRouter()
+    return (
+        <Row
+            authorized={authorized}
+            className={`pr-2 sm:pr-4 ${className ? className : ''}`}
+            rowMain={<DatasetCardProfile dataset={dataset} />}
+            controlButtons={[
+                {
+                    label: 'Edit',
+                    color: 'bg-wri-gold hover:bg-yellow-400',
+                    icon: <PencilSquareIcon className="w-4 h-4 text-white" />,
+                    tooltip: {
+                        id: `edit-tooltip-${dataset.name}`,
+                        content: 'Edit dataset',
+                    },
+                    onClick: () => {
+                        router.push(`/dashboard/datasets/${dataset.name}/edit`)
+                    },
+                },
+                {
+                    label: 'Delete',
+                    color: 'bg-red-600 hover:bg-red-500',
+                    icon: <TrashIcon className="w-4 h-4 text-white" />,
+                    tooltip: {
+                        id: `delete-tooltip-${dataset.name}`,
+                        content: 'Delete dataset',
+                    },
+                    onClick: () => handleOpenModal(dataset),
+                },
+            ]}
+            linkButton={{
+                label: 'View Issues',
+                link: `../datasets/${dataset.name}?tab=issues`,
+            }}
+            rowSub={<SubCardProfile dataset={dataset} />}
+            isDropDown
+        />
+    )
+}
+
 export function FavouriteRow({
     className,
     dataset,

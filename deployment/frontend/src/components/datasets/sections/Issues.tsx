@@ -174,6 +174,11 @@ function IssueCard({
             await utils.dataset.getDatasetIssues.invalidate({
                 id: datasetName,
             })
+            await utils.dataset.getPendingDatasets.invalidate({
+                search: '',
+                page: { start: 0, rows: 10 },
+                sortBy: 'metadata_modified desc',
+            })
             setOpenDelete(false)
             notify(`Issue #${data} successfully deleted`, 'error')
         },
@@ -247,9 +252,9 @@ function IssueCard({
                             <img
                                 className="h-12 w-12 flex-none rounded-full bg-gray-50"
                                 src={
-                                    comment.user.gravatar_url ??
-                                    comment.user.image_display_url ??
-                                    '/images/placeholders/user/userdefault.png'
+                                    comment.user?.image_display_url
+                                        ? comment.user?.image_display_url
+                                        : `https://gravatar.com/avatar/${comment.user?.email_hash}?s=270&d=identicon`
                                 }
                                 alt=""
                             />

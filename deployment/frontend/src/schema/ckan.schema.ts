@@ -113,6 +113,10 @@ export interface WriDataset extends Dataset {
     connectorType?: string
     provider?: string
     tableName?: string
+    user?: User
+    approval_status?: string
+    draft?: boolean
+    issue_count?: number
 }
 
 export interface Extra {
@@ -199,4 +203,10 @@ export interface Member {
     role: string
     team: string
     teamId: string
+}
+
+export interface PendingDataset {
+    package_id: string
+    package_data: WriDataset
+    last_modified: string
 }
