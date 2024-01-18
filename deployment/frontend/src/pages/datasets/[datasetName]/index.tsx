@@ -28,7 +28,7 @@ import { useSession } from 'next-auth/react'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import SyncUrl from '@/components/_shared/map/SyncUrl'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
@@ -164,6 +164,7 @@ export default function DatasetPage(
 ) {
     const { dataset, prevdataset } = props
     const [isCurrentVersion, setIsCurrentVersion] = useState<boolean>(false)
+    const [selectedIndex, setSelectedIndex] = useState(0)
     const datasetName = props.datasetName as string
     const datasetId = props.datasetId!
     const pendingExist = props.pendingExist!
@@ -275,6 +276,12 @@ export default function DatasetPage(
         generalAuthorized = true
     }
 
+    useEffect(() => {
+        if (query.tab === 'issues' && issues.data) {
+            setSelectedIndex(6)
+        }
+    }, [issues.data, query.tab])
+
     const tabs = [
         { name: 'Data files', enabled: true },
         { name: 'About', enabled: true },
@@ -339,7 +346,7 @@ export default function DatasetPage(
     }
 
     const shouldLoad = pendingExist ? isLoadingDiff : false
-    console.log('SHOULD LOAD: ', prevDatasetData)
+
     if (isLoading || !datasetData || isLoadingPrev || shouldLoad) {
         return (
             <>
@@ -351,8 +358,6 @@ export default function DatasetPage(
             </>
         )
     }
-
-    console.log('QUERY: ', diffFields)
 
     return (
         <>
@@ -392,7 +397,11 @@ export default function DatasetPage(
                                 setIsCurrentVersion={setIsCurrentVersion}
                             />
                             <div className="px-4 sm:px-6">
-                                <Tab.Group as="div">
+                                <Tab.Group
+                                    as="div"
+                                    selectedIndex={selectedIndex}
+                                    onChange={setSelectedIndex}
+                                >
                                     <Tab.List
                                         as="nav"
                                         className="flex w-full gap-x-2 border-b border-zinc-300"
