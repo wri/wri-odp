@@ -58,6 +58,15 @@ jobs:
           --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
+      - name: Build and push Datapusher image to ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
+          datapusher
+          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
