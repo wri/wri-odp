@@ -37,6 +37,26 @@ interface FlowState {
 }
 
 export const prefectRouter = createTRPCRouter({
+    submitToDatapusher: protectedProcedure
+        .input(z.object({ resourceId: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            console.log(`Submitting ${input.resourceId} to Datapusher`)
+            const user = ctx.session.user
+            const submitToDatapusherRes = await fetch(
+                `${env.CKAN_URL}/api/action/prefect_datapusher_submit`,
+                {
+                    headers: {
+                        'content-type': 'application/json',
+                        Authorization: `${user.apikey}`,
+                    },
+                    body: JSON.stringify({ resource_id: input.resourceId }),
+                    method: 'POST',
+                }
+            )
+            const submitToDatapusher: CkanResponse<boolean> =
+                await submitToDatapusherRes.json()
+            return submitToDatapusher
+        }),
     getFlowState: protectedProcedure
         .input(z.object({ resourceId: z.string() }))
         .query(async ({ ctx, input }) => {
@@ -64,7 +84,6 @@ export const prefectRouter = createTRPCRouter({
                 offset: 0,
                 sort: 'TIMESTAMP_ASC',
             }
-            console.log('FLOW ID', flow_id)
             const flowStateRes = await fetch(
                 `http://127.0.0.1:4200/api/flow_runs/${flow_id}`,
                 {
@@ -73,8 +92,7 @@ export const prefectRouter = createTRPCRouter({
                     },
                 }
             )
-            const flowState: FlowState = await flowStateRes.json()
-            console.log('FLOW STATE', flowState)
+            const flowState = await flowStateRes.json()
             const logsRes = await fetch(
                 'http://127.0.0.1:4200/api/logs/filter',
                 {
@@ -86,6 +104,6 @@ export const prefectRouter = createTRPCRouter({
                 }
             )
             const logs: Log[] = await logsRes.json()
-            return { ...flowState, logs }
+            return { ...flowState.state, logs }
         }),
 })
