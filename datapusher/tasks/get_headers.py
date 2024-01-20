@@ -1,10 +1,10 @@
-from prefect import get_run_logger
+from prefect import get_run_logger, task
 from config import config
 import subprocess
 import  os
 import json
 
-
+@task(retries=3, retry_delay_seconds=15)
 def get_headers(tmp, temp_dir, qsv_bin):
     logger = get_run_logger()
      # ----------------------- Headers & Safenames ---------------------------

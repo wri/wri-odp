@@ -3,7 +3,7 @@ import json
 import os
 from prefect import task, get_run_logger
 
-@task()
+@task(retries=3, retry_delay_seconds=15)
 def sort_and_dedup(tmp, qsv_bin, temp_dir):
     # --------------------- Sortcheck --------------------------
     # if SORT_AND_DUPE_CHECK is True or DEDUP is True

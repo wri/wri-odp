@@ -2,7 +2,7 @@ from pathlib import Path
 import subprocess
 from prefect import task, get_run_logger
 
-@task()
+@task(retries=3, retry_delay_seconds=15)
 def validate_csv(tmp, qsv_bin):
     # ------------------------------------- Validate CSV --------------------------------------
     # Run an RFC4180 check with `qsv validate` against the normalized, UTF-8 encoded CSV file.

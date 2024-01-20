@@ -219,7 +219,7 @@ def send_resource_to_datastore(
     check_response(r, url, "CKAN DataStore")
     return r.json()
 
-def get_package(package_id, ckan_url, api_key) -> Package:
+def get_package(package_id, ckan_url, api_key):
     """
     Gets available information about a package from CKAN
     """
@@ -232,11 +232,13 @@ def get_package(package_id, ckan_url, api_key) -> Package:
     )
     check_response(r, url, "CKAN")
 
-    return Package(**r.json()["result"])
+    return r.json()["result"]
 
 
 def update_resource(resource, ckan_url, api_key) -> Resource:
-    url = get_url("resource_update", ckan_url)
+    print("Resource")
+    print(json.dumps(resource, indent=4))
+    url = get_url("resource_patch", ckan_url)
     r = requests.post(
         url,
         verify=True,

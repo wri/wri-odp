@@ -9,8 +9,11 @@ from dotenv import load_dotenv
 env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
 load_dotenv(env_file)
 
-_DATABASE_URI = "postgresql://ckandbuser:ckandbpassword@localhost:5432/datastore"
-_WRITE_ENGINE_URL = "postgresql://ckandbuser:ckandbpassword@localhost:5432/datastore"
+_DATABASE_URI = os.environ['CKAN_DATASTORE_WRITE_URL']
+_WRITE_ENGINE_URL = os.environ['CKAN_DATASTORE_WRITE_URL']
+#_QSVDP_BIN = '/root/.cargo/bin/qsvdp' if os.environ.get('QSVPDP_BIN') is None else os.environ['QSVPDP_BIN']
+_QSVDP_BIN = '/home/luccas/.cargo/bin/qsvdp' if os.environ.get('QSVPDP_BIN') is None else os.environ['QSVPDP_BIN']
+_CKAN_URL = 'http://ckan-dev:5000' if os.environ.get('CKAN_URL') is None else os.environ['CKAN_URL']
 _TYPES = "String", "Float", "Integer", "DateTime", "Date", "NULL"
 _TYPE_MAPPING = {
     "String": "text",
@@ -33,6 +36,7 @@ def _parse_bool(val: Union[str, bool]) -> bool:  # pylint: disable=E1136
 # DataPusherPlusConfig class with required fields, default values, type checking, and typecasting for int and bool values
 class DataPusherPlusConfig(MutableMapping):
     # ckan_service_provider settings
+    CKAN_URL: str = _CKAN_URL
     SQLALCHEMY_DATABASE_URI: str = _DATABASE_URI
     WRITE_ENGINE_URL: str = _WRITE_ENGINE_URL
     DEBUG: bool = False
@@ -63,7 +67,7 @@ class DataPusherPlusConfig(MutableMapping):
     PII_SHOW_CANDIDATES: bool = False
     PII_REGEX_RESOURCE_ID_OR_ALIAS: str = ""
 
-    QSV_BIN: str = "/usr/local/bin/qsvdp"
+    QSV_BIN: str = _QSVDP_BIN
     FILE_BIN: str = "/usr/bin/file"
 
     PREFER_DMY: bool = False

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 from pydantic import BaseModel, field_validator
 from pydantic_core import Url
 
@@ -21,17 +21,31 @@ class Organization(BaseModel):
     state: str 
 
 class Resource(BaseModel):
+    fileBlob: Optional[Any]
+    key: Optional[str]
+    last_modified: Any
+    layerObj: Optional[Any]
+    layerObjRaw: Optional[Any]
+    position: Optional[Any]
+    resourceId: Optional[str]
+    schema: Optional[Any]
+    size: Optional[int]
+    state: Optional[str]
+    title: Optional[str]
+    type: Any
+    url: Any
+    url_type: Any
     cache_last_updated: Optional[str]
     cache_url: Optional[str]
     created: str
     datastore_active: bool
-    description: str
-    format: str
+    description: Optional[str]
+    format: Optional[str]
     hash: str
     id: str
-    last_modified: str
+    last_modified: Optional[str]
     metadata_modified: str
-    mimetype: str
+    mimetype: Optional[str]
     mimetype_inner: Optional[str]
     name: str
     package_id: str
@@ -50,38 +64,38 @@ class Resource(BaseModel):
 
 class Package(BaseModel):
     application: Optional[str]
-    author: str
-    author_email: str
-    citation: str
+    author: Optional[str]
+    author_email: Optional[str]
+    citation: Optional[str]
     creator_user_id: str
     featured_dataset: bool
-    featured_image: str
+    featured_image: Optional[str]
     id: str
     isopen: bool
-    license_id: str
-    license_title: str
-    maintainer: str
-    maintainer_email: str
+    license_id: Optional[str]
+    license_title: Optional[str]
+    maintainer: Optional[str]
+    maintainer_email: Optional[str]
     metadata_created: str
-    metadata_modified: str
+    metadata_modified: Optional[str]
     name: str
     num_resources: int
     num_tags: int
     organization: Optional[Organization]
     owner_org: Optional[str]
     private: bool
-    project: str
+    project: Optional[str]
     rw_dataset: bool
-    rw_id: str
-    short_description: str
-    spatial: str
-    state: str
-    technical_notes: str
-    title: str
+    rw_id: Optional[str]
+    short_description: Optional[str]
+    spatial: Optional[str]
+    state: Optional[str]
+    technical_notes: Optional[str]
+    title: Optional[str]
     type: str
-    update_frequency: str
-    url: str
+    update_frequency: Optional[str]
+    url: Optional[str]
     version: Optional[str]
-    visibility_type: str
+    visibility_type: Optional[str]
     wri_data: bool
     resources: Optional[list[Resource]]

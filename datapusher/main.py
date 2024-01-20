@@ -22,19 +22,20 @@ MINIMUM_QSV_VERSION = "0.108.0"
 
 DATASTORE_URLS = {
     "datastore_delete": "{ckan_url}/api/action/datastore_delete",
-    "resource_update": "{ckan_url}/api/action/resource_update",
+    "resource_update": "{ckan_url}/api/action/resource_patch",
 }
 
 
 @flow(log_prints=True)
 def push_to_datastore(resource_id, api_key):
     logger = get_run_logger()
-    qsv_bin = "/home/luccas/.cargo/bin/qsvdp"
-    file_bin = "/usr/bin/file"
+    qsv_bin = config.get('QSV_BIN')
+    file_bin = config.get('FILE_BIN')
+    ckan_url = config.get('CKAN_URL')
     check_qsv(qsv_bin, file_bin)
     get_resource = GetResource(
         resource_id=resource_id,
-        ckan_url="http://ckan-dev:5000",
+        ckan_url=ckan_url,
         api_key=api_key
     )
     resource = get_resource_metadata(get_resource)
@@ -53,6 +54,7 @@ def push_to_datastore(resource_id, api_key):
         tmp_file, qsv_headers, original_header_dicts = get_headers(
             tmp_file, temp_dir, qsv_bin
         )
+        data_dictionary = resource.get('schema').get('value', None) if resource.get('schema') else None
         (
             tmp_file,
             header_dicts,
@@ -66,6 +68,7 @@ def push_to_datastore(resource_id, api_key):
             temp_dir,
             get_resource,
             original_header_dicts,
+            data_dictionary,
         )
         tmp_file = normalize_timestamps(tmp_file, qsv_bin, temp_dir, datetime_cols_list)
         analysis_elapsed = time.perf_counter() - analysis_start

@@ -10,7 +10,7 @@ from prefect import task
 from models import GetResource, Resource
 from datasize import DataSize
 
-@task()
+@task(retries=3, retry_delay_seconds=15)
 def download_resource(resource: Resource, get_resource: GetResource, temp_dir):
     timer_start = time.perf_counter()
 

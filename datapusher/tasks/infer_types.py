@@ -2,6 +2,7 @@ from prefect import get_run_logger
 import subprocess
 import os
 import csv
+import json
 from prefect import task, get_run_logger
 from config import config
 from helpers import datastore_resource_exists, delete_datastore_resource
@@ -14,6 +15,7 @@ POSTGRES_BIGINT_MAX = 9223372036854775807
 POSTGRES_BIGINT_MIN = -9223372036854775808
 
 
+@task(retries=3, retry_delay_seconds=15)
 def infer_types(
     tmp,
     qsv_bin,
@@ -21,6 +23,7 @@ def infer_types(
     temp_dir,
     get_resource: GetResource,
     original_header_dict,
+    override_header_dict,
 ):
     logger = get_run_logger()
     try:
@@ -96,9 +99,11 @@ def infer_types(
 
     existing = datastore_resource_exists(get_resource.resource_id, get_resource.api_key, get_resource.ckan_url)
     existing_info = None
-    if existing:
+    if override_header_dict:
+        print("Override header dict")
+        print(override_header_dict)
         existing_info = dict(
-            (f["id"], f["info"]) for f in existing.get("fields", []) if "info" in f
+            (f["id"], f["info"]) for f in override_header_dict if "info" in f
         )
 
     # if this is an existing resource

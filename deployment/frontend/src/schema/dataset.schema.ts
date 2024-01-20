@@ -21,11 +21,12 @@ const capacitySchema = z.enum(['admin', 'editor', 'member'])
 
 export const DataDictionarySchema = z.array(
     z.object({
-        field: z.string(),
-        type: z.string(),
-        null: z.string(),
-        key: z.string(),
-        default: z.string(),
+        id: z.string(),
+        info: z.object({
+            type_override: z.string(),
+            label: z.string(),
+            default: z.string(),
+        }),
     })
 )
 

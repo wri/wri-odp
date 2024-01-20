@@ -6,7 +6,7 @@ from prefect import task
 from helpers import check_response, get_url
 from models import GetResource
 
-@task()
+@task(retries=3, retry_delay_seconds=15)
 def get_resource_metadata(get_resource: GetResource):
     """
     Gets available information about the resource from CKAN

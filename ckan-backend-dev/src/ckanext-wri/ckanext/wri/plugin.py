@@ -177,7 +177,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
         self._submit_to_datapusher(resource_dict)
 
-    def after_update(
+    def after_resource_update(
             self, context: Context, resource_dict: dict[str, Any]):
 
         self._submit_to_datapusher(resource_dict)
@@ -242,6 +242,16 @@ class WriPlugin(plugins.SingletonPlugin):
 
 
     # IPackageController
+
+    def after_dataset_create(self, context, pkg_dict):
+        if pkg_dict.get('resources') is not None:
+            for resource in pkg_dict.get('resources'):
+                self._submit_to_datapusher(resource)
+
+    def after_dataset_update(self, context, pkg_dict):
+        if pkg_dict.get('resources') is not None:
+            for resource in pkg_dict.get('resources'):
+                self._submit_to_datapusher(resource)
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)

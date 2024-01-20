@@ -1,8 +1,9 @@
 import os
 import subprocess
 
-from prefect import get_run_logger
+from prefect import get_run_logger, task
 
+@task(retries=3, retry_delay_seconds=15)
 def normalize_timestamps(tmp, qsv_bin, temp_dir, datetimecols_list, prefer_dmy = True):
     logger = get_run_logger()
      # ---------------- Normalize dates to RFC3339 format --------------------

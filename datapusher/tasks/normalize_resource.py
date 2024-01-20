@@ -4,7 +4,7 @@ import os
 from prefect import task, get_run_logger
 from models import Resource
 
-@task()
+@task(retries=3, retry_delay_seconds=15)
 def normalize_resource(resource: Resource, temp_dir, qsv_bin, file_bin, tmp):
     logger = get_run_logger()
     # ===================================================================================

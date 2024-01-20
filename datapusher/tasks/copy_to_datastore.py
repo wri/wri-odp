@@ -7,7 +7,7 @@ from config import config
 from helpers import get_package, send_resource_to_datastore, update_resource
 from models import Resource
 
-@task()
+@task(retries=3, retry_delay_seconds=15)
 def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_url: str, headers_dicts, record_count: int, datetimecols_list, headers_cardinality, headers):
     logger = get_run_logger()
     # ============================================================
@@ -107,12 +107,12 @@ def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_
         package = get_package(resource.package_id, ckan_url, api_key)
 
         resource_name = resource.name
-        package_name = package.name
-        owner_org = package.organization
+        package_name = package['name']
+        owner_org = package['organization']
         owner_org_name = ""
-        if owner_org:
+        if owner_org and owner_org.name is not None:
             owner_org_name = owner_org.name
-        if resource_name and package_name and owner_org_name:
+        if resource_name and package_name:
             # we limit it to 55, so we still have space for sequence & stats suffix
             # postgres max identifier length is 63
             alias = f"{resource_name}-{package_name}-{owner_org_name}"[:55]
