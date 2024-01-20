@@ -18,6 +18,7 @@ import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { Input } from '@/components/_shared/SimpleInput'
 import FormatInput from './FormatInput'
+import { Datapusher } from './Datapusher'
 import { LoaderButton } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
@@ -234,6 +235,28 @@ export function EditDataFile({
                                                     )}
                                                 </Tab>
                                             )}
+                                        {datafile.format?.toLowerCase() ===
+                                            'csv' && (
+                                            <Tab as={Fragment}>
+                                                {({ selected }) => (
+                                                    <div
+                                                        className={classNames(
+                                                            'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                            selected
+                                                                ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
+                                                                : 'text-black'
+                                                        )}
+                                                        aria-current={
+                                                            selected
+                                                                ? 'page'
+                                                                : undefined
+                                                        }
+                                                    >
+                                                        Datapusher
+                                                    </div>
+                                                )}
+                                            </Tab>
+                                        )}
                                     </div>
                                 </Tab.List>
                                 <Tab.Panels className="px-4 sm:px-6 xxl:px-0 py-4">
@@ -293,6 +316,8 @@ export function EditDataFile({
                                                 />
                                             </Tab.Panel>
                                         )}
+                                    {datafile.format?.toLowerCase() ===
+                                        'csv' && <Tab.Panel><Datapusher datafile={datafile} /></Tab.Panel>}
                                 </Tab.Panels>
                             </div>
                         </Tab.Group>

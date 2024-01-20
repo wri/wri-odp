@@ -206,3 +206,31 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
     p.toolkit.get_action("task_status_update")(context, task)
 
     return True
+
+
+@logic.side_effect_free
+def datapusher_latest_task(
+        context: Context, data_dict: dict[str, Any]) -> dict[str, Any]:
+    ''' Get the latest task of datapusher job for a certain resource.
+
+    With the job id in hand we can ask Prefect to get the status and logs of the job
+
+    :param resource_id: The resource id of the resource that you want the
+        datapusher status for.
+    :type resource_id: string
+    '''
+
+    p.toolkit.check_access('datapusher_status', context, data_dict)
+
+    if 'id' in data_dict:
+        data_dict['resource_id'] = data_dict['id']
+    res_id = _get_or_bust(data_dict, 'resource_id')
+
+    task = p.toolkit.get_action('task_status_show')(context, {
+        'entity_id': res_id,
+        'task_type': 'datapusher',
+        'key': 'datapusher'
+    })
+
+    return task
+

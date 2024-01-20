@@ -8,7 +8,7 @@ from ckan import model, logic, authz
 from ckan.types import Action, AuthFunction, Context
 from ckan.lib.search import SearchError
 from ckanext.wri.logic.auth import auth as auth
-from ckanext.wri.logic.action.datapusher import datapusher_submit
+from ckanext.wri.logic.action.datapusher import datapusher_latest_task, datapusher_submit
 from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
 from ckanext.wri.logic.action.update import notification_update, pending_dataset_update
 from ckanext.wri.logic.action.get import package_search, notification_get_all, pending_dataset_show, pending_diff_show
@@ -124,6 +124,7 @@ class WriPlugin(plugins.SingletonPlugin):
             'pending_dataset_delete': pending_dataset_delete,
             'pending_diff_show': pending_diff_show,
             'prefect_datapusher_submit': datapusher_submit,
+            'prefect_latest_task': datapusher_latest_task,
         }
 
     # IPermissionLabels
@@ -203,26 +204,6 @@ class WriPlugin(plugins.SingletonPlugin):
 
         if not submit:
             return
-
-        try:
-            task = toolkit.get_action(u'task_status_show')(
-                context, {
-                    u'entity_id': resource_dict['id'],
-                    u'task_type': u'datapusher',
-                    u'key': u'datapusher'
-                }
-            )
-
-            if task.get(u'state') in (u'pending', u'submitting'):
-                # There already is a pending DataPusher submission,
-                # skip this one ...
-                log.debug(
-                    u'Skipping DataPusher submission for '
-                    u'resource {0}'.format(resource_dict['id'])
-                )
-                return
-        except toolkit.ObjectNotFound:
-            pass
 
         try:
             log.debug(
