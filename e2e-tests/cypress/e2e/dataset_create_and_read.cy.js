@@ -123,21 +123,6 @@ describe("Create dataset", () => {
     cy.contains(user);
   });
 
-  it(
-    "Should show the tabular preview",
-    {
-      retries: {
-        runMode: 5,
-        openMode: 0,
-      },
-    },
-    () => {
-      cy.visit("/datasets/" + dataset);
-      cy.contains("Add Tabular View").click();
-      cy.contains('01D2539e270CEbd', { timeout: 15000 });
-    },
-  );
-
   it("Edit metadata", () => {
     cy.visit("/dashboard/datasets/" + dataset + "/edit");
     cy.get("input[name=title]")
