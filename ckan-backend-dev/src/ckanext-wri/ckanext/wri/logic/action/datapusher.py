@@ -33,6 +33,8 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
     :param resource_id: The resource id of the resource that the data
         should be imported in. The resource's URL will be used to get the data.
     :type resource_id: string
+    :param force: Set to ``True`` to force the datapusher to reload the file
+    :type force: bool
     :param set_url_type: If set to True, the ``url_type`` of the resource will
         be set to ``datastore`` and the resource URL will automatically point
         to the :ref:`datastore dump <dump>` URL. (optional, default: False)
@@ -52,6 +54,10 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
         raise p.toolkit.ValidationError(errors)
 
     res_id = data_dict["resource_id"]
+
+    force = False
+    if data_dict.get("__extras"):
+        force = data_dict["__extras"].get("force", False)
 
     p.toolkit.check_access("datapusher_submit", context, data_dict)
 
@@ -99,6 +105,43 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
         "error": "{}",
     }
 
+    try:
+        existing_task = p.toolkit.get_action("task_status_show")(
+            context,
+            {"entity_id": res_id, "task_type": "datapusher", "key": "datapusher"},
+        )
+        assume_task_stale_after = datetime.timedelta(
+            seconds=config.get("ckan.datapusher.assume_task_stale_after")
+        )
+        if existing_task.get("state") == "pending":
+            updated = datetime.datetime.strptime(
+                existing_task["last_updated"], "%Y-%m-%dT%H:%M:%S.%f"
+            )
+            time_since_last_updated = datetime.datetime.utcnow() - updated
+            if time_since_last_updated > assume_task_stale_after:
+                # it's been a while since the job was last updated - it's more
+                # likely something went wrong with it and the state wasn't
+                # updated than its still in progress. Let it be restarted.
+                log.info(
+                    "A pending task was found %r, but it is only %s hours" " old",
+                    existing_task["id"],
+                    time_since_last_updated,
+                )
+            else:
+                if force:
+                    log.info("Force flag set, so we will continue")
+                else:
+                    log.info(
+                        "A pending task was found %s for this resource, so "
+                        "skipping this duplicate task",
+                        existing_task["id"],
+                    )
+                    return False
+
+        task["id"] = existing_task["id"]
+    except logic.NotFound:
+        pass
+
     context["ignore_auth"] = True
     # Use local session for task_status_update, so it can commit its own
     # results without messing up with the parent session that contains pending
@@ -113,7 +156,9 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
     # This setting is checked on startup
     api_token = p.toolkit.config.get("ckan.datapusher.api_token")
     try:
-        print(f"DEPLOYMENT URL: {urljoin(prefect_url, 'api/deployments/name/push-to-datastore/datapusher')}")
+        print(
+            f"DEPLOYMENT URL: {urljoin(prefect_url, 'api/deployments/name/push-to-datastore/datapusher')}"
+        )
         deployment = requests.get(
             urljoin(prefect_url, "api/deployments/name/push-to-datastore/datapusher")
         )
@@ -177,27 +222,25 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
 
 @logic.side_effect_free
 def datapusher_latest_task(
-        context: Context, data_dict: dict[str, Any]) -> dict[str, Any]:
-    ''' Get the latest task of datapusher job for a certain resource.
+    context: Context, data_dict: dict[str, Any]
+) -> dict[str, Any]:
+    """Get the latest task of datapusher job for a certain resource.
 
     With the job id in hand we can ask Prefect to get the status and logs of the job
 
     :param resource_id: The resource id of the resource that you want the
         datapusher status for.
     :type resource_id: string
-    '''
+    """
 
-    p.toolkit.check_access('datapusher_status', context, data_dict)
+    p.toolkit.check_access("datapusher_status", context, data_dict)
 
-    if 'id' in data_dict:
-        data_dict['resource_id'] = data_dict['id']
-    res_id = _get_or_bust(data_dict, 'resource_id')
+    if "id" in data_dict:
+        data_dict["resource_id"] = data_dict["id"]
+    res_id = _get_or_bust(data_dict, "resource_id")
 
-    task = p.toolkit.get_action('task_status_show')(context, {
-        'entity_id': res_id,
-        'task_type': 'datapusher',
-        'key': 'datapusher'
-    })
+    task = p.toolkit.get_action("task_status_show")(
+        context, {"entity_id": res_id, "task_type": "datapusher", "key": "datapusher"}
+    )
 
     return task
-

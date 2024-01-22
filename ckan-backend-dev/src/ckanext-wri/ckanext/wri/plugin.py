@@ -39,8 +39,6 @@ class WriPlugin(plugins.SingletonPlugin):
         config_options = (
             'ckanext.wri.prefect_url',
         )
-        print("WRI Plugin Configuring")
-        print(f"Config: {config.get('ckanext.wri.prefect_url')}")
         for option in config_options:
             if not config.get(option, None):
                 raise RuntimeError(missing_config.format(option))

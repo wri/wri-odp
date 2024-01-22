@@ -62,6 +62,7 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM=${SMTP_FROM}
+      - PREFECT_INTERNAL_URL=http://prefect:4200
     depends_on:
       ckan-dev:
         condition: service_healthy

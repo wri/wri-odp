@@ -49,7 +49,7 @@ export const prefectRouter = createTRPCRouter({
                         'content-type': 'application/json',
                         Authorization: `${user.apikey}`,
                     },
-                    body: JSON.stringify({ resource_id: input.resourceId }),
+                    body: JSON.stringify({ resource_id: input.resourceId, force: true }),
                     method: 'POST',
                 }
             )
@@ -86,7 +86,7 @@ export const prefectRouter = createTRPCRouter({
                 sort: 'TIMESTAMP_ASC',
             }
             const flowStateRes = await fetch(
-                `http://127.0.0.1:4200/api/flow_runs/${flow_id}`,
+                `${env.PREFECT_INTERNAL_URL}/api/flow_runs/${flow_id}`,
                 {
                     headers: {
                         'content-type': 'application/json',
@@ -95,7 +95,7 @@ export const prefectRouter = createTRPCRouter({
             )
             const flowState = await flowStateRes.json()
             const logsRes = await fetch(
-                'http://127.0.0.1:4200/api/logs/filter',
+                `${env.PREFECT_INTERNAL_URL}/api/logs/filter`,
                 {
                     headers: {
                         'content-type': 'application/json',

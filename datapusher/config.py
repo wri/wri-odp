@@ -11,8 +11,7 @@ load_dotenv(env_file)
 
 _DATABASE_URI = os.environ['CKAN_DATASTORE_WRITE_URL']
 _WRITE_ENGINE_URL = os.environ['CKAN_DATASTORE_WRITE_URL']
-#_QSVDP_BIN = '/root/.cargo/bin/qsvdp' if os.environ.get('QSVPDP_BIN') is None else os.environ['QSVPDP_BIN']
-_QSVDP_BIN = '/home/luccas/.cargo/bin/qsvdp' if os.environ.get('QSVPDP_BIN') is None else os.environ['QSVPDP_BIN']
+_QSVDP_BIN = '/root/.cargo/bin/qsvdp' if os.environ.get('QSVPDP_BIN') is None else os.environ['QSVPDP_BIN']
 _CKAN_URL = 'http://ckan-dev:5000' if os.environ.get('CKAN_URL') is None else os.environ['CKAN_URL']
 _TYPES = "String", "Float", "Integer", "DateTime", "Date", "NULL"
 _TYPE_MAPPING = {
