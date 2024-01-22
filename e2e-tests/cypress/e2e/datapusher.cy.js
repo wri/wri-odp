@@ -50,6 +50,7 @@ describe("Upload file and create dataset", () => {
       },
     },
     () => {
+      cy.viewport(1440, 900);
       cy.wait(15000);
       cy.visit("/datasets/" + dataset);
       cy.contains("Add Tabular View", { timeout: 30000 }).click();
