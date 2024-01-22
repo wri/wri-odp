@@ -111,7 +111,7 @@ function AddDataFile({
                         id: item.name,
                         info: {
                             label: item.name,
-                            type_override: (types[item.type as any]),
+                            type_override: (types[item.type as keyof typeof types]),
                             default: '',
                         },
                     })
