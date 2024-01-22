@@ -22,6 +22,9 @@ describe("Upload file and create dataset", () => {
     cy.visit("/dashboard/datasets/new");
     cy.get("input[name=title]").type(dataset);
     cy.get("input[name=name]").should("have.value", dataset);
+    cy.get("#visibility_type").click();
+    cy.get("li").contains("Public").click();
+    cy.get("input[name=technical_notes]").type("https://google.com");
     cy.get("textarea[name=short_description]").type("test");
     cy.get("input[name=author]").type("Luccas");
     cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
@@ -53,6 +56,7 @@ describe("Upload file and create dataset", () => {
       cy.viewport(1440, 900);
       cy.wait(15000);
       cy.visit("/datasets/" + dataset);
+      cy.reload(true)
       cy.contains("Add Tabular View", { timeout: 30000 }).click();
       cy.contains('01D2539e270CEbd', { timeout: 15000 });
     },
