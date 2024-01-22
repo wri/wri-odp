@@ -40,13 +40,11 @@ export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
                 data && data.type === 'COMPLETED' ? false : 5000,
         }
     )
-    console.log('FLOW STATE TYPE', flowState)
-    console.log('IS LOADING', submitToDatapusher.isLoading)
     return (
         <>
             <div className="pt-4 pb-8">
                 <LoaderButton
-                    loading={submitToDatapusher.isLoading || (flowState !== undefined && flowState.type !== 'COMPLETED')}
+                    loading={submitToDatapusher.isLoading || (flowState !== undefined && (flowState.type === 'RUNNING' || flowState.type === 'PENDING'))}
                     onClick={() =>
                         submitToDatapusher.mutate({
                             resourceId: datafile.id ?? '',

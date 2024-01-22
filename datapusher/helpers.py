@@ -50,6 +50,7 @@ def check_response(
     try:
         if response.status_code not in good_status:
             json_response = response.json()
+            print("JSON RESPONSE", json_response)
             if not ignore_no_success or json_response.get("success"):
                 try:
                     message = json_response["error"]["message"]
@@ -141,6 +142,7 @@ def datastore_resource_exists(resource_id, api_key, ckan_url):
             data=json.dumps({"id": resource_id, "limit": 0}),
             headers={"Content-Type": "application/json", "Authorization": api_key},
         )
+        print("JSON", response.json())
         if response.status_code == 404:
             return False
         elif response.status_code == 200:
@@ -216,6 +218,7 @@ def send_resource_to_datastore(
         data=json.dumps(request, cls=DatastoreEncoder),
         headers={"Content-Type": "application/json", "Authorization": api_key},
     )
+    print('SENT TO DATASTORE', r.json())
     check_response(r, url, "CKAN DataStore")
     return r.json()
 

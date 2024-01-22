@@ -11,6 +11,7 @@ import { env } from '@/env.mjs'
 import { CkanResponse } from '@/schema/ckan.schema'
 import { FilterObjType } from './search.schema'
 import { DataExplorerColumnFilter } from './DataExplorer'
+import { useSession } from 'next-auth/react'
 
 export interface FieldsResponse {
     tableName: string
@@ -18,6 +19,7 @@ export interface FieldsResponse {
 }
 
 export function useFields({ id, provider }: TabularResource) {
+    const { data: session } = useSession()
     if (provider === 'datastore') {
         return useQuery(['fields', id], async () => {
             const fieldsRes = await fetch(
@@ -26,6 +28,7 @@ export function useFields({ id, provider }: TabularResource) {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `${session?.user?.apikey}`,
                     },
                     body: JSON.stringify({
                         id,

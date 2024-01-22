@@ -55,6 +55,7 @@ export const prefectRouter = createTRPCRouter({
             )
             const submitToDatapusher: CkanResponse<boolean> =
                 await submitToDatapusherRes.json()
+            console.log("submitToDatapusher", submitToDatapusher)
             return submitToDatapusher
         }),
     getFlowState: protectedProcedure

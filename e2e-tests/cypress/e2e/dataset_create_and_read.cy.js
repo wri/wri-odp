@@ -90,13 +90,13 @@ describe("Create dataset", () => {
     cy.get('input[name="resources.1.title"]')
       .clear()
       .type("Resource for E2E Testing (IMAGE)");
-    cy.wait(10000);
     cy.contains("Next: Preview").click();
     //get button of type submit
     cy.get('button[type="submit"]').click();
     cy.contains(`Successfully created the "${dataset}" dataset`, {
       timeout: 15000,
     });
+    cy.wait(15000);
   });
 
   it(
@@ -122,6 +122,21 @@ describe("Create dataset", () => {
     cy.contains("Collaborators").click();
     cy.contains(user);
   });
+
+  it(
+    "Should show the tabular preview",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/datasets/" + dataset);
+      cy.contains("Add Tabular View").click();
+      cy.contains('01D2539e270CEbd', { timeout: 15000 });
+    },
+  );
 
   it("Edit metadata", () => {
     cy.visit("/dashboard/datasets/" + dataset + "/edit");

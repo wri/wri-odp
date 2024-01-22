@@ -34,7 +34,7 @@ export const datastoreRouter = createTRPCRouter({
                 ),
             })
         )
-        .query(async ({ input }) => {
+        .query(async ({ ctx, input }) => {
             const { pagination, resourceId, columns, sorting, filters } = input
             const paginationSql = `LIMIT ${
                 pagination.pageIndex * pagination.pageSize + pagination.pageSize
@@ -73,7 +73,12 @@ export const datastoreRouter = createTRPCRouter({
             }/api/action/datastore_search_sql?sql=SELECT ${parsedColumns.join(
                 ' , '
             )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${paginationSql}`
-            const tableDataRes = await fetch(url)
+            const tableDataRes = await fetch(url, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${ctx?.session?.user.apikey}`,
+                        },
+    })
             const tableData: DataResponse = await tableDataRes.json()
             if (!tableData.success && tableData.error) {
                 if (tableData.error.message)
