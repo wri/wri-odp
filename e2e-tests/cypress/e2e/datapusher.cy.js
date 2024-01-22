@@ -33,7 +33,7 @@ describe("Upload file and create dataset", () => {
       force: true,
     });
     cy.wait(5000);
-    cy.contans("Next: Preview").click();
+    cy.contains("Next: Preview").click();
     //get button of type submit
     cy.get('button[type="submit"]').click();
     cy.contains(`Successfully created the "${dataset}" dataset`, {
