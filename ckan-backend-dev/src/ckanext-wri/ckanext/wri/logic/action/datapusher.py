@@ -48,6 +48,7 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
 
     :rtype: bool
     """
+    print("DATAPUSHER CONTEXT", context.get("user"))
     schema = context.get("schema", dpschema.datapusher_submit_schema())
     data_dict, errors = _validate(data_dict, schema, context)
     if errors:
@@ -155,6 +156,8 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
 
     # This setting is checked on startup
     api_token = p.toolkit.config.get("ckan.datapusher.api_token")
+    # Datapusher hack
+    api_token = p.toolkit.get_action('api_token_create')(context, data_dict).get('token') if api_token == '12345678123412341234123456789012' else api_token
     print("API TOKEN", api_token)
     try:
         print(
