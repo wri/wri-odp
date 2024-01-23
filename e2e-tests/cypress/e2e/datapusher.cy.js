@@ -8,14 +8,12 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 const dataset = `${uuid()}-test-dataset`;
 
 describe("Upload file and create dataset", () => {
-  beforeEach(function () {
-    cy.logout();
-    cy.wait(5000)
-    cy.login('ckan_admin', 'test1234');
-    cy.wait(5000)
+  beforeAll(function () {
+    cy.logout()
   });
 
   it("Should create dataset", () => {
+    cy.login('ckan_admin', 'test1234');
     cy.visit("/dashboard/datasets/new");
     cy.get("input[name=title]").type(dataset);
     cy.get("input[name=name]").should("have.value", dataset);
