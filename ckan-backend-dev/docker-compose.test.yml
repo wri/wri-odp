@@ -66,6 +66,8 @@ services:
         condition: service_healthy
       prefect:
         condition: service_healthy
+      my-datapusher:
+        condition: service_started
     ports:
       - "0.0.0.0:3000:3000"
     healthcheck:

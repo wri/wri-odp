@@ -56,7 +56,7 @@ describe("Upload file and create dataset", () => {
         timeout: 15000,
       });
       cy.wait(15000);
-      cy.contains("Finished in state Completed", { timeout: 15000 });
+      cy.contains("exited cleanly", { timeout: 15000 });
     },
   );
 
