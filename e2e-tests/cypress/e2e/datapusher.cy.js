@@ -45,6 +45,27 @@ describe("Upload file and create dataset", () => {
   });
 
   it(
+    "Submit datapusher",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/dashboard/datasets/" + dataset + "/edit");
+      cy.contains("Data Files").click();
+      cy.contains("Datapusher").click();
+      cy.contains("Submit to Datapusher").click();
+      cy.contains(`Successfully submited resource to the datapusher`, {
+        timeout: 15000,
+      });
+      cy.wait(15000);
+      cy.contains("Finished in state Completed", { timeout: 15000 });
+    },
+  );
+
+  it(
     "Should show the tabular preview",
     {
       retries: {
@@ -56,13 +77,13 @@ describe("Upload file and create dataset", () => {
       cy.viewport(1440, 900);
       cy.wait(15000);
       cy.visit("/datasets/" + dataset);
-      cy.reload(true)
+      cy.reload(true);
       cy.contains("Add Tabular View", { timeout: 30000 }).click();
-      cy.contains('01D2539e270CEbd', { timeout: 15000 });
+      cy.contains("01D2539e270CEbd", { timeout: 15000 });
     },
   );
 
- after(() => {
+  after(() => {
     cy.deleteDatasetAPI(dataset);
   });
 });
