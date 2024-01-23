@@ -5,17 +5,14 @@ const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
 
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
-const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const topic = `${uuid()}_test_topic`;
 const dataset = `${uuid()}-test-dataset`;
-const user = `${uuid()}-test-user`;
-const user_email = `${uuid()}@gmail.com`;
-const user_2 = `${uuid()}-test-user`;
-const user_email_2 = `${uuid()}@gmail.com`;
 
 describe("Upload file and create dataset", () => {
   beforeEach(function () {
+    cy.logout();
+    cy.wait(5000)
     cy.login(ckanUserName, ckanUserPassword);
+    cy.wait(5000)
   });
 
   it("Should create dataset", () => {
