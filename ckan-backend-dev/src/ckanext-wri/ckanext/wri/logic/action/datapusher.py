@@ -155,6 +155,7 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
 
     # This setting is checked on startup
     api_token = p.toolkit.config.get("ckan.datapusher.api_token")
+    print("API TOKEN", api_token)
     try:
         print(
             f"DEPLOYMENT URL: {urljoin(prefect_url, 'api/deployments/name/push-to-datastore/datapusher')}"
