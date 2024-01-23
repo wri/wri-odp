@@ -42,6 +42,7 @@ describe("Upload file and create dataset", () => {
     cy.contains(`Successfully created the "${dataset}" dataset`, {
       timeout: 15000,
     });
+    cy.wait(20000);
   });
 
   it(
