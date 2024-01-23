@@ -11,7 +11,7 @@ describe("Upload file and create dataset", () => {
   beforeEach(function () {
     cy.logout();
     cy.wait(5000)
-    cy.login(ckanUserName, ckanUserPassword);
+    cy.login('ckan_admin', 'test1234');
     cy.wait(5000)
   });
 
