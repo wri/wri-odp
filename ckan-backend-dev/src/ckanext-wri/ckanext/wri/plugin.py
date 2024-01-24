@@ -1,12 +1,14 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.plugins as lib_plugins
+from typing import Any, Callable, cast
 import ckanext.wri.logic.action as action
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
 from ckan.types import Action, AuthFunction, Context
 from ckan.lib.search import SearchError
 from ckanext.wri.logic.auth import auth as auth
+from ckanext.wri.logic.action.datapusher import datapusher_latest_task, datapusher_submit
 from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
 from ckanext.wri.logic.action.update import notification_update, pending_dataset_update
 from ckanext.wri.logic.action.get import package_search, notification_get_all, pending_dataset_show, pending_diff_show
@@ -19,6 +21,7 @@ log = logging.getLogger(__name__)
 
 class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IConfigurable)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IClick)
@@ -26,8 +29,19 @@ class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IPermissionLabels)
     plugins.implements(plugins.IPackageController, inherit=True)
+    plugins.implements(plugins.IResourceController, inherit=True)
 
     # IConfigurer
+    def configure(self, config):
+        # Certain config options must exists for the plugin to work. Raise an
+        # exception if they're missing.
+        missing_config = "{0} is not configured. Please amend your .ini file."
+        config_options = (
+            'ckanext.wri.prefect_url',
+        )
+        for option in config_options:
+            if not config.get(option, None):
+                raise RuntimeError(missing_config.format(option))
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
@@ -107,6 +121,8 @@ class WriPlugin(plugins.SingletonPlugin):
             'pending_dataset_update': pending_dataset_update,
             'pending_dataset_delete': pending_dataset_delete,
             'pending_diff_show': pending_diff_show,
+            'prefect_datapusher_submit': datapusher_submit,
+            'prefect_latest_task': datapusher_latest_task,
         }
 
     # IPermissionLabels
@@ -157,7 +173,68 @@ class WriPlugin(plugins.SingletonPlugin):
 
         return labels
 
+    # IResourceController
+
+    def after_resource_create(
+            self, context: Context, resource_dict: dict[str, Any]):
+
+        self._submit_to_datapusher(resource_dict)
+
+    def after_resource_update(
+            self, context: Context, resource_dict: dict[str, Any]):
+
+        self._submit_to_datapusher(resource_dict)
+
+    def _submit_to_datapusher(self, resource_dict: dict[str, Any]):
+        print("SUBMITTING TO DATAPUSHER")
+        context = cast(Context, {
+            u'model': model,
+            u'ignore_auth': True,
+            u'defer_commit': True
+        })
+
+        resource_format = resource_dict.get('format')
+        supported_formats = toolkit.config.get(
+            'ckan.datapusher.formats'
+        )
+
+        submit = (
+            resource_format
+            and resource_format.lower() in supported_formats
+            and resource_dict.get('url_type') != u'datapusher'
+        )
+
+        if not submit:
+            return
+
+        try:
+            log.debug(
+                u'Submitting resource {0}'.format(resource_dict['id']) +
+                u' to DataPusher'
+            )
+            toolkit.get_action(u'prefect_datapusher_submit')(
+                context, {
+                    u'resource_id': resource_dict['id']
+                }
+            )
+        except toolkit.ValidationError as e:
+            # If datapusher is offline want to catch error instead
+            # of raising otherwise resource save will fail with 500
+            log.critical(e)
+            pass
+
+
     # IPackageController
+
+    def after_dataset_create(self, context, pkg_dict):
+        if pkg_dict.get('resources') is not None:
+            for resource in pkg_dict.get('resources'):
+                self._submit_to_datapusher(resource)
+
+    def after_dataset_update(self, context, pkg_dict):
+        if pkg_dict.get('resources') is not None:
+            for resource in pkg_dict.get('resources'):
+                self._submit_to_datapusher(resource)
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)
