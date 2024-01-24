@@ -78,7 +78,7 @@ export function AddDataFile({
                         ? `${watch('team')?.id}/ckan/resources/${
                               datafile.resourceId
                           }`
-                        : `resources/${datafile.resourceId}`
+                        : `ckan/resources/${datafile.resourceId}`
                 ),
         })
         return uppy
