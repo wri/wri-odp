@@ -8,7 +8,7 @@ from helpers import get_package, send_resource_to_datastore, update_resource
 from models import Resource
 
 @task(retries=3, retry_delay_seconds=15)
-def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_url: str, headers_dicts, record_count: int, datetimecols_list, headers_cardinality, headers):
+def copy_to_datastore(tmp, rows_to_copy, resource: dict, api_key: str, ckan_url: str, headers_dicts, record_count: int, datetimecols_list, headers_cardinality, headers):
     logger = get_run_logger()
     # ============================================================
     # COPY to Datastore
@@ -20,7 +20,7 @@ def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_
     # first, let's create an empty datastore table w/ guessed types
     send_resource_to_datastore(
         resource=None,
-        resource_id=resource.id,
+        resource_id=resource['id'],
         headers=headers_dicts,
         api_key=api_key,
         ckan_url=ckan_url,
@@ -43,7 +43,7 @@ def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_
         """
         try:
             cur.execute(
-                sql.SQL("TRUNCATE TABLE {}").format(sql.Identifier(resource.id))
+                sql.SQL("TRUNCATE TABLE {}").format(sql.Identifier(resource['id']))
             )
 
         except psycopg2.Error as e:
@@ -56,7 +56,7 @@ def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_
             "WITH (FORMAT CSV, FREEZE 1, "
             "HEADER 1, ENCODING 'UTF8');"
         ).format(
-            sql.Identifier(resource.id),
+            sql.Identifier(resource['id']),
             column_names,
         )
         with open(tmp, "rb") as f:
@@ -74,7 +74,7 @@ def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_
         )
         analyze_cur = raw_connection.cursor()
         analyze_cur.execute(
-            sql.SQL("VACUUM ANALYZE {}").format(sql.Identifier(resource.id))
+            sql.SQL("VACUUM ANALYZE {}").format(sql.Identifier(resource['id']))
         )
         analyze_cur.close()
 
@@ -82,7 +82,7 @@ def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_
     logger.info(
         '...copying done. Copied {n} rows to "{res_id}" in {copy_elapsed} seconds.'.format(
             n="{:,}".format(copied_count),
-            res_id=resource.id,
+            res_id=resource['id'],
             copy_elapsed="{:,.2f}".format(copy_elapsed),
         )
     )
@@ -94,7 +94,7 @@ def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_
     logger.info("UPDATING RESOURCE METADATA...")
 
     # --------------------- AUTO-ALIASING ------------------------
-    # aliases are human-readable, and make it easier to use than resource id hash
+    # aliases are human-readable, and make it easier to use than resource['id'] hash
     # when using the Datastore API and in SQL queries
     auto_alias = config.get("AUTO_ALIAS")
     auto_alias_unique = config.get("AUTO_ALIAS_UNIQUE")
@@ -104,14 +104,14 @@ def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_
             "AUTO-ALIASING. Auto-alias-unique: {} ...".format(auto_alias_unique)
         )
         # get package info, so we can construct the alias
-        package = get_package(resource.package_id, ckan_url, api_key)
+        package = get_package(resource['package_id'], ckan_url, api_key)
 
-        resource_name = resource.name
+        resource_name = resource['name']
         package_name = package['name']
         owner_org = package['organization']
         owner_org_name = ""
-        if owner_org and owner_org.name is not None:
-            owner_org_name = owner_org.name
+        if owner_org and owner_org['name'] is not None:
+            owner_org_name = owner_org['name']
         if resource_name and package_name:
             # we limit it to 55, so we still have space for sequence & stats suffix
             # postgres max identifier length is 63
@@ -164,7 +164,6 @@ def copy_to_datastore(tmp, rows_to_copy, resource: Resource, api_key: str, ckan_
             )
             alias = None
 
-    resource = resource.dict()
     resource["datastore_active"] = True
     resource["total_record_count"] = record_count
     resource["preview"] = False

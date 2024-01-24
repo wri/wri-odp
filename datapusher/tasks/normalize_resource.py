@@ -5,7 +5,7 @@ from prefect import task, get_run_logger
 from models import Resource
 
 @task(retries=3, retry_delay_seconds=15)
-def normalize_resource(resource: Resource, temp_dir, qsv_bin, file_bin, tmp):
+def normalize_resource(resource: dict, temp_dir, qsv_bin, file_bin, tmp):
     logger = get_run_logger()
     # ===================================================================================
     # ANALYZE WITH QSV
@@ -18,18 +18,18 @@ def normalize_resource(resource: Resource, temp_dir, qsv_bin, file_bin, tmp):
     # ----------------- is it a spreadsheet? ---------------
     # check content type or file extension if its a spreadsheet
     spreadsheet_extensions = ["XLS", "XLSX", "ODS", "XLSM", "XLSB"]
-    if resource.format in spreadsheet_extensions:
+    if resource['format'] in spreadsheet_extensions:
         # if so, export spreadsheet as a CSV file
         default_excel_sheet = 0
         print(
             "Converting {} sheet {} to CSV...".format(
-                resource.format, default_excel_sheet
+                resource['format'], default_excel_sheet
             )
         )
         # first, we need a temporary spreadsheet filename with the right file extension
         # we only need the filename though, that's why we remove it
         # and create a hardlink to the file we got from CKAN
-        qsv_spreadsheet = os.path.join(temp_dir, "qsv_spreadsheet." + resource.format)
+        qsv_spreadsheet = os.path.join(temp_dir, "qsv_spreadsheet." + resource['format'])
         os.link(tmp, qsv_spreadsheet)
 
         # run `qsv excel` and export it to a CSV
@@ -85,11 +85,11 @@ def normalize_resource(resource: Resource, temp_dir, qsv_bin, file_bin, tmp):
         # ------------------- Normalize to CSV ---------------------
         qsv_input_csv = os.path.join(temp_dir, "qsv_input.csv")
         # if resource_format is CSV we don't need to normalize
-        if resource.format == "CSV":
-            print("Normalizing/UTF-8 transcoding {}...".format(resource.format))
+        if resource['format'] == "CSV":
+            print("Normalizing/UTF-8 transcoding {}...".format(resource['format']))
         else:
             # if not CSV (e.g. TSV, TAB, etc.) we need to normalize to CSV
-            print("Normalizing/UTF-8 transcoding {} to CSV...".format(resource.format))
+            print("Normalizing/UTF-8 transcoding {} to CSV...".format(resource['format']))
 
         qsv_input_utf_8_encoded_csv = tempfile.NamedTemporaryFile(suffix=".csv")
         # using uchardet to determine encoding
