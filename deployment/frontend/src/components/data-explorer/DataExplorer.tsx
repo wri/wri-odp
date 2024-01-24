@@ -26,6 +26,7 @@ export interface Filter {
 
 export function DataExplorer({ tabularResource }: DataExplorerProps) {
     const { data: tableData } = useFields(tabularResource)
+    console.log('TABLE DATA', tableData)
     if (!tableData)
         return (
             <div className="bg-lima-700 my-auto flex w-full flex-col items-center justify-center overflow-hidden opacity-75 h-full">
@@ -47,7 +48,7 @@ export function DataExplorer({ tabularResource }: DataExplorerProps) {
 export interface DataExplorerInnerProps {
     tableName: string
     tabularResource: TabularResource
-    columns: { key: string; name: string }[]
+    columns: { key: string; name: string, type: string }[]
 }
 
 export interface DataExplorerColumnFilter {
@@ -132,6 +133,11 @@ function DataExplorerInner({
     const tableCols = useMemo(() => {
         return cols.map((c) => ({
             accessorKey: c.key,
+            header: c.name,
+            extra: {
+                key: 'type',
+                name: c.type,
+            },
             filterFn: () => {
                 // not sure why this needs to be added
                 return true

@@ -291,6 +291,7 @@ export function Table({ table, isLoading }: TableProps) {
 }
 
 function Column({ h }: { h: Header<any, unknown> }) {
+    console.log('COLUMN', h.column)
     return (
         <div className="relative flex gap-x-2 items-center pr-4">
             {flexRender(h.column.columnDef.header, h.getContext())}

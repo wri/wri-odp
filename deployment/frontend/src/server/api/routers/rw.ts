@@ -32,6 +32,7 @@ export const rwRouter = createTRPCRouter({
                     .map((field) => ({
                         name: field,
                         key: field,
+                        type: 'any',
                     })),
             }
             return columns
