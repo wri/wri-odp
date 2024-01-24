@@ -49,13 +49,16 @@ export const prefectRouter = createTRPCRouter({
                         'content-type': 'application/json',
                         Authorization: `${user.apikey}`,
                     },
-                    body: JSON.stringify({ resource_id: input.resourceId, force: true }),
+                    body: JSON.stringify({
+                        resource_id: input.resourceId,
+                        force: true,
+                    }),
                     method: 'POST',
                 }
             )
             const submitToDatapusher: CkanResponse<boolean> =
                 await submitToDatapusherRes.json()
-            console.log("submitToDatapusher", submitToDatapusher)
+            console.log('submitToDatapusher', submitToDatapusher)
             return submitToDatapusher
         }),
     getFlowState: protectedProcedure
@@ -73,6 +76,7 @@ export const prefectRouter = createTRPCRouter({
             )
             const tasks: CkanResponse<Task> = await taskRes.json()
             const flow_id = JSON.parse(tasks.result.value).job_id
+            if (!flow_id) return null
             const body = {
                 limit: 200,
                 logs: {
