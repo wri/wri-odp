@@ -42,7 +42,7 @@ def push_to_datastore(resource_id, api_key):
     with tempfile.TemporaryDirectory() as temp_dir:
         timer_start = time.perf_counter()
         new_resource, tmp_file, fetch_elapsed = download_resource(
-            Resource(**resource), get_resource, temp_dir
+            resource, get_resource, temp_dir
         )
         fetch_elapsed = time.perf_counter() - timer_start
         analysis_start = time.perf_counter()
