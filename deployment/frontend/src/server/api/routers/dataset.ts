@@ -79,8 +79,9 @@ async function createDatasetRw(dataset: DatasetFormType) {
             body,
         }
     )
-    const datasetRw: { data: { id: string; attributes: APILayerSpec } } =
+    const datasetRw: { data: { id: string; attributes: APILayerSpec } } | { errors: { status: number, detail: string }[]} =
         await datasetRwRes.json()
+    if (datasetRw.errors) throw new Error(JSON.stringify(datasetRw.errors))
     return datasetRw
 }
 
@@ -103,6 +104,7 @@ async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
         }
     )
     const layerRw: any = await layerRwRes.json()
+    if (layerRw.errors) throw new Error(JSON.stringify(layerRw.errors))
     const url = `https://api.resourcewatch.org/v1/dataset/${layerRw.data.attributes.dataset}/layer/${layerRw.data.id}`
     const name = layerRw.data.id
     const title = layerRw.data.attributes.name
