@@ -8,9 +8,12 @@ import { InputGroup } from '@/components/_shared/InputGroup'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dynamic from 'next/dynamic'
-const Chart = dynamic(() => import('@/components/datasets/visualizations/Chart'), {
-    ssr: false,
-})
+const Chart = dynamic(
+    () => import('@/components/datasets/visualizations/Chart'),
+    {
+        ssr: false,
+    }
+)
 
 export default function ChartView() {
     const [activeChart, setActiveChart] = useState<View | undefined>()
@@ -18,6 +21,10 @@ export default function ChartView() {
 
     const viewOptionsSchema = z.object({
         x_tick_angle: z.object({
+            value: z.number().or(z.literal('auto')),
+            label: z.string(),
+        }),
+        y_tick_angle: z.object({
             value: z.number().or(z.literal('auto')),
             label: z.string(),
         }),
@@ -52,14 +59,12 @@ export default function ChartView() {
     }, [])
 
     const onChange = (selected: View) => {
-        setActiveChart(selected)
-        console.log(
-            selected.config_obj.form_state.config.chart?.labels?.x?.angle
-                ?.value ?? 'auto'
-        )
         reset({
             x_tick_angle:
                 selected.config_obj.form_state.config.chart?.labels?.x?.angle
+                    ?.value ?? labelAngleOptions[0],
+            y_tick_angle:
+                selected.config_obj.form_state.config.chart?.labels?.y?.angle
                     ?.value ?? labelAngleOptions[0],
         })
     }
@@ -73,6 +78,14 @@ export default function ChartView() {
             config.props.layout.xaxis = {
                 ...config.props.layout.xaxis,
                 tickangle: xTickAngle,
+            }
+        }
+
+        const yTickAngle = watch('y_tick_angle')?.value
+        if (yTickAngle) {
+            config.props.layout.yaxis = {
+                ...config.props.layout.yaxis,
+                tickangle: yTickAngle,
             }
         }
 
@@ -94,8 +107,8 @@ export default function ChartView() {
             {activeChart?.config_obj && (
                 <Chart config={getConfigWithOverrides()} />
             )}
-            <form onSubmit={handleSubmit((data) => { })}>
-                <div className="grid grid-cols-2 xl:grid-cols-4 mb-5">
+            <form onSubmit={handleSubmit((data) => { })} className="mt-10">
+                <div className="grid grid-cols-2 xl:grid-cols-2 mb-5 space-x-2">
                     <InputGroup
                         label="X axis tick angle"
                         className="sm:grid-cols-1 gap-x-2"
@@ -105,6 +118,19 @@ export default function ChartView() {
                             id="x-axis-label-orientation"
                             formObj={formObj}
                             name="x_tick_angle"
+                            placeholder="E.g. 45º"
+                            options={labelAngleOptions}
+                        />
+                    </InputGroup>
+                    <InputGroup
+                        label="Y axis tick angle"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <SimpleSelect
+                            id="y-axis-label-orientation"
+                            formObj={formObj}
+                            name="y_tick_angle"
                             placeholder="E.g. 45º"
                             options={labelAngleOptions}
                         />
@@ -120,5 +146,5 @@ const labelAngleOptions = [
     { value: 0, label: '0º' },
     { value: 45, label: '45º' },
     { value: 90, label: '90º' },
-    { value: 135, label: '180º' },
+    { value: 180, label: '180º' },
 ]

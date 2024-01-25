@@ -185,8 +185,8 @@ export default function ChartViewEditor({
 
             // Tooltips
             const tooltipsEnabled =
-                formData.config.chart.tooltips.enabled?.value
-            const tooltipsFormat = formData.config.chart.tooltips.format?.value
+                formData.config.chart.tooltips?.enabled?.value
+            const tooltipsFormat = formData.config.chart.tooltips?.format?.value
 
             let categories = []
             if (isGrouped) {
@@ -769,6 +769,7 @@ export default function ChartViewEditor({
 const chartTypeOptions = [
     { value: 'bar', label: 'Bar', default: true },
     { value: 'scatter', label: 'Line' },
+    { value: 'pie', label: 'Pie' },
 ]
 
 const aggregateOptions = [
@@ -793,7 +794,7 @@ const labelAngleOptions = [
     { value: 0, label: '0º' },
     { value: 45, label: '45º' },
     { value: 90, label: '90º' },
-    { value: 135, label: '180º' },
+    { value: 180, label: '180º' },
 ]
 
 const legendEnabledOptions = [
