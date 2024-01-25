@@ -9,11 +9,13 @@ import {
     Updater,
     useReactTable,
     VisibilityState,
+    RowData,
 } from '@tanstack/react-table'
 import { useFields, useNumberOfRows, useTableData } from './queryHooks'
 import Spinner from '../_shared/Spinner'
 import { TabularResource } from '../datasets/visualizations/Visualizations'
 import { FilterObjType } from './search.schema'
+import '@tanstack/react-table'
 
 interface DataExplorerProps {
     tabularResource: TabularResource
@@ -24,14 +26,21 @@ export interface Filter {
     value: string
 }
 
+declare module '@tanstack/react-table' {
+    interface ColumnMeta<TData extends RowData, TValue> {
+        type: string
+        default?: string
+    }
+}
+
 export function DataExplorer({ tabularResource }: DataExplorerProps) {
     const { data: tableData } = useFields(tabularResource)
     console.log('TABLE DATA', tableData)
     if (!tableData)
         return (
             <div className="bg-lima-700 my-auto flex w-full flex-col items-center justify-center overflow-hidden opacity-75 h-full">
-                <Spinner className="text-wri-green w-12 h-12" />
-                <h2 className="text-center text-xl font-semibold text-wri-green">
+                <Spinner className="text-blue-800 w-12 h-12" />
+                <h2 className="text-center text-xl font-semibold text-blue-800">
                     Loading...
                 </h2>
             </div>
@@ -48,7 +57,7 @@ export function DataExplorer({ tabularResource }: DataExplorerProps) {
 export interface DataExplorerInnerProps {
     tableName: string
     tabularResource: TabularResource
-    columns: { key: string; name: string, type: string }[]
+    columns: { key: string; name: string; type: string, default?: string }[]
 }
 
 export interface DataExplorerColumnFilter {
@@ -134,9 +143,9 @@ function DataExplorerInner({
         return cols.map((c) => ({
             accessorKey: c.key,
             header: c.name,
-            extra: {
-                key: 'type',
-                name: c.type,
+            meta: {
+                type: c.type,
+                default: c.default,
             },
             filterFn: () => {
                 // not sure why this needs to be added
