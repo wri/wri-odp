@@ -455,6 +455,7 @@ export const DatasetRouter = createTRPCRouter({
                         .filter((resource) => resource.type !== 'empty')
                         .map((resource) => ({
                             ...resource,
+                            package_id: input.id ?? '',
                             format: resource.format ?? '',
                             id: resource.resourceId,
                             new: false,
