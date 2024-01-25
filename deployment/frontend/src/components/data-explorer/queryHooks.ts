@@ -39,7 +39,7 @@ export function useFields({ id, provider }: TabularResource) {
                 fields: Array<{
                     id: string
                     name: string
-                    info: { label: string | null }
+                    info: { label: string | null, default: string | null }
                     type: string
                 }>
             }> = await fieldsRes.json()
@@ -49,6 +49,7 @@ export function useFields({ id, provider }: TabularResource) {
                     key: field.id,
                     name: field.info.label ?? field.id,
                     type: field.type,
+                    default: field.info.default ?? '',
                 })),
             }
         })

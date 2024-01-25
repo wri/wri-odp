@@ -202,6 +202,7 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
 
 export function Table({ table, isLoading }: TableProps) {
     const numOfColumns = table.getAllColumns().length
+    console.log('rows', table.getRowModel().rows)
     return (
         <div className="max-w-full grow flex border-t border-gray-200">
             <table className="block border-r border-gray-200 shadow">
@@ -272,17 +273,31 @@ export function Table({ table, isLoading }: TableProps) {
                 <tbody>
                     {table.getRowModel().rows.map((r) => (
                         <tr key={r.id} className="border-b border-b-slate-200">
-                            {r.getCenterVisibleCells().map((c) => (
-                                <td key={c.id} className="py-2 pl-12">
-                                    <div className="min-h-[65px] flex items-center text-base">
-                                        {' '}
-                                        {flexRender(
-                                            c.column.columnDef.cell,
-                                            c.getContext()
-                                        )}
-                                    </div>
-                                </td>
-                            ))}
+                            {r.getCenterVisibleCells().map((c) => {
+                                if (
+                                    c.getValue() === '' ||
+                                    c.getValue() === ' '
+                                ) {
+                                    return (
+                                        <td key={c.id} className="py-2 pl-12">
+                                            <div className="min-h-[65px] flex items-center text-base">
+                                                {c.column.columnDef.meta
+                                                    ?.default ?? ''}
+                                            </div>
+                                        </td>
+                                    )
+                                }
+                                return (
+                                    <td key={c.id} className="py-2 pl-12">
+                                        <div className="min-h-[65px] flex items-center text-base">
+                                            {flexRender(
+                                                c.column.columnDef.cell,
+                                                c.getContext()
+                                            )}
+                                        </div>
+                                    </td>
+                                )
+                            })}
                         </tr>
                     ))}
                 </tbody>
@@ -412,8 +427,6 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
         return () => subscription.unsubscribe()
     }, [watch])
 
-    console.log('filter values', watch())
-
     return (
         <FormProvider {...formObj}>
             <div className="flex flex-col gap-y-2 py-4 px-4">
@@ -490,12 +503,14 @@ export default function Filters({
                                 label: 'Smaller or equal than',
                                 value: '<=',
                             },
-                        ].filter(
-                            (o) =>
+                        ].filter((o) => {
+                            if (!datePicker) return true
+                            return (
                                 datePicker &&
                                 o.value !== '=' &&
                                 o.value !== '!='
-                        )}
+                            )
+                        })}
                         placeholder="Select a filter"
                     />
                     <Controller
