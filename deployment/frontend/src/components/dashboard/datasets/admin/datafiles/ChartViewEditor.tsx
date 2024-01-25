@@ -162,6 +162,7 @@ export default function ChartViewEditor({
              * Chart configuration
              *
              */
+            console.log(formData.config.chart)
             const data: Plotly.Data[] = []
             const layout: Partial<Plotly.Layout> = {
                 title: { text: formData.title },
@@ -391,8 +392,8 @@ export default function ChartViewEditor({
                                             errors={errors}
                                         />
                                     </InputGroup>
-                                    <Accordion text="Data">
-                                        <div className="grow flex flex-col space-y-4">
+                                    <Accordion text="Data" >
+                                        <div className="grow flex flex-col space-y-4 pb-60">
                                             <InputGroup
                                                 label="Dimension column"
                                                 className="sm:grid-cols-1 gap-x-2"
@@ -519,7 +520,7 @@ export default function ChartViewEditor({
                                         />
                                     </Accordion>
                                     {!['pie'].includes(
-                                        watch('config.chart.type').value
+                                        watch('config.chart.type')?.value
                                     ) && (
                                             <Accordion text="Sorting">
                                                 <div className="grow flex flex-col space-y-4">
@@ -564,7 +565,7 @@ export default function ChartViewEditor({
                                             </Accordion>
                                         )}
                                     {!['pie'].includes(
-                                        watch('config.chart.type').value
+                                        watch('config.chart.type')?.value
                                     ) && (
                                             <Accordion text="Labels">
                                                 <div className="grow flex flex-col space-y-4">
@@ -672,7 +673,7 @@ export default function ChartViewEditor({
                                     </Accordion>
 
                                     {!['pie'].includes(
-                                        watch('config.chart.type').value
+                                        watch('config.chart.type')?.value
                                     ) && (
                                             <Accordion text="Tooltips">
                                                 <div className="grow flex flex-col space-y-4">
