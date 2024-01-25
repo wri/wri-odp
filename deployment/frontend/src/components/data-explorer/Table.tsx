@@ -290,15 +290,10 @@ export function Table({ table, isLoading }: TableProps) {
                                 return (
                                     <td key={c.id} className="py-2 pl-12">
                                         <div className="min-h-[65px] flex items-center text-base">
-                                            {' '}
-                                            {c.column.columnDef.cell !== ' ' &&
-                                            c.column.columnDef.cell !== ''
-                                                ? flexRender(
-                                                      c.column.columnDef.cell,
-                                                      c.getContext()
-                                                  )
-                                                : c.column.columnDef.meta
-                                                      ?.default ?? ''}
+                                            {flexRender(
+                                                c.column.columnDef.cell,
+                                                c.getContext()
+                                            )}
                                         </div>
                                     </td>
                                 )
@@ -431,8 +426,6 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
         })
         return () => subscription.unsubscribe()
     }, [watch])
-
-    console.log('filter values', watch())
 
     return (
         <FormProvider {...formObj}>

@@ -38,7 +38,7 @@ export const datastoreRouter = createTRPCRouter({
             const { pagination, resourceId, columns, sorting, filters } = input
             const paginationSql = `LIMIT ${
                 pagination.pageIndex * pagination.pageSize + pagination.pageSize
-            }`
+            } OFFSET ${pagination.pageIndex * pagination.pageSize}`
             const sortSql =
                 sorting.length > 0
                     ? 'ORDER BY ' +
