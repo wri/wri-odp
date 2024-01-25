@@ -11,11 +11,7 @@ import {
     getAllUsers,
     upsertCollaborator,
     deleteCollaborator,
-    sendIssueOrCommentNotigication,
-    getResourceViews,
-    createResourceView,
-    updateResourceView,
-    deleteResourceView,
+    sendIssueOrCommentNotigication
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -51,7 +47,6 @@ import { sendMemberNotifications } from '@/utils/apiUtils'
 import { TRPCError } from '@trpc/server'
 import { CommentSchema, IssueSchema } from '@/schema/issue.schema'
 import { throws } from 'assert'
-import { createViewFormSchema, editViewFormSchema, viewFormSchema } from '@/schema/view.schema'
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -89,8 +84,8 @@ async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     const body = r.layerObj
         ? JSON.stringify(convertFormToLayerObj(r.layerObj))
         : JSON.stringify({
-            ...getApiSpecFromRawObj(r.layerObjRaw),
-        })
+              ...getApiSpecFromRawObj(r.layerObjRaw),
+          })
     const layerRwRes = await fetch(
         `https://api.resourcewatch.org/v1/dataset/${datasetRwId}/layer`,
         {
@@ -112,7 +107,7 @@ async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     r.title = title
     r.description = description
     r.rw_id = layerRw.data.id
-    r.format = 'Layer'
+    r.format = "Layer"
     return r
 }
 
@@ -142,7 +137,7 @@ async function editLayerRw(r: ResourceFormType) {
             const description = layerRw.data.attributes.description
             r.title = title
             r.description = description
-            r.format = 'Layer'
+            r.format = "Layer"
             return r
         }
     } catch (e) {
@@ -171,8 +166,11 @@ async function getLayerRw(layerUrl: string) {
     return { ...layerRw.data.attributes, id: layerRw.data.id }
 }
 
-async function fetchDatasetCollabIds(datasetId: string, userApiKey: string) {
-    const res = await fetch(
+async function fetchDatasetCollabIds(
+    datasetId: string,
+    userApiKey: string
+) {
+    const res  = await  fetch(
         `${env.CKAN_URL}/api/3/action/package_collaborator_list?id=${datasetId}`,
         {
             headers: {
@@ -189,17 +187,12 @@ async function fetchDatasetCollabIds(datasetId: string, userApiKey: string) {
                 message: 'You are not authorized to perform this action',
             })
         if (collaborators.error.message)
-            throw new TRPCError({
-                code: 'BAD_REQUEST',
-                message: collaborators.error.message,
-            })
-        throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: JSON.stringify(collaborators.error),
-        })
+            throw new TRPCError({code: 'BAD_REQUEST', message: collaborators.error.message})
+        throw new TRPCError({code: 'BAD_REQUEST', message: JSON.stringify(collaborators.error)})
     }
 
     return collaborators.result.map((collaborator) => collaborator.user_id)
+    
 }
 
 export async function fetchDatasetCollaborators(
@@ -225,14 +218,8 @@ export async function fetchDatasetCollaborators(
                 message: 'You are not authorized to perform this action',
             })
         if (collaborators.error.message)
-            throw new TRPCError({
-                code: 'BAD_REQUEST',
-                message: collaborators.error.message,
-            })
-        throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: JSON.stringify(collaborators.error),
-        })
+            throw new TRPCError({code: 'BAD_REQUEST', message: collaborators.error.message})
+        throw new TRPCError({code: 'BAD_REQUEST', message: JSON.stringify(collaborators.error)})
     }
 
     const collaboratorsWithDetails = await Promise.all(
@@ -321,8 +308,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                                ? JSON.stringify(input.spatial)
-                                : null,
+                            ? JSON.stringify(input.spatial)
+                            : null,
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -397,27 +384,27 @@ export const DatasetRouter = createTRPCRouter({
             }
             const resourcesToEditLayer = input.rw_id
                 ? await Promise.all(
-                    input.resources
-                        .filter(
-                            (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
-                        )
-                        .map(async (r) => {
-                            return await editLayerRw(r)
-                        })
-                )
+                      input.resources
+                          .filter(
+                              (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
+                          )
+                          .map(async (r) => {
+                              return await editLayerRw(r)
+                          })
+                  )
                 : []
             const resourcesToCreateLayer =
                 rw_id !== null
                     ? await Promise.all(
-                        input.resources
-                            .filter(
-                                (r) =>
-                                    (r.layerObj || r.layerObjRaw) && !r.rw_id
-                            )
-                            .map(async (r) => {
-                                return await createLayerRw(r, rw_id ?? '')
-                            })
-                    )
+                          input.resources
+                              .filter(
+                                  (r) =>
+                                      (r.layerObj || r.layerObjRaw) && !r.rw_id
+                              )
+                              .map(async (r) => {
+                                  return await createLayerRw(r, rw_id ?? '')
+                              })
+                      )
                     : []
             const resources = [
                 ...resourcesWithoutLayer,
@@ -468,8 +455,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                                ? JSON.stringify(input.spatial)
-                                : null,
+                            ? JSON.stringify(input.spatial)
+                            : null,
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -586,48 +573,7 @@ export const DatasetRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
-    getResourceViews: publicProcedure
-        .input(z.object({ id: z.string() }))
-        .query(async ({ input, ctx }) => {
-            const views = await getResourceViews({
-                ...input,
-                session: ctx.session,
-            })
 
-            return views
-        }),
-    createResourceView: protectedProcedure
-        .input(createViewFormSchema)
-        .mutation(async ({ input, ctx }) => {
-            console.log("!!!");
-            console.log(input);
-            const view = await createResourceView({
-                view: input,
-                session: ctx.session,
-            })
-
-            return view
-        }),
-    updateResourceView: protectedProcedure
-        .input(editViewFormSchema)
-        .mutation(async ({ input, ctx }) => {
-            const view = await updateResourceView({
-                view: input,
-                session: ctx.session,
-            })
-
-            return view
-        }),
-    deleteResourceView: protectedProcedure
-        .input(z.object({id: z.string()}))
-        .mutation(async ({ input, ctx }) => {
-            const view = await deleteResourceView({
-                session: ctx.session,
-                id: input.id
-            })
-
-            return view
-        }),
     getAllDataset: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
@@ -671,7 +617,7 @@ export const DatasetRouter = createTRPCRouter({
 
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session?.user.apikey ?? '',
-                fq: `${fq}${input.appendRawFq ?? ''}`,
+                fq: `${fq}${input.appendRawFq ?? ""}`,
                 query: input,
                 facetFields: input.facetFields,
                 sortBy: input.sortBy,
@@ -737,34 +683,13 @@ export const DatasetRouter = createTRPCRouter({
             return issuesWithDetails
         }),
     getOneDataset: publicProcedure
-        .input(
-            z.object({
-                id: z.string(),
-                includeViews: z.boolean().default(false).optional(),
-            })
-        )
+        .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
             const dataset = await getOneDataset(input.id, ctx.session)
             const resources = await Promise.all(
                 dataset.resources.map(async (r) => {
-                    const _views = await getResourceViews({
-                        id: r.id,
-                        session: ctx.session,
-                    })
-
-                    if (r.url_type === 'upload' || r.url_type === 'link') {
-                        const resourceHasChartView =
-                            r.datastore_active &&
-                            _views.some(
-                                (v) =>
-                                    v.view_type == 'custom' &&
-                                    v.config_obj.type == 'chart'
-                            )
-
-                        r._hasChartView = resourceHasChartView
-                        
-                        return { ...r, _views }
-                    }
+                    if (r.url_type === 'upload' || r.url_type === 'link')
+                        return r
                     if (!r.url) return r
                     const layerObj = await getLayerRw(r.url)
                     if (r.url_type === 'layer')
@@ -1010,27 +935,25 @@ export const DatasetRouter = createTRPCRouter({
     createIssueComment: protectedProcedure
         .input(CommentSchema)
         .mutation(async ({ input, ctx }) => {
-            const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/issue_comment_create`,
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_comment_create`,
                 {
-                    method: 'POST',
+                    method: "POST",
                     body: JSON.stringify(input),
                     headers: {
                         Authorization: ctx.session.user.apikey,
                         'Content-Type': 'application/json',
                     },
-                }
-            )
-
+                })
+            
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(data.error.message)
 
             try {
-                const collab = await fetchDatasetCollabIds(
+                const collab =  await fetchDatasetCollabIds(
                     input.dataset_id,
-                    ctx.session.user.apikey
+                    ctx.session.user.apikey,
                 )
-                console.log('COLLAB IDS: ', collab)
+                console.log("COLLAB IDS: ", collab)
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
                     creator_id: input.creator_id,
@@ -1038,54 +961,48 @@ export const DatasetRouter = createTRPCRouter({
                     dataset_id: input.dataset_id,
                     session: ctx.session,
                     title: input.issuetitle,
-                    action: 'commented',
+                    action: "commented"
                 })
-            } catch (error) {
+            }
+            catch (error) {
                 console.log(error)
-                throw Error('Error in sending issue /comment notification')
+                throw Error("Error in sending issue /comment notification")
             }
             return data
         }),
-
+    
     closeOpenIssue: protectedProcedure
         .input(CommentSchema)
         .mutation(async ({ input, ctx }) => {
-            const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/issue_update`,
-                {
-                    method: 'POST',
-                    body: JSON.stringify(input),
-                    headers: {
-                        Authorization: ctx.session.user.apikey,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_update`, {
+                method: "POST",
+                body: JSON.stringify(input),
+                headers: {
+                    Authorization: ctx.session.user.apikey,
+                    'Content-Type': 'application/json',
+                },
+            })
 
             const data = (await response.json()) as CkanResponse<null>
             if (!data.success && data.error) throw Error(data.error.message)
 
-            const responseComment = await fetch(
-                `${env.CKAN_URL}/api/3/action/issue_comment_create`,
+            const responseComment = await fetch(`${env.CKAN_URL}/api/3/action/issue_comment_create`,
                 {
-                    method: 'POST',
+                    method: "POST",
                     body: JSON.stringify(input),
                     headers: {
                         Authorization: ctx.session.user.apikey,
                         'Content-Type': 'application/json',
                     },
-                }
-            )
-
-            const dataComment =
-                (await responseComment.json()) as CkanResponse<null>
-            if (!dataComment.success && dataComment.error)
-                throw Error(dataComment.error.message)
+                })
+            
+            const dataComment = (await responseComment.json()) as CkanResponse<null>
+            if (!dataComment.success && dataComment.error) throw Error(dataComment.error.message)
 
             try {
-                const collab = await fetchDatasetCollabIds(
+                const collab =  await fetchDatasetCollabIds(
                     input.dataset_id,
-                    ctx.session.user.apikey
+                    ctx.session.user.apikey,
                 )
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
@@ -1094,38 +1011,37 @@ export const DatasetRouter = createTRPCRouter({
                     dataset_id: input.dataset_id,
                     session: ctx.session,
                     title: input.issuetitle,
-                    action: input.status!,
+                    action: input.status!
                 })
-            } catch (error) {
+            }
+            catch (error) {
                 console.log(error)
-                throw Error('Error in sending issue /comment notification')
+                throw Error("Error in sending issue /comment notification")
             }
             return input.status
         }),
-
+    
     deleteIssue: protectedProcedure
         .input(CommentSchema)
         .mutation(async ({ input, ctx }) => {
-            const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/issue_delete`,
-                {
-                    method: 'POST',
-                    body: JSON.stringify(input),
-                    headers: {
-                        Authorization: ctx.session.user.apikey,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
-
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_delete`,
+                    {
+                        method: "POST",
+                        body: JSON.stringify(input),
+                        headers: {
+                            Authorization: ctx.session.user.apikey,
+                            'Content-Type': 'application/json',
+                        },
+                })
+            
+            
             const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error)
-                throw Error(JSON.stringify(data.error))
+            if (!data.success && data.error) throw Error(JSON.stringify(data.error))
             try {
-                // get dataset collaborators id
-                const collab = await fetchDatasetCollabIds(
+                 // get dataset collaborators id
+                const collab =  await fetchDatasetCollabIds(
                     input.dataset_id,
-                    ctx.session.user.apikey
+                    ctx.session.user.apikey,
                 )
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
@@ -1134,37 +1050,36 @@ export const DatasetRouter = createTRPCRouter({
                     dataset_id: input.dataset_id,
                     session: ctx.session,
                     title: input.issuetitle,
-                    action: 'deleted',
+                    action: "deleted"
                 })
-            } catch (error) {
+            }
+            catch (error) {
                 console.log(error)
-                throw Error('Error in sending issue /comment notification')
+                throw Error("Error in sending issue /comment notification")
             }
             return input.issue_number
         }),
     createIssue: protectedProcedure
         .input(IssueSchema)
         .mutation(async ({ input, ctx }) => {
-            const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/issue_create`,
-                {
-                    method: 'POST',
-                    body: JSON.stringify(input),
-                    headers: {
-                        Authorization: ctx.session.user.apikey,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
-
+            const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_create`,
+                    {
+                        method: "POST",
+                        body: JSON.stringify(input),
+                        headers: {
+                            Authorization: ctx.session.user.apikey,
+                            'Content-Type': 'application/json',
+                        },
+                })
+            
+            
             const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error)
-                throw Error(JSON.stringify(data.error))
+            if (!data.success && data.error) throw Error(JSON.stringify(data.error))
 
             try {
-                const collab = await fetchDatasetCollabIds(
+                const collab =  await fetchDatasetCollabIds(
                     input.dataset_id,
-                    ctx.session.user.apikey
+                    ctx.session.user.apikey,
                 )
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
@@ -1173,12 +1088,14 @@ export const DatasetRouter = createTRPCRouter({
                     dataset_id: input.dataset_id,
                     session: ctx.session,
                     title: input.title,
-                    action: 'created',
+                    action: "created"
                 })
-            } catch (error) {
+            }
+            catch (error) {
                 console.log(error)
-                throw Error('Error in sending issue /comment notification')
+                throw Error("Error in sending issue /comment notification")
             }
             return data
         }),
+    
 })

@@ -29,23 +29,18 @@ const DefaultTooltip = ({
     content,
     disabled = false,
     side = 'top',
-    contentClassName = '',
 }: {
     children: React.ReactNode
     content: React.ReactNode | string
     disabled?: boolean
     side?: 'top' | 'bottom' | 'left' | 'right'
-    contentClassName?: string
 }) => {
     if (disabled) return <>{children}</>
     return (
         <TooltipProvider delayDuration={100}>
             <Tooltip>
                 <TooltipTrigger asChild>{children}</TooltipTrigger>
-                <TooltipContent
-                    className={`bg-white z-[10000] ${contentClassName}`}
-                    side={side}
-                >
+                <TooltipContent className="bg-white z-50" side={side}>
                     <p>{content}</p>
                 </TooltipContent>
             </Tooltip>

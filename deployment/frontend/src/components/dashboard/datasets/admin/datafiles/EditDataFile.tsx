@@ -24,7 +24,6 @@ import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
-import ViewPanel from './ViewsPanel'
 
 export function EditDataFile({
     remove,
@@ -56,7 +55,6 @@ export function EditDataFile({
     })
 
     const datafile = watch(`resources.${index}`)
-
     return (
         <>
             <DataFileAccordion
@@ -285,9 +283,7 @@ export function EditDataFile({
                                             </InputGroup>
                                         </div>
                                     </Tab.Panel>
-                                    <Tab.Panel>
-                                        <ViewPanel datafile={datafile as any} />
-                                    </Tab.Panel>
+                                    <Tab.Panel></Tab.Panel>
                                     {datafile.schema &&
                                         datafile.schema.length > 0 && (
                                             <Tab.Panel>

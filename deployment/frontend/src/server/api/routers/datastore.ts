@@ -32,11 +32,10 @@ export const datastoreRouter = createTRPCRouter({
                         value: z.array(filterObj),
                     })
                 ),
-                groupBy: z.array(z.string()).optional(),
             })
         )
-        .query(async ({ input, ctx }) => {
-            const { pagination, resourceId, columns, sorting, filters, groupBy } = input
+        .query(async ({ input }) => {
+            const { pagination, resourceId, columns, sorting, filters } = input
             const paginationSql = `LIMIT ${
                 pagination.pageIndex * pagination.pageSize + pagination.pageSize
             }`
@@ -68,32 +67,19 @@ export const datastoreRouter = createTRPCRouter({
                           )
                           .join(' AND ')
                     : ''
-            const groupBySql =
-                groupBy && groupBy.length
-                    ? 'GROUP BY ' + groupBy.map(item => `"${item}"`).join(', ')
-                    : ''
-
-
             const parsedColumns = columns.map((column) => `"${column}"`)
             const url = `${
                 env.CKAN_URL
             }/api/action/datastore_search_sql?sql=SELECT ${parsedColumns.join(
                 ' , '
-            )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${groupBySql} ${paginationSql}`
-            const tableDataRes = await fetch(url, {
-                headers: {
-                    Authorization: ctx.session?.user.apikey ?? '',
-                },
-            })
+            )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${paginationSql}`
+            const tableDataRes = await fetch(url)
             const tableData: DataResponse = await tableDataRes.json()
             if (!tableData.success && tableData.error) {
-                console.log(tableData.error)
-                if (tableData.error.message){
+                if (tableData.error.message)
                     throw Error(tableData.error.message)
-                }
                 throw Error(JSON.stringify(tableData.error))
             }
-            console.log(tableData)
             const data = tableData.result.records
             return data
         }),
@@ -109,7 +95,7 @@ export const datastoreRouter = createTRPCRouter({
                 ),
             })
         )
-        .query(async ({ input, ctx }) => {
+        .query(async ({ input }) => {
             try {
                 const { resourceId, filters } = input
                 const filtersSql =
@@ -136,7 +122,6 @@ export const datastoreRouter = createTRPCRouter({
                 const numRowsRes = await fetch(url, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': ctx.session?.user.apikey ?? ""
                     },
                 })
                 const numRows: DataResponse = await numRowsRes.json()
@@ -152,7 +137,6 @@ export const datastoreRouter = createTRPCRouter({
                 ) {
                     return numRows.result.records[0].count as number
                 }
-                console.log(numRows)
                 throw new Error('Could not get number of rows')
             } catch (e) {
                 let error =
