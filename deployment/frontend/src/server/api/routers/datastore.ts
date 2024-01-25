@@ -74,11 +74,11 @@ export const datastoreRouter = createTRPCRouter({
                 ' , '
             )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${paginationSql}`
             const tableDataRes = await fetch(url, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `${ctx?.session?.user.apikey}`,
-                        },
-    })
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${ctx?.session?.user.apikey}`,
+                },
+            })
             const tableData: DataResponse = await tableDataRes.json()
             if (!tableData.success && tableData.error) {
                 if (tableData.error.message)
@@ -100,7 +100,7 @@ export const datastoreRouter = createTRPCRouter({
                 ),
             })
         )
-        .query(async ({ input }) => {
+        .query(async ({ ctx, input }) => {
             try {
                 const { resourceId, filters } = input
                 const filtersSql =
@@ -127,6 +127,7 @@ export const datastoreRouter = createTRPCRouter({
                 const numRowsRes = await fetch(url, {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `${ctx?.session?.user.apikey}`,
                     },
                 })
                 const numRows: DataResponse = await numRowsRes.json()
@@ -138,7 +139,7 @@ export const datastoreRouter = createTRPCRouter({
                 if (
                     numRows.result &&
                     numRows.result.records[0] &&
-                    numRows.result.records[0].count
+                    (numRows.result.records[0].count || numRows.result.records[0].count === 0)
                 ) {
                     return numRows.result.records[0].count as number
                 }
