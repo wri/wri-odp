@@ -32,7 +32,7 @@ export const chartSchema = z.object({
         chart: z.object({
             type: z
                 .object({
-                    value: z.enum(['bar', 'scatter'], {
+                    value: z.enum(['bar', 'scatter', 'pie'], {
                         errorMap: () => ({
                             message: 'Please select a chart type',
                         }),
@@ -91,14 +91,14 @@ export const chartSchema = z.object({
             tooltips: z.object({
                 enabled: z
                     .object({
-                        label: z.string(),
+                        label: z.string().optional(),
                         value: z.boolean().default(true),
                     })
                     .optional(),
                 format: z
                     .object({ label: z.string(), value: z.string().optional() })
                     .optional(),
-            }),
+            }).optional(),
             colors: z.object({ starting: z.string(), ending: z.string() }),
         }),
         query: z.object({
