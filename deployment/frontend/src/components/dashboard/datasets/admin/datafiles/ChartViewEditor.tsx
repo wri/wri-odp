@@ -393,7 +393,7 @@ export default function ChartViewEditor({
                                         />
                                     </InputGroup>
                                     <Accordion text="Data" >
-                                        <div className="grow flex flex-col space-y-4 pb-60">
+                                        <div className="grow flex flex-col space-y-4">
                                             <InputGroup
                                                 label="Dimension column"
                                                 className="sm:grid-cols-1 gap-x-2"
