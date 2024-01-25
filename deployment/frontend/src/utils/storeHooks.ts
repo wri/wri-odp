@@ -20,6 +20,7 @@ export const useActiveDatafileCharts = () => {
         activeDatafileCharts: store.activeDatafileCharts,
         addDatafileCharts: store.addDatafileCharts,
         removeDatafileCharts: store.removeDatafileCharts,
+        replaceDatafileCharts: store.replaceDatafileCharts,
     }))
 }
 

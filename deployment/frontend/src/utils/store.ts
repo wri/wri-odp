@@ -349,6 +349,13 @@ export const initializeStore = (preloadedState: any = {}) => {
                         activeDatafileCharts: [...prev.activeDatafileCharts.filter((c: View) => c.id != dfId)],
                     })
                 },
+                replaceDatafileCharts: (datafiles: Resource[]) => {
+                    const prev = get()
+                    set({
+                        ...prev,
+                        activeDatafileCharts: datafiles,
+                    })
+                },
             })
         )
     )

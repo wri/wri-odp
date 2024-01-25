@@ -1,23 +1,25 @@
 import { useState } from 'react'
 import { DocumentDuplicateIcon } from '@heroicons/react/20/solid'
-import { useDataset } from '@/utils/storeHooks'
+import { useActiveDatafileCharts, useDataset } from '@/utils/storeHooks'
 import IconButton from '@/components/_shared/map/controls/IconButton'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { Button } from '@/components/_shared/Button'
 import Modal from '@/components/_shared/Modal'
+import { View } from '@/interfaces/dataset.interface'
 
 export default function ChartViewExport() {
+    const { activeDatafileCharts } = useActiveDatafileCharts()
     const { dataset } = useDataset()
     const [open, setOpen] = useState(false)
     const searchParams = new URLSearchParams(window.location.search)
-    const map = searchParams.get('map')
+    const chartsId = activeDatafileCharts.map((df: View) => df.id).join(',')
 
-    const embedUrl = `${window.location.origin}/datasets/${dataset.name}/embed/map?map=${map}`
+    const embedUrl = `${window.location.origin}/datasets/${dataset.name}/embed/chart?charts=${chartsId}`
 
-    const iFrameHtml = `<iframe src=${embedUrl} width="1000" height="800" />`
+    const iFrameHtml = `<iframe src="${embedUrl}" width="1000" height="800" />`
     return (
-        <IconButton tooltip='Embed this chart' onClick={() => setOpen(true)}>
+        <IconButton tooltip="Embed this view" onClick={() => setOpen(true)}>
             <ExportIcon />
 
             <Modal
@@ -78,4 +80,3 @@ function ExportIcon() {
         </svg>
     )
 }
-

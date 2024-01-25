@@ -15,7 +15,7 @@ const Chart = dynamic(
     }
 )
 
-export default function ChartView() {
+export default function ChartView({ isEmbed = false }: { isEmbed?: boolean }) {
     const [activeChart, setActiveChart] = useState<View | undefined>()
     const { activeDatafileCharts } = useActiveDatafileCharts()
 
@@ -51,14 +51,17 @@ export default function ChartView() {
     }
 
     useEffect(() => {
-        const defaultChart = chartOptions.find((co: any) => co.default)
+        if (chartOptions) {
+            const defaultChart = chartOptions.find((co: any) => co.default)
 
-        if (defaultChart) {
-            setActiveChart(defaultChart.value)
+            if (defaultChart) {
+                setActiveChart(defaultChart.value)
+            }
         }
-    }, [])
+    }, [activeDatafileCharts])
 
     const onChange = (selected: View) => {
+        setActiveChart(selected)
         reset({
             x_tick_angle:
                 selected.config_obj.form_state.config.chart?.labels?.x?.angle
@@ -102,41 +105,43 @@ export default function ChartView() {
                     maxWidth="max-w-[300px]"
                     onChange={onChange}
                 />
-                <ChartViewExport />
+                {!isEmbed && <ChartViewExport />}
             </div>
             {activeChart?.config_obj && (
                 <Chart config={getConfigWithOverrides()} />
             )}
-            <form onSubmit={handleSubmit((data) => { })} className="mt-10">
-                <div className="grid grid-cols-2 xl:grid-cols-2 mb-5 space-x-2">
-                    <InputGroup
-                        label="X axis tick angle"
-                        className="sm:grid-cols-1 gap-x-2"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                    >
-                        <SimpleSelect
-                            id="x-axis-label-orientation"
-                            formObj={formObj}
-                            name="x_tick_angle"
-                            placeholder="E.g. 45º"
-                            options={labelAngleOptions}
-                        />
-                    </InputGroup>
-                    <InputGroup
-                        label="Y axis tick angle"
-                        className="sm:grid-cols-1 gap-x-2"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                    >
-                        <SimpleSelect
-                            id="y-axis-label-orientation"
-                            formObj={formObj}
-                            name="y_tick_angle"
-                            placeholder="E.g. 45º"
-                            options={labelAngleOptions}
-                        />
-                    </InputGroup>
-                </div>
-            </form>
+            {!isEmbed && (
+                <form onSubmit={handleSubmit((data) => { })} className="mt-10">
+                    <div className="grid grid-cols-2 xl:grid-cols-2 mb-5 space-x-2">
+                        <InputGroup
+                            label="X axis tick angle"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                        >
+                            <SimpleSelect
+                                id="x-axis-label-orientation"
+                                formObj={formObj}
+                                name="x_tick_angle"
+                                placeholder="E.g. 45º"
+                                options={labelAngleOptions}
+                            />
+                        </InputGroup>
+                        <InputGroup
+                            label="Y axis tick angle"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                        >
+                            <SimpleSelect
+                                id="y-axis-label-orientation"
+                                formObj={formObj}
+                                name="y_tick_angle"
+                                placeholder="E.g. 45º"
+                                options={labelAngleOptions}
+                            />
+                        </InputGroup>
+                    </div>
+                </form>
+            )}
         </div>
     )
 }
