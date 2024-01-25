@@ -88,7 +88,6 @@ export async function queryDatastore(
         ' , '
     )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${groupBySql} ${paginationSql}`
 
-    console.log(sql)
 
     return { data: await sqlQueryDatastore(sql, session), sql }
 }

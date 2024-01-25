@@ -1,8 +1,5 @@
-import { Button, LoaderButton } from '@/components/_shared/Button'
 import Modal from '@/components/_shared/Modal'
-import { CodeEditor } from '@/components/dashboard/_shared/CodeEditor'
 import { Dialog } from '@headlessui/react'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dispatch, SetStateAction } from 'react'
 
 export default function DataDialog({

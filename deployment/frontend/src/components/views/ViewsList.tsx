@@ -8,13 +8,14 @@ import { Resource, ViewState } from '@/interfaces/dataset.interface'
 import { PopoverClose } from '@radix-ui/react-popover'
 import { useState } from 'react'
 import ViewCard from './ViewCard'
+import { DatastoreViewCard } from './DatastoreViewCard'
 
 let uniqueId = 0
 const getUniqueInternalId = () => {
     return uniqueId++
 }
 
-export default function ViewPanel({ datafile }: { datafile: Resource }) {
+export default function ViewsList({ datafile }: { datafile: Resource }) {
     const ogViews = datafile._views
 
     const [views, setViews] = useState<ViewState[]>(
@@ -86,7 +87,7 @@ export default function ViewPanel({ datafile }: { datafile: Resource }) {
                 </h2>
                 {views.map((view: ViewState) => {
                     return (
-                        <ViewCard
+                        <DatastoreViewCard
                             view={view}
                             datafile={datafile}
                             key={`view-${datafile.id}-${view._id}`}

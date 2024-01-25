@@ -1,63 +1,27 @@
 import { ChartBarIcon } from '@heroicons/react/20/solid'
 import ChartViewEditor from './ChartViewEditor'
-import { api } from '@/utils/api'
-import { toast } from 'react-toastify'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { Resource, View, ViewState } from '@/interfaces/dataset.interface'
-import { useState } from 'react'
+import { View, ViewState } from '@/interfaces/dataset.interface'
+import { Dispatch, SetStateAction } from 'react'
 
 export default function ViewCard({
-    view: _ogView,
-    datafile,
-    onCancelOrDelete: onCancel,
+    view,
+    setView,
+    onCancelOrDelete,
+    mode,
+    setMode,
+    onSave,
 }: {
-    view: ViewState
-    datafile: Resource
+    view: View
+    setView: Dispatch<SetStateAction<View>>
     onCancelOrDelete: (mode: string) => void
+    mode: ViewState["_state"]
+    setMode: Dispatch<SetStateAction<ViewState['_state']>>
+    onSave: (mode: string, view: View) => void
 }) {
-    const [mode, setMode] = useState(_ogView._state)
-    const [view, setView] = useState<View>(_ogView)
 
-    const createMutation = api.dataset.createResourceView.useMutation()
-    const updateMutation = api.dataset.updateResourceView.useMutation()
 
-    const onSave = (mode: string, view: View) => {
-        if (mode == 'new') {
-            createMutation.mutate(
-                {
-                    ...view,
-                    resource_id: datafile.id,
-                },
-                {
-                    onError: (e) => {
-                        toast(e.message, { type: 'error' })
-                    },
-                    onSuccess: () => {
-                        toast('The new view was successfully created')
-                        setMode('saved')
-                    },
-                }
-            )
-        } else if (mode == 'edit' && view.id) {
-            updateMutation.mutate(
-                {
-                    ...view,
-                    id: view.id,
-                    resource_id: datafile.id,
-                },
-                {
-                    onError: (e) => {
-                        toast(e.message, { type: 'error' })
-                    },
-                    onSuccess: () => {
-                        toast('The view was successfully updated')
-                        setMode('saved')
-                    },
-                }
-            )
-        }
-    }
 
     return (
         <div>
@@ -89,9 +53,8 @@ export default function ViewCard({
             {['new', 'edit'].includes(mode) &&
                 view.config_obj.type == 'chart' && (
                     <ChartViewEditor
-                        // @ts-ignore
                         mode={mode}
-                        onCancelOrDelete={onCancel}
+                        onCancelOrDelete={onCancelOrDelete}
                         onSave={onSave}
                         view={view}
                         setView={setView}

@@ -3,13 +3,16 @@ import { InputGroup, ErrorDisplay } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { useFields } from '@/components/data-explorer/queryHooks'
-import { type ChartViewConfig, type View } from '@/interfaces/dataset.interface'
+import {
+    ViewState,
+    type ChartViewConfig,
+    type View,
+} from '@/interfaces/dataset.interface'
 import { queryDatastore } from '@/utils/datastore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSession } from 'next-auth/react'
 import { type Dispatch, type SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Accordion } from './sections/BuildALayer/Accordion'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 
 import { ChartFormType, chartSchema } from '@/schema/view.schema'
@@ -20,6 +23,7 @@ import dynamic from 'next/dynamic'
 import { getGradientColor } from '@/utils/colors'
 import ChartFilters from './ChartFilters'
 import DataDialog from './DataDialog'
+import { Accordion } from '../dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion'
 const Chart = dynamic(
     () => import('@/components/datasets/visualizations/Chart'),
     {
@@ -51,7 +55,7 @@ export default function ChartViewEditor({
     setView: Dispatch<SetStateAction<View>>
     onCancelOrDelete: (mode: string) => void
     onSave: (mode: string, view: View) => void
-    mode: 'new' | 'edit'
+    mode: ViewState['_state']
 }) {
     const session = useSession()
 
@@ -151,10 +155,18 @@ export default function ChartViewEditor({
             }
 
             // TODO: add loading indicator for this query
-            const { data: tableData, sql } = await queryDatastore(
-                query,
-                session.data
-            )
+            let tableData
+            let sql
+
+            if (view.config_obj.config.provider == 'datastore') {
+                const { data, sql: querySql } = await queryDatastore(
+                    query,
+                    session.data
+                )
+
+                tableData = data;
+                sql = querySql
+            } 
 
             setSql(sql)
 
@@ -162,7 +174,6 @@ export default function ChartViewEditor({
              * Chart configuration
              *
              */
-            console.log(formData.config.chart)
             const data: Plotly.Data[] = []
             const layout: Partial<Plotly.Layout> = {
                 title: { text: formData.title },
@@ -392,7 +403,7 @@ export default function ChartViewEditor({
                                             errors={errors}
                                         />
                                     </InputGroup>
-                                    <Accordion text="Data" >
+                                    <Accordion text="Data">
                                         <div className="grow flex flex-col space-y-4">
                                             <InputGroup
                                                 label="Dimension column"

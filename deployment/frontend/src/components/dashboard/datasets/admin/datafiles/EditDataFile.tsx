@@ -24,7 +24,7 @@ import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
-import ViewPanel from './ViewsPanel'
+import ViewPanel from '@/components/views/ViewsList'
 
 export function EditDataFile({
     remove,
