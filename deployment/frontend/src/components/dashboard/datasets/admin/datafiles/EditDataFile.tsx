@@ -235,8 +235,19 @@ export function EditDataFile({
                                                     )}
                                                 </Tab>
                                             )}
-                                        {datafile.format?.toLowerCase() ===
-                                            'csv' && (
+                                        {[
+                                            'xls',
+                                            'xlsx',
+                                            'ods',
+                                            'xlsm',
+                                            'xlsb',
+                                            'csv',
+                                            'tsv',
+                                            'tab',
+                                        ].includes(
+                                            datafile.format?.toLowerCase() ??
+                                                'none'
+                                        ) && (
                                             <Tab as={Fragment}>
                                                 {({ selected }) => (
                                                     <div
@@ -316,8 +327,22 @@ export function EditDataFile({
                                                 />
                                             </Tab.Panel>
                                         )}
-                                    {datafile.format?.toLowerCase() ===
-                                        'csv' && <Tab.Panel><Datapusher datafile={datafile} /></Tab.Panel>}
+                                    {[
+                                        'xls',
+                                        'xlsx',
+                                        'ods',
+                                        'xlsm',
+                                        'xlsb',
+                                        'csv',
+                                        'tsv',
+                                        'tab',
+                                    ].includes(
+                                        datafile.format?.toLowerCase() ?? 'none'
+                                    ) && (
+                                        <Tab.Panel>
+                                            <Datapusher datafile={datafile} />
+                                        </Tab.Panel>
+                                    )}
                                 </Tab.Panels>
                             </div>
                         </Tab.Group>
