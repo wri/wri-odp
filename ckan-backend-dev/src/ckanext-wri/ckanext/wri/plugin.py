@@ -11,6 +11,7 @@ from ckanext.wri.logic.action.create import notification_create
 from ckanext.wri.logic.action.update import notification_update
 from ckanext.wri.logic.action.get import package_search, notification_get_all
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
+from ckan.lib.navl.validators import ignore_missing
 
 import logging
 log = logging.getLogger(__name__)
@@ -25,6 +26,7 @@ class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IPermissionLabels)
     plugins.implements(plugins.IPackageController, inherit=True)
+    plugins.implements(plugins.IResourceView, inherit=True)
 
     # IConfigurer
 
@@ -180,4 +182,18 @@ class WriPlugin(plugins.SingletonPlugin):
                 point, input_address, search_params)
 
         return search_params
+
+    # IResourceView
+    def info(self):
+        return {
+                "name": "custom", 
+                "title": "Custom View",
+                "always_available": True,
+                "preview_enabled": False,
+                "iframed": False,
+                "schema": {"config_obj": [ignore_missing]}
+                }
+
+    def can_view(self):
+        return True
 

@@ -4,20 +4,53 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/_shared/Popover'
-import { Resource, View } from '@/interfaces/dataset.interface'
-import { ChartBarIcon } from '@heroicons/react/20/solid'
+import { Resource, ViewState } from '@/interfaces/dataset.interface'
 import { PopoverClose } from '@radix-ui/react-popover'
 import { useState } from 'react'
-import ChartViewEditor from './ChartViewEditor'
+import ViewCard from './ViewCard'
 
-type ViewState = View & { _state: 'new' | 'saved' | 'edit' }
+let uniqueId = 0
+const getUniqueInternalId = () => {
+    return uniqueId++
+}
 
 export default function ViewPanel({ datafile }: { datafile: Resource }) {
     const ogViews = datafile._views
 
     const [views, setViews] = useState<ViewState[]>(
-        ogViews ? ogViews.map((view) => ({ ...view, _state: 'saved' })) : []
+        ogViews
+            ? ogViews.map((view) => ({
+                ...view,
+                _state: 'saved',
+                _id: getUniqueInternalId(),
+            }))
+            : []
     )
+
+    const addNewChartView = () => {
+        setViews((prev) => [
+            ...prev,
+            {
+                config_obj: {
+                    type: 'chart',
+                    config: {
+                        provider: 'datastore',
+                        id: datafile.id,
+                        props: {
+                            data: [],
+                            layout: {},
+                        },
+                    },
+                    form_state: {},
+                },
+                title: '',
+                description: '',
+                view_type: 'custom',
+                _state: 'new',
+                _id: getUniqueInternalId(),
+            },
+        ])
+    }
 
     return (
         <div>
@@ -35,25 +68,7 @@ export default function ViewPanel({ datafile }: { datafile: Resource }) {
                                 <Button
                                     variant="ghost"
                                     className="w-full"
-                                    onClick={() =>
-                                        setViews((prev) => [
-                                            ...prev,
-                                            {
-                                                config: {
-                                                    provider: 'datastore',
-                                                    id: datafile.id,
-                                                    props: {
-                                                        data: [],
-                                                        layout: {},
-                                                    },
-                                                },
-                                                title: '',
-                                                description: '',
-                                                view_type: 'chart',
-                                                _state: 'new',
-                                            },
-                                        ])
-                                    }
+                                    onClick={addNewChartView}
                                 >
                                     <div className="text-left w-full">
                                         Chart
@@ -69,48 +84,39 @@ export default function ViewPanel({ datafile }: { datafile: Resource }) {
                 <h2 className="text-base mb-2">
                     {views.filter((v) => v._state != 'new').length} Views
                 </h2>
-                {views.map((view: ViewState, i: number) => {
+                {views.map((view: ViewState) => {
                     return (
                         <ViewCard
                             view={view}
                             datafile={datafile}
-                            key={`view-${i}`}
+                            key={`view-${datafile.id}-${view._id}`}
+                            onCancelOrDelete={(mode) => {
+                                if (mode == 'new') {
+                                    setViews((prev) => {
+                                        let newViews = [...prev]
+
+                                        newViews = newViews.filter(
+                                            (v) => v._id != view._id
+                                        )
+
+                                        return newViews
+                                    })
+                                } else if (mode == 'edit') {
+                                    setViews((prev) => {
+                                        let newViews = [...prev]
+
+                                        newViews = newViews.filter(
+                                            (v) => v._id != view._id
+                                        )
+
+                                        return newViews
+                                    })
+                                }
+                            }}
                         />
                     )
                 })}
             </div>
-        </div>
-    )
-}
-
-function ViewCard({
-    view: _ogView,
-    datafile,
-}: {
-    view: ViewState
-    datafile: Resource
-}) {
-    const [mode, setMode] = useState(_ogView._state)
-    const [view, setView] = useState<View>(_ogView)
-
-    return (
-        <div>
-            {mode != 'new' && (
-                <div className="w-full px-6 py-5 shadow-md">
-                    <h2 className="flex items-center">
-                        {view.view_type == 'chart' && (
-                            <>
-                                <ChartBarIcon className="w-6 text-wri-dark-blue mr-2 text-base" />{' '}
-                                {view.title || 'Chart View'}
-                            </>
-                        )}
-                    </h2>
-                </div>
-            )}
-
-            {['new', 'edit'].includes(mode) && view.view_type == 'chart' && (
-                <ChartViewEditor view={view} setView={setView} />
-            )}
         </div>
     )
 }

@@ -12,7 +12,10 @@ import {
     upsertCollaborator,
     deleteCollaborator,
     sendIssueOrCommentNotigication,
-    getResourceViews
+    getResourceViews,
+    createResourceView,
+    updateResourceView,
+    deleteResourceView,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -48,6 +51,7 @@ import { sendMemberNotifications } from '@/utils/apiUtils'
 import { TRPCError } from '@trpc/server'
 import { CommentSchema, IssueSchema } from '@/schema/issue.schema'
 import { throws } from 'assert'
+import { createViewFormSchema, editViewFormSchema, viewFormSchema } from '@/schema/view.schema'
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -85,8 +89,8 @@ async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     const body = r.layerObj
         ? JSON.stringify(convertFormToLayerObj(r.layerObj))
         : JSON.stringify({
-              ...getApiSpecFromRawObj(r.layerObjRaw),
-          })
+            ...getApiSpecFromRawObj(r.layerObjRaw),
+        })
     const layerRwRes = await fetch(
         `https://api.resourcewatch.org/v1/dataset/${datasetRwId}/layer`,
         {
@@ -108,7 +112,7 @@ async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     r.title = title
     r.description = description
     r.rw_id = layerRw.data.id
-    r.format = "Layer"
+    r.format = 'Layer'
     return r
 }
 
@@ -138,7 +142,7 @@ async function editLayerRw(r: ResourceFormType) {
             const description = layerRw.data.attributes.description
             r.title = title
             r.description = description
-            r.format = "Layer"
+            r.format = 'Layer'
             return r
         }
     } catch (e) {
@@ -167,11 +171,8 @@ async function getLayerRw(layerUrl: string) {
     return { ...layerRw.data.attributes, id: layerRw.data.id }
 }
 
-async function fetchDatasetCollabIds(
-    datasetId: string,
-    userApiKey: string
-) {
-    const res  = await  fetch(
+async function fetchDatasetCollabIds(datasetId: string, userApiKey: string) {
+    const res = await fetch(
         `${env.CKAN_URL}/api/3/action/package_collaborator_list?id=${datasetId}`,
         {
             headers: {
@@ -188,12 +189,17 @@ async function fetchDatasetCollabIds(
                 message: 'You are not authorized to perform this action',
             })
         if (collaborators.error.message)
-            throw new TRPCError({code: 'BAD_REQUEST', message: collaborators.error.message})
-        throw new TRPCError({code: 'BAD_REQUEST', message: JSON.stringify(collaborators.error)})
+            throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: collaborators.error.message,
+            })
+        throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: JSON.stringify(collaborators.error),
+        })
     }
 
     return collaborators.result.map((collaborator) => collaborator.user_id)
-    
 }
 
 export async function fetchDatasetCollaborators(
@@ -219,8 +225,14 @@ export async function fetchDatasetCollaborators(
                 message: 'You are not authorized to perform this action',
             })
         if (collaborators.error.message)
-            throw new TRPCError({code: 'BAD_REQUEST', message: collaborators.error.message})
-        throw new TRPCError({code: 'BAD_REQUEST', message: JSON.stringify(collaborators.error)})
+            throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: collaborators.error.message,
+            })
+        throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: JSON.stringify(collaborators.error),
+        })
     }
 
     const collaboratorsWithDetails = await Promise.all(
@@ -309,8 +321,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                            ? JSON.stringify(input.spatial)
-                            : null,
+                                ? JSON.stringify(input.spatial)
+                                : null,
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -385,27 +397,27 @@ export const DatasetRouter = createTRPCRouter({
             }
             const resourcesToEditLayer = input.rw_id
                 ? await Promise.all(
-                      input.resources
-                          .filter(
-                              (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
-                          )
-                          .map(async (r) => {
-                              return await editLayerRw(r)
-                          })
-                  )
+                    input.resources
+                        .filter(
+                            (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
+                        )
+                        .map(async (r) => {
+                            return await editLayerRw(r)
+                        })
+                )
                 : []
             const resourcesToCreateLayer =
                 rw_id !== null
                     ? await Promise.all(
-                          input.resources
-                              .filter(
-                                  (r) =>
-                                      (r.layerObj || r.layerObjRaw) && !r.rw_id
-                              )
-                              .map(async (r) => {
-                                  return await createLayerRw(r, rw_id ?? '')
-                              })
-                      )
+                        input.resources
+                            .filter(
+                                (r) =>
+                                    (r.layerObj || r.layerObjRaw) && !r.rw_id
+                            )
+                            .map(async (r) => {
+                                return await createLayerRw(r, rw_id ?? '')
+                            })
+                    )
                     : []
             const resources = [
                 ...resourcesWithoutLayer,
@@ -456,8 +468,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                            ? JSON.stringify(input.spatial)
-                            : null,
+                                ? JSON.stringify(input.spatial)
+                                : null,
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -584,7 +596,38 @@ export const DatasetRouter = createTRPCRouter({
 
             return views
         }),
+    createResourceView: protectedProcedure
+        .input(createViewFormSchema)
+        .mutation(async ({ input, ctx }) => {
+            console.log("!!!");
+            console.log(input);
+            const view = await createResourceView({
+                view: input,
+                session: ctx.session,
+            })
 
+            return view
+        }),
+    updateResourceView: protectedProcedure
+        .input(editViewFormSchema)
+        .mutation(async ({ input, ctx }) => {
+            const view = await updateResourceView({
+                view: input,
+                session: ctx.session,
+            })
+
+            return view
+        }),
+    deleteResourceView: protectedProcedure
+        .input(z.object({id: z.string()}))
+        .mutation(async ({ input, ctx }) => {
+            const view = await deleteResourceView({
+                session: ctx.session,
+                id: input.id
+            })
+
+            return view
+        }),
     getAllDataset: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
@@ -709,8 +752,19 @@ export const DatasetRouter = createTRPCRouter({
                         session: ctx.session,
                     })
 
-                    if (r.url_type === 'upload' || r.url_type === 'link')
+                    if (r.url_type === 'upload' || r.url_type === 'link') {
+                        const resourceHasChartView =
+                            r.datastore_active &&
+                            _views.some(
+                                (v) =>
+                                    v.view_type == 'custom' &&
+                                    v.config_obj.type == 'chart'
+                            )
+
+                        r._hasChartView = resourceHasChartView
+                        
                         return { ...r, _views }
+                    }
                     if (!r.url) return r
                     const layerObj = await getLayerRw(r.url)
                     if (r.url_type === 'layer')

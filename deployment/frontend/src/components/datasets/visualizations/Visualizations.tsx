@@ -3,8 +3,9 @@ import { VisualizationTabs } from './VisualizationTabs'
 import MapView from './MapView'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useRouter } from 'next/router'
-import { useVizIndex } from '@/utils/storeHooks'
+import { useActiveDatafileCharts, useVizIndex } from '@/utils/storeHooks'
 import { DataExplorer } from '@/components/data-explorer/DataExplorer'
+import Chart from './ChartView'
 import ChartView from './ChartView'
 
 export type TabularResource = {
@@ -21,10 +22,12 @@ export default function Visualizations({
     const [prevTabularResource, setPrevTabularResource] =
         useState(tabularResource)
     const { vizIndex, setVizIndex } = useVizIndex()
+    const { activeDatafileCharts } = useActiveDatafileCharts()
+
     const tabs = [
         { name: 'Map View', enabled: true },
         { name: 'Tabular View', enabled: !!tabularResource },
-        { name: 'Chart View', enabled: true }, // TODO: verify this
+        { name: 'Chart View', enabled: activeDatafileCharts?.length }, // TODO: verify this
     ]
 
     if (!tabularResource && prevTabularResource) {

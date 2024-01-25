@@ -15,6 +15,14 @@ export const useDataset = () => {
     return { dataset }
 }
 
+export const useActiveDatafileCharts = () => {
+    return useStore((store) => ({
+        activeDatafileCharts: store.activeDatafileCharts,
+        addDatafileCharts: store.addDatafileCharts,
+        removeDatafileCharts: store.removeDatafileCharts,
+    }))
+}
+
 export const useRelatedDatasets = () => {
     const { relatedDatasets } = useStore((store) => ({
         relatedDatasets: store.relatedDatasets,

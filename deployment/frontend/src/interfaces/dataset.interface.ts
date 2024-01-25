@@ -59,6 +59,7 @@ export interface Resource {
     key?: string
     schema?: { value: DataDictionaryFormType }
     rw_id?: string
+    _hasChartView?: boolean;
     _views?: View[]
 }
 
@@ -87,14 +88,19 @@ export interface Tag {
 }
 
 export interface View {
+    id?: string,
     title: string
     description: string
-    view_type: 'chart'
-    config: ChartViewConfig // | ...
+    view_type: 'custom'
+    config_obj: { type: ViewType, config: ChartViewConfig, form_state: any /* | OtherViewConfig ... */ } 
 }
+
+export type ViewType = "chart"
 
 export interface ChartViewConfig {
     provider: 'datastore' | 'rw'
     id: string
     props: PlotParams
 }
+
+export type ViewState = View & { _state: 'new' | 'saved' | 'edit'; _id: number }

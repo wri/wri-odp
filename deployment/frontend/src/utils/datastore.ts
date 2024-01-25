@@ -30,50 +30,66 @@ export async function queryDatastore(
         resourceId: string
         columns: string[]
         sorting: { id: string; desc: boolean }[]
-        filters: { id: string; value: FilterObjType[] }[]
+        filters: {
+            column: string
+            operation: string
+            value: string
+            link?: string
+        }[]
         groupBy: string[]
+        aggregate?: { column: string; fn: string }
     },
     session: Session | null
 ) {
-    const { pagination, resourceId, columns, sorting, filters, groupBy } = input
-    const paginationSql = `LIMIT ${
-        pagination.pageIndex * pagination.pageSize + pagination.pageSize
-    }`
+    const {
+        pagination,
+        resourceId,
+        columns,
+        sorting,
+        filters,
+        groupBy,
+        aggregate,
+    } = input
+    const paginationSql = `LIMIT ${pagination.pageIndex * pagination.pageSize + pagination.pageSize
+        }`
     const sortSql =
         sorting.length > 0
             ? 'ORDER BY ' +
-              sorting
-                  .map((sort) => `"${sort.id}" ${sort.desc ? 'DESC' : 'ASC'}`)
-                  .join(', ')
+            sorting
+                .map((sort) => `"${sort.id}" ${sort.desc ? 'DESC' : 'ASC'}`)
+                .join(', ')
             : ''
     const filtersSql =
         filters.length > 0
             ? 'WHERE ' +
-              filters
-                  .map(
-                      (filter) =>
-                          `( ${filter.value
-                              .filter((v) => v.value !== '')
-                              .map(
-                                  (v) =>
-                                      `${filter.id} ${v.operation.value} '${
-                                          v.value
-                                      }' ${v.link ?? ''} `
-                              )
-                              .join('')} )`
-                  )
-                  .join(' AND ')
+            filters
+                .map(
+                    (f, i) =>
+                        `"${f.column}" ${f.operation} '${f.value}' ${f.link && i != filters.length - 1 ? f.link : ''}`
+                )
+                .join(' ')
             : ''
     const groupBySql =
         groupBy && groupBy.length
             ? 'GROUP BY ' + groupBy.map((item) => `"${item}"`).join(', ')
             : ''
 
-    const parsedColumns = columns.map((column) => `"${column}"`)
+    let aggregateSql = ''
+    if (input.aggregate) {
+        aggregateSql = `${aggregate?.fn}("${aggregate?.column}") as "${aggregate?.column}"`
+    }
+
+    const parsedColumns = columns.map((column) =>
+        aggregate?.column == column && aggregateSql
+            ? aggregateSql
+            : `"${column}"`
+    )
 
     const sql = `SELECT ${parsedColumns.join(
         ' , '
     )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${groupBySql} ${paginationSql}`
+
+    console.log(sql)
 
     return await sqlQueryDatastore(sql, session)
 }

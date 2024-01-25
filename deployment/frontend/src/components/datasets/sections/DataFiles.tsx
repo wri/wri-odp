@@ -15,7 +15,10 @@ import { Index } from 'flexsearch'
 import { useState } from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
-import { useActiveLayerGroups } from '@/utils/storeHooks'
+import {
+    useActiveLayerGroups,
+    useActiveDatafileCharts,
+} from '@/utils/storeHooks'
 import { TabularResource } from '../visualizations/Visualizations'
 
 export function DataFiles({
@@ -29,20 +32,16 @@ export function DataFiles({
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
 }) {
-    const {
-        addLayerGroup,
-        removeLayerGroup,
-        addLayerToLayerGroup,
-        removeLayerFromLayerGroup,
-    } = useActiveLayerGroups()
+    const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
+        useActiveLayerGroups()
     const { data: activeLayers } = useLayersFromRW()
     const datafiles = dataset?.resources
     const [q, setQ] = useState('')
     const filteredDatafiles =
         q !== ''
             ? datafiles?.filter((datafile) =>
-                  index.search(q).includes(datafile.id)
-              )
+                index.search(q).includes(datafile.id)
+            )
             : datafiles
     return (
         <>
@@ -121,9 +120,13 @@ function DatafileCard({
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
 }) {
+    const { addDatafileCharts, removeDatafileCharts, activeDatafileCharts } =
+        useActiveDatafileCharts()
+
     const { data: activeLayers } = useLayersFromRW()
     const { removeLayerFromLayerGroup, addLayerToLayerGroup } =
         useActiveLayerGroups()
+
     const created_at = new Date(datafile?.created ?? '')
     const last_updated = new Date(datafile?.metadata_modified ?? '')
     const options = {
@@ -169,8 +172,8 @@ function DatafileCard({
                             {/* @ts-ignore */}
                             {datafile?.rw_id && (
                                 <>
-                                    {activeLayers.some(
-                                        (a) => datafile.url?.endsWith(a.id)
+                                    {activeLayers.some((a) =>
+                                        datafile.url?.endsWith(a.id)
                                     ) ? (
                                         <Button
                                             variant="light"
@@ -215,7 +218,7 @@ function DatafileCard({
                             {datafile.datastore_active && (
                                 <>
                                     {tabularResource &&
-                                    tabularResource.id === datafile.id ? (
+                                        tabularResource.id === datafile.id ? (
                                         <Button
                                             variant="outline"
                                             size="sm"
@@ -241,13 +244,41 @@ function DatafileCard({
                                 </>
                             )}
 
+                            {datafile._hasChartView && (
+                                <>
+                                    {activeDatafileCharts.some(
+                                        (df: Resource) => df.id == datafile.id
+                                    ) ? (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                removeDatafileCharts(
+                                                    datafile.id
+                                                )
+                                            }}
+                                        >
+                                            Remove Chart View
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            size="sm"
+                                            onClick={() => {
+                                                addDatafileCharts(datafile)
+                                            }}
+                                        >
+                                            Add Chart View
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+
                             <Disclosure.Button>
                                 <ChevronDownIcon
-                                    className={`${
-                                        open
+                                    className={`${open
                                             ? 'rotate-180 transform  transition'
                                             : ''
-                                    } h-5 w-5 text-stone-900`}
+                                        } h-5 w-5 text-stone-900`}
                                 />
                             </Disclosure.Button>
                         </div>
