@@ -20,7 +20,7 @@ import dynamic from 'next/dynamic'
 import { getGradientColor } from '@/utils/colors'
 import ChartFilters from './ChartFilters'
 import DataDialog from './DataDialog'
-const Chart = dynamic(import('@/components/datasets/visualizations/Chart'), {
+const Chart = dynamic(() => import('@/components/datasets/visualizations/Chart'), {
     ssr: false,
 })
 

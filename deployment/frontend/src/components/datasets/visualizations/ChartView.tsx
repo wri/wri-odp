@@ -8,7 +8,7 @@ import { InputGroup } from '@/components/_shared/InputGroup'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dynamic from 'next/dynamic'
-const Chart = dynamic(import('@/components/datasets/visualizations/Chart'), {
+const Chart = dynamic(() => import('@/components/datasets/visualizations/Chart'), {
     ssr: false,
 })
 
@@ -53,10 +53,30 @@ export default function ChartView() {
 
     const onChange = (selected: View) => {
         setActiveChart(selected)
+        console.log(
+            selected.config_obj.form_state.config.chart?.labels?.x?.angle
+                ?.value ?? 'auto'
+        )
         reset({
             x_tick_angle:
-                selected.config_obj.form_state.chart.labels.x.angle.value,
+                selected.config_obj.form_state.config.chart?.labels?.x?.angle
+                    ?.value ?? labelAngleOptions[0],
         })
+    }
+
+    const getConfigWithOverrides = () => {
+        // @ts-ignore
+        const config = activeChart.config_obj?.config
+
+        const xTickAngle = watch('x_tick_angle')?.value
+        if (xTickAngle) {
+            config.props.layout.xaxis = {
+                ...config.props.layout.xaxis,
+                tickangle: xTickAngle,
+            }
+        }
+
+        return config
     }
 
     return (
@@ -72,22 +92,24 @@ export default function ChartView() {
                 <ChartViewExport />
             </div>
             {activeChart?.config_obj && (
-                <Chart config={activeChart.config_obj?.config} />
+                <Chart config={getConfigWithOverrides()} />
             )}
             <form onSubmit={handleSubmit((data) => { })}>
-                <InputGroup
-                    label="X axis tick angle"
-                    className="sm:grid-cols-1 gap-x-2"
-                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                >
-                    <SimpleSelect
-                        id="x-axis-label-orientation"
-                        formObj={formObj}
-                        name="x_tick_angle"
-                        placeholder="E.g. 45º"
-                        options={labelAngleOptions}
-                    />
-                </InputGroup>
+                <div className="grid grid-cols-2 xl:grid-cols-4 mb-5">
+                    <InputGroup
+                        label="X axis tick angle"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <SimpleSelect
+                            id="x-axis-label-orientation"
+                            formObj={formObj}
+                            name="x_tick_angle"
+                            placeholder="E.g. 45º"
+                            options={labelAngleOptions}
+                        />
+                    </InputGroup>
+                </div>
             </form>
         </div>
     )
