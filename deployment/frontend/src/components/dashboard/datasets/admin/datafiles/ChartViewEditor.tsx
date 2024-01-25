@@ -19,7 +19,10 @@ import { PencilSquareIcon } from '@heroicons/react/24/outline'
 import dynamic from 'next/dynamic'
 import { getGradientColor } from '@/utils/colors'
 import ChartFilters from './ChartFilters'
-const Chart = dynamic(import('@/components/datasets/visualizations/Chart'))
+import DataDialog from './DataDialog'
+const Chart = dynamic(import('@/components/datasets/visualizations/Chart'), {
+    ssr: false,
+})
 
 const withEmptyOption = (ar?: any[]) => {
     if (ar) {
@@ -50,6 +53,9 @@ export default function ChartViewEditor({
     const session = useSession()
 
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+    const [isDataDialogOpen, setIsDataDialogOpen] = useState(false)
+
+    const [sql, setSql] = useState('')
 
     const [error, setError] = useState<
         { title: string; text: string } | undefined
@@ -142,7 +148,12 @@ export default function ChartViewEditor({
             }
 
             // TODO: add loading indicator for this query
-            const tableData = await queryDatastore(query, session.data)
+            const { data: tableData, sql } = await queryDatastore(
+                query,
+                session.data
+            )
+
+            setSql(sql)
 
             /*
              * Chart configuration
@@ -175,7 +186,7 @@ export default function ChartViewEditor({
             // Tooltips
             const tooltipsEnabled =
                 formData.config.chart.tooltips.enabled?.value
-            const tooltipsFormat = formData.config.chart.tooltips.format
+            const tooltipsFormat = formData.config.chart.tooltips.format?.value
 
             let categories = []
             if (isGrouped) {
@@ -329,13 +340,13 @@ export default function ChartViewEditor({
                 onSubmit={handleSubmit(onSubmit, (e) => {
                     console.log(e)
                 })}
-                className="flex space-x-10 stretch"
+                className="mt-5 flex space-x-10 stretch flex-col xl:flex-row"
             >
                 <div className="min-w-[450px]">
                     {!isFieldsLoading && !fieldsError && (
                         <div className="h-full">
                             <div className="flex flex-col h-full space-y-4">
-                                <div className="flex flex-col h-full space-y-4 overflow-y-scroll pr-2 h-[475px] max-h-[475px]">
+                                <div className="flex flex-col h-full space-y-4 xl:overflow-y-scroll pr-2 xl:h-[475px] xl:max-h-[475px]">
                                     <InputGroup
                                         label="Title"
                                         className="sm:grid-cols-1 gap-x-2"
@@ -373,6 +384,7 @@ export default function ChartViewEditor({
                                                 className="sm:grid-cols-1 gap-x-2"
                                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                                 required={true}
+                                                info="X-axis colum name"
                                             >
                                                 <SimpleSelect
                                                     id="dimension"
@@ -399,6 +411,7 @@ export default function ChartViewEditor({
                                                 className="sm:grid-cols-1 gap-x-2"
                                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                                 required={true}
+                                                info="Y-axis column name"
                                             >
                                                 <SimpleSelect
                                                     id="category"
@@ -429,6 +442,7 @@ export default function ChartViewEditor({
                                                 label="Category column"
                                                 className="sm:grid-cols-1 gap-x-2"
                                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                info="Used for data point grouping"
                                             >
                                                 <SimpleSelect
                                                     id="category"
@@ -467,6 +481,7 @@ export default function ChartViewEditor({
                                                 label="Aggregation function"
                                                 className="sm:grid-cols-1 gap-x-2"
                                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                info="Aggegate the y-axis values by this function"
                                             >
                                                 <SimpleSelect
                                                     id="aggregate"
@@ -649,16 +664,14 @@ export default function ChartViewEditor({
                                                 className="sm:grid-cols-1 gap-x-2"
                                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                             >
-                                                <Input
-                                                    {...register(
-                                                        'config.chart.tooltips.format'
-                                                    )}
-                                                    disabled={
-                                                        !watch(
-                                                            'config.chart.tooltips.enabled'
-                                                        )?.value
+                                                <SimpleSelect
+                                                    id="legends-enabled"
+                                                    formObj={formObj}
+                                                    name="config.chart.tooltips.format"
+                                                    placeholder="E.g. 0.0%"
+                                                    options={
+                                                        tooltipsFormattingOptions
                                                     }
-                                                    placeholder="E.g. %"
                                                 />
                                                 <ErrorDisplay
                                                     name="config.chart.legends.format"
@@ -743,6 +756,12 @@ export default function ChartViewEditor({
                 id={view.id ?? ''}
                 onDelete={() => onCancelOrDelete(mode)}
             />
+
+            <DataDialog
+                isOpen={isDataDialogOpen}
+                setIsOpen={setIsDataDialogOpen}
+                sql={sql}
+            />
         </div>
     )
 }
@@ -785,4 +804,16 @@ const legendEnabledOptions = [
 const tooltipsEnabledOptions = [
     { value: false, label: 'No' },
     { value: true, label: 'Yes', default: true },
+]
+
+const tooltipsFormattingOptions = [
+    { value: '', label: 'None' },
+    { value: '.0f', label: '0' },
+    { value: '.1f', label: '0.0' },
+    { value: '.2f', label: '0.00' },
+    { value: '.3f', label: '0.000' },
+    { value: '.4f', label: '0.0000' },
+    { value: '.0%', label: '0%' },
+    { value: '.1%', label: '0.0%' },
+    { value: '.2%', label: '0.00%' },
 ]

@@ -121,7 +121,7 @@ export default function ChartFilters({
                                 {i !=
                                     watch('config.query.filters').length -
                                     1 && (
-                                        <div className="flex justify-around">
+                                        <div className="flex justify-around mt-5">
                                             <Button
                                                 type="button"
                                                 variant="ghost"

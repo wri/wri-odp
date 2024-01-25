@@ -1,4 +1,3 @@
-import { FilterObjType } from '@/components/data-explorer/search.schema'
 import { env } from '@/env.mjs'
 import { DataResponse } from '@/server/api/routers/datastore'
 import { Session } from 'next-auth'
@@ -91,5 +90,5 @@ export async function queryDatastore(
 
     console.log(sql)
 
-    return await sqlQueryDatastore(sql, session)
+    return { data: await sqlQueryDatastore(sql, session), sql }
 }

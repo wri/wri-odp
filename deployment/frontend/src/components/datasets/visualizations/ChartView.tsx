@@ -32,7 +32,7 @@ export default function ChartView() {
     }
 
     return (
-        <div className="px-10 py-5">
+        <div className="px-5 py-5 xl:px-10 xl:py-5">
             <SimpleSelect
                 options={chartOptions}
                 name="selected-chart"

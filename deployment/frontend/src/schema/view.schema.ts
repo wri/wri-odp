@@ -95,7 +95,9 @@ export const chartSchema = z.object({
                         value: z.boolean().default(true),
                     })
                     .optional(),
-                format: z.string().optional(),
+                format: z
+                    .object({ label: z.string(), value: z.string().optional() })
+                    .optional(),
             }),
             colors: z.object({ starting: z.string(), ending: z.string() }),
         }),
@@ -128,17 +130,19 @@ export const chartSchema = z.object({
             aggregate: z
                 .object({ value: z.string().optional(), label: z.string() })
                 .optional(),
-            filters: z.array(
-                z.object({
-                    column: z.string(),
-                    operation: z.object({
+            filters: z
+                .array(
+                    z.object({
+                        column: z.string(),
+                        operation: z.object({
+                            value: z.string(),
+                            label: z.string(),
+                        }),
                         value: z.string(),
-                        label: z.string(),
-                    }),
-                    value: z.string(),
-                    link: z.string().default("OR")
-                })
-            ).optional(),
+                        link: z.string().default('OR'),
+                    })
+                )
+                .optional(),
         }),
     }),
 })
