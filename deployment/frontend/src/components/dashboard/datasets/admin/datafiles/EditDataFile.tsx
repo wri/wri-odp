@@ -58,29 +58,10 @@ export function EditDataFile({
     })
 
     const datafile = watch(`resources.${index}`)
-    const rwId = watch('rw_id')
-    const provider = watch('provider')
-    const {
-        data: datasetViews,
-        isLoading: isDatasetViewsLoading,
-        error: datasetViewsError,
-    } = api.rw.getDatasetViews.useQuery(
-        { rwDatasetId: rwId ?? "" },
-        { enabled: !!rwId }
-    )
+
 
     return (
         <>
-            {rwId && provider && !isDatasetViewsLoading && (
-                <MetadataAccordion label="Dataset views" defaultOpen={false}>
-                    <ViewsList
-                        provider="rw"
-                        rwDatasetId={rwId}
-                        views={datasetViews}
-                    />
-                </MetadataAccordion>
-            )}
-
             <DataFileAccordion
                 icon={<></>}
                 title={`Data File ${index + 1}`}
