@@ -433,6 +433,8 @@ export const DatasetRouter = createTRPCRouter({
                 ...resourcesToCreateLayer,
             ]
 
+            console.log('RESOURCES', resources)
+
             try {
                 const user = ctx.session.user
                 const body = JSON.stringify({
@@ -464,6 +466,7 @@ export const DatasetRouter = createTRPCRouter({
                             package_id: input.id ?? '',
                             format: resource.format ?? '',
                             id: resource.resourceId,
+                            datastore_active : resource.datastore_active === true ? true : null,
                             new: false,
                             layerObjRaw: null,
                             layerObj: null,

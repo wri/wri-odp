@@ -183,7 +183,7 @@ export function EditDataFile({
                                             {({ selected }) => (
                                                 <div
                                                     className={classNames(
-                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
                                                         selected
                                                             ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                             : 'text-black'
@@ -202,7 +202,7 @@ export function EditDataFile({
                                             {({ selected }) => (
                                                 <div
                                                     className={classNames(
-                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
                                                         selected
                                                             ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                             : 'text-black'
@@ -223,7 +223,7 @@ export function EditDataFile({
                                                     {({ selected }) => (
                                                         <div
                                                             className={classNames(
-                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
                                                                 selected
                                                                     ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                                     : 'text-black'
@@ -256,7 +256,7 @@ export function EditDataFile({
                                                 {({ selected }) => (
                                                     <div
                                                         className={classNames(
-                                                            'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                            'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
                                                             selected
                                                                 ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                                 : 'text-black'
