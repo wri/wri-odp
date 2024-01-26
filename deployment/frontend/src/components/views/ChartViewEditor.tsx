@@ -17,7 +17,11 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 
 import { ChartFormType, chartSchema } from '@/schema/view.schema'
 import DeleteViewDialog from './DeleteViewDialog'
-import { PencilSquareIcon } from '@heroicons/react/24/outline'
+import {
+    CheckIcon,
+    InformationCircleIcon,
+    PencilSquareIcon,
+} from '@heroicons/react/24/outline'
 
 import dynamic from 'next/dynamic'
 import { getGradientColor } from '@/utils/colors'
@@ -25,6 +29,7 @@ import ChartFilters from './ChartFilters'
 import DataDialog from './DataDialog'
 import { Accordion } from '../dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion'
 import { queryRw } from '@/utils/rw'
+import { DefaultTooltip } from '../_shared/Tooltip'
 const Chart = dynamic(
     () => import('@/components/datasets/visualizations/Chart'),
     {
@@ -246,7 +251,9 @@ export default function ChartViewEditor({
                 )
                 category.x = dimensionAr
 
-                const measureAr = tableData.map((row: any) => row[measureColName])
+                const measureAr = tableData.map(
+                    (row: any) => row[measureColName]
+                )
                 category.y = measureAr
 
                 categories.push(category)
@@ -778,17 +785,34 @@ export default function ChartViewEditor({
                                     >
                                         {mode == 'new' ? 'Cancel' : 'Delete'}
                                     </Button>
-                                    <Button
-                                        type="button"
-                                        name="save"
-                                        className="bg-wri-light-yellow"
-                                        disabled={isDirty}
-                                        onClick={() => onSave(mode, view)}
+                                    <DefaultTooltip
+                                        content={
+                                            'You can only save after updating the preview'
+                                        }
+                                        disabled={!isDirty}
                                     >
-                                        {mode == 'new'
-                                            ? 'Add to Views'
-                                            : 'Update View'}
-                                    </Button>
+                                        <div>
+                                            <Button
+                                                type="button"
+                                                name="save"
+                                                className="bg-wri-light-yellow"
+                                                disabled={isDirty}
+                                                onClick={() =>
+                                                    onSave(mode, view)
+                                                }
+                                            >
+                                                {mode == 'new'
+                                                    ? 'Add to Views'
+                                                    : 'Update View'}
+                                                {isDirty ? (
+                                                    <InformationCircleIcon
+                                                        className={`transition-all h-5 w-5 text-red-500 ml-1 mb-1 ml-1`}
+                                                        aria-hidden="true"
+                                                    />
+                                                ) : null}
+                                            </Button>
+                                        </div>
+                                    </DefaultTooltip>
                                 </div>
                             </div>
                         </div>
