@@ -10,6 +10,7 @@ import type {
     Collaborator,
     GroupsmDetails,
     WriUser,
+    PendingDataset,
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
@@ -562,6 +563,47 @@ export async function getOneDataset(
             : [],
         spatial,
     }
+}
+
+export async function getOnePendingDataset(
+    datasetName: string,
+    session: Session | null
+) {
+    const user = session?.user
+    const response = await fetch(
+        `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
+        {
+            headers: {
+                Authorization: `${user?.apikey ?? ''}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const data = (await response.json()) as CkanResponse<PendingDataset>
+    if (!data.success && data.error) {
+        const erroInfo = JSON.stringify(data.error).toLowerCase()
+        if (erroInfo.includes('not found')) {
+            return null
+         }
+        throw Error(JSON.stringify(data.error))
+    }
+    const dataset = data.result.package_data
+    
+    let spatial = null
+    if (dataset.spatial) {
+        try {
+            spatial = JSON.parse(dataset.spatial)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+    
+    return {
+        ...data.result.package_data,
+        open_in: dataset.open_in ? Object.values(dataset.open_in) : [],
+        spatial
+    }
+
 }
 
 export async function upsertCollaborator(
@@ -1505,3 +1547,80 @@ export async function deleteResourceView({
 
     return views.result
 }
+
+export async function sendGroupNotification({
+    owner_org,
+    creator_id,
+    collaborator_id,
+    dataset_id,
+    session,
+    action
+}: {
+        owner_org: string | null;
+        creator_id: string | null;
+        collaborator_id: string[] | null;
+        dataset_id: string;
+        session: Session,
+        action: string
+    }) {
+    try {
+        let recipientIds: string[] = []
+
+        if (owner_org) {
+            recipientIds = await getRecipient({owner_org: owner_org, session: session})
+        }
+        else if (creator_id) {
+            recipientIds = [creator_id]
+        }
+
+        if (collaborator_id) {
+            recipientIds = recipientIds.concat(collaborator_id)
+        }
+
+        if (recipientIds.length > 0) {
+            const notificationPromises = recipientIds
+                .filter((recipientId) => recipientId !== session.user.id)
+                .map((recipientId) => {
+                return createNotification(
+                    recipientId,
+                    session.user.id,
+                     action,
+                    'dataset',
+                    dataset_id,
+                    true
+                );
+            });
+
+            await Promise.all(notificationPromises);
+        }
+    } catch (error) {
+        console.error(error);
+        throw Error("Error in sending issue /comment notification");
+    }
+}
+
+export async function getPackageDiff({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const user = session?.user
+    const packageRes = await fetch(
+        `${env.CKAN_URL}/api/action/pending_diff_show?id=${id}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${user?.apikey ?? ''}`,
+            },
+        }
+    )
+    const packageData = (await packageRes.json()) as CkanResponse<Record<string, Record<string, never>>>
+    if (!packageData.success && packageData.error) {
+        if (packageData.error.message) throw Error(packageData.error.message)
+        throw Error(JSON.stringify(packageData.error))
+    }
+    return packageData.result
+}
+

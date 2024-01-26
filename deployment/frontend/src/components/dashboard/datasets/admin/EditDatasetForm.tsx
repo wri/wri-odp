@@ -146,6 +146,8 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         },
     })
 
+    console.log('EDITING ERRORS', formObj.formState.errors)
+
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
             notify(

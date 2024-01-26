@@ -39,7 +39,7 @@ export const datastoreRouter = createTRPCRouter({
             const { pagination, resourceId, columns, sorting, filters, groupBy } = input
             const paginationSql = `LIMIT ${
                 pagination.pageIndex * pagination.pageSize + pagination.pageSize
-            }`
+            } OFFSET ${pagination.pageIndex * pagination.pageSize}`
             const sortSql =
                 sorting.length > 0
                     ? 'ORDER BY ' +
@@ -82,6 +82,7 @@ export const datastoreRouter = createTRPCRouter({
             )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${groupBySql} ${paginationSql}`
             const tableDataRes = await fetch(url, {
                 headers: {
+                    'Content-Type': 'application/json',
                     Authorization: ctx.session?.user.apikey ?? '',
                 },
             })
@@ -136,7 +137,7 @@ export const datastoreRouter = createTRPCRouter({
                 const numRowsRes = await fetch(url, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': ctx.session?.user.apikey ?? ""
+                        Authorization: `${ctx?.session?.user.apikey}`,
                     },
                 })
                 const numRows: DataResponse = await numRowsRes.json()
@@ -148,7 +149,7 @@ export const datastoreRouter = createTRPCRouter({
                 if (
                     numRows.result &&
                     numRows.result.records[0] &&
-                    numRows.result.records[0].count
+                    (numRows.result.records[0].count || numRows.result.records[0].count === 0)
                 ) {
                     return numRows.result.records[0].count as number
                 }

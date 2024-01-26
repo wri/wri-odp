@@ -26,11 +26,15 @@ export function DataFiles({
     index,
     setTabularResource,
     tabularResource,
+    isCurrentVersion,
+    diffFields,
 }: {
     dataset: WriDataset
     index: Index
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
+    isCurrentVersion?: boolean
+    diffFields: Array<Record<string, { old_value: string; new_value: string }>>
 }) {
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
         useActiveLayerGroups()
@@ -102,6 +106,8 @@ export function DataFiles({
                         key={datafile.id}
                         datafile={datafile}
                         dataset={dataset}
+                        diffFields={diffFields}
+                        isCurrentVersion={isCurrentVersion}
                     />
                 ))}
             </div>
@@ -114,11 +120,15 @@ function DatafileCard({
     dataset,
     setTabularResource,
     tabularResource,
+    diffFields,
+    isCurrentVersion,
 }: {
     datafile: Resource
     dataset: WriDataset
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
+    isCurrentVersion?: boolean
+    diffFields: Array<Record<string, { old_value: string; new_value: string }>>
 }) {
     const { addDatafileCharts, removeDatafileCharts, activeDatafileCharts } =
         useActiveDatafileCharts()
@@ -134,6 +144,21 @@ function DatafileCard({
         month: 'short',
         day: 'numeric',
     } as const
+
+    const higlighted = (field: string, value: string) => {
+        if (diffFields && isCurrentVersion) {
+            if (
+                diffFields.some(
+                    (diffField) =>
+                        diffField[field] &&
+                        diffField[field]?.old_value === value
+                )
+            ) {
+                return 'bg-yellow-200'
+            }
+        }
+        return ''
+    }
     return (
         <Disclosure>
             {({ open }) => (
@@ -163,7 +188,16 @@ function DatafileCard({
                                 </span>
                             )}
                             <Disclosure.Button>
-                                <h3 className="font-acumin text-lg font-semibold leading-loose text-stone-900">
+                                <h3
+                                    className={`font-acumin text-lg font-semibold leading-loose text-stone-900 ${
+                                        datafile.title
+                                            ? higlighted(
+                                                  'title',
+                                                  datafile.title
+                                              )
+                                            : higlighted('name', datafile.name!)
+                                    }`}
+                                >
                                     {datafile.title ?? datafile.name}
                                 </h3>
                             </Disclosure.Button>
@@ -292,7 +326,16 @@ function DatafileCard({
                         leaveTo="transform scale-95 opacity-0"
                     >
                         <Disclosure.Panel className="py-3">
-                            <p className="font-acumin text-base font-light text-stone-900">
+                            <p
+                                className={`font-acumin text-base font-light text-stone-900 ${
+                                    datafile.description
+                                        ? higlighted(
+                                              'description',
+                                              datafile.description
+                                          )
+                                        : ''
+                                }`}
+                            >
                                 {datafile.description ?? 'No Description'}
                             </p>
                             <div className="mt-[0.33rem] flex justify-start gap-x-3">

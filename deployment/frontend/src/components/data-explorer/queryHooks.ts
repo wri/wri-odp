@@ -41,14 +41,22 @@ export function useFields({ id, provider }: TabularResource) {
                     }),
                 }
             )
-            const fields: CkanResponse<{ fields: Array<{ id: string }> }> =
-                await fieldsRes.json()
+            const fields: CkanResponse<{
+                fields: Array<{
+                    id: string
+                    name: string
+                    info: { label: string | null, default: string | null }
+                    type: string
+                }>
+            }> = await fieldsRes.json()
 
             return {
                 tableName: id,
                 columns: fields.result.fields.map((field) => ({
                     key: field.id,
-                    name: field.id,
+                    name: field.info.label ?? field.id,
+                    type: field.type,
+                    default: field.info.default ?? '',
                 })),
             }
         })
@@ -71,6 +79,7 @@ export function useNumberOfRows({
     provider: string
     setPageCount: (updater: Updater<number>) => void
 }) {
+    console.log('TABLE NAME', tableName)
     if (provider === 'datastore') {
         return api.datastore.getNumberOfRows.useQuery(
             {

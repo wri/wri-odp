@@ -38,6 +38,7 @@ import { FilterFormType, FilterObjType, filterSchema } from './search.schema'
 import { Button } from '../_shared/Button'
 import SimpleSelect from '../_shared/SimpleSelect'
 import { DataExplorerColumnFilter } from './DataExplorer'
+import { DatePicker } from '../_shared/DatePicker'
 
 type TableProps = {
     table: TableType<any>
@@ -201,6 +202,7 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
 
 export function Table({ table, isLoading }: TableProps) {
     const numOfColumns = table.getAllColumns().length
+    console.log('rows', table.getRowModel().rows)
     return (
         <div className="max-w-full grow flex border-t border-gray-200">
             <table className="block border-r border-gray-200 shadow">
@@ -271,17 +273,31 @@ export function Table({ table, isLoading }: TableProps) {
                 <tbody>
                     {table.getRowModel().rows.map((r) => (
                         <tr key={r.id} className="border-b border-b-slate-200">
-                            {r.getCenterVisibleCells().map((c) => (
-                                <td key={c.id} className="py-2 pl-12">
-                                    <div className="min-h-[65px] flex items-center text-base">
-                                        {' '}
-                                        {flexRender(
-                                            c.column.columnDef.cell,
-                                            c.getContext()
-                                        )}
-                                    </div>
-                                </td>
-                            ))}
+                            {r.getCenterVisibleCells().map((c) => {
+                                if (
+                                    c.getValue() === '' ||
+                                    c.getValue() === ' '
+                                ) {
+                                    return (
+                                        <td key={c.id} className="py-2 pl-12">
+                                            <div className="min-h-[65px] flex items-center text-base">
+                                                {c.column.columnDef.meta
+                                                    ?.default ?? ''}
+                                            </div>
+                                        </td>
+                                    )
+                                }
+                                return (
+                                    <td key={c.id} className="py-2 pl-12">
+                                        <div className="min-h-[65px] flex items-center text-base">
+                                            {flexRender(
+                                                c.column.columnDef.cell,
+                                                c.getContext()
+                                            )}
+                                        </div>
+                                    </td>
+                                )
+                            })}
                         </tr>
                     ))}
                 </tbody>
@@ -393,7 +409,10 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
         defaultValues: {
             filters: (defaultValues as FilterObjType[]) ?? [
                 {
-                    operation: { label: 'Equals', value: '=' },
+                    operation:
+                        column.columnDef.meta?.type === 'timestamp'
+                            ? { label: 'Greater than', value: '>' }
+                            : { label: 'Equals', value: '=' },
                     value: '',
                     link: null,
                 },
@@ -412,14 +431,20 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
         <FormProvider {...formObj}>
             <div className="flex flex-col gap-y-2 py-4 px-4">
                 <div className="flex flex-col gap-y-2 justify-center items-center">
-                    <Filters />
+                    <Filters
+                        datePicker={column.columnDef.meta?.type === 'timestamp'}
+                    />
                 </div>
             </div>
         </FormProvider>
     )
 }
 
-export default function Filters() {
+export default function Filters({
+    datePicker = false,
+}: {
+    datePicker?: boolean
+}) {
     const formObj = useFormContext<FilterFormType>()
     const { register, control, setValue, watch, getValues } = formObj
     const { append, fields, remove } = useFieldArray({
@@ -448,7 +473,7 @@ export default function Filters() {
             {fields.map((field, index) => (
                 <div
                     key={field.id}
-                    className="flex flex-col items-center gap-y-2"
+                    className="flex flex-col items-center gap-y-2 w-full"
                 >
                     <SimpleSelect
                         formObj={formObj}
@@ -478,7 +503,14 @@ export default function Filters() {
                                 label: 'Smaller or equal than',
                                 value: '<=',
                             },
-                        ]}
+                        ].filter((o) => {
+                            if (!datePicker) return true
+                            return (
+                                datePicker &&
+                                o.value !== '=' &&
+                                o.value !== '!='
+                            )
+                        })}
                         placeholder="Select a filter"
                     />
                     <Controller
@@ -486,27 +518,31 @@ export default function Filters() {
                         name={`filters.${index}.value`}
                         render={({
                             field: { onChange, onBlur, value, ref },
-                        }) => (
-                            <DebouncedInput
-                                onChange={onChange} // send value to hook form
-                                onBlur={onBlur} // notify when input is touched/blur
-                                value={value}
-                                icon={
-                                    fields.length > 1 && (
-                                        <DefaultTooltip content="Remove filter">
-                                            <button
-                                                onClick={() =>
-                                                    removeFilter(index)
-                                                }
-                                                className="w-4 h-4"
-                                            >
-                                                <XCircleIcon className="text-red-600" />
-                                            </button>
-                                        </DefaultTooltip>
-                                    )
-                                }
-                            />
-                        )}
+                        }) =>
+                            datePicker ? (
+                                <DatePicker date={value} setDate={onChange} />
+                            ) : (
+                                <DebouncedInput
+                                    onChange={onChange} // send value to hook form
+                                    onBlur={onBlur} // notify when input is touched/blur
+                                    value={value}
+                                    icon={
+                                        fields.length > 1 && (
+                                            <DefaultTooltip content="Remove filter">
+                                                <button
+                                                    onClick={() =>
+                                                        removeFilter(index)
+                                                    }
+                                                    className="w-4 h-4"
+                                                >
+                                                    <XCircleIcon className="text-red-600" />
+                                                </button>
+                                            </DefaultTooltip>
+                                        )
+                                    }
+                                />
+                            )
+                        }
                     />
                     {field.link && (
                         <span className="text-xs text-gray-500 uppercase">

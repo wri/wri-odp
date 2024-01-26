@@ -93,14 +93,27 @@ function AddDataFile({
         watch(`resources.${index}.fileBlob`),
         (data) => {
             if (data) {
+                const types = {
+                    string: 'text',
+                    number: 'numeric',
+                    integer: 'numeric',
+                    float: 'numeric',
+                    date: 'timestamp',
+                    time: 'timestamp',
+                    datetime: 'timestamp',
+                    year: 'numeric',
+                    yearmonth: 'timestamp',
+                    duration: 'numeric',
+                } as const
                 const dataDictionary = data.map(
                     (item: Field, index: number) => ({
-                        id: index,
-                        field: item.name,
-                        type: item.type,
-                        null: 'YES',
-                        key: 'MUL',
-                        default: 'NULL',
+                        _id: index,
+                        id: item.name,
+                        info: {
+                            label: item.name,
+                            type_override: (types[item.type as keyof typeof types]),
+                            default: '',
+                        },
                     })
                 )
                 setValue(`resources.${index}.schema`, dataDictionary)
@@ -124,7 +137,7 @@ function AddDataFile({
                         ? `${watch('team')?.id}/ckan/resources/${
                               datafile.resourceId
                           }`
-                        : `resources/${datafile.resourceId}`
+                        : `ckan/resources/${datafile.resourceId}`
                 ),
         })
         return uppy

@@ -1,15 +1,18 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.plugins as lib_plugins
+from typing import Any, Callable, cast
 import ckanext.wri.logic.action as action
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
 from ckan.types import Action, AuthFunction, Context
 from ckan.lib.search import SearchError
 from ckanext.wri.logic.auth import auth as auth
-from ckanext.wri.logic.action.create import notification_create
-from ckanext.wri.logic.action.update import notification_update
-from ckanext.wri.logic.action.get import package_search, notification_get_all
+from ckanext.wri.logic.action.datapusher import datapusher_latest_task, datapusher_submit
+from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
+from ckanext.wri.logic.action.update import notification_update, pending_dataset_update
+from ckanext.wri.logic.action.get import package_search, notification_get_all, pending_dataset_show, pending_diff_show
+from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
 from ckan.lib.navl.validators import ignore_missing
 
@@ -19,6 +22,7 @@ log = logging.getLogger(__name__)
 
 class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IConfigurable)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IClick)
@@ -27,8 +31,19 @@ class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IPermissionLabels)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IResourceView, inherit=True)
+    plugins.implements(plugins.IResourceController, inherit=True)
 
     # IConfigurer
+    def configure(self, config):
+        # Certain config options must exists for the plugin to work. Raise an
+        # exception if they're missing.
+        missing_config = "{0} is not configured. Please amend your .ini file."
+        config_options = (
+            'ckanext.wri.prefect_url',
+        )
+        for option in config_options:
+            if not config.get(option, None):
+                raise RuntimeError(missing_config.format(option))
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
@@ -36,7 +51,7 @@ class WriPlugin(plugins.SingletonPlugin):
         toolkit.add_resource("assets", "wri")
 
     def get_commands(self):
-        """CLI commands - Creates notifications data tables"""
+        """CLI commands - Creates custom data tables"""
         import click
 
         @click.command()
@@ -45,14 +60,24 @@ class WriPlugin(plugins.SingletonPlugin):
             from ckanext.wri.model import setup
             setup()
 
-        return [notificationdb]
+        @click.command()
+        def pendingdatasetsdb():
+            """Creates pending datasets table"""
+            from ckanext.wri.model import setup_pending_datasets
+            setup_pending_datasets()
+
+        return [notificationdb, pendingdatasetsdb]
 
     # IAuth
 
     def get_auth_functions(self) -> dict[str, AuthFunction]:
         return {
             'notification_get_all': auth.notification_get_all,
-            'notification_create': auth.notification_create
+            'notification_create': auth.notification_create,
+            'pending_dataset_create': auth.pending_dataset_create,
+            'pending_dataset_show': auth.pending_dataset_show,
+            'pending_dataset_update': auth.pending_dataset_update,
+            'pending_dataset_delete': auth.pending_dataset_delete,
         }
 
     # IValidators
@@ -92,15 +117,24 @@ class WriPlugin(plugins.SingletonPlugin):
             'password_reset': action.password_reset,
             'notification_get_all': notification_get_all,
             'notification_create': notification_create,
-            'notification_update': notification_update
-
+            'notification_update': notification_update,
+            'pending_dataset_create': pending_dataset_create,
+            'pending_dataset_show': pending_dataset_show,
+            'pending_dataset_update': pending_dataset_update,
+            'pending_dataset_delete': pending_dataset_delete,
+            'pending_diff_show': pending_diff_show,
+            'prefect_datapusher_submit': datapusher_submit,
+            'prefect_latest_task': datapusher_latest_task,
         }
 
     # IPermissionLabels
 
     def get_dataset_labels(self, dataset_obj: model.Package) -> list[str]:
         visibility_type = dataset_obj.extras.get('visibility_type', '')
-        if dataset_obj.state == u'active' and visibility_type == "public":
+        
+        is_draft = dataset_obj.extras.get('draft', False)
+        is_draftTrue = is_draft == 'true' or is_draft is True
+        if dataset_obj.state == u'active' and visibility_type == "public" and not is_draftTrue:
             return [u'public']
 
         if authz.check_config_permission('allow_dataset_collaborators'):
@@ -111,8 +145,10 @@ class WriPlugin(plugins.SingletonPlugin):
 
         if dataset_obj.owner_org and visibility_type in ["private"]:
             labels.append(u'member-%s' % dataset_obj.owner_org)
-        elif visibility_type == "internal":
+        elif visibility_type == "internal" and not is_draftTrue:
             labels.append(u'authenticated')
+        elif (visibility_type == "public" or visibility_type == "internal" ) and is_draftTrue and dataset_obj.owner_org:
+             labels.append(u'member-%s' % dataset_obj.owner_org)
         else: # Draft
             labels.append(u'creator-%s' % dataset_obj.creator_user_id)
 
@@ -139,7 +175,68 @@ class WriPlugin(plugins.SingletonPlugin):
 
         return labels
 
+    # IResourceController
+
+    def after_resource_create(
+            self, context: Context, resource_dict: dict[str, Any]):
+
+        self._submit_to_datapusher(resource_dict)
+
+    def after_resource_update(
+            self, context: Context, resource_dict: dict[str, Any]):
+
+        self._submit_to_datapusher(resource_dict)
+
+    def _submit_to_datapusher(self, resource_dict: dict[str, Any]):
+        print("SUBMITTING TO DATAPUSHER")
+        context = cast(Context, {
+            u'model': model,
+            u'ignore_auth': True,
+            u'defer_commit': True
+        })
+
+        resource_format = resource_dict.get('format')
+        supported_formats = toolkit.config.get(
+            'ckan.datapusher.formats'
+        )
+
+        submit = (
+            resource_format
+            and resource_format.lower() in supported_formats
+            and resource_dict.get('url_type') != u'datapusher'
+        )
+
+        if not submit:
+            return
+
+        try:
+            log.debug(
+                u'Submitting resource {0}'.format(resource_dict['id']) +
+                u' to DataPusher'
+            )
+            toolkit.get_action(u'prefect_datapusher_submit')(
+                context, {
+                    u'resource_id': resource_dict['id']
+                }
+            )
+        except toolkit.ValidationError as e:
+            # If datapusher is offline want to catch error instead
+            # of raising otherwise resource save will fail with 500
+            log.critical(e)
+            pass
+
+
     # IPackageController
+
+    def after_dataset_create(self, context, pkg_dict):
+        if pkg_dict.get('resources') is not None:
+            for resource in pkg_dict.get('resources'):
+                self._submit_to_datapusher(resource)
+
+    def after_dataset_update(self, context, pkg_dict):
+        if pkg_dict.get('resources') is not None:
+            for resource in pkg_dict.get('resources'):
+                self._submit_to_datapusher(resource)
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)

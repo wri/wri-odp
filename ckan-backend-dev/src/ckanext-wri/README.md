@@ -3,6 +3,21 @@
 **Table of Contents**
 
 - [ckanext-wri](#ckanext-wri)
+  - [Notifications Feature](#notifications-feature)
+    - [Database Setup](#database-setup)
+    - [API Endpoints](#api-endpoints)
+      - [POST /api/action/notification_create](#post-apiactionnotification_create)
+      - [POST /api/action/notification_update](#post-apiactionnotification_update)
+      - [GET /api/action/notification_get_all](#get-apiactionnotification_get_all)
+  - [Pending Datasets (Approval Workflow)](#pending-datasets-approval-workflow)
+    - [Pending Dataset Table](#pending-dataset-table)
+      - [Initializing the Pending Dataset Table](#initializing-the-pending-dataset-table)
+    - [API Endpoints](#api-endpoints-1)
+      - [POST /api/action/pending_dataset_create](#post-apiactionpending_dataset_create)
+      - [POST /api/action/pending_dataset_update](#post-apiactionpending_dataset_update)
+      - [POST /api/action/pending_dataset_delete](#post-apiactionpending_dataset_delete)
+      - [GET /api/action/pending_dataset_show](#get-apiactionpending_dataset_show)
+      - [GET /api/action/pending_diff_show](#get-apiactionpending_diff_show)
   - [Development](#development)
   - [Testing](#testing)
 
@@ -61,6 +76,117 @@ Returns a list of notifications for a sender or recipient.
 **Parameters:**
 - **recipient_id** (string) – The user ID of the recipient of the notification (optional, but either `recipient_id` or `sender_id` is required).
 - **sender_id** (string) – The user ID of the sender of the notification (optional, but either `recipient_id` or `sender_id` is required).
+
+## Pending Datasets (Approval Workflow)
+
+A pending dataset is dataset metadata that's been submitted for approval. While pending, the dataset metadata lives in a separate table from the main `package` table, `pending_datasets`. Once approved, the existing dataset is updated with the new metadata.
+
+### Pending Dataset Table
+
+The `pending_datasets` table has the following columns:
+
+| `package_id` | `package_data` | `last_modified` |
+| ------------ | -------------- | --------------- |
+| `text` (PK)  | `jsonb`        | `timestamp`     |
+
+The `package_id` column is the UUID of the dataset (and it's the primary key). The `package_data` column contains the dataset metadata as a JSONB object. The `last_modified` column is a timestamp that is automatically generated whenever `package_data` is updated.
+
+#### Initializing the Pending Dataset Table
+
+You can initialize the pending dataset table by running the following command:
+
+```console
+ckan -c <path-to-ini-file> pendingdatasetsdb
+```
+
+### API Endpoints
+
+#### POST /api/action/pending_dataset_create
+
+**Parameters:**
+- **package_id** (string) – The UUID of the dataset (required).
+- **package_data** (JSON object) – The dataset metadata (required).
+
+Creates a new pending dataset and returns the newly created pending dataset.
+
+#### POST /api/action/pending_dataset_update
+
+**Parameters:**
+- **package_id** (string) – The UUID of the dataset (required).
+- **package_data** (JSON object) – The dataset metadata (required).
+
+Updates an existing pending dataset and returns the updated pending dataset.
+
+#### POST /api/action/pending_dataset_delete
+
+**Parameters:**
+- **package_id** (string) – The UUID of the dataset (required).
+
+Deletes an existing pending dataset.
+
+#### GET /api/action/pending_dataset_show
+
+**Parameters:**
+- **package_id** (string) – The UUID of the dataset (required).
+
+Returns the pending dataset for the given `package_id`.
+
+#### GET /api/action/pending_diff_show
+
+**Parameters:**
+- **package_id** (string) – The UUID of the dataset (required).
+
+Returns the diff between the pending dataset and the existing dataset for the given `package_id`.
+
+Here's an example:
+
+```json
+{
+    "help": "http://ckan-dev:5000/api/3/action/help_show?name=pending_diff_show",
+    "success": true,
+    "result": {
+        "title": {
+            "old_value": "My dataset title",
+            "new_value": "My better dataset title"
+        },
+        "application": {
+            "old_value": "",
+            "new_value": "wri"
+        },
+        "resources[0].description": {
+            "old_value": "My resource description",
+            "new_value": "My better resource description"
+        },
+        "resources[0].format": {
+            "old_value": "CSV",
+            "new_value": "HTML"
+        },
+        "resources[1].title": {
+            "old_value": "My resource title",
+            "new_value": "My better resource title"        },
+        "wri_data": {
+            "old_value": false,
+            "new_value": true
+        },
+        "cautions": {
+            "old_value": "",
+            "new_value": "This is a caution"
+        },
+        "languages": {
+            "old_value": [
+                "fr"
+            ],
+            "new_value": [
+                "en"
+            ]
+        },
+        "function": {
+            "old_value": "The function of this dataset is to x...",
+            "new_value": "The function of this dataset is to y..."
+        },
+    },
+}
+```
 
 ## Development
 
