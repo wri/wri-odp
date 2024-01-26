@@ -20,9 +20,6 @@ export default function ViewCard({
     setMode: Dispatch<SetStateAction<ViewState['_state']>>
     onSave: (mode: string, view: View) => void
 }) {
-
-
-
     return (
         <div>
             {!['new'].includes(mode) && (

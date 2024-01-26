@@ -11,30 +11,57 @@ export default function DeleteViewDialog({
     setIsOpen,
     id,
     onDelete,
+    provider,
+    rwDatasetId,
 }: {
     isOpen: boolean
     setIsOpen: Dispatch<SetStateAction<boolean>>
     id: string
     onDelete: () => void
+    provider: 'rw' | 'datastore'
+    rwDatasetId?: string
 }) {
-    const deleteMutation = api.dataset.deleteResourceView.useMutation()
+    const datastoreDeleteMutation = api.dataset.deleteResourceView.useMutation()
+    const rwDeleteMutation = api.rw.deleteDatasetView.useMutation()
 
     const handleDelete = () => {
-        deleteMutation.mutate(
-            { id: id ?? '' },
-            {
-                onSuccess: () => {
-                    toast('View was successfully deleted', { type: 'success' })
-                    onDelete()
-                },
-                onError: (e) => {
-                    console.log(e)
-                    toast('Failed to delete view', {
-                        type: 'error',
-                    })
-                },
-            }
-        )
+        if (provider == 'datastore') {
+            datastoreDeleteMutation.mutate(
+                { id: id ?? '' },
+                {
+                    onSuccess: () => {
+                        toast('View was successfully deleted', {
+                            type: 'success',
+                        })
+                        onDelete()
+                    },
+                    onError: (e) => {
+                        console.log(e)
+                        toast('Failed to delete view', {
+                            type: 'error',
+                        })
+                    },
+                }
+            )
+        } else if (provider == 'rw') {
+            rwDeleteMutation.mutate(
+                { datasetId: rwDatasetId ?? "", id: id ?? '' },
+                {
+                    onSuccess: () => {
+                        toast('View was successfully deleted', {
+                            type: 'success',
+                        })
+                        onDelete()
+                    },
+                    onError: (e) => {
+                        console.log(e)
+                        toast('Failed to delete view', {
+                            type: 'error',
+                        })
+                    },
+                }
+            )
+        }
     }
 
     return (
@@ -70,7 +97,7 @@ export default function DeleteViewDialog({
                     loading={false}
                     onClick={() => handleDelete()}
                 >
-                    Delete Dataset
+                    Delete View
                 </LoaderButton>
                 <Button
                     variant="outline"

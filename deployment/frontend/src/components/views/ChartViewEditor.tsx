@@ -24,6 +24,7 @@ import { getGradientColor } from '@/utils/colors'
 import ChartFilters from './ChartFilters'
 import DataDialog from './DataDialog'
 import { Accordion } from '../dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion'
+import { queryRw } from '@/utils/rw'
 const Chart = dynamic(
     () => import('@/components/datasets/visualizations/Chart'),
     {
@@ -164,11 +165,21 @@ export default function ChartViewEditor({
                     session.data
                 )
 
-                tableData = data;
+                tableData = data
                 sql = querySql
-            } 
+            } else if (view.config_obj.config.provider == 'rw') {
+                const data = await queryRw({
+                    ...query,
+                    datasetId: view.config_obj.config.id,
+                    tableName: fields?.tableName ?? '',
+                    provider: '',
+                })
 
-            setSql(sql)
+                console.log(query)
+                console.log(data)
+
+                tableData = data
+            }
 
             /*
              * Chart configuration
@@ -800,6 +811,8 @@ export default function ChartViewEditor({
                 setIsOpen={setIsDeleteDialogOpen}
                 id={view.id ?? ''}
                 onDelete={() => onCancelOrDelete(mode)}
+                provider={view.config_obj.config.provider}
+                rwDatasetId={view.config_obj.config.id}
             />
 
             <DataDialog
@@ -821,6 +834,7 @@ const aggregateOptions = [
     { value: '', label: 'None' },
     { value: 'SUM', label: 'Sum' },
     { value: 'AVG', label: 'Average' },
+    { value: 'COUNT', label: 'Count' },
 ]
 
 const sortByOptions = [
