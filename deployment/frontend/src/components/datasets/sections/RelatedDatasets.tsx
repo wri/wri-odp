@@ -9,7 +9,6 @@ import classNames from '@/utils/classnames'
 import { getFormatColor } from '@/utils/formatColors'
 import { useActiveLayerGroups, useRelatedDatasets } from '@/utils/storeHooks'
 import {
-    ChartBarIcon,
     ExclamationTriangleIcon,
     MagnifyingGlassIcon,
 } from '@heroicons/react/20/solid'
@@ -19,6 +18,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import MapViewIcon from '../view-icons/MapViewIcon'
 import TabularViewIcon from '../view-icons/TabularViewIcon'
+import ChartViewIcon from '../view-icons/ChartViewIcon'
 
 export function RelatedDatasets() {
     const { relatedDatasets: datasets } = useRelatedDatasets()
@@ -153,11 +153,7 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                         dataset.cautions ? 'border-r border-black' : ''
                     )}
                 >
-                    {false && (
-                        <div className="rounded-full bg-stone-100 p-1">
-                            <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                        </div>
-                    )}
+                    <ChartViewIcon dataset={dataset} />
                     <MapViewIcon dataset={dataset} />
                     <TabularViewIcon dataset={dataset} />
                 </div>

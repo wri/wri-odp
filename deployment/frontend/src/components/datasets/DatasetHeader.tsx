@@ -1,6 +1,5 @@
 import {
     ArrowUpRightIcon,
-    ChartBarIcon,
     ChevronLeftIcon,
     ExclamationTriangleIcon,
     InformationCircleIcon,
@@ -36,6 +35,7 @@ import MapViewIcon from './view-icons/MapViewIcon'
 import ToggleVersion from './ToogleVersion'
 import { useActiveCharts } from '@/utils/storeHooks'
 import { View } from '@/interfaces/dataset.interface'
+import ChartViewIcon from './view-icons/ChartViewIcon'
 
 function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     const session = useSession()
@@ -379,11 +379,7 @@ export function DatasetHeader({
                             className="flex justify-start gap-x-3
             "
                         >
-                            {false && (
-                                <div className="rounded-full bg-stone-100 p-1">
-                                    <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                                </div>
-                            )}
+                            <ChartViewIcon dataset={dataset} />
                             <MapViewIcon dataset={dataset} />
                             <TabularViewIcon dataset={dataset} />
                         </div>
@@ -634,7 +630,7 @@ export function DatasetHeader({
                                         size="sm"
                                         onClick={() => {
                                             removeCharts(
-                                                datasetViews.map((v) => v.id)
+                                                datasetViews.map((v: View) => v.id)
                                             )
                                         }}
                                     >

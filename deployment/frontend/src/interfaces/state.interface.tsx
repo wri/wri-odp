@@ -19,7 +19,7 @@ export interface State {
         layersParsed: Array<[string, LayerState]>
     } & Layers,
     activeCharts: View[]
-    selectedChart: View
+    selectedChart?: View
 }
 
 export interface ActiveLayerGroup {

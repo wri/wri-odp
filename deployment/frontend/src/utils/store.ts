@@ -56,7 +56,7 @@ const getDefaultInitialState = () => {
             isDrawing: undefined,
         },
         activeCharts: [],
-        selectedChart: null 
+        selectedChart: undefined 
     }
     return initialState
 }
