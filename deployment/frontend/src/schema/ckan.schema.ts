@@ -1,9 +1,5 @@
-import { Dataset } from '@/interfaces/dataset.interface'
-import type {
-    Group,
-    Organization,
-    User as CkanUser,
-} from '@portaljs/ckan'
+import { Dataset, Resource } from '@/interfaces/dataset.interface'
+import type { Group, Organization, User as CkanUser } from '@portaljs/ckan'
 
 type Only<T, U> = {
     [P in keyof T]: T[P]
@@ -38,8 +34,8 @@ export interface User {
     number_created_packages?: number
     apikey?: string
     email?: string
-    image_display_url?: string,
-    capacity?: string,
+    image_display_url?: string
+    capacity?: string
 }
 
 export interface Activity {
@@ -117,6 +113,7 @@ export interface WriDataset extends Dataset {
     approval_status?: string
     draft?: boolean
     issue_count?: number
+    resources: Resource[]
 }
 
 export interface Extra {

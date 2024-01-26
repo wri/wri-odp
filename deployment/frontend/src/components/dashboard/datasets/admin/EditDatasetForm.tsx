@@ -134,6 +134,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       ),
                   }))
                 : [],
+            //@ts-ignore
             resources: dataset.resources.map((resource) => ({
                 ...resource,
                 schema: resource.schema ? resource.schema.value : undefined,

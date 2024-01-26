@@ -527,7 +527,8 @@ export async function getOneDataset(
         if (dataset.error.message) throw Error(dataset.error.message)
         throw Error(JSON.stringify(dataset.error))
     }
-    if (dataset.result.rw_id) {
+
+    if (dataset.result.rw_id && dataset.result.approval_status !== 'pending') {
         const rwRes = await fetch(
             `https://api.resourcewatch.org/v1/dataset/${dataset.result.rw_id}`,
             {
@@ -548,6 +549,17 @@ export async function getOneDataset(
         dataset.result.connectorUrl = datasetRw.data.attributes.connectorUrl
         dataset.result.provider = datasetRw.data.attributes.provider
         dataset.result.tableName = datasetRw.data.attributes.tableName
+    } else {
+        const resource = dataset.result.resources.filter(
+            (x) => x.format?.toLowerCase() === 'layer'
+        )
+        if (resource) {
+            const layer = resource[0]!
+            dataset.result.connectorType = layer.connectorType
+            dataset.result.connectorUrl = layer.connectorUrl
+            dataset.result.provider = layer.provider
+            dataset.result.tableName = layer.tableName
+        }
     }
 
     let spatial = null
@@ -559,12 +571,19 @@ export async function getOneDataset(
         }
     }
 
+    dataset.result.resources = dataset.result.resources.map((x) => {
+        if (x.layerObj || x.layerObjRaw) {
+            return { ...x, rw_id: x.id }
+        }
+        return x
+    })
+
     return {
         ...dataset.result,
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
-        spatial
+        spatial,
     }
 }
 
@@ -587,11 +606,29 @@ export async function getOnePendingDataset(
         const erroInfo = JSON.stringify(data.error).toLowerCase()
         if (erroInfo.includes('not found')) {
             return null
-         }
+        }
         throw Error(JSON.stringify(data.error))
     }
     const dataset = data.result.package_data
-    
+
+    if (dataset.rw_id) {
+        const resource = dataset.resources.filter(
+            (x) => x.format?.toLowerCase() === 'layer'
+        )
+        const layer = resource[0]!
+        dataset.connectorType = layer.connectorType
+        dataset.connectorUrl = layer.connectorUrl
+        dataset.provider = layer.provider
+        dataset.tableName = layer.tableName
+    }
+
+    dataset.resources = dataset.resources.map((x) => {
+        if (x.layerObj || x.layerObjRaw) {
+            return { ...x, rw_id: x.id }
+        }
+        return x
+    })
+
     let spatial = null
     if (dataset.spatial) {
         try {
@@ -600,13 +637,12 @@ export async function getOnePendingDataset(
             console.log(e)
         }
     }
-    
-    return {
-        ...data.result.package_data,
-        open_in: dataset.open_in ? Object.values(dataset.open_in) : [],
-        spatial
-    }
 
+    return {
+        ...dataset,
+        open_in: dataset.open_in ? Object.values(dataset.open_in) : [],
+        spatial,
+    }
 }
 
 export async function upsertCollaborator(
@@ -1316,50 +1352,56 @@ export async function getTopicDetails({
 }
 
 export async function getRecipient({
-  owner_org,
-  session,
+    owner_org,
+    session,
 }: {
-  owner_org: string;
-  session: Session;
+    owner_org: string
+    session: Session
 }): Promise<string[]> {
-  try {
-    const response = await fetch(
-      `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
-      {
-        headers: {
-          Authorization: `${session.user?.apikey ?? ''}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    try {
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
+            {
+                headers: {
+                    Authorization: `${session.user?.apikey ?? ''}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch organization information: ${response.statusText}`);
+        if (!response.ok) {
+            throw new Error(
+                `Failed to fetch organization information: ${response.statusText}`
+            )
+        }
+
+        const responseData =
+            (await response.json()) as CkanResponse<WriOrganization | null>
+        const organization: WriOrganization | null =
+            responseData.success === true ? responseData.result : null
+
+        if (organization) {
+            const members = organization.users!
+
+            // Filter members to include only admins and editors
+            const adminAndEditorMembers = members.filter(
+                (member) =>
+                    member.capacity === 'admin' || member.capacity === 'editor'
+            )
+
+            // Extract member IDs into an array
+            const memberIds = adminAndEditorMembers.map((member) => member.id!)
+
+            return memberIds
+        } else {
+            throw new Error(
+                `Failed to fetch organization information: ${responseData.error?.message}`
+            )
+        }
+    } catch (error) {
+        console.error(`Error in getRecipient function`)
+        throw error
     }
-
-    const responseData = (await response.json()) as CkanResponse<WriOrganization | null>
-    const organization: WriOrganization | null =
-        responseData.success === true ? responseData.result : null
-
-    if (organization) {
-      const members = organization.users!;
-
-      // Filter members to include only admins and editors
-      const adminAndEditorMembers = members.filter(
-        (member) => member.capacity === 'admin' || member.capacity === 'editor'
-      );
-
-      // Extract member IDs into an array
-      const memberIds = adminAndEditorMembers.map((member) => member.id!);
-
-      return memberIds;
-    } else {
-      throw new Error(`Failed to fetch organization information: ${responseData.error?.message}`);
-    }
-  } catch (error) {
-    console.error(`Error in getRecipient function`);
-    throw error;
-  }
 }
 
 export async function sendIssueOrCommentNotigication({
@@ -1369,23 +1411,25 @@ export async function sendIssueOrCommentNotigication({
     dataset_id,
     session,
     title,
-    action
+    action,
 }: {
-        owner_org: string | null;
-        creator_id: string | null;
-        collaborator_id: string[] | null;
-        dataset_id: string;
-        session: Session,
-        title: string,
-        action: string
-    }) {
+    owner_org: string | null
+    creator_id: string | null
+    collaborator_id: string[] | null
+    dataset_id: string
+    session: Session
+    title: string
+    action: string
+}) {
     try {
         let recipientIds: string[] = []
 
         if (owner_org) {
-            recipientIds = await getRecipient({owner_org: owner_org, session: session})
-        }
-        else if (creator_id) {
+            recipientIds = await getRecipient({
+                owner_org: owner_org,
+                session: session,
+            })
+        } else if (creator_id) {
             recipientIds = [creator_id]
         }
 
@@ -1394,25 +1438,25 @@ export async function sendIssueOrCommentNotigication({
         }
 
         if (recipientIds.length > 0) {
-            const titleNotification = title.split(" ").join("nbsp;")
+            const titleNotification = title.split(' ').join('nbsp;')
             const notificationPromises = recipientIds
                 .filter((recipientId) => recipientId !== session.user.id)
                 .map((recipientId) => {
-                return createNotification(
-                    recipientId,
-                    session.user.id,
-                     `issue_${action}_${titleNotification}`,
-                    'dataset',
-                    dataset_id,
-                    true
-                );
-            });
+                    return createNotification(
+                        recipientId,
+                        session.user.id,
+                        `issue_${action}_${titleNotification}`,
+                        'dataset',
+                        dataset_id,
+                        true
+                    )
+                })
 
-            await Promise.all(notificationPromises);
+            await Promise.all(notificationPromises)
         }
     } catch (error) {
-        console.error(error);
-        throw Error("Error in sending issue /comment notification");
+        console.error(error)
+        throw Error('Error in sending issue /comment notification')
     }
 }
 
@@ -1422,22 +1466,24 @@ export async function sendGroupNotification({
     collaborator_id,
     dataset_id,
     session,
-    action
+    action,
 }: {
-        owner_org: string | null;
-        creator_id: string | null;
-        collaborator_id: string[] | null;
-        dataset_id: string;
-        session: Session,
-        action: string
-    }) {
+    owner_org: string | null
+    creator_id: string | null
+    collaborator_id: string[] | null
+    dataset_id: string
+    session: Session
+    action: string
+}) {
     try {
         let recipientIds: string[] = []
 
         if (owner_org) {
-            recipientIds = await getRecipient({owner_org: owner_org, session: session})
-        }
-        else if (creator_id) {
+            recipientIds = await getRecipient({
+                owner_org: owner_org,
+                session: session,
+            })
+        } else if (creator_id) {
             recipientIds = [creator_id]
         }
 
@@ -1449,21 +1495,21 @@ export async function sendGroupNotification({
             const notificationPromises = recipientIds
                 .filter((recipientId) => recipientId !== session.user.id)
                 .map((recipientId) => {
-                return createNotification(
-                    recipientId,
-                    session.user.id,
-                     action,
-                    'dataset',
-                    dataset_id,
-                    true
-                );
-            });
+                    return createNotification(
+                        recipientId,
+                        session.user.id,
+                        action,
+                        'dataset',
+                        dataset_id,
+                        true
+                    )
+                })
 
-            await Promise.all(notificationPromises);
+            await Promise.all(notificationPromises)
         }
     } catch (error) {
-        console.error(error);
-        throw Error("Error in sending issue /comment notification");
+        console.error(error)
+        throw Error('Error in sending issue /comment notification')
     }
 }
 
@@ -1484,10 +1530,223 @@ export async function getPackageDiff({
             },
         }
     )
-    const packageData = (await packageRes.json()) as CkanResponse<Record<string, Record<string, never>>>
+    const packageData = (await packageRes.json()) as CkanResponse<
+        Record<string, Record<string, never>>
+    >
     if (!packageData.success && packageData.error) {
         if (packageData.error.message) throw Error(packageData.error.message)
         throw Error(JSON.stringify(packageData.error))
     }
     return packageData.result
+}
+
+export const datsetData = {
+    title: 'with layer',
+    name: 'with-layer',
+    url: '',
+    rw_dataset: true,
+    connectorUrl:
+        'https://wri-rw.carto.com:443/api/v2/sql?q=SELECT *, ghg_quantity_metric_tons_co2e AS ghg_fixed FROM ene_017_rw1_energy_facility_emissions_edit WHERE reporting_year = 2016',
+    connectorType: 'rest',
+    tableName: 'ene_017_rw1_energy_facility_emissions_edit',
+    provider: 'cartodb',
+    language: {
+        value: '',
+        label: '',
+    },
+    team: {
+        value: '',
+        label: 'No team',
+        id: '',
+    },
+    project: '',
+    application: '',
+    tags: [],
+    topics: [],
+    temporal_coverage_start: null,
+    temporal_coverage_end: null,
+    update_frequency: {
+        value: 'monthly',
+        label: 'Monthly',
+    },
+    citation: '',
+    visibility_type: {
+        value: 'private',
+        label: 'Private',
+    },
+    license_id: {
+        value: 'notspecified',
+        label: 'License not specified',
+    },
+    short_description: 'x',
+    wri_data: false,
+    featured_dataset: false,
+    author: 'x',
+    author_email: 'stephenoni2@gmail.com',
+    maintainer: 'x',
+    maintainer_email: 'stephenoni2@gmail.com',
+    extras: [],
+    open_in: [],
+    resources: [
+        {
+            description: '',
+            resourceId: 'e1c26bc8-1e49-43ab-bcf6-04f99199604e',
+            url: '',
+            format: '',
+            title: 'Example title',
+            type: 'layer',
+            schema: [],
+            layerObj: {
+                name: '2015 Human Development Index',
+                slug: '2015-Human-Development-Index_5',
+                default: false,
+                published: false,
+                protected: false,
+                env: 'staging',
+                application: ['data-explorer'],
+                description:
+                    'A composite index measuring average achievement in 3 basic dimensions of human development: a long and healthy life, knowledge, and a decent standard of living. 2015 Index scores are displayed.',
+                provider: 'cartodb',
+                type: 'layer',
+                iso: [],
+                layerConfig: {
+                    type: {
+                        value: 'vector',
+                        label: 'Vector',
+                    },
+                    source: {
+                        provider: {
+                            type: {
+                                value: 'carto',
+                                label: 'Carto',
+                            },
+                            account: 'wri-rw',
+                            layers: [
+                                {
+                                    options: {
+                                        sql: 'SELECT wri.cartodb_id, wri.the_geom_webmercator, data.rw_country_name, data.rw_country_code, data.datetime, data.yr_data FROM soc_004_human_development_index data LEFT OUTER JOIN wri_countries_a wri ON data.rw_country_code = wri.iso_a3 WHERE EXTRACT(YEAR FROM data.datetime) = 2015 and data.yr_data is not null',
+                                        type: 'cartodb',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    render: {
+                        layers: [
+                            {
+                                type: {
+                                    value: 'fill',
+                                    label: 'Fill',
+                                },
+                                'source-layer': 'layer0',
+                                paint: {
+                                    'fill-color': {
+                                        type: {
+                                            value: 'step',
+                                            label: 'Steps',
+                                        },
+                                        interpolationType: null,
+                                        input: {
+                                            coercion: 'to-number',
+                                            operation: 'get',
+                                            column: {
+                                                value: 'yr_data',
+                                                label: 'yr_data',
+                                            },
+                                        },
+                                        output: [
+                                            {
+                                                color: '#ffffcc',
+                                                value: 0.5,
+                                            },
+                                            {
+                                                color: '#a1dab4',
+                                                value: 0.7,
+                                            },
+                                            {
+                                                color: '#41b6c4',
+                                                value: 0.75,
+                                            },
+                                            {
+                                                color: '#2c7fb8',
+                                                value: 0.85,
+                                            },
+                                            {
+                                                color: '#253494',
+                                            },
+                                        ],
+                                    },
+                                    'fill-opacity': 1,
+                                },
+                                filter: ['all'],
+                            },
+                            {
+                                type: {
+                                    value: 'line',
+                                    label: 'Line',
+                                },
+                                'source-layer': 'layer0',
+                                paint: {
+                                    'line-color': '#fff',
+                                    'line-opacity': 0.8,
+                                    'line-width': 0.5,
+                                },
+                                filter: ['all'],
+                            },
+                        ],
+                    },
+                },
+                connectorUrl:
+                    'https://wri-rw.carto.com:443/api/v2/sql?q=SELECT wri.cartodb_id, wri.the_geom_webmercator, data.rw_country_name, data.rw_country_code, data.datetime, data.yr_data FROM soc_004_human_development_index data LEFT OUTER JOIN wri_countries_a wri ON data.rw_country_code = wri.iso_a3 WHERE EXTRACT(YEAR FROM data.datetime) = 2015 and data.yr_data is not null',
+                legendConfig: {
+                    type: 'choropleth',
+                    items: [
+                        {
+                            color: '#ffffcc',
+                            name: '<0.5',
+                        },
+                        {
+                            color: '#a1dab4',
+                            name: '<0.7',
+                        },
+                        {
+                            color: '#41b6c4',
+                            name: '<0.75',
+                        },
+                        {
+                            color: '#2c7fb8',
+                            name: '<0.85',
+                        },
+                        {
+                            color: '#253494',
+                            name: '<0.95',
+                        },
+                    ],
+                },
+                interactionConfig: {
+                    output: [
+                        {
+                            column: 'rw_country_name',
+                            format: '',
+                            prefix: '',
+                            property: '',
+                            suffix: '',
+                            type: '',
+                            enabled: true,
+                        },
+                        {
+                            column: 'yr_data',
+                            format: '',
+                            prefix: '',
+                            property: '2015 Human Development Index',
+                            suffix: '',
+                            type: 'number',
+                            enabled: true,
+                        },
+                    ],
+                },
+            },
+        },
+    ],
+    collaborators: [],
 }

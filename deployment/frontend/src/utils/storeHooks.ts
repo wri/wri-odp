@@ -15,6 +15,14 @@ export const useDataset = () => {
     return { dataset }
 }
 
+export const useLayerAsLayerObj = () => {
+    const { layerAsLayerObj } = useStore((store) => ({
+        layerAsLayerObj: store.layerAsLayerObj,
+    }))
+
+    return { layerAsLayerObj }
+}
+
 export const useRelatedDatasets = () => {
     const { relatedDatasets } = useStore((store) => ({
         relatedDatasets: store.relatedDatasets,
@@ -29,6 +37,16 @@ export const useIsEmbeddingMap = () => {
     }))
 
     return { isEmbedding }
+}
+
+export const useToggleLayergroups = () => {
+    const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
+        useStore((store) => ({
+            tempLayerAsLayerobj: store.tempLayerAsLayerobj,
+            prevLayerGroups: store.prevLayerGroups,
+            setToggleLayergroups: store.toggleActiveLayerGroup,
+        }))
+    return { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups }
 }
 
 export const useIsAddingLayers = () => {

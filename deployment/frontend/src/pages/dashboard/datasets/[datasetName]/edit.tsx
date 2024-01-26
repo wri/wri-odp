@@ -162,6 +162,7 @@ export default function EditDatasetPage(
                             )
                         )
                         .with({ data: P.select('data') }, ({ data }) => (
+                            //@ts-ignore
                             <EditDatasetForm dataset={data} />
                         ))
                         .otherwise(() => (

@@ -131,7 +131,6 @@ export default function CreateDatasetForm() {
                             className="flex flex-col gap-y-12"
                             id="create_dataset_form"
                             onSubmit={formObj.handleSubmit((data) => {
-                        console.log(data)
                                 createDataset.mutate(data)
                             })}
                         >

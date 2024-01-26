@@ -156,6 +156,7 @@ function DatafileCard({
         }
         return ''
     }
+
     return (
         <Disclosure>
             {({ open }) => (
@@ -204,7 +205,9 @@ function DatafileCard({
                             {datafile?.rw_id && (
                                 <>
                                     {activeLayers.some(
-                                        (a) => datafile.url?.endsWith(a.id)
+                                        (a) =>
+                                            datafile.url?.endsWith(a.id) ||
+                                            datafile.id === a.id
                                     ) ? (
                                         <Button
                                             variant="light"

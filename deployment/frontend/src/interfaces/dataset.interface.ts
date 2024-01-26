@@ -1,5 +1,6 @@
 import { DataDictionaryFormType } from '@/schema/dataset.schema'
 import { Activity, Group, Organization } from '@portaljs/ckan'
+import { APILayerSpec } from './layer.interface'
 
 export interface Dataset {
     author?: string
@@ -58,6 +59,13 @@ export interface Resource {
     key?: string
     schema?: { value: DataDictionaryFormType }
     rw_id?: string
+    layerObjRaw: APILayerSpec | null
+    layerObj: APILayerSpec | null
+    connectorType?: string
+    connectorUrl?: string
+    provider?: string
+    tableName?: string
+    type: 'link' | 'upload' | 'layer' | 'empty' | 'layer-raw'
 }
 
 export interface DatasetListQueryOptions {

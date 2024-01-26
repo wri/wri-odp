@@ -34,6 +34,7 @@ import { TabularResource } from './visualizations/Visualizations'
 import TabularViewIcon from './view-icons/TabularViewIcon'
 import MapViewIcon from './view-icons/MapViewIcon'
 import ToggleVersion from './ToogleVersion'
+import { useToggleLayergroups } from '@/utils/storeHooks'
 
 function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     const session = useSession()
@@ -131,6 +132,8 @@ export function DatasetHeader({
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
 }) {
+    const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
+        useToggleLayergroups()
     const [open, setOpen] = useState(false)
     const [fopen, setFOpen] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -210,7 +213,13 @@ export function DatasetHeader({
                         {diffFields.length > 0 && (
                             <ToggleVersion
                                 enabled={isCurrentVersion!}
-                                setEnabled={setIsCurrentVersion}
+                                setEnabled={(enabled) => {
+                                    setToggleLayergroups(
+                                        prevLayerGroups,
+                                        tempLayerAsLayerobj
+                                    )
+                                    setIsCurrentVersion(enabled)
+                                }}
                             />
                         )}
                         {isLoading ? (

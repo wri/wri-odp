@@ -32,7 +32,7 @@ import { useState, useEffect } from 'react'
 
 import SyncUrl from '@/components/_shared/map/SyncUrl'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
-import { useIsAddingLayers } from '@/utils/storeHooks'
+import { useIsAddingLayers, useToggleLayergroups } from '@/utils/storeHooks'
 import { decodeMapParam } from '@/utils/urlEncoding'
 import { WriDataset } from '@/schema/ckan.schema'
 import { User } from '@portaljs/ckan'
@@ -206,7 +206,7 @@ export default function DatasetPage(
         }
     )
     if (!datasetData && datasetError) {
-        router.replace('/datasets/404')
+        // router.replace('/datasets/404')
     }
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
@@ -385,6 +385,7 @@ export default function DatasetPage(
                     ) : (
                         <>
                             <DatasetHeader
+                                //@ts-ignore
                                 dataset={
                                     isCurrentVersion
                                         ? prevDatasetData
@@ -466,6 +467,7 @@ export default function DatasetPage(
                                             </Tab.Panel>
                                             <Tab.Panel as="div">
                                                 <Contact
+                                                    //@ts-ignore
                                                     dataset={datasetData}
                                                 />
                                             </Tab.Panel>
