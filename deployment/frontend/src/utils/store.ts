@@ -56,6 +56,8 @@ const getDefaultInitialState = () => {
             isDrawing: undefined,
         },
         activeDatafileCharts: [],
+        //TODO: have a single array for charts
+        activeCharts: []
     }
     return initialState
 }
@@ -354,6 +356,19 @@ export const initializeStore = (preloadedState: any = {}) => {
                     set({
                         ...prev,
                         activeDatafileCharts: datafiles,
+                    })
+                },
+                addChart: (view: View) => {
+                    const prev = get()
+                    set({
+                        ...prev,
+                        activeCharts: [...prev.activeCharts, view],
+                    })
+                },
+                removeChart: (chartId: string) => {
+                    const prev = get()
+                    set({
+                        activeCharts: [...prev.activeDatafileCharts.filter((c: View) => c.id != chartId)],
                     })
                 },
             })

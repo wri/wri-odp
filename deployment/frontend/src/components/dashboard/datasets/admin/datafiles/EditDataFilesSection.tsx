@@ -4,6 +4,9 @@ import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import { v4 as uuidv4 } from 'uuid'
 import { AddDataFile } from './AddDataFile'
 import { EditDataFile } from './EditDataFile'
+import { MetadataAccordion } from '../metadata/MetadataAccordion'
+import { api } from '@/utils/api'
+import ViewsList from '@/components/views/ViewsList'
 
 export function EditDataFilesSection({
     formObj,
@@ -16,15 +19,29 @@ export function EditDataFilesSection({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
         })
+
+    const rwId = watch('rw_id')
+    const provider = watch('provider')
+    const {
+        data: datasetViews,
+        isLoading: isDatasetViewsLoading,
+        error: datasetViewsError,
+    } = api.rw.getDatasetViews.useQuery(
+        { rwDatasetId: rwId ?? "" },
+        { enabled: !!rwId }
+    )
+
     return (
         <>
-            <div>
-                
-
-
-
-
-            </div>
+            {rwId && provider && !isDatasetViewsLoading && (
+                <MetadataAccordion label="Dataset views" defaultOpen={false}>
+                    <ViewsList
+                        provider="rw"
+                        rwDatasetId={rwId}
+                        views={datasetViews}
+                    />
+                </MetadataAccordion>
+            )}
             {fields.map((field, index) =>
                 field.new ? (
                     <AddDataFile

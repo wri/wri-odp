@@ -24,6 +24,14 @@ export const useActiveDatafileCharts = () => {
     }))
 }
 
+export const useActiveCharts = () => {
+    return useStore((store) => ({
+        activeCharts: store.activeCharts,
+        addChart: store.addChart,
+        removeChart: store.removeChart,
+    }))
+}
+
 export const useRelatedDatasets = () => {
     const { relatedDatasets } = useStore((store) => ({
         relatedDatasets: store.relatedDatasets,

@@ -83,21 +83,21 @@ export default function ViewsList(props: ViewsListProps) {
                     </PopoverTrigger>
                     <PopoverContent className="w-full md:w-[10rem] lg:w-[10rem] xl:w-[10rem] bg-white p-0">
                         {(datafile && datafile.datastore_active) ||
+                            rwDatasetId ? (
                             // TODO: is rwDatasetId enough? Is the provider needed?
-                            (rwDatasetId && (
-                                /* TODO: Button cannot be descend of button */
-                                <PopoverClose className="w-full">
-                                    <Button
-                                        variant="ghost"
-                                        className="w-full"
-                                        onClick={addNewChartView}
-                                    >
-                                        <div className="text-left w-full">
-                                            Chart
-                                        </div>
-                                    </Button>
-                                </PopoverClose>
-                            ))}
+                            /* TODO: Button cannot be descend of button */
+                            <PopoverClose className="w-full">
+                                <Button
+                                    variant="ghost"
+                                    className="w-full"
+                                    onClick={addNewChartView}
+                                >
+                                    <div className="text-left w-full">
+                                        Chart
+                                    </div>
+                                </Button>
+                            </PopoverClose>
+                        ) : null}
                     </PopoverContent>
                 </Popover>
             </div>
