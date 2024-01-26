@@ -57,6 +57,7 @@ export const ResourceSchema = z
         type: z.enum(['link', 'upload', 'layer', 'empty', 'layer-raw']),
         schema: DataDictionarySchema.optional().nullable(),
         layerObj: layerSchema.optional().nullable(),
+        datastore_active: z.boolean().optional().nullable(),
         layerObjRaw: z.any().optional().nullable(),
     })
     .refine(

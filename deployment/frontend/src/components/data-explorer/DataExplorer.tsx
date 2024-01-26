@@ -35,7 +35,6 @@ declare module '@tanstack/react-table' {
 
 export function DataExplorer({ tabularResource }: DataExplorerProps) {
     const { data: tableData } = useFields(tabularResource)
-    console.log('TABLE DATA', tableData)
     if (!tableData)
         return (
             <div className="bg-lima-700 my-auto flex w-full flex-col items-center justify-center overflow-hidden opacity-75 h-full">
@@ -47,6 +46,7 @@ export function DataExplorer({ tabularResource }: DataExplorerProps) {
         )
     return (
         <DataExplorerInner
+            key={tabularResource.id}
             tableName={tableData.tableName}
             columns={tableData.columns}
             tabularResource={tabularResource}
