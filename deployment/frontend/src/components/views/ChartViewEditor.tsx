@@ -787,7 +787,7 @@ export default function ChartViewEditor({
                                     >
                                         {mode == 'new'
                                             ? 'Add to Views'
-                                            : 'Update'}
+                                            : 'Update View'}
                                     </Button>
                                 </div>
                             </div>
