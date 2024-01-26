@@ -36,6 +36,10 @@ const Chart = dynamic(
         ssr: false,
     }
 )
+const emptyOption = {
+    label: 'None',
+    value: '',
+}
 
 const withEmptyOption = (ar?: any[]) => {
     if (ar) {
@@ -87,6 +91,8 @@ export default function ChartViewEditor({
     const config = formState?.config
     const chart = config?.chart
     const colors = chart?.colors
+    const tooltips = chart?.tooltips
+    const tooltipsEnabled = tooltips?.enabled
 
     const formObj = useForm<ChartFormType>({
         resolver: zodResolver(chartSchema),
@@ -101,6 +107,13 @@ export default function ChartViewEditor({
                         starting: colors?.starting ?? '#1dab58',
                         ending: colors?.ending ?? '#1dab58',
                     },
+                    tooltips: {
+                        ...tooltips,
+                        enabled: tooltipsEnabled ?? {
+                            value: true,
+                            label: 'Yes',
+                        },
+                    },
                 },
             },
         },
@@ -112,6 +125,7 @@ export default function ChartViewEditor({
         watch,
         formState: { errors, isDirty },
         reset,
+        setValue,
     } = formObj
 
     const onSubmit = async (formData: ChartFormType) => {
@@ -180,9 +194,6 @@ export default function ChartViewEditor({
                     provider: '',
                 })
 
-                console.log(query)
-                console.log(data)
-
                 tableData = data
             }
 
@@ -217,6 +228,7 @@ export default function ChartViewEditor({
             // Tooltips
             const tooltipsEnabled =
                 formData.config.chart.tooltips?.enabled?.value
+
             const tooltipsFormat = formData.config.chart.tooltips?.format?.value
 
             let categories = []
@@ -443,6 +455,7 @@ export default function ChartViewEditor({
                                                             })
                                                         ) ?? []
                                                     }
+                                                    onChange={(selected) => { }}
                                                 />
                                                 <ErrorDisplay
                                                     name="config.query.dimension.value"

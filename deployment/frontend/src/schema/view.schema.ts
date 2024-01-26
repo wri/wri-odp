@@ -88,17 +88,23 @@ export const chartSchema = z.object({
                     .optional(),
                 title: z.string().optional(),
             }),
-            tooltips: z.object({
-                enabled: z
-                    .object({
-                        label: z.string().optional(),
-                        value: z.boolean().default(true),
-                    })
-                    .optional(),
-                format: z
-                    .object({ label: z.string(), value: z.string().optional() })
-                    .optional(),
-            }).optional(),
+            tooltips: z
+                .object({
+                    enabled: z
+                        .object({
+                            label: z.string().optional(),
+                            value: z.boolean().default(true),
+                        })
+                        .default({ value: true })
+                        .optional(),
+                    format: z
+                        .object({
+                            label: z.string(),
+                            value: z.string().optional(),
+                        })
+                        .optional(),
+                })
+                .optional(),
             colors: z.object({ starting: z.string(), ending: z.string() }),
         }),
         query: z.object({
@@ -117,16 +123,18 @@ export const chartSchema = z.object({
             category: z
                 .object({ value: z.string().optional(), label: z.string() })
                 .optional(),
-            measure: z.object({
-                value: z
-                    .string({
-                        errorMap: () => ({
-                            message: 'Please select a measure',
-                        }),
-                    })
-                    .min(1),
-                label: z.string(),
-            }),
+            measure: z
+                .object({
+                    value: z
+                        .string({
+                            errorMap: () => ({
+                                message: 'Please select a measure',
+                            }),
+                        })
+                        .min(1),
+                    label: z.string(),
+                })
+                .required(),
             aggregate: z
                 .object({ value: z.string().optional(), label: z.string() })
                 .optional(),
