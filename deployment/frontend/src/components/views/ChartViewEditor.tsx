@@ -63,7 +63,7 @@ export default function ChartViewEditor({
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [isDataDialogOpen, setIsDataDialogOpen] = useState(false)
 
-    const [sql, setSql] = useState('')
+    const [sql] = useState('')
 
     const [error, setError] = useState<
         { title: string; text: string } | undefined
@@ -217,20 +217,20 @@ export default function ChartViewEditor({
             let categories = []
             if (isGrouped) {
                 const categoryNames = tableData.map(
-                    (row) => row[categoryColName]
+                    (row: any) => row[categoryColName]
                 )
                 const uniqueCategoryNames = [...new Set(categoryNames)]
 
                 for (let categoryName of uniqueCategoryNames) {
                     let categoryData = tableData.filter(
-                        (row) => row[categoryColName] == categoryName
+                        (row: any) => row[categoryColName] == categoryName
                     )
 
                     const dimensionAr = categoryData.map(
-                        (row) => row[dimensionColName]
+                        (row: any) => row[dimensionColName]
                     )
                     const measureAr = categoryData.map(
-                        (row) => row[measureColName]
+                        (row: any) => row[measureColName]
                     )
 
                     categories.push({
@@ -242,11 +242,11 @@ export default function ChartViewEditor({
             } else {
                 const category: any = { name: undefined }
                 const dimensionAr = tableData.map(
-                    (row) => row[dimensionColName]
+                    (row: any) => row[dimensionColName]
                 )
                 category.x = dimensionAr
 
-                const measureAr = tableData.map((row) => row[measureColName])
+                const measureAr = tableData.map((row: any) => row[measureColName])
                 category.y = measureAr
 
                 categories.push(category)
