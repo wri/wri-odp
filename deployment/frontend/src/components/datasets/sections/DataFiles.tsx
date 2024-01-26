@@ -9,16 +9,13 @@ import {
 } from '@heroicons/react/24/outline'
 import { DownloadButton } from './datafiles/Download'
 import { OpenInButton } from './datafiles/OpenIn'
-import { Resource } from '@/interfaces/dataset.interface'
+import { Resource, View } from '@/interfaces/dataset.interface'
 import { getFormatColor } from '@/utils/formatColors'
 import { Index } from 'flexsearch'
 import { useState } from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
-import {
-    useActiveLayerGroups,
-    useActiveDatafileCharts,
-} from '@/utils/storeHooks'
+import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
 import { TabularResource } from '../visualizations/Visualizations'
 
 export function DataFiles({
@@ -47,6 +44,7 @@ export function DataFiles({
                 index.search(q).includes(datafile.id)
             )
             : datafiles
+
     return (
         <>
             <div className="relative py-4">
@@ -130,9 +128,7 @@ function DatafileCard({
     isCurrentVersion?: boolean
     diffFields: Array<Record<string, { old_value: string; new_value: string }>>
 }) {
-    const { addDatafileCharts, removeDatafileCharts, activeDatafileCharts } =
-        useActiveDatafileCharts()
-
+    const { activeCharts, addCharts, removeCharts } = useActiveCharts()
     const { data: activeLayers } = useLayersFromRW()
     const { removeLayerFromLayerGroup, addLayerToLayerGroup } =
         useActiveLayerGroups()
@@ -159,6 +155,7 @@ function DatafileCard({
         }
         return ''
     }
+
     return (
         <Disclosure>
             {({ open }) => (
@@ -189,14 +186,13 @@ function DatafileCard({
                             )}
                             <Disclosure.Button>
                                 <h3
-                                    className={`font-acumin text-lg font-semibold leading-loose text-stone-900 ${
-                                        datafile.title
+                                    className={`font-acumin text-lg font-semibold leading-loose text-stone-900 ${datafile.title
                                             ? higlighted(
-                                                  'title',
-                                                  datafile.title
-                                              )
+                                                'title',
+                                                datafile.title
+                                            )
                                             : higlighted('name', datafile.name!)
-                                    }`}
+                                        }`}
                                 >
                                     {datafile.title ?? datafile.name}
                                 </h3>
@@ -280,16 +276,24 @@ function DatafileCard({
 
                             {datafile._hasChartView && (
                                 <>
-                                    {activeDatafileCharts.some(
-                                        (df: Resource) => df.id == datafile.id
+                                    {datafile?._views?.some((v) =>
+                                        activeCharts
+                                            .map((c: View) => c.id)
+                                            .includes(v.id)
                                     ) ? (
                                         <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={() => {
-                                                removeDatafileCharts(
-                                                    datafile.id
-                                                )
+                                                const viewIds =
+                                                    datafile._views?.map(
+                                                        (v: View) => v.id
+                                                    )
+                                                if (viewIds) {
+                                                    removeCharts(
+                                                        viewIds as string[]
+                                                    )
+                                                }
                                             }}
                                         >
                                             Remove Chart View
@@ -298,7 +302,8 @@ function DatafileCard({
                                         <Button
                                             size="sm"
                                             onClick={() => {
-                                                addDatafileCharts(datafile)
+                                                if (datafile._views)
+                                                    addCharts(datafile._views)
                                             }}
                                         >
                                             Add Chart View
@@ -327,14 +332,13 @@ function DatafileCard({
                     >
                         <Disclosure.Panel className="py-3">
                             <p
-                                className={`font-acumin text-base font-light text-stone-900 ${
-                                    datafile.description
+                                className={`font-acumin text-base font-light text-stone-900 ${datafile.description
                                         ? higlighted(
-                                              'description',
-                                              datafile.description
-                                          )
+                                            'description',
+                                            datafile.description
+                                        )
                                         : ''
-                                }`}
+                                    }`}
                             >
                                 {datafile.description ?? 'No Description'}
                             </p>

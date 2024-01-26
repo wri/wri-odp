@@ -55,9 +55,7 @@ const getDefaultInitialState = () => {
             },
             isDrawing: undefined,
         },
-        activeDatafileCharts: [],
-        //TODO: have a single array for charts
-        activeCharts: []
+        activeCharts: [],
     }
     return initialState
 }
@@ -338,37 +336,21 @@ export const initializeStore = (preloadedState: any = {}) => {
                         },
                     })
                 },
-                addDatafileCharts: (datafile: Resource) => {
+                addCharts: (views: View[]) => {
                     const prev = get()
                     set({
                         ...prev,
-                        activeDatafileCharts: [...prev.activeDatafileCharts, datafile],
+                        activeCharts: [...prev.activeCharts, ...views],
                     })
                 },
-                removeDatafileCharts: (dfId: string) => {
+                removeCharts: (chartIds: string[]) => {
                     const prev = get()
                     set({
-                        activeDatafileCharts: [...prev.activeDatafileCharts.filter((c: View) => c.id != dfId)],
-                    })
-                },
-                replaceDatafileCharts: (datafiles: Resource[]) => {
-                    const prev = get()
-                    set({
-                        ...prev,
-                        activeDatafileCharts: datafiles,
-                    })
-                },
-                addChart: (view: View) => {
-                    const prev = get()
-                    set({
-                        ...prev,
-                        activeCharts: [...prev.activeCharts, view],
-                    })
-                },
-                removeChart: (chartId: string) => {
-                    const prev = get()
-                    set({
-                        activeCharts: [...prev.activeDatafileCharts.filter((c: View) => c.id != chartId)],
+                        activeCharts: [
+                            ...prev.activeCharts.filter(
+                                (c: View) => !chartIds.includes(c.id ?? '')
+                            ),
+                        ],
                     })
                 },
             })

@@ -3,7 +3,6 @@ import ChartView from '@/components/datasets/visualizations/ChartView'
 import { getServerAuthSession } from '@/server/auth'
 import { api } from '@/utils/api'
 import { getOneDataset } from '@/utils/apiUtils'
-import { useActiveDatafileCharts } from '@/utils/storeHooks'
 import { GetServerSidePropsContext } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
@@ -46,6 +45,11 @@ export default function Embed({
     dataset: any
     datasetName: string
 }) {
+    /*
+     * TODO: get id and provider of the view
+     * render only given view
+     *
+     */
     const {
         data: datasetData,
         error: datasetError,

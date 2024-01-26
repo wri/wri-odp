@@ -18,7 +18,6 @@ export interface State {
         isDrawing: boolean | undefined
         layersParsed: Array<[string, LayerState]>
     } & Layers,
-    activeDatafileCharts: Resource[]
     activeCharts: View[]
 }
 

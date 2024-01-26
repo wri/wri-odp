@@ -32,6 +32,8 @@ import type {
 } from '@/schema/notification.schema'
 import { View } from '@/interfaces/dataset.interface'
 import { CreateViewFormSchema, EditViewFormSchema, ViewFormSchema } from '@/schema/view.schema'
+import { getLayerRw } from '@/server/api/routers/dataset'
+import { convertLayerObjToForm, getRawObjFromApiSpec } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -556,8 +558,45 @@ export async function getOneDataset(
         }
     }
 
+    const resources = await Promise.all(
+        dataset.result.resources.map(async (r) => {
+            const _views = await getResourceViews({
+                id: r.id,
+                session: session,
+            })
+
+            if (r.url_type === 'upload' || r.url_type === 'link') {
+                const resourceHasChartView =
+                    r.datastore_active &&
+                    _views.some(
+                        (v) =>
+                            v.view_type == 'custom' &&
+                            v.config_obj.type == 'chart'
+                    )
+
+                r._hasChartView = resourceHasChartView
+
+                return { ...r, _views }
+            }
+            if (!r.url) return r
+            const layerObj = await getLayerRw(r.url)
+            if (r.url_type === 'layer')
+                return {
+                    ...r,
+                    layerObj: convertLayerObjToForm(layerObj),
+                }
+            if (r.url_type === 'layer-raw')
+                return {
+                    ...r,
+                    layerObjRaw: getRawObjFromApiSpec(layerObj),
+                }
+            return r
+        })
+    )
+
     return {
         ...dataset.result,
+        resources,
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
@@ -1623,4 +1662,3 @@ export async function getPackageDiff({
     }
     return packageData.result
 }
-

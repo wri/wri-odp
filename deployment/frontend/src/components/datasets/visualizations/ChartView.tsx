@@ -1,6 +1,6 @@
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { Resource, View } from '@/interfaces/dataset.interface'
-import { useActiveDatafileCharts } from '@/utils/storeHooks'
+import { useActiveCharts } from '@/utils/storeHooks'
 import { useEffect, useState } from 'react'
 import ChartViewExport from './ChartViewExport'
 import { useForm } from 'react-hook-form'
@@ -17,7 +17,7 @@ const Chart = dynamic(
 
 export default function ChartView({ isEmbed = false }: { isEmbed?: boolean }) {
     const [activeChart, setActiveChart] = useState<View | undefined>()
-    const { activeDatafileCharts } = useActiveDatafileCharts()
+    const { activeCharts } = useActiveCharts()
 
     const viewOptionsSchema = z.object({
         x_tick_angle: z.object({
@@ -40,9 +40,7 @@ export default function ChartView({ isEmbed = false }: { isEmbed?: boolean }) {
     const { watch, register, handleSubmit, reset } = formObj
 
     // TODO: we should group options by datafile
-    const chartOptions = activeDatafileCharts
-        ?.map((df: Resource) => df._views)
-        .flat()
+    const chartOptions = activeCharts
         .filter((v: View) => v?.config_obj?.type == 'chart')
         .map((v: View) => ({ label: v.title, value: v }))
 
@@ -58,7 +56,7 @@ export default function ChartView({ isEmbed = false }: { isEmbed?: boolean }) {
                 setActiveChart(defaultChart.value)
             }
         }
-    }, [activeDatafileCharts])
+    }, [activeCharts])
 
     const onChange = (selected: View) => {
         setActiveChart(selected)

@@ -133,7 +133,7 @@ export function DatasetHeader({
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
 }) {
-    const { activeCharts, addChart, removeChart } = useActiveCharts()
+    const { activeCharts, addCharts, removeCharts } = useActiveCharts()
     const [open, setOpen] = useState(false)
     const [fopen, setFOpen] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -148,7 +148,7 @@ export function DatasetHeader({
         isLoading: isDatasetViewsLoading,
         error: datasetViewsError,
     } = api.rw.getDatasetViews.useQuery(
-        { rwDatasetId: dataset?.rw_id ?? "" },
+        { rwDatasetId: dataset?.rw_id ?? '' },
         { enabled: !!dataset?.rw_id }
     )
 
@@ -400,8 +400,8 @@ export function DatasetHeader({
                     <div className="flex items-center gap-x-3">
                         <h1
                             className={`w-fit text-3xl font-bold text-black ${dataset?.title
-                                ? higlighted('title')
-                                : higlighted('name')
+                                    ? higlighted('title')
+                                    : higlighted('name')
                                 }  `}
                         >
                             {dataset?.title ?? dataset?.name}{' '}
@@ -589,59 +589,70 @@ export function DatasetHeader({
                     </a>
                 )}
 
-                <div className='flex space-x-2'>
-                
-                {dataset?.provider && dataset?.rw_id && (
-                    <div className="py-4">
-                        {tabularResource &&
-                            tabularResource.id === dataset.rw_id ? (
-                            <Button
-                                size="sm"
-                                onClick={() => setTabularResource(null)}
-                            >
-                                Remove Tabular View
-                            </Button>
-                        ) : (
-                            <Button
-                                size="sm"
-                                onClick={() =>
-                                    setTabularResource({
-                                        provider: dataset.provider as string,
-                                        id: dataset.rw_id as string,
-                                    })
-                                }
-                            >
-                                Add Tabular View
-                            </Button>
+                <div className="flex space-x-2">
+                    {dataset?.provider && dataset?.rw_id && (
+                        <div className="py-4">
+                            {tabularResource &&
+                                tabularResource.id === dataset.rw_id ? (
+                                <Button
+                                    size="sm"
+                                    onClick={() => setTabularResource(null)}
+                                >
+                                    Remove Tabular View
+                                </Button>
+                            ) : (
+                                <Button
+                                    size="sm"
+                                    onClick={() =>
+                                        setTabularResource({
+                                            provider:
+                                                dataset.provider as string,
+                                            id: dataset.rw_id as string,
+                                        })
+                                    }
+                                >
+                                    Add Tabular View
+                                </Button>
+                            )}
+                        </div>
+                    )}
+                    {dataset?.provider &&
+                        dataset?.rw_id &&
+                        !isDatasetViewsLoading &&
+                        datasetViews.some(
+                            (v: View) => v.config_obj.type == 'chart'
+                        ) && (
+                            <div className="py-4">
+                                {activeCharts
+                                    .map((c: View) => c.id)
+                                    .some((id: string) =>
+                                        datasetViews
+                                            .map((v: View) => v.id)
+                                            .includes(id)
+                                    ) ? (
+                                    <Button
+                                        size="sm"
+                                        onClick={() => {
+                                            removeCharts(
+                                                datasetViews.map((v) => v.id)
+                                            )
+                                        }}
+                                    >
+                                        Remove Chart View
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        size="sm"
+                                        onClick={() => {
+                                            addCharts(datasetViews)
+                                        }}
+                                    >
+                                        Add Chart View
+                                    </Button>
+                                )}
+                            </div>
                         )}
-                    </div>
-                )}
-                {dataset?.provider && dataset?.rw_id && !isDatasetViewsLoading && datasetViews.some((v: View) => v.config_obj.type == "chart")  && (
-                    <div className="py-4">
-                        {tabularResource &&
-                            tabularResource.id === dataset.rw_id ? (
-                            <Button
-                                size="sm"
-                                onClick={() => setTabularResource(null)}
-                            >
-                                Remove Chart View
-                            </Button>
-                        ) : (
-                            <Button
-                                size="sm"
-                                onClick={() =>
-                                    setTabularResource({
-                                        provider: dataset.provider as string,
-                                        id: dataset.rw_id as string,
-                                    })
-                                }
-                            >
-                                Add Chart View
-                            </Button>
-                        )}
-                    </div>
-                )}
-            </div>
+                </div>
             </div>
         </div>
     )
