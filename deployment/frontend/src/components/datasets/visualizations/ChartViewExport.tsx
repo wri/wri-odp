@@ -9,13 +9,13 @@ import Modal from '@/components/_shared/Modal'
 import { View } from '@/interfaces/dataset.interface'
 
 export default function ChartViewExport() {
+    const { selectedChart } = useActiveCharts()
     const { activeCharts } = useActiveCharts()
     const { dataset } = useDataset()
     const [open, setOpen] = useState(false)
-    const searchParams = new URLSearchParams(window.location.search)
     const chartsId = activeCharts.map((df: View) => df.id).join(',')
 
-    const embedUrl = `${window.location.origin}/datasets/${dataset.name}/embed/chart?charts=${chartsId}`
+    const embedUrl = `${window.location.origin}/datasets/${dataset.name}/embed/chart?chart_provider=${selectedChart?.config_obj?.config?.provider}&chart_id=${selectedChart?.id}`
 
     const iFrameHtml = `<iframe src="${embedUrl}" width="1000" height="800" />`
     return (

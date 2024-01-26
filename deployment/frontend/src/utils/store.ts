@@ -56,6 +56,7 @@ const getDefaultInitialState = () => {
             isDrawing: undefined,
         },
         activeCharts: [],
+        selectedChart: null 
     }
     return initialState
 }
@@ -353,6 +354,12 @@ export const initializeStore = (preloadedState: any = {}) => {
                         ],
                     })
                 },
+                selectChart: (view: View | null) => {
+                    set({
+                        selectedChart: view,
+                    })
+
+                }
             })
         )
     )

@@ -1486,6 +1486,36 @@ export async function getResourceViews({
     return views.result
 }
 
+
+export async function getResourceView({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_show?id=${id}`,
+        { headers }
+    )
+    const views: CkanResponse<View> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
 export async function createResourceView({
     view,
     session,
@@ -1661,4 +1691,22 @@ export async function getPackageDiff({
         throw Error(JSON.stringify(packageData.error))
     }
     return packageData.result
+}
+
+export async function getDatasetView({ id }: { id: string }) {
+    const viewsRes = await fetch(
+        `https://api.resourcewatch.org/v1/widget/${id}`,
+        {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const result = await viewsRes.json()
+    return {
+        id: result.data.id,
+        ...result.data.attributes.widgetConfig,
+    }
 }

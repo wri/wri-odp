@@ -1,6 +1,6 @@
 import { WriDataset } from '@/schema/ckan.schema'
 import { ViewState } from 'react-map-gl'
-import { Resource, View } from './dataset.interface'
+import { View } from './dataset.interface'
 
 export interface State {
     vizIndex: number
@@ -19,6 +19,7 @@ export interface State {
         layersParsed: Array<[string, LayerState]>
     } & Layers,
     activeCharts: View[]
+    selectedChart: View
 }
 
 export interface ActiveLayerGroup {

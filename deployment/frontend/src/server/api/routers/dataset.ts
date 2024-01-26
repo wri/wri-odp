@@ -20,6 +20,7 @@ import {
     sendGroupNotification,
     getOnePendingDataset,
     getUserOrganizations,
+    getResourceView,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -602,6 +603,16 @@ export const DatasetRouter = createTRPCRouter({
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
             const views = await getResourceViews({
+                ...input,
+                session: ctx.session,
+            })
+
+            return views
+        }),
+    getResourceView: publicProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            const views = await getResourceView({
                 ...input,
                 session: ctx.session,
             })

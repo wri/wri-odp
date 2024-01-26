@@ -20,6 +20,8 @@ export const useActiveCharts = () => {
         activeCharts: store.activeCharts,
         addCharts: store.addCharts,
         removeCharts: store.removeCharts,
+        selectedChart: store.selectedChart,
+        selectChart: store.selectChart
     }))
 }
 
