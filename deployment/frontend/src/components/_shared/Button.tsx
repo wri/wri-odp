@@ -18,7 +18,7 @@ const buttonVariants = cva(
                     'border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold',
                 secondary:
                     'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-                ghost: 'hover:bg-accent hover:text-accent-foreground',
+                ghost: 'hover:bg-wri-slate hover:font-semibold',
                 link: 'text-primary underline-offset-4 hover:underline',
                 input: 'shadow-wri-small w-full rounded-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 disabled:bg-gray-100 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0',
             },

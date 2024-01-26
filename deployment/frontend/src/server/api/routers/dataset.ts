@@ -12,6 +12,10 @@ import {
     upsertCollaborator,
     deleteCollaborator,
     sendIssueOrCommentNotigication,
+    getResourceViews,
+    createResourceView,
+    updateResourceView,
+    deleteResourceView,
     getUser,
     sendGroupNotification,
     getOnePendingDataset,
@@ -52,6 +56,8 @@ import {
 import { sendMemberNotifications } from '@/utils/apiUtils'
 import { TRPCError } from '@trpc/server'
 import { CommentSchema, IssueSchema } from '@/schema/issue.schema'
+import { throws } from 'assert'
+import { createViewFormSchema, editViewFormSchema, viewFormSchema } from '@/schema/view.schema'
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -89,8 +95,8 @@ async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     const body = r.layerObj
         ? JSON.stringify(convertFormToLayerObj(r.layerObj))
         : JSON.stringify({
-              ...getApiSpecFromRawObj(r.layerObjRaw),
-          })
+            ...getApiSpecFromRawObj(r.layerObjRaw),
+        })
     const layerRwRes = await fetch(
         `https://api.resourcewatch.org/v1/dataset/${datasetRwId}/layer`,
         {
@@ -323,8 +329,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                            ? JSON.stringify(input.spatial)
-                            : null,
+                                ? JSON.stringify(input.spatial)
+                                : null,
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -399,27 +405,27 @@ export const DatasetRouter = createTRPCRouter({
             }
             const resourcesToEditLayer = input.rw_id
                 ? await Promise.all(
-                      input.resources
-                          .filter(
-                              (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
-                          )
-                          .map(async (r) => {
-                              return await editLayerRw(r)
-                          })
-                  )
+                    input.resources
+                        .filter(
+                            (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
+                        )
+                        .map(async (r) => {
+                            return await editLayerRw(r)
+                        })
+                )
                 : []
             const resourcesToCreateLayer =
                 rw_id !== null
                     ? await Promise.all(
-                          input.resources
-                              .filter(
-                                  (r) =>
-                                      (r.layerObj || r.layerObjRaw) && !r.rw_id
-                              )
-                              .map(async (r) => {
-                                  return await createLayerRw(r, rw_id ?? '')
-                              })
-                      )
+                        input.resources
+                            .filter(
+                                (r) =>
+                                    (r.layerObj || r.layerObjRaw) && !r.rw_id
+                            )
+                            .map(async (r) => {
+                                return await createLayerRw(r, rw_id ?? '')
+                            })
+                    )
                     : []
             const resources = [
                 ...resourcesWithoutLayer,
@@ -471,8 +477,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                            ? JSON.stringify(input.spatial)
-                            : null,
+                                ? JSON.stringify(input.spatial)
+                                : null,
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -589,7 +595,48 @@ export const DatasetRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
+    getResourceViews: publicProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            const views = await getResourceViews({
+                ...input,
+                session: ctx.session,
+            })
 
+            return views
+        }),
+    createResourceView: protectedProcedure
+        .input(createViewFormSchema)
+        .mutation(async ({ input, ctx }) => {
+            console.log("!!!");
+            console.log(input);
+            const view = await createResourceView({
+                view: input,
+                session: ctx.session,
+            })
+
+            return view
+        }),
+    updateResourceView: protectedProcedure
+        .input(editViewFormSchema)
+        .mutation(async ({ input, ctx }) => {
+            const view = await updateResourceView({
+                view: input,
+                session: ctx.session,
+            })
+
+            return view
+        }),
+    deleteResourceView: protectedProcedure
+        .input(z.object({id: z.string()}))
+        .mutation(async ({ input, ctx }) => {
+            const view = await deleteResourceView({
+                session: ctx.session,
+                id: input.id
+            })
+
+            return view
+        }),
     getAllDataset: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
@@ -699,13 +746,34 @@ export const DatasetRouter = createTRPCRouter({
             return issuesWithDetails
         }),
     getOneDataset: publicProcedure
-        .input(z.object({ id: z.string() }))
+        .input(
+            z.object({
+                id: z.string(),
+                includeViews: z.boolean().default(false).optional(),
+            })
+        )
         .query(async ({ input, ctx }) => {
             const dataset = await getOneDataset(input.id, ctx.session)
             const resources = await Promise.all(
                 dataset.resources.map(async (r) => {
-                    if (r.url_type === 'upload' || r.url_type === 'link')
-                        return r
+                    const _views = await getResourceViews({
+                        id: r.id,
+                        session: ctx.session,
+                    })
+
+                    if (r.url_type === 'upload' || r.url_type === 'link') {
+                        const resourceHasChartView =
+                            r.datastore_active &&
+                            _views.some(
+                                (v) =>
+                                    v.view_type == 'custom' &&
+                                    v.config_obj.type == 'chart'
+                            )
+
+                        r._hasChartView = resourceHasChartView
+                        
+                        return { ...r, _views }
+                    }
                     if (!r.url) return r
                     const layerObj = await getLayerRw(r.url)
                     if (r.url_type === 'layer')

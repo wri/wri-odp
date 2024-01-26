@@ -243,6 +243,11 @@ $dark-pink: #c32d7b;
   }
 }
 
+/* Plotly */
+.js-plotly-plot svg {
+  display: inline;
+}
+
 .rdp-vhidden {
   @apply hidden;
 }

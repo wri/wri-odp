@@ -19,17 +19,23 @@ export interface FieldsResponse {
 }
 
 export function useFields({ id, provider }: TabularResource) {
-    const { data: session } = useSession()
+    const session = useSession()
+
     if (provider === 'datastore') {
+        const headers = {
+            'Content-Type': 'application/json',
+        } as any
+
+        if (session.data?.user.apikey) {
+            headers['Authorization'] = session.data?.user.apikey
+        }
+
         return useQuery(['fields', id], async () => {
             const fieldsRes = await fetch(
                 `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/datastore_info`,
                 {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${session?.user?.apikey}`,
-                    },
+                    headers,
                     body: JSON.stringify({
                         id,
                     }),
@@ -43,6 +49,7 @@ export function useFields({ id, provider }: TabularResource) {
                     type: string
                 }>
             }> = await fieldsRes.json()
+
             return {
                 tableName: id,
                 columns: fields.result.fields.map((field) => ({
@@ -115,6 +122,7 @@ export function useTableData({
     enabled = true,
     filters,
     provider,
+    groupBy
 }: {
     pagination: PaginationState
     sorting: ColumnSort[]
@@ -124,6 +132,7 @@ export function useTableData({
     enabled?: boolean
     filters: ColumnFilter[]
     provider: string
+    groupBy?: string[]
 }) {
     if (provider === 'datastore') {
         return api.datastore.getData.useQuery(
@@ -136,6 +145,7 @@ export function useTableData({
                     id: string
                     value: FilterObjType[]
                 }[],
+                groupBy
             },
             {
                 enabled: !!tableName && enabled,
