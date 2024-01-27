@@ -30,6 +30,17 @@ import type {
     NewNotificationInputType,
     NotificationType,
 } from '@/schema/notification.schema'
+import { View } from '@/interfaces/dataset.interface'
+import {
+    CreateViewFormSchema,
+    EditViewFormSchema,
+    ViewFormSchema,
+} from '@/schema/view.schema'
+import { getLayerRw } from '@/server/api/routers/dataset'
+import {
+    convertLayerObjToForm,
+    getRawObjFromApiSpec,
+} from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -577,9 +588,64 @@ export async function getOneDataset(
         }
         return x
     })
+    const resources = await Promise.all(
+        dataset.result.resources.map(async (r) => {
+            const _views = await getResourceViews({
+                id: r.id,
+                session: session,
+            })
+
+            if (r.url_type === 'upload' || r.url_type === 'link') {
+                const resourceHasChartView =
+                    r.datastore_active &&
+                    _views.some(
+                        (v) =>
+                            v.view_type == 'custom' &&
+                            v.config_obj.type == 'chart'
+                    )
+
+                r._hasChartView = resourceHasChartView
+
+                return { ...r, _views }
+            }
+            if (!r.url) return r
+            if (!r.layerObj || !r.layerObjRaw) {
+                const layerObj = await getLayerRw(r.url)
+                if (r.url_type === 'layer')
+                    return {
+                        ...r,
+                        layerObj: convertLayerObjToForm(layerObj),
+                    }
+                if (r.url_type === 'layer-raw')
+                    return {
+                        ...r,
+                        layerObjRaw: getRawObjFromApiSpec(layerObj),
+                    }
+            }
+
+            if (r.layerObj || r.layerObjRaw) {
+                if (r.layerObj) {
+                    return {
+                        ...r,
+                        layerObj: convertLayerObjToForm(r.layerObj),
+                        rw_id: r.id,
+                    }
+                }
+                if (r.layerObjRaw) {
+                    return {
+                        ...r,
+                        layerObjRaw: getRawObjFromApiSpec(r.layerObjRaw),
+                        rw_id: r.id,
+                    }
+                }
+            }
+            return r
+        })
+    )
 
     return {
         ...dataset.result,
+        resources,
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
@@ -622,12 +688,42 @@ export async function getOnePendingDataset(
         dataset.tableName = layer.tableName
     }
 
-    dataset.resources = dataset.resources.map((x) => {
-        if (x.layerObj || x.layerObjRaw) {
-            return { ...x, rw_id: x.id }
-        }
-        return x
-    })
+    const resources = await Promise.all(
+        dataset.resources.map(async (r) => {
+            if (r.url_type === 'upload' || r.url_type === 'link') return r
+            if (!r.url) return r
+            if (!r.layerObj || !r.layerObjRaw) {
+                const layerObj = await getLayerRw(r.url)
+                if (r.url_type === 'layer')
+                    return {
+                        ...r,
+                        layerObj: convertLayerObjToForm(layerObj),
+                    }
+                if (r.url_type === 'layer-raw')
+                    return {
+                        ...r,
+                        layerObjRaw: getRawObjFromApiSpec(layerObj),
+                    }
+            }
+            if (r.layerObj || r.layerObjRaw) {
+                if (r.layerObj) {
+                    return {
+                        ...r,
+                        layerObj: convertLayerObjToForm(r.layerObj),
+                        rw_id: r.id,
+                    }
+                }
+                if (r.layerObjRaw) {
+                    return {
+                        ...r,
+                        layerObjRaw: getRawObjFromApiSpec(r.layerObjRaw),
+                        rw_id: r.id,
+                    }
+                }
+            }
+            return r
+        })
+    )
 
     let spatial = null
     if (dataset.spatial) {
@@ -640,6 +736,7 @@ export async function getOnePendingDataset(
 
     return {
         ...dataset,
+        resources,
         open_in: dataset.open_in ? Object.values(dataset.open_in) : [],
         spatial,
     }
@@ -1460,6 +1557,164 @@ export async function sendIssueOrCommentNotigication({
     }
 }
 
+export async function getResourceViews({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_list?id=${id}`,
+        { headers }
+    )
+    const views: CkanResponse<View[]> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
+export async function getResourceView({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_show?id=${id}`,
+        { headers }
+    )
+    const views: CkanResponse<View> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
+export async function createResourceView({
+    view,
+    session,
+}: {
+    view: CreateViewFormSchema
+    session: Session | null
+}) {
+    console.log(view)
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_create`,
+        {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(view),
+        }
+    )
+    const views: CkanResponse<View[]> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
+export async function updateResourceView({
+    view,
+    session,
+}: {
+    view: EditViewFormSchema
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_update`,
+        {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(view),
+        }
+    )
+    const views: CkanResponse<View[]> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
+export async function deleteResourceView({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_delete`,
+        {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ id }),
+        }
+    )
+    const views: CkanResponse<View[]> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
 export async function sendGroupNotification({
     owner_org,
     creator_id,
@@ -1540,213 +1795,20 @@ export async function getPackageDiff({
     return packageData.result
 }
 
-export const datsetData = {
-    title: 'with layer',
-    name: 'with-layer',
-    url: '',
-    rw_dataset: true,
-    connectorUrl:
-        'https://wri-rw.carto.com:443/api/v2/sql?q=SELECT *, ghg_quantity_metric_tons_co2e AS ghg_fixed FROM ene_017_rw1_energy_facility_emissions_edit WHERE reporting_year = 2016',
-    connectorType: 'rest',
-    tableName: 'ene_017_rw1_energy_facility_emissions_edit',
-    provider: 'cartodb',
-    language: {
-        value: '',
-        label: '',
-    },
-    team: {
-        value: '',
-        label: 'No team',
-        id: '',
-    },
-    project: '',
-    application: '',
-    tags: [],
-    topics: [],
-    temporal_coverage_start: null,
-    temporal_coverage_end: null,
-    update_frequency: {
-        value: 'monthly',
-        label: 'Monthly',
-    },
-    citation: '',
-    visibility_type: {
-        value: 'private',
-        label: 'Private',
-    },
-    license_id: {
-        value: 'notspecified',
-        label: 'License not specified',
-    },
-    short_description: 'x',
-    wri_data: false,
-    featured_dataset: false,
-    author: 'x',
-    author_email: 'stephenoni2@gmail.com',
-    maintainer: 'x',
-    maintainer_email: 'stephenoni2@gmail.com',
-    extras: [],
-    open_in: [],
-    resources: [
+export async function getDatasetView({ id }: { id: string }) {
+    const viewsRes = await fetch(
+        `https://api.resourcewatch.org/v1/widget/${id}`,
         {
-            description: '',
-            resourceId: 'e1c26bc8-1e49-43ab-bcf6-04f99199604e',
-            url: '',
-            format: '',
-            title: 'Example title',
-            type: 'layer',
-            schema: [],
-            layerObj: {
-                name: '2015 Human Development Index',
-                slug: '2015-Human-Development-Index_5',
-                default: false,
-                published: false,
-                protected: false,
-                env: 'staging',
-                application: ['data-explorer'],
-                description:
-                    'A composite index measuring average achievement in 3 basic dimensions of human development: a long and healthy life, knowledge, and a decent standard of living. 2015 Index scores are displayed.',
-                provider: 'cartodb',
-                type: 'layer',
-                iso: [],
-                layerConfig: {
-                    type: {
-                        value: 'vector',
-                        label: 'Vector',
-                    },
-                    source: {
-                        provider: {
-                            type: {
-                                value: 'carto',
-                                label: 'Carto',
-                            },
-                            account: 'wri-rw',
-                            layers: [
-                                {
-                                    options: {
-                                        sql: 'SELECT wri.cartodb_id, wri.the_geom_webmercator, data.rw_country_name, data.rw_country_code, data.datetime, data.yr_data FROM soc_004_human_development_index data LEFT OUTER JOIN wri_countries_a wri ON data.rw_country_code = wri.iso_a3 WHERE EXTRACT(YEAR FROM data.datetime) = 2015 and data.yr_data is not null',
-                                        type: 'cartodb',
-                                    },
-                                },
-                            ],
-                        },
-                    },
-                    render: {
-                        layers: [
-                            {
-                                type: {
-                                    value: 'fill',
-                                    label: 'Fill',
-                                },
-                                'source-layer': 'layer0',
-                                paint: {
-                                    'fill-color': {
-                                        type: {
-                                            value: 'step',
-                                            label: 'Steps',
-                                        },
-                                        interpolationType: null,
-                                        input: {
-                                            coercion: 'to-number',
-                                            operation: 'get',
-                                            column: {
-                                                value: 'yr_data',
-                                                label: 'yr_data',
-                                            },
-                                        },
-                                        output: [
-                                            {
-                                                color: '#ffffcc',
-                                                value: 0.5,
-                                            },
-                                            {
-                                                color: '#a1dab4',
-                                                value: 0.7,
-                                            },
-                                            {
-                                                color: '#41b6c4',
-                                                value: 0.75,
-                                            },
-                                            {
-                                                color: '#2c7fb8',
-                                                value: 0.85,
-                                            },
-                                            {
-                                                color: '#253494',
-                                            },
-                                        ],
-                                    },
-                                    'fill-opacity': 1,
-                                },
-                                filter: ['all'],
-                            },
-                            {
-                                type: {
-                                    value: 'line',
-                                    label: 'Line',
-                                },
-                                'source-layer': 'layer0',
-                                paint: {
-                                    'line-color': '#fff',
-                                    'line-opacity': 0.8,
-                                    'line-width': 0.5,
-                                },
-                                filter: ['all'],
-                            },
-                        ],
-                    },
-                },
-                connectorUrl:
-                    'https://wri-rw.carto.com:443/api/v2/sql?q=SELECT wri.cartodb_id, wri.the_geom_webmercator, data.rw_country_name, data.rw_country_code, data.datetime, data.yr_data FROM soc_004_human_development_index data LEFT OUTER JOIN wri_countries_a wri ON data.rw_country_code = wri.iso_a3 WHERE EXTRACT(YEAR FROM data.datetime) = 2015 and data.yr_data is not null',
-                legendConfig: {
-                    type: 'choropleth',
-                    items: [
-                        {
-                            color: '#ffffcc',
-                            name: '<0.5',
-                        },
-                        {
-                            color: '#a1dab4',
-                            name: '<0.7',
-                        },
-                        {
-                            color: '#41b6c4',
-                            name: '<0.75',
-                        },
-                        {
-                            color: '#2c7fb8',
-                            name: '<0.85',
-                        },
-                        {
-                            color: '#253494',
-                            name: '<0.95',
-                        },
-                    ],
-                },
-                interactionConfig: {
-                    output: [
-                        {
-                            column: 'rw_country_name',
-                            format: '',
-                            prefix: '',
-                            property: '',
-                            suffix: '',
-                            type: '',
-                            enabled: true,
-                        },
-                        {
-                            column: 'yr_data',
-                            format: '',
-                            prefix: '',
-                            property: '2015 Human Development Index',
-                            suffix: '',
-                            type: 'number',
-                            enabled: true,
-                        },
-                    ],
-                },
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
             },
-        },
-    ],
-    collaborators: [],
+        }
+    )
+    const result = await viewsRes.json()
+    return {
+        id: result.data.id,
+        ...result.data.attributes.widgetConfig,
+    }
 }

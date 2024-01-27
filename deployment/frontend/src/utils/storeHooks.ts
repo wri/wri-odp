@@ -22,6 +22,15 @@ export const useLayerAsLayerObj = () => {
 
     return { layerAsLayerObj }
 }
+export const useActiveCharts = () => {
+    return useStore((store) => ({
+        activeCharts: store.activeCharts,
+        addCharts: store.addCharts,
+        removeCharts: store.removeCharts,
+        selectedChart: store.selectedChart,
+        selectChart: store.selectChart,
+    }))
+}
 
 export const useRelatedDatasets = () => {
     const { relatedDatasets } = useStore((store) => ({

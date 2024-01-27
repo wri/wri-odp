@@ -9,13 +9,13 @@ import {
 } from '@heroicons/react/24/outline'
 import { DownloadButton } from './datafiles/Download'
 import { OpenInButton } from './datafiles/OpenIn'
-import { Resource } from '@/interfaces/dataset.interface'
+import { Resource, View } from '@/interfaces/dataset.interface'
 import { getFormatColor } from '@/utils/formatColors'
 import { Index } from 'flexsearch'
 import { useState } from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
-import { useActiveLayerGroups } from '@/utils/storeHooks'
+import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
 import { TabularResource } from '../visualizations/Visualizations'
 
 export function DataFiles({
@@ -33,12 +33,8 @@ export function DataFiles({
     isCurrentVersion?: boolean
     diffFields: Array<Record<string, { old_value: string; new_value: string }>>
 }) {
-    const {
-        addLayerGroup,
-        removeLayerGroup,
-        addLayerToLayerGroup,
-        removeLayerFromLayerGroup,
-    } = useActiveLayerGroups()
+    const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
+        useActiveLayerGroups()
     const { data: activeLayers } = useLayersFromRW()
     const datafiles = dataset?.resources
     const [q, setQ] = useState('')
@@ -48,6 +44,7 @@ export function DataFiles({
                   index.search(q).includes(datafile.id)
               )
             : datafiles
+
     return (
         <>
             <div className="relative py-4">
@@ -131,9 +128,11 @@ function DatafileCard({
     isCurrentVersion?: boolean
     diffFields: Array<Record<string, { old_value: string; new_value: string }>>
 }) {
+    const { activeCharts, addCharts, removeCharts } = useActiveCharts()
     const { data: activeLayers } = useLayersFromRW()
     const { removeLayerFromLayerGroup, addLayerToLayerGroup } =
         useActiveLayerGroups()
+
     const created_at = new Date(datafile?.created ?? '')
     const last_updated = new Date(datafile?.metadata_modified ?? '')
     const options = {
@@ -273,6 +272,44 @@ function DatafileCard({
                                             }
                                         >
                                             Add Tabular View
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+
+                            {datafile._hasChartView && (
+                                <>
+                                    {datafile?._views?.some((v) =>
+                                        activeCharts
+                                            .map((c: View) => c.id)
+                                            .includes(v.id)
+                                    ) ? (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                const viewIds =
+                                                    datafile._views?.map(
+                                                        (v: View) => v.id
+                                                    )
+                                                if (viewIds) {
+                                                    removeCharts(
+                                                        viewIds as string[]
+                                                    )
+                                                }
+                                            }}
+                                        >
+                                            Remove Chart View
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            size="sm"
+                                            onClick={() => {
+                                                if (datafile._views)
+                                                    addCharts(datafile._views)
+                                            }}
+                                        >
+                                            Add Chart View
                                         </Button>
                                     )}
                                 </>

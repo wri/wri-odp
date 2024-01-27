@@ -35,23 +35,23 @@ function filteredDataset(dataset: WriDataset) {
 
         {
             title: 'maintainer',
-            description: dataset?.maintainer,
+            description: dataset?.maintainer ?? '',
         },
         {
             title: 'maintainer_email',
-            description: dataset?.maintainer_email,
+            description: dataset?.maintainer_email ?? '',
         },
         {
             title: 'Short description',
-            description: dataset?.short_description,
+            description: dataset?.short_description ?? '',
         },
         {
             title: 'Technical Notes',
-            description: dataset?.technical_notes,
+            description: dataset?.technical_notes ?? '',
         },
         {
             title: 'update_frequency',
-            description: dataset?.update_frequency,
+            description: dataset?.update_frequency ?? '',
         },
     ]
 }
@@ -166,18 +166,23 @@ function SubCardProfile({
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredDataset(data).map((key, index) => {
-                                return (
-                                    <TableRow key={index} className="border-0">
-                                        <TableCell className="font-acumin text-xs font-normal text-black">
-                                            {key.title}
-                                        </TableCell>
-                                        <TableCell className="font-acumin text-xs font-normal text-black">
-                                            {key.description}
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })}
+                            {filteredDataset(data)
+                                .filter((d) => d.description !== '')
+                                .map((key, index) => {
+                                    return (
+                                        <TableRow
+                                            key={index}
+                                            className="border-0"
+                                        >
+                                            <TableCell className="font-acumin text-xs font-normal text-black">
+                                                {key.title}
+                                            </TableCell>
+                                            <TableCell className="font-acumin text-xs font-normal text-black">
+                                                {key.description}
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })}
                         </TableBody>
                     </Table>
                 </>

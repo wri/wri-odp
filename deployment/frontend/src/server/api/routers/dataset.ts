@@ -12,11 +12,15 @@ import {
     upsertCollaborator,
     deleteCollaborator,
     sendIssueOrCommentNotigication,
+    getResourceViews,
+    createResourceView,
+    updateResourceView,
+    deleteResourceView,
     getUser,
     sendGroupNotification,
     getOnePendingDataset,
     getUserOrganizations,
-    datsetData,
+    getResourceView,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -47,11 +51,18 @@ import {
     RwLayerResp,
     RwResponse,
     isRwError,
+    isRwLayerResp,
     RwErrorResponse,
 } from '@/interfaces/rw.interface'
 import { sendMemberNotifications } from '@/utils/apiUtils'
 import { TRPCError } from '@trpc/server'
 import { CommentSchema, IssueSchema } from '@/schema/issue.schema'
+import { throws } from 'assert'
+import {
+    createViewFormSchema,
+    editViewFormSchema,
+    viewFormSchema,
+} from '@/schema/view.schema'
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -79,8 +90,8 @@ async function createDatasetRw(dataset: DatasetFormType) {
             body,
         }
     )
-    const datasetRw: { data: { id: string; attributes: APILayerSpec } } =
-        await datasetRwRes.json()
+    const datasetRw: RwResponse = await datasetRwRes.json()
+    if (isRwError(datasetRw)) throw new Error(JSON.stringify(datasetRw.errors))
     return datasetRw
 }
 
@@ -102,7 +113,9 @@ async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
             body,
         }
     )
-    const layerRw: any = await layerRwRes.json()
+    const layerRw: RwResponse = await layerRwRes.json()
+    if (isRwError(layerRw)) throw new Error(JSON.stringify(layerRw.errors))
+    if (!isRwLayerResp(layerRw)) throw new Error('Invalid response from RW API')
     const url = `https://api.resourcewatch.org/v1/dataset/${layerRw.data.attributes.dataset}/layer/${layerRw.data.id}`
     const name = layerRw.data.id
     const title = layerRw.data.attributes.name
@@ -154,7 +167,7 @@ async function editLayerRw(r: ResourceFormType) {
     return r
 }
 
-async function getLayerRw(layerUrl: string) {
+export async function getLayerRw(layerUrl: string) {
     const layerRwRes = await fetch(layerUrl, {
         headers: {
             'Content-Type': 'application/json',
@@ -485,6 +498,8 @@ export const DatasetRouter = createTRPCRouter({
                 ...resourcesToCreateLayer,
             ]
 
+            console.log('RESOURCES', resources)
+
             try {
                 const user = ctx.session.user
                 const body = JSON.stringify({
@@ -513,8 +528,13 @@ export const DatasetRouter = createTRPCRouter({
                         .filter((resource) => resource.type !== 'empty')
                         .map((resource) => ({
                             ...resource,
+                            package_id: input.id ?? '',
                             format: resource.format ?? '',
                             id: resource.resourceId,
+                            datastore_active:
+                                resource.datastore_active === true
+                                    ? true
+                                    : null,
                             new: false,
                             layerObjRaw: null,
                             layerObj: null,
@@ -646,7 +666,58 @@ export const DatasetRouter = createTRPCRouter({
                 throw Error(error)
             }
         }),
+    getResourceViews: publicProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            const views = await getResourceViews({
+                ...input,
+                session: ctx.session,
+            })
 
+            return views
+        }),
+    getResourceView: publicProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            const views = await getResourceView({
+                ...input,
+                session: ctx.session,
+            })
+
+            return views
+        }),
+    createResourceView: protectedProcedure
+        .input(createViewFormSchema)
+        .mutation(async ({ input, ctx }) => {
+            console.log('!!!')
+            console.log(input)
+            const view = await createResourceView({
+                view: input,
+                session: ctx.session,
+            })
+
+            return view
+        }),
+    updateResourceView: protectedProcedure
+        .input(editViewFormSchema)
+        .mutation(async ({ input, ctx }) => {
+            const view = await updateResourceView({
+                view: input,
+                session: ctx.session,
+            })
+
+            return view
+        }),
+    deleteResourceView: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ input, ctx }) => {
+            const view = await deleteResourceView({
+                session: ctx.session,
+                id: input.id,
+            })
+
+            return view
+        }),
     getAllDataset: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
@@ -756,7 +827,12 @@ export const DatasetRouter = createTRPCRouter({
             return issuesWithDetails
         }),
     getOneDataset: publicProcedure
-        .input(z.object({ id: z.string() }))
+        .input(
+            z.object({
+                id: z.string(),
+                includeViews: z.boolean().default(false).optional(),
+            })
+        )
         .query(async ({ input, ctx }) => {
             const dataset = await getOneDataset(input.id, ctx.session)
 

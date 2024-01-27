@@ -18,12 +18,15 @@ import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { Input } from '@/components/_shared/SimpleInput'
 import FormatInput from './FormatInput'
+import { Datapusher, DatapusherStatus } from './Datapusher'
 import { LoaderButton } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
+import ViewsList from '@/components/views/ViewsList'
+import { MetadataAccordion } from '../metadata/MetadataAccordion'
 
 export function EditDataFile({
     remove,
@@ -55,6 +58,8 @@ export function EditDataFile({
     })
 
     const datafile = watch(`resources.${index}`)
+
+
     return (
         <>
             <DataFileAccordion
@@ -178,7 +183,7 @@ export function EditDataFile({
                                             {({ selected }) => (
                                                 <div
                                                     className={classNames(
-                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
                                                         selected
                                                             ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                             : 'text-black'
@@ -197,7 +202,7 @@ export function EditDataFile({
                                             {({ selected }) => (
                                                 <div
                                                     className={classNames(
-                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
                                                         selected
                                                             ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                             : 'text-black'
@@ -218,7 +223,7 @@ export function EditDataFile({
                                                     {({ selected }) => (
                                                         <div
                                                             className={classNames(
-                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
                                                                 selected
                                                                     ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                                     : 'text-black'
@@ -234,6 +239,39 @@ export function EditDataFile({
                                                     )}
                                                 </Tab>
                                             )}
+                                        {[
+                                            'xls',
+                                            'xlsx',
+                                            'ods',
+                                            'xlsm',
+                                            'xlsb',
+                                            'csv',
+                                            'tsv',
+                                            'tab',
+                                        ].includes(
+                                            datafile.format?.toLowerCase() ??
+                                                'none'
+                                        ) && (
+                                            <Tab as={Fragment}>
+                                                {({ selected }) => (
+                                                    <div
+                                                        className={classNames(
+                                                            'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
+                                                            selected
+                                                                ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
+                                                                : 'text-black'
+                                                        )}
+                                                        aria-current={
+                                                            selected
+                                                                ? 'page'
+                                                                : undefined
+                                                        }
+                                                    >
+                                                        Datapusher <DatapusherStatus datafile={datafile} />
+                                                    </div>
+                                                )}
+                                            </Tab>
+                                        )}
                                     </div>
                                 </Tab.List>
                                 <Tab.Panels className="px-4 sm:px-6 xxl:px-0 py-4">
@@ -283,7 +321,12 @@ export function EditDataFile({
                                             </InputGroup>
                                         </div>
                                     </Tab.Panel>
-                                    <Tab.Panel></Tab.Panel>
+                                    <Tab.Panel>
+                                        <ViewsList
+                                            provider="datastore"
+                                            datafile={datafile as any}
+                                        />
+                                    </Tab.Panel>
                                     {datafile.schema &&
                                         datafile.schema.length > 0 && (
                                             <Tab.Panel>
@@ -293,6 +336,22 @@ export function EditDataFile({
                                                 />
                                             </Tab.Panel>
                                         )}
+                                    {[
+                                        'xls',
+                                        'xlsx',
+                                        'ods',
+                                        'xlsm',
+                                        'xlsb',
+                                        'csv',
+                                        'tsv',
+                                        'tab',
+                                    ].includes(
+                                        datafile.format?.toLowerCase() ?? 'none'
+                                    ) && (
+                                        <Tab.Panel>
+                                            <Datapusher datafile={datafile} />
+                                        </Tab.Panel>
+                                    )}
                                 </Tab.Panels>
                             </div>
                         </Tab.Group>
@@ -320,7 +379,7 @@ export function EditDataFile({
                             onClick={() => editResource.mutate(datafile)}
                             loading={editResource.isLoading}
                         >
-                            Update
+                            Update Data File 
                         </LoaderButton>
                     </div>
                 </div>

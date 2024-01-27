@@ -52,6 +52,13 @@ const MyApp: AppType<{ session: Session | null }> = ({
     const [queryClient] = useState(() => new QueryClient())
     const { initialZustandState, dataset, prevdataset } = pageProps
 
+    if (typeof dataset == 'string') {
+        dataset = JSON.parse(dataset)
+    }
+    if (typeof initialZustandState?.dataset == 'string') {
+        initialZustandState.dataset = JSON.parse(initialZustandState.dataset)
+    }
+
     const newLayersState = new Map()
     if (initialZustandState && initialZustandState?.mapView?.layersParsed) {
         initialZustandState.mapView?.layersParsed?.forEach(

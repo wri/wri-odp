@@ -51,6 +51,7 @@ export default function EditDatasetPage(
     const utils = api.useContext()
     const dataset = api.dataset.getOneDataset.useQuery({
         id: datasetName,
+        includeViews: true
     })
     const deleteDataset = api.dataset.deleteDataset.useMutation({
         onSuccess: async () => {
@@ -81,7 +82,6 @@ export default function EditDatasetPage(
 
     return (
         <>
-            {' '}
             <Modal
                 open={deleteOpen}
                 setOpen={setDeleteOpen}

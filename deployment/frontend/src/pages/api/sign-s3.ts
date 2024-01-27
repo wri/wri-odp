@@ -8,6 +8,18 @@ import s3 from '@/server/s3'
 import { v4 as uuidv4 } from 'uuid'
 import { slugify } from '@/utils/slugify'
 
+function makeid(length: number) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+}
+
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
@@ -23,7 +35,7 @@ export default async function handler(
     }
     const extension = filename.split('.').pop()
     const _filename = filename.split('.')[0]
-    const key = slugify(`${_filename}-${uuidv4()}`)
+    const key = slugify(`${_filename}-${makeid(6)}`)
     const signedUrl = await getSignedUrl(
         s3,
         new PutObjectCommand({
@@ -32,6 +44,7 @@ export default async function handler(
                 ? `${_filePath}/${key}.${extension}`
                 : `resources/${fileHash}/${key}.${extension}`,
             ContentType: contentType as string,
+            ACL: 'public-read',
         }),
         { expiresIn: 3600 }
     )
