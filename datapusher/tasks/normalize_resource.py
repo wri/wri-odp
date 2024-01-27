@@ -75,6 +75,8 @@ def normalize_resource(resource: dict, temp_dir, qsv_bin, file_bin, tmp):
         excel_export_msg = qsv_excel.stderr
         print("{}...".format(excel_export_msg))
         tmp = qsv_excel_csv
+        logger.info("Normalized & transcoded...")
+        return tmp
     else:
         # -------------- its not a spreadsheet, its a CSV/TSV/TAB file ---------------
         # Normalize & transcode to UTF-8 using `qsv input`. We need to normalize as
