@@ -45,7 +45,7 @@ export function DatapusherStatus({ datafile }: { datafile: ResourceFormType }) {
             }
         >
             {flowState?.type}{' '}
-            {['RUNNING', 'PENDING', 'QUEUED'].includes(flowState.type) && (
+            {['RUNNING', 'PENDING', 'QUEUED', 'SCHEDULED'].includes(flowState.type) && (
                 <Spinner className="text-white w-3 h-3 mb-1" />
             )}
         </Badge>
