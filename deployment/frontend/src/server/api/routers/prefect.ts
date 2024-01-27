@@ -64,51 +64,56 @@ export const prefectRouter = createTRPCRouter({
     getFlowState: protectedProcedure
         .input(z.object({ resourceId: z.string() }))
         .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
-            const taskRes = await fetch(
-                `${env.CKAN_URL}/api/action/prefect_latest_task?resource_id=${input.resourceId}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
+            try {
+                const user = ctx.session.user
+                const taskRes = await fetch(
+                    `${env.CKAN_URL}/api/action/prefect_latest_task?resource_id=${input.resourceId}`,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${user.apikey}`,
+                        },
+                    }
+                )
+                const tasks: CkanResponse<Task> = await taskRes.json()
+                const flow_id = JSON.parse(tasks.result.value).job_id
+                if (!flow_id) return null
+                const body = {
+                    limit: 200,
+                    logs: {
+                        level: { ge_: 0 },
+                        flow_run_id: {
+                            any_: [flow_id],
+                        },
                     },
+                    flow_run_id: { any_: [flow_id] },
+                    offset: 0,
+                    sort: 'TIMESTAMP_ASC',
                 }
-            )
-            const tasks: CkanResponse<Task> = await taskRes.json()
-            const flow_id = JSON.parse(tasks.result.value).job_id
-            if (!flow_id) return null
-            const body = {
-                limit: 200,
-                logs: {
-                    level: { ge_: 0 },
-                    flow_run_id: {
-                        any_: [flow_id],
-                    },
-                },
-                flow_run_id: { any_: [flow_id] },
-                offset: 0,
-                sort: 'TIMESTAMP_ASC',
+                const flowStateRes = await fetch(
+                    `${env.PREFECT_INTERNAL_URL}/api/flow_runs/${flow_id}`,
+                    {
+                        headers: {
+                            'content-type': 'application/json',
+                        },
+                    }
+                )
+                const flowState = await flowStateRes.json()
+                const logsRes = await fetch(
+                    `${env.PREFECT_INTERNAL_URL}/api/logs/filter`,
+                    {
+                        headers: {
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify(body),
+                        method: 'POST',
+                    }
+                )
+                const logs: Log[] = await logsRes.json()
+                return { ...flowState.state, logs }
+            } catch (e) {
+                console.log(e)
+                throw e
             }
-            const flowStateRes = await fetch(
-                `${env.PREFECT_INTERNAL_URL}/api/flow_runs/${flow_id}`,
-                {
-                    headers: {
-                        'content-type': 'application/json',
-                    },
-                }
-            )
-            const flowState = await flowStateRes.json()
-            const logsRes = await fetch(
-                `${env.PREFECT_INTERNAL_URL}/api/logs/filter`,
-                {
-                    headers: {
-                        'content-type': 'application/json',
-                    },
-                    body: JSON.stringify(body),
-                    method: 'POST',
-                }
-            )
-            const logs: Log[] = await logsRes.json()
-            return { ...flowState.state, logs }
         }),
 })

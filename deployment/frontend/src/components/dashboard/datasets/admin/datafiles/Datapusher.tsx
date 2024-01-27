@@ -1,5 +1,6 @@
 import { LoaderButton } from '@/components/_shared/Button'
 import { ScrollArea } from '@/components/_shared/ScrollArea'
+import { Badge } from '@/components/_shared/Badge'
 import {
     Table,
     TableHead,
@@ -12,10 +13,43 @@ import { ResourceFormType } from '@/schema/dataset.schema'
 import { Log } from '@/server/api/routers/prefect'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
+import { match } from 'ts-pattern'
+import Spinner from '@/components/_shared/Spinner'
 
 function convertTimestamp(timestamp: string) {
     const date = new Date(timestamp)
     return `${date.toLocaleDateString()} - ${date.toLocaleTimeString()}`
+}
+
+export function DatapusherStatus({ datafile }: { datafile: ResourceFormType }) {
+    const { isLoading, data: flowState } = api.prefect.getFlowState.useQuery(
+        {
+            resourceId: datafile.id ?? '',
+        },
+        {
+            refetchInterval: (data) =>
+                data && data.type === 'COMPLETED' ? false : data && data.type === 'RUNNING' ? 5000 : 1000,
+        }
+    )
+    if (!flowState) return <></>
+    return (
+        <Badge
+            variant={
+                match(flowState.type)
+                    .with('COMPLETED', () => 'success')
+                    .with('RUNNING', () => 'running')
+                    .with('PENDING', () => 'pending')
+                    .with('FAILED', () => 'destructive')
+                    .with('QUEUED', () => 'pending')
+                    .otherwise(() => 'default') as any
+            }
+        >
+            {flowState?.type}{' '}
+            {['RUNNING', 'PENDING', 'QUEUED', 'SCHEDULED'].includes(flowState.type) && (
+                <Spinner className="text-white w-3 h-3 mb-1" />
+            )}
+        </Badge>
+    )
 }
 
 export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
@@ -44,7 +78,12 @@ export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
         <>
             <div className="pt-4 pb-8">
                 <LoaderButton
-                    loading={submitToDatapusher.isLoading || (flowState && (flowState.type === 'RUNNING' || flowState.type === 'PENDING'))}
+                    loading={
+                        submitToDatapusher.isLoading ||
+                        (flowState &&
+                            (flowState.type === 'RUNNING' ||
+                                flowState.type === 'PENDING'))
+                    }
                     onClick={() =>
                         submitToDatapusher.mutate({
                             resourceId: datafile.id ?? '',
