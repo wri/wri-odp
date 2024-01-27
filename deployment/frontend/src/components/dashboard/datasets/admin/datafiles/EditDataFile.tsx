@@ -18,7 +18,7 @@ import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { Input } from '@/components/_shared/SimpleInput'
 import FormatInput from './FormatInput'
-import { Datapusher } from './Datapusher'
+import { Datapusher, DatapusherStatus } from './Datapusher'
 import { LoaderButton } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
@@ -267,7 +267,7 @@ export function EditDataFile({
                                                                 : undefined
                                                         }
                                                     >
-                                                        Datapusher
+                                                        Datapusher <DatapusherStatus datafile={datafile} />
                                                     </div>
                                                 )}
                                             </Tab>
