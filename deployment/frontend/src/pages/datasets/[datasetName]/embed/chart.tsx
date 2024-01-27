@@ -1,31 +1,37 @@
-import Loading from '@/components/_shared/Loading'
-import ChartView from '@/components/datasets/visualizations/ChartView'
+import { View } from '@/interfaces/dataset.interface'
 import { getServerAuthSession } from '@/server/auth'
-import { api } from '@/utils/api'
-import { getOneDataset } from '@/utils/apiUtils'
-import { useActiveDatafileCharts } from '@/utils/storeHooks'
+import { getDatasetView, getResourceView } from '@/utils/apiUtils'
 import { GetServerSidePropsContext } from 'next'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import dynamic from 'next/dynamic'
+
+const Chart = dynamic(
+    () => import('@/components/datasets/visualizations/Chart'),
+    { ssr: false }
+)
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ datasetName: string }>
 ) {
-    const datasetName = context.params?.datasetName as string
+    const { chart_provider, chart_id } = context.query
     const session = await getServerAuthSession(context)
+
     try {
-        const dataset = await getOneDataset(datasetName, session)
+        let view: View
+
+        if (chart_provider == 'datastore') {
+            console.log('ts')
+            view = await getResourceView({ id: chart_id as string, session })
+        } else {
+            view = await getDatasetView({ id: chart_id as string })
+        }
+
+        if (!view) {
+            throw 'View not found'
+        }
 
         return {
             props: {
-                dataset: {
-                    ...dataset,
-                    spatial: dataset.spatial ?? null,
-                },
-                datasetName,
-                initialZustandState: {
-                    dataset,
-                },
+                view,
             },
         }
     } catch {
@@ -39,41 +45,6 @@ export async function getServerSideProps(
     }
 }
 
-export default function Embed({
-    dataset,
-    datasetName,
-}: {
-    dataset: any
-    datasetName: string
-}) {
-    const {
-        data: datasetData,
-        error: datasetError,
-        isLoading,
-    } = api.dataset.getOneDataset.useQuery({ id: datasetName }, { retry: 0 })
-
-    const { replaceDatafileCharts } = useActiveDatafileCharts()
-
-    const router = useRouter()
-
-    const { query } = router
-
-    let { charts } = query
-
-    charts = charts as string
-    const urlDfIds = charts.split(',')
-
-    useEffect(() => {
-        if (datasetData) {
-            const datafiles = datasetData.resources.filter((df) =>
-                urlDfIds.includes(df.id)
-            )
-
-            replaceDatafileCharts(datafiles)
-        }
-    }, [datasetData])
-
-    if (isLoading) return <Loading />
-
-    return <ChartView isEmbed={true} />
+export default function Embed({ view }: { view: View }) {
+    return <Chart config={view.config_obj.config} />
 }

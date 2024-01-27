@@ -379,7 +379,7 @@ export function EditDataFile({
                             onClick={() => editResource.mutate(datafile)}
                             loading={editResource.isLoading}
                         >
-                            Update
+                            Update Data File 
                         </LoaderButton>
                     </div>
                 </div>

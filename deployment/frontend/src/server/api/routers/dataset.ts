@@ -20,6 +20,7 @@ import {
     sendGroupNotification,
     getOnePendingDataset,
     getUserOrganizations,
+    getResourceView,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -162,7 +163,7 @@ async function editLayerRw(r: ResourceFormType) {
     return r
 }
 
-async function getLayerRw(layerUrl: string) {
+export async function getLayerRw(layerUrl: string) {
     const layerRwRes = await fetch(layerUrl, {
         headers: {
             'Content-Type': 'application/json',
@@ -608,6 +609,16 @@ export const DatasetRouter = createTRPCRouter({
 
             return views
         }),
+    getResourceView: publicProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            const views = await getResourceView({
+                ...input,
+                session: ctx.session,
+            })
+
+            return views
+        }),
     createResourceView: protectedProcedure
         .input(createViewFormSchema)
         .mutation(async ({ input, ctx }) => {
@@ -757,42 +768,8 @@ export const DatasetRouter = createTRPCRouter({
         )
         .query(async ({ input, ctx }) => {
             const dataset = await getOneDataset(input.id, ctx.session)
-            const resources = await Promise.all(
-                dataset.resources.map(async (r) => {
-                    const _views = await getResourceViews({
-                        id: r.id,
-                        session: ctx.session,
-                    })
 
-                    if (r.url_type === 'upload' || r.url_type === 'link') {
-                        const resourceHasChartView =
-                            r.datastore_active &&
-                            _views.some(
-                                (v) =>
-                                    v.view_type == 'custom' &&
-                                    v.config_obj.type == 'chart'
-                            )
-
-                        r._hasChartView = resourceHasChartView
-                        
-                        return { ...r, _views }
-                    }
-                    if (!r.url) return r
-                    const layerObj = await getLayerRw(r.url)
-                    if (r.url_type === 'layer')
-                        return {
-                            ...r,
-                            layerObj: convertLayerObjToForm(layerObj),
-                        }
-                    if (r.url_type === 'layer-raw')
-                        return {
-                            ...r,
-                            layerObjRaw: getRawObjFromApiSpec(layerObj),
-                        }
-                    return r
-                })
-            )
-            return { ...dataset, resources }
+            return dataset
         }),
     getPossibleCollaborators: protectedProcedure.query(async () => {
         const apiKey = env.SYS_ADMIN_API_KEY

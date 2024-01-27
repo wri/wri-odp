@@ -1,6 +1,6 @@
 import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { Resource, View } from '@/interfaces/dataset.interface'
-import { useActiveDatafileCharts } from '@/utils/storeHooks'
+import { View } from '@/interfaces/dataset.interface'
+import { useActiveCharts } from '@/utils/storeHooks'
 import { useEffect, useState } from 'react'
 import ChartViewExport from './ChartViewExport'
 import { useForm } from 'react-hook-form'
@@ -15,9 +15,8 @@ const Chart = dynamic(
     }
 )
 
-export default function ChartView({ isEmbed = false }: { isEmbed?: boolean }) {
-    const [activeChart, setActiveChart] = useState<View | undefined>()
-    const { activeDatafileCharts } = useActiveDatafileCharts()
+export default function ChartView() {
+    const { activeCharts, selectedChart, selectChart } = useActiveCharts()
 
     const viewOptionsSchema = z.object({
         x_tick_angle: z.object({
@@ -37,12 +36,10 @@ export default function ChartView({ isEmbed = false }: { isEmbed?: boolean }) {
         defaultValues: {},
     })
 
-    const { watch, register, handleSubmit, reset } = formObj
+    const { watch, handleSubmit, reset } = formObj
 
     // TODO: we should group options by datafile
-    const chartOptions = activeDatafileCharts
-        ?.map((df: Resource) => df._views)
-        .flat()
+    const chartOptions = activeCharts
         .filter((v: View) => v?.config_obj?.type == 'chart')
         .map((v: View) => ({ label: v.title, value: v }))
 
@@ -55,13 +52,15 @@ export default function ChartView({ isEmbed = false }: { isEmbed?: boolean }) {
             const defaultChart = chartOptions.find((co: any) => co.default)
 
             if (defaultChart) {
-                setActiveChart(defaultChart.value)
+                selectChart(defaultChart.value)
+            } else {
+                selectChart(chartOptions[0])
             }
         }
-    }, [activeDatafileCharts])
+    }, [activeCharts])
 
     const onChange = (selected: View) => {
-        setActiveChart(selected)
+        selectChart(selected)
         reset({
             x_tick_angle:
                 selected.config_obj.form_state.config.chart?.labels?.x?.angle
@@ -74,7 +73,7 @@ export default function ChartView({ isEmbed = false }: { isEmbed?: boolean }) {
 
     const getConfigWithOverrides = () => {
         // @ts-ignore
-        const config = activeChart.config_obj?.config
+        const config = selectedChart.config_obj?.config
 
         const xTickAngle = watch('x_tick_angle')?.value
         if (xTickAngle) {
@@ -105,43 +104,42 @@ export default function ChartView({ isEmbed = false }: { isEmbed?: boolean }) {
                     maxWidth="max-w-[300px]"
                     onChange={onChange}
                 />
-                {!isEmbed && <ChartViewExport />}
+                <ChartViewExport />
             </div>
-            {activeChart?.config_obj && (
+            {selectedChart?.config_obj && (
                 <Chart config={getConfigWithOverrides()} />
             )}
-            {!isEmbed && (
-                <form onSubmit={handleSubmit((data) => { })} className="mt-10">
-                    <div className="grid grid-cols-2 xl:grid-cols-2 mb-5 space-x-2">
-                        <InputGroup
-                            label="X axis tick angle"
-                            className="sm:grid-cols-1 gap-x-2"
-                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                        >
-                            <SimpleSelect
-                                id="x-axis-label-orientation"
-                                formObj={formObj}
-                                name="x_tick_angle"
-                                placeholder="E.g. 45º"
-                                options={labelAngleOptions}
-                            />
-                        </InputGroup>
-                        <InputGroup
-                            label="Y axis tick angle"
-                            className="sm:grid-cols-1 gap-x-2"
-                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                        >
-                            <SimpleSelect
-                                id="y-axis-label-orientation"
-                                formObj={formObj}
-                                name="y_tick_angle"
-                                placeholder="E.g. 45º"
-                                options={labelAngleOptions}
-                            />
-                        </InputGroup>
-                    </div>
-                </form>
-            )}
+
+            <form onSubmit={handleSubmit((data) => { })} className="mt-10">
+                <div className="grid grid-cols-2 xl:grid-cols-2 mb-5 space-x-2">
+                    <InputGroup
+                        label="X axis tick angle"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <SimpleSelect
+                            id="x-axis-label-orientation"
+                            formObj={formObj}
+                            name="x_tick_angle"
+                            placeholder="E.g. 45º"
+                            options={labelAngleOptions}
+                        />
+                    </InputGroup>
+                    <InputGroup
+                        label="Y axis tick angle"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <SimpleSelect
+                            id="y-axis-label-orientation"
+                            formObj={formObj}
+                            name="y_tick_angle"
+                            placeholder="E.g. 45º"
+                            options={labelAngleOptions}
+                        />
+                    </InputGroup>
+                </div>
+            </form>
         </div>
     )
 }

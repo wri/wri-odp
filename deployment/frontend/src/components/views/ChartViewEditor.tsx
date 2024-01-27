@@ -17,7 +17,11 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 
 import { ChartFormType, chartSchema } from '@/schema/view.schema'
 import DeleteViewDialog from './DeleteViewDialog'
-import { PencilSquareIcon } from '@heroicons/react/24/outline'
+import {
+    CheckIcon,
+    InformationCircleIcon,
+    PencilSquareIcon,
+} from '@heroicons/react/24/outline'
 
 import dynamic from 'next/dynamic'
 import { getGradientColor } from '@/utils/colors'
@@ -25,12 +29,17 @@ import ChartFilters from './ChartFilters'
 import DataDialog from './DataDialog'
 import { Accordion } from '../dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion'
 import { queryRw } from '@/utils/rw'
+import { DefaultTooltip } from '../_shared/Tooltip'
 const Chart = dynamic(
     () => import('@/components/datasets/visualizations/Chart'),
     {
         ssr: false,
     }
 )
+const emptyOption = {
+    label: 'None',
+    value: '',
+}
 
 const withEmptyOption = (ar?: any[]) => {
     if (ar) {
@@ -82,6 +91,8 @@ export default function ChartViewEditor({
     const config = formState?.config
     const chart = config?.chart
     const colors = chart?.colors
+    const tooltips = chart?.tooltips
+    const tooltipsEnabled = tooltips?.enabled
 
     const formObj = useForm<ChartFormType>({
         resolver: zodResolver(chartSchema),
@@ -96,6 +107,13 @@ export default function ChartViewEditor({
                         starting: colors?.starting ?? '#1dab58',
                         ending: colors?.ending ?? '#1dab58',
                     },
+                    tooltips: {
+                        ...tooltips,
+                        enabled: tooltipsEnabled ?? {
+                            value: true,
+                            label: 'Yes',
+                        },
+                    },
                 },
             },
         },
@@ -107,6 +125,7 @@ export default function ChartViewEditor({
         watch,
         formState: { errors, isDirty },
         reset,
+        setValue,
     } = formObj
 
     const onSubmit = async (formData: ChartFormType) => {
@@ -175,9 +194,6 @@ export default function ChartViewEditor({
                     provider: '',
                 })
 
-                console.log(query)
-                console.log(data)
-
                 tableData = data
             }
 
@@ -212,6 +228,7 @@ export default function ChartViewEditor({
             // Tooltips
             const tooltipsEnabled =
                 formData.config.chart.tooltips?.enabled?.value
+
             const tooltipsFormat = formData.config.chart.tooltips?.format?.value
 
             let categories = []
@@ -246,7 +263,9 @@ export default function ChartViewEditor({
                 )
                 category.x = dimensionAr
 
-                const measureAr = tableData.map((row: any) => row[measureColName])
+                const measureAr = tableData.map(
+                    (row: any) => row[measureColName]
+                )
                 category.y = measureAr
 
                 categories.push(category)
@@ -436,6 +455,7 @@ export default function ChartViewEditor({
                                                             })
                                                         ) ?? []
                                                     }
+                                                    onChange={(selected) => { }}
                                                 />
                                                 <ErrorDisplay
                                                     name="config.query.dimension.value"
@@ -778,17 +798,34 @@ export default function ChartViewEditor({
                                     >
                                         {mode == 'new' ? 'Cancel' : 'Delete'}
                                     </Button>
-                                    <Button
-                                        type="button"
-                                        name="save"
-                                        className="bg-wri-light-yellow"
-                                        disabled={isDirty}
-                                        onClick={() => onSave(mode, view)}
+                                    <DefaultTooltip
+                                        content={
+                                            'You can only save after updating the preview'
+                                        }
+                                        disabled={!isDirty}
                                     >
-                                        {mode == 'new'
-                                            ? 'Add to Views'
-                                            : 'Update'}
-                                    </Button>
+                                        <div>
+                                            <Button
+                                                type="button"
+                                                name="save"
+                                                className="bg-wri-light-yellow"
+                                                disabled={isDirty}
+                                                onClick={() =>
+                                                    onSave(mode, view)
+                                                }
+                                            >
+                                                {mode == 'new'
+                                                    ? 'Add to Views'
+                                                    : 'Update View'}
+                                                {isDirty ? (
+                                                    <InformationCircleIcon
+                                                        className={`transition-all h-5 w-5 text-red-500 ml-1 mb-1 ml-1`}
+                                                        aria-hidden="true"
+                                                    />
+                                                ) : null}
+                                            </Button>
+                                        </div>
+                                    </DefaultTooltip>
                                 </div>
                             </div>
                         </div>

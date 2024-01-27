@@ -1,11 +1,9 @@
 import { Tab } from '@headlessui/react'
 import { VisualizationTabs } from './VisualizationTabs'
 import MapView from './MapView'
-import { Dispatch, SetStateAction, useState } from 'react'
-import { useRouter } from 'next/router'
-import { useActiveDatafileCharts, useVizIndex } from '@/utils/storeHooks'
+import { useEffect, useState } from 'react'
+import { useActiveCharts, useVizIndex } from '@/utils/storeHooks'
 import { DataExplorer } from '@/components/data-explorer/DataExplorer'
-import Chart from './ChartView'
 import ChartView from './ChartView'
 
 export type TabularResource = {
@@ -18,26 +16,40 @@ export default function Visualizations({
 }: {
     tabularResource: TabularResource | null
 }) {
-    const router = useRouter()
     const [prevTabularResource, setPrevTabularResource] =
         useState(tabularResource)
     const { vizIndex, setVizIndex } = useVizIndex()
-    const { activeDatafileCharts } = useActiveDatafileCharts()
+    const { activeCharts } = useActiveCharts()
+    const [prevActiveCharts, setPrevActiveCharts] = useState([])
 
     const tabs = [
         { name: 'Map View', enabled: true },
         { name: 'Tabular View', enabled: !!tabularResource },
-        { name: 'Chart View', enabled: activeDatafileCharts?.length }, // TODO: verify this
+        { name: 'Chart View', enabled: activeCharts?.length }, // TODO: verify this
     ]
 
-    if (!tabularResource && prevTabularResource) {
-        setPrevTabularResource(null)
-        setVizIndex(vizIndex === 2 ? 2 : 0)
-    }
-    if (tabularResource && !prevTabularResource) {
-        setPrevTabularResource(tabularResource)
-        setVizIndex(1)
-    }
+    useEffect(() => {
+        if (activeCharts?.length && !prevActiveCharts.length) {
+            // Charts view was enabled, focus it
+            const index = tabs.findIndex((t) => t.name == 'Chart View')
+            setVizIndex(index)
+        } else if (!activeCharts?.length && prevActiveCharts.length && vizIndex == 2) {
+            setVizIndex(0)
+        }
+
+        setPrevActiveCharts(activeCharts)
+    }, [activeCharts])
+
+    useEffect(() => {
+        if (tabularResource && !prevTabularResource) {
+            const index = tabs.findIndex((t) => t.name == 'Tabular View')
+            setVizIndex(index)
+        } else if (!tabularResource && vizIndex == 1) {
+            setVizIndex(0)
+        }
+
+        setPrevActiveCharts(activeCharts)
+    }, [tabularResource])
 
     return (
         <div className="h-full grow flex flex-col">

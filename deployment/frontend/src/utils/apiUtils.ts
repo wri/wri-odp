@@ -32,6 +32,8 @@ import type {
 } from '@/schema/notification.schema'
 import { View } from '@/interfaces/dataset.interface'
 import { CreateViewFormSchema, EditViewFormSchema, ViewFormSchema } from '@/schema/view.schema'
+import { getLayerRw } from '@/server/api/routers/dataset'
+import { convertLayerObjToForm, getRawObjFromApiSpec } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -556,8 +558,45 @@ export async function getOneDataset(
         }
     }
 
+    const resources = await Promise.all(
+        dataset.result.resources.map(async (r) => {
+            const _views = await getResourceViews({
+                id: r.id,
+                session: session,
+            })
+
+            if (r.url_type === 'upload' || r.url_type === 'link') {
+                const resourceHasChartView =
+                    r.datastore_active &&
+                    _views.some(
+                        (v) =>
+                            v.view_type == 'custom' &&
+                            v.config_obj.type == 'chart'
+                    )
+
+                r._hasChartView = resourceHasChartView
+
+                return { ...r, _views }
+            }
+            if (!r.url) return r
+            const layerObj = await getLayerRw(r.url)
+            if (r.url_type === 'layer')
+                return {
+                    ...r,
+                    layerObj: convertLayerObjToForm(layerObj),
+                }
+            if (r.url_type === 'layer-raw')
+                return {
+                    ...r,
+                    layerObjRaw: getRawObjFromApiSpec(layerObj),
+                }
+            return r
+        })
+    )
+
     return {
         ...dataset.result,
+        resources,
         open_in: dataset.result.open_in
             ? Object.values(dataset.result.open_in)
             : [],
@@ -1447,6 +1486,36 @@ export async function getResourceViews({
     return views.result
 }
 
+
+export async function getResourceView({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_show?id=${id}`,
+        { headers }
+    )
+    const views: CkanResponse<View> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
 export async function createResourceView({
     view,
     session,
@@ -1624,3 +1693,20 @@ export async function getPackageDiff({
     return packageData.result
 }
 
+export async function getDatasetView({ id }: { id: string }) {
+    const viewsRes = await fetch(
+        `https://api.resourcewatch.org/v1/widget/${id}`,
+        {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const result = await viewsRes.json()
+    return {
+        id: result.data.id,
+        ...result.data.attributes.widgetConfig,
+    }
+}

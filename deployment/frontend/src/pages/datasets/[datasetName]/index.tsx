@@ -86,11 +86,10 @@ export async function getServerSideProps(
                 fq:
                     dataset?.groups && dataset.groups.length > 0
                         ? `groups:
-                          ${
-                              dataset?.groups
-                                  ?.map((group) => group.name)
-                                  .join(' OR ') ?? ''
-                          }
+                          ${dataset?.groups
+                            ?.map((group) => group.name)
+                            .join(' OR ') ?? ''
+                        }
                   `
                         : '',
             })
@@ -109,11 +108,10 @@ export async function getServerSideProps(
                     fq:
                         prevdataset?.groups && prevdataset.groups.length > 0
                             ? `groups:
-                              ${
-                                  prevdataset?.groups
-                                      ?.map((group) => group.name)
-                                      .join(' OR ') ?? ''
-                              }
+                              ${prevdataset?.groups
+                                ?.map((group) => group.name)
+                                .join(' OR ') ?? ''
+                            }
                       `
                             : '',
                 })
@@ -130,19 +128,19 @@ export async function getServerSideProps(
 
         return {
             props: {
-                dataset: {
+                dataset: JSON.stringify({
                     ...dataset,
                     spatial: dataset.spatial ?? null,
-                },
-                prevdataset: {
+                }),
+                prevdataset: JSON.stringify({
                     ...prevdataset,
                     spatial: prevdataset.spatial ?? null,
-                },
+                }),
                 pendingExist: pendingExist,
                 datasetName,
                 datasetId: dataset.id,
                 initialZustandState: {
-                    dataset,
+                    dataset: JSON.stringify(dataset),
                     relatedDatasets,
                     mapView: mapState,
                 },
@@ -162,7 +160,10 @@ export async function getServerSideProps(
 export default function DatasetPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const { dataset, prevdataset } = props
+    let { dataset, prevdataset } = props
+    if (typeof dataset == 'string') dataset = JSON.parse(dataset)
+    if (typeof prevdataset == 'string') prevdataset = JSON.parse(prevdataset)
+
     const [isCurrentVersion, setIsCurrentVersion] = useState<boolean>(false)
     const [selectedIndex, setSelectedIndex] = useState(0)
     const datasetName = props.datasetName as string
@@ -180,6 +181,7 @@ export default function DatasetPage(
         isLoading,
     } = api.dataset.getOneActualOrPendingDataset.useQuery(
         { id: datasetId, isPending: pendingExist },
+        // @ts-ignore
         { retry: 0, initialData: dataset }
     )
 
@@ -189,6 +191,7 @@ export default function DatasetPage(
         isLoading: isLoadingPrev,
     } = api.dataset.getOneDataset.useQuery(
         { id: datasetName },
+        // @ts-ignore
         { retry: 0, initialData: prevdataset, enabled: !!pendingExist }
     )
 
@@ -252,7 +255,7 @@ export default function DatasetPage(
 
     const openIssueLength =
         issues.data &&
-        issues.data.filter((issue) => issue.status === 'open').length
+            issues.data.filter((issue) => issue.status === 'open').length
             ? issues.data.filter((issue) => issue.status === 'open').length
             : undefined
 
