@@ -60,7 +60,7 @@ export const datastoreRouter = createTRPCRouter({
                                       .filter((v) => v.value !== '')
                                       .map(
                                           (v) =>
-                                              `${filter.id} ${
+                                              `"${filter.id}" ${
                                                   v.operation.value
                                               } '${v.value}' ${v.link ?? ''} `
                                       )
@@ -123,7 +123,7 @@ export const datastoreRouter = createTRPCRouter({
                                           .filter((v) => v.value !== '')
                                           .map(
                                               (v) =>
-                                                  `${filter.id} ${
+                                                  `"${filter.id}" ${
                                                       v.operation.value
                                                   } '${v.value}' ${
                                                       v.link ?? ''
