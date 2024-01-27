@@ -28,21 +28,26 @@ export function DatapusherStatus({ datafile }: { datafile: ResourceFormType }) {
         },
         {
             refetchInterval: (data) =>
-                data && data.type === 'COMPLETED' ? false : 1000,
+                data && data.type === 'COMPLETED' ? false : data && data.type === 'RUNNING' ? 5000 : 1000,
         }
     )
     if (!flowState) return <></>
     return (
         <Badge
-            variant={match(flowState.type)
-                .with('COMPLETED', () => 'success')
-                .with('RUNNING', () => 'running')
-                .with('PENDING', () => 'running')
-                .with('FAILED', () => 'destructive')
-                .with('QUEUED', () => 'secondary')
-                .otherwise(() => 'default') as any}
+            variant={
+                match(flowState.type)
+                    .with('COMPLETED', () => 'success')
+                    .with('RUNNING', () => 'running')
+                    .with('PENDING', () => 'pending')
+                    .with('FAILED', () => 'destructive')
+                    .with('QUEUED', () => 'pending')
+                    .otherwise(() => 'default') as any
+            }
         >
-            {flowState?.type} <Spinner className="text-blue-800 w-6 h-6" />
+            {flowState?.type}{' '}
+            {['RUNNING', 'PENDING', 'QUEUED'].includes(flowState.type) && (
+                <Spinner className="text-white w-3 h-3 mb-1" />
+            )}
         </Badge>
     )
 }
