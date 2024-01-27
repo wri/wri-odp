@@ -23,7 +23,7 @@ export const editViewFormSchema = createViewFormSchema.and(
     z.object({ id: z.string() })
 )
 
-export type EditViewFormSchema = z.infer<typeof createViewFormSchema>
+export type EditViewFormSchema = z.infer<typeof editViewFormSchema>
 
 export const chartSchema = z.object({
     title: z.string().min(1, 'Please insert a title'),
