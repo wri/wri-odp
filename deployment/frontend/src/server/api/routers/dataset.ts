@@ -794,7 +794,6 @@ export const DatasetRouter = createTRPCRouter({
         )
         .query(async ({ input, ctx }) => {
             const dataset = await getOneDataset(input.id, ctx.session)
-
             return dataset
         }),
     getPossibleCollaborators: protectedProcedure.query(async () => {

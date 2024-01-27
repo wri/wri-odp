@@ -511,6 +511,7 @@ export async function getOneDataset(
     datasetName: string,
     session: Session | null
 ) {
+    console.log("!!!!")
     const user = session?.user
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
@@ -521,6 +522,7 @@ export async function getOneDataset(
             },
         }
     )
+    console.log("!!!!")
     const dataset: CkanResponse<WriDataset> = await datasetRes.json()
     if (!dataset.success && dataset.error) {
         if (dataset.error.message) throw Error(dataset.error.message)
@@ -593,6 +595,8 @@ export async function getOneDataset(
             return r
         })
     )
+
+    console.log("!!!!")
 
     return {
         ...dataset.result,
@@ -1472,10 +1476,9 @@ export async function getResourceViews({
         headers['Authorization'] = session.user.apikey
     }
 
-    const viewsRes = await fetch(
-        `${env.CKAN_URL}/api/action/resource_view_list?id=${id}`,
-        { headers }
-    )
+    const url = `${env.CKAN_URL}/api/action/resource_view_list?id=${id}`
+    const viewsRes = await fetch(url, { headers })
+
     const views: CkanResponse<View[]> = await viewsRes.json()
 
     if (!views.success && views.error) {

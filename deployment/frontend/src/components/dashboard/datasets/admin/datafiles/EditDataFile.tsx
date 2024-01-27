@@ -65,6 +65,7 @@ export function EditDataFile({
     return (
         <>
             <DataFileAccordion
+                id={`datafile-accordion-${datafile.id}`}
                 icon={<></>}
                 title={`Data File ${index + 1}`}
                 className="py-0"

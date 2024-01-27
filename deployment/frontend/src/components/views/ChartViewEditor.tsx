@@ -508,7 +508,7 @@ export default function ChartViewEditor({
                                                 info="Y-axis column name"
                                             >
                                                 <SimpleSelect
-                                                    id="category"
+                                                    id="measure"
                                                     formObj={formObj}
                                                     name="config.query.measure"
                                                     placeholder="E.g. GDP"
