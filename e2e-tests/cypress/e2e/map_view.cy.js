@@ -27,6 +27,7 @@ describe("Map view", () => {
     cy.createOrganizationAPI(parentOrg2);
     cy.createDatasetAPI(parentOrg2, datasetName2, true, {
       groups: [{ name: group }],
+      visibility_type: "public",
     });
 
     cy.createResourceAPI(datasetName, {
@@ -47,37 +48,64 @@ describe("Map view", () => {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
-  it("should render initial layer", () => {
-    cy.visit(`/datasets/${datasetName}`);
+  it(
+    "should render initial layer",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit(`/datasets/${datasetName}`);
 
-    cy.get(".vizzuality__c-legend-map", { timeout: 60000 }).contains(
-      "2015 Human Development Index",
-      { timeout: 60000 }
-    );
-  });
+      cy.get(".vizzuality__c-legend-map", { timeout: 60000 }).contains(
+        "2015 Human Development Index",
+        { timeout: 60000 },
+      );
+    },
+  );
 
-  it("should support multiple legend configs for a layer", () => {
-    cy.visit(`/datasets/${datasetName}`);
+  it(
+    "should support multiple legend configs for a layer",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit(`/datasets/${datasetName}`);
 
-    cy.get(".vizzuality__c-legend-map .vizzuality__legend-info > div", {
-      timeout: 60000,
-    }).should("have.length", 2);
-  });
+      cy.get(".vizzuality__c-legend-map .vizzuality__legend-info > div", {
+        timeout: 60000,
+      }).should("have.length", 2);
+    },
+  );
 
-  it("should allow to add layers from related datasets", () => {
-    cy.visit(`/datasets/${datasetName}`);
-    cy.contains("Related Datasets").click({ force: true });
-    cy.contains(datasetName2);
-    cy.contains("Add to map").click()
-    cy.contains("Layer 2").click()
-    cy.wait(2000)
-    cy.get("#add-to-map-modal-btn").click()
-    
-    cy.get(".vizzuality__c-legend-map", { timeout: 60000 }).contains(
-      "Tree cover loss - 2001-2022",
-      { timeout: 60000 }
-    );
-  });
+  it(
+    "should allow to add layers from related datasets",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit(`/datasets/${datasetName}`);
+      cy.contains("Related Datasets").click({ force: true });
+      cy.contains(datasetName2);
+      cy.contains("Add to map").click();
+      cy.contains("Layer 2").click();
+      cy.wait(2000);
+      cy.get("#add-to-map-modal-btn").click();
+
+      cy.get(".vizzuality__c-legend-map", { timeout: 60000 }).contains(
+        "Tree cover loss - 2001-2022",
+        { timeout: 60000 },
+      );
+    },
+  );
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);

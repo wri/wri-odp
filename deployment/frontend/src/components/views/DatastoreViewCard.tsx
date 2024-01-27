@@ -3,15 +3,18 @@ import ViewCard from './ViewCard'
 import { useState } from 'react'
 import { api } from '@/utils/api'
 import { toast } from 'react-toastify'
+import { WriDataset } from '@/schema/ckan.schema'
 
 export function DatastoreViewCard({
     view: _ogView,
     datafile,
     onCancelOrDelete,
+    dataset,
 }: {
     view: ViewState
     datafile: Resource
     onCancelOrDelete: (mode: string) => void
+    dataset: WriDataset
 }) {
     const [mode, setMode] = useState(_ogView._state)
     const [view, setView] = useState<View>(_ogView)
@@ -23,8 +26,11 @@ export function DatastoreViewCard({
         if (mode == 'new') {
             createMutation.mutate(
                 {
-                    ...view,
-                    resource_id: datafile.id,
+                    view: {
+                        ...view,
+                        resource_id: datafile.id,
+                    },
+                    ckanDatasetId: dataset.id,
                 },
                 {
                     onError: (e) => {
@@ -39,9 +45,12 @@ export function DatastoreViewCard({
         } else if (mode == 'edit' && view.id) {
             updateMutation.mutate(
                 {
-                    ...view,
-                    id: view.id,
-                    resource_id: datafile.id,
+                    view: {
+                        ...view,
+                        id: view.id,
+                        resource_id: datafile.id,
+                    },
+                    ckanDatasetId: dataset.id,
                 },
                 {
                     onError: (e) => {
@@ -64,6 +73,7 @@ export function DatastoreViewCard({
             mode={mode}
             setMode={setMode}
             onSave={onSave}
+            dataset={dataset}
         />
     )
 }

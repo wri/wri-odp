@@ -21,6 +21,7 @@ import {
     getOnePendingDataset,
     getUserOrganizations,
     getResourceView,
+    updateDatasetHasChartsFlag,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -167,13 +168,12 @@ export async function getLayerRw(layerUrl: string) {
     const layerRwRes = await fetch(layerUrl, {
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${env.RW_API_KEY}`,
         },
     })
     const layerRw: RwLayerResp | RwErrorResponse = await layerRwRes.json()
     if (isRwError(layerRw))
         throw Error(
-            `Error creating resource at the Resource Watch API - (${JSON.stringify(
+            `Error reading resource at the Resource Watch API - (${JSON.stringify(
                 layerRw.errors
             )})`
         )
@@ -330,8 +330,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                                ? JSON.stringify(input.spatial)
-                                : null,
+                              ? JSON.stringify(input.spatial)
+                              : null,
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -406,27 +406,27 @@ export const DatasetRouter = createTRPCRouter({
             }
             const resourcesToEditLayer = input.rw_id
                 ? await Promise.all(
-                    input.resources
-                        .filter(
-                            (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
-                        )
-                        .map(async (r) => {
-                            return await editLayerRw(r)
-                        })
-                )
+                      input.resources
+                          .filter(
+                              (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
+                          )
+                          .map(async (r) => {
+                              return await editLayerRw(r)
+                          })
+                  )
                 : []
             const resourcesToCreateLayer =
                 rw_id !== null
                     ? await Promise.all(
-                        input.resources
-                            .filter(
-                                (r) =>
-                                    (r.layerObj || r.layerObjRaw) && !r.rw_id
-                            )
-                            .map(async (r) => {
-                                return await createLayerRw(r, rw_id ?? '')
-                            })
-                    )
+                          input.resources
+                              .filter(
+                                  (r) =>
+                                      (r.layerObj || r.layerObjRaw) && !r.rw_id
+                              )
+                              .map(async (r) => {
+                                  return await createLayerRw(r, rw_id ?? '')
+                              })
+                      )
                     : []
             const resources = [
                 ...resourcesWithoutLayer,
@@ -467,7 +467,10 @@ export const DatasetRouter = createTRPCRouter({
                             package_id: input.id ?? '',
                             format: resource.format ?? '',
                             id: resource.resourceId,
-                            datastore_active : resource.datastore_active === true ? true : null,
+                            datastore_active:
+                                resource.datastore_active === true
+                                    ? true
+                                    : null,
                             new: false,
                             layerObjRaw: null,
                             layerObj: null,
@@ -481,8 +484,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                                ? JSON.stringify(input.spatial)
-                                : null,
+                              ? JSON.stringify(input.spatial)
+                              : null,
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -620,33 +623,55 @@ export const DatasetRouter = createTRPCRouter({
             return views
         }),
     createResourceView: protectedProcedure
-        .input(createViewFormSchema)
+        .input(
+            z.object({ view: createViewFormSchema, ckanDatasetId: z.string() })
+        )
         .mutation(async ({ input, ctx }) => {
-            console.log("!!!");
-            console.log(input);
             const view = await createResourceView({
-                view: input,
+                view: input.view,
                 session: ctx.session,
-            })
+            }).then(async (res) => {
+                await updateDatasetHasChartsFlag({
+                    ckanDatasetId: input.ckanDatasetId,
+                    session: ctx.session,
+                })
 
+                return res
+            })
             return view
         }),
     updateResourceView: protectedProcedure
-        .input(editViewFormSchema)
+        .input(
+            z.object({ view: editViewFormSchema, ckanDatasetId: z.string() })
+        )
         .mutation(async ({ input, ctx }) => {
             const view = await updateResourceView({
-                view: input,
+                view: input.view,
                 session: ctx.session,
+            }).then(async (res) => {
+                await updateDatasetHasChartsFlag({
+                    ckanDatasetId: input.ckanDatasetId,
+                    session: ctx.session,
+                })
+
+                return res
             })
 
             return view
         }),
     deleteResourceView: protectedProcedure
-        .input(z.object({id: z.string()}))
+        .input(z.object({ id: z.string(), ckanDatasetId: z.string() }))
         .mutation(async ({ input, ctx }) => {
             const view = await deleteResourceView({
                 session: ctx.session,
-                id: input.id
+                id: input.id,
+            }).then(async (res) => {
+                await updateDatasetHasChartsFlag({
+                    ckanDatasetId: input.ckanDatasetId,
+                    session: ctx.session,
+                })
+
+                return res
             })
 
             return view
@@ -768,7 +793,6 @@ export const DatasetRouter = createTRPCRouter({
         )
         .query(async ({ input, ctx }) => {
             const dataset = await getOneDataset(input.id, ctx.session)
-
             return dataset
         }),
     getPossibleCollaborators: protectedProcedure.query(async () => {

@@ -229,7 +229,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
-                            <EditDataFilesSection formObj={formObj} />
+                            <EditDataFilesSection formObj={formObj} dataset={dataset} />
                         </Tab.Panel>
                         {canEditCollaborators && (
                             <Tab.Panel
