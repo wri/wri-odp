@@ -181,6 +181,7 @@ export default function DatasetPage(
         isLoading,
     } = api.dataset.getOneActualOrPendingDataset.useQuery(
         { id: datasetId, isPending: pendingExist },
+        // @ts-ignore
         { retry: 0, initialData: dataset }
     )
 
@@ -190,6 +191,7 @@ export default function DatasetPage(
         isLoading: isLoadingPrev,
     } = api.dataset.getOneDataset.useQuery(
         { id: datasetName },
+        // @ts-ignore
         { retry: 0, initialData: prevdataset, enabled: !!pendingExist }
     )
 
