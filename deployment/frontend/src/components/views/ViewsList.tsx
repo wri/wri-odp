@@ -9,15 +9,25 @@ import { PopoverClose } from '@radix-ui/react-popover'
 import { useState } from 'react'
 import { DatastoreViewCard } from './DatastoreViewCard'
 import { RwViewCard } from './RwViewCard'
+import { WriDataset } from '@/schema/ckan.schema'
 
 let uniqueId = 0
 const getUniqueInternalId = () => {
     return uniqueId++
 }
 
-type DatastoreViewsListProps = { provider: 'datastore'; datafile: Resource }
+type DatastoreViewsListProps = {
+    provider: 'datastore'
+    datafile: Resource
+    dataset: WriDataset
+}
 
-type RwViewsListProps = { provider: 'rw'; rwDatasetId: string; views: View[] }
+type RwViewsListProps = {
+    provider: 'rw'
+    rwDatasetId: string
+    views: View[]
+    dataset: WriDataset
+}
 
 type ViewsListProps = DatastoreViewsListProps | RwViewsListProps
 
@@ -109,6 +119,7 @@ export default function ViewsList(props: ViewsListProps) {
                 {views.map((view: ViewState) => {
                     return datafile ? (
                         <DatastoreViewCard
+                            dataset={props.dataset}
                             view={view}
                             datafile={datafile}
                             key={`view-${datafile.id}-${view._id}`}
@@ -138,8 +149,8 @@ export default function ViewsList(props: ViewsListProps) {
                         />
                     ) : (
                         <RwViewCard
+                            dataset={props.dataset}
                             view={view}
-                            datasetId={rwDatasetId ?? ''}
                             key={`view-dataset-${view._id}`}
                             onCancelOrDelete={(mode) => {
                                 if (mode == 'new') {

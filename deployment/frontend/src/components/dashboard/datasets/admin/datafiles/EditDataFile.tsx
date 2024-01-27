@@ -26,18 +26,20 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import ViewsList from '@/components/views/ViewsList'
-import { MetadataAccordion } from '../metadata/MetadataAccordion'
+import { WriDataset } from '@/schema/ckan.schema'
 
 export function EditDataFile({
     remove,
     field,
     index,
     formObj,
+    dataset
 }: {
     remove: () => void
     index: number
     field: ResourceFormType
     formObj: UseFormReturn<DatasetFormType>
+    dataset: WriDataset
 }) {
     const {
         watch,
@@ -325,6 +327,7 @@ export function EditDataFile({
                                         <ViewsList
                                             provider="datastore"
                                             datafile={datafile as any}
+                                            dataset={dataset}
                                         />
                                     </Tab.Panel>
                                     {datafile.schema &&

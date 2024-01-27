@@ -1523,8 +1523,6 @@ export async function createResourceView({
     view: CreateViewFormSchema 
     session: Session | null
 }) {
-
-    console.log(view)
     const headers = {
         'Content-Type': 'application/json',
     } as any
@@ -1693,6 +1691,25 @@ export async function getPackageDiff({
     return packageData.result
 }
 
+export async function getDatasetViews({ rwDatasetId }: { rwDatasetId: string }) {
+
+    const viewsRes = await fetch(
+        `https://api.resourcewatch.org/v1/dataset/${rwDatasetId}/widget`,
+        {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const result = await viewsRes.json()
+    return result.data.map((d: any) => ({
+        id: d.id,
+        ...d.attributes.widgetConfig,
+    })) as View[]
+}
+
 export async function getDatasetView({ id }: { id: string }) {
     const viewsRes = await fetch(
         `https://api.resourcewatch.org/v1/widget/${id}`,
@@ -1709,4 +1726,111 @@ export async function getDatasetView({ id }: { id: string }) {
         id: result.data.id,
         ...result.data.attributes.widgetConfig,
     }
+}
+
+export async function patchDataset({ dataset, session }: { dataset: Partial<WriDataset>, session: Session }) {
+    const datasetRes = await fetch(`${env.CKAN_URL}/api/action/package_patch`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${session.user.apikey}`,
+        },
+        body: JSON.stringify(dataset),
+    })
+
+    const datasetObj: CkanResponse<WriDataset> = await datasetRes.json()
+    if (!datasetObj.success && datasetObj.error) {
+        if (datasetObj.error.message) throw Error(datasetObj.error.message)
+        throw Error(JSON.stringify(datasetObj.error))
+    }
+}
+
+export async function updateDatasetHasChartsFlag({
+    ckanDatasetId,
+    session
+}: {
+    ckanDatasetId: string
+    session: Session
+    }) {
+    const ckanDataset = await getOneDataset(ckanDatasetId, session)
+    const ckanViews =
+        ckanDataset.resources?.map((r) => r._views).flat() ?? []
+    const ckanHasChartViews = ckanViews.some(
+        (v) => v?.config_obj?.type == 'chart'
+    )
+    let hasChartViews = ckanHasChartViews
+
+    if (ckanDataset?.rw_id) {
+        const rwDatasetViews = await getDatasetViews({
+            rwDatasetId: ckanDataset.rw_id,
+        })
+        const rwHasChartViews = rwDatasetViews.some(
+            (v) => v?.config_obj?.type == 'chart'
+        )
+
+        hasChartViews = hasChartViews || rwHasChartViews
+    }
+
+    await patchDataset({
+        session,
+        dataset: { id: ckanDatasetId, has_chart_views: hasChartViews },
+    })
+}
+
+
+export async function createDatasetView(input: CreateViewFormSchema) {
+    const createRes = await fetch(
+        `https://api.resourcewatch.org/v1/dataset/${input.resource_id}/widget`,
+        {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            // TODO: should application be the same as on the dataset metadata?
+            body: JSON.stringify({
+                name: input.title,
+                application: ['rw'],
+                widgetConfig: input,
+            }),
+        }
+    )
+    const result = await createRes.json()
+    return result
+}
+
+export async function editDatasetView(input: EditViewFormSchema) {
+    const createRes = await fetch(
+        `https://api.resourcewatch.org/v1/dataset/${input.resource_id}/widget/${input.id}`,
+        {
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            // TODO: should application be the same as on the dataset metadata?
+            body: JSON.stringify({
+                name: input.title,
+                application: ['rw'],
+                widgetConfig: input,
+            }),
+        }
+    )
+    const result = await createRes.json()
+    return result
+}
+
+export async function deleteDatasetView(datasetId: string, id: string) {
+    const createRes = await fetch(
+        `https://api.resourcewatch.org/v1/dataset/${datasetId}/widget/${id}`,
+        {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const result = await createRes.json()
+    return result
 }

@@ -23,6 +23,12 @@ dataset_fields:
   output_validators: boolean_validator
   preset: checkbox
 
+- field_name: has_chart_views
+  label: Has chart views
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
 - field_name: spatial_address
   label: Spatial address
   validators: ignore_missing

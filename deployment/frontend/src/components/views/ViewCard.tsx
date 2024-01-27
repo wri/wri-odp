@@ -4,6 +4,7 @@ import { PencilSquareIcon } from '@heroicons/react/24/outline'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { View, ViewState } from '@/interfaces/dataset.interface'
 import { Dispatch, SetStateAction } from 'react'
+import { WriDataset } from '@/schema/ckan.schema'
 
 export default function ViewCard({
     view,
@@ -12,6 +13,7 @@ export default function ViewCard({
     mode,
     setMode,
     onSave,
+    dataset
 }: {
     view: View
     setView: Dispatch<SetStateAction<View>>
@@ -19,6 +21,7 @@ export default function ViewCard({
     mode: ViewState["_state"]
     setMode: Dispatch<SetStateAction<ViewState['_state']>>
     onSave: (mode: string, view: View) => void
+    dataset: WriDataset
 }) {
     return (
         <div>
@@ -55,6 +58,7 @@ export default function ViewCard({
                         onSave={onSave}
                         view={view}
                         setView={setView}
+                        dataset={dataset}
                     />
                 )}
         </div>

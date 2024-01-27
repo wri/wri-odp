@@ -30,6 +30,7 @@ import DataDialog from './DataDialog'
 import { Accordion } from '../dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion'
 import { queryRw } from '@/utils/rw'
 import { DefaultTooltip } from '../_shared/Tooltip'
+import { WriDataset } from '@/schema/ckan.schema'
 const Chart = dynamic(
     () => import('@/components/datasets/visualizations/Chart'),
     {
@@ -60,12 +61,14 @@ export default function ChartViewEditor({
     onCancelOrDelete,
     onSave,
     mode,
+    dataset
 }: {
     view: View
     setView: Dispatch<SetStateAction<View>>
     onCancelOrDelete: (mode: string) => void
     onSave: (mode: string, view: View) => void
     mode: ViewState['_state']
+    dataset: WriDataset
 }) {
     const session = useSession()
 
@@ -849,7 +852,7 @@ export default function ChartViewEditor({
                 id={view.id ?? ''}
                 onDelete={() => onCancelOrDelete(mode)}
                 provider={view.config_obj.config.provider}
-                rwDatasetId={view.config_obj.config.id}
+                dataset={dataset}
             />
 
             <DataDialog
