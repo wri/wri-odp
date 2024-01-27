@@ -168,13 +168,12 @@ export async function getLayerRw(layerUrl: string) {
     const layerRwRes = await fetch(layerUrl, {
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${env.RW_API_KEY}`,
         },
     })
     const layerRw: RwLayerResp | RwErrorResponse = await layerRwRes.json()
     if (isRwError(layerRw))
         throw Error(
-            `Error creating resource at the Resource Watch API - (${JSON.stringify(
+            `Error reading resource at the Resource Watch API - (${JSON.stringify(
                 layerRw.errors
             )})`
         )
