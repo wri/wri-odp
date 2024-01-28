@@ -62,12 +62,13 @@ export async function getServerSideProps(
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
     try {
-        const prevdataset = await getOneDataset(datasetName, session)
+        let prevdataset = await getOneDataset(datasetName, session)
         const pendingDataset = await getOnePendingDataset(
             prevdataset.id,
             session
         )
-        let dataset: WriDataset = prevdataset
+
+        let dataset = prevdataset
 
         const pendingExist =
             pendingDataset && Object.keys(pendingDataset).length > 0
@@ -86,10 +87,11 @@ export async function getServerSideProps(
                 fq:
                     dataset?.groups && dataset.groups.length > 0
                         ? `groups:
-                          ${dataset?.groups
-                            ?.map((group) => group.name)
-                            .join(' OR ') ?? ''
-                        }
+                          ${
+                              dataset?.groups
+                                  ?.map((group) => group.name)
+                                  .join(' OR ') ?? ''
+                          }
                   `
                         : '',
             })
@@ -108,10 +110,11 @@ export async function getServerSideProps(
                     fq:
                         prevdataset?.groups && prevdataset.groups.length > 0
                             ? `groups:
-                              ${prevdataset?.groups
-                                ?.map((group) => group.name)
-                                .join(' OR ') ?? ''
-                            }
+                              ${
+                                  prevdataset?.groups
+                                      ?.map((group) => group.name)
+                                      .join(' OR ') ?? ''
+                              }
                       `
                             : '',
                 })
@@ -132,10 +135,12 @@ export async function getServerSideProps(
                     ...dataset,
                     spatial: dataset.spatial ?? null,
                 }),
-                prevdataset: JSON.stringify({
-                    ...prevdataset,
-                    spatial: prevdataset.spatial ?? null,
-                }),
+                prevdataset: pendingExist
+                    ? JSON.stringify({
+                          ...prevdataset,
+                          spatial: prevdataset.spatial ?? null,
+                      })
+                    : null,
                 pendingExist: pendingExist,
                 datasetName,
                 datasetId: dataset.id,
@@ -255,7 +260,7 @@ export default function DatasetPage(
 
     const openIssueLength =
         issues.data &&
-            issues.data.filter((issue) => issue.status === 'open').length
+        issues.data.filter((issue) => issue.status === 'open').length
             ? issues.data.filter((issue) => issue.status === 'open').length
             : undefined
 

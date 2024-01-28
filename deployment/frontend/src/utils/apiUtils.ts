@@ -588,6 +588,7 @@ export async function getOneDataset(
         }
         return x
     })
+
     const resources = await Promise.all(
         dataset.result.resources.map(async (r) => {
             const _views = await getResourceViews({
@@ -608,9 +609,10 @@ export async function getOneDataset(
 
                 return { ...r, _views }
             }
-            if (!r.url) return r
-            if (!r.layerObj || !r.layerObjRaw) {
-                const layerObj = await getLayerRw(r.url)
+
+            if (!r.url && !r.layerObj && !r.layerObjRaw) return r
+            if (!r.layerObj && !r.layerObjRaw) {
+                const layerObj = await getLayerRw(r.url!)
                 if (r.url_type === 'layer')
                     return {
                         ...r,
@@ -657,6 +659,7 @@ export async function getOnePendingDataset(
     datasetName: string,
     session: Session | null
 ) {
+    console.log('IN pending api')
     const user = session?.user
     const response = await fetch(
         `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
@@ -688,12 +691,14 @@ export async function getOnePendingDataset(
         dataset.tableName = layer.tableName
     }
 
+    console.log('IN HERE BERFORE RESOUIRCES: ', dataset.resources)
+
     const resources = await Promise.all(
         dataset.resources.map(async (r) => {
             if (r.url_type === 'upload' || r.url_type === 'link') return r
-            if (!r.url) return r
-            if (!r.layerObj || !r.layerObjRaw) {
-                const layerObj = await getLayerRw(r.url)
+            if (!r.url && !r.layerObj && !r.layerObjRaw) return r
+            if (!r.layerObj && !r.layerObjRaw) {
+                const layerObj = await getLayerRw(r.url!)
                 if (r.url_type === 'layer')
                     return {
                         ...r,
@@ -705,7 +710,9 @@ export async function getOnePendingDataset(
                         layerObjRaw: getRawObjFromApiSpec(layerObj),
                     }
             }
+            console.log('BEFORE PENDING IN HERE')
             if (r.layerObj || r.layerObjRaw) {
+                console.log('GOT IN JHERE PENDING GOT IN HERE PENDING')
                 if (r.layerObj) {
                     return {
                         ...r,

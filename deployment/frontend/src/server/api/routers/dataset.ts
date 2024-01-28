@@ -498,8 +498,6 @@ export const DatasetRouter = createTRPCRouter({
                 ...resourcesToCreateLayer,
             ]
 
-            console.log('RESOURCES', resources)
-
             try {
                 const user = ctx.session.user
                 const body = JSON.stringify({
@@ -836,48 +834,7 @@ export const DatasetRouter = createTRPCRouter({
         .query(async ({ input, ctx }) => {
             const dataset = await getOneDataset(input.id, ctx.session)
 
-            const resources = await Promise.all(
-                dataset.resources.map(async (r) => {
-                    if (r.url_type === 'upload' || r.url_type === 'link')
-                        return r
-                    if (!r.url) return r
-                    if (!r.layerObj || !r.layerObjRaw) {
-                        const layerObj = await getLayerRw(r.url)
-                        if (r.url_type === 'layer')
-                            return {
-                                ...r,
-                                layerObj: convertLayerObjToForm(layerObj),
-                            }
-                        if (r.url_type === 'layer-raw')
-                            return {
-                                ...r,
-                                layerObjRaw: getRawObjFromApiSpec(layerObj),
-                            }
-                    }
-
-                    if (r.layerObj || r.layerObjRaw) {
-                        if (r.layerObj) {
-                            return {
-                                ...r,
-                                layerObj: convertLayerObjToForm(r.layerObj),
-                                rw_id: r.id,
-                            }
-                        }
-                        if (r.layerObjRaw) {
-                            return {
-                                ...r,
-                                layerObjRaw: getRawObjFromApiSpec(
-                                    r.layerObjRaw
-                                ),
-                                rw_id: r.id,
-                            }
-                        }
-                    }
-                    return r
-                })
-            )
-
-            return { ...dataset, resources }
+            return dataset
         }),
     getPossibleCollaborators: protectedProcedure.query(async () => {
         const apiKey = env.SYS_ADMIN_API_KEY
@@ -1693,58 +1650,15 @@ export const DatasetRouter = createTRPCRouter({
     getOneActualOrPendingDataset: publicProcedure
         .input(z.object({ id: z.string(), isPending: z.boolean() }))
         .query(async ({ input, ctx }) => {
-            let dataset: WriDataset | null
             if (input.isPending) {
-                dataset = await getOnePendingDataset(input.id, ctx.session)
-            } else {
-                dataset = await getOneDataset(input.id, ctx.session)
+                const dataset = await getOnePendingDataset(
+                    input.id,
+                    ctx.session
+                )
+                return dataset
             }
-
-            if (!dataset) {
-                return null
-            }
-
-            const resources = await Promise.all(
-                dataset.resources.map(async (r) => {
-                    if (r.url_type === 'upload' || r.url_type === 'link')
-                        return r
-                    if (!r.url) return r
-                    if (!r.layerObj || !r.layerObjRaw) {
-                        const layerObj = await getLayerRw(r.url)
-                        if (r.url_type === 'layer')
-                            return {
-                                ...r,
-                                layerObj: convertLayerObjToForm(layerObj),
-                            }
-                        if (r.url_type === 'layer-raw')
-                            return {
-                                ...r,
-                                layerObjRaw: getRawObjFromApiSpec(layerObj),
-                            }
-                    }
-                    if (r.layerObj || r.layerObjRaw) {
-                        if (r.layerObj) {
-                            return {
-                                ...r,
-                                layerObj: convertLayerObjToForm(r.layerObj),
-                                rw_id: r.id,
-                            }
-                        }
-                        if (r.layerObjRaw) {
-                            return {
-                                ...r,
-                                layerObjRaw: getRawObjFromApiSpec(
-                                    r.layerObjRaw
-                                ),
-                                rw_id: r.id,
-                            }
-                        }
-                    }
-                    return r
-                })
-            )
-
-            return { ...dataset, resources }
+            const dataset = await getOneDataset(input.id, ctx.session)
+            return dataset
         }),
 
     // show pending diff

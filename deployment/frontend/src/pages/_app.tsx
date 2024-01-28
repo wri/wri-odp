@@ -50,8 +50,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
     pageProps: { session, ...pageProps },
 }: AppProps) => {
     const [queryClient] = useState(() => new QueryClient())
-    const { initialZustandState, dataset, prevdataset } = pageProps
+    const { initialZustandState } = pageProps
+    let { dataset, prevdataset } = pageProps
 
+    if (typeof prevdataset == 'string') {
+        prevdataset = JSON.parse(prevdataset)
+    }
     if (typeof dataset == 'string') {
         dataset = JSON.parse(dataset)
     }
@@ -87,7 +91,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
             })
         }
         for (const resource of dataset?.resources) {
-            if (resource['layerObj'] || resource['layerObjRaw']) {
+            if (
+                (resource['layerObj'] || resource['layerObjRaw']) &&
+                !resource.url
+            ) {
                 layerAsLayerObj.set(resource.rw_id, 'pending')
             } else {
                 layerAsLayerObj.set(resource.rw_id, 'approved')
@@ -108,7 +115,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
         }
 
         for (const resource of prevdataset?.resources) {
-            if (resource['layerObj'] || resource['layerObjRaw']) {
+            if (
+                resource['layerObj'] ||
+                (resource['layerObjRaw'] && !resource.url)
+            ) {
                 tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')
             } else {
                 tempLayerAsLayerobj.set(resource.rw_id, 'approved')
