@@ -465,7 +465,6 @@ def pending_dataset_show(context: Context, data_dict: DataDict):
 
     return pending_dataset
 
-
 @logic.side_effect_free
 def pending_diff_show(context: Context, data_dict: DataDict):
     """Get a pending dataset by package_id"""
@@ -497,7 +496,6 @@ def pending_diff_show(context: Context, data_dict: DataDict):
         # )
 
     return dataset_diff
-
 
 def _diff(existing, pending, path=""):
     diff = {}
