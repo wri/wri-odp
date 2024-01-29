@@ -32,13 +32,14 @@ export const datastoreRouter = createTRPCRouter({
                         value: z.array(filterObj),
                     })
                 ),
+                groupBy: z.array(z.string()).optional(),
             })
         )
-        .query(async ({ input }) => {
-            const { pagination, resourceId, columns, sorting, filters } = input
+        .query(async ({ input, ctx }) => {
+            const { pagination, resourceId, columns, sorting, filters, groupBy } = input
             const paginationSql = `LIMIT ${
                 pagination.pageIndex * pagination.pageSize + pagination.pageSize
-            }`
+            } OFFSET ${pagination.pageIndex * pagination.pageSize}`
             const sortSql =
                 sorting.length > 0
                     ? 'ORDER BY ' +
@@ -55,11 +56,11 @@ export const datastoreRouter = createTRPCRouter({
                       filters
                           .map(
                               (filter) =>
-                                  `( ${filter.value
+                                  `${filter.value
                                       .filter((v) => v.value !== '')
                                       .map(
                                           (v) =>
-                                              `${filter.id} ${
+                                              `( "${filter.id}" ${
                                                   v.operation.value
                                               } '${v.value}' ${v.link ?? ''} `
                                       )
@@ -67,17 +68,30 @@ export const datastoreRouter = createTRPCRouter({
                           )
                           .join(' AND ')
                     : ''
+            const groupBySql =
+                groupBy && groupBy.length
+                    ? 'GROUP BY ' + groupBy.map(item => `"${item}"`).join(', ')
+                    : ''
+
+
             const parsedColumns = columns.map((column) => `"${column}"`)
             const url = `${
                 env.CKAN_URL
             }/api/action/datastore_search_sql?sql=SELECT ${parsedColumns.join(
                 ' , '
-            )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${paginationSql}`
-            const tableDataRes = await fetch(url)
+            )} FROM "${resourceId}" ${filtersSql} ${sortSql} ${groupBySql} ${paginationSql}`
+            const tableDataRes = await fetch(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: ctx.session?.user.apikey ?? '',
+                },
+            })
             const tableData: DataResponse = await tableDataRes.json()
             if (!tableData.success && tableData.error) {
-                if (tableData.error.message)
+                console.log(tableData.error)
+                if (tableData.error.message){
                     throw Error(tableData.error.message)
+                }
                 throw Error(JSON.stringify(tableData.error))
             }
             const data = tableData.result.records
@@ -95,7 +109,7 @@ export const datastoreRouter = createTRPCRouter({
                 ),
             })
         )
-        .query(async ({ input }) => {
+        .query(async ({ input, ctx }) => {
             try {
                 const { resourceId, filters } = input
                 const filtersSql =
@@ -108,7 +122,7 @@ export const datastoreRouter = createTRPCRouter({
                                           .filter((v) => v.value !== '')
                                           .map(
                                               (v) =>
-                                                  `${filter.id} ${
+                                                  `"${filter.id}" ${
                                                       v.operation.value
                                                   } '${v.value}' ${
                                                       v.link ?? ''
@@ -122,6 +136,7 @@ export const datastoreRouter = createTRPCRouter({
                 const numRowsRes = await fetch(url, {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `${ctx?.session?.user.apikey}`,
                     },
                 })
                 const numRows: DataResponse = await numRowsRes.json()
@@ -133,10 +148,11 @@ export const datastoreRouter = createTRPCRouter({
                 if (
                     numRows.result &&
                     numRows.result.records[0] &&
-                    numRows.result.records[0].count
+                    (numRows.result.records[0].count || numRows.result.records[0].count === 0)
                 ) {
                     return numRows.result.records[0].count as number
                 }
+                console.log(numRows)
                 throw new Error('Could not get number of rows')
             } catch (e) {
                 let error =

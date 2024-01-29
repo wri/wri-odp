@@ -1,6 +1,5 @@
 import {
     ArrowUpRightIcon,
-    ChartBarIcon,
     ChevronLeftIcon,
     ExclamationTriangleIcon,
     InformationCircleIcon,
@@ -33,6 +32,10 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import { TabularResource } from './visualizations/Visualizations'
 import TabularViewIcon from './view-icons/TabularViewIcon'
 import MapViewIcon from './view-icons/MapViewIcon'
+import ToggleVersion from './ToogleVersion'
+import { useActiveCharts } from '@/utils/storeHooks'
+import { View } from '@/interfaces/dataset.interface'
+import ChartViewIcon from './view-icons/ChartViewIcon'
 
 function OpenInButton({ open_in }: { open_in: OpenIn[] }) {
     const session = useSession()
@@ -119,11 +122,18 @@ export function DatasetHeader({
     dataset,
     setTabularResource,
     tabularResource,
+    diffFields,
+    isCurrentVersion,
+    setIsCurrentVersion,
 }: {
     dataset?: WriDataset
+    isCurrentVersion?: boolean
+    diffFields: string[]
+    setIsCurrentVersion: React.Dispatch<React.SetStateAction<boolean>>
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
 }) {
+    const { activeCharts, addCharts, removeCharts } = useActiveCharts()
     const [open, setOpen] = useState(false)
     const [fopen, setFOpen] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -132,13 +142,22 @@ export function DatasetHeader({
         dataset?.id as string,
         { retry: false, enabled: !!session.data?.user }
     )
+
+    const {
+        data: datasetViews,
+        isLoading: isDatasetViewsLoading,
+        error: datasetViewsError,
+    } = api.rw.getDatasetViews.useQuery(
+        { rwDatasetId: dataset?.rw_id ?? '' },
+        { enabled: !!dataset?.rw_id }
+    )
+
     const addToFavorites = api.dataset.followDataset.useMutation({
         onSuccess: async (data) => {
             await refetch()
             setOpen(false)
             notify(
-                `Successfully added the ${
-                    dataset?.title ?? dataset?.name
+                `Successfully added the ${dataset?.title ?? dataset?.name
                 } dataset to your favorites`,
                 'success'
             )
@@ -150,8 +169,7 @@ export function DatasetHeader({
             await refetch()
             setFOpen(false)
             notify(
-                `Successfully removed the ${
-                    dataset?.title ?? dataset?.name
+                `Successfully removed the ${dataset?.title ?? dataset?.name
                 } dataset from your favorites`,
                 'error'
             )
@@ -165,6 +183,15 @@ export function DatasetHeader({
         month: 'short',
         day: 'numeric',
     } as const
+
+    const higlighted = (field: string) => {
+        if (diffFields && isCurrentVersion) {
+            if (diffFields.includes(field)) {
+                return 'bg-yellow-200'
+            }
+        }
+        return ''
+    }
 
     return (
         <div className="flex w-full flex-col pb-10 font-acumin">
@@ -191,6 +218,12 @@ export function DatasetHeader({
                         <OpenInButton open_in={dataset?.open_in ?? []} />
                     </div>
                     <div className="flex items-center gap-x-2">
+                        {diffFields.length > 0 && (
+                            <ToggleVersion
+                                enabled={isCurrentVersion!}
+                                setEnabled={setIsCurrentVersion}
+                            />
+                        )}
                         {isLoading ? (
                             <Spinner className="w-2 h-2" />
                         ) : data !== undefined && data ? (
@@ -346,31 +379,44 @@ export function DatasetHeader({
                             className="flex justify-start gap-x-3
             "
                         >
-                            {false && (
-                                <div className="rounded-full bg-stone-100 p-1">
-                                    <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                                </div>
-                            )}
+                            <ChartViewIcon dataset={dataset} />
                             <MapViewIcon dataset={dataset} />
                             <TabularViewIcon dataset={dataset} />
                         </div>
                     )}
                 </div>
                 <div className="flex max-w-[560px] flex-col gap-y-2">
-                    <h2 className="text-xs font-bold uppercase leading-none tracking-wide text-green-700">
+                    <h2
+                        className={`text-xs font-bold uppercase leading-none tracking-wide text-green-700 ${higlighted(
+                            'organization'
+                        )} `}
+                    >
                         {dataset?.organization?.title ?? 'No Team'}
                     </h2>
                     <div className="flex items-center gap-x-3">
-                        <h1 className="w-fit text-3xl font-bold text-black">
+                        <h1
+                            className={`w-fit text-3xl font-bold text-black ${dataset?.title
+                                    ? higlighted('title')
+                                    : higlighted('name')
+                                }  `}
+                        >
                             {dataset?.title ?? dataset?.name}{' '}
                         </h1>
                         {session?.data?.user && (
-                            <span className="rounded-full h-fit text-sm lg:text-xs px-2 py-y border border-gray-400 capitalize">
+                            <span
+                                className={`rounded-full h-fit text-sm lg:text-xs px-2 py-y border border-gray-400 capitalize ${higlighted(
+                                    'visibility_type'
+                                )}`}
+                            >
                                 {dataset?.visibility_type}
                             </span>
                         )}
                     </div>
-                    <p className=" text-justify text-base font-light leading-snug text-stone-900">
+                    <p
+                        className={`text-justify text-base font-light leading-snug text-stone-900 ${higlighted(
+                            'short_description'
+                        )}`}
+                    >
                         {dataset?.short_description ?? 'No description'}
                     </p>
                     <div className="flex flex-wrap gap-4 py-4">
@@ -392,7 +438,11 @@ export function DatasetHeader({
                         <div className="flex gap-x-1">
                             <ArrowPathIcon className="h-5 w-5 text-blue-800" />
                             <div>
-                                <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
+                                <div
+                                    className={`whitespace-nowrap text-sm font-semibold text-neutral-700 ${higlighted(
+                                        'metadata_modified'
+                                    )}`}
+                                >
                                     Last Updated
                                 </div>
                                 <div className="text-sm font-light text-stone-900">
@@ -405,11 +455,17 @@ export function DatasetHeader({
                             </div>
                         </div>
                         {dataset?.temporal_coverage_start ||
-                        dataset?.temporal_coverage_end ? (
+                            dataset?.temporal_coverage_end ? (
                             <div className="flex gap-x-1">
                                 <ClockIcon className="h-5 w-5 text-blue-800" />
                                 <div>
-                                    <div className="whitespace-nowrap text-sm font-semibold text-neutral-700">
+                                    <div
+                                        className={`whitespace-nowrap text-sm font-semibold text-neutral-700 ${higlighted(
+                                            'temporal_coverage_start'
+                                        ) ??
+                                            higlighted('temporal_coverage_end')
+                                            }`}
+                                    >
                                         Temporal coverage
                                     </div>
                                     <div className="text-sm font-light text-stone-900">
@@ -427,7 +483,11 @@ export function DatasetHeader({
                     <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-x-3 rounded-sm bg-cyan-700 bg-opacity-10 p-3">
                         <ExclamationTriangleIcon className="col-span-1 grow max-h-8 max-w-8 text-yellow-600 sm:h-12 sm:w-12" />
                         <div className="col-span-11">
-                            <span className=" font-acumin text-sm font-semibold leading-none text-black">
+                            <span
+                                className={` font-acumin text-sm font-semibold leading-none text-black ${higlighted(
+                                    'cautions'
+                                )}`}
+                            >
                                 Caution:{' '}
                             </span>
                             <div
@@ -451,13 +511,21 @@ export function DatasetHeader({
                     )}
                     {session.data?.user ? (
                         dataset?.technical_notes ? (
-                            <div className="flex items-center rounded-[3px] border border-green-500 bg-green-500">
+                            <div
+                                className={`flex items-center rounded-[3px] border border-green-500 bg-green-500 ${higlighted(
+                                    'technical_notes'
+                                )}`}
+                            >
                                 <div className="px-2 font-acumin text-xs font-medium text-white">
                                     RDI approved
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex items-center rounded-[3px] border border-orange-400 bg-orange-400">
+                            <div
+                                className={`flex items-center rounded-[3px] border border-orange-400 bg-orange-400 ${higlighted(
+                                    'technical_notes'
+                                )}`}
+                            >
                                 <div className="px-2 font-acumin text-xs font-medium text-white">
                                     Awaiting RDI approval
                                 </div>
@@ -506,37 +574,81 @@ export function DatasetHeader({
                         rel="noopener noreferrer"
                         className="flex items-center gap-x-1 pt-4 w-fit"
                     >
-                        <LinkIcon className="h-4 w-4 text-wri-green" />
+                        <LinkIcon
+                            className={`h-4 w-4 text-wri-green ${higlighted(
+                                'technical_notes'
+                            )}`}
+                        />
                         <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
                             Technical Notes
                         </div>
                     </a>
                 )}
-                {dataset?.provider && dataset?.rw_id && (
-                    <div className="py-4">
-                        {tabularResource &&
-                        tabularResource.id === dataset.rw_id ? (
-                            <Button
-                                size="sm"
-                                onClick={() => setTabularResource(null)}
-                            >
-                                Remove Tabular View
-                            </Button>
-                        ) : (
-                            <Button
-                                size="sm"
-                                onClick={() =>
-                                    setTabularResource({
-                                        provider: dataset.provider as string,
-                                        id: dataset.rw_id as string,
-                                    })
-                                }
-                            >
-                                Add Tabular View
-                            </Button>
+
+                <div className="flex space-x-2">
+                    {dataset?.provider && dataset?.rw_id && (
+                        <div className="py-4">
+                            {tabularResource &&
+                                tabularResource.id === dataset.rw_id ? (
+                                <Button
+                                    size="sm"
+                                    onClick={() => setTabularResource(null)}
+                                >
+                                    Remove Tabular View
+                                </Button>
+                            ) : (
+                                <Button
+                                    size="sm"
+                                    onClick={() =>
+                                        setTabularResource({
+                                            provider:
+                                                dataset.provider as string,
+                                            id: dataset.rw_id as string,
+                                        })
+                                    }
+                                >
+                                    Add Tabular View
+                                </Button>
+                            )}
+                        </div>
+                    )}
+                    {dataset?.provider &&
+                        dataset?.rw_id &&
+                        !isDatasetViewsLoading &&
+                        datasetViews?.some(
+                            (v: View) => v.config_obj.type == 'chart'
+                        ) && (
+                            <div className="py-4">
+                                {activeCharts
+                                    .map((c: View) => c.id)
+                                    .some((id: string) =>
+                                        datasetViews
+                                            .map((v: View) => v.id)
+                                            .includes(id)
+                                    ) ? (
+                                    <Button
+                                        size="sm"
+                                        onClick={() => {
+                                            removeCharts(
+                                                datasetViews?.map((v: View) => v.id ?? "") 
+                                            )
+                                        }}
+                                    >
+                                        Remove Chart View
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        size="sm"
+                                        onClick={() => {
+                                            addCharts(datasetViews)
+                                        }}
+                                    >
+                                        Add Chart View
+                                    </Button>
+                                )}
+                            </div>
                         )}
-                    </div>
-                )}
+                </div>
             </div>
         </div>
     )

@@ -531,13 +531,10 @@ function PreviewTable({
                         Field
                     </TableHead>
                     <TableHead className="font-acumin text-xs font-semibold text-black">
+                        Label
+                    </TableHead>
+                    <TableHead className="font-acumin text-xs font-semibold text-black">
                         Type
-                    </TableHead>
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Null
-                    </TableHead>
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Key
                     </TableHead>
                     <TableHead className="font-acumin text-xs font-semibold text-black">
                         Default
@@ -554,11 +551,10 @@ function PreviewTable({
                                 : 'border-0 bg-white'
                         }
                     >
-                        <TableCell>{field.field}</TableCell>
-                        <TableCell>{field.type}</TableCell>
-                        <TableCell>{field.null ? 'YES' : 'NO'}</TableCell>
-                        <TableCell>{field.key}</TableCell>
-                        <TableCell>{field.default}</TableCell>
+                        <TableCell>{field.id}</TableCell>
+                        <TableCell>{field.info.label}</TableCell>
+                        <TableCell>{field.info.type_override}</TableCell>
+                        <TableCell>{field.info.default}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>

@@ -8,6 +8,7 @@ interface DataFileAccordionProps {
   icon: React.ReactNode;
   className?: string;
   preview: React.ReactNode;
+  id?: string
 }
 
 export function DataFileAccordion({
@@ -16,6 +17,7 @@ export function DataFileAccordion({
   icon,
   className,
   preview,
+  id = ""
 }: DataFileAccordionProps) {
   return (
     <Disclosure
@@ -32,7 +34,7 @@ export function DataFileAccordion({
             )}
           >
             <div>
-              <Disclosure.Button className="sm:px-8 px-4 col-span-full flex w-full justify-between border-b border-stone-50 py-5">
+              <Disclosure.Button id={id ?? ""} className="sm:px-8 px-4 col-span-full flex w-full justify-between border-b border-stone-50 py-5">
                 <h3 className="text-black text-xl font-normal font-['Acumin Pro SemiCondensed']">{title}</h3>
                 <ChevronDownIcon
                   className={`${

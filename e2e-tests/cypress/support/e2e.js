@@ -522,30 +522,21 @@ Cypress.Commands.add("userMetadata", (name) => {
     });
 });
 
-// Cypress.Commands.add("addNotificationApi", async ( object_id) => {
-
-//   const dataset = await cy.request({
-//     method: "GET",
-//     url: apiUrl("package_show"),
-//     headers: headers,
-//     qs: {
-//       id: object_id,
-//     },
-//   });
-
-//   const dataset_id = dataset.body.result.id;
-//   console.log(dataset_id);
-
-//   cy.request({
-//     method: "POST",
-//     url: apiUrl("notification_create"),
-//     headers: headers,
-//     body: {
-//       recipient_id: "2b6f6d69-5f13-4091-8131-2182be659ea1",
-//       sender_id: "b53a31a7-55f0-425b-bd6e-db9a20b517c6",
-//       activity_type: "deleted dataset",
-//       object_id: dataset_id,
-//       object_type: "dataset"
-//     },
-//   });
-// });
+Cypress.Commands.add(
+  "createPendingDataset",
+  (package_id, name) => {
+    const request = cy.request({
+      method: "POST",
+      url: apiUrl("pending_dataset_create"),
+      headers: headers,
+      body: {
+        package_id: package_id,
+        package_data: {
+          'id': package_id,
+          'name': name,
+          'notes': 'test dataset',
+        }
+      },
+    });
+  }
+);
