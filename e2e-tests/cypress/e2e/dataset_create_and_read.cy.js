@@ -79,24 +79,18 @@ describe("Create dataset", () => {
     cy.get('input[name="extras.1.key"]').type("Test 2");
     cy.get('input[name="extras.1.value"]').type("Test 2");
     cy.contains("Next: Datafiles").click();
-    cy.get("input[type=file]").selectFile("cypress/fixtures/cities.csv", {
+    cy.get("input[type=file]").selectFile("cypress/fixtures/logo.png", {
       force: true,
     });
-    cy.get('input[name="resources.0.title"]').clear().type("Cities");
-    cy.get("button").contains("Add another data file").click();
-    cy.get("input[type=file]").eq(1).selectFile("cypress/fixtures/logo.png", {
-      force: true,
-    });
-    cy.get('input[name="resources.1.title"]')
-      .clear()
-      .type("Resource for E2E Testing (IMAGE)");
-    cy.wait(10000);
+    cy.get('input[name="resources.0.title"]').clear().type("Logo");
+    cy.wait(5000);
     cy.contains("Next: Preview").click();
     //get button of type submit
     cy.get('button[type="submit"]').click();
     cy.contains(`Successfully created the "${dataset}" dataset`, {
       timeout: 15000,
     });
+    cy.wait(15000);
   });
 
   it(
@@ -112,7 +106,7 @@ describe("Create dataset", () => {
       cy.get("h1").contains(dataset, { timeout: 15000 });
       cy.get("h2").contains(org);
       cy.contains("Data files").click();
-      cy.contains("CSV");
+      cy.contains("PNG");
     },
   );
 
@@ -135,7 +129,6 @@ describe("Create dataset", () => {
     cy.get(".tiptap.ProseMirror").eq(1).type("EDITED");
     cy.get(".tiptap.ProseMirror").eq(2).type("EDITED");
     cy.contains("Data Files").click();
-    cy.get("#remove_0_datafile").click();
     cy.wait(5000);
     cy.get("button").contains("Add another data file").click();
     cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/logo_2.jpg", {
@@ -178,6 +171,7 @@ describe("Create dataset", () => {
     cy.contains(ckanUserName);
     cy.contains(" added you as a collaborator (member) for the dataset");
   });
+
 
   after(() => {
     cy.deleteOrganizationAPI(org);

@@ -15,6 +15,16 @@ export const useDataset = () => {
     return { dataset }
 }
 
+export const useActiveCharts = () => {
+    return useStore((store) => ({
+        activeCharts: store.activeCharts,
+        addCharts: store.addCharts,
+        removeCharts: store.removeCharts,
+        selectedChart: store.selectedChart,
+        selectChart: store.selectChart
+    }))
+}
+
 export const useRelatedDatasets = () => {
     const { relatedDatasets } = useStore((store) => ({
         relatedDatasets: store.relatedDatasets,

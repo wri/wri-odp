@@ -1,7 +1,12 @@
 import { FieldsResponse } from '@/components/data-explorer/queryHooks'
 import { filterObj } from '@/components/data-explorer/search.schema'
-import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
-import { a } from 'vitest/dist/suite-SvxfaIxW'
+import { createViewFormSchema, editViewFormSchema } from '@/schema/view.schema'
+import {
+    createTRPCRouter,
+    protectedProcedure,
+    publicProcedure,
+} from '@/server/api/trpc'
+import { createDatasetView, deleteDatasetView, editDatasetView, getDatasetViews, updateDatasetHasChartsFlag } from '@/utils/apiUtils'
 import { z } from 'zod'
 
 export interface NumOfRowsResponse {
@@ -32,6 +37,7 @@ export const rwRouter = createTRPCRouter({
                     .map((field) => ({
                         name: field,
                         key: field,
+                        type: 'any',
                     })),
             }
             return columns
@@ -105,6 +111,8 @@ export const rwRouter = createTRPCRouter({
             const url = `https://api.resourcewatch.org/v1/query/${datasetId}?sql=SELECT ${columns.join(
                 ' , '
             )} FROM ${tableName} ${sortSql} ${filtersSql} ${paginationSql}`
+
+            console.log(url)
             const tableDataRes = await fetch(url)
             const tableData: DataResponse = await tableDataRes.json()
             const data = tableData.data
@@ -174,5 +182,55 @@ export const rwRouter = createTRPCRouter({
                 if (e instanceof Error) error = e.message
                 throw Error(error)
             }
+        }),
+    createDatasetView: protectedProcedure
+        .input(
+            z.object({ view: createViewFormSchema, ckanDatasetId: z.string() })
+        )
+        .mutation(async ({ input, ctx }) => {
+            return createDatasetView(input.view).then( async (res) => {
+                await updateDatasetHasChartsFlag({
+                    ckanDatasetId: input.ckanDatasetId,
+                    session: ctx.session,
+                })
+                return res
+            })
+        }),
+    updateDatasetView: protectedProcedure
+        .input(
+            z.object({ view: editViewFormSchema, ckanDatasetId: z.string() })
+        )
+        .mutation(async ({ input, ctx }) => {
+            return editDatasetView(input.view).then( async (res) => {
+                await updateDatasetHasChartsFlag({
+                    ckanDatasetId: input.ckanDatasetId,
+                    session: ctx.session,
+                })
+                return res
+            })
+        }),
+    deleteDatasetView: protectedProcedure
+        .input(
+            z.object({
+                ckanDatasetId: z.string(),
+                rwDatasetId: z.string(),
+                id: z.string(),
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            return deleteDatasetView(input.rwDatasetId, input.id).then(
+                async (res) => {
+                    await updateDatasetHasChartsFlag({
+                        ckanDatasetId: input.ckanDatasetId,
+                        session: ctx.session,
+                    })
+                    return res
+                }
+            )
+        }),
+    getDatasetViews: publicProcedure
+        .input(z.object({ rwDatasetId: z.string() }))
+        .query(async ({ input }) => {
+            return await getDatasetViews({ rwDatasetId: input.rwDatasetId })
         }),
 })

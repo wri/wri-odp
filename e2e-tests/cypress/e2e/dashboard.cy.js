@@ -25,10 +25,15 @@ describe("Dashboard Test", () => {
 
   before(() => {
     cy.createOrganizationAPI(parentOrg);
-    cy.createDatasetAPI(parentOrg, datasetName, true);
+    cy.createDatasetAPI(parentOrg, datasetName, true, {
+        'notes': 'test',
+        'draft': 'true',
+        'approval_status': 'pending'
+      });
 
     cy.createOrganizationAPI(parentOrg2);
     cy.createDatasetAPI(parentOrg2, datasetName2, true);
+    
 
     cy.createGroupAPI(group);
     cy.createUserApi(user, email, "test1234");
@@ -63,8 +68,13 @@ describe("Dashboard Test", () => {
         });
       });
     });
+    cy.get("@dataset").then((dataset) => {
+      cy.createPendingDataset(dataset.id, dataset.name)
+    });
+
   });
 
+  
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
@@ -218,6 +228,31 @@ describe("Dashboard Test", () => {
     cy.contains("Delete Issue");
     cy.get("button").contains("Delete Issue").click();
   });
+
+  it("Should have reject dataset", () => {
+    cy.visit("/dashboard/approval-request");
+    cy.contains(datasetName,  { timeout: 30000 });
+     cy.get(`button#delete-tooltip-${datasetName}`)
+      .first()
+      .click({ force: true });
+
+    cy.get("input[id=title]").type("Test");
+    cy.get(".tiptap.ProseMirror").type("Test");
+    cy.contains('button', 'Reject and send feedback').click({ force: true });
+    cy.contains(`Dataset ${datasetName} is successfully rejected`);
+
+  })
+
+  it("Should have approve dataset", () => {
+    cy.visit("/dashboard/approval-request");
+    cy.contains(datasetName,  { timeout: 30000 });
+    cy.get(`button#approve-tooltip-${datasetName}`)
+      .first()
+      .click({ force: true });
+    cy.contains('button', 'Approve Dataset').click({ force: true });
+    cy.contains(`Successfully approved the dataset ${datasetName}`);
+  })
+  
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);

@@ -3,6 +3,8 @@ import Image from 'next/image'
 import Topic from '@/interfaces/topic.interface'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 
+
+
 export default function TopicCard({
     topic,
     topicDetails,

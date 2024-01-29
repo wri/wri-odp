@@ -10,6 +10,8 @@ import type {
     Collaborator,
     GroupsmDetails,
     WriUser,
+    PendingDataset,
+    OpenIn,
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
@@ -29,6 +31,10 @@ import type {
     NewNotificationInputType,
     NotificationType,
 } from '@/schema/notification.schema'
+import { View } from '@/interfaces/dataset.interface'
+import { CreateViewFormSchema, EditViewFormSchema, ViewFormSchema } from '@/schema/view.schema'
+import { getLayerRw } from '@/server/api/routers/dataset'
+import { convertLayerObjToForm, getRawObjFromApiSpec } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -47,13 +53,11 @@ export async function searchHierarchy({
         if (isSysadmin) {
             let urLink = ''
             if (q) {
-                urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group' ? 'group_list' : 'organization_list'
-                }?q=${q}&all_fields=True`
+                urLink = `${env.CKAN_URL}/api/3/action/${group_type == 'group' ? 'group_list' : 'organization_list'
+                    }?q=${q}&all_fields=True`
             } else {
-                urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group' ? 'group_list' : 'organization_list'
-                }?all_fields=True`
+                urLink = `${env.CKAN_URL}/api/3/action/${group_type == 'group' ? 'group_list' : 'organization_list'
+                    }?all_fields=True`
             }
             response = await fetch(urLink, {
                 headers: {
@@ -64,10 +68,9 @@ export async function searchHierarchy({
             groups = data.success === true ? data.result : []
         } else {
             response = await fetch(
-                `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group'
-                        ? 'group_list_authz'
-                        : 'organization_list_for_user'
+                `${env.CKAN_URL}/api/3/action/${group_type == 'group'
+                    ? 'group_list_authz'
+                    : 'organization_list_for_user'
                 }?all_fields=True`,
                 {
                     headers: {
@@ -206,10 +209,8 @@ export async function getAllOrganizations({
         const orgList = await Promise.all(
             [0, 1, 2, 3, 4, 5].map(async (i) => {
                 const response = await fetch(
-                    `${
-                        env.CKAN_URL
-                    }/api/3/action/organization_list?all_fields=True&limit=${
-                        (i + 1) * 25
+                    `${env.CKAN_URL
+                    }/api/3/action/organization_list?all_fields=True&limit=${(i + 1) * 25
                     }&offset=${i * 25}`,
                     {
                         headers: {
@@ -511,6 +512,7 @@ export async function getOneDataset(
     datasetName: string,
     session: Session | null
 ) {
+    console.log("!!!!")
     const user = session?.user
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
@@ -521,6 +523,7 @@ export async function getOneDataset(
             },
         }
     )
+    console.log("!!!!")
     const dataset: CkanResponse<WriDataset> = await datasetRes.json()
     if (!dataset.success && dataset.error) {
         if (dataset.error.message) throw Error(dataset.error.message)
@@ -558,13 +561,93 @@ export async function getOneDataset(
         }
     }
 
+    const resources = await Promise.all(
+        dataset.result.resources.map(async (r) => {
+            const _views = await getResourceViews({
+                id: r.id,
+                session: session,
+            })
+
+            if (r.url_type === 'upload' || r.url_type === 'link') {
+                const resourceHasChartView =
+                    r.datastore_active &&
+                    _views.some(
+                        (v) =>
+                            v.view_type == 'custom' &&
+                            v.config_obj.type == 'chart'
+                    )
+
+                r._hasChartView = resourceHasChartView
+
+                return { ...r, _views }
+            }
+            if (!r.url) return r
+            const layerObj = await getLayerRw(r.url)
+            if (r.url_type === 'layer')
+                return {
+                    ...r,
+                    layerObj: convertLayerObjToForm(layerObj),
+                }
+            if (r.url_type === 'layer-raw')
+                return {
+                    ...r,
+                    layerObjRaw: getRawObjFromApiSpec(layerObj),
+                }
+            return r
+        })
+    )
+
+    console.log("!!!!")
+
     return {
         ...dataset.result,
+        resources,
         open_in: dataset.result.open_in
-            ? Object.values(dataset.result.open_in)
+            ? JSON.parse(dataset.result.open_in as unknown as string) as OpenIn[]
             : [],
+        spatial,
+    }
+}
+
+export async function getOnePendingDataset(
+    datasetName: string,
+    session: Session | null
+) {
+    const user = session?.user
+    const response = await fetch(
+        `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
+        {
+            headers: {
+                Authorization: `${user?.apikey ?? ''}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const data = (await response.json()) as CkanResponse<PendingDataset>
+    if (!data.success && data.error) {
+        const erroInfo = JSON.stringify(data.error).toLowerCase()
+        if (erroInfo.includes('not found')) {
+            return null
+         }
+        throw Error(JSON.stringify(data.error))
+    }
+    const dataset = data.result.package_data
+    
+    let spatial = null
+    if (dataset.spatial) {
+        try {
+            spatial = JSON.parse(dataset.spatial)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+    
+    return {
+        ...data.result.package_data,
+        open_in: dataset.open_in ? JSON.parse(dataset.open_in as unknown as string) as OpenIn[] : [],
         spatial
     }
+
 }
 
 export async function upsertCollaborator(
@@ -1028,23 +1111,20 @@ export async function generateMemberEmail(
         >
         const teamOrTopicName = teamOrTopicData.result.name
         const teamOrTopicTitle = teamOrTopicData.result.title ?? teamOrTopicName
-        const objectLink = `<a href="${portalUrl}/${
-            notification.object_type === 'team' ? 'teams' : 'topics'
-        }/${teamOrTopicData.result.name}">${teamOrTopicTitle}</a>`
+        const objectLink = `<a href="${portalUrl}/${notification.object_type === 'team' ? 'teams' : 'topics'
+            }/${teamOrTopicData.result.name}">${teamOrTopicTitle}</a>`
 
         if (actionType[0] === 'member') {
             const role = actionType[2]
             const action = actionType[1]
             if (action === 'removed') {
-                subMsg = `${action} you as a member${
-                    role !== 'member' ? ` (${role})` : ''
-                } from the ${notification.object_type}`
+                subMsg = `${action} you as a member${role !== 'member' ? ` (${role})` : ''
+                    } from the ${notification.object_type}`
                 subject = `Membership role ${action} from ${notification.object_type} ${teamOrTopicTitle}`
                 msg = `${senderUserLink} ${subMsg} ${objectLink}`
             } else if (action === 'added') {
-                subMsg = `${action} you as a member${
-                    role !== 'member' ? ` (${role})` : ''
-                } in the ${notification.object_type}`
+                subMsg = `${action} you as a member${role !== 'member' ? ` (${role})` : ''
+                    } in the ${notification.object_type}`
                 subject = `Membership role ${action} to ${notification.object_type} ${teamOrTopicTitle}`
                 msg = `${senderUserLink} ${subMsg} ${objectLink}`
             } else if (action === 'updated') {
@@ -1274,50 +1354,56 @@ export async function getTopicDetails({
 }
 
 export async function getRecipient({
-  owner_org,
-  session,
+    owner_org,
+    session,
 }: {
-  owner_org: string;
-  session: Session;
+    owner_org: string
+    session: Session
 }): Promise<string[]> {
-  try {
-    const response = await fetch(
-      `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
-      {
-        headers: {
-          Authorization: `${session.user?.apikey ?? ''}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    try {
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
+            {
+                headers: {
+                    Authorization: `${session.user?.apikey ?? ''}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch organization information: ${response.statusText}`);
+        if (!response.ok) {
+            throw new Error(
+                `Failed to fetch organization information: ${response.statusText}`
+            )
+        }
+
+        const responseData =
+            (await response.json()) as CkanResponse<WriOrganization | null>
+        const organization: WriOrganization | null =
+            responseData.success === true ? responseData.result : null
+
+        if (organization) {
+            const members = organization.users!
+
+            // Filter members to include only admins and editors
+            const adminAndEditorMembers = members.filter(
+                (member) =>
+                    member.capacity === 'admin' || member.capacity === 'editor'
+            )
+
+            // Extract member IDs into an array
+            const memberIds = adminAndEditorMembers.map((member) => member.id!)
+
+            return memberIds
+        } else {
+            throw new Error(
+                `Failed to fetch organization information: ${responseData.error?.message}`
+            )
+        }
+    } catch (error) {
+        console.error(`Error in getRecipient function`)
+        throw error
     }
-
-    const responseData = (await response.json()) as CkanResponse<WriOrganization | null>
-    const organization: WriOrganization | null =
-        responseData.success === true ? responseData.result : null
-
-    if (organization) {
-      const members = organization.users!;
-
-      // Filter members to include only admins and editors
-      const adminAndEditorMembers = members.filter(
-        (member) => member.capacity === 'admin' || member.capacity === 'editor'
-      );
-
-      // Extract member IDs into an array
-      const memberIds = adminAndEditorMembers.map((member) => member.id!);
-
-      return memberIds;
-    } else {
-      throw new Error(`Failed to fetch organization information: ${responseData.error?.message}`);
-    }
-  } catch (error) {
-    console.error(`Error in getRecipient function`);
-    throw error;
-  }
 }
 
 export async function sendIssueOrCommentNotigication({
@@ -1327,6 +1413,218 @@ export async function sendIssueOrCommentNotigication({
     dataset_id,
     session,
     title,
+    action,
+}: {
+    owner_org: string | null
+    creator_id: string | null
+    collaborator_id: string[] | null
+    dataset_id: string
+    session: Session
+    title: string
+    action: string
+}) {
+    try {
+        let recipientIds: string[] = []
+
+        if (owner_org) {
+            recipientIds = await getRecipient({
+                owner_org: owner_org,
+                session: session,
+            })
+        } else if (creator_id) {
+            recipientIds = [creator_id]
+        }
+
+        if (collaborator_id) {
+            recipientIds = recipientIds.concat(collaborator_id)
+        }
+
+        if (recipientIds.length > 0) {
+            const titleNotification = title.split(' ').join('nbsp;')
+            const notificationPromises = recipientIds
+                .filter((recipientId) => recipientId !== session.user.id)
+                .map((recipientId) => {
+                    return createNotification(
+                        recipientId,
+                        session.user.id,
+                        `issue_${action}_${titleNotification}`,
+                        'dataset',
+                        dataset_id,
+                        true
+                    )
+                })
+
+            await Promise.all(notificationPromises)
+        }
+    } catch (error) {
+        console.error(error)
+        throw Error('Error in sending issue /comment notification')
+    }
+}
+
+export async function getResourceViews({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const url = `${env.CKAN_URL}/api/action/resource_view_list?id=${id}`
+    const viewsRes = await fetch(url, { headers })
+
+    const views: CkanResponse<View[]> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
+
+export async function getResourceView({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_show?id=${id}`,
+        { headers }
+    )
+    const views: CkanResponse<View> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
+export async function createResourceView({
+    view,
+    session,
+}: {
+    view: CreateViewFormSchema 
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_create`,
+        {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(view)
+        }
+    )
+    const views: CkanResponse<View[]> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
+export async function updateResourceView({
+    view,
+    session,
+}: {
+    view: EditViewFormSchema 
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_update`,
+        {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(view)
+        }
+    )
+    const views: CkanResponse<View[]> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
+export async function deleteResourceView({
+    id,
+    session,
+}: {
+    id: string,
+    session: Session | null
+}) {
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (session) {
+        headers['Authorization'] = session.user.apikey
+    }
+
+    const viewsRes = await fetch(
+        `${env.CKAN_URL}/api/action/resource_view_delete`,
+        {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({id})
+        }
+    )
+    const views: CkanResponse<View[]> = await viewsRes.json()
+
+    if (!views.success && views.error) {
+        if (views.error.message) throw Error(views.error.message)
+        throw Error(JSON.stringify(views.error))
+    }
+
+    return views.result
+}
+
+export async function sendGroupNotification({
+    owner_org,
+    creator_id,
+    collaborator_id,
+    dataset_id,
+    session,
     action
 }: {
         owner_org: string | null;
@@ -1334,7 +1632,6 @@ export async function sendIssueOrCommentNotigication({
         collaborator_id: string[] | null;
         dataset_id: string;
         session: Session,
-        title: string,
         action: string
     }) {
     try {
@@ -1352,14 +1649,13 @@ export async function sendIssueOrCommentNotigication({
         }
 
         if (recipientIds.length > 0) {
-            const titleNotification = title.split(" ").join("nbsp;")
             const notificationPromises = recipientIds
                 .filter((recipientId) => recipientId !== session.user.id)
                 .map((recipientId) => {
                 return createNotification(
                     recipientId,
                     session.user.id,
-                     `issue_${action}_${titleNotification}`,
+                     action,
                     'dataset',
                     dataset_id,
                     true
@@ -1372,4 +1668,173 @@ export async function sendIssueOrCommentNotigication({
         console.error(error);
         throw Error("Error in sending issue /comment notification");
     }
+}
+
+export async function getPackageDiff({
+    id,
+    session,
+}: {
+    id: string
+    session: Session | null
+}) {
+    const user = session?.user
+    const packageRes = await fetch(
+        `${env.CKAN_URL}/api/action/pending_diff_show?id=${id}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${user?.apikey ?? ''}`,
+            },
+        }
+    )
+    const packageData = (await packageRes.json()) as CkanResponse<Record<string, Record<string, never>>>
+    if (!packageData.success && packageData.error) {
+        if (packageData.error.message) throw Error(packageData.error.message)
+        throw Error(JSON.stringify(packageData.error))
+    }
+    return packageData.result
+}
+
+export async function getDatasetViews({ rwDatasetId }: { rwDatasetId: string }) {
+
+    const viewsRes = await fetch(
+        `https://api.resourcewatch.org/v1/dataset/${rwDatasetId}/widget`,
+        {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const result = await viewsRes.json()
+    return result.data.map((d: any) => ({
+        id: d.id,
+        ...d.attributes.widgetConfig,
+    })) as View[]
+}
+
+export async function getDatasetView({ id }: { id: string }) {
+    const viewsRes = await fetch(
+        `https://api.resourcewatch.org/v1/widget/${id}`,
+        {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const result = await viewsRes.json()
+    return {
+        id: result.data.id,
+        ...result.data.attributes.widgetConfig,
+    }
+}
+
+export async function patchDataset({ dataset, session }: { dataset: Partial<WriDataset>, session: Session }) {
+    const datasetRes = await fetch(`${env.CKAN_URL}/api/action/package_patch`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${session.user.apikey}`,
+        },
+        body: JSON.stringify(dataset),
+    })
+
+    const datasetObj: CkanResponse<WriDataset> = await datasetRes.json()
+    if (!datasetObj.success && datasetObj.error) {
+        if (datasetObj.error.message) throw Error(datasetObj.error.message)
+        throw Error(JSON.stringify(datasetObj.error))
+    }
+}
+
+export async function updateDatasetHasChartsFlag({
+    ckanDatasetId,
+    session
+}: {
+    ckanDatasetId: string
+    session: Session
+    }) {
+    const ckanDataset = await getOneDataset(ckanDatasetId, session)
+    const ckanViews =
+        ckanDataset.resources?.map((r) => r._views).flat() ?? []
+    const ckanHasChartViews = ckanViews.some(
+        (v) => v?.config_obj?.type == 'chart'
+    )
+    let hasChartViews = ckanHasChartViews
+
+    if (ckanDataset?.rw_id) {
+        const rwDatasetViews = await getDatasetViews({
+            rwDatasetId: ckanDataset.rw_id,
+        })
+        const rwHasChartViews = rwDatasetViews.some(
+            (v) => v?.config_obj?.type == 'chart'
+        )
+
+        hasChartViews = hasChartViews || rwHasChartViews
+    }
+
+    await patchDataset({
+        session,
+        dataset: { id: ckanDatasetId, has_chart_views: hasChartViews },
+    })
+}
+
+
+export async function createDatasetView(input: CreateViewFormSchema) {
+    const createRes = await fetch(
+        `https://api.resourcewatch.org/v1/dataset/${input.resource_id}/widget`,
+        {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            // TODO: should application be the same as on the dataset metadata?
+            body: JSON.stringify({
+                name: input.title,
+                application: ['rw'],
+                widgetConfig: input,
+            }),
+        }
+    )
+    const result = await createRes.json()
+    return result
+}
+
+export async function editDatasetView(input: EditViewFormSchema) {
+    const createRes = await fetch(
+        `https://api.resourcewatch.org/v1/dataset/${input.resource_id}/widget/${input.id}`,
+        {
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            // TODO: should application be the same as on the dataset metadata?
+            body: JSON.stringify({
+                name: input.title,
+                application: ['rw'],
+                widgetConfig: input,
+            }),
+        }
+    )
+    const result = await createRes.json()
+    return result
+}
+
+export async function deleteDatasetView(datasetId: string, id: string) {
+    const createRes = await fetch(
+        `https://api.resourcewatch.org/v1/dataset/${datasetId}/widget/${id}`,
+        {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${env.RW_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const result = await createRes.json()
+    return result
 }

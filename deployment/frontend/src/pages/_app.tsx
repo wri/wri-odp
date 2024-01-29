@@ -50,7 +50,14 @@ const MyApp: AppType<{ session: Session | null }> = ({
     pageProps: { session, ...pageProps },
 }: AppProps) => {
     const [queryClient] = useState(() => new QueryClient())
-    const { initialZustandState, dataset } = pageProps
+    let { initialZustandState, dataset } = pageProps
+
+    if (typeof dataset == 'string') {
+        dataset = JSON.parse(dataset)
+    }
+    if (typeof initialZustandState?.dataset == 'string') {
+        initialZustandState.dataset = JSON.parse(initialZustandState.dataset)
+    }
 
     const newLayersState = new Map()
     if (initialZustandState && initialZustandState?.mapView?.layersParsed) {
@@ -66,7 +73,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     if (!activeLayerGroups?.length && dataset) {
         const layers = dataset?.resources
-            .filter((r: any) => r?.format == "Layer")
+            .filter((r: any) => r?.format == 'Layer')
             .map((r: any) => r?.rw_id)
 
         if (layers) {
