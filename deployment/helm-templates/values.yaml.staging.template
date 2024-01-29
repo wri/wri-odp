@@ -1,18 +1,15 @@
 ckan:
-  auth:
-    enable: false
   ckan:
     replicaCount: 2
     envVarsSecretName: ckan-cloud-centeralized-sql
     env:
       UWSGI_HARAKIRI: "50"
-      CKANEXT__DCAT__ENABLE_CONTENT_NEGOTIATION: "True"
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
-      CKAN_SITE_ID: wri-dev
-      CKAN_SITE_URL: https://wri.dev.ckan.datopian.com
+      CKAN_SITE_ID: wri-staging
+      CKAN_SITE_URL: https://wri.staging.ckan.datopian.com
       CKAN_HOMEPAGE_STYLE: "2"
-      CKAN__DATAPUSHER__URL: http://wri-dev-datapusher-svc:80/
+      CKAN__DATAPUSHER__URL: http://wri-staging-datapusher-svc:80/
       CKAN_SVC_PORT_80_TCP_PROTO: tcp
       CKAN__AUTH__ANON_CREATE_DATASET: "False"
       CKAN__AUTH__CREATE_DATASET_IF_NOT_IN_ORGANIZATION: "True"
@@ -26,7 +23,7 @@ ckan:
       CKAN__HARVEST__MQ__TYPE: redis
       CKAN__LOCALE_DEFAULT: en
       CKAN__RESOURCE_PROXY__MAX_FILE_SIZE: "100000000"
-      CKAN__SITE_TITLE: WRI OpenData Platform Dev
+      CKAN__SITE_TITLE: WRI OpenData Platform Staging
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
       CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
@@ -142,11 +139,11 @@ ckan:
     autoscaling:
       enable: false
     customResource: true
-    projectId: wri-dev
+    projectId: wri-staging
     resources: {}
     useProductionCerts: true
   ingress:
-    domain: wri.dev.ckan.datopian.com
+    domain: wri.staging.ckan.datopian.com
     enable: true
     enableExternal: false
     extraAnnotations:
@@ -166,45 +163,47 @@ ckan:
           }
         }
     hosts:
-      - host: wri.dev.console.datopian.com
+      - host: wri.staging.console.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-dev-hasura-svc
-      - host: wri.dev.data.datopian.com
+            service: wri-staging-hasura-svc
+      - host: wri.staging.data.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-dev-data-api-svc
-      - host: wri.dev.ckan.datopian.com
+            service: wri-staging-data-api-svc
+      - host: wri.staging.ckan.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-dev-ckan-svc
-      - host: wri.dev.frontend.datopian.com
+            service: wri-staging-ckan-svc
+      - host: wri.staging.frontend.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-dev-frontend-svc
+            service: wri-staging-frontend-svc
     ingressNamespace: nginx-ingress
     ingressClass: nginx
     tls:
       - hosts:
-          - wri.dev.ckan.datopian.com
-        secretName: wri.dev.ckan.datopian.com
+          - wri.staging.ckan.datopian.com
+        secretName: wri.staging.ckan.datopian.com
       - hosts:
-          - wri.dev.data.datopian.com
-        secretName: wri.dev.data.datopian.com
+          - wri.staging.data.datopian.com
+        secretName: wri.staging.data.datopian.com
       - hosts:
-          - wri.dev.frontend.datopian.com
-        secretName: wri.dev.frontend.datopian.com
+          - wri.staging.frontend.datopian.com
+        secretName: wri.staging.frontend.datopian.com
       - hosts:
-          - wri.dev.console.datopian.com
-        secretName: wri.dev.console.datopian.com
+          - wri.staging.console.datopian.com
+        secretName: wri.staging.console.datopian.com
+  auth:
+    enable: false
   solr:
     enable: false
     image:
