@@ -30,6 +30,7 @@ import { queryRw } from '@/utils/rw'
 import { DefaultTooltip } from '../_shared/Tooltip'
 import { WriDataset } from '@/schema/ckan.schema'
 import { Button, LoaderButton } from '../_shared/Button'
+import { Transform } from 'plotly.js'
 const Chart = dynamic(
     () => import('@/components/datasets/visualizations/Chart'),
     {
@@ -151,7 +152,10 @@ export default function ChartViewEditor({
              *
              */
             const dimensionColName = formData.config.query.dimension.value
-            const categoryColName = formData.config.query.category?.value
+            let categoryColName = formData.config.query.category?.value || ''
+            if (chartType == 'pie') {
+                categoryColName = ''
+            }
             const isGrouped = !!categoryColName
             const measureColName = formData.config.query.measure.value
             const columns: string[] = [dimensionColName, measureColName]
@@ -221,8 +225,7 @@ export default function ChartViewEditor({
                     tickangle:
                         formData.config.chart.labels?.y?.angle?.value ?? 'auto',
                 },
-                showlegend:
-                    formData.config.chart.legends.enabled?.value || false,
+                showlegend: true,
                 legend: {
                     title: { text: formData.config.chart.legends.title },
                 },
@@ -232,14 +235,87 @@ export default function ChartViewEditor({
             const sortByCol = formData.config.chart?.sorting?.by?.value
             const sortOrder = formData.config.chart?.sorting?.order?.value
 
+            if (sortByCol && sortOrder) {
+                tableData.sort((rowA: any, rowB: any) => {
+                    const sortByColName =
+                        sortByCol == 'data' ? measureColName : dimensionColName
+
+                    const sample = rowA[sortByColName][0]
+
+                    const isNumeric = !isNaN(parseFloat(sample))
+
+                    rowA = rowA[sortByColName]
+                    rowB = rowB[sortByColName]
+
+                    if (isNumeric) {
+                        if (sortOrder == 'DESC') {
+                            return parseFloat(rowB) - parseFloat(rowA)
+                        } else {
+                            return parseFloat(rowA) - parseFloat(rowB)
+                        }
+                    } else {
+                        if (sortOrder == 'DESC') {
+                            return rowB.localeCompare(rowA)
+                        } else {
+                            return rowA.localeCompare(rowB)
+                        }
+                    }
+                })
+            }
+
             // Tooltips
             const tooltipsEnabled =
                 formData.config.chart.tooltips?.enabled?.value
 
             const tooltipsFormat = formData.config.chart.tooltips?.format?.value
 
+            //  Ungrouped bar chart = each bar should be a trace
+            //  and colors are applied with layout.colorway
+            if (chartType == 'bar' && !isGrouped) {
+                categoryColName = dimensionColName
+                const uniqueCategories = [
+                    ...new Set(
+                        tableData.map((row: any) => row[dimensionColName])
+                    ),
+                ]
+                const uniqueCategoriesQty = uniqueCategories.length
+                const startingColor = formData.config.chart.colors.starting
+                const endingColor = formData.config.chart.colors.ending
+
+                // @ts-ignore
+                const colors = uniqueCategories.map((value: any, i: number) => {
+                    return getGradientColor(
+                        startingColor,
+                        endingColor,
+                        i / uniqueCategoriesQty
+                    )
+                })
+
+                layout.colorway = colors
+            } else if (['bar', 'scatter'].includes(chartType) && isGrouped) {
+                const uniqueCategories = [
+                    ...new Set(
+                        tableData.map((row: any) => row[categoryColName])
+                    ),
+                ]
+                const uniqueCategoriesQty = uniqueCategories.length
+                const startingColor = formData.config.chart.colors.starting
+                const endingColor = formData.config.chart.colors.ending
+
+                // @ts-ignore
+                const colors = uniqueCategories.map((value: any, i: number) => {
+                    return getGradientColor(
+                        startingColor,
+                        endingColor,
+                        i / uniqueCategoriesQty
+                    )
+                })
+
+                layout.colorway = colors
+            }
+
             let categories = []
-            if (isGrouped) {
+            if (categoryColName) {
                 const categoryNames = tableData.map(
                     (row: any) => row[categoryColName]
                 )
@@ -290,60 +366,30 @@ export default function ChartViewEditor({
                     trace.values = category.y
                 }
 
-                const dataPointsQty = category.x.length
+                if (['pie'].includes(chartType)) {
+                    const dataPointsQty = category.x.length
+                    const startingColor = formData.config.chart.colors.starting
+                    const endingColor = formData.config.chart.colors.ending
 
-                const startingColor = formData.config.chart.colors.starting
-                const endingColor = formData.config.chart.colors.ending
-
-                // @ts-ignore
-                const colors = category.x.map((value: any, i: number) => {
-                    return getGradientColor(
-                        startingColor,
-                        endingColor,
-                        i / dataPointsQty
-                    )
-                })
-
-                trace.marker = {
-                    color: colors,
-                    colors: colors,
-                }
-
-                if (sortByCol && sortOrder) {
-                    const colName =
-                        sortByCol == 'data' ? measureColName : dimensionColName
                     // @ts-ignore
-                    const sample = tableData[0][colName]
+                    const colors = category.x.map((value: any, i: number) => {
+                        return getGradientColor(
+                            startingColor,
+                            endingColor,
+                            i / dataPointsQty
+                        )
+                    })
 
-                    const isNumeric =
-                        !isNaN(sample) || !isNaN(parseFloat(sample))
-
-                    if (isNumeric) {
-                        let target = 'y'
-                        if (['bar', 'line'].includes(chartType)) {
-                            target = sortByCol == 'data' ? 'y' : 'x'
-                        } else if (['pie'].includes(chartType)) {
-                            target = sortByCol == 'data' ? 'values' : 'labels'
-                        }
-
-                        const sortTransform: any = {
-                            type: 'sort',
-                            target: target,
-                            order:
-                                sortOrder == 'DESC'
-                                    ? 'descending'
-                                    : 'ascending',
-                        }
-
-                        if (trace.transforms) {
-                            trace.transforms.push(sortTransform)
-                        } else {
-                            trace.transforms = [sortTransform]
-                        }
-                    } else {
-                        layout.xaxis = {
-                            categoryorder: `category ${sortOrder == 'ASC' ? 'ascending' : 'descending'}`,
-                        }
+                    trace.marker = {
+                        color: colors,
+                        colors: colors,
+                    }
+                } else if (
+                    ['scatter'].includes(chartType) &&
+                    !categoryColName
+                ) {
+                    trace.marker = {
+                        color: formData.config.chart.colors.starting,
                     }
                 }
 
@@ -556,45 +602,48 @@ export default function ChartViewEditor({
                                                     errors={errors}
                                                 />
                                             </InputGroup>
-                                            <InputGroup
-                                                label="Category column"
-                                                className="sm:grid-cols-1 gap-x-2"
-                                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                                info="Used for data point grouping"
-                                            >
-                                                <SimpleSelect
-                                                    id="category"
-                                                    formObj={formObj}
-                                                    name="config.query.category"
-                                                    placeholder="E.g. Country"
-                                                    options={
-                                                        withEmptyOption(
-                                                            fields?.columns
-                                                                .filter(
-                                                                    (f) =>
-                                                                        watch(
-                                                                            'config.query.dimension'
+                                            {watch('config.chart.type')
+                                                ?.value != 'pie' && (
+                                                    <InputGroup
+                                                        label="Category column"
+                                                        className="sm:grid-cols-1 gap-x-2"
+                                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                        info="Used for data point grouping"
+                                                    >
+                                                        <SimpleSelect
+                                                            id="category"
+                                                            formObj={formObj}
+                                                            name="config.query.category"
+                                                            placeholder="E.g. Country"
+                                                            options={
+                                                                withEmptyOption(
+                                                                    fields?.columns
+                                                                        .filter(
+                                                                            (f) =>
+                                                                                watch(
+                                                                                    'config.query.dimension'
+                                                                                )
+                                                                                    ?.value !=
+                                                                                f.key &&
+                                                                                watch(
+                                                                                    'config.query.measure'
+                                                                                )
+                                                                                    ?.value !=
+                                                                                f.key
                                                                         )
-                                                                            ?.value !=
-                                                                        f.key &&
-                                                                        watch(
-                                                                            'config.query.measure'
+                                                                        .map(
+                                                                            (
+                                                                                field
+                                                                            ) => ({
+                                                                                label: field.name,
+                                                                                value: field.key,
+                                                                            })
                                                                         )
-                                                                            ?.value !=
-                                                                        f.key
-                                                                )
-                                                                .map(
-                                                                    (
-                                                                        field
-                                                                    ) => ({
-                                                                        label: field.name,
-                                                                        value: field.key,
-                                                                    })
-                                                                )
-                                                        ) ?? []
-                                                    }
-                                                />
-                                            </InputGroup>
+                                                                ) ?? []
+                                                            }
+                                                        />
+                                                    </InputGroup>
+                                                )}
                                             <InputGroup
                                                 label="Aggregation function"
                                                 className="sm:grid-cols-1 gap-x-2"
@@ -637,7 +686,21 @@ export default function ChartViewEditor({
                                                             formObj={formObj}
                                                             name="config.chart.sorting.by"
                                                             placeholder="Data or Labels"
-                                                            options={sortByOptions}
+                                                            options={
+                                                                watch(
+                                                                    'config.chart.type'
+                                                                )?.value ==
+                                                                    'scatter' &&
+                                                                    watch(
+                                                                        'config.query.category'
+                                                                    )?.value
+                                                                    ? sortByOptions.filter(
+                                                                        (o) =>
+                                                                            o.value !=
+                                                                            'data'
+                                                                    )
+                                                                    : sortByOptions
+                                                            }
                                                         />
                                                         <ErrorDisplay
                                                             name="config.chart.sorting.by"
@@ -738,21 +801,6 @@ export default function ChartViewEditor({
                                     <Accordion text="Legends">
                                         <div className="grow flex flex-col space-y-4">
                                             <InputGroup
-                                                label="Enabled"
-                                                className="sm:grid-cols-1 gap-x-2"
-                                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                            >
-                                                <SimpleSelect
-                                                    id="legends-enabled"
-                                                    formObj={formObj}
-                                                    name="config.chart.legends.enabled"
-                                                    placeholder=""
-                                                    options={
-                                                        legendEnabledOptions
-                                                    }
-                                                />
-                                            </InputGroup>
-                                            <InputGroup
                                                 label="Title"
                                                 className="sm:grid-cols-1 gap-x-2"
                                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
@@ -761,11 +809,6 @@ export default function ChartViewEditor({
                                                     {...register(
                                                         'config.chart.legends.title'
                                                     )}
-                                                    disabled={
-                                                        !watch(
-                                                            'config.chart.legends.enabled'
-                                                        )?.value
-                                                    }
                                                 />
                                                 <ErrorDisplay
                                                     name="config.chart.legends.title"
@@ -968,11 +1011,6 @@ const labelAngleOptions = [
     { value: 45, label: '45º' },
     { value: 90, label: '90º' },
     { value: 180, label: '180º' },
-]
-
-const legendEnabledOptions = [
-    { value: false, label: 'No', default: true },
-    { value: true, label: 'Yes' },
 ]
 
 const tooltipsEnabledOptions = [
