@@ -27,5 +27,6 @@ def pending_dataset_delete(context: Context, data_dict: DataDict):
 
     if not pending_dataset:
         raise tk.ValidationError(_(f"Pending Dataset not found: {package_id}"))
-
+    # was returining pending_dataset db object
+    # change to return package_id or can  none either way
     return package_id
