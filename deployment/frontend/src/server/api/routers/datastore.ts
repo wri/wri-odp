@@ -60,11 +60,11 @@ export const datastoreRouter = createTRPCRouter({
                                       .filter((v) => v.value !== '')
                                       .map(
                                           (v) =>
-                                              `"${filter.id}" ${
+                                              `( "${filter.id}" ${
                                                   v.operation.value
                                               } '${v.value}' ${v.link ?? ''} `
                                       )
-                                      .join('')}`
+                                      .join('')} )`
                           )
                           .join(' AND ')
                     : ''
@@ -80,7 +80,6 @@ export const datastoreRouter = createTRPCRouter({
             }/api/action/datastore_search_sql?sql=SELECT ${parsedColumns.join(
                 ' , '
             )} FROM "${resourceId}" ${filtersSql} ${sortSql} ${groupBySql} ${paginationSql}`
-            console.log('URL', url)
             const tableDataRes = await fetch(url, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -95,7 +94,6 @@ export const datastoreRouter = createTRPCRouter({
                 }
                 throw Error(JSON.stringify(tableData.error))
             }
-            console.log(tableData)
             const data = tableData.result.records
             return data
         }),
