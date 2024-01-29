@@ -106,7 +106,7 @@ export interface WriDataset extends Dataset {
     rw_id?: string
     learn_more?: string
     restrictions?: string
-    open_in: OpenIn[]
+    open_in: string
     extras?: Extra[]
     spatial?: any
     spatial_address?: string

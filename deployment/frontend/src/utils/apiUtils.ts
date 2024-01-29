@@ -602,7 +602,7 @@ export async function getOneDataset(
         ...dataset.result,
         resources,
         open_in: dataset.result.open_in
-            ? Object.values(dataset.result.open_in)
+            ? JSON.parse(dataset.result.open_in)
             : [],
         spatial,
     }
@@ -643,7 +643,7 @@ export async function getOnePendingDataset(
     
     return {
         ...data.result.package_data,
-        open_in: dataset.open_in ? Object.values(dataset.open_in) : [],
+        open_in: dataset.open_in ? JSON.parse(dataset.open_in) : [],
         spatial
     }
 
