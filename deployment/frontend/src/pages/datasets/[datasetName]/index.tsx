@@ -63,6 +63,7 @@ export async function getServerSideProps(
     const session = await getServerAuthSession(context)
     try {
         let prevdataset = await getOneDataset(datasetName, session)
+        console.log('GET HERE DATASET')
         const pendingDataset = await getOnePendingDataset(
             prevdataset.id,
             session
@@ -152,7 +153,7 @@ export async function getServerSideProps(
             },
         }
     } catch (e) {
-        console.log("DATASET PAGE ERROR")
+        console.log('DATASET PAGE ERROR')
         console.log(e)
         console.log((e as any)?.message)
         return {

@@ -523,7 +523,7 @@ export async function getOneDataset(
     datasetName: string,
     session: Session | null
 ) {
-    console.log("!!!!")
+    console.log('!!!!')
     const user = session?.user
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
@@ -534,7 +534,7 @@ export async function getOneDataset(
             },
         }
     )
-    console.log("!!!!")
+    console.log('!!!!')
     const dataset: CkanResponse<WriDataset> = await datasetRes.json()
     if (!dataset.success && dataset.error) {
         if (dataset.error.message) throw Error(dataset.error.message)
@@ -563,10 +563,12 @@ export async function getOneDataset(
         dataset.result.provider = datasetRw.data.attributes.provider
         dataset.result.tableName = datasetRw.data.attributes.tableName
     } else {
+        console.log('IN BLAHBLAH BLAH HERE')
         const resource = dataset.result.resources.filter(
             (x) => x.format?.toLowerCase() === 'layer'
         )
-        if (resource) {
+
+        if (resource.length) {
             const layer = resource[0]!
             dataset.result.connectorType = layer.connectorType
             dataset.result.connectorUrl = layer.connectorUrl
@@ -647,7 +649,7 @@ export async function getOneDataset(
         })
     )
 
-    console.log("!!!!")
+    console.log('!!!!')
 
     return {
         ...dataset.result,
@@ -688,11 +690,13 @@ export async function getOnePendingDataset(
         const resource = dataset.resources.filter(
             (x) => x.format?.toLowerCase() === 'layer'
         )
-        const layer = resource[0]!
-        dataset.connectorType = layer.connectorType
-        dataset.connectorUrl = layer.connectorUrl
-        dataset.provider = layer.provider
-        dataset.tableName = layer.tableName
+        if (resource.length) {
+            const layer = resource[0]!
+            dataset.connectorType = layer.connectorType
+            dataset.connectorUrl = layer.connectorUrl
+            dataset.provider = layer.provider
+            dataset.tableName = layer.tableName
+        }
     }
 
     console.log('IN HERE BERFORE RESOUIRCES: ', dataset.resources)
@@ -1804,8 +1808,11 @@ export async function getPackageDiff({
     return packageData.result
 }
 
-export async function getDatasetViews({ rwDatasetId }: { rwDatasetId: string }) {
-
+export async function getDatasetViews({
+    rwDatasetId,
+}: {
+    rwDatasetId: string
+}) {
     const viewsRes = await fetch(
         `https://api.resourcewatch.org/v1/dataset/${rwDatasetId}/widget`,
         {
@@ -1841,7 +1848,13 @@ export async function getDatasetView({ id }: { id: string }) {
     }
 }
 
-export async function patchDataset({ dataset, session }: { dataset: Partial<WriDataset>, session: Session }) {
+export async function patchDataset({
+    dataset,
+    session,
+}: {
+    dataset: Partial<WriDataset>
+    session: Session
+}) {
     const datasetRes = await fetch(`${env.CKAN_URL}/api/action/package_patch`, {
         method: 'POST',
         headers: {
@@ -1860,14 +1873,13 @@ export async function patchDataset({ dataset, session }: { dataset: Partial<WriD
 
 export async function updateDatasetHasChartsFlag({
     ckanDatasetId,
-    session
+    session,
 }: {
     ckanDatasetId: string
     session: Session
-    }) {
+}) {
     const ckanDataset = await getOneDataset(ckanDatasetId, session)
-    const ckanViews =
-        ckanDataset.resources?.map((r) => r._views).flat() ?? []
+    const ckanViews = ckanDataset.resources?.map((r) => r._views).flat() ?? []
     const ckanHasChartViews = ckanViews.some(
         (v) => v?.config_obj?.type == 'chart'
     )
@@ -1889,7 +1901,6 @@ export async function updateDatasetHasChartsFlag({
         dataset: { id: ckanDatasetId, has_chart_views: hasChartViews },
     })
 }
-
 
 export async function createDatasetView(input: CreateViewFormSchema) {
     const createRes = await fetch(
