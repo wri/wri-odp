@@ -22,7 +22,7 @@ export function DatastoreViewCard({
     const createMutation = api.dataset.createResourceView.useMutation()
     const updateMutation = api.dataset.updateResourceView.useMutation()
 
-    const onSave = (mode: string, view: View) => {
+    const onSave = (mode: string, view: View, onError: () => void, onSuccess: () => void) => {
         if (mode == 'new') {
             createMutation.mutate(
                 {
@@ -35,10 +35,14 @@ export function DatastoreViewCard({
                 {
                     onError: (e) => {
                         toast(e.message, { type: 'error' })
+                        onError()
                     },
                     onSuccess: () => {
-                        toast('The new view was successfully created')
+                        toast('The new view was successfully created', {
+                            type: 'success',
+                        })
                         setMode('saved')
+                        onSuccess()
                     },
                 }
             )
@@ -55,10 +59,14 @@ export function DatastoreViewCard({
                 {
                     onError: (e) => {
                         toast(e.message, { type: 'error' })
+                        onError()
                     },
                     onSuccess: () => {
-                        toast('The view was successfully updated')
+                        toast('The view was successfully updated', {
+                            type: 'success',
+                        })
                         setMode('saved')
+                        onSuccess()
                     },
                 }
             )
