@@ -1,4 +1,4 @@
-# Tabular Previews
+# Tabular Previews + Datapusher
 
 Tabular previews are shown everytime you upload a CSV/TSV/TAB/XLS/XLSX/ODP file to the ODP, out of these, the one we suggest are CSVs, 
 thats because they are the simplest ones, and can be divided into bytesized chunks, this means that when you upload a CSV we can parse the 
@@ -16,7 +16,17 @@ This table has the following columns
 Once you save the dataset, an asynchronous job is setup that will read the files, infer the types, and using the data dictionary  will try to setup a SQL Table that can be queried directly
 You can see the logs for this job in the datapusher tab inside the edit page for the specifc datafile
 
+# Datapusher
+
 ![Datapusher](./datapusher.png)
+
+ The datapusher is run when
+
+- You first create the datafile
+- When you update the datafile
+- When you specifically click on "Submit to Datapusher"
+
+# Tabular Preview
 
 Once the job is completed, the file will be available for querying in the datastore, 
 this allows us to show the data in a tabular preview inside the dataset individual page, all the user has to do is click on "Add Tabular View"
