@@ -56,11 +56,11 @@ export const datastoreRouter = createTRPCRouter({
                       filters
                           .map(
                               (filter) =>
-                                  `( ${filter.value
+                                  `${filter.value
                                       .filter((v) => v.value !== '')
                                       .map(
                                           (v) =>
-                                              `"${filter.id}" ${
+                                              `( "${filter.id}" ${
                                                   v.operation.value
                                               } '${v.value}' ${v.link ?? ''} `
                                       )
@@ -79,7 +79,7 @@ export const datastoreRouter = createTRPCRouter({
                 env.CKAN_URL
             }/api/action/datastore_search_sql?sql=SELECT ${parsedColumns.join(
                 ' , '
-            )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${groupBySql} ${paginationSql}`
+            )} FROM "${resourceId}" ${filtersSql} ${sortSql} ${groupBySql} ${paginationSql}`
             const tableDataRes = await fetch(url, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -94,7 +94,6 @@ export const datastoreRouter = createTRPCRouter({
                 }
                 throw Error(JSON.stringify(tableData.error))
             }
-            console.log(tableData)
             const data = tableData.result.records
             return data
         }),
