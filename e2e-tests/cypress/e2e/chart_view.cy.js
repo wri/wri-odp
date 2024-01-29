@@ -38,7 +38,7 @@ describe("Chart view", () => {
       },
     },
     () => {
-      cy.visit("/dashboard/datasets/" + dataset + "/edit");
+      cy.visit("/dashboard/datasets/" + datasetName + "/edit");
       cy.contains("Data Files").click();
       cy.contains("Datapusher").click();
       cy.contains("Submit to Datapusher").click();
