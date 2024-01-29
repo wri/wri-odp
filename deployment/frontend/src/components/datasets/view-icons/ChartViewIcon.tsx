@@ -4,9 +4,7 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { ChartBarIcon } from '@heroicons/react/20/solid'
 
 export default function ChartViewIcon({ dataset }: { dataset: WriDataset }) {
-    const hasChartView = dataset?.resources?.some((r) =>
-        r?._views?.some((v: View) => v.config_obj.type == 'chart')
-    )
+    const hasChartView = dataset?.has_chart_views
 
     return hasChartView ? (
         <DefaultTooltip content="Chart View">

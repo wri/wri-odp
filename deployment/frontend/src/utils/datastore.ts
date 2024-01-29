@@ -5,10 +5,14 @@ import { Session } from 'next-auth'
 export async function sqlQueryDatastore(sql: string, session: Session | null) {
     const url = `${env.NEXT_PUBLIC_CKAN_URL}/api/action/datastore_search_sql?sql=${sql}`
 
-    const tableDataRes = await fetch(url, {
-        headers: {
-            Authorization: session?.user.apikey ?? '',
-        },
+    const tableDataRes = await fetch('/api/proxy', {
+        method: 'POST',
+        body: JSON.stringify({
+            url,
+            headers: {
+                Authorization: session?.user.apikey ?? '',
+            },
+        }),
     })
     const tableData: DataResponse = await tableDataRes.json()
     if (!tableData.success && tableData.error) {
@@ -87,7 +91,6 @@ export async function queryDatastore(
     const sql = `SELECT ${parsedColumns.join(
         ' , '
     )} FROM "${resourceId}" ${sortSql} ${filtersSql} ${groupBySql} ${paginationSql}`
-
 
     return { data: await sqlQueryDatastore(sql, session), sql }
 }

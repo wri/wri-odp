@@ -7,11 +7,14 @@ import { EditDataFile } from './EditDataFile'
 import { MetadataAccordion } from '../metadata/MetadataAccordion'
 import { api } from '@/utils/api'
 import ViewsList from '@/components/views/ViewsList'
+import { WriDataset } from '@/schema/ckan.schema'
 
 export function EditDataFilesSection({
     formObj,
+    dataset
 }: {
     formObj: UseFormReturn<DatasetFormType>
+    dataset: WriDataset
 }) {
     const { control, watch } = formObj
     const { fields, append, prepend, remove, swap, move, insert } =
@@ -38,7 +41,8 @@ export function EditDataFilesSection({
                     <ViewsList
                         provider="rw"
                         rwDatasetId={rwId}
-                        views={datasetViews}
+                        views={datasetViews ?? []}
+                        dataset={dataset}
                     />
                 </MetadataAccordion>
             )}
@@ -58,6 +62,7 @@ export function EditDataFilesSection({
                         field={field}
                         remove={() => remove(index)}
                         formObj={formObj}
+                        dataset={dataset}
                     />
                 )
             )}

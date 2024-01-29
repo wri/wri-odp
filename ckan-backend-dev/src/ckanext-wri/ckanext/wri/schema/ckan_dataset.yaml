@@ -4,226 +4,233 @@ about: A reimplementation of the default CKAN dataset schema
 about_url: http://github.com/ckan/ckanext-scheming
 
 dataset_fields:
-  - field_name: approval_status
-    label: Approval Status
-    preset: select
-    choices:
-      - value: pending
-        label: Pending
-      - value: approved
-        label: Approved
-      - value: rejected
-        label: Rejected
 
-  - field_name: draft
+- field_name: approval_status
+  label: Approval Status
+  preset: select
+  choices:
+  - value: pending
+    label: Pending
+  - value: approved
+    label: Approved
+  - value: rejected
+    label: Rejected
+
+- field_name: draft
+  label: Draft
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
+- field_name: has_chart_views
+  label: Has chart views
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
+- field_name: spatial_address
+  label: Spatial address
+  validators: ignore_missing
+
+- field_name: spatial
+  label: Spatial
+  validators: ignore_missing
+
+- field_name: wri_data
+  label: WRI Data
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
+- field_name: rw_dataset
+  label: RW Dataset
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
+- field_name: title
+  label: Title
+  preset: title
+  form_placeholder: eg. A descriptive title
+
+- field_name: name
+  label: URL
+  preset: dataset_slug
+  form_placeholder: eg. my-dataset
+
+- field_name: url
+  label: Source
+  form_placeholder: http://example.com/dataset.json
+  display_property: foaf:homepage
+  display_snippet: link.html
+  validators: ignore_missing url_validator
+
+- field_name: language
+  label: Language
+  form_placeholder: eg. en
+  validators: iso_language_code
+
+- field_name: owner_org
+  label: Team
+  preset: dataset_organization
+
+- field_name: project
+  label: Project
+  form_placeholder: eg. Project Name
+
+- field_name: application
+  label: Application
+  form_placeholder: eg. Application Name
+
+- field_name: technical_notes
+  label: Technical Notes
+  form_placeholder: eg. https://example.com/technical_notes.pdf
+  validators: ignore_missing url_validator
+  output_validators: url_validator
+
+- field_name: tag_string
+  label: Tags
+  preset: tag_string_autocomplete
+  form_placeholder: eg. economy, mental health, government
+
+- field_name: temporal_coverage_start
+  label: Temporal Coverage Start
+  form_placeholder: eg. 2010
+  validators: ignore_missing year_validator
+
+- field_name: temporal_coverage_end
+  label: Temporal Coverage End
+  form_placeholder: eg. 2011
+  validators: ignore_missing year_validator
+
+- field_name: update_frequency
+  label: Update Frequency
+  preset: select
+  choices:
+  - value: annually
+    label: Annually
+  - value: biannually
+    label: Biannually
+  - value: quarterly
+    label: Quarterly
+  - value: monthly
+    label: Monthly
+  - value: weekly
+    label: Weekly
+  - value: daily
+    label: Daily
+  - value: hourly
+    label: Hourly
+  - value: as_needed
+    label: As Needed
+
+- field_name: citation
+  label: Citation
+  form_snippet: markdown.html
+  form_placeholder: eg. Citation information
+
+- field_name: visibility_type
+  label: Visibility Type
+  preset: select
+  choices:
+  - value: private
+    label: Private
+  - value: internal
+    label: Internal
+  - value: public
+    label: Public
+  - value: draft
     label: Draft
-    validators: boolean_validator
-    output_validators: boolean_validator
-    preset: checkbox
 
-  - field_name: spatial_address
-    label: Spatial address
-    validators: ignore_missing
+- field_name: license_id
+  label: License
+  form_snippet: license.html
+  help_text: License definitions and additional information can be found at http://opendefinition.org/
 
-  - field_name: spatial
-    label: Spatial
-    validators: ignore_missing
+- field_name: featured_dataset
+  label: Featured Dataset
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
 
-  - field_name: wri_data
-    label: WRI Data
-    validators: boolean_validator
-    output_validators: boolean_validator
-    preset: checkbox
+- field_name: rw_id
+  label: RW ID
+  validators: ignore_missing
 
-  - field_name: rw_dataset
-    label: RW Dataset
-    validators: boolean_validator
-    output_validators: boolean_validator
-    preset: checkbox
+- field_name: featured_image
+  label: Featured Image
+  form_placeholder: eg. http://example.com/featured_image.png
+  validators: ignore_missing
 
-  - field_name: title
-    label: Title
-    preset: title
-    form_placeholder: eg. A descriptive title
+- field_name: short_description
+  label: Short Description
+  form_snippet: markdown.html
+  form_placeholder: eg. A short description of the dataset
 
-  - field_name: name
-    label: URL
-    preset: dataset_slug
-    form_placeholder: eg. my-dataset
+- field_name: notes
+  label: Description
+  form_snippet: markdown.html
+  form_placeholder: eg. Some useful notes about the data
 
-  - field_name: url
-    label: Source
-    form_placeholder: http://example.com/dataset.json
-    display_property: foaf:homepage
-    display_snippet: link.html
-    validators: ignore_missing url_validator
+- field_name: author
+  label: Author
+  form_placeholder: Joe Bloggs
+  display_property: dc:creator
 
-  - field_name: language
-    label: Language
-    form_placeholder: eg. en
-    validators: iso_language_code
+- field_name: author_email
+  label: Author Email
+  form_placeholder: joe@example.com
+  display_property: dc:creator
+  display_snippet: email.html
+  display_email_name_field: author
 
-  - field_name: owner_org
-    label: Team
-    preset: dataset_organization
+- field_name: maintainer
+  label: Maintainer
+  form_placeholder: Joe Bloggs
+  display_property: dc:contributor
 
-  - field_name: project
-    label: Project
-    form_placeholder: eg. Project Name
+- field_name: maintainer_email
+  label: Maintainer Email
+  form_placeholder: joe@example.com
+  display_property: dc:contributor
+  display_snippet: email.html
+  display_email_name_field: maintainer
 
-  - field_name: application
-    label: Application
-    form_placeholder: eg. Application Name
+- field_name: function
+  label: Function
+  form_snippet: markdown.html
+  form_placeholder: eg. This data is used to...
 
-  - field_name: technical_notes
-    label: Technical Notes
-    form_placeholder: eg. https://example.com/technical_notes.pdf
-    validators: ignore_missing url_validator
-    output_validators: url_validator
+- field_name: restrictions
+  label: Restrictions
+  form_snippet: markdown.html
+  form_placeholder: eg. This data is restricted to...
 
-  - field_name: tag_string
-    label: Tags
-    preset: tag_string_autocomplete
-    form_placeholder: eg. economy, mental health, government
+- field_name: reason_for_adding
+  label: Reason for Adding
+  form_snippet: markdown.html
+  form_placeholder: eg. This data is being added because...
 
-  - field_name: temporal_coverage_start
-    label: Temporal Coverage Start
-    form_placeholder: eg. 2010
-    validators: ignore_missing year_validator
+- field_name: learn_more
+  label: Learn More
+  form_placeholder: eg. https://example.com/learn_more.pdf
+  validators: ignore_missing url_validator
+  output_validators: url_validator
 
-  - field_name: temporal_coverage_end
-    label: Temporal Coverage End
-    form_placeholder: eg. 2011
-    validators: ignore_missing year_validator
+- field_name: cautions
+  label: Cautions
+  form_snippet: markdown.html
+  form_placeholder: eg. This data should be used with caution because...
 
-  - field_name: update_frequency
-    label: Update Frequency
-    preset: select
-    choices:
-      - value: annually
-        label: Annually
-      - value: biannually
-        label: Biannually
-      - value: quarterly
-        label: Quarterly
-      - value: monthly
-        label: Monthly
-      - value: weekly
-        label: Weekly
-      - value: daily
-        label: Daily
-      - value: hourly
-        label: Hourly
-      - value: as_needed
-        label: As Needed
+- field_name: methodology
+  label: Methodology
+  form_snippet: markdown.html
+  form_placeholder: eg. A short methodology of the dataset
 
-  - field_name: citation
-    label: Citation
-    form_snippet: markdown.html
-    form_placeholder: eg. Citation information
-
-  - field_name: visibility_type
-    label: Visibility Type
-    preset: select
-    choices:
-      - value: private
-        label: Private
-      - value: internal
-        label: Internal
-      - value: public
-        label: Public
-      - value: draft
-        label: Draft
-
-  - field_name: license_id
-    label: License
-    form_snippet: license.html
-    help_text: License definitions and additional information can be found at http://opendefinition.org/
-
-  - field_name: featured_dataset
-    label: Featured Dataset
-    validators: boolean_validator
-    output_validators: boolean_validator
-    preset: checkbox
-
-  - field_name: rw_id
-    label: RW ID
-    validators: ignore_missing
-
-  - field_name: featured_image
-    label: Featured Image
-    form_placeholder: eg. http://example.com/featured_image.png
-    validators: ignore_missing
-
-  - field_name: short_description
-    label: Short Description
-    form_snippet: markdown.html
-    form_placeholder: eg. A short description of the dataset
-
-  - field_name: notes
-    label: Description
-    form_snippet: markdown.html
-    form_placeholder: eg. Some useful notes about the data
-
-  - field_name: author
-    label: Author
-    form_placeholder: Joe Bloggs
-    display_property: dc:creator
-
-  - field_name: author_email
-    label: Author Email
-    form_placeholder: joe@example.com
-    display_property: dc:creator
-    display_snippet: email.html
-    display_email_name_field: author
-
-  - field_name: maintainer
-    label: Maintainer
-    form_placeholder: Joe Bloggs
-    display_property: dc:contributor
-
-  - field_name: maintainer_email
-    label: Maintainer Email
-    form_placeholder: joe@example.com
-    display_property: dc:contributor
-    display_snippet: email.html
-    display_email_name_field: maintainer
-
-  - field_name: function
-    label: Function
-    form_snippet: markdown.html
-    form_placeholder: eg. This data is used to...
-
-  - field_name: restrictions
-    label: Restrictions
-    form_snippet: markdown.html
-    form_placeholder: eg. This data is restricted to...
-
-  - field_name: reason_for_adding
-    label: Reason for Adding
-    form_snippet: markdown.html
-    form_placeholder: eg. This data is being added because...
-
-  - field_name: learn_more
-    label: Learn More
-    form_placeholder: eg. https://example.com/learn_more.pdf
-    validators: ignore_missing url_validator
-    output_validators: url_validator
-
-  - field_name: cautions
-    label: Cautions
-    form_snippet: markdown.html
-    form_placeholder: eg. This data should be used with caution because...
-
-  - field_name: methodology
-    label: Methodology
-    form_snippet: markdown.html
-    form_placeholder: eg. A short methodology of the dataset
-
-  - field_name: open_in
-    label: Open In
-    form_placeholder: 'eg. {"title": "External site", "url": "http://example.com"}'
-    preset: json_object
+- field_name: open_in
+  label: Open In
+  form_placeholder: 'eg. {"title": "External site", "url": "http://example.com"}'
+  preset: json_object
 
 resource_fields:
   - field_name: url

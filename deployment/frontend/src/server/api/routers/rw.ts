@@ -1,13 +1,12 @@
 import { FieldsResponse } from '@/components/data-explorer/queryHooks'
 import { filterObj } from '@/components/data-explorer/search.schema'
-import { env } from '@/env.mjs'
 import { createViewFormSchema, editViewFormSchema } from '@/schema/view.schema'
 import {
     createTRPCRouter,
     protectedProcedure,
     publicProcedure,
 } from '@/server/api/trpc'
-import { a } from 'vitest/dist/suite-SvxfaIxW'
+import { createDatasetView, deleteDatasetView, editDatasetView, getDatasetViews, updateDatasetHasChartsFlag } from '@/utils/apiUtils'
 import { z } from 'zod'
 
 export interface NumOfRowsResponse {
@@ -78,34 +77,36 @@ export const rwRouter = createTRPCRouter({
                 sorting,
                 filters,
             } = input
-            const paginationSql = `LIMIT ${pagination.pageIndex * pagination.pageSize + pagination.pageSize
-                }`
+            const paginationSql = `LIMIT ${
+                pagination.pageIndex * pagination.pageSize + pagination.pageSize
+            }`
             const sortSql =
                 sorting.length > 0
                     ? 'ORDER BY ' +
-                    sorting
-                        .map(
-                            (sort) =>
-                                `${sort.id} ${sort.desc ? 'DESC' : 'ASC'}`
-                        )
-                        .join(', ')
+                      sorting
+                          .map(
+                              (sort) =>
+                                  `${sort.id} ${sort.desc ? 'DESC' : 'ASC'}`
+                          )
+                          .join(', ')
                     : ''
             const filtersSql =
                 filters.length > 0
                     ? 'WHERE ' +
-                    filters
-                        .map(
-                            (filter) =>
-                                `( ${filter.value
-                                    .filter((v) => v.value !== '')
-                                    .map(
-                                        (v) =>
-                                            `${filter.id} ${v.operation.value
-                                            } '${v.value}' ${v.link ?? ''} `
-                                    )
-                                    .join('')} )`
-                        )
-                        .join(' AND ')
+                      filters
+                          .map(
+                              (filter) =>
+                                  `( ${filter.value
+                                      .filter((v) => v.value !== '')
+                                      .map(
+                                          (v) =>
+                                              `${filter.id} ${
+                                                  v.operation.value
+                                              } '${v.value}' ${v.link ?? ''} `
+                                      )
+                                      .join('')} )`
+                          )
+                          .join(' AND ')
                     : ''
             const url = `https://api.resourcewatch.org/v1/query/${datasetId}?sql=SELECT ${columns.join(
                 ' , '
@@ -142,20 +143,22 @@ export const rwRouter = createTRPCRouter({
                 const filtersSql =
                     filters.length > 0
                         ? 'WHERE ' +
-                        filters
-                            .map(
-                                (filter) =>
-                                    `( ${filter.value
-                                        .filter((v) => v.value !== '')
-                                        .map(
-                                            (v) =>
-                                                `${filter.id} ${v.operation.value
-                                                } '${v.value}' ${v.link ?? ''
-                                                } `
-                                        )
-                                        .join('')} )`
-                            )
-                            .join(' AND ')
+                          filters
+                              .map(
+                                  (filter) =>
+                                      `( ${filter.value
+                                          .filter((v) => v.value !== '')
+                                          .map(
+                                              (v) =>
+                                                  `${filter.id} ${
+                                                      v.operation.value
+                                                  } '${v.value}' ${
+                                                      v.link ?? ''
+                                                  } `
+                                          )
+                                          .join('')} )`
+                              )
+                              .join(' AND ')
                         : ''
                 const numRowsRes = await fetch(
                     `https://api.resourcewatch.org/v1/query/${datasetId}?sql=SELECT COUNT(*) FROM ${tableName} ${filtersSql}`,
@@ -181,84 +184,53 @@ export const rwRouter = createTRPCRouter({
             }
         }),
     createDatasetView: protectedProcedure
-        .input(createViewFormSchema)
-        .mutation(async ({ input }) => {
-            const createRes = await fetch(
-                `https://api.resourcewatch.org/v1/dataset/${input.resource_id}/widget`,
-                {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${env.RW_API_KEY}`,
-                        'Content-Type': 'application/json',
-                    },
-                    // TODO: should application be the same as on the dataset metadata?
-                    body: JSON.stringify({
-                        name: input.title,
-                        application: ['rw'],
-                        widgetConfig: input,
-                    }),
-                }
-            )
-            const result = await createRes.json()
-            return result
+        .input(
+            z.object({ view: createViewFormSchema, ckanDatasetId: z.string() })
+        )
+        .mutation(async ({ input, ctx }) => {
+            return createDatasetView(input.view).then( async (res) => {
+                await updateDatasetHasChartsFlag({
+                    ckanDatasetId: input.ckanDatasetId,
+                    session: ctx.session,
+                })
+                return res
+            })
         }),
     updateDatasetView: protectedProcedure
-        .input(editViewFormSchema)
-        .mutation(async ({ input }) => {
-            const createRes = await fetch(
-                `https://api.resourcewatch.org/v1/dataset/${input.resource_id}/widget/${input.id}`,
-                {
-                    method: 'PATCH',
-                    headers: {
-                        Authorization: `Bearer ${env.RW_API_KEY}`,
-                        'Content-Type': 'application/json',
-                    },
-                    // TODO: should application be the same as on the dataset metadata?
-                    body: JSON.stringify({
-                        name: input.title,
-                        application: ['rw'],
-                        widgetConfig: input,
-                    }),
-                }
-            )
-            const result = await createRes.json()
-            return result
+        .input(
+            z.object({ view: editViewFormSchema, ckanDatasetId: z.string() })
+        )
+        .mutation(async ({ input, ctx }) => {
+            return editDatasetView(input.view).then( async (res) => {
+                await updateDatasetHasChartsFlag({
+                    ckanDatasetId: input.ckanDatasetId,
+                    session: ctx.session,
+                })
+                return res
+            })
         }),
     deleteDatasetView: protectedProcedure
-        .input(z.object({ datasetId: z.string(), id: z.string() }))
-        .mutation(async ({ input }) => {
-            const createRes = await fetch(
-                `https://api.resourcewatch.org/v1/dataset/${input.datasetId}/widget/${input.id}`,
-                {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `Bearer ${env.RW_API_KEY}`,
-                        'Content-Type': 'application/json',
-                    },
-                    // TODO: should application be the same as on the dataset metadata?
+        .input(
+            z.object({
+                ckanDatasetId: z.string(),
+                rwDatasetId: z.string(),
+                id: z.string(),
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            return deleteDatasetView(input.rwDatasetId, input.id).then(
+                async (res) => {
+                    await updateDatasetHasChartsFlag({
+                        ckanDatasetId: input.ckanDatasetId,
+                        session: ctx.session,
+                    })
+                    return res
                 }
             )
-            const result = await createRes.json()
-            return result
         }),
-
     getDatasetViews: publicProcedure
         .input(z.object({ rwDatasetId: z.string() }))
         .query(async ({ input }) => {
-            const viewsRes = await fetch(
-                `https://api.resourcewatch.org/v1/dataset/${input.rwDatasetId}/widget`,
-                {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${env.RW_API_KEY}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
-            const result = await viewsRes.json()
-            return result.data.map((d: any) => ({
-                id: d.id,
-                ...d.attributes.widgetConfig,
-            }))
+            return await getDatasetViews({ rwDatasetId: input.rwDatasetId })
         }),
 })

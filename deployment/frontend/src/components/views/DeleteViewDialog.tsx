@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction } from 'react'
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
 import { toast } from 'react-toastify'
+import { WriDataset } from '@/schema/ckan.schema'
 
 export default function DeleteViewDialog({
     isOpen,
@@ -12,14 +13,14 @@ export default function DeleteViewDialog({
     id,
     onDelete,
     provider,
-    rwDatasetId,
+    dataset,
 }: {
     isOpen: boolean
     setIsOpen: Dispatch<SetStateAction<boolean>>
     id: string
     onDelete: () => void
     provider: 'rw' | 'datastore'
-    rwDatasetId?: string
+    dataset: WriDataset
 }) {
     const datastoreDeleteMutation = api.dataset.deleteResourceView.useMutation()
     const rwDeleteMutation = api.rw.deleteDatasetView.useMutation()
@@ -27,7 +28,7 @@ export default function DeleteViewDialog({
     const handleDelete = () => {
         if (provider == 'datastore') {
             datastoreDeleteMutation.mutate(
-                { id: id ?? '' },
+                { id: id ?? '', ckanDatasetId: dataset.id },
                 {
                     onSuccess: () => {
                         toast('View was successfully deleted', {
@@ -45,7 +46,11 @@ export default function DeleteViewDialog({
             )
         } else if (provider == 'rw') {
             rwDeleteMutation.mutate(
-                { datasetId: rwDatasetId ?? "", id: id ?? '' },
+                {
+                    rwDatasetId: dataset.rw_id ?? '',
+                    id: id ?? '',
+                    ckanDatasetId: dataset.id,
+                },
                 {
                     onSuccess: () => {
                         toast('View was successfully deleted', {

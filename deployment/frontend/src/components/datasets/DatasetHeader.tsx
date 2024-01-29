@@ -628,7 +628,7 @@ export function DatasetHeader({
                     {dataset?.provider &&
                         dataset?.rw_id &&
                         !isDatasetViewsLoading &&
-                        datasetViews.some(
+                        datasetViews?.some(
                             (v: View) => v.config_obj.type == 'chart'
                         ) && (
                             <div className="py-4">
@@ -643,9 +643,7 @@ export function DatasetHeader({
                                         size="sm"
                                         onClick={() => {
                                             removeCharts(
-                                                datasetViews.map(
-                                                    (v: View) => v.id
-                                                )
+                                                datasetViews?.map((v: View) => v.id ?? "") 
                                             )
                                         }}
                                     >

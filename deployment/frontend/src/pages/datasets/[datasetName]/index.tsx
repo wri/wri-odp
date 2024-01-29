@@ -151,7 +151,10 @@ export async function getServerSideProps(
                 },
             },
         }
-    } catch {
+    } catch (e) {
+        console.log("DATASET PAGE ERROR")
+        console.log(e)
+        console.log((e as any)?.message)
         return {
             props: {
                 redirect: {

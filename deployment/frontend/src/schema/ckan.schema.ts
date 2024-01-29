@@ -71,6 +71,7 @@ export interface ActivityDisplay {
 }
 
 export interface WriDataset extends Dataset {
+    has_chart_views?: boolean
     methodology?: string
     technical_notes?: string
     temporal_coverage_start: string

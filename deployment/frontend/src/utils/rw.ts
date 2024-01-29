@@ -66,7 +66,12 @@ export const queryRw = async (
     const url = `https://api.resourcewatch.org/v1/query/${datasetId}?sql=SELECT ${parsedColumns.join(
         ' , '
     )} FROM ${tableName} ${sortSql} ${filtersSql} ${groupBySql} ${paginationSql}`
-    const tableDataRes = await fetch(url)
+    const tableDataRes = await fetch('/api/proxy', {
+        method: 'POST',
+        body: JSON.stringify({
+            url,
+        }),
+    })
     const tableData: any = await tableDataRes.json()
     const data = tableData.data
     if (provider === 'cartodb')
