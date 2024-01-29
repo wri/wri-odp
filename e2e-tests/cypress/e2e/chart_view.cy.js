@@ -23,22 +23,32 @@ describe("Chart view", () => {
       url_type: "link",
       url: "https://people.sc.fsu.edu/~jburkardt/data/csv/airtravel.csv",
     });
-
-    cy.login(ckanUserName, ckanUserPassword);
-    cy.visit("/dashboard/datasets/" + datasetName + "/edit");
-    cy.contains("Data Files").click();
-    cy.contains("Datapusher").click();
-    cy.contains("Submit to Datapusher").click();
-    cy.contains(`Successfully submited resource to the datapusher`, {
-      timeout: 15000,
-    });
-    cy.wait(15000);
-    cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 15000 });
   });
 
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
+
+  it(
+    "Submit datapusher",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/dashboard/datasets/" + dataset + "/edit");
+      cy.contains("Data Files").click();
+      cy.contains("Datapusher").click();
+      cy.contains("Submit to Datapusher").click();
+      cy.contains(`Successfully submited resource to the datapusher`, {
+        timeout: 15000,
+      });
+      cy.wait(15000);
+      cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 15000 });
+    },
+  );
 
   it(
     "should be creatable from the UI",
