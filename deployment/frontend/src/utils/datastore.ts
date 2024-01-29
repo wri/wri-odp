@@ -72,6 +72,7 @@ export async function queryDatastore(
                 )
                 .join(' ')
             : ''
+
     const groupBySql =
         groupBy && groupBy.length
             ? 'GROUP BY ' + groupBy.map((item) => `"${item}"`).join(', ')

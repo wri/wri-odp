@@ -105,7 +105,7 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
         q === ''
             ? table.getAllLeafColumns()
             : table.getAllLeafColumns().filter((column) => {
-                  return column.id.toLowerCase().includes(q.toLowerCase())
+                  return column.id.toLowerCase().includes(q.toLowerCase()) || typeof column.columnDef.header === 'string' && column.columnDef.header.toLowerCase().includes(q.toLowerCase())
               })
     return (
         <Popover as="div" className="relative inline-block text-left">
@@ -189,7 +189,7 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
                                     htmlFor={column.id}
                                     className="font-medium text-gray-900 truncate"
                                 >
-                                    {column.id}
+                                    {typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id}
                                 </label>
                             </div>
                         </div>
@@ -202,7 +202,6 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
 
 export function Table({ table, isLoading }: TableProps) {
     const numOfColumns = table.getAllColumns().length
-    console.log('rows', table.getRowModel().rows)
     return (
         <div className="max-w-full grow flex border-t border-gray-200">
             <table className="block border-r border-gray-200 shadow">
