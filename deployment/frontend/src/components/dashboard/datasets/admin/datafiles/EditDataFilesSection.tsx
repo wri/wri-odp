@@ -4,11 +4,17 @@ import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import { v4 as uuidv4 } from 'uuid'
 import { AddDataFile } from './AddDataFile'
 import { EditDataFile } from './EditDataFile'
+import { MetadataAccordion } from '../metadata/MetadataAccordion'
+import { api } from '@/utils/api'
+import ViewsList from '@/components/views/ViewsList'
+import { WriDataset } from '@/schema/ckan.schema'
 
 export function EditDataFilesSection({
     formObj,
+    dataset
 }: {
     formObj: UseFormReturn<DatasetFormType>
+    dataset: WriDataset
 }) {
     const { control, watch } = formObj
     const { fields, append, prepend, remove, swap, move, insert } =
@@ -16,8 +22,30 @@ export function EditDataFilesSection({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
         })
+
+    const rwId = watch('rw_id')
+    const provider = watch('provider')
+    const {
+        data: datasetViews,
+        isLoading: isDatasetViewsLoading,
+        error: datasetViewsError,
+    } = api.rw.getDatasetViews.useQuery(
+        { rwDatasetId: rwId ?? "" },
+        { enabled: !!rwId }
+    )
+
     return (
         <>
+            {rwId && provider && !isDatasetViewsLoading && (
+                <MetadataAccordion label="Dataset views" defaultOpen={false}>
+                    <ViewsList
+                        provider="rw"
+                        rwDatasetId={rwId}
+                        views={datasetViews ?? []}
+                        dataset={dataset}
+                    />
+                </MetadataAccordion>
+            )}
             {fields.map((field, index) =>
                 field.new ? (
                     <AddDataFile
@@ -34,6 +62,7 @@ export function EditDataFilesSection({
                         field={field}
                         remove={() => remove(index)}
                         formObj={formObj}
+                        dataset={dataset}
                     />
                 )
             )}

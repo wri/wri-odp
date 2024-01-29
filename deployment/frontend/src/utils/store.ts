@@ -1,3 +1,4 @@
+import { Resource, View } from '@/interfaces/dataset.interface'
 import {
     ActiveLayerGroup,
     Basemap,
@@ -54,6 +55,8 @@ const getDefaultInitialState = () => {
             },
             isDrawing: undefined,
         },
+        activeCharts: [],
+        selectedChart: undefined 
     }
     return initialState
 }
@@ -334,6 +337,29 @@ export const initializeStore = (preloadedState: any = {}) => {
                         },
                     })
                 },
+                addCharts: (views: View[]) => {
+                    const prev = get()
+                    set({
+                        ...prev,
+                        activeCharts: [...prev.activeCharts, ...views],
+                    })
+                },
+                removeCharts: (chartIds: string[]) => {
+                    const prev = get()
+                    set({
+                        activeCharts: [
+                            ...prev.activeCharts.filter(
+                                (c: View) => !chartIds.includes(c.id ?? '')
+                            ),
+                        ],
+                    })
+                },
+                selectChart: (view: View | null) => {
+                    set({
+                        selectedChart: view,
+                    })
+
+                }
             })
         )
     )

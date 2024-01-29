@@ -21,11 +21,12 @@ const capacitySchema = z.enum(['admin', 'editor', 'member'])
 
 export const DataDictionarySchema = z.array(
     z.object({
-        field: z.string(),
-        type: z.string(),
-        null: z.string(),
-        key: z.string(),
-        default: z.string(),
+        id: z.string(),
+        info: z.object({
+            type_override: z.string(),
+            label: z.string(),
+            default: z.string(),
+        }),
     })
 )
 
@@ -56,6 +57,7 @@ export const ResourceSchema = z
         type: z.enum(['link', 'upload', 'layer', 'empty', 'layer-raw']),
         schema: DataDictionarySchema.optional().nullable(),
         layerObj: layerSchema.optional().nullable(),
+        datastore_active: z.boolean().optional().nullable(),
         layerObjRaw: z.any().optional().nullable(),
     })
     .refine(

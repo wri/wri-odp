@@ -9,13 +9,13 @@ import {
 } from '@heroicons/react/24/outline'
 import { DownloadButton } from './datafiles/Download'
 import { OpenInButton } from './datafiles/OpenIn'
-import { Resource } from '@/interfaces/dataset.interface'
+import { Resource, View } from '@/interfaces/dataset.interface'
 import { getFormatColor } from '@/utils/formatColors'
 import { Index } from 'flexsearch'
 import { useState } from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
-import { useActiveLayerGroups } from '@/utils/storeHooks'
+import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
 import { TabularResource } from '../visualizations/Visualizations'
 
 export function DataFiles({
@@ -23,27 +23,28 @@ export function DataFiles({
     index,
     setTabularResource,
     tabularResource,
+    isCurrentVersion,
+    diffFields,
 }: {
     dataset: WriDataset
     index: Index
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
+    isCurrentVersion?: boolean
+    diffFields: Array<Record<string, { old_value: string; new_value: string }>>
 }) {
-    const {
-        addLayerGroup,
-        removeLayerGroup,
-        addLayerToLayerGroup,
-        removeLayerFromLayerGroup,
-    } = useActiveLayerGroups()
+    const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
+        useActiveLayerGroups()
     const { data: activeLayers } = useLayersFromRW()
     const datafiles = dataset?.resources
     const [q, setQ] = useState('')
     const filteredDatafiles =
         q !== ''
             ? datafiles?.filter((datafile) =>
-                  index.search(q).includes(datafile.id)
-              )
+                index.search(q).includes(datafile.id)
+            )
             : datafiles
+
     return (
         <>
             <div className="relative py-4">
@@ -103,6 +104,8 @@ export function DataFiles({
                         key={datafile.id}
                         datafile={datafile}
                         dataset={dataset}
+                        diffFields={diffFields}
+                        isCurrentVersion={isCurrentVersion}
                     />
                 ))}
             </div>
@@ -115,15 +118,21 @@ function DatafileCard({
     dataset,
     setTabularResource,
     tabularResource,
+    diffFields,
+    isCurrentVersion,
 }: {
     datafile: Resource
     dataset: WriDataset
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
+    isCurrentVersion?: boolean
+    diffFields: Array<Record<string, { old_value: string; new_value: string }>>
 }) {
+    const { activeCharts, addCharts, removeCharts } = useActiveCharts()
     const { data: activeLayers } = useLayersFromRW()
     const { removeLayerFromLayerGroup, addLayerToLayerGroup } =
         useActiveLayerGroups()
+
     const created_at = new Date(datafile?.created ?? '')
     const last_updated = new Date(datafile?.metadata_modified ?? '')
     const options = {
@@ -131,6 +140,22 @@ function DatafileCard({
         month: 'short',
         day: 'numeric',
     } as const
+
+    const higlighted = (field: string, value: string) => {
+        if (diffFields && isCurrentVersion) {
+            if (
+                diffFields.some(
+                    (diffField) =>
+                        diffField[field] &&
+                        diffField[field]?.old_value === value
+                )
+            ) {
+                return 'bg-yellow-200'
+            }
+        }
+        return ''
+    }
+
     return (
         <Disclosure>
             {({ open }) => (
@@ -160,7 +185,15 @@ function DatafileCard({
                                 </span>
                             )}
                             <Disclosure.Button>
-                                <h3 className="font-acumin text-lg font-semibold leading-loose text-stone-900">
+                                <h3
+                                    className={`font-acumin text-lg font-semibold leading-loose text-stone-900 ${datafile.title
+                                            ? higlighted(
+                                                'title',
+                                                datafile.title
+                                            )
+                                            : higlighted('name', datafile.name!)
+                                        }`}
+                                >
                                     {datafile.title ?? datafile.name}
                                 </h3>
                             </Disclosure.Button>
@@ -169,8 +202,8 @@ function DatafileCard({
                             {/* @ts-ignore */}
                             {datafile?.rw_id && (
                                 <>
-                                    {activeLayers.some(
-                                        (a) => datafile.url?.endsWith(a.id)
+                                    {activeLayers.some((a) =>
+                                        datafile.url?.endsWith(a.id)
                                     ) ? (
                                         <Button
                                             variant="light"
@@ -215,7 +248,7 @@ function DatafileCard({
                             {datafile.datastore_active && (
                                 <>
                                     {tabularResource &&
-                                    tabularResource.id === datafile.id ? (
+                                        tabularResource.id === datafile.id ? (
                                         <Button
                                             variant="outline"
                                             size="sm"
@@ -241,13 +274,50 @@ function DatafileCard({
                                 </>
                             )}
 
+                            {datafile._hasChartView && (
+                                <>
+                                    {datafile?._views?.some((v) =>
+                                        activeCharts
+                                            .map((c: View) => c.id)
+                                            .includes(v.id)
+                                    ) ? (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                const viewIds =
+                                                    datafile._views?.map(
+                                                        (v: View) => v.id
+                                                    )
+                                                if (viewIds) {
+                                                    removeCharts(
+                                                        viewIds as string[]
+                                                    )
+                                                }
+                                            }}
+                                        >
+                                            Remove Chart View
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            size="sm"
+                                            onClick={() => {
+                                                if (datafile._views)
+                                                    addCharts(datafile._views)
+                                            }}
+                                        >
+                                            Add Chart View
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+
                             <Disclosure.Button>
                                 <ChevronDownIcon
-                                    className={`${
-                                        open
+                                    className={`${open
                                             ? 'rotate-180 transform  transition'
                                             : ''
-                                    } h-5 w-5 text-stone-900`}
+                                        } h-5 w-5 text-stone-900`}
                                 />
                             </Disclosure.Button>
                         </div>
@@ -261,7 +331,15 @@ function DatafileCard({
                         leaveTo="transform scale-95 opacity-0"
                     >
                         <Disclosure.Panel className="py-3">
-                            <p className="font-acumin text-base font-light text-stone-900">
+                            <p
+                                className={`font-acumin text-base font-light text-stone-900 ${datafile.description
+                                        ? higlighted(
+                                            'description',
+                                            datafile.description
+                                        )
+                                        : ''
+                                    }`}
+                            >
                                 {datafile.description ?? 'No Description'}
                             </p>
                             <div className="mt-[0.33rem] flex justify-start gap-x-3">

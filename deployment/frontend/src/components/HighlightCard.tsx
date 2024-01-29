@@ -1,10 +1,10 @@
 import React from 'react'
 import Image from 'next/image'
-import { ChartBarIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import { WriDataset } from '@/schema/ckan.schema'
 import MapViewIcon from './datasets/view-icons/MapViewIcon'
 import TabularViewIcon from './datasets/view-icons/TabularViewIcon'
+import ChartViewIcon from './datasets/view-icons/ChartViewIcon'
 
 export default function HighlightCard({
     highlight,
@@ -60,16 +60,14 @@ export default function HighlightCard({
                                 fill
                             />
                         </div>
-                        <div className="ml-1 w-fit h-[14px] line-clamp-1">{highlight.spatial_address}</div>
+                        <div className="ml-1 w-fit h-[14px] line-clamp-1">
+                            {highlight.spatial_address}
+                        </div>
                     </div>
                 ) : null}
             </div>
             <div className="px-4 mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black h-7">
-                {false && (
-                    <div className="rounded-full bg-stone-100 p-1">
-                        <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                    </div>
-                )}
+                <ChartViewIcon dataset={highlight} />
                 <MapViewIcon dataset={highlight} />
                 <TabularViewIcon dataset={highlight} />
             </div>

@@ -6,6 +6,12 @@ export const isRwError = (
     return (resp as RwErrorResponse).errors !== undefined
 }
 
+export const isRwLayerResp = (
+    resp: RwLayerResp | RwDatasetResp
+): resp is RwLayerResp => {
+    return (resp as RwLayerResp).data.attributes.dataset !== undefined
+}
+
 export type RwResponse = RwLayerResp | RwDatasetResp | RwErrorResponse
 
 export interface RwLayerResp {
