@@ -36,6 +36,8 @@ jobs:
         run: sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
       - name: Add Frontend url to hosts
         run: sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
+      - name: Add Prefect url to hosts
+        run: sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
       - name: Build and push CKAN image to ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -45,6 +47,15 @@ jobs:
           mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
           docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
+      - name: Build and push Datapusher image to ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
+          datapusher
+          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
       - name: Build and push Frontend image to ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
