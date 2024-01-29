@@ -31,6 +31,7 @@ import type {
     WriDataset,
     FolloweeList,
     PendingDataset,
+    OpenIn,
 } from '@/schema/ckan.schema'
 import {
     DatasetFormType,
@@ -300,7 +301,7 @@ export const DatasetRouter = createTRPCRouter({
                     groups: input.topics
                         ? input.topics.map((topic) => ({ name: topic }))
                         : [],
-                    open_in: input.open_in ? { ...input.open_in } : '',
+                    open_in: JSON.stringify(input.open_in) ?? '',
                     language: input.language?.value ?? '',
                     license_id: input.license_id?.value ?? '',
                     owner_org: input.team ? input.team.value : '',
@@ -446,7 +447,7 @@ export const DatasetRouter = createTRPCRouter({
                     groups: input.topics
                         ? input.topics.map((topic) => ({ name: topic }))
                         : [],
-                    open_in: input.open_in ? { ...input.open_in } : '',
+                    open_in: JSON.stringify(input.open_in) ?? '',
                     language: input.language?.value ?? '',
                     license_id: input.license_id?.value ?? '',
                     rw_id: rw_id ?? '',
@@ -1514,7 +1515,7 @@ export const DatasetRouter = createTRPCRouter({
 
             return {
                 ...data.result.package_data,
-                open_in: dataset.open_in ? Object.values(dataset.open_in) : [],
+                open_in: dataset.open_in ? JSON.parse(dataset.open_in as unknown as string) as OpenIn[] : [],
                 spatial,
             }
         }),

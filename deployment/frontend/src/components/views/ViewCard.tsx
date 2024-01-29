@@ -20,7 +20,7 @@ export default function ViewCard({
     onCancelOrDelete: (mode: string) => void
     mode: ViewState["_state"]
     setMode: Dispatch<SetStateAction<ViewState['_state']>>
-    onSave: (mode: string, view: View) => void
+    onSave: (mode: string, view: View, onError: () => void, onSuccess: () => void) => void
     dataset: WriDataset
 }) {
     return (

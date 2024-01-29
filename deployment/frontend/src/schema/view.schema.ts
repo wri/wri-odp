@@ -80,12 +80,6 @@ export const chartSchema = z.object({
                     .optional(),
             }),
             legends: z.object({
-                enabled: z
-                    .object({
-                        label: z.string(),
-                        value: z.boolean().default(false),
-                    })
-                    .optional(),
                 title: z.string().optional(),
             }),
             tooltips: z

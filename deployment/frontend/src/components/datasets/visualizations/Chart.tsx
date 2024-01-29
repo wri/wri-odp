@@ -17,7 +17,7 @@ export default function Chart({
                 datarevision,
             }}
             className="w-full h-full"
-            config={{ responsive: true, displaylogo: false }}
+            config={{ displaylogo: false }}
         />
     )
 }
