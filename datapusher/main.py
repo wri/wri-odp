@@ -107,7 +107,7 @@ def push_to_datastore(resource_id, api_key):
 
 if __name__ == "__main__":
     datastore_deployment = push_to_datastore.to_deployment(
-        name="datapusher",
+        name=config.get('DEPLOYMENT_NAME'),
         parameters={"resource_id": "test_id", "api_key": "api_key"},
         enforce_parameter_schema=False,
         is_schedule_active=False,

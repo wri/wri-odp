@@ -40,6 +40,7 @@ class WriPlugin(plugins.SingletonPlugin):
         missing_config = "{0} is not configured. Please amend your .ini file."
         config_options = (
             'ckanext.wri.prefect_url',
+            'ckanext.wri.datapusher_deployment_name',
         )
         for option in config_options:
             if not config.get(option, None):
