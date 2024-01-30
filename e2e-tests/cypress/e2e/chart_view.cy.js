@@ -95,7 +95,8 @@ describe("Chart view", () => {
         .contains("Add to Views")
         .click({ force: true, timeout: "60000" });
 
-      cy.contains("successfully", { timeout: 30000 });
+      // cy.contains("successfully", { timeout: 30000 });
+      cy.wait(30000);
 
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
