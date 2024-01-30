@@ -180,7 +180,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             {tabs
                                 .filter((tab) => tab.enabled)
                                 .map((tab) => (
-                                    <Tab key={tab.name} as={Fragment}>
+                                    <Tab as={Fragment}>
                                         {({ selected }) => (
                                             <div
                                                 key={tab.name}
@@ -230,7 +230,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
-                            <EditDataFilesSection formObj={formObj} dataset={dataset} />
+                            <EditDataFilesSection formObj={formObj} />
                         </Tab.Panel>
                         {canEditCollaborators && (
                             <Tab.Panel
@@ -264,15 +264,9 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 <LoaderButton
                     loading={editDataset.isLoading}
                     type="submit"
-                    onClick={formObj.handleSubmit(
-                        (data) => {
-                            console.log('teste')
-                            editDataset.mutate(data)
-                        },
-                        (err) => {
-                            console.log(err)
-                        }
-                    )}
+                    onClick={formObj.handleSubmit((data) => {
+                        editDataset.mutate(data)
+                    })}
                 >
                     Update Dataset
                 </LoaderButton>

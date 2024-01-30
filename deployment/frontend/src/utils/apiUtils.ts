@@ -586,13 +586,6 @@ export async function getOneDataset(
         }
     }
 
-    dataset.result.resources = dataset.result.resources.map((x) => {
-        if (x.layerObj || x.layerObjRaw) {
-            return { ...x, rw_id: x.id }
-        }
-        return x
-    })
-
     const resources = await Promise.all(
         dataset.result.resources.map(async (r) => {
             const _views = await getResourceViews({
@@ -650,6 +643,7 @@ export async function getOneDataset(
     )
 
     console.log('!!!!')
+    console.log('DAATA222NUSPATIAL: ', dataset.result?.spatial, spatial)
 
     return {
         ...dataset.result,
@@ -699,8 +693,6 @@ export async function getOnePendingDataset(
         }
     }
 
-    console.log('IN HERE BERFORE RESOUIRCES: ', dataset.resources)
-
     const resources = await Promise.all(
         dataset.resources.map(async (r) => {
             if (r.url_type === 'upload' || r.url_type === 'link') return r
@@ -747,6 +739,11 @@ export async function getOnePendingDataset(
         } catch (e) {
             console.log(e)
         }
+    }
+
+    if (!dataset.spatial || !dataset.spatial_address) {
+        delete dataset.spatial
+        delete dataset.spatial_address
     }
 
     return {

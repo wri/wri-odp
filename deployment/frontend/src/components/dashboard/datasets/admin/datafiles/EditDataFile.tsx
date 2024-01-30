@@ -33,7 +33,7 @@ export function EditDataFile({
     field,
     index,
     formObj,
-    dataset
+    dataset,
 }: {
     remove: () => void
     index: number
@@ -60,7 +60,6 @@ export function EditDataFile({
     })
 
     const datafile = watch(`resources.${index}`)
-
 
     return (
         <>
@@ -270,7 +269,10 @@ export function EditDataFile({
                                                                 : undefined
                                                         }
                                                     >
-                                                        Datapusher <DatapusherStatus datafile={datafile} />
+                                                        Datapusher{' '}
+                                                        <DatapusherStatus
+                                                            datafile={datafile}
+                                                        />
                                                     </div>
                                                 )}
                                             </Tab>
@@ -380,10 +382,13 @@ export function EditDataFile({
                         <LoaderButton
                             variant="muted"
                             type="button"
-                            onClick={() => editResource.mutate(datafile)}
+                            onClick={() => {
+                                console.log('LAYERS: ', datafile)
+                                editResource.mutate(datafile)
+                            }}
                             loading={editResource.isLoading}
                         >
-                            Update Data File 
+                            Update Data File
                         </LoaderButton>
                     </div>
                 </div>
