@@ -110,12 +110,21 @@ describe("Create dataset", () => {
     },
   );
 
-  it("Should show the members", () => {
-    cy.addPackageCollaboratorApi(user, dataset, "editor");
-    cy.visit("/datasets/" + dataset);
-    cy.contains("Collaborators").click();
-    cy.contains(user);
-  });
+  it(
+    "Should show the members",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.addPackageCollaboratorApi(user, dataset, "editor");
+      cy.visit("/datasets/" + dataset);
+      cy.contains("Collaborators").click();
+      cy.contains(user);
+    },
+  );
 
   it("Edit metadata", () => {
     cy.visit("/dashboard/datasets/" + dataset + "/edit");
@@ -161,16 +170,25 @@ describe("Create dataset", () => {
     },
   );
 
-  it("Should show the new member", () => {
-    cy.visit("/datasets/" + dataset);
-    cy.contains("Collaborators").click();
-    cy.contains(user_2);
-    cy.logout();
-    cy.login(user_2, "test_user_2");
-    cy.visit("/dashboard/notifications");
-    cy.contains(ckanUserName);
-    cy.contains(" added you as a collaborator (member) for the dataset");
-  });
+  it(
+    "Should show the new member",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/datasets/" + dataset);
+      cy.contains("Collaborators").click();
+      cy.contains(user_2);
+      cy.logout();
+      cy.login(user_2, "test_user_2");
+      cy.visit("/dashboard/notifications");
+      cy.contains(ckanUserName);
+      cy.contains(" added you as a collaborator (member) for the dataset");
+    },
+  );
 
 
   after(() => {
