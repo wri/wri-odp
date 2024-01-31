@@ -107,10 +107,7 @@ services:
     restart: always
     environment:
       - PREFECT_API_URL=http://prefect:4200/api
-<<<<<<< HEAD
-=======
       - DEPLOYMENT_NAME=datapusher-dev
->>>>>>> 398d84648f4fc90502a37dc1ec5fab7dcd97af1a
       - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
       - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
     depends_on:
