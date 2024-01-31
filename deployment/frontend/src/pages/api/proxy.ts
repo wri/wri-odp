@@ -8,7 +8,7 @@ export default async function handler(
 
     const { url, headers } = body
 
-    const response = await fetch(url, headers)
+    const response = await fetch(url, { headers })
 
     return res.json(await response.json())
 }
