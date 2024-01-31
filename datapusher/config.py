@@ -11,6 +11,7 @@ load_dotenv(env_file)
 
 _DATABASE_URI = os.environ['CKAN_DATASTORE_WRITE_URL']
 _WRITE_ENGINE_URL = os.environ['CKAN_DATASTORE_WRITE_URL']
+_DEPLOYMENT_NAME = os.environ['DEPLOYMENT_NAME']
 _QSVDP_BIN = '/root/.cargo/bin/qsvdp' if os.environ.get('QSVPDP_BIN') is None else os.environ['QSVPDP_BIN']
 _CKAN_URL = 'http://ckan-dev:5000' if os.environ.get('CKAN_URL') is None else os.environ['CKAN_URL']
 _TYPES = "String", "Float", "Integer", "DateTime", "Date", "NULL"
@@ -35,6 +36,7 @@ def _parse_bool(val: Union[str, bool]) -> bool:  # pylint: disable=E1136
 # DataPusherPlusConfig class with required fields, default values, type checking, and typecasting for int and bool values
 class DataPusherPlusConfig(MutableMapping):
     # ckan_service_provider settings
+    DEPLOYMENT_NAME: str = _DEPLOYMENT_NAME
     CKAN_URL: str = _CKAN_URL
     SQLALCHEMY_DATABASE_URI: str = _DATABASE_URI
     WRITE_ENGINE_URL: str = _WRITE_ENGINE_URL

@@ -72,6 +72,7 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
         return False
 
     prefect_url: str = config.get("ckanext.wri.prefect_url")
+    deployment_name: str = config.get("ckanext.wri.datapusher_deployment_name")
 
     callback_url_base = config.get("ckan.datapusher.callback_url_base") or config.get(
         "ckan.site_url"
@@ -159,7 +160,7 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
     api_token = p.toolkit.get_action('api_token_create')(None, {"user": "ckan_admin", "name": "datapusher"}).get('token') if force else api_token
     try:
         deployment = requests.get(
-            urljoin(prefect_url, "api/deployments/name/push-to-datastore/datapusher")
+            urljoin(prefect_url, f"api/deployments/name/push-to-datastore/{deployment_name}")
         )
         deployment = deployment.json()
         deployment_id = deployment["id"]

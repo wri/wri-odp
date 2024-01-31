@@ -14,7 +14,11 @@ import { Group } from '@portaljs/ckan'
 function LeftNode({
     setQuery,
     query,
+    setServerQuery,
+    serverQuery,
 }: {
+    setServerQuery: React.Dispatch<React.SetStateAction<SearchInput>>
+    serverQuery: SearchInput
     setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
     query: SearchInput
 }) {
@@ -110,8 +114,8 @@ function LeftNode({
                         )
                     )}
                     filtername="packageId"
-                    setQuery={setQuery}
-                    query={query}
+                    setQuery={setServerQuery}
+                    query={serverQuery}
                 />
             ) : (
                 ''
@@ -126,8 +130,8 @@ function LeftNode({
                         )
                     )}
                     filtername="orgId"
-                    setQuery={setQuery}
-                    query={query}
+                    setQuery={setServerQuery}
+                    query={serverQuery}
                 />
             ) : (
                 ''
@@ -152,15 +156,26 @@ function LeftNode({
 export default function ActivitystreamHeader({
     setQuery,
     query,
+    setServerQuery,
+    serverQuery,
     Pagination,
 }: {
     setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
     query: SearchInput
+    setServerQuery: React.Dispatch<React.SetStateAction<SearchInput>>
+    serverQuery: SearchInput
     Pagination?: React.ReactNode
 }) {
     return (
         <TableHeader
-            leftNode={<LeftNode setQuery={setQuery} query={query} />}
+            leftNode={
+                <LeftNode
+                    setServerQuery={setServerQuery}
+                    serverQuery={serverQuery}
+                    setQuery={setQuery}
+                    query={query}
+                />
+            }
             rightStyle="sm:mt-4"
             Pagination={Pagination}
         />
