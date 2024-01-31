@@ -4,7 +4,7 @@ import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { Button } from '@/components/_shared/Button'
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { light } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import dynamic from 'next/dynamic'
 
 export const QueryEndpoint = ({
     description,
@@ -48,7 +48,7 @@ export const QueryEndpoint = ({
                     <div className="absolute right-5 top-5">
                         <CopyButton content={body} />
                     </div>
-                    <SyntaxHighlighter language={lang} style={light}>
+                    <SyntaxHighlighter language={lang}>
                         {body}
                     </SyntaxHighlighter>
                 </div>
@@ -74,7 +74,7 @@ export const JsEndpoint = ({
                     <div className="absolute right-5 top-5">
                         <CopyButton content={snippet} />
                     </div>
-                    <SyntaxHighlighter language={'javascript'} style={light}>
+                    <SyntaxHighlighter language={'javascript'}>
                         {snippet}
                     </SyntaxHighlighter>
                 </div>
