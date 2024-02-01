@@ -8,6 +8,7 @@ import {
     ArrowDownTrayIcon,
     PaperAirplaneIcon,
 } from '@heroicons/react/24/outline'
+import Link from 'next/link'
 import { useState } from 'react'
 
 export function DownloadButton({ datafile }: { datafile: Resource }) {
@@ -20,74 +21,18 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
         { enabled: !!datafile.key }
     )
     if (datafile.key && isLoading) {
-        return (
-            <span
-                className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
-            >
-                <Spinner className="h-5 w-5 sm:h-9 sm:w-9" />
-                <div className="font-acumin text-xs sm:text-sm font-normal text-black">
-                    Loading Link
-                </div>
-                {datafile.size && (
-                    <div className="font-acumin text-xs sm:text-xs font-normal text-black">
-                        {convertBytes(datafile.size)}
-                    </div>
-                )}
-            </span>
-        )
+        return <DownloadIcon text="Loading Link" />
     }
     if (signedUrl && !isLoading) {
-        return (
-            <a
-                href={signedUrl}
-                className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
-            >
-                <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
-                <div className="font-acumin text-xs sm:text-sm font-normal text-black">
-                    Download
-                </div>
-                {datafile.size && (
-                    <div className="font-acumin text-xs sm:text-xs font-normal text-black">
-                        {convertBytes(datafile.size)}
-                    </div>
-                )}
-            </a>
-        )
+        return <DownloadIcon url={signedUrl} size={datafile.size} />
     }
     if (!datafile.key && datafile.url) {
-        return (
-            <a
-                href={datafile.url}
-                className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
-            >
-                <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
-                <div className="font-acumin text-xs sm:text-sm font-normal text-black">
-                    Download
-                </div>
-                {datafile.size && (
-                    <div className="font-acumin text-xs sm:text-xs font-normal text-black">
-                        {convertBytes(datafile.size)}
-                    </div>
-                )}
-            </a>
-        )
+        return <DownloadIcon url={datafile.url} size={datafile.size} />
     }
+
     return (
         <>
-            <button
-                onClick={() => setOpen(true)}
-                className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
-            >
-                <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
-                <div className="font-acumin text-xs sm:text-sm font-normal text-black">
-                    Download
-                </div>
-                {datafile.size && (
-                    <div className="font-acumin text-xs sm:text-xs font-normal text-black">
-                        {convertBytes(datafile.size)}
-                    </div>
-                )}
-            </button>
+            <DownloadIcon onClick={() => setOpen(true)} />
             <DownloadModal open={open} setOpen={setOpen} />
         </>
     )
@@ -127,5 +72,71 @@ function DownloadModal({
                 </div>
             </div>
         </Modal>
+    )
+}
+
+// TODO: find a better name for this component
+const DownloadIcon = ({
+    url,
+    size,
+    text,
+    onClick,
+}: {
+    url?: string
+    size?: number
+    text?: string
+    onClick?: () => void
+}) => {
+    let Component = ({
+        children,
+        className,
+    }: {
+        children: React.ReactNode
+        className: string
+    }) => <span className={className}>{children}</span>
+    if (url) {
+        Component = ({
+            children,
+            className,
+        }: {
+            children: React.ReactNode
+            className: string
+        }) => (
+            <Link
+                href={url}
+                target="_blank"
+                type="download"
+                className={className}
+            >
+                {children}
+            </Link>
+        )
+    }
+    if (onClick) {
+        Component = ({
+            children,
+            className,
+        }: {
+            children: React.ReactNode
+            className: string
+        }) => (
+            <Button onClick={onClick} className={className}>
+                {children}
+            </Button>
+        )
+    }
+
+    return (
+        <Component className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400">
+            <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+            <div className="font-acumin text-xs sm:text-sm font-normal text-black">
+                {text ?? 'Download'}
+            </div>
+            {size && (
+                <div className="font-acumin text-xs sm:text-xs font-normal text-black">
+                    {convertBytes(size)}
+                </div>
+            )}
+        </Component>
     )
 }
