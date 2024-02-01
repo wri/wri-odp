@@ -111,6 +111,21 @@ describe("Create dataset", () => {
   );
 
   it(
+    "Should show API endpoints",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/datasets/" + dataset);
+      cy.contains("API").click({ force: true });
+      cy.contains("Datasets API")
+    },
+  );
+
+  it(
     "Should show the members",
     {
       retries: {
