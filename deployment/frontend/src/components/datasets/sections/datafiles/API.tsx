@@ -82,7 +82,11 @@ function OpenInModal({
 }
 
 const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
-    const ckanBaseUrl = `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action`
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    publicCkanUrl = publicCkanUrl.endsWith('/')
+        ? publicCkanUrl.slice(0, -1)
+        : publicCkanUrl
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
     const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafile.id}`
     let ckanResourcGetFileUrl
     if (datafile.url) {
@@ -156,7 +160,11 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
 }
 
 const JavascriptInstructions = ({ datafile }: { datafile: Resource }) => {
-    const ckanBaseUrl = `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action`
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    publicCkanUrl = publicCkanUrl.endsWith('/')
+        ? publicCkanUrl.slice(0, -1)
+        : publicCkanUrl
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
     const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafile.id}`
     const ckanResourcGetSnippet = getSnippet(ckanResourcGetUrl)
 
