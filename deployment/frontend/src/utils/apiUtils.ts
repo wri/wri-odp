@@ -535,7 +535,6 @@ export async function getOneDataset(
             {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${env.RW_API_KEY}`,
                 },
             }
         )

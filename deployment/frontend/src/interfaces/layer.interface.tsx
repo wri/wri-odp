@@ -1,5 +1,6 @@
 
 import { InteractionFormType } from "@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/layer.schema";
+import { TileLayer } from "@deck.gl/geo-layers";
 import type { Source, LayerType } from "@vizzuality/layer-manager";
 
 export interface DeckProps {
@@ -7,6 +8,12 @@ export interface DeckProps {
   params?: Record<string, unknown>;
   data: string;
   subtype: string;
+}
+
+export interface DeckLayerSpec {
+  id: string;
+  type: 'deck';
+  deck: TileLayer<any, any>[];
 }
 
 export interface layerConfigBodySpec {
@@ -25,13 +32,15 @@ export type Provider = {
 
 export interface layerConfigSpec {
   type: LayerType;
+  render_function?: string;
   render?: any;
-  source: Partial<Source & { provider: Provider }>;
+  source: Partial<Source & { provider: Provider, maxzoom: number, minzoom: number }>;
   [key: string]:
     | Record<string, string | number | boolean | unknown>
     | string
     | boolean
-    | number;
+    | number
+    | undefined;
   attribution?: any;
   body?: any;
   deck?: any;
