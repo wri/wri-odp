@@ -1,5 +1,10 @@
 import { Button } from '@/components/_shared/Button'
 import Modal from '@/components/_shared/Modal'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/_shared/Popover'
 import Spinner from '@/components/_shared/Spinner'
 import { Resource } from '@/interfaces/dataset.interface'
 import { api } from '@/utils/api'
@@ -13,6 +18,7 @@ import { useState } from 'react'
 
 export function DownloadButton({ datafile }: { datafile: Resource }) {
     console.log(datafile)
+    const [convertTo, setConvertTo] = useState<string>()
     const [open, setOpen] = useState(false)
     const { data: signedUrl, isLoading } = api.uploads.getPresignedUrl.useQuery(
         {
@@ -20,20 +26,94 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
         },
         { enabled: !!datafile.key }
     )
-    if (datafile.key && isLoading) {
-        return <DownloadIcon text="Loading Link" />
+
+    // Resource doesn't have a file or it is layer
+    // TODO: if it's a layer show other conversion options
+    if (datafile.format == 'Layer' || (!datafile.key && !datafile.url)) {
+        return null
     }
-    if (signedUrl && !isLoading) {
-        return <DownloadIcon url={signedUrl} size={datafile.size} />
+
+    const size = datafile.size
+    const mode = datafile.key ? 'SIGNED_URL' : 'RES_URL'
+    let originalResourceDownloadUrl: string
+
+    if (mode == 'RES_URL' && datafile.url) {
+        originalResourceDownloadUrl = datafile.url
+    } else if (mode == 'SIGNED_URL' && signedUrl && !isLoading) {
+        originalResourceDownloadUrl = signedUrl
     }
-    if (!datafile.key && datafile.url) {
-        return <DownloadIcon url={datafile.url} size={datafile.size} />
-    }
+
+    const Component =
+        isLoading && mode == 'SIGNED_URL' ? `span` : PopoverTrigger
+
+    const conversibleFormats = ['CSV', 'XLSX', 'JSON', 'TSV']
+
+    const format = datafile.format ?? ''
+    const isConversible =
+        datafile.datastore_active &&
+        conversibleFormats.includes(format.toUpperCase())
+
+    const conversionOptions = conversibleFormats.filter(
+        (f) => f != format.toUpperCase()
+    )
+
+    const download = (url: string) => window.open(url, '_target')
 
     return (
         <>
-            <DownloadIcon onClick={() => setOpen(true)} />
-            <DownloadModal open={open} setOpen={setOpen} />
+            <Popover>
+                <Component className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400">
+                    <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                    <div className="font-acumin text-xs sm:text-sm font-normal text-black">
+                        {isLoading && mode == 'SIGNED_URL'
+                            ? 'Loading'
+                            : 'Download'}
+                    </div>
+                    {size && (
+                        <div className="font-acumin text-xs sm:text-xs font-normal text-black">
+                            {convertBytes(size)}
+                        </div>
+                    )}
+                </Component>
+                <PopoverContent>
+                    <Button
+                        className="w-full"
+                        variant="ghost"
+                        onClick={() => download(originalResourceDownloadUrl)}
+                    >
+                        Original Format{' '}
+                        {mode == 'SIGNED_URL' && datafile.format
+                            ? `(${datafile.format})`
+                            : ''}
+                    </Button>
+                    {isConversible &&
+                        conversionOptions.map((f) => (
+                            <Button
+                                variant="ghost"
+                                className="w-full"
+                                onClick={() => {
+                                    // TODO: check if converted file is in cache
+                                    const cachedUrl = ''
+                                    const isCached = !!cachedUrl
+
+                                    if (isCached) {
+                                        return download(cachedUrl)
+                                    }
+
+                                    setConvertTo(f)
+                                    setOpen(true)
+                                }}
+                            >
+                                {f}
+                            </Button>
+                        ))}
+                </PopoverContent>
+            </Popover>
+            <DownloadModal
+                convertTo={convertTo ?? ''}
+                open={open}
+                setOpen={setOpen}
+            />
         </>
     )
 }
@@ -41,20 +121,22 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
 function DownloadModal({
     open,
     setOpen,
+    convertTo,
 }: {
     open: boolean
     setOpen: (open: boolean) => void
+    convertTo: string
 }) {
     return (
         <Modal open={open} setOpen={setOpen} className="max-w-[48rem]">
             <div className="p-6">
                 <div className="border-b border-zinc-100 pb-5">
                     <div className="font-acumin text-3xl font-normal text-black">
-                        The file you are about to download is 1.8 GB.
+                        This {convertTo} file is being prepared for download
                     </div>
                     <div className="font-acumin text-base font-light text-neutral-600">
-                        Please enter your email address so that you receive it
-                        via email.
+                        Please enter your email address so that you receive the
+                        download link via email when it's ready.
                     </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-5 pt-6">
@@ -72,71 +154,5 @@ function DownloadModal({
                 </div>
             </div>
         </Modal>
-    )
-}
-
-// TODO: find a better name for this component
-const DownloadIcon = ({
-    url,
-    size,
-    text,
-    onClick,
-}: {
-    url?: string
-    size?: number
-    text?: string
-    onClick?: () => void
-}) => {
-    let Component = ({
-        children,
-        className,
-    }: {
-        children: React.ReactNode
-        className: string
-    }) => <span className={className}>{children}</span>
-    if (url) {
-        Component = ({
-            children,
-            className,
-        }: {
-            children: React.ReactNode
-            className: string
-        }) => (
-            <Link
-                href={url}
-                target="_blank"
-                type="download"
-                className={className}
-            >
-                {children}
-            </Link>
-        )
-    }
-    if (onClick) {
-        Component = ({
-            children,
-            className,
-        }: {
-            children: React.ReactNode
-            className: string
-        }) => (
-            <Button onClick={onClick} className={className}>
-                {children}
-            </Button>
-        )
-    }
-
-    return (
-        <Component className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400">
-            <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
-            <div className="font-acumin text-xs sm:text-sm font-normal text-black">
-                {text ?? 'Download'}
-            </div>
-            {size && (
-                <div className="font-acumin text-xs sm:text-xs font-normal text-black">
-                    {convertBytes(size)}
-                </div>
-            )}
-        </Component>
     )
 }
