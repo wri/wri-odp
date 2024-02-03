@@ -28,6 +28,8 @@ const getDefaultInitialState = () => {
         vizIndex: 0,
         dataset: null,
         relatedDatasets: null,
+        storeDirtyFields: [],
+        prevRelatedDatasets: null,
         layerAsLayerObj: new Map(),
         tempLayerAsLayerobj: new Map(),
         prevLayerGroups: [],
@@ -60,7 +62,7 @@ const getDefaultInitialState = () => {
             isDrawing: undefined,
         },
         activeCharts: [],
-        selectedChart: undefined 
+        selectedChart: undefined,
     }
     return initialState
 }
@@ -81,6 +83,11 @@ export const initializeStore = (preloadedState: any = {}) => {
                 },
             },
             (set, get) => ({
+                setStoreDirtyFields: (storeDirtyFieldsFunc: () => string[]) => {
+                    const storeDirtyFields = storeDirtyFieldsFunc()
+                    const prev = get()
+                    set({ ...prev, storeDirtyFields })
+                },
                 setVizIndex: (vizIndex: number) => {
                     const prev = get()
                     set({ ...prev, vizIndex })
@@ -241,11 +248,22 @@ export const initializeStore = (preloadedState: any = {}) => {
                     layerAsLayerObj = new Map(tempLayerAsLayerobj)
                     tempLayerAsLayerobj = new Map([...temp2])
 
+                    // switch prevRelatedDatasets and relatedDatasets
+                    let prevRelatedDatasets = prev.prevRelatedDatasets
+                    let relatedDatasets = prev.relatedDatasets
+
+                    const tempRelatedDataset =
+                        structuredClone(prevRelatedDatasets)
+                    prevRelatedDatasets = structuredClone(relatedDatasets)
+                    relatedDatasets = structuredClone(tempRelatedDataset)
+
                     set({
                         ...prev,
                         tempLayerAsLayerobj: tempLayerAsLayerobj,
                         layerAsLayerObj: layerAsLayerObj,
                         prevLayerGroups: prevLayerGroups,
+                        prevRelatedDatasets: prevRelatedDatasets,
+                        relatedDatasets: relatedDatasets,
                         mapView: {
                             ...prev.mapView,
                             activeLayerGroups: activeLayerGroups,
@@ -291,7 +309,6 @@ export const initializeStore = (preloadedState: any = {}) => {
                     const newActiveLayerGroups =
                         structuredClone(activeLayerGroups)
 
-                    console.log('ACTIVELAYERGROUP: ', activeLayerGroups)
                     const lg = newActiveLayerGroups.find(
                         (lg: any) => lg.datasetId == datasetId
                     )
@@ -391,8 +408,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                     set({
                         selectedChart: view,
                     })
-
-                }
+                },
             })
         )
     )

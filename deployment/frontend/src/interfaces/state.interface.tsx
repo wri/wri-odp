@@ -6,9 +6,11 @@ export interface State {
     vizIndex: number
     dataset: WriDataset | null
     relatedDatasets: WriDataset[] | null
+    prevRelatedDatasets: WriDataset[] | null
     layerAsLayerObj: Map<string, string>
     tempLayerAsLayerobj: Map<string, string>
     prevLayerGroups: ActiveLayerGroup[]
+    storeDirtyFields: string[]
     mapView: {
         isEmbedding: boolean
         isAddingLayers?: boolean
@@ -20,7 +22,7 @@ export interface State {
         bounds: Bounds
         isDrawing: boolean | undefined
         layersParsed: Array<[string, LayerState]>
-    } & Layers,
+    } & Layers
     activeCharts: View[]
     selectedChart?: View
 }

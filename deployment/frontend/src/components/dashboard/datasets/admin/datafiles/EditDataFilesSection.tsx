@@ -11,10 +11,12 @@ import { WriDataset } from '@/schema/ckan.schema'
 
 export function EditDataFilesSection({
     formObj,
-    dataset
+    dataset,
+    setStoreDirtyFields,
 }: {
     formObj: UseFormReturn<DatasetFormType>
     dataset: WriDataset
+    setStoreDirtyFields: React.Dispatch<React.SetStateAction<string[]>>
 }) {
     const { control, watch } = formObj
     const { fields, append, prepend, remove, swap, move, insert } =
@@ -30,7 +32,7 @@ export function EditDataFilesSection({
         isLoading: isDatasetViewsLoading,
         error: datasetViewsError,
     } = api.rw.getDatasetViews.useQuery(
-        { rwDatasetId: rwId ?? "" },
+        { rwDatasetId: rwId ?? '' },
         { enabled: !!rwId }
     )
 
@@ -63,6 +65,7 @@ export function EditDataFilesSection({
                         remove={() => remove(index)}
                         formObj={formObj}
                         dataset={dataset}
+                        setStoreDirtyFields={setStoreDirtyFields}
                     />
                 )
             )}

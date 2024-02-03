@@ -90,6 +90,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 datasetId: dataset.id,
             })
         }
+
         for (const resource of dataset?.resources) {
             if (
                 (resource['layerObj'] || resource['layerObjRaw']) &&
@@ -98,6 +99,41 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 layerAsLayerObj.set(resource.rw_id, 'pending')
             } else {
                 layerAsLayerObj.set(resource.rw_id, 'approved')
+            }
+        }
+    }
+
+    if (initialZustandState && initialZustandState?.relatedDatasets.length) {
+        const datasets = initialZustandState?.relatedDatasets
+        for (const dataset of datasets) {
+            for (const resource of dataset?.resources) {
+                if (
+                    (resource['layerObj'] || resource['layerObjRaw']) &&
+                    !resource.url
+                ) {
+                    layerAsLayerObj.set(resource.rw_id, 'pending')
+                } else {
+                    layerAsLayerObj.set(resource.rw_id, 'approved')
+                }
+            }
+        }
+    }
+
+    if (
+        initialZustandState &&
+        initialZustandState?.prevRelatedDatasets.length
+    ) {
+        const datasets = initialZustandState?.prevRelatedDatasets
+        for (const dataset of datasets) {
+            for (const resource of dataset?.resources) {
+                if (
+                    (resource['layerObj'] || resource['layerObjRaw']) &&
+                    !resource.url
+                ) {
+                    tempLayerAsLayerobj.set(resource.rw_id, 'pending')
+                } else {
+                    tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                }
             }
         }
     }

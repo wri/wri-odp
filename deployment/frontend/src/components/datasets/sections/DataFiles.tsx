@@ -142,12 +142,12 @@ function DatafileCard({
     } as const
 
     const higlighted = (field: string, value: string) => {
-        if (diffFields && isCurrentVersion) {
+        if (diffFields && !isCurrentVersion) {
             if (
                 diffFields.some(
                     (diffField) =>
                         diffField[field] &&
-                        diffField[field]?.old_value === value
+                        diffField[field]?.new_value === value
                 )
             ) {
                 return 'bg-yellow-200'

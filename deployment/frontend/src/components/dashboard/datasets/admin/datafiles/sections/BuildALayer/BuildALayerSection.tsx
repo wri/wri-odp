@@ -98,6 +98,16 @@ export function BuildALayer({
         watch('layerConfig.source.provider.layers.0.options.sql'),
     ])
 
+    useEffect(() => {
+        if (Object.keys(dirtyFields).length > 0) {
+            const data = Object.keys(dirtyFields)
+            //session storage
+            sessionStorage.setItem('dirtyFields', JSON.stringify(data))
+        }
+    }, [watch()])
+
+    console.log('IN HERE TO SEE')
+
     return (
         <FormProvider {...layerFormObj}>
             <Steps state={current.toStrings()[0] ?? 'setSourceConfig'} />

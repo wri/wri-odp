@@ -51,7 +51,7 @@ export async function getLayersFromRW(
     if (activeLayerGroups.length === 0) return []
     let countdown = 10
     const apikey = session?.user?.apikey ?? ''
-    console.log('activeLayerGroups: ', activeLayerGroups)
+
     return await Promise.all(
         activeLayerGroups.map(
             async (layerGroup: ActiveLayerGroup, index: number) => {
@@ -87,6 +87,7 @@ export async function getLayersFromRW(
                                         : true,
                             }
                         } else if (layerInfo === 'pending') {
+                            console.log('Coming herewwwwww')
                             // something here
                             const fieldsRes = await fetch(
                                 `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetId}`,

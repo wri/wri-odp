@@ -642,9 +642,6 @@ export async function getOneDataset(
         })
     )
 
-    console.log('!!!!')
-    console.log('DAATA222NUSPATIAL: ', dataset.result?.spatial, spatial)
-
     return {
         ...dataset.result,
         resources,
@@ -659,7 +656,6 @@ export async function getOnePendingDataset(
     datasetName: string,
     session: Session | null
 ) {
-    console.log('IN pending api')
     const user = session?.user
     const response = await fetch(
         `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
@@ -680,19 +676,20 @@ export async function getOnePendingDataset(
     }
     const dataset = data.result.package_data
 
-    if (dataset.rw_id) {
-        const resource = dataset.resources.filter(
-            (x) => x.format?.toLowerCase() === 'layer'
-        )
-        if (resource.length) {
-            const layer = resource[0]!
-            dataset.connectorType = layer.connectorType
-            dataset.connectorUrl = layer.connectorUrl
-            dataset.provider = layer.provider
-            dataset.tableName = layer.tableName
-        }
+    // if (dataset.rw_id) {
+    const resourceLayer = dataset.resources.filter(
+        (x) => x.format?.toLowerCase() === 'layer'
+    )
+    if (resourceLayer.length) {
+        const layer = resourceLayer[0]!
+        dataset.connectorType = layer.connectorType
+        dataset.connectorUrl = layer.connectorUrl
+        dataset.provider = layer.provider
+        dataset.tableName = layer.tableName
     }
+    // }
 
+    let hasLayer = false
     const resources = await Promise.all(
         dataset.resources.map(async (r) => {
             if (r.url_type === 'upload' || r.url_type === 'link') return r
@@ -710,9 +707,9 @@ export async function getOnePendingDataset(
                         layerObjRaw: getRawObjFromApiSpec(layerObj),
                     }
             }
-            console.log('BEFORE PENDING IN HERE')
+            
             if (r.layerObj || r.layerObjRaw) {
-                console.log('GOT IN JHERE PENDING GOT IN HERE PENDING')
+                hasLayer = true
                 if (r.layerObj) {
                     return {
                         ...r,
@@ -744,6 +741,14 @@ export async function getOnePendingDataset(
     if (!dataset.spatial || !dataset.spatial_address) {
         delete dataset.spatial
         delete dataset.spatial_address
+    }
+
+    if (!dataset.metadata_modified) {
+        dataset.metadata_modified = data.result.last_modified
+    }
+
+    if (hasLayer) {
+        dataset.rw_dataset = true
     }
 
     return {
@@ -1466,7 +1471,7 @@ export async function getRecipient({
 }: {
     owner_org: string
     session: Session
-}): Promise<string[]> {
+}): Promise<WriUser[]> {
     try {
         const response = await fetch(
             `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
@@ -1499,9 +1504,9 @@ export async function getRecipient({
             )
 
             // Extract member IDs into an array
-            const memberIds = adminAndEditorMembers.map((member) => member.id!)
+            // const memberIds = adminAndEditorMembers.map((member) => member.id!)
 
-            return memberIds
+            return adminAndEditorMembers
         } else {
             throw new Error(
                 `Failed to fetch organization information: ${responseData.error?.message}`
@@ -1532,36 +1537,80 @@ export async function sendIssueOrCommentNotigication({
 }) {
     try {
         let recipientIds: string[] = []
+        let recipientUsers: WriUser[] | null = null
 
         if (owner_org) {
-            recipientIds = await getRecipient({
+            recipientUsers = (await getRecipient({
                 owner_org: owner_org,
                 session: session,
-            })
+            }))!
+            recipientIds = recipientUsers.map((user) => user.id!)
         } else if (creator_id) {
             recipientIds = [creator_id]
+            const creatorUser = await getUser({
+                userId: creator_id,
+                apiKey: session.user.apikey,
+            })
+            recipientUsers = [creatorUser as WriUser]
         }
 
         if (collaborator_id) {
             recipientIds = recipientIds.concat(collaborator_id)
+            const collaboratorUsers = await Promise.all(
+                collaborator_id.map(async (id) => {
+                    return await getUser({
+                        userId: id,
+                        apiKey: session.user.apikey,
+                    })
+                })
+            )
+
+            const collaboratorUsersw = collaboratorUsers as WriUser[]
+
+            if (recipientUsers) {
+                recipientUsers = recipientUsers.concat(collaboratorUsersw)
+            } else {
+                recipientUsers = collaboratorUsersw
+            }
         }
+
+        const dataset = await getDatasetDetails({
+            id: dataset_id,
+            session: session,
+        })
 
         if (recipientIds.length > 0) {
             const titleNotification = title.split(' ').join('nbsp;')
-            const notificationPromises = recipientIds
-                .filter((recipientId) => recipientId !== session.user.id)
-                .map((recipientId) => {
-                    return createNotification(
-                        recipientId,
-                        session.user.id,
-                        `issue_${action}_${titleNotification}`,
-                        'dataset',
-                        dataset_id,
-                        true
-                    )
-                })
+            const notificationPromises = recipientIds.map((recipientId) => {
+                return createNotification(
+                    recipientId,
+                    session.user.id,
+                    `issue_${action}_${titleNotification}`,
+                    'dataset',
+                    dataset_id,
+                    true
+                )
+            })
 
             await Promise.all(notificationPromises)
+
+            if (recipientUsers) {
+                await Promise.all(
+                    recipientUsers
+                        .filter((user) => user.email)
+                        .map(async (user) => {
+                            const subject = `Issue ${action} on dataset ${dataset.title}`
+                            const body = `<p>Hi ${
+                                user.name ?? user.display_name ?? 'There'
+                            }</p>
+                        <p>There has been an issue ${action} on the dataset ${
+                            dataset.title
+                        }.</p>`
+                            const email = user.email!
+                            return await sendEmail(email, subject, body)
+                        })
+                )
+            }
         }
     } catch (error) {
         console.error(error)
@@ -1742,35 +1791,79 @@ export async function sendGroupNotification({
 }) {
     try {
         let recipientIds: string[] = []
-
+        let recipientUsers: WriUser[] | null = null
         if (owner_org) {
-            recipientIds = await getRecipient({
+            recipientUsers = (await getRecipient({
                 owner_org: owner_org,
                 session: session,
-            })
+            }))!
+            recipientIds = recipientUsers.map((user) => user.id!)
         } else if (creator_id) {
             recipientIds = [creator_id]
+            const creatorUser = await getUser({
+                userId: creator_id,
+                apiKey: session.user.apikey,
+            })
+            recipientUsers = [creatorUser as WriUser]
         }
 
         if (collaborator_id) {
             recipientIds = recipientIds.concat(collaborator_id)
+            const collaboratorUsers = await Promise.all(
+                collaborator_id.map(async (id) => {
+                    return await getUser({
+                        userId: id,
+                        apiKey: session.user.apikey,
+                    })
+                })
+            )
+
+            const collaboratorUsersw = collaboratorUsers as WriUser[]
+
+            if (recipientUsers) {
+                recipientUsers = recipientUsers.concat(collaboratorUsersw)
+            } else {
+                recipientUsers = collaboratorUsersw
+            }
         }
 
+        const dataset = await getDatasetDetails({
+            id: dataset_id,
+            session: session,
+        })
+
         if (recipientIds.length > 0) {
-            const notificationPromises = recipientIds
-                .filter((recipientId) => recipientId !== session.user.id)
-                .map((recipientId) => {
-                    return createNotification(
-                        recipientId,
-                        session.user.id,
-                        action,
-                        'dataset',
-                        dataset_id,
-                        true
-                    )
-                })
+            const notificationPromises = recipientIds.map((recipientId) => {
+                return createNotification(
+                    recipientId,
+                    session.user.id,
+                    action,
+                    'dataset',
+                    dataset_id,
+                    true
+                )
+            })
 
             await Promise.all(notificationPromises)
+
+            if (recipientUsers) {
+                await Promise.all(
+                    recipientUsers
+                        .filter((user) => user.email)
+                        .map(async (user) => {
+                            const mainAction = action.split('_')[0]
+                            const subject = `Approval status on dataset ${dataset.title}`
+                            const body = `<p>Hi ${
+                                user.name ?? user.display_name ?? 'There'
+                            }</p>
+                        <p>The approval status for the dataset ${
+                            dataset.title
+                        } is now <b><string>${mainAction}</strong><b></p>`
+                            const email = user.email!
+                            return await sendEmail(email, subject, body)
+                        })
+                )
+            }
         }
     } catch (error) {
         console.error(error)
@@ -1954,4 +2047,58 @@ export async function deleteDatasetView(datasetId: string, id: string) {
     )
     const result = await createRes.json()
     return result
+}
+
+export const datsetFields = [
+    'application',
+    'approval_status',
+    'author',
+    'author_email',
+    'citation',
+    'creator_user_id',
+    'draft',
+    'featured_dataset',
+    'has_chart_views',
+    'id',
+    'isopen',
+    'license_id',
+    'license_title',
+    'maintainer',
+    'maintainer_email',
+    'metadata_created',
+    'metadata_modified',
+    'name',
+    'num_resources',
+    'num_tags',
+    'organization',
+    'owner_org',
+    'private',
+    'project',
+    'rw_dataset',
+    'rw_id',
+    'short_description',
+    'state',
+    'technical_notes',
+    'title',
+    'type',
+    'update_frequency',
+    'url',
+    'version',
+    'visibility_type',
+    'wri_data',
+    'groups',
+    'resources',
+    'tags',
+    'relationships_as_subject',
+    'relationships_as_object',
+]
+
+export function filterDatasetFields(dataset: any) {
+    const filteredDataset: any = {}
+    for (const field of datsetFields) {
+        if (dataset[field]) {
+            filteredDataset[field] = dataset[field]
+        }
+    }
+    return filteredDataset
 }

@@ -35,6 +35,36 @@ import Modal from '@/components/_shared/Modal'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
+import form from '@/components/vizzuality/1.3-components/form'
+import { difference, differenceWith, isEqual } from 'lodash'
+import {
+    convertFormToLayerObj,
+    getRawObjFromApiSpec,
+} from './datafiles/sections/BuildALayer/convertObjects'
+import { useStoreDirtyFields } from '@/utils/storeHooks'
+
+export function getDirtyValues<
+    DirtyFields extends Record<string, unknown>,
+    Values extends Record<keyof DirtyFields, unknown>,
+>(dirtyFields: DirtyFields, values: Values): Partial<typeof values> {
+    const dirtyValues = Object.keys(dirtyFields).reduce((prev, key) => {
+        // Unsure when RFH sets this to `false`, but omit the field if so.
+        if (!dirtyFields[key]) return prev
+
+        return {
+            ...prev,
+            [key]:
+                typeof dirtyFields[key] === 'object'
+                    ? getDirtyValues(
+                          dirtyFields[key] as DirtyFields,
+                          values[key] as Values
+                      )
+                    : values[key],
+        }
+    }, {})
+
+    return dirtyValues
+}
 
 //change image
 //change title
@@ -52,7 +82,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     const possibleLicenses = api.dataset.getLicenses.useQuery()
     const { data: teamUsers } = api.teams.getTeamUsers.useQuery(
         {
-            id: dataset.organization?.id ?? '',
+            id: dataset.organization?.id ?? dataset.owner_org ?? '',
             capacity: 'admin',
         },
         { enabled: !!dataset.organization?.id }
@@ -92,7 +122,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             ...dataset,
             id: dataset.id,
             rw_id: dataset.rw_id,
-            rw_dataset: !!dataset.rw_id,
+            rw_dataset: dataset.rw_id ? !!dataset.rw_id : !!dataset.rw_dataset,
             tags: dataset.tags ? dataset.tags.map((tag) => tag.name) : [],
             temporal_coverage_start: dataset.temporal_coverage_start
                 ? Number(dataset.temporal_coverage_start)
@@ -134,7 +164,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       ),
                   }))
                 : [],
-            //@ts-ignore
             resources: dataset.resources.map((resource) => ({
                 ...resource,
                 schema: resource.schema ? resource.schema.value : undefined,
@@ -180,7 +209,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             {tabs
                                 .filter((tab) => tab.enabled)
                                 .map((tab) => (
-                                    <Tab as={Fragment}>
+                                    <Tab key={tab.name} as={Fragment}>
                                         {({ selected }) => (
                                             <div
                                                 key={tab.name}
@@ -264,9 +293,58 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 <LoaderButton
                     loading={editDataset.isLoading}
                     type="submit"
-                    onClick={formObj.handleSubmit((data) => {
-                        editDataset.mutate(data)
-                    })}
+                    onClick={formObj.handleSubmit(
+                        (data) => {
+                            const modifiedKeys = Object.keys(
+                                formObj.formState.dirtyFields
+                            )
+                            const storedDirty =
+                                sessionStorage.getItem('dirtyFields')
+
+                            if (storedDirty) {
+                                const storedDirtyArray = JSON.parse(
+                                    storedDirty
+                                ) as string[]
+
+                                if (storedDirtyArray.length > 0) {
+                                    if (!modifiedKeys.includes('resources')) {
+                                        modifiedKeys.push('resources')
+                                    }
+                                }
+                                sessionStorage.removeItem('dirtyFields')
+                            }
+
+                            modifiedKeys.push('id')
+
+                            const connectorRw = [
+                                'connectorUrl',
+                                'connectorType',
+                                'provider',
+                                'tableName',
+                            ]
+
+                            if (
+                                modifiedKeys.some((key) =>
+                                    connectorRw.includes(key)
+                                )
+                            ) {
+                                if (!modifiedKeys.includes('resources')) {
+                                    modifiedKeys.push('resources')
+                                }
+                            }
+                            const newData: Partial<DatasetFormType> =
+                                Object.fromEntries(
+                                    Object.entries(data).filter(([key]) =>
+                                        modifiedKeys.includes(key)
+                                    )
+                                )
+
+                            editDataset.mutate(newData)
+                        },
+                        (err) => {
+                            console.log(err)
+                        }
+                    )}
                 >
                     Update Dataset
                 </LoaderButton>

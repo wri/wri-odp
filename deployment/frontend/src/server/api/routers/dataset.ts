@@ -23,6 +23,10 @@ import {
     getResourceView,
     updateDatasetHasChartsFlag,
     getDatasetDetails,
+    getTeamDetails,
+    getOrgDetails,
+    filterDatasetFields,
+    patchDataset,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -32,10 +36,12 @@ import type {
     WriDataset,
     FolloweeList,
     PendingDataset,
+    WriOrganization,
 } from '@/schema/ckan.schema'
 import {
     DatasetFormType,
     DatasetSchema,
+    DatasetSchemaForEdit,
     ResourceFormType,
     ResourceSchema,
 } from '@/schema/dataset.schema'
@@ -276,28 +282,9 @@ export const DatasetRouter = createTRPCRouter({
     createDataset: protectedProcedure
         .input(DatasetSchema)
         .mutation(async ({ ctx, input }) => {
-            // let resources = input.resources
-            // let datasetRw: null | any = null
-            // if (input.rw_dataset) {
-            //     try {
-            //         datasetRw = await createDatasetRw(input)
-            //         resources = await Promise.all(
-            //             resources.map(async (r) =>
-            //                 datasetRw
-            //                     ? await createLayerRw(r, datasetRw.data.id)
-            //                     : r
-            //             )
-            //         )
-            //     } catch (e) {
-            //         let error =
-            //             'Something went wrong when we tried to create some resources in the Resource Watch API please contact the system administrator'
-            //         if (e instanceof Error) error = e.message
-            //         throw Error(error)
-            //     }
-            // }
             try {
                 const user = ctx.session.user
-                const body = JSON.stringify({
+                const body = {
                     ...input,
                     draft: true,
                     approval_status: 'pending',
@@ -371,9 +358,9 @@ export const DatasetRouter = createTRPCRouter({
                                         resource.layerObj?.name ?? title ?? '',
                                     id: resource.resourceId,
                                     url_type: resource.type,
-                                    schema: resource.schema
-                                        ? { value: resource.schema }
-                                        : '{}',
+                                    // schema: resource.schema
+                                    //     ? { value: resource.schema }
+                                    //     : '{}',
                                     url: resource.url ?? resource.name,
                                 }
                             } else {
@@ -400,7 +387,8 @@ export const DatasetRouter = createTRPCRouter({
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
-                })
+                }
+
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
                     {
@@ -409,7 +397,7 @@ export const DatasetRouter = createTRPCRouter({
                             'Content-Type': 'application/json',
                             Authorization: `${user.apikey}`,
                         },
-                        body,
+                        body: JSON.stringify(body),
                     }
                 )
                 const dataset: CkanResponse<Dataset> = await datasetRes.json()
@@ -420,6 +408,32 @@ export const DatasetRouter = createTRPCRouter({
                         JSON.stringify(dataset.error).concat(' datastet create')
                     )
                 }
+
+                // get organization detals
+
+                if (body.owner_org) {
+                    const org = (await getOrgDetails({
+                        orgId: body.owner_org,
+                        apiKey: ctx.session.user.apikey,
+                    }))!
+
+                    const customOrg = {
+                        id: org.id,
+                        name: org.name,
+                        title: org.title,
+                        description: org.description,
+                        image_url: org.image_url,
+                        created: org.created,
+                        approval_status: org.approval_status,
+                        is_organization: org.is_organization,
+                        state: org.state,
+                        type: org.type,
+                    }
+
+                    dataset.result.organization = customOrg
+                }
+
+                // dataset.result = {}
 
                 const response = await fetch(
                     `${env.CKAN_URL}/api/3/action/pending_dataset_create`,
@@ -439,6 +453,27 @@ export const DatasetRouter = createTRPCRouter({
                     (await response.json()) as CkanResponse<PendingDataset>
                 if (!data.success && data.error) throw Error(data.error.message)
 
+                try {
+                    // get dataset collaborators id
+                    const collab = await fetchDatasetCollabIds(
+                        dataset.result.id,
+                        ctx.session.user.apikey
+                    )
+                    await sendGroupNotification({
+                        owner_org: dataset.result.owner_org
+                            ? dataset.result.owner_org
+                            : null,
+                        creator_id: dataset.result.creator_user_id!,
+                        collaborator_id: collab,
+                        dataset_id: dataset.result.id,
+                        session: ctx.session,
+                        action: 'pending_dataset',
+                    })
+                } catch (error) {
+                    console.log(error)
+                    throw Error('Error in sending issue /comment notification')
+                }
+
                 return dataset.result
             } catch (e) {
                 let error =
@@ -448,7 +483,7 @@ export const DatasetRouter = createTRPCRouter({
             }
         }),
     editDataset: protectedProcedure
-        .input(DatasetSchema)
+        .input(DatasetSchemaForEdit)
         .mutation(async ({ ctx, input }) => {
             const user = ctx.session.user
             const existingCollaboratorsDetails =
@@ -457,7 +492,7 @@ export const DatasetRouter = createTRPCRouter({
                     ctx.session.user.apikey,
                     env.SYS_ADMIN_API_KEY
                 )
-            const newCollaborators = input.collaborators.map(
+            const newCollaborators = input.collaborators?.map(
                 (collaborator) => ({
                     name: collaborator.user.label.toLowerCase(),
                     capacity: collaborator.capacity.label.toLowerCase(),
@@ -471,175 +506,311 @@ export const DatasetRouter = createTRPCRouter({
             )
 
             try {
-                sendMemberNotifications(
-                    user.id,
-                    newCollaborators,
-                    existingCollaborators,
-                    input.id ?? '',
-                    'dataset'
-                )
+                if (input.collaborators) {
+                    sendMemberNotifications(
+                        user.id,
+                        newCollaborators,
+                        existingCollaborators,
+                        input.id ?? '',
+                        'dataset'
+                    )
+                }
             } catch (e) {
                 console.log(e)
             }
 
+            const inputKeys = Object.keys(input)
+            const isUpdate = !(
+                inputKeys.length == 2 && inputKeys.includes('collaborators')
+            )
+
+            console.log('isUpdate ', isUpdate)
+
+            const pendingResponse = await fetch(
+                `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${input.id}`,
+                {
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const pendingData =
+                (await pendingResponse.json()) as CkanResponse<PendingDataset | null>
+            if (!pendingData.success && pendingData.error) {
+                const error = JSON.stringify(pendingData.error).toLowerCase()
+                if (!error.includes('not found')) {
+                    throw Error(JSON.stringify(pendingData.error))
+                }
+            }
+            let prevDataset: WriDataset | null = null
+
+            if (pendingData.result) {
+                prevDataset = pendingData.result.package_data
+            } else {
+                prevDataset = await getDatasetDetails({
+                    id: input.id ?? '',
+                    session: ctx.session,
+                })
+            }
+
             const rw_id = input.rw_id ?? null
 
-            try {
-                const user = ctx.session.user
-                const body = {
-                    ...input,
-                    draft: true,
-                    approval_status: 'pending',
-                    tags: input.tags
-                        ? input.tags.map((tag) => ({ name: tag }))
-                        : [],
-                    groups: input.topics
-                        ? input.topics.map((topic) => ({ name: topic }))
-                        : [],
-                    open_in: input.open_in ? { ...input.open_in } : '',
-                    language: input.language?.value ?? '',
-                    license_id: input.license_id?.value ?? '',
-                    rw_id: rw_id ?? '',
-                    owner_org: input.team ? input.team.value : '',
-                    collaborators: null,
-                    update_frequency: input.update_frequency?.value ?? '',
-                    featured_image:
-                        input.featured_image && input.featured_dataset
-                            ? !isValidUrl(input.featured_image)
-                                ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
-                                : input.featured_image
-                            : null,
-                    visibility_type: input.visibility_type?.value ?? '',
-                    resources: input.resources
-                        .filter((resource) => resource.type !== 'empty')
-                        .map((resource) => {
-                            let description = ''
-                            let title = ''
-                            if (resource.layerObjRaw) {
-                                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                                const layerRaw = getApiSpecFromRawObj(
-                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                                    resource.layerObjRaw
-                                )
+            let org: WriOrganization | null = null
+            if (input.team && isUpdate) {
+                org = (await getOrgDetails({
+                    orgId: input.team.value,
+                    apiKey: ctx.session.user.apikey,
+                }))!
 
-                                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                                description = layerRaw.description
-                                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                                title = layerRaw.name
-                            }
-                            if (resource.layerObj || resource.layerObjRaw) {
-                                return {
-                                    ...resource,
-                                    connectorType: input.connectorType ?? '',
-                                    connectorUrl: input.connectorUrl ?? '',
-                                    provider: input.provider ?? '',
-                                    tableName: input.tableName ?? '',
-                                    package_id: input.id ?? '',
-                                    format: resource.format
-                                        ? resource.format
-                                        : resource.layerObj ||
-                                          resource.layerObjRaw
-                                        ? 'Layer'
-                                        : '',
-                                    id: resource.resourceId,
-                                    datastore_active:
-                                        resource.datastore_active === true
-                                            ? true
-                                            : null,
-                                    new: false,
-                                    layerObj: resource.layerObj
-                                        ? convertFormToLayerObj(
-                                              resource.layerObj
-                                          )
-                                        : null,
-                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                                    layerObjRaw: resource.layerObjRaw
-                                        ? // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                                          getApiSpecFromRawObj(
-                                              resource.layerObjRaw
-                                          )
-                                        : null,
-                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                                    description:
-                                        resource.layerObj?.description ??
-                                        description ??
-                                        '',
-                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                                    title:
-                                        resource.layerObj?.name ?? title ?? '',
-                                    url_type: resource.type,
-                                    schema: resource.schema
-                                        ? { value: resource.schema }
-                                        : '{}',
-                                    url: resource.url ?? resource.name,
-                                }
-                            } else {
-                                return {
-                                    ...resource,
-                                    format: resource.format ?? '',
-                                    id: resource.resourceId,
-                                    url_type: resource.type,
-                                    layerObjRaw: null,
-                                    layerObj: null,
-                                    schema: resource.schema
-                                        ? { value: resource.schema }
-                                        : '{}',
-                                    url: resource.url ?? resource.name,
-                                }
-                            }
-                        }),
-                    spatial:
-                        input.spatial && input.spatial_address
-                            ? null
-                            : JSON.stringify(input.spatial)
-                            ? JSON.stringify(input.spatial)
-                            : null,
-                    spatial_address: input.spatial_address
-                        ? input.spatial_address
-                        : null,
+                org = {
+                    id: org.id,
+                    name: org.name,
+                    title: org.title,
+                    type: org.type,
+                    description: org.description,
+                    image_url: org.image_url,
+                    created: org.created,
+                    approval_status: org.approval_status,
+                    is_organization: org.is_organization,
+                    state: org.state,
                 }
+            }
 
-                const response = await fetch(
-                    `${env.CKAN_URL}/api/3/action/pending_dataset_update`,
-                    {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            package_id: input.id,
-                            package_data: body,
-                        }),
-                        headers: {
-                            Authorization: ctx.session.user.apikey,
-                            'Content-Type': 'application/json',
-                        },
+            try {
+                console.log('INPUTTTT: ', input)
+                if (isUpdate) {
+                    const user = ctx.session.user
+                    const body = {
+                        ...prevDataset,
+                        ...input,
+                        draft: true,
+                        approval_status: 'pending',
+                        tags: input.tags
+                            ? input.tags.map((tag) => ({ name: tag }))
+                            : [],
+                        groups: input.topics
+                            ? input.topics.map((topic) => ({ name: topic }))
+                            : [],
+                        open_in: input.open_in ? { ...input.open_in } : '',
+                        language: input.language?.value ?? '',
+                        license_id: input.license_id?.value ?? '',
+                        rw_id: rw_id ?? '',
+                        owner_org: input.team ? input.team.value : '',
+                        organization: org,
+                        collaborators: null,
+                        update_frequency: input.update_frequency?.value ?? '',
+                        featured_image:
+                            input.featured_image && input.featured_dataset
+                                ? !isValidUrl(input.featured_image)
+                                    ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
+                                    : input.featured_image
+                                : null,
+                        visibility_type: input.visibility_type?.value ?? '',
+                        resources: input.resources
+                            ?.filter((resource) => resource.type !== 'empty')
+                            .map((resource) => {
+                                const rr = prevDataset?.resources.find(
+                                    (r) => r.id === resource.id
+                                )
+                                let description = ''
+                                let title = ''
+                                if (resource.layerObjRaw) {
+                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                                    const layerRaw = getApiSpecFromRawObj(
+                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                                        resource.layerObjRaw
+                                    )
+
+                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                                    description = layerRaw.description
+                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                                    title = layerRaw.name
+                                }
+                                if (resource.layerObj || resource.layerObjRaw) {
+                                    return {
+                                        ...rr,
+                                        ...resource,
+                                        connectorType:
+                                            input.connectorType ??
+                                            rr?.connectorType ??
+                                            '',
+                                        connectorUrl:
+                                            input.connectorUrl ??
+                                            rr?.connectorUrl ??
+                                            '',
+                                        provider:
+                                            input.provider ??
+                                            rr?.provider ??
+                                            '',
+                                        tableName:
+                                            input.tableName ??
+                                            rr?.tableName ??
+                                            '',
+                                        package_id: input.id ?? '',
+                                        format: resource.format
+                                            ? resource.format
+                                            : resource.layerObj ||
+                                              resource.layerObjRaw
+                                            ? 'Layer'
+                                            : '',
+                                        id: resource.resourceId,
+                                        datastore_active:
+                                            resource.datastore_active === true
+                                                ? true
+                                                : null,
+                                        new: false,
+                                        layerObj: resource.layerObj
+                                            ? convertFormToLayerObj(
+                                                  resource.layerObj
+                                              )
+                                            : null,
+                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                                        layerObjRaw: resource.layerObjRaw
+                                            ? // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                                              getApiSpecFromRawObj(
+                                                  resource.layerObjRaw
+                                              )
+                                            : null,
+                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                                        description:
+                                            resource.layerObj?.description ??
+                                            description ??
+                                            '',
+                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                                        title:
+                                            resource.layerObj?.name ??
+                                            title ??
+                                            '',
+                                        url_type: resource.type,
+                                        // schema: resource.schema
+                                        //     ? { value: resource.schema }
+                                        //     : '{}',
+                                        url: resource.url ?? resource.name,
+                                        created:
+                                            rr?.created ??
+                                            new Date()
+                                                .toISOString()
+                                                .replace('Z', ''),
+                                        metadata_modified: new Date()
+                                            .toISOString()
+                                            .replace('Z', ''),
+                                    }
+                                } else {
+                                    return {
+                                        ...rr,
+                                        ...resource,
+                                        format: resource.format ?? '',
+                                        id: resource.resourceId,
+                                        url_type: resource.type,
+                                        layerObjRaw: null,
+                                        layerObj: null,
+                                        schema: resource.schema
+                                            ? { value: resource.schema }
+                                            : '{}',
+                                        url: resource.url ?? resource.name,
+                                        created:
+                                            rr?.created ??
+                                            new Date()
+                                                .toISOString()
+                                                .replace('Z', ''),
+                                        metadata_modified: new Date()
+                                            .toISOString()
+                                            .replace('Z', ''),
+                                    }
+                                }
+                            }),
+                        spatial:
+                            input.spatial && input.spatial_address
+                                ? null
+                                : JSON.stringify(input.spatial)
+                                ? JSON.stringify(input.spatial)
+                                : null,
+                        spatial_address: input.spatial_address
+                            ? input.spatial_address
+                            : null,
                     }
-                )
 
-                let data =
-                    (await response.json()) as CkanResponse<PendingDataset>
-                if (!data.success && data.error) {
-                    const error = JSON.stringify(data.error).toLowerCase()
-                    if (!error.includes('not found')) {
-                        throw Error(JSON.stringify(data.error))
-                    } else {
-                        const response = await fetch(
-                            `${env.CKAN_URL}/api/3/action/pending_dataset_create`,
-                            {
-                                method: 'POST',
-                                body: JSON.stringify({
-                                    package_id: input.id,
-                                    package_data: body,
-                                }),
-                                headers: {
-                                    Authorization: ctx.session.user.apikey,
-                                    'Content-Type': 'application/json',
-                                },
+                    const newBodyDataset = filterDatasetFields(body)
+                    const metadaFilter = Object.keys(newBodyDataset)
+                        .filter((x) => inputKeys.includes(x))
+                        .map((x) => ({ [x]: newBodyDataset[x] }))
+
+                    const responseData = {
+                        ...prevDataset,
+                        ...metadaFilter.reduce(
+                            (obj, item) => ({ ...obj, ...item }),
+                            {}
+                        ),
+                    }
+
+                    const response = await fetch(
+                        `${env.CKAN_URL}/api/3/action/pending_dataset_update`,
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                package_id: input.id,
+                                package_data: responseData,
+                            }),
+                            headers: {
+                                Authorization: ctx.session.user.apikey,
+                                'Content-Type': 'application/json',
+                            },
+                        }
+                    )
+
+                    let data =
+                        (await response.json()) as CkanResponse<PendingDataset>
+                    if (!data.success && data.error) {
+                        const error = JSON.stringify(data.error).toLowerCase()
+                        if (!error.includes('not found')) {
+                            throw Error(JSON.stringify(data.error))
+                        } else {
+                            const response = await fetch(
+                                `${env.CKAN_URL}/api/3/action/pending_dataset_create`,
+                                {
+                                    method: 'POST',
+                                    body: JSON.stringify({
+                                        package_id: input.id,
+                                        package_data: responseData,
+                                    }),
+                                    headers: {
+                                        Authorization: ctx.session.user.apikey,
+                                        'Content-Type': 'application/json',
+                                    },
+                                }
+                            )
+                            data =
+                                (await response.json()) as CkanResponse<PendingDataset>
+                            if (!data.success && data.error)
+                                throw Error(data.error.message)
+
+                            const pendingDataset = data.result.package_data
+                            try {
+                                // get dataset collaborators id
+                                const collab = await fetchDatasetCollabIds(
+                                    pendingDataset.id,
+                                    ctx.session.user.apikey
+                                )
+                                await sendGroupNotification({
+                                    owner_org: pendingDataset.owner_org
+                                        ? pendingDataset.owner_org
+                                        : null,
+                                    creator_id: pendingDataset.creator_user_id,
+                                    collaborator_id: collab,
+                                    dataset_id: pendingDataset.id,
+                                    session: ctx.session,
+                                    action: 'pending_dataset',
+                                })
+                            } catch (error) {
+                                console.log(error)
+                                throw Error(
+                                    'Error in sending approval status notification'
+                                )
                             }
-                        )
-                        data =
-                            (await response.json()) as CkanResponse<PendingDataset>
-                        if (!data.success && data.error)
-                            throw Error(data.error.message)
+                        }
                     }
+                    prevDataset = data.result.package_data
                 }
 
                 const collaborators = await Promise.all(
@@ -678,7 +849,8 @@ export const DatasetRouter = createTRPCRouter({
                 } catch (e) {
                     console.log(e)
                 }
-                return { ...data.result.package_data, collaborators }
+
+                return { ...prevDataset, collaborators }
             } catch (e) {
                 let error =
                     'Something went wrong please contact the system administrator'
@@ -690,25 +862,18 @@ export const DatasetRouter = createTRPCRouter({
         .input(ResourceSchema)
         .mutation(async ({ ctx, input }) => {
             try {
-                if ((input.layerObj || input.layerObjRaw) && input.url) {
-                    return await editLayerRw(input)
-                }
-            } catch (e) {
-                let error =
-                    'Something went wrong when we tried to create some resources in the Resource Watch API please contact the system administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(error)
-            }
-            try {
                 let resource: Resource = {
                     ...input,
                     format: input.format ?? '',
-                    new: false,
+                    id: input.resourceId,
                     url_type: input.type,
                     layerObjRaw: null,
                     layerObj: null,
                     schema: input.schema ? { value: input.schema } : '{}',
                     url: input.url ?? input.name,
+                    metadata_modified: new Date()
+                        .toISOString()
+                        .replace('Z', ''),
                 }
 
                 if (input.layerObj || input.layerObjRaw) {
@@ -747,13 +912,14 @@ export const DatasetRouter = createTRPCRouter({
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                         title: input.layerObj?.name ?? title ?? '',
                         url_type: resource.type,
-                        schema: input.schema
-                            ? { value: resource.schema }
-                            : '{}',
+                        // schema: input.schema
+                        //     ? { value: resource.schema }
+                        //     : '{}',
                         url: resource.url ?? resource.name,
+                        metadata_modified: new Date()
+                            .toISOString()
+                            .replace('Z', ''),
                     }
-
-                    console.log('RESOURCESppplayerrr: ', resource)
                 }
 
                 const response = await fetch(
@@ -810,11 +976,34 @@ export const DatasetRouter = createTRPCRouter({
                         (await response.json()) as CkanResponse<PendingDataset>
                     if (!data.success && data.error)
                         throw Error(data.error.message)
+
+                    const pendingDataset = data.result.package_data
+                    try {
+                        // get dataset collaborators id
+                        const collab = await fetchDatasetCollabIds(
+                            pendingDataset.id,
+                            ctx.session.user.apikey
+                        )
+                        await sendGroupNotification({
+                            owner_org: pendingDataset.owner_org
+                                ? pendingDataset.owner_org
+                                : null,
+                            creator_id: pendingDataset.creator_user_id,
+                            collaborator_id: collab,
+                            dataset_id: pendingDataset.id,
+                            session: ctx.session,
+                            action: 'pending_dataset',
+                        })
+                    } catch (error) {
+                        console.log(error)
+                        throw Error(
+                            'Error in sending approval status notification'
+                        )
+                    }
                     return data.result.package_data.resources.find(
                         (x) => x.id === input.id
                     )
                 } else {
-                    console.log('ENTER HERE: ')
                     const pendingPackage = datapending.result.package_data
                     const resourcetoUpdate = pendingPackage.resources.map(
                         (r) => {
@@ -829,7 +1018,6 @@ export const DatasetRouter = createTRPCRouter({
                         }
                     )
 
-                    console.log('ENTER DATASET HERE: ', resourcetoUpdate)
                     pendingPackage.resources = resourcetoUpdate
 
                     const response = await fetch(
@@ -1454,6 +1642,61 @@ export const DatasetRouter = createTRPCRouter({
             if (!data.success && data.error)
                 throw Error(JSON.stringify(data.error))
 
+            const mainDataset = await getDatasetDetails({
+                id: input.dataset_id,
+                session: ctx.session,
+            })
+            const rejectMainDataset = {
+                ...mainDataset,
+                approval_status: 'rejected',
+            }
+
+            await patchDataset({
+                dataset: rejectMainDataset,
+                session: ctx.session,
+            })
+
+            // fetch pending dataset
+            const pendingDataset = await fetch(
+                `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${input.dataset_id}`,
+                {
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+
+            const pendingData =
+                (await pendingDataset.json()) as CkanResponse<PendingDataset>
+            if (!pendingData.success && pendingData.error)
+                throw Error(JSON.stringify(pendingData.error))
+
+            const rejectedPendingDataset = {
+                ...pendingData.result.package_data,
+                approval_status: 'rejected',
+            }
+
+            const responsePending = await fetch(
+                `${env.CKAN_URL}/api/3/action/pending_dataset_update`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        package_id: input.dataset_id,
+                        package_data: rejectedPendingDataset,
+                    }),
+                    headers: {
+                        Authorization: ctx.session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+
+            const dataPending =
+                (await responsePending.json()) as CkanResponse<PendingDataset>
+            if (!dataPending.success && dataPending.error)
+                throw Error(JSON.stringify(dataPending.error))
+
             try {
                 const collab = await fetchDatasetCollabIds(
                     input.dataset_id,
@@ -1468,9 +1711,18 @@ export const DatasetRouter = createTRPCRouter({
                     title: input.title,
                     action: 'created',
                 })
+
+                await sendGroupNotification({
+                    owner_org: input.owner_org,
+                    creator_id: input.creator_id,
+                    collaborator_id: collab,
+                    dataset_id: input.dataset_id,
+                    session: ctx.session,
+                    action: 'rejected_dataset',
+                })
             } catch (error) {
                 console.log(error)
-                throw Error('Error in sending issue /comment notification')
+                throw Error('Error in sending issue /approval notification')
             }
             return data
         }),
@@ -1480,7 +1732,7 @@ export const DatasetRouter = createTRPCRouter({
             let fq = 'approval_status:pending+draft:true'
 
             if (input._isUserSearch) {
-                fq += `+creator_user_id:${ctx.session.user.id}`
+                fq = `approval_status:(pending OR rejected)+draft:true+creator_user_id:${ctx.session.user.id}`
             }
 
             if (!ctx.session.user.sysadmin && !input._isUserSearch) {

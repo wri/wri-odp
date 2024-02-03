@@ -37,6 +37,7 @@ import { decodeMapParam } from '@/utils/urlEncoding'
 import { WriDataset } from '@/schema/ckan.schema'
 import { User } from '@portaljs/ckan'
 import { record, string } from 'zod'
+import { matchesAnyPattern } from '@/utils/general'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -92,7 +93,7 @@ export async function getServerSideProps(
                               dataset?.groups
                                   ?.map((group) => group.name)
                                   .join(' OR ') ?? ''
-                          }
+                          }+approval_status:approved+draft:false
                   `
                         : '',
             })
@@ -115,7 +116,7 @@ export async function getServerSideProps(
                                   prevdataset?.groups
                                       ?.map((group) => group.name)
                                       .join(' OR ') ?? ''
-                              }
+                              }+approval_status:approved+draft:false
                       `
                             : '',
                 })
@@ -148,6 +149,7 @@ export async function getServerSideProps(
                 initialZustandState: {
                     dataset: JSON.stringify(dataset),
                     relatedDatasets,
+                    prevRelatedDatasets,
                     mapView: mapState,
                 },
             },
@@ -323,8 +325,12 @@ export default function DatasetPage(
     let diffFields: string[] | never[] = []
 
     if (pendingExist && diffData) {
-        diffFields = Object.keys(diffData)
+        diffFields = Object.keys(diffData).filter((item) =>
+            matchesAnyPattern(item)
+        )
     }
+
+    console.log('DIFFFIELDS: ', diffFields)
 
     let resourceDiffValues: Array<
         Record<string, { old_value: string; new_value: string }>

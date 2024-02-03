@@ -383,7 +383,6 @@ export function EditDataFile({
                             variant="muted"
                             type="button"
                             onClick={() => {
-                                console.log('LAYERS: ', datafile)
                                 editResource.mutate(datafile)
                             }}
                             loading={editResource.isLoading}

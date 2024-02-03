@@ -190,7 +190,7 @@ export function DatasetHeader({
     } as const
 
     const higlighted = (field: string) => {
-        if (diffFields && isCurrentVersion) {
+        if (diffFields && !isCurrentVersion) {
             if (diffFields.includes(field)) {
                 return 'bg-yellow-200'
             }
@@ -643,7 +643,9 @@ export function DatasetHeader({
                                         size="sm"
                                         onClick={() => {
                                             removeCharts(
-                                                datasetViews?.map((v: View) => v.id ?? "") 
+                                                datasetViews?.map(
+                                                    (v: View) => v.id ?? ''
+                                                )
                                             )
                                         }}
                                     >

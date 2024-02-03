@@ -211,12 +211,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                                           ?.length ? (
                                                                                         <div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
                                                                                             {
-                                                                                                pendingData?.datasets?.filter(
-                                                                                                    (
-                                                                                                        item
-                                                                                                    ) =>
-                                                                                                        item.issue_count
-                                                                                                )
+                                                                                                pendingData
+                                                                                                    ?.datasets
                                                                                                     .length
                                                                                             }
                                                                                         </div>
@@ -357,13 +353,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                                   ?.length ? (
                                                                                 <div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
                                                                                     {
-                                                                                        pendingData?.datasets?.filter(
-                                                                                            (
-                                                                                                item
-                                                                                            ) =>
-                                                                                                item.issue_count ==
-                                                                                                0
-                                                                                        )
+                                                                                        pendingData
+                                                                                            ?.datasets
                                                                                             .length
                                                                                     }
                                                                                 </div>

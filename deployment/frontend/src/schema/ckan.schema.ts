@@ -1,5 +1,10 @@
 import { Dataset, Resource } from '@/interfaces/dataset.interface'
-import type { Group, Organization, User as CkanUser } from '@portaljs/ckan'
+import type {
+    Group,
+    Tag,
+    Activity as CkanActivity,
+    User as CkanUser,
+} from '@portaljs/ckan'
 
 type Only<T, U> = {
     [P in keyof T]: T[P]
@@ -115,6 +120,7 @@ export interface WriDataset extends Dataset {
     draft?: boolean
     issue_count?: number
     resources: Resource[]
+    rw_dataset?: boolean
 }
 
 export interface Extra {
@@ -125,6 +131,26 @@ export interface Extra {
 export interface OpenIn {
     title: string
     url: string
+}
+
+export interface Organization {
+    id: string
+    name: string
+    title: string
+    display_name?: string
+    type?: string
+    description?: string
+    image_url?: string
+    image_display_url?: string
+    created?: string
+    is_organization: boolean
+    package_count?: number
+    approval_status?: 'approved'
+    state: 'active'
+    packages?: Array<Dataset>
+    activity_stream?: Array<CkanActivity>
+    users?: Array<User>
+    tags?: Array<Tag>
 }
 
 export interface WriOrganization extends Organization {
