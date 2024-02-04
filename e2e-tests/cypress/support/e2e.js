@@ -259,6 +259,8 @@ Cypress.Commands.add(
         name: name,
         author: "datopian",
         license_id: "notspecified",
+        approval_status: "approved",
+        draft: "false",
         tags: [{ display_name: "subscriable", name: "subscriable" }],
         ...otherFields,
       },

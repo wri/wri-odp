@@ -157,7 +157,7 @@ describe("Create dataset", () => {
       cy.visit("/datasets/" + dataset);
       cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
       cy.contains("Data files").click();
-      cy.contains("JPEG");
+      cy.contains("jpg");
     },
   );
 

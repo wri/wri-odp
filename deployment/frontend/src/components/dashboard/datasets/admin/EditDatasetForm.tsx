@@ -43,29 +43,6 @@ import {
 } from './datafiles/sections/BuildALayer/convertObjects'
 import { useStoreDirtyFields } from '@/utils/storeHooks'
 
-export function getDirtyValues<
-    DirtyFields extends Record<string, unknown>,
-    Values extends Record<keyof DirtyFields, unknown>,
->(dirtyFields: DirtyFields, values: Values): Partial<typeof values> {
-    const dirtyValues = Object.keys(dirtyFields).reduce((prev, key) => {
-        // Unsure when RFH sets this to `false`, but omit the field if so.
-        if (!dirtyFields[key]) return prev
-
-        return {
-            ...prev,
-            [key]:
-                typeof dirtyFields[key] === 'object'
-                    ? getDirtyValues(
-                          dirtyFields[key] as DirtyFields,
-                          values[key] as Values
-                      )
-                    : values[key],
-        }
-    }, {})
-
-    return dirtyValues
-}
-
 //change image
 //change title
 //change some rich text field
@@ -298,46 +275,19 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             const modifiedKeys = Object.keys(
                                 formObj.formState.dirtyFields
                             )
-                            const storedDirty =
-                                sessionStorage.getItem('dirtyFields')
 
-                            if (storedDirty) {
-                                const storedDirtyArray = JSON.parse(
-                                    storedDirty
-                                ) as string[]
-
-                                if (storedDirtyArray.length > 0) {
-                                    if (!modifiedKeys.includes('resources')) {
-                                        modifiedKeys.push('resources')
-                                    }
-                                }
-                                sessionStorage.removeItem('dirtyFields')
-                            }
-
-                            modifiedKeys.push('id')
-
-                            const connectorRw = [
-                                'connectorUrl',
-                                'connectorType',
-                                'provider',
-                                'tableName',
-                            ]
+                            let newData: Partial<DatasetFormType> = data
 
                             if (
-                                modifiedKeys.some((key) =>
-                                    connectorRw.includes(key)
-                                )
+                                modifiedKeys.length === 1 &&
+                                modifiedKeys[0] === 'collaborators'
                             ) {
-                                if (!modifiedKeys.includes('resources')) {
-                                    modifiedKeys.push('resources')
-                                }
-                            }
-                            const newData: Partial<DatasetFormType> =
-                                Object.fromEntries(
+                                newData = Object.fromEntries(
                                     Object.entries(data).filter(([key]) =>
                                         modifiedKeys.includes(key)
                                     )
                                 )
+                            }
 
                             editDataset.mutate(newData)
                         },

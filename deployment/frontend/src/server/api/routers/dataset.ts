@@ -485,6 +485,7 @@ export const DatasetRouter = createTRPCRouter({
     editDataset: protectedProcedure
         .input(DatasetSchemaForEdit)
         .mutation(async ({ ctx, input }) => {
+            console.log('INPUTTTT: ', input)
             const user = ctx.session.user
             const existingCollaboratorsDetails =
                 await fetchDatasetCollaborators(
@@ -557,7 +558,7 @@ export const DatasetRouter = createTRPCRouter({
             const rw_id = input.rw_id ?? null
 
             let org: WriOrganization | null = null
-            if (input.team && isUpdate) {
+            if (input.team && input.team?.value && isUpdate) {
                 org = (await getOrgDetails({
                     orgId: input.team.value,
                     apiKey: ctx.session.user.apikey,

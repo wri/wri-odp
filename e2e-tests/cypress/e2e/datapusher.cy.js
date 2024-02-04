@@ -60,11 +60,21 @@ describe("Upload file and create dataset", () => {
     },
   );
 
+  it("Edit metadata", () => {
+    cy.visit("/dashboard/datasets/" + dataset + "/edit");
+    cy.get("input[name=title]")
+      .clear()
+      .type(dataset + " EDITED");
+    cy.get("textarea[name=short_description]").clear().type("test234");
+    cy.get("button").contains("Update Dataset").click({force: true,});
+     cy.wait(20000);
+    });
+
   it(
     "Should show the tabular preview",
     {
       retries: {
-        runMode: 5,
+        runMode: 3,
         openMode: 0,
       },
     },
@@ -72,7 +82,8 @@ describe("Upload file and create dataset", () => {
       cy.viewport(1440, 900);
       cy.wait(15000);
       cy.visit("/datasets/" + dataset);
-      cy.reload(true);
+      cy.get("#toggle-version").click();
+      cy.wait(10000)
       cy.contains("Add Tabular View", { timeout: 30000 }).click();
       cy.contains("01D2539e270CEbd", { timeout: 15000 });
     },
