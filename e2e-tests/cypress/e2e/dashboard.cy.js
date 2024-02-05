@@ -28,7 +28,15 @@ describe("Dashboard Test", () => {
     cy.createDatasetAPI(parentOrg, datasetName, true, {
         'notes': 'test',
         'draft': 'true',
-        'approval_status': 'pending'
+        'approval_status': 'pending',
+        'short_description': 'test',
+        "technical_notes": "https://source.com/stat",
+        "visibility_type": "public",
+        "maintainer": "Stephen Oni",
+        "maintainer_email": "stephenoni2@gmail.com",
+        "author": "Stephen",
+        "author_email": "stephenoni2@gmail.com",
+        "update_frequency": "hourly",
       });
 
     cy.createOrganizationAPI(parentOrg2);
@@ -69,7 +77,7 @@ describe("Dashboard Test", () => {
       });
     });
     cy.get("@dataset").then((dataset) => {
-      cy.createPendingDataset(dataset.id, dataset.name)
+      cy.createPendingDataset(dataset.id, dataset)
     });
 
   });
@@ -84,11 +92,11 @@ describe("Dashboard Test", () => {
     cy.get("#alldataset").should("exist");
     cy.get("#alldataset").find("div").should("have.length.greaterThan", 0);
 
-    cy.get('input[type="search"]').type(datasetName).type("{enter}");
+    cy.get('input[type="search"]').type(datasetName2).type("{enter}");
 
-    cy.contains("div", datasetName).should("exist", { timeout: 15000 });
+    cy.contains("div", datasetName2).should("exist", { timeout: 15000 });
     cy.get("button#rowshow").first().click();
-    cy.contains(parentOrg);
+    cy.contains(parentOrg2);
   });
 
   it("Should test activity stream", () => {
@@ -243,9 +251,29 @@ describe("Dashboard Test", () => {
 
   })
 
+  it("Should be in awaiting approval", () => {
+    cy.visit("/dashboard/datasets");
+    cy.contains("Awaiting Approval").click();
+    cy.wait(15000)
+    cy.get('input[type="search"]').type(datasetName).type("{enter}");
+    cy.contains(datasetName).should("exist", { timeout: 15000 });
+  })
+
+  it("Should edit pending dataset", () => {
+    cy.visit("/dashboard/datasets/" + datasetName + "/edit");
+    cy.get("input[name=title]")
+      .clear()
+      .type(datasetName + " EDITED");
+    cy.get("button").contains("Update Dataset").click({ force: true, });
+    cy.wait(20000);
+  })
+
   it("Should have approve dataset", () => {
     cy.visit("/dashboard/approval-request");
-    cy.contains(datasetName,  { timeout: 30000 });
+    cy.contains(datasetName, { timeout: 30000 });
+    cy.get("button#rowshow").first().click();
+    cy.contains("title")
+    cy.contains(datasetName + " EDITED")
     cy.get(`button#approve-tooltip-${datasetName}`)
       .first()
       .click({ force: true });

@@ -732,18 +732,29 @@ export const DatasetRouter = createTRPCRouter({
                             : null,
                     }
 
-                    const newBodyDataset = filterDatasetFields(body)
-                    const metadaFilter = Object.keys(newBodyDataset)
-                        .filter((x) => inputKeys.includes(x))
-                        .map((x) => ({ [x]: newBodyDataset[x] }))
+                    const newBodyDataset = filterDatasetFields(
+                        body
+                    ) as WriDataset
+                    // const metadaFilter = Object.keys(newBodyDataset)
+                    //     .filter((x) => inputKeys.includes(x))
+                    //     .map((x) => ({ [x]: newBodyDataset[x] }))
 
                     const responseData = {
                         ...prevDataset,
-                        ...metadaFilter.reduce(
-                            (obj, item) => ({ ...obj, ...item }),
-                            {}
-                        ),
+                        ...newBodyDataset,
                     }
+
+                    console.log('responseData', responseData)
+
+                    // update main data to pending also
+                    await patchDataset({
+                        dataset: {
+                            id: responseData.id,
+                            approval_status: 'pending',
+                            draft: true,
+                        },
+                        session: ctx.session,
+                    })
 
                     const response = await fetch(
                         `${env.CKAN_URL}/api/3/action/pending_dataset_update`,
@@ -811,6 +822,7 @@ export const DatasetRouter = createTRPCRouter({
                             }
                         }
                     }
+
                     prevDataset = data.result.package_data
                 }
 

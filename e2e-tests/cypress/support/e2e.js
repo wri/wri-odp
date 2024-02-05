@@ -526,18 +526,14 @@ Cypress.Commands.add("userMetadata", (name) => {
 
 Cypress.Commands.add(
   "createPendingDataset",
-  (package_id, name) => {
+  (package_id, dataset) => {
     const request = cy.request({
       method: "POST",
       url: apiUrl("pending_dataset_create"),
       headers: headers,
       body: {
         package_id: package_id,
-        package_data: {
-          'id': package_id,
-          'name': name,
-          'notes': 'test dataset',
-        }
+        package_data: dataset
       },
     });
   }
