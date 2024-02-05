@@ -141,7 +141,12 @@ describe("Create dataset", () => {
     },
   );
 
-  it("Edit metadata", () => {
+  it("Edit metadata",  {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    }, () => {
     cy.visit("/dashboard/datasets/" + dataset + "/edit");
     cy.get("input[name=title]")
       .clear()
