@@ -38,6 +38,7 @@ import type {
     PendingDataset,
     WriOrganization,
     OpenIn,
+    User,
 } from '@/schema/ckan.schema'
 import {
     DatasetFormType,
@@ -72,6 +73,7 @@ import {
     editViewFormSchema,
     viewFormSchema,
 } from '@/schema/view.schema'
+import { Organization } from '@portaljs/ckan'
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -431,7 +433,7 @@ export const DatasetRouter = createTRPCRouter({
                         type: org.type,
                     }
 
-                    dataset.result.organization = customOrg
+                    dataset.result.organization = customOrg as Organization
                 }
 
                 // dataset.result = {}
@@ -486,7 +488,6 @@ export const DatasetRouter = createTRPCRouter({
     editDataset: protectedProcedure
         .input(DatasetSchemaForEdit)
         .mutation(async ({ ctx, input }) => {
-            console.log('INPUTTTT: ', input)
             const user = ctx.session.user
             const existingCollaboratorsDetails =
                 await fetchDatasetCollaborators(
@@ -509,10 +510,10 @@ export const DatasetRouter = createTRPCRouter({
 
             try {
                 if (input.collaborators) {
-                    sendMemberNotifications(
+                    await sendMemberNotifications(
                         user.id,
-                        newCollaborators,
-                        existingCollaborators,
+                        newCollaborators as unknown as User[],
+                        existingCollaborators as unknown as User[],
                         input.id ?? '',
                         'dataset'
                     )
@@ -580,7 +581,6 @@ export const DatasetRouter = createTRPCRouter({
             }
 
             try {
-                console.log('INPUTTTT: ', input)
                 if (isUpdate) {
                     const user = ctx.session.user
                     const body = {
@@ -745,13 +745,13 @@ export const DatasetRouter = createTRPCRouter({
                         ...newBodyDataset,
                     }
 
-                    console.log('responseData', responseData)
-
                     // update main data to pending also
                     await patchDataset({
                         dataset: {
                             id: responseData.id,
                             approval_status: 'pending',
+                            visibility_type:
+                                responseData.visibility_type ?? 'draft',
                             draft: true,
                         },
                         session: ctx.session,
@@ -844,7 +844,7 @@ export const DatasetRouter = createTRPCRouter({
                         existingCollaborators
                             .filter(
                                 (existingCollaborator) =>
-                                    !newCollaborators.some(
+                                    !newCollaborators?.some(
                                         (newCollaborator) =>
                                             newCollaborator.name ===
                                             existingCollaborator.name
@@ -854,7 +854,8 @@ export const DatasetRouter = createTRPCRouter({
                                 deleteCollaborator(
                                     {
                                         package_id: input.id ?? '',
-                                        user_id: existingCollaborator.name,
+                                        user_id:
+                                            existingCollaborator?.name as string,
                                     },
                                     ctx.session
                                 )
@@ -883,6 +884,7 @@ export const DatasetRouter = createTRPCRouter({
                     url_type: input.type,
                     layerObjRaw: null,
                     layerObj: null,
+                    //@ts-ignore
                     schema: input.schema ? { value: input.schema } : '{}',
                     url: input.url ?? input.name,
                     metadata_modified: new Date()
@@ -905,8 +907,10 @@ export const DatasetRouter = createTRPCRouter({
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                         title = layerRaw.name
                     }
+                    //@ts-ignore
                     resource = {
                         ...input,
+                        id: input.id!,
                         format: input.format
                             ? input.format
                             : input.layerObj || input.layerObjRaw
@@ -966,11 +970,15 @@ export const DatasetRouter = createTRPCRouter({
                         session: ctx.session,
                     })
 
+                    const resources = [...packageData.resources]
+                    //@ts-ignore
+                    resources.push(resource)
+
                     const body = {
                         ...packageData,
                         draft: true,
                         approval_status: 'pending',
-                        resources: [...packageData.resources, resource],
+                        resources: resources,
                     }
                     const response = await fetch(
                         `${env.CKAN_URL}/api/3/action/pending_dataset_create`,
@@ -1014,9 +1022,10 @@ export const DatasetRouter = createTRPCRouter({
                             'Error in sending approval status notification'
                         )
                     }
-                    return data.result.package_data.resources.find(
+                    const resource = data.result.package_data.resources.find(
                         (x) => x.id === input.id
-                    )
+                    )!
+                    return resource
                 } else {
                     const pendingPackage = datapending.result.package_data
                     const resourcetoUpdate = pendingPackage.resources.map(
@@ -1052,9 +1061,11 @@ export const DatasetRouter = createTRPCRouter({
                         (await response.json()) as CkanResponse<PendingDataset>
                     if (!data.success && data.error)
                         throw Error(data.error.message)
-                    return data.result.package_data.resources.find(
+
+                    const resource = data.result.package_data.resources.find(
                         (x) => x.id === input.id
-                    )
+                    )!
+                    return resource
                 }
             } catch (e) {
                 let error =
@@ -1288,12 +1299,23 @@ export const DatasetRouter = createTRPCRouter({
         .query(async ({ input, ctx }) => {
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session.user.apikey,
-                fq: `creator_user_id:${ctx.session.user.id}`,
+                fq: `creator_user_id:${ctx.session.user.id}+draft:false`,
                 query: input,
             }))!
+            const privateDataset = (await getAllDatasetFq({
+                apiKey: ctx.session.user.apikey,
+                fq: `creator_user_id:${ctx.session.user.id}+draft:true+visibility_type:private`,
+                query: input,
+            }))!
+
+            const allMydataset = [
+                ...dataset.datasets,
+                ...privateDataset.datasets,
+            ]
+            const allMycount = dataset.count + privateDataset.count
             return {
-                datasets: dataset.datasets,
-                count: dataset.count,
+                datasets: allMydataset,
+                count: allMycount,
             }
         }),
     getLicenses: protectedProcedure.query(async ({ ctx }) => {
@@ -1743,10 +1765,11 @@ export const DatasetRouter = createTRPCRouter({
     getPendingDatasets: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            let fq = 'approval_status:pending+draft:true'
+            let fq =
+                'approval_status:pending+draft:true+visibility_type:(public OR internal)'
 
             if (input._isUserSearch) {
-                fq = `approval_status:(pending OR rejected)+draft:true+creator_user_id:${ctx.session.user.id}`
+                fq = `visibility_type:(public OR internal)+approval_status:(pending OR rejected)+draft:true+creator_user_id:${ctx.session.user.id}`
             }
 
             if (!ctx.session.user.sysadmin && !input._isUserSearch) {
@@ -1875,11 +1898,32 @@ export const DatasetRouter = createTRPCRouter({
                     JSON.stringify(deleteData.error).concat('pending_delete')
                 )
 
-            // create dataset
-            // TODO before create ensure layers make a call to RW API to ensure layers are created
-            const resourcesWithoutLayer = submittedDataset.resources.filter(
-                (r) => !r.layerObj && !r.layerObjRaw
-            )
+            // fix datastore not working for initial csv
+            const initialdataset = await getOneDataset(input.id, ctx.session)
+            const InitialresourcesWithoutLayer =
+                initialdataset.resources.filter(
+                    (r) => !r.layerObj && !r.layerObjRaw
+                )
+            const resourcesWithoutLayer = submittedDataset.resources
+                .filter((r) => !r.layerObj && !r.layerObjRaw)
+                .map((r) => {
+                    const defaultResource = InitialresourcesWithoutLayer.find(
+                        (x) => x.id === r.id
+                    )
+                    if (defaultResource) {
+                        return {
+                            ...r,
+                            datastore_active: defaultResource.datastore_active,
+                            hash: defaultResource.hash,
+                            total_record_count:
+                                defaultResource.total_record_count,
+                            size: defaultResource.size,
+                        }
+                    } else {
+                        return r
+                    }
+                })
+
             let rw_id = submittedDataset.rw_id ?? null
             const isLayer = submittedDataset.resources.some(
                 (x) => x.format === 'Layer'
@@ -1967,17 +2011,24 @@ export const DatasetRouter = createTRPCRouter({
 
             submittedDataset.rw_id = rw_id!
 
-            submittedDataset.resources = resources.map((resource) => ({
-                ...resource,
-                format: resource.format ?? '',
-                id: resource.id,
-                new: false,
-                layerObjRaw: null,
-                layerObj: null,
-                url_type: resource.type,
-                schema: resource.schema ? { value: resource.schema } : '{}',
-                url: resource.url ?? resource.name,
-            })) as Resource[]
+            submittedDataset.resources = resources.map((resource) => {
+                const schema = resource.schema as Resource['schema']
+                return {
+                    ...resource,
+                    format: resource.format ?? '',
+                    id: resource.id,
+                    new: false,
+                    layerObjRaw: null,
+                    layerObj: null,
+                    url_type: resource.type,
+                    schema: resource.schema
+                        ? {
+                              value: schema?.value,
+                          }
+                        : '{}',
+                    url: resource.url ?? resource.name,
+                }
+            }) as Resource[]
 
             const datasetRes = await fetch(
                 `${env.CKAN_URL}/api/action/package_update`,

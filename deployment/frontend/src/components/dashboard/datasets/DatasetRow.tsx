@@ -38,7 +38,7 @@ function subFields(dataset: WriDataset) {
     ]
 }
 
-function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
+function ApprovalDatasetCardProfile({ dataset }: { dataset: WriDataset }) {
     const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
 
     return (
@@ -54,6 +54,26 @@ function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
             ) : (
                 ''
             )}
+            <div className="flex flex-col w-full">
+                <p className="font-semibold text-[15px]">
+                    {dataset?.title ?? dataset?.name}
+                </p>
+                <div className="flex font-normal">
+                    <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />
+                    <div className="ml-1 w-fit h-[12px] text-[12px] text-[#666666]">
+                        {formatDate(created)}
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
+    const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
+
+    return (
+        <div className="flex  py-3 rounded-md pl-4 sm:pl-14 gap-x-2">
             <div className="flex flex-col w-full">
                 <p className="font-semibold text-[15px]">
                     {dataset?.title ?? dataset?.name}
@@ -159,7 +179,7 @@ export function ApprovalDatasetRow({
         <Row
             authorized={authorized}
             className={`pr-2 sm:pr-4 ${className ? className : ''}`}
-            rowMain={<DatasetCardProfile dataset={dataset} />}
+            rowMain={<ApprovalDatasetCardProfile dataset={dataset} />}
             controlButtons={[
                 {
                     label: 'Edit',

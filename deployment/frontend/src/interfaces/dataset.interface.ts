@@ -39,7 +39,7 @@ export interface Resource {
     cache_last_updated?: string
     cache_url?: string
     created?: string
-    datastore_active?: boolean
+    datastore_active?: boolean | null
     description?: string
     format?: string
     hash?: string
@@ -69,6 +69,7 @@ export interface Resource {
     type: 'link' | 'upload' | 'layer' | 'empty' | 'layer-raw'
     _hasChartView?: boolean
     _views?: View[]
+    total_record_count?: number
 }
 
 export interface DatasetListQueryOptions {

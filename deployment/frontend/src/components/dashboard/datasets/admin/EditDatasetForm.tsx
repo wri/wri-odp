@@ -1,8 +1,10 @@
 import { Collaborator, WriDataset } from '@/schema/ckan.schema'
 import {
     CapacityUnion,
+    DataDictionaryFormType,
     DatasetFormType,
     DatasetSchema,
+    ResourceFormType,
 } from '@/schema/dataset.schema'
 import classNames from '@/utils/classnames'
 import { Tab } from '@headlessui/react'
@@ -92,6 +94,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         })
         .otherwise(() => false)
 
+    const resourceForm = dataset.resources as unknown as ResourceFormType[]
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
@@ -141,10 +144,15 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       ),
                   }))
                 : [],
-            resources: dataset.resources.map((resource) => ({
-                ...resource,
-                schema: resource.schema ? resource.schema.value : undefined,
-            })),
+            resources: resourceForm.map((resource) => {
+                const schema = resource.schema as unknown as {
+                    value: DataDictionaryFormType
+                }
+                return {
+                    ...resource,
+                    schema: resource.schema ? schema.value : undefined,
+                }
+            }),
             spatial_type: dataset.spatial_address
                 ? 'address'
                 : dataset.spatial
@@ -236,7 +244,10 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
-                            <EditDataFilesSection formObj={formObj} />
+                            <EditDataFilesSection
+                                formObj={formObj}
+                                dataset={dataset}
+                            />
                         </Tab.Panel>
                         {canEditCollaborators && (
                             <Tab.Panel
@@ -276,6 +287,12 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 formObj.formState.dirtyFields
                             )
 
+                            const touchedKeys = Object.keys(
+                                formObj.formState.touchedFields
+                            )
+
+                            modifiedKeys.concat(touchedKeys)
+
                             let newData: Partial<DatasetFormType> = data
 
                             if (
@@ -289,7 +306,12 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 )
                             }
 
-                            editDataset.mutate(newData)
+                            if (modifiedKeys.length === 0) {
+                                router.push('/dashboard/datasets')
+                                return
+                            } else {
+                                editDataset.mutate(newData)
+                            }
                         },
                         (err) => {
                             console.log(err)

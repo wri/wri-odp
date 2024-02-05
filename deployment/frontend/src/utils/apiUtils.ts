@@ -602,7 +602,7 @@ export async function getOneDataset(
                             v.config_obj.type == 'chart'
                     )
 
-                r._hasChartView = resourceHasChartView
+                r._hasChartView = resourceHasChartView!
 
                 return { ...r, _views }
             }
@@ -903,7 +903,7 @@ export async function getOrganizationTreeDetails({
             acc[org.id] = {
                 img_url: org.image_display_url ?? '',
                 description: org.description ?? '',
-                package_count: org.package_count,
+                package_count: org.package_count!,
             }
             return acc
         },

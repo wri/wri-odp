@@ -159,7 +159,7 @@ export default function EditDatasetPage(
                     <LoaderButton
                         variant="destructive"
                         loading={deleteDataset.isLoading}
-                        onClick={() => deleteDataset.mutate(datasetName)}
+                        onClick={() => deleteDataset.mutate(datasetName!)}
                     >
                         Delete Dataset
                     </LoaderButton>
