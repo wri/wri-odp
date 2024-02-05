@@ -230,7 +230,6 @@ dataset_fields:
 - field_name: open_in
   label: Open In
   form_placeholder: 'eg. {"title": "External site", "url": "http://example.com"}'
-  preset: json_object
 
 resource_fields:
   - field_name: url

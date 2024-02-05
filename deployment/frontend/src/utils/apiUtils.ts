@@ -11,6 +11,7 @@ import type {
     GroupsmDetails,
     WriUser,
     PendingDataset,
+    OpenIn,
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
@@ -547,7 +548,6 @@ export async function getOneDataset(
             {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${env.RW_API_KEY}`,
                 },
             }
         )
@@ -646,7 +646,9 @@ export async function getOneDataset(
         ...dataset.result,
         resources,
         open_in: dataset.result.open_in
-            ? Object.values(dataset.result.open_in)
+            ? (JSON.parse(
+                  dataset.result.open_in as unknown as string
+              ) as OpenIn[])
             : [],
         spatial,
     }
@@ -707,7 +709,7 @@ export async function getOnePendingDataset(
                         layerObjRaw: getRawObjFromApiSpec(layerObj),
                     }
             }
-            
+
             if (r.layerObj || r.layerObjRaw) {
                 hasLayer = true
                 if (r.layerObj) {
@@ -754,7 +756,9 @@ export async function getOnePendingDataset(
     return {
         ...dataset,
         resources,
-        open_in: dataset.open_in ? Object.values(dataset.open_in) : [],
+        open_in: dataset.open_in
+            ? (JSON.parse(dataset.open_in as unknown as string) as OpenIn[])
+            : [],
         spatial,
     }
 }

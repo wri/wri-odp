@@ -180,7 +180,7 @@ function DataExplorerInner({
     if (pageCount < pagination.pageIndex) resetPagination()
     return (
         <div className={`w-full relative grow flex flex-col gap-y-2 mt-6`}>
-            <div className="flex flex-row justify-between items-center px-6">
+            <div className="flex flex-col gap-y-4 sm:flex-row justify-between items-end sm:items-center px-6">
                 <TopBar table={table} numOfRows={numOfRows ?? 0} />
             </div>
             <div className="flex flex-row justify-between px-6">

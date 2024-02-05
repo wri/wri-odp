@@ -6,7 +6,6 @@ import {
 } from '@/utils/storeHooks'
 import { useEffect, useRef, useState } from 'react'
 import ReactMapGL, { type MapRef } from 'react-map-gl'
-import LayerManager from './LayerManager'
 import { useInteractiveLayers } from '@/utils/queryHooks'
 import Tooltip, { type TooltipRef } from './Tooltip'
 import { type APILayerSpec } from '@/interfaces/layer.interface'
@@ -14,6 +13,14 @@ import { Legends } from './controls/Legends'
 import Controls from './controls/Controls'
 import Basemap from './Basemap'
 import Labels from './Labels'
+import dynamic from 'next/dynamic'
+
+const DynamicLayerManger = dynamic(
+  () => import("./LayerManager"),
+  {
+    ssr: false,
+  }
+);
 
 export default function Map({
     layers,
@@ -72,7 +79,7 @@ export default function Map({
             >
                 {!!mapRef.current && layers && ready && (
                     <>
-                        <LayerManager layers={layers} />
+                        <DynamicLayerManger layers={layers} />
                         <Basemap mapRef={mapRef} />
                         <Labels mapRef={mapRef} />
                         {showControls && (

@@ -17,6 +17,7 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
 import { TabularResource } from '../visualizations/Visualizations'
+import { APIButton } from './datafiles/API'
 
 export function DataFiles({
     dataset,
@@ -371,6 +372,7 @@ function DatafileCard({
                                 <DownloadButton datafile={datafile} />
                                 {/*<LearnMoreButton datafile={datafile} dataset={dataset} />*/}
                                 <OpenInButton />
+                                <APIButton datafile={datafile} />
                             </div>
                         </Disclosure.Panel>
                     </Transition>

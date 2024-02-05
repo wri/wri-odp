@@ -1,4 +1,3 @@
-import { Button } from '@/components/_shared/Button'
 import { InputGroup, ErrorDisplay } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
@@ -18,7 +17,6 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import { ChartFormType, chartSchema } from '@/schema/view.schema'
 import DeleteViewDialog from './DeleteViewDialog'
 import {
-    CheckIcon,
     InformationCircleIcon,
     PencilSquareIcon,
 } from '@heroicons/react/24/outline'
@@ -31,16 +29,14 @@ import { Accordion } from '../dashboard/datasets/admin/datafiles/sections/BuildA
 import { queryRw } from '@/utils/rw'
 import { DefaultTooltip } from '../_shared/Tooltip'
 import { WriDataset } from '@/schema/ckan.schema'
+import { Button, LoaderButton } from '../_shared/Button'
+import { Transform } from 'plotly.js'
 const Chart = dynamic(
     () => import('@/components/datasets/visualizations/Chart'),
     {
         ssr: false,
     }
 )
-const emptyOption = {
-    label: 'None',
-    value: '',
-}
 
 const withEmptyOption = (ar?: any[]) => {
     if (ar) {
@@ -66,7 +62,12 @@ export default function ChartViewEditor({
     view: View
     setView: Dispatch<SetStateAction<View>>
     onCancelOrDelete: (mode: string) => void
-    onSave: (mode: string, view: View) => void
+    onSave: (
+        mode: string,
+        view: View,
+        onError: () => void,
+        onSuccess: () => void
+    ) => void
     mode: ViewState['_state']
     dataset: WriDataset
 }) {
@@ -74,6 +75,9 @@ export default function ChartViewEditor({
 
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [isDataDialogOpen, setIsDataDialogOpen] = useState(false)
+
+    const [isPreviewLoading, setIsPreviewLoading] = useState(false)
+    const [isSaveLoading, setIsSaveLoading] = useState(false)
 
     const [sql] = useState('')
 
@@ -134,6 +138,7 @@ export default function ChartViewEditor({
     const onSubmit = async (formData: ChartFormType) => {
         //  Reset error message
         setError(undefined)
+        setIsPreviewLoading(true)
 
         try {
             const chartProps: ChartViewConfig['props'] = {
@@ -147,7 +152,10 @@ export default function ChartViewEditor({
              *
              */
             const dimensionColName = formData.config.query.dimension.value
-            const categoryColName = formData.config.query.category?.value
+            let categoryColName = formData.config.query.category?.value || ''
+            if (chartType == 'pie') {
+                categoryColName = ''
+            }
             const isGrouped = !!categoryColName
             const measureColName = formData.config.query.measure.value
             const columns: string[] = [dimensionColName, measureColName]
@@ -217,8 +225,7 @@ export default function ChartViewEditor({
                     tickangle:
                         formData.config.chart.labels?.y?.angle?.value ?? 'auto',
                 },
-                showlegend:
-                    formData.config.chart.legends.enabled?.value || false,
+                showlegend: true,
                 legend: {
                     title: { text: formData.config.chart.legends.title },
                 },
@@ -228,14 +235,87 @@ export default function ChartViewEditor({
             const sortByCol = formData.config.chart?.sorting?.by?.value
             const sortOrder = formData.config.chart?.sorting?.order?.value
 
+            if (sortByCol && sortOrder) {
+                tableData.sort((rowA: any, rowB: any) => {
+                    const sortByColName =
+                        sortByCol == 'data' ? measureColName : dimensionColName
+
+                    const sample = rowA[sortByColName][0]
+
+                    const isNumeric = !isNaN(parseFloat(sample))
+
+                    rowA = rowA[sortByColName]
+                    rowB = rowB[sortByColName]
+
+                    if (isNumeric) {
+                        if (sortOrder == 'DESC') {
+                            return parseFloat(rowB) - parseFloat(rowA)
+                        } else {
+                            return parseFloat(rowA) - parseFloat(rowB)
+                        }
+                    } else {
+                        if (sortOrder == 'DESC') {
+                            return rowB.localeCompare(rowA)
+                        } else {
+                            return rowA.localeCompare(rowB)
+                        }
+                    }
+                })
+            }
+
             // Tooltips
             const tooltipsEnabled =
                 formData.config.chart.tooltips?.enabled?.value
 
             const tooltipsFormat = formData.config.chart.tooltips?.format?.value
 
+            //  Ungrouped bar chart = each bar should be a trace
+            //  and colors are applied with layout.colorway
+            if (chartType == 'bar' && !isGrouped) {
+                categoryColName = dimensionColName
+                const uniqueCategories = [
+                    ...new Set(
+                        tableData.map((row: any) => row[dimensionColName])
+                    ),
+                ]
+                const uniqueCategoriesQty = uniqueCategories.length
+                const startingColor = formData.config.chart.colors.starting
+                const endingColor = formData.config.chart.colors.ending
+
+                // @ts-ignore
+                const colors = uniqueCategories.map((value: any, i: number) => {
+                    return getGradientColor(
+                        startingColor,
+                        endingColor,
+                        i / uniqueCategoriesQty
+                    )
+                })
+
+                layout.colorway = colors
+            } else if (['bar', 'scatter'].includes(chartType) && isGrouped) {
+                const uniqueCategories = [
+                    ...new Set(
+                        tableData.map((row: any) => row[categoryColName])
+                    ),
+                ]
+                const uniqueCategoriesQty = uniqueCategories.length
+                const startingColor = formData.config.chart.colors.starting
+                const endingColor = formData.config.chart.colors.ending
+
+                // @ts-ignore
+                const colors = uniqueCategories.map((value: any, i: number) => {
+                    return getGradientColor(
+                        startingColor,
+                        endingColor,
+                        i / uniqueCategoriesQty
+                    )
+                })
+
+                layout.colorway = colors
+            }
+
             let categories = []
-            if (isGrouped) {
+            if (categoryColName) {
                 const categoryNames = tableData.map(
                     (row: any) => row[categoryColName]
                 )
@@ -286,60 +366,30 @@ export default function ChartViewEditor({
                     trace.values = category.y
                 }
 
-                const dataPointsQty = category.x.length
+                if (['pie'].includes(chartType)) {
+                    const dataPointsQty = category.x.length
+                    const startingColor = formData.config.chart.colors.starting
+                    const endingColor = formData.config.chart.colors.ending
 
-                const startingColor = formData.config.chart.colors.starting
-                const endingColor = formData.config.chart.colors.ending
-
-                // @ts-ignore
-                const colors = category.x.map((value: any, i: number) => {
-                    return getGradientColor(
-                        startingColor,
-                        endingColor,
-                        i / dataPointsQty
-                    )
-                })
-
-                trace.marker = {
-                    color: colors,
-                    colors: colors,
-                }
-
-                if (sortByCol && sortOrder) {
-                    const colName =
-                        sortByCol == 'data' ? measureColName : dimensionColName
                     // @ts-ignore
-                    const sample = tableData[0][colName]
+                    const colors = category.x.map((value: any, i: number) => {
+                        return getGradientColor(
+                            startingColor,
+                            endingColor,
+                            i / dataPointsQty
+                        )
+                    })
 
-                    const isNumeric =
-                        !isNaN(sample) || !isNaN(parseFloat(sample))
-
-                    if (isNumeric) {
-                        let target = 'y'
-                        if (['bar', 'line'].includes(chartType)) {
-                            target = sortByCol == 'data' ? 'y' : 'x'
-                        } else if (['pie'].includes(chartType)) {
-                            target = sortByCol == 'data' ? 'values' : 'labels'
-                        }
-
-                        const sortTransform: any = {
-                            type: 'sort',
-                            target: target,
-                            order:
-                                sortOrder == 'DESC'
-                                    ? 'descending'
-                                    : 'ascending',
-                        }
-
-                        if (trace.transforms) {
-                            trace.transforms.push(sortTransform)
-                        } else {
-                            trace.transforms = [sortTransform]
-                        }
-                    } else {
-                        layout.xaxis = {
-                            categoryorder: `category ${sortOrder == 'ASC' ? 'ascending' : 'descending'}`,
-                        }
+                    trace.marker = {
+                        color: colors,
+                        colors: colors,
+                    }
+                } else if (
+                    ['scatter'].includes(chartType) &&
+                    !categoryColName
+                ) {
+                    trace.marker = {
+                        color: formData.config.chart.colors.starting,
                     }
                 }
 
@@ -377,6 +427,8 @@ export default function ChartViewEditor({
             // @ts-ignore
             setError({ title: 'Error', text: e?.message as string })
         }
+
+        setIsPreviewLoading(false)
     }
 
     return (
@@ -550,45 +602,48 @@ export default function ChartViewEditor({
                                                     errors={errors}
                                                 />
                                             </InputGroup>
-                                            <InputGroup
-                                                label="Category column"
-                                                className="sm:grid-cols-1 gap-x-2"
-                                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                                info="Used for data point grouping"
-                                            >
-                                                <SimpleSelect
-                                                    id="category"
-                                                    formObj={formObj}
-                                                    name="config.query.category"
-                                                    placeholder="E.g. Country"
-                                                    options={
-                                                        withEmptyOption(
-                                                            fields?.columns
-                                                                .filter(
-                                                                    (f) =>
-                                                                        watch(
-                                                                            'config.query.dimension'
+                                            {watch('config.chart.type')
+                                                ?.value != 'pie' && (
+                                                    <InputGroup
+                                                        label="Category column"
+                                                        className="sm:grid-cols-1 gap-x-2"
+                                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                        info="Used for data point grouping"
+                                                    >
+                                                        <SimpleSelect
+                                                            id="category"
+                                                            formObj={formObj}
+                                                            name="config.query.category"
+                                                            placeholder="E.g. Country"
+                                                            options={
+                                                                withEmptyOption(
+                                                                    fields?.columns
+                                                                        .filter(
+                                                                            (f) =>
+                                                                                watch(
+                                                                                    'config.query.dimension'
+                                                                                )
+                                                                                    ?.value !=
+                                                                                f.key &&
+                                                                                watch(
+                                                                                    'config.query.measure'
+                                                                                )
+                                                                                    ?.value !=
+                                                                                f.key
                                                                         )
-                                                                            ?.value !=
-                                                                            f.key &&
-                                                                        watch(
-                                                                            'config.query.measure'
+                                                                        .map(
+                                                                            (
+                                                                                field
+                                                                            ) => ({
+                                                                                label: field.name,
+                                                                                value: field.key,
+                                                                            })
                                                                         )
-                                                                            ?.value !=
-                                                                            f.key
-                                                                )
-                                                                .map(
-                                                                    (
-                                                                        field
-                                                                    ) => ({
-                                                                        label: field.name,
-                                                                        value: field.key,
-                                                                    })
-                                                                )
-                                                        ) ?? []
-                                                    }
-                                                />
-                                            </InputGroup>
+                                                                ) ?? []
+                                                            }
+                                                        />
+                                                    </InputGroup>
+                                                )}
                                             <InputGroup
                                                 label="Aggregation function"
                                                 className="sm:grid-cols-1 gap-x-2"
@@ -619,133 +674,132 @@ export default function ChartViewEditor({
                                     {!['pie'].includes(
                                         watch('config.chart.type')?.value
                                     ) && (
-                                        <Accordion text="Sorting">
-                                            <div className="grow flex flex-col space-y-4">
-                                                <InputGroup
-                                                    label="Sort by"
-                                                    className="sm:grid-cols-1 gap-x-2"
-                                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                                >
-                                                    <SimpleSelect
-                                                        id="sort-by"
-                                                        formObj={formObj}
-                                                        name="config.chart.sorting.by"
-                                                        placeholder="Data or Labels"
-                                                        options={sortByOptions}
-                                                    />
-                                                    <ErrorDisplay
-                                                        name="config.chart.sorting.by"
-                                                        errors={errors}
-                                                    />
-                                                </InputGroup>
+                                            <Accordion text="Sorting">
+                                                <div className="grow flex flex-col space-y-4">
+                                                    <InputGroup
+                                                        label="Sort by"
+                                                        className="sm:grid-cols-1 gap-x-2"
+                                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                    >
+                                                        <SimpleSelect
+                                                            id="sort-by"
+                                                            formObj={formObj}
+                                                            name="config.chart.sorting.by"
+                                                            placeholder="Data or Labels"
+                                                            options={
+                                                                watch(
+                                                                    'config.chart.type'
+                                                                )?.value ==
+                                                                    'scatter' &&
+                                                                    watch(
+                                                                        'config.query.category'
+                                                                    )?.value
+                                                                    ? sortByOptions.filter(
+                                                                        (o) =>
+                                                                            o.value !=
+                                                                            'data'
+                                                                    )
+                                                                    : sortByOptions
+                                                            }
+                                                        />
+                                                        <ErrorDisplay
+                                                            name="config.chart.sorting.by"
+                                                            errors={errors}
+                                                        />
+                                                    </InputGroup>
 
-                                                <InputGroup
-                                                    label="Sort oder"
-                                                    className="sm:grid-cols-1 gap-x-2"
-                                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                                >
-                                                    <SimpleSelect
-                                                        id="sort-order"
-                                                        formObj={formObj}
-                                                        name="config.chart.sorting.order"
-                                                        placeholder="Ascending or Descending"
-                                                        options={
-                                                            sortOrderOptions
-                                                        }
-                                                    />
-                                                    <ErrorDisplay
-                                                        name="config.chart.sorting.order"
-                                                        errors={errors}
-                                                    />
-                                                </InputGroup>
-                                            </div>
-                                        </Accordion>
-                                    )}
+                                                    <InputGroup
+                                                        label="Sort oder"
+                                                        className="sm:grid-cols-1 gap-x-2"
+                                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                    >
+                                                        <SimpleSelect
+                                                            id="sort-order"
+                                                            formObj={formObj}
+                                                            name="config.chart.sorting.order"
+                                                            placeholder="Ascending or Descending"
+                                                            options={
+                                                                sortOrderOptions
+                                                            }
+                                                        />
+                                                        <ErrorDisplay
+                                                            name="config.chart.sorting.order"
+                                                            errors={errors}
+                                                        />
+                                                    </InputGroup>
+                                                </div>
+                                            </Accordion>
+                                        )}
                                     {!['pie'].includes(
                                         watch('config.chart.type')?.value
                                     ) && (
-                                        <Accordion text="Labels">
-                                            <div className="grow flex flex-col space-y-4">
-                                                <InputGroup
-                                                    label="X axis label"
-                                                    className="sm:grid-cols-1 gap-x-2"
-                                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                                >
-                                                    <Input
-                                                        {...register(
-                                                            'config.chart.labels.x.text'
-                                                        )}
-                                                    />
-                                                    <ErrorDisplay
-                                                        name="config.chart.labels.x.text"
-                                                        errors={errors}
-                                                    />
-                                                </InputGroup>
-                                                <InputGroup
-                                                    label="X axis tick angle"
-                                                    className="sm:grid-cols-1 gap-x-2"
-                                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                                >
-                                                    <SimpleSelect
-                                                        id="x-axis-label-orientation"
-                                                        formObj={formObj}
-                                                        name="config.chart.labels.x.angle"
-                                                        placeholder="E.g. 45º"
-                                                        options={
-                                                            labelAngleOptions
-                                                        }
-                                                    />
-                                                </InputGroup>
-                                                <InputGroup
-                                                    label="Y axis label"
-                                                    className="sm:grid-cols-1 gap-x-2"
-                                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                                >
-                                                    <Input
-                                                        {...register(
-                                                            'config.chart.labels.y.text'
-                                                        )}
-                                                    />
-                                                    <ErrorDisplay
-                                                        name="config.chart.labels.y.text"
-                                                        errors={errors}
-                                                    />
-                                                </InputGroup>
-                                                <InputGroup
-                                                    label="Y axis tick angle"
-                                                    className="sm:grid-cols-1 gap-x-2"
-                                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                                >
-                                                    <SimpleSelect
-                                                        id="y-axis-tick-angle"
-                                                        formObj={formObj}
-                                                        name="config.chart.labels.y.angle"
-                                                        placeholder="E.g. 45º"
-                                                        options={
-                                                            labelAngleOptions
-                                                        }
-                                                    />
-                                                </InputGroup>
-                                            </div>
-                                        </Accordion>
-                                    )}
+                                            <Accordion text="Labels">
+                                                <div className="grow flex flex-col space-y-4">
+                                                    <InputGroup
+                                                        label="X axis label"
+                                                        className="sm:grid-cols-1 gap-x-2"
+                                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                    >
+                                                        <Input
+                                                            {...register(
+                                                                'config.chart.labels.x.text'
+                                                            )}
+                                                        />
+                                                        <ErrorDisplay
+                                                            name="config.chart.labels.x.text"
+                                                            errors={errors}
+                                                        />
+                                                    </InputGroup>
+                                                    <InputGroup
+                                                        label="X axis tick angle"
+                                                        className="sm:grid-cols-1 gap-x-2"
+                                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                    >
+                                                        <SimpleSelect
+                                                            id="x-axis-label-orientation"
+                                                            formObj={formObj}
+                                                            name="config.chart.labels.x.angle"
+                                                            placeholder="E.g. 45º"
+                                                            options={
+                                                                labelAngleOptions
+                                                            }
+                                                        />
+                                                    </InputGroup>
+                                                    <InputGroup
+                                                        label="Y axis label"
+                                                        className="sm:grid-cols-1 gap-x-2"
+                                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                    >
+                                                        <Input
+                                                            {...register(
+                                                                'config.chart.labels.y.text'
+                                                            )}
+                                                        />
+                                                        <ErrorDisplay
+                                                            name="config.chart.labels.y.text"
+                                                            errors={errors}
+                                                        />
+                                                    </InputGroup>
+                                                    <InputGroup
+                                                        label="Y axis tick angle"
+                                                        className="sm:grid-cols-1 gap-x-2"
+                                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                    >
+                                                        <SimpleSelect
+                                                            id="y-axis-tick-angle"
+                                                            formObj={formObj}
+                                                            name="config.chart.labels.y.angle"
+                                                            placeholder="E.g. 45º"
+                                                            options={
+                                                                labelAngleOptions
+                                                            }
+                                                        />
+                                                    </InputGroup>
+                                                </div>
+                                            </Accordion>
+                                        )}
                                     <Accordion text="Legends">
                                         <div className="grow flex flex-col space-y-4">
-                                            <InputGroup
-                                                label="Enabled"
-                                                className="sm:grid-cols-1 gap-x-2"
-                                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                            >
-                                                <SimpleSelect
-                                                    id="legends-enabled"
-                                                    formObj={formObj}
-                                                    name="config.chart.legends.enabled"
-                                                    placeholder=""
-                                                    options={
-                                                        legendEnabledOptions
-                                                    }
-                                                />
-                                            </InputGroup>
                                             <InputGroup
                                                 label="Title"
                                                 className="sm:grid-cols-1 gap-x-2"
@@ -755,11 +809,6 @@ export default function ChartViewEditor({
                                                     {...register(
                                                         'config.chart.legends.title'
                                                     )}
-                                                    disabled={
-                                                        !watch(
-                                                            'config.chart.legends.enabled'
-                                                        )?.value
-                                                    }
                                                 />
                                                 <ErrorDisplay
                                                     name="config.chart.legends.title"
@@ -772,45 +821,45 @@ export default function ChartViewEditor({
                                     {!['pie'].includes(
                                         watch('config.chart.type')?.value
                                     ) && (
-                                        <Accordion text="Tooltips">
-                                            <div className="grow flex flex-col space-y-4">
-                                                <InputGroup
-                                                    label="Enabled"
-                                                    className="sm:grid-cols-1 gap-x-2"
-                                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                                >
-                                                    <SimpleSelect
-                                                        id="legends-enabled"
-                                                        formObj={formObj}
-                                                        name="config.chart.tooltips.enabled"
-                                                        placeholder=""
-                                                        options={
-                                                            tooltipsEnabledOptions
-                                                        }
-                                                    />
-                                                </InputGroup>
-                                                <InputGroup
-                                                    label="Format"
-                                                    className="sm:grid-cols-1 gap-x-2"
-                                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                                >
-                                                    <SimpleSelect
-                                                        id="legends-enabled"
-                                                        formObj={formObj}
-                                                        name="config.chart.tooltips.format"
-                                                        placeholder="E.g. 0.0%"
-                                                        options={
-                                                            tooltipsFormattingOptions
-                                                        }
-                                                    />
-                                                    <ErrorDisplay
-                                                        name="config.chart.legends.format"
-                                                        errors={errors}
-                                                    />
-                                                </InputGroup>
-                                            </div>
-                                        </Accordion>
-                                    )}
+                                            <Accordion text="Tooltips">
+                                                <div className="grow flex flex-col space-y-4">
+                                                    <InputGroup
+                                                        label="Enabled"
+                                                        className="sm:grid-cols-1 gap-x-2"
+                                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                    >
+                                                        <SimpleSelect
+                                                            id="legends-enabled"
+                                                            formObj={formObj}
+                                                            name="config.chart.tooltips.enabled"
+                                                            placeholder=""
+                                                            options={
+                                                                tooltipsEnabledOptions
+                                                            }
+                                                        />
+                                                    </InputGroup>
+                                                    <InputGroup
+                                                        label="Format"
+                                                        className="sm:grid-cols-1 gap-x-2"
+                                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                                    >
+                                                        <SimpleSelect
+                                                            id="legends-enabled"
+                                                            formObj={formObj}
+                                                            name="config.chart.tooltips.format"
+                                                            placeholder="E.g. 0.0%"
+                                                            options={
+                                                                tooltipsFormattingOptions
+                                                            }
+                                                        />
+                                                        <ErrorDisplay
+                                                            name="config.chart.legends.format"
+                                                            errors={errors}
+                                                        />
+                                                    </InputGroup>
+                                                </div>
+                                            </Accordion>
+                                        )}
                                     <Accordion text="Colors">
                                         <div className="grow flex flex-col space-y-4">
                                             <InputGroup
@@ -860,14 +909,29 @@ export default function ChartViewEditor({
                                         disabled={!isDirty}
                                     >
                                         <div>
-                                            <Button
+                                            <LoaderButton
                                                 type="button"
                                                 name="save"
                                                 className="bg-wri-light-yellow"
                                                 disabled={isDirty}
-                                                onClick={() =>
-                                                    onSave(mode, view)
-                                                }
+                                                onClick={() => {
+                                                    setIsSaveLoading(true)
+                                                    onSave(
+                                                        mode,
+                                                        view,
+                                                        () => {
+                                                            setIsSaveLoading(
+                                                                false
+                                                            )
+                                                        },
+                                                        () => {
+                                                            setIsSaveLoading(
+                                                                false
+                                                            )
+                                                        }
+                                                    )
+                                                }}
+                                                loading={isSaveLoading}
                                             >
                                                 {mode == 'new'
                                                     ? 'Add to Views'
@@ -878,7 +942,7 @@ export default function ChartViewEditor({
                                                         aria-hidden="true"
                                                     />
                                                 ) : null}
-                                            </Button>
+                                            </LoaderButton>
                                         </div>
                                     </DefaultTooltip>
                                 </div>
@@ -887,12 +951,13 @@ export default function ChartViewEditor({
                     )}
                 </div>
                 <div className="w-full h-full shadow-md p-10">
-                    <Button
+                    <LoaderButton
                         type="submit"
                         className="bg-wri-light-yellow mb-5 float-right"
+                        loading={isPreviewLoading}
                     >
                         Update Preview
-                    </Button>
+                    </LoaderButton>
                     {!error && <Chart config={view.config_obj.config} />}
                     {error && <ErrorAlert {...error} />}
                 </div>
@@ -946,11 +1011,6 @@ const labelAngleOptions = [
     { value: 45, label: '45º' },
     { value: 90, label: '90º' },
     { value: 180, label: '180º' },
-]
-
-const legendEnabledOptions = [
-    { value: false, label: 'No', default: true },
-    { value: true, label: 'Yes' },
 ]
 
 const tooltipsEnabledOptions = [

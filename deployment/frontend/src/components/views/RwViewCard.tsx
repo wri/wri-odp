@@ -20,7 +20,12 @@ export function RwViewCard({
     const createMutation = api.rw.createDatasetView.useMutation()
     const updateMutation = api.rw.updateDatasetView.useMutation()
 
-    const onSave = (mode: string, view: View) => {
+    const onSave = (
+        mode: string,
+        view: View,
+        onError: () => void,
+        onSuccess: () => void
+    ) => {
         if (mode == 'new') {
             createMutation.mutate(
                 {
@@ -33,10 +38,12 @@ export function RwViewCard({
                 {
                     onError: (e) => {
                         toast(e.message, { type: 'error' })
+                        onError()
                     },
                     onSuccess: () => {
                         toast('The new view was successfully created')
                         setMode('saved')
+                        onSuccess()
                     },
                 }
             )
@@ -53,10 +60,12 @@ export function RwViewCard({
                 {
                     onError: (e) => {
                         toast(e.message, { type: 'error' })
+                        onError()
                     },
                     onSuccess: () => {
                         toast('The view was successfully updated')
                         setMode('saved')
+                        onSuccess()
                     },
                 }
             )
