@@ -10,7 +10,7 @@ import classNames from '@/utils/classnames'
 import { Tab } from '@headlessui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { OverviewForm } from './metadata/Overview'
 import { DescriptionForm } from './metadata/DescriptionForm'
@@ -38,12 +38,6 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
 import form from '@/components/vizzuality/1.3-components/form'
-import { difference, differenceWith, isEqual } from 'lodash'
-import {
-    convertFormToLayerObj,
-    getRawObjFromApiSpec,
-} from './datafiles/sections/BuildALayer/convertObjects'
-import { useStoreDirtyFields } from '@/utils/storeHooks'
 
 //change image
 //change title
@@ -182,6 +176,14 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         { name: 'Collaborators', enabled: canEditCollaborators },
     ]
 
+    // WHY THIS IS USED
+    // touched requires some kind of rendering to get updated
+    // so we are using this to force a re-render
+    useEffect(() => {
+        console.log('FORM DIRTY FIELDS', formObj.formState.dirtyFields)
+        console.log('FORM TOUCHED FIELDS', formObj.formState.touchedFields)
+    }, [formObj.watch()])
+
     return (
         <>
             <Tab.Group>
@@ -292,6 +294,20 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             )
 
                             modifiedKeys.concat(touchedKeys)
+
+                            const storedDirty =
+                                sessionStorage.getItem('dirtyFields')
+
+                            if (storedDirty) {
+                                const storedDirtyArray = JSON.parse(
+                                    storedDirty
+                                ) as string[]
+
+                                if (storedDirtyArray.length > 0) {
+                                    modifiedKeys.push(...storedDirtyArray)
+                                }
+                                sessionStorage.removeItem('dirtyFields')
+                            }
 
                             let newData: Partial<DatasetFormType> = data
 

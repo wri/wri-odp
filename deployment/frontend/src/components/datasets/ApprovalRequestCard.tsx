@@ -46,7 +46,7 @@ export default function ApprovalRequestCard({
         defaultValues: {
             title: '',
             description: '',
-            dataset_id: datasetName,
+            dataset_id: datasetId,
             owner_org: owner_org,
             creator_id: creator_id,
         },

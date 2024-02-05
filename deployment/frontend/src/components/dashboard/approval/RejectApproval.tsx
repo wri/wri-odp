@@ -63,7 +63,6 @@ export default function RejectApproval({
             </p>
             <form
                 onSubmit={formObj.handleSubmit((data) => {
-                    console.log('SGSGSGSGSG: ', data)
                     createIssueApi.mutate(data)
                 })}
             >

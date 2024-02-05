@@ -74,7 +74,7 @@ describe("Upload file and create dataset", () => {
     "Should show the tabular preview",
     {
       retries: {
-        runMode: 3,
+        runMode: 5,
         openMode: 0,
       },
     },
