@@ -164,6 +164,7 @@ describe("Create dataset", () => {
     cy.get("input").eq(1).click().type(user_2);
     cy.get("li").contains(user_2).click();
     cy.get("button").contains("Update Dataset").click().then(() => {
+      cy.wait(15000)
       cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
       timeout: 30000,
     });
