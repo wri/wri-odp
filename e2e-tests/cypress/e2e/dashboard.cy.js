@@ -192,7 +192,7 @@ describe("Dashboard Test", () => {
     },
   );
 
-  it("should delete notification", 
+  it("should delete notification",
     {
       retries: {
         runMode: 5,
@@ -217,6 +217,20 @@ describe("Dashboard Test", () => {
       },
     );
   });
+  
+  it("Should reject dataset", () => {
+    cy.visit("/dashboard/approval-request");
+    cy.contains(datasetName,  { timeout: 30000 });
+     cy.get(`button#delete-tooltip-${datasetName}`)
+      .first()
+      .click({ force: true });
+
+    cy.get("input[id=title]").type("Test");
+    cy.get(".tiptap.ProseMirror").type("Test");
+    cy.contains('button', 'Reject and send feedback').click({ force: true });
+    cy.contains(`Dataset ${datasetName} is successfully rejected`);
+
+  })
 
   it("Should have issues", () => {
     cy.visit("/datasets/" + datasetName + "?approval=true");
@@ -237,19 +251,7 @@ describe("Dashboard Test", () => {
     cy.get("button").contains("Delete Issue").click();
   });
 
-  it("Should have reject dataset", () => {
-    cy.visit("/dashboard/approval-request");
-    cy.contains(datasetName,  { timeout: 30000 });
-     cy.get(`button#delete-tooltip-${datasetName}`)
-      .first()
-      .click({ force: true });
-
-    cy.get("input[id=title]").type("Test");
-    cy.get(".tiptap.ProseMirror").type("Test");
-    cy.contains('button', 'Reject and send feedback').click({ force: true });
-    cy.contains(`Dataset ${datasetName} is successfully rejected`);
-
-  })
+  
 
   it("Should be in awaiting approval", () => {
     cy.visit("/dashboard/datasets");
