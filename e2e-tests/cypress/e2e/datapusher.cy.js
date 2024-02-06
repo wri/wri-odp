@@ -40,9 +40,10 @@ describe("Upload file and create dataset", () => {
     // });
     cy.get('button[type="submit"]').click();
     cy.wait(40000);
-
-     cy.contains("Awaiting Approval").click({ timeout: 15000 });
+    cy.visit("/dashboard/datasets");
     cy.wait(15000)
+    cy.contains("Awaiting Approval").click({ timeout: 15000 });
+   
     cy.get('input[type="search"]').type(dataset).type("{enter}");
 
     cy.contains("div", dataset).should("exist", { timeout: 15000 });
