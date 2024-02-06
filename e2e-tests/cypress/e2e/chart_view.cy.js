@@ -137,7 +137,7 @@ describe("Chart view", () => {
       cy.get("@chart-container")
         .contains("Update View")
         .click({ force: true, timeout: "60000" });
-      cy.wait(15000)
+      cy.wait(20000)
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });

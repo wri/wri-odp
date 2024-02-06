@@ -12,12 +12,7 @@ describe("Upload file and create dataset", () => {
     cy.login('ckan_admin', 'test1234');
   });
 
-  it("Should create dataset",  {
-      retries: {
-        runMode: 5,
-        openMode: 0,
-      },
-    }, () => {
+  it("Should create dataset", () => {
     cy.visit("/dashboard/datasets/new");
     cy.get("input[name=title]").type(dataset);
     cy.get("input[name=name]").should("have.value", dataset);

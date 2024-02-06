@@ -170,19 +170,15 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         },
     })
 
+    const {
+        formState: { dirtyFields, touchedFields },
+    } = formObj
+
     const tabs = [
         { name: 'Metadata', enabled: true },
         { name: 'Data Files', enabled: true },
         { name: 'Collaborators', enabled: canEditCollaborators },
     ]
-
-    // WHY THIS IS USED
-    // touched requires some kind of rendering to get updated
-    // so we are using this to force a re-render
-    useEffect(() => {
-        console.log('FORM DIRTY FIELDS', formObj.formState.dirtyFields)
-        console.log('FORM TOUCHED FIELDS', formObj.formState.touchedFields)
-    }, [formObj.watch()])
 
     return (
         <>
@@ -285,49 +281,52 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     type="submit"
                     onClick={formObj.handleSubmit(
                         (data) => {
-                            const modifiedKeys = Object.keys(
-                                formObj.formState.dirtyFields
-                            )
+                            // const modifiedKeys = Object.keys(
+                            //     formObj.formState.dirtyFields
+                            // )
 
-                            const touchedKeys = Object.keys(
-                                formObj.formState.touchedFields
-                            )
+                            // const touchedKeys = Object.keys(
+                            //     formObj.formState.touchedFields
+                            // )
 
-                            modifiedKeys.concat(touchedKeys)
+                            // modifiedKeys.concat(touchedKeys)
 
-                            const storedDirty =
-                                sessionStorage.getItem('dirtyFields')
+                            // const storedDirty =
+                            //     sessionStorage.getItem('dirtyFields')
 
-                            if (storedDirty) {
-                                const storedDirtyArray = JSON.parse(
-                                    storedDirty
-                                ) as string[]
+                            // if (storedDirty) {
+                            //     const storedDirtyArray = JSON.parse(
+                            //         storedDirty
+                            //     ) as string[]
 
-                                if (storedDirtyArray.length > 0) {
-                                    modifiedKeys.push(...storedDirtyArray)
-                                }
-                                sessionStorage.removeItem('dirtyFields')
-                            }
+                            //     if (storedDirtyArray.length > 0) {
+                            //         modifiedKeys.push(...storedDirtyArray)
+                            //     }
+                            //     sessionStorage.removeItem('dirtyFields')
+                            // }
 
-                            let newData: Partial<DatasetFormType> = data
+                            // let newData: Partial<DatasetFormType> = data
 
-                            if (
-                                modifiedKeys.length === 1 &&
-                                modifiedKeys[0] === 'collaborators'
-                            ) {
-                                newData = Object.fromEntries(
-                                    Object.entries(data).filter(([key]) =>
-                                        modifiedKeys.includes(key)
-                                    )
-                                )
-                            }
+                            // if (
+                            //     modifiedKeys.length === 1 &&
+                            //     modifiedKeys[0] === 'collaborators'
+                            // ) {
+                            //     newData = Object.fromEntries(
+                            //         Object.entries(data).filter(([key]) =>
+                            //             modifiedKeys.includes(key)
+                            //         )
+                            //     )
+                            // }
 
-                            if (modifiedKeys.length === 0) {
-                                router.push('/dashboard/datasets')
-                                return
-                            } else {
-                                editDataset.mutate(newData)
-                            }
+                            // console.log('MODIFIED KEYS', modifiedKeys)
+
+                            // if (modifiedKeys.length === 0) {
+                            //     router.push('/dashboard/datasets')
+                            //     return
+                            // } else {
+                            //     editDataset.mutate(newData)
+                            // }
+                            editDataset.mutate(data)
                         },
                         (err) => {
                             console.log(err)
