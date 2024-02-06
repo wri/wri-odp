@@ -152,7 +152,7 @@ export const DatasetSchema = z
             .nullable()
             .or(emptyStringToUndefined),
         author: z.string(),
-        author_email: z.string().email(),
+        author_email: z.string().email().optional().nullable().or(emptyStringToUndefined),
         maintainer: z.string(),
         maintainer_email: z.string().email(),
         function: z.string().optional().nullable(),

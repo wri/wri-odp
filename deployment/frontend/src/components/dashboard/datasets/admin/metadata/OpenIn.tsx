@@ -80,7 +80,7 @@ export function OpenInForm({
             label={
                 <>
                     <ArrowUpRightIcon className="h-7 w-7" />
-                    Open In
+                    Link to Another WRI Product
                 </>
             }
         >

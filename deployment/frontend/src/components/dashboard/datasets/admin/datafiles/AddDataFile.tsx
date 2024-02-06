@@ -64,7 +64,8 @@ export function AddDataFile({
                         id: item.name,
                         info: {
                             label: item.name,
-                            type_override: (types[item.type as keyof typeof types]),
+                            type_override:
+                                types[item.type as keyof typeof types],
                             default: '',
                         },
                     })
@@ -261,7 +262,7 @@ export function AddDataFile({
                                             'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
                                         )}
                                     >
-                                        Upload a file
+                                        Upload file from my computer
                                     </div>
                                 </Tab>
                                 <Tab
@@ -290,7 +291,7 @@ export function AddDataFile({
                                                     selected ? 'font-bold' : ''
                                                 )}
                                             >
-                                                Link External File
+                                                Link to file in cloud storage
                                             </div>
                                         </span>
                                     )}
@@ -322,12 +323,12 @@ export function AddDataFile({
                                                     selected ? 'font-bold' : ''
                                                 )}
                                             >
-                                                Build a layer
+                                                Build a map layer (simple, no
+                                                code)
                                                 {watch('rw_dataset') ===
                                                     false && (
                                                     <span>
-                                                        Toggle RW Data to
-                                                        enable
+                                                        Toggle RW Data to enable
                                                     </span>
                                                 )}
                                             </div>
@@ -361,12 +362,11 @@ export function AddDataFile({
                                                     selected ? 'font-bold' : ''
                                                 )}
                                             >
-                                                Build a layer (Raw)
+                                                Build a map layer (JSON code)
                                                 {watch('rw_dataset') ===
                                                     false && (
                                                     <span>
-                                                        Toggle RW Data to
-                                                        enable
+                                                        Toggle RW Data to enable
                                                     </span>
                                                 )}
                                             </div>

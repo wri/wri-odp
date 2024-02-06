@@ -491,7 +491,7 @@ export default function ChartViewEditor({
                                     <Accordion text="Data">
                                         <div className="grow flex flex-col space-y-4">
                                             <InputGroup
-                                                label="Dimension column"
+                                                label="X-axis"
                                                 className="sm:grid-cols-1 gap-x-2"
                                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                                 required={true}
@@ -553,7 +553,7 @@ export default function ChartViewEditor({
                                             </InputGroup>
 
                                             <InputGroup
-                                                label="Value column"
+                                                label="Y-axis"
                                                 className="sm:grid-cols-1 gap-x-2"
                                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                                 required={true}

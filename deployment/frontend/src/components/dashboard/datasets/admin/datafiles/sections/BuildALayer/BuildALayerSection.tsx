@@ -20,6 +20,7 @@ import Tooltip from './preview/Tooltip'
 import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import LayerManagerPreview from './preview/LayerManagerPreview'
+import { slugify } from '@/utils/slugify'
 
 export function BuildALayer({
     formObj,
@@ -97,6 +98,10 @@ export function BuildALayer({
         watch('layerConfig.source.provider.account'),
         watch('layerConfig.source.provider.layers.0.options.sql'),
     ])
+
+    useEffect(() => {
+        if (!dirtyFields['slug']) setValue('slug', slugify(watch('name')))
+    }, [watch('name')])
 
     return (
         <FormProvider {...layerFormObj}>
