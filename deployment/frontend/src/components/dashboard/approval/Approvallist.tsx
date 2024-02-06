@@ -166,7 +166,7 @@ export default function Approvallist() {
                     </div>
                     <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
                         <LoaderButton
-                            variant="destructive"
+                            variant="default"
                             loading={approveDataset.isLoading}
                             onClick={() =>
                                 approveDataset.mutate({ id: selectDataset.id })

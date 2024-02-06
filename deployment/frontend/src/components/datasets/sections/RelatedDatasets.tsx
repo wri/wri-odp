@@ -32,7 +32,10 @@ export function RelatedDatasets() {
     return (
         <div className="flex flex-col gap-y-4 py-2">
             {datasets.map((dataset: WriDataset) => (
-                <DatasetCard key={`related-dataset-card-${dataset.name}`} dataset={dataset} />
+                <DatasetCard
+                    key={`related-dataset-card-${dataset.name}`}
+                    dataset={dataset}
+                />
             ))}
         </div>
     )
@@ -310,9 +313,9 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                                 id="add-to-map-modal-btn"
                                 onClick={() => {
                                     const layerIds = dataFiles
-                                        .filter((df) =>
-                                            selectedDataFileIds.includes(df.id)
-                                        )
+                                        // .filter((df) =>
+                                        //     selectedDataFileIds.includes(df.id)
+                                        // ) //ask Lucas what this line is doing
                                         .map((df) => df?.url?.split('/').at(-1))
                                         .filter((l) => l != undefined)
 

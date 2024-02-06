@@ -1,5 +1,6 @@
 import { DataDictionaryFormType } from '@/schema/dataset.schema'
 import { Activity, Group, Organization } from '@portaljs/ckan'
+import { APILayerSpec } from './layer.interface'
 import { PlotParams } from 'react-plotly.js'
 
 export interface Dataset {
@@ -38,7 +39,7 @@ export interface Resource {
     cache_last_updated?: string
     cache_url?: string
     created?: string
-    datastore_active?: boolean
+    datastore_active?: boolean | null
     description?: string
     format?: string
     hash?: string
@@ -59,8 +60,16 @@ export interface Resource {
     key?: string
     schema?: { value: DataDictionaryFormType }
     rw_id?: string
+    layerObjRaw: APILayerSpec | null
+    layerObj: APILayerSpec | null
+    connectorType?: string
+    connectorUrl?: string
+    provider?: string
+    tableName?: string
+    type: 'link' | 'upload' | 'layer' | 'empty' | 'layer-raw'
     _hasChartView?: boolean
     _views?: View[]
+    total_record_count?: number
 }
 
 export interface DatasetListQueryOptions {
@@ -110,5 +119,3 @@ export interface ChartViewConfig {
 }
 
 export type ViewState = View & { _state: 'new' | 'saved' | 'edit'; _id: number }
-
-

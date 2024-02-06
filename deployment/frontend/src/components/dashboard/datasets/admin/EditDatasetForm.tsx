@@ -1,14 +1,16 @@
 import { Collaborator, WriDataset } from '@/schema/ckan.schema'
 import {
     CapacityUnion,
+    DataDictionaryFormType,
     DatasetFormType,
     DatasetSchema,
+    ResourceFormType,
 } from '@/schema/dataset.schema'
 import classNames from '@/utils/classnames'
 import { Tab } from '@headlessui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { OverviewForm } from './metadata/Overview'
 import { DescriptionForm } from './metadata/DescriptionForm'
@@ -36,6 +38,7 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
 import { EditRwSection } from './datafiles/EditRwSection'
+import form from '@/components/vizzuality/1.3-components/form'
 
 //change image
 //change title
@@ -53,7 +56,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     const possibleLicenses = api.dataset.getLicenses.useQuery()
     const { data: teamUsers } = api.teams.getTeamUsers.useQuery(
         {
-            id: dataset.organization?.id ?? '',
+            id: dataset.organization?.id ?? dataset.owner_org ?? '',
             capacity: 'admin',
         },
         { enabled: !!dataset.organization?.id }
@@ -86,6 +89,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         })
         .otherwise(() => false)
 
+    const resourceForm = dataset.resources as unknown as ResourceFormType[]
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
@@ -93,7 +97,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             ...dataset,
             id: dataset.id,
             rw_id: dataset.rw_id,
-            rw_dataset: !!dataset.rw_id,
+            rw_dataset: dataset.rw_id ? !!dataset.rw_id : !!dataset.rw_dataset,
             tags: dataset.tags ? dataset.tags.map((tag) => tag.name) : [],
             temporal_coverage_start: dataset.temporal_coverage_start
                 ? Number(dataset.temporal_coverage_start)
@@ -135,10 +139,15 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       ),
                   }))
                 : [],
-            resources: dataset.resources.map((resource) => ({
-                ...resource,
-                schema: resource.schema ? resource.schema.value : undefined,
-            })),
+            resources: resourceForm.map((resource) => {
+                const schema = resource.schema as unknown as {
+                    value: DataDictionaryFormType
+                }
+                return {
+                    ...resource,
+                    schema: resource.schema ? schema.value : undefined,
+                }
+            }),
             spatial_type: dataset.spatial_address
                 ? 'address'
                 : dataset.spatial
@@ -161,6 +170,10 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             setErrorMessage(error.message)
         },
     })
+
+    const {
+        formState: { dirtyFields, touchedFields },
+    } = formObj
 
     const tabs = [
         { name: 'Metadata', enabled: true },
@@ -231,7 +244,10 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
-                            <EditDataFilesSection formObj={formObj} dataset={dataset} />
+                            <EditDataFilesSection
+                                formObj={formObj}
+                                dataset={dataset}
+                            />
                         </Tab.Panel>
                         <Tab.Panel
                             as="div"
@@ -273,7 +289,51 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     type="submit"
                     onClick={formObj.handleSubmit(
                         (data) => {
-                            console.log('teste')
+                            // const modifiedKeys = Object.keys(
+                            //     formObj.formState.dirtyFields
+                            // )
+
+                            // const touchedKeys = Object.keys(
+                            //     formObj.formState.touchedFields
+                            // )
+
+                            // modifiedKeys.concat(touchedKeys)
+
+                            // const storedDirty =
+                            //     sessionStorage.getItem('dirtyFields')
+
+                            // if (storedDirty) {
+                            //     const storedDirtyArray = JSON.parse(
+                            //         storedDirty
+                            //     ) as string[]
+
+                            //     if (storedDirtyArray.length > 0) {
+                            //         modifiedKeys.push(...storedDirtyArray)
+                            //     }
+                            //     sessionStorage.removeItem('dirtyFields')
+                            // }
+
+                            // let newData: Partial<DatasetFormType> = data
+
+                            // if (
+                            //     modifiedKeys.length === 1 &&
+                            //     modifiedKeys[0] === 'collaborators'
+                            // ) {
+                            //     newData = Object.fromEntries(
+                            //         Object.entries(data).filter(([key]) =>
+                            //             modifiedKeys.includes(key)
+                            //         )
+                            //     )
+                            // }
+
+                            // console.log('MODIFIED KEYS', modifiedKeys)
+
+                            // if (modifiedKeys.length === 0) {
+                            //     router.push('/dashboard/datasets')
+                            //     return
+                            // } else {
+                            //     editDataset.mutate(newData)
+                            // }
                             editDataset.mutate(data)
                         },
                         (err) => {

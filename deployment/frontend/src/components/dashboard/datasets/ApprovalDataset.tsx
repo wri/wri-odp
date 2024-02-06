@@ -11,15 +11,60 @@ import Modal from '@/components/_shared/Modal'
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
+import SelectFilter from '../_shared/SelectFilter'
+import { useQuery } from 'react-query'
+import { searchArrayForKeyword, filterObjects } from '@/utils/general'
+
+function customSort(obj: WriDataset) {
+    return [obj.approval_status === 'rejected', new Date(obj.metadata_created!)]
+}
+
+const sortedArray = (a: WriDataset, b: WriDataset) => {
+    const keyA = customSort(a)
+    const keyB = customSort(b)
+
+    if (keyA[0] !== keyB[0]) {
+        return keyA[0] ? -1 : 1
+    } else {
+        return (keyB[1] as Date).getTime() - (keyA[1] as Date).getTime()
+    }
+}
+
+export function ApprovalSelect({
+    setQuery,
+    query,
+}: {
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
+    query: SearchInput
+}) {
+    return (
+        <>
+            <SelectFilter
+                options={[
+                    { id: 'all', label: 'All' },
+                    { id: 'pending', label: 'Pending' },
+                    { id: 'rejected', label: 'Rejected' },
+                ]}
+                filtername="approval_status"
+                setQuery={setQuery}
+                query={query}
+            />
+        </>
+    )
+}
 
 export default function ApprovalDataset() {
     const [query, setQuery] = useState<SearchInput>({
         search: '',
-        page: { start: 0, rows: 10 },
+        page: { start: 0, rows: 10000 },
         _isUserSearch: true,
     })
     const { data, isLoading, refetch } =
-        api.dataset.getPendingDatasets.useQuery(query)
+        api.dataset.getPendingDatasets.useQuery({
+            search: '',
+            page: { start: 0, rows: 10000 },
+            _isUserSearch: true,
+        })
     const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
     const [open, setOpen] = useState(false)
     const utils = api.useUtils()
@@ -42,6 +87,28 @@ export default function ApprovalDataset() {
         },
     })
 
+    const filteredDataset = useQuery(['filteredDataset', data, query], () => {
+        if (!data) return { datasets: [], count: 0 }
+        const searchTerm = query.search.toLowerCase()
+        const dataset = data.datasets
+        let filterDataset = dataset
+
+        if (searchTerm) {
+            filterDataset = searchArrayForKeyword(dataset, searchTerm)
+        }
+        const fq = query.fq
+        if (fq && Object.keys(fq).length > 0) {
+            if (fq.approval_status !== '') {
+                filterDataset = filterObjects(filterDataset, fq)
+            }
+        }
+
+        const start = query.page.start
+        const rows = query.page.rows
+        const slicedData = filterDataset.slice(start, start + rows)
+        return { datasets: slicedData, count: filterDataset.length }
+    })
+
     const handleOpenModal = (dataset: WriDataset) => {
         setSelectDataset(dataset)
         setOpen(true)
@@ -57,10 +124,11 @@ export default function ApprovalDataset() {
                     <Pagination
                         setQuery={setQuery}
                         query={query}
-                        isLoading={isLoading}
-                        count={data?.count}
+                        isLoading={filteredDataset.isLoading}
+                        count={filteredDataset.data?.count}
                     />
                 }
+                RightNode={<ApprovalSelect setQuery={setQuery} query={query} />}
             />
             <div className="w-full" id="mydatasetlist">
                 {isLoading ? (
@@ -72,21 +140,23 @@ export default function ApprovalDataset() {
                         No data
                     </div>
                 ) : (
-                    data?.datasets.map((items, index) => {
-                        return (
-                            <ApprovalDatasetRow
-                                authorized={true}
-                                key={index}
-                                dataset={items}
-                                handleOpenModal={handleOpenModal}
-                                className={
-                                    index % 2 === 0
-                                        ? ' bg-wri-row-gray hover:bg-wri-slate'
-                                        : ''
-                                }
-                            />
-                        )
-                    })
+                    filteredDataset.data?.datasets
+                        .sort(sortedArray)
+                        .map((items, index) => {
+                            return (
+                                <ApprovalDatasetRow
+                                    authorized={true}
+                                    key={index}
+                                    dataset={items}
+                                    handleOpenModal={handleOpenModal}
+                                    className={
+                                        index % 2 === 0
+                                            ? ' bg-wri-row-gray hover:bg-wri-slate'
+                                            : ''
+                                    }
+                                />
+                            )
+                        })
                 )}
                 {selectDataset && (
                     <Modal

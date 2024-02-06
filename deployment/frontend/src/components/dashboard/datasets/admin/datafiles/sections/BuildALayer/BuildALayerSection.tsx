@@ -81,7 +81,7 @@ export function BuildALayer({
     const {
         watch,
         setValue,
-        formState: { dirtyFields },
+        formState: { dirtyFields, touchedFields },
     } = layerFormObj
     useEffect(() => {
         if (!dirtyFields['connectorUrl'])
@@ -101,8 +101,21 @@ export function BuildALayer({
 
     useEffect(() => {
         if (!dirtyFields['slug']) setValue('slug', slugify(watch('name')))
-    }, [watch('name')])
+    }, [watch('name')]) 
+     useEffect(() => {
+        if (
+            Object.keys(dirtyFields).length > 0 ||
+            Object.keys(touchedFields).length > 0
+        ) {
+            const dirty = Object.keys(dirtyFields)
+            const touched = Object.keys(touchedFields)
+            dirty.push(...touched)
+            //session storage
+            sessionStorage.setItem('dirtyFields', JSON.stringify(dirty))
+        }
+    }, [watch()])
 
+    console.log('IN HERE TO SEE')
     return (
         <FormProvider {...layerFormObj}>
             <Steps state={current.toStrings()[0] ?? 'setSourceConfig'} />

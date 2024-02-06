@@ -5,6 +5,7 @@ import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
 import type { WriDataset } from '@/schema/ckan.schema'
 import { formatDate } from '@/utils/general'
 import { useRouter } from 'next/router'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
 function subFields(dataset: WriDataset) {
     return [
@@ -37,17 +38,51 @@ function subFields(dataset: WriDataset) {
     ]
 }
 
+function ApprovalDatasetCardProfile({ dataset }: { dataset: WriDataset }) {
+    const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
+
+    return (
+        <div className="flex  py-3 rounded-md pl-4 sm:pl-14 gap-x-2">
+            {dataset.approval_status === 'pending' ? (
+                <DefaultTooltip content="pending" side="bottom">
+                    <div className="w-2 h-2 rounded-full bg-wri-gold my-auto "></div>
+                </DefaultTooltip>
+            ) : dataset.approval_status === 'rejected' ? (
+                <DefaultTooltip content="rejected" side="bottom">
+                    <div className="w-2 h-2 rounded-full bg-red-700 my-auto "></div>
+                </DefaultTooltip>
+            ) : (
+                ''
+            )}
+            <div className="flex flex-col w-full">
+                <p className="font-semibold text-[15px]">
+                    {dataset?.title ?? dataset?.name}
+                </p>
+                <div className="flex font-normal">
+                    <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />
+                    <div className="ml-1 w-fit h-[12px] text-[12px] text-[#666666]">
+                        {formatDate(created)}
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
     const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
+
     return (
-        <div className="flex flex-col p-1 py-3 rounded-md pl-4 sm:pl-14">
-            <p className="font-semibold text-[15px]">
-                {dataset?.title ?? dataset?.name}
-            </p>
-            <div className="flex font-normal">
-                <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />
-                <div className="ml-1 w-fit h-[12px] text-[12px] text-[#666666]">
-                    {formatDate(created)}
+        <div className="flex  py-3 rounded-md pl-4 sm:pl-14 gap-x-2">
+            <div className="flex flex-col w-full">
+                <p className="font-semibold text-[15px]">
+                    {dataset?.title ?? dataset?.name}
+                </p>
+                <div className="flex font-normal">
+                    <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />
+                    <div className="ml-1 w-fit h-[12px] text-[12px] text-[#666666]">
+                        {formatDate(created)}
+                    </div>
                 </div>
             </div>
         </div>
@@ -144,7 +179,7 @@ export function ApprovalDatasetRow({
         <Row
             authorized={authorized}
             className={`pr-2 sm:pr-4 ${className ? className : ''}`}
-            rowMain={<DatasetCardProfile dataset={dataset} />}
+            rowMain={<ApprovalDatasetCardProfile dataset={dataset} />}
             controlButtons={[
                 {
                     label: 'Edit',

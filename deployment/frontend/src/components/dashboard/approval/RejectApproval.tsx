@@ -27,7 +27,7 @@ export default function RejectApproval({
         defaultValues: {
             title: '',
             description: '',
-            dataset_id: dataset.name,
+            dataset_id: dataset.id,
             owner_org: dataset.owner_org,
             creator_id: dataset.creator_user_id,
         },
