@@ -2,14 +2,15 @@ import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import { v4 as uuidv4 } from 'uuid'
-import { AddDataFile } from './AddDataFile'
 import { EditDataFile } from './EditDataFile'
 import { MetadataAccordion } from '../metadata/MetadataAccordion'
+import { RWDatasetForm } from '../metadata/RWDataset'
 import { api } from '@/utils/api'
 import ViewsList from '@/components/views/ViewsList'
+import { AddLayer } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection'
 import { WriDataset } from '@/schema/ckan.schema'
 
-export function EditDataFilesSection({
+export function EditRwSection({
     formObj,
     dataset,
 }: {
@@ -34,17 +35,32 @@ export function EditDataFilesSection({
         { enabled: !!rwId }
     )
 
+    console.log(
+        'fields',
+        fields.map((f) => f.type)
+    )
     return (
         <>
-              {fields.map((field, index) => {
+            <RWDatasetForm formObj={formObj} editing={true} />
+            {rwId && provider && !isDatasetViewsLoading && (
+                <MetadataAccordion label="Dataset views" defaultOpen={false}>
+                    <ViewsList
+                        provider="rw"
+                        rwDatasetId={rwId}
+                        views={datasetViews ?? []}
+                        dataset={dataset}
+                    />
+                </MetadataAccordion>
+            )}
+            {fields.map((field, index) => {
                 if (
-                    field.type === 'layer' ||
-                    field.type === 'layer-raw' ||
-                    field.type === 'empty-layer'
+                    field.type === 'link' ||
+                    field.type === 'upload' ||
+                    field.type === 'empty-file'
                 )
                     return <></>
                 return field.new ? (
-                    <AddDataFile
+                    <AddLayer
                         key={index}
                         index={index}
                         field={field}
@@ -69,7 +85,7 @@ export function EditDataFilesSection({
                             resourceId: uuidv4(),
                             package_id: watch('id'),
                             title: '',
-                            type: 'empty-file',
+                            type: 'empty-layer',
                             format: '',
                             new: true,
                             schema: [],
@@ -79,7 +95,7 @@ export function EditDataFilesSection({
                 >
                     <PlusCircleIcon className="h-5 w-5 text-amber-400" />
                     <span className="font-['Acumin Pro SemiCondensed'] text-lg font-normal leading-tight text-black">
-                        Add another data file
+                        Add another layer
                     </span>
                 </button>
             </div>

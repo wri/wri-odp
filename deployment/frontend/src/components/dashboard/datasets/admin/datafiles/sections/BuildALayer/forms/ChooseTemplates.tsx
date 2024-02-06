@@ -14,6 +14,7 @@ import { LayerFormType } from '../layer.schema'
 import { convertLayerObjToForm } from '../convertObjects'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import Image from 'next/image'
+import { ScrollArea, ScrollBar } from '@/components/_shared/ScrollArea'
 
 interface IProps {
     setOpen: (open: boolean) => void
@@ -65,56 +66,94 @@ export function ChooseTemplates(props: IProps) {
                         a basis
                     </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <Image
-                        onClick={() => setTemplate(democracy_index as any)}
-                        src={democracy_index.thumbnailUrl}
-                        alt="Thumbnail image for the democracy index template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                    <Image
-                        onClick={() => setTemplate(hdi as any)}
-                        src={hdi.thumbnailUrl}
-                        alt="Thumbnail image for the HDI template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                    <Image
-                        onClick={() => setTemplate(roads as any)}
-                        src={roads.thumbnailUrl}
-                        alt="Thumbnail image for the roads template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                    <Image
-                        onClick={() => setTemplate(marine_ecoregions as any)}
-                        src={marine_ecoregions.thumbnailUrl}
-                        alt="Thumbnail image for the marine ecoregions template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                    <Image
-                        onClick={() => setTemplate(temperature as any)}
-                        src={temperature.thumbnailUrl}
-                        alt="Thumbnail image for the temperature template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                    <Image
-                        onClick={() => setTemplate(energy_facilities as any)}
-                        src={energy_facilities.thumbnailUrl}
-                        alt="Thumbnail image for the energy facilities template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                </div>
+                <ScrollArea className="h-[300px]">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-4">
+                            <h2 className="font-acumin text-xl font-normal text-black">
+                                Continous Data - Polygon - Using filters
+                            </h2>
+                            <Image
+                                onClick={() =>
+                                    setTemplate(democracy_index as any)
+                                }
+                                src={democracy_index.thumbnailUrl}
+                                alt="Thumbnail image for the democracy index template"
+                                className="cursor-pointer"
+                                height={300}
+                                width={300}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <h2 className="font-acumin text-xl font-normal text-black">
+                                Continous Data - Polygon - Using steps
+                            </h2>
+                            <Image
+                                onClick={() => setTemplate(hdi as any)}
+                                src={hdi.thumbnailUrl}
+                                alt="Thumbnail image for the HDI template"
+                                className="cursor-pointer"
+                                height={300}
+                                width={300}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <h2 className="font-acumin text-xl font-normal text-black">
+                                Categorical Data - Lines - Using filters
+                            </h2>
+                            <Image
+                                onClick={() => setTemplate(roads as any)}
+                                src={roads.thumbnailUrl}
+                                alt="Thumbnail image for the roads template"
+                                className="cursor-pointer"
+                                height={300}
+                                width={300}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <h2 className="font-acumin text-xl font-normal text-black">
+                                Categorical Data - Polygon - Using filters
+                            </h2>
+                            <Image
+                                onClick={() =>
+                                    setTemplate(marine_ecoregions as any)
+                                }
+                                src={marine_ecoregions.thumbnailUrl}
+                                alt="Thumbnail image for the marine ecoregions template"
+                                className="cursor-pointer"
+                                height={300}
+                                width={300}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <h2 className="font-acumin text-xl font-normal text-black">
+                                Continous Data - Polygon - Using ramps
+                            </h2>
+                            <Image
+                                onClick={() => setTemplate(temperature as any)}
+                                src={temperature.thumbnailUrl}
+                                alt="Thumbnail image for the temperature template"
+                                className="cursor-pointer"
+                                height={300}
+                                width={300}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <h2 className="font-acumin text-xl font-normal text-black">
+                                Continous Data - Point - Using filters
+                            </h2>
+                            <Image
+                                onClick={() =>
+                                    setTemplate(energy_facilities as any)
+                                }
+                                src={energy_facilities.thumbnailUrl}
+                                alt="Thumbnail image for the energy facilities template"
+                                className="cursor-pointer"
+                                height={300}
+                                width={300}
+                            />
+                        </div>
+                    </div>
+                </ScrollArea>
                 <div>
                     <div className="font-acumin text-base font-light pt-6 text-neutral-600">
                         Or type the ID/Slug of the layer you want to fetch from

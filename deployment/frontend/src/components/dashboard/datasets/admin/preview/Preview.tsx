@@ -266,7 +266,7 @@ export function Preview({
                                             resource.name ?? resource.url ?? resource.title ?? '-'
                                         }
                                         title={resource.title ?? '-'}
-                                        type={resource.type ?? 'empty'}
+                                        type={resource.type ?? 'empty-file'}
                                         format={resource.format ?? '-'}
                                         size={resource.size ?? null}
                                         layerObj={resource.layerObj ?? null}
@@ -376,7 +376,7 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
 }
 
 interface DatafilePreviewProps {
-    type: 'link' | 'upload' | 'layer' | 'empty' | 'layer-raw'
+    type: 'link' | 'upload' | 'layer' | 'empty-file' | 'empty-layer' | 'layer-raw'
     name: string
     title: string
     format: string
@@ -437,7 +437,8 @@ function Datafile({
                                             </span>
                                         </>
                                     ))
-                                    .with('empty', () => <></>)
+                                    .with('empty-layer', () => <></>)
+                                    .with('empty-file', () => <></>)
                                     .otherwise(() => (
                                         <>
                                             <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />

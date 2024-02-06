@@ -63,7 +63,14 @@ export default function CreateDatasetForm() {
                 {
                     resourceId: uuidv4(),
                     title: 'Example title',
-                    type: 'empty',
+                    type: 'empty-file',
+                    format: '',
+                    schema: [],
+                },
+                {
+                    resourceId: uuidv4(),
+                    title: 'Example layer',
+                    type: 'empty-layer',
                     format: '',
                     schema: [],
                 },

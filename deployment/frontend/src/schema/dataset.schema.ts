@@ -54,7 +54,7 @@ export const ResourceSchema = z
         size: z.number().optional().nullable(),
         title: z.string().optional(),
         fileBlob: z.any(),
-        type: z.enum(['link', 'upload', 'layer', 'empty', 'layer-raw']),
+        type: z.enum(['link', 'upload', 'layer', 'empty-file', 'empty-layer', 'layer-raw']),
         schema: DataDictionarySchema.optional().nullable(),
         layerObj: layerSchema.optional().nullable(),
         datastore_active: z.boolean().optional().nullable(),

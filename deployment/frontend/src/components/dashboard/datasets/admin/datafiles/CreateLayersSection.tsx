@@ -30,14 +30,14 @@ export function CreateLayersSection({
     return (
         <>
             <RWDatasetForm formObj={formObj} />
-            {fields
-                .filter(
-                    (field) =>
-                        field.type === 'layer' ||
-                        field.type === 'layer-raw' ||
-                        field.type === 'empty'
+            {fields.map((field, index) => {
+                if (
+                    field.type === 'upload' ||
+                    field.type === 'link' ||
+                    field.type === 'empty-file'
                 )
-                .map((field, index) => (
+                    return <></>
+                return (
                     <AddLayer
                         key={index}
                         index={index}
@@ -45,14 +45,15 @@ export function CreateLayersSection({
                         remove={() => remove(index)}
                         formObj={formObj}
                     />
-                ))}
+                )
+            })}
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>
                         append({
                             resourceId: uuidv4(),
                             title: '',
-                            type: 'empty',
+                            type: 'empty-layer',
                             format: '',
                             schema: [],
                             layerObj: null,
@@ -70,7 +71,7 @@ export function CreateLayersSection({
     )
 }
 
-function AddLayer({
+export function AddLayer({
     remove,
     field,
     index,
@@ -113,7 +114,7 @@ function AddLayer({
                 <div className="px-4 py-8">
                     <Tab.Group
                         selectedIndex={match(datafile.type)
-                            .with('empty', () => 0)
+                            .with('empty-layer', () => 0)
                             .with('layer', () => 1)
                             .with('layer-raw', () => 2)
                             .otherwise(() => 0)}

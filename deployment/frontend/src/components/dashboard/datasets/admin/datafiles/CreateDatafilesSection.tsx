@@ -41,14 +41,14 @@ export function CreateDataFilesSection({
         })
     return (
         <>
-            {fields
-                .filter(
-                    (field) =>
-                        field.type === 'upload' ||
-                        field.type === 'link' ||
-                        field.type === 'empty'
+            {fields.map((field, index) => {
+                if (
+                    field.type === 'layer' ||
+                    field.type === 'layer-raw' ||
+                    field.type === 'empty-layer'
                 )
-                .map((field, index) => (
+                    return <></>
+                return (
                     <AddDataFile
                         key={index}
                         index={index}
@@ -56,14 +56,15 @@ export function CreateDataFilesSection({
                         remove={() => remove(index)}
                         formObj={formObj}
                     />
-                ))}
+                )
+            })}
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>
                         append({
                             resourceId: uuidv4(),
                             title: '',
-                            type: 'empty',
+                            type: 'empty-file',
                             format: '',
                             schema: [],
                             layerObj: null,
@@ -269,7 +270,7 @@ function AddDataFile({
                 <div className="px-4 py-8">
                     <Tab.Group
                         selectedIndex={match(datafile.type)
-                            .with('empty', () => 0)
+                            .with('empty-file', () => 0)
                             .with('upload', () => 1)
                             .with('link', () => 2)
                             .otherwise(() => 0)}
@@ -341,7 +342,7 @@ function AddDataFile({
                                         setValue(`resources.${index}`, {
                                             resourceId: uuidv4(),
                                             title: '',
-                                            type: 'empty',
+                                            type: 'empty-file',
                                             schema: [],
                                             layerObj: null,
                                         })
