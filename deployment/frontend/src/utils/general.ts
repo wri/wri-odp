@@ -93,3 +93,20 @@ function isWithinTimeframe(isoTimestamp: string, timeframe: string): boolean {
       return true;
   }
 }
+
+
+
+// Function to test if any pattern matches the string
+export function matchesAnyPattern(item: string): boolean {
+  const patterns: RegExp[] = [
+      /resource\[\d+\]\.connector/,
+      /modified/,
+      /datastore_active/,
+      /rw_id/,
+      /new/,
+      /preview/,
+      /hash/,
+      /total_record_count/,
+  ]
+    return !patterns.some((pattern) => pattern.test(item))
+}

@@ -259,6 +259,8 @@ Cypress.Commands.add(
         name: name,
         author: "datopian",
         license_id: "notspecified",
+        approval_status: "approved",
+        draft: "false",
         tags: [{ display_name: "subscriable", name: "subscriable" }],
         ...otherFields,
       },
@@ -524,18 +526,14 @@ Cypress.Commands.add("userMetadata", (name) => {
 
 Cypress.Commands.add(
   "createPendingDataset",
-  (package_id, name) => {
+  (package_id, dataset) => {
     const request = cy.request({
       method: "POST",
       url: apiUrl("pending_dataset_create"),
       headers: headers,
       body: {
         package_id: package_id,
-        package_data: {
-          'id': package_id,
-          'name': name,
-          'notes': 'test dataset',
-        }
+        package_data: dataset
       },
     });
   }

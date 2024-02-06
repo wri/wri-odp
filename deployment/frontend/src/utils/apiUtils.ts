@@ -32,9 +32,16 @@ import type {
     NotificationType,
 } from '@/schema/notification.schema'
 import { View } from '@/interfaces/dataset.interface'
-import { CreateViewFormSchema, EditViewFormSchema, ViewFormSchema } from '@/schema/view.schema'
+import {
+    CreateViewFormSchema,
+    EditViewFormSchema,
+    ViewFormSchema,
+} from '@/schema/view.schema'
 import { getLayerRw } from '@/server/api/routers/dataset'
-import { convertLayerObjToForm, getRawObjFromApiSpec } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
+import {
+    convertLayerObjToForm,
+    getRawObjFromApiSpec,
+} from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -53,11 +60,13 @@ export async function searchHierarchy({
         if (isSysadmin) {
             let urLink = ''
             if (q) {
-                urLink = `${env.CKAN_URL}/api/3/action/${group_type == 'group' ? 'group_list' : 'organization_list'
-                    }?q=${q}&all_fields=True`
+                urLink = `${env.CKAN_URL}/api/3/action/${
+                    group_type == 'group' ? 'group_list' : 'organization_list'
+                }?q=${q}&all_fields=True`
             } else {
-                urLink = `${env.CKAN_URL}/api/3/action/${group_type == 'group' ? 'group_list' : 'organization_list'
-                    }?all_fields=True`
+                urLink = `${env.CKAN_URL}/api/3/action/${
+                    group_type == 'group' ? 'group_list' : 'organization_list'
+                }?all_fields=True`
             }
             response = await fetch(urLink, {
                 headers: {
@@ -68,9 +77,10 @@ export async function searchHierarchy({
             groups = data.success === true ? data.result : []
         } else {
             response = await fetch(
-                `${env.CKAN_URL}/api/3/action/${group_type == 'group'
-                    ? 'group_list_authz'
-                    : 'organization_list_for_user'
+                `${env.CKAN_URL}/api/3/action/${
+                    group_type == 'group'
+                        ? 'group_list_authz'
+                        : 'organization_list_for_user'
                 }?all_fields=True`,
                 {
                     headers: {
@@ -209,8 +219,10 @@ export async function getAllOrganizations({
         const orgList = await Promise.all(
             [0, 1, 2, 3, 4, 5].map(async (i) => {
                 const response = await fetch(
-                    `${env.CKAN_URL
-                    }/api/3/action/organization_list?all_fields=True&limit=${(i + 1) * 25
+                    `${
+                        env.CKAN_URL
+                    }/api/3/action/organization_list?all_fields=True&limit=${
+                        (i + 1) * 25
                     }&offset=${i * 25}`,
                     {
                         headers: {
@@ -512,7 +524,7 @@ export async function getOneDataset(
     datasetName: string,
     session: Session | null
 ) {
-    console.log("!!!!")
+    console.log('!!!!')
     const user = session?.user
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
@@ -523,13 +535,14 @@ export async function getOneDataset(
             },
         }
     )
-    console.log("!!!!")
+    console.log('!!!!')
     const dataset: CkanResponse<WriDataset> = await datasetRes.json()
     if (!dataset.success && dataset.error) {
         if (dataset.error.message) throw Error(dataset.error.message)
         throw Error(JSON.stringify(dataset.error))
     }
-    if (dataset.result.rw_id) {
+
+    if (dataset.result.rw_id && dataset.result.approval_status !== 'pending') {
         const rwRes = await fetch(
             `https://api.resourcewatch.org/v1/dataset/${dataset.result.rw_id}`,
             {
@@ -549,6 +562,19 @@ export async function getOneDataset(
         dataset.result.connectorUrl = datasetRw.data.attributes.connectorUrl
         dataset.result.provider = datasetRw.data.attributes.provider
         dataset.result.tableName = datasetRw.data.attributes.tableName
+    } else {
+        console.log('IN BLAHBLAH BLAH HERE')
+        const resource = dataset.result.resources.filter(
+            (x) => x.format?.toLowerCase() === 'layer'
+        )
+
+        if (resource.length) {
+            const layer = resource[0]!
+            dataset.result.connectorType = layer.connectorType
+            dataset.result.connectorUrl = layer.connectorUrl
+            dataset.result.provider = layer.provider
+            dataset.result.tableName = layer.tableName
+        }
     }
 
     let spatial = null
@@ -576,33 +602,53 @@ export async function getOneDataset(
                             v.config_obj.type == 'chart'
                     )
 
-                r._hasChartView = resourceHasChartView
+                r._hasChartView = resourceHasChartView!
 
                 return { ...r, _views }
             }
-            if (!r.url) return r
-            const layerObj = await getLayerRw(r.url)
-            if (r.url_type === 'layer')
-                return {
-                    ...r,
-                    layerObj: convertLayerObjToForm(layerObj),
+
+            if (!r.url && !r.layerObj && !r.layerObjRaw) return r
+            if (!r.layerObj && !r.layerObjRaw) {
+                const layerObj = await getLayerRw(r.url!)
+                if (r.url_type === 'layer')
+                    return {
+                        ...r,
+                        layerObj: convertLayerObjToForm(layerObj),
+                    }
+                if (r.url_type === 'layer-raw')
+                    return {
+                        ...r,
+                        layerObjRaw: getRawObjFromApiSpec(layerObj),
+                    }
+            }
+
+            if (r.layerObj || r.layerObjRaw) {
+                if (r.layerObj) {
+                    return {
+                        ...r,
+                        layerObj: convertLayerObjToForm(r.layerObj),
+                        rw_id: r.id,
+                    }
                 }
-            if (r.url_type === 'layer-raw')
-                return {
-                    ...r,
-                    layerObjRaw: getRawObjFromApiSpec(layerObj),
+                if (r.layerObjRaw) {
+                    return {
+                        ...r,
+                        layerObjRaw: getRawObjFromApiSpec(r.layerObjRaw),
+                        rw_id: r.id,
+                    }
                 }
+            }
             return r
         })
     )
-
-    console.log("!!!!")
 
     return {
         ...dataset.result,
         resources,
         open_in: dataset.result.open_in
-            ? JSON.parse(dataset.result.open_in as unknown as string) as OpenIn[]
+            ? (JSON.parse(
+                  dataset.result.open_in as unknown as string
+              ) as OpenIn[])
             : [],
         spatial,
     }
@@ -627,11 +673,64 @@ export async function getOnePendingDataset(
         const erroInfo = JSON.stringify(data.error).toLowerCase()
         if (erroInfo.includes('not found')) {
             return null
-         }
+        }
         throw Error(JSON.stringify(data.error))
     }
     const dataset = data.result.package_data
-    
+
+    // if (dataset.rw_id) {
+    const resourceLayer = dataset.resources.filter(
+        (x) => x.format?.toLowerCase() === 'layer'
+    )
+    if (resourceLayer.length) {
+        const layer = resourceLayer[0]!
+        dataset.connectorType = layer.connectorType
+        dataset.connectorUrl = layer.connectorUrl
+        dataset.provider = layer.provider
+        dataset.tableName = layer.tableName
+    }
+    // }
+
+    let hasLayer = false
+    const resources = await Promise.all(
+        dataset.resources.map(async (r) => {
+            if (r.url_type === 'upload' || r.url_type === 'link') return r
+            if (!r.url && !r.layerObj && !r.layerObjRaw) return r
+            if (!r.layerObj && !r.layerObjRaw) {
+                const layerObj = await getLayerRw(r.url!)
+                if (r.url_type === 'layer')
+                    return {
+                        ...r,
+                        layerObj: convertLayerObjToForm(layerObj),
+                    }
+                if (r.url_type === 'layer-raw')
+                    return {
+                        ...r,
+                        layerObjRaw: getRawObjFromApiSpec(layerObj),
+                    }
+            }
+
+            if (r.layerObj || r.layerObjRaw) {
+                hasLayer = true
+                if (r.layerObj) {
+                    return {
+                        ...r,
+                        layerObj: convertLayerObjToForm(r.layerObj),
+                        rw_id: r.id,
+                    }
+                }
+                if (r.layerObjRaw) {
+                    return {
+                        ...r,
+                        layerObjRaw: getRawObjFromApiSpec(r.layerObjRaw),
+                        rw_id: r.id,
+                    }
+                }
+            }
+            return r
+        })
+    )
+
     let spatial = null
     if (dataset.spatial) {
         try {
@@ -640,13 +739,28 @@ export async function getOnePendingDataset(
             console.log(e)
         }
     }
-    
-    return {
-        ...data.result.package_data,
-        open_in: dataset.open_in ? JSON.parse(dataset.open_in as unknown as string) as OpenIn[] : [],
-        spatial
+
+    if (!dataset.spatial || !dataset.spatial_address) {
+        delete dataset.spatial
+        delete dataset.spatial_address
     }
 
+    if (!dataset.metadata_modified) {
+        dataset.metadata_modified = data.result.last_modified
+    }
+
+    if (hasLayer) {
+        dataset.rw_dataset = true
+    }
+
+    return {
+        ...dataset,
+        resources,
+        open_in: dataset.open_in
+            ? (JSON.parse(dataset.open_in as unknown as string) as OpenIn[])
+            : [],
+        spatial,
+    }
 }
 
 export async function upsertCollaborator(
@@ -789,7 +903,7 @@ export async function getOrganizationTreeDetails({
             acc[org.id] = {
                 img_url: org.image_display_url ?? '',
                 description: org.description ?? '',
-                package_count: org.package_count,
+                package_count: org.package_count!,
             }
             return acc
         },
@@ -1110,20 +1224,23 @@ export async function generateMemberEmail(
         >
         const teamOrTopicName = teamOrTopicData.result.name
         const teamOrTopicTitle = teamOrTopicData.result.title ?? teamOrTopicName
-        const objectLink = `<a href="${portalUrl}/${notification.object_type === 'team' ? 'teams' : 'topics'
-            }/${teamOrTopicData.result.name}">${teamOrTopicTitle}</a>`
+        const objectLink = `<a href="${portalUrl}/${
+            notification.object_type === 'team' ? 'teams' : 'topics'
+        }/${teamOrTopicData.result.name}">${teamOrTopicTitle}</a>`
 
         if (actionType[0] === 'member') {
             const role = actionType[2]
             const action = actionType[1]
             if (action === 'removed') {
-                subMsg = `${action} you as a member${role !== 'member' ? ` (${role})` : ''
-                    } from the ${notification.object_type}`
+                subMsg = `${action} you as a member${
+                    role !== 'member' ? ` (${role})` : ''
+                } from the ${notification.object_type}`
                 subject = `Membership role ${action} from ${notification.object_type} ${teamOrTopicTitle}`
                 msg = `${senderUserLink} ${subMsg} ${objectLink}`
             } else if (action === 'added') {
-                subMsg = `${action} you as a member${role !== 'member' ? ` (${role})` : ''
-                    } in the ${notification.object_type}`
+                subMsg = `${action} you as a member${
+                    role !== 'member' ? ` (${role})` : ''
+                } in the ${notification.object_type}`
                 subject = `Membership role ${action} to ${notification.object_type} ${teamOrTopicTitle}`
                 msg = `${senderUserLink} ${subMsg} ${objectLink}`
             } else if (action === 'updated') {
@@ -1358,7 +1475,7 @@ export async function getRecipient({
 }: {
     owner_org: string
     session: Session
-}): Promise<string[]> {
+}): Promise<WriUser[]> {
     try {
         const response = await fetch(
             `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
@@ -1391,9 +1508,9 @@ export async function getRecipient({
             )
 
             // Extract member IDs into an array
-            const memberIds = adminAndEditorMembers.map((member) => member.id!)
+            // const memberIds = adminAndEditorMembers.map((member) => member.id!)
 
-            return memberIds
+            return adminAndEditorMembers
         } else {
             throw new Error(
                 `Failed to fetch organization information: ${responseData.error?.message}`
@@ -1424,36 +1541,80 @@ export async function sendIssueOrCommentNotigication({
 }) {
     try {
         let recipientIds: string[] = []
+        let recipientUsers: WriUser[] | null = null
 
         if (owner_org) {
-            recipientIds = await getRecipient({
+            recipientUsers = (await getRecipient({
                 owner_org: owner_org,
                 session: session,
-            })
+            }))!
+            recipientIds = recipientUsers.map((user) => user.id!)
         } else if (creator_id) {
             recipientIds = [creator_id]
+            const creatorUser = await getUser({
+                userId: creator_id,
+                apiKey: session.user.apikey,
+            })
+            recipientUsers = [creatorUser as WriUser]
         }
 
         if (collaborator_id) {
             recipientIds = recipientIds.concat(collaborator_id)
+            const collaboratorUsers = await Promise.all(
+                collaborator_id.map(async (id) => {
+                    return await getUser({
+                        userId: id,
+                        apiKey: session.user.apikey,
+                    })
+                })
+            )
+
+            const collaboratorUsersw = collaboratorUsers as WriUser[]
+
+            if (recipientUsers) {
+                recipientUsers = recipientUsers.concat(collaboratorUsersw)
+            } else {
+                recipientUsers = collaboratorUsersw
+            }
         }
+
+        const dataset = await getDatasetDetails({
+            id: dataset_id,
+            session: session,
+        })
 
         if (recipientIds.length > 0) {
             const titleNotification = title.split(' ').join('nbsp;')
-            const notificationPromises = recipientIds
-                .filter((recipientId) => recipientId !== session.user.id)
-                .map((recipientId) => {
-                    return createNotification(
-                        recipientId,
-                        session.user.id,
-                        `issue_${action}_${titleNotification}`,
-                        'dataset',
-                        dataset_id,
-                        true
-                    )
-                })
+            const notificationPromises = recipientIds.map((recipientId) => {
+                return createNotification(
+                    recipientId,
+                    session.user.id,
+                    `issue_${action}_${titleNotification}`,
+                    'dataset',
+                    dataset_id,
+                    true
+                )
+            })
 
             await Promise.all(notificationPromises)
+
+            if (recipientUsers) {
+                await Promise.all(
+                    recipientUsers
+                        .filter((user) => user.email)
+                        .map(async (user) => {
+                            const subject = `Issue ${action} on dataset ${dataset.title}`
+                            const body = `<p>Hi ${
+                                user.name ?? user.display_name ?? 'There'
+                            }</p>
+                        <p>There has been an issue ${action} on the dataset ${
+                            dataset.title
+                        }.</p>`
+                            const email = user.email!
+                            return await sendEmail(email, subject, body)
+                        })
+                )
+            }
         }
     } catch (error) {
         console.error(error)
@@ -1489,7 +1650,6 @@ export async function getResourceViews({
     return views.result
 }
 
-
 export async function getResourceView({
     id,
     session,
@@ -1523,7 +1683,7 @@ export async function createResourceView({
     view,
     session,
 }: {
-    view: CreateViewFormSchema 
+    view: CreateViewFormSchema
     session: Session | null
 }) {
     const headers = {
@@ -1539,7 +1699,7 @@ export async function createResourceView({
         {
             method: 'POST',
             headers,
-            body: JSON.stringify(view)
+            body: JSON.stringify(view),
         }
     )
     const views: CkanResponse<View[]> = await viewsRes.json()
@@ -1556,7 +1716,7 @@ export async function updateResourceView({
     view,
     session,
 }: {
-    view: EditViewFormSchema 
+    view: EditViewFormSchema
     session: Session | null
 }) {
     const headers = {
@@ -1572,7 +1732,7 @@ export async function updateResourceView({
         {
             method: 'POST',
             headers,
-            body: JSON.stringify(view)
+            body: JSON.stringify(view),
         }
     )
     const views: CkanResponse<View[]> = await viewsRes.json()
@@ -1589,7 +1749,7 @@ export async function deleteResourceView({
     id,
     session,
 }: {
-    id: string,
+    id: string
     session: Session | null
 }) {
     const headers = {
@@ -1605,7 +1765,7 @@ export async function deleteResourceView({
         {
             method: 'POST',
             headers,
-            body: JSON.stringify({id})
+            body: JSON.stringify({ id }),
         }
     )
     const views: CkanResponse<View[]> = await viewsRes.json()
@@ -1624,48 +1784,94 @@ export async function sendGroupNotification({
     collaborator_id,
     dataset_id,
     session,
-    action
+    action,
 }: {
-        owner_org: string | null;
-        creator_id: string | null;
-        collaborator_id: string[] | null;
-        dataset_id: string;
-        session: Session,
-        action: string
-    }) {
+    owner_org: string | null
+    creator_id: string | null
+    collaborator_id: string[] | null
+    dataset_id: string
+    session: Session
+    action: string
+}) {
     try {
         let recipientIds: string[] = []
-
+        let recipientUsers: WriUser[] | null = null
         if (owner_org) {
-            recipientIds = await getRecipient({owner_org: owner_org, session: session})
-        }
-        else if (creator_id) {
+            recipientUsers = (await getRecipient({
+                owner_org: owner_org,
+                session: session,
+            }))!
+            recipientIds = recipientUsers.map((user) => user.id!)
+        } else if (creator_id) {
             recipientIds = [creator_id]
+            const creatorUser = await getUser({
+                userId: creator_id,
+                apiKey: session.user.apikey,
+            })
+            recipientUsers = [creatorUser as WriUser]
         }
 
         if (collaborator_id) {
             recipientIds = recipientIds.concat(collaborator_id)
+            const collaboratorUsers = await Promise.all(
+                collaborator_id.map(async (id) => {
+                    return await getUser({
+                        userId: id,
+                        apiKey: session.user.apikey,
+                    })
+                })
+            )
+
+            const collaboratorUsersw = collaboratorUsers as WriUser[]
+
+            if (recipientUsers) {
+                recipientUsers = recipientUsers.concat(collaboratorUsersw)
+            } else {
+                recipientUsers = collaboratorUsersw
+            }
         }
 
+        const dataset = await getDatasetDetails({
+            id: dataset_id,
+            session: session,
+        })
+
         if (recipientIds.length > 0) {
-            const notificationPromises = recipientIds
-                .filter((recipientId) => recipientId !== session.user.id)
-                .map((recipientId) => {
+            const notificationPromises = recipientIds.map((recipientId) => {
                 return createNotification(
                     recipientId,
                     session.user.id,
-                     action,
+                    action,
                     'dataset',
                     dataset_id,
                     true
-                );
-            });
+                )
+            })
 
-            await Promise.all(notificationPromises);
+            await Promise.all(notificationPromises)
+
+            if (recipientUsers) {
+                await Promise.all(
+                    recipientUsers
+                        .filter((user) => user.email)
+                        .map(async (user) => {
+                            const mainAction = action.split('_')[0]
+                            const subject = `Approval status on dataset ${dataset.title}`
+                            const body = `<p>Hi ${
+                                user.name ?? user.display_name ?? 'There'
+                            }</p>
+                        <p>The approval status for the dataset ${
+                            dataset.title
+                        } is now <b><string>${mainAction}</strong><b></p>`
+                            const email = user.email!
+                            return await sendEmail(email, subject, body)
+                        })
+                )
+            }
         }
     } catch (error) {
-        console.error(error);
-        throw Error("Error in sending issue /comment notification");
+        console.error(error)
+        throw Error('Error in sending issue /comment notification')
     }
 }
 
@@ -1686,7 +1892,9 @@ export async function getPackageDiff({
             },
         }
     )
-    const packageData = (await packageRes.json()) as CkanResponse<Record<string, Record<string, never>>>
+    const packageData = (await packageRes.json()) as CkanResponse<
+        Record<string, Record<string, never>>
+    >
     if (!packageData.success && packageData.error) {
         if (packageData.error.message) throw Error(packageData.error.message)
         throw Error(JSON.stringify(packageData.error))
@@ -1694,8 +1902,11 @@ export async function getPackageDiff({
     return packageData.result
 }
 
-export async function getDatasetViews({ rwDatasetId }: { rwDatasetId: string }) {
-
+export async function getDatasetViews({
+    rwDatasetId,
+}: {
+    rwDatasetId: string
+}) {
     const viewsRes = await fetch(
         `https://api.resourcewatch.org/v1/dataset/${rwDatasetId}/widget`,
         {
@@ -1731,7 +1942,13 @@ export async function getDatasetView({ id }: { id: string }) {
     }
 }
 
-export async function patchDataset({ dataset, session }: { dataset: Partial<WriDataset>, session: Session }) {
+export async function patchDataset({
+    dataset,
+    session,
+}: {
+    dataset: Partial<WriDataset>
+    session: Session
+}) {
     const datasetRes = await fetch(`${env.CKAN_URL}/api/action/package_patch`, {
         method: 'POST',
         headers: {
@@ -1750,14 +1967,13 @@ export async function patchDataset({ dataset, session }: { dataset: Partial<WriD
 
 export async function updateDatasetHasChartsFlag({
     ckanDatasetId,
-    session
+    session,
 }: {
     ckanDatasetId: string
     session: Session
-    }) {
+}) {
     const ckanDataset = await getOneDataset(ckanDatasetId, session)
-    const ckanViews =
-        ckanDataset.resources?.map((r) => r._views).flat() ?? []
+    const ckanViews = ckanDataset.resources?.map((r) => r._views).flat() ?? []
     const ckanHasChartViews = ckanViews.some(
         (v) => v?.config_obj?.type == 'chart'
     )
@@ -1779,7 +1995,6 @@ export async function updateDatasetHasChartsFlag({
         dataset: { id: ckanDatasetId, has_chart_views: hasChartViews },
     })
 }
-
 
 export async function createDatasetView(input: CreateViewFormSchema) {
     const createRes = await fetch(
@@ -1836,4 +2051,58 @@ export async function deleteDatasetView(datasetId: string, id: string) {
     )
     const result = await createRes.json()
     return result
+}
+
+export const datsetFields = [
+    'application',
+    'approval_status',
+    'author',
+    'author_email',
+    'citation',
+    'creator_user_id',
+    'draft',
+    'featured_dataset',
+    'has_chart_views',
+    'id',
+    'isopen',
+    'license_id',
+    'license_title',
+    'maintainer',
+    'maintainer_email',
+    'metadata_created',
+    'metadata_modified',
+    'name',
+    'num_resources',
+    'num_tags',
+    'organization',
+    'owner_org',
+    'private',
+    'project',
+    'rw_dataset',
+    'rw_id',
+    'short_description',
+    'state',
+    'technical_notes',
+    'title',
+    'type',
+    'update_frequency',
+    'url',
+    'version',
+    'visibility_type',
+    'wri_data',
+    'groups',
+    'resources',
+    'tags',
+    'relationships_as_subject',
+    'relationships_as_object',
+]
+
+export function filterDatasetFields(dataset: any) {
+    const filteredDataset: any = {}
+    for (const field of datsetFields) {
+        if (dataset[field]) {
+            filteredDataset[field] = dataset[field]
+        }
+    }
+    return filteredDataset
 }

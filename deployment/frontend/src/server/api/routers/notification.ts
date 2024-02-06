@@ -40,14 +40,13 @@ export const notificationRouter = createTRPCRouter({
         )
 
         const data = (await response.json()) as CkanResponse<NotificationType[]>
-        
         const activities = await Promise.all(
             data.result.map(async (notification: NotificationType) => {
                 let user_data = await getUser({
                     userId: notification.sender_id,
                     apiKey: ctx.session.user.apikey,
                 })
-                
+
                 user_data = user_data === undefined ? null : user_data
                 let objectName = ''
                 let objectIdName = ''
@@ -72,27 +71,32 @@ export const notificationRouter = createTRPCRouter({
                         } else if (action === 'updated') {
                             msg = ` ${action} your collaborator status to "${role}" for the dataset`
                         }
-                    }
-                    else if (actionType[0] === 'issue') {
+                    } else if (actionType[0] === 'issue') {
                         const action = actionType[1]
                         if (action === 'created') {
-                            msg = ` ${action} an issue (${actionType[2]?.split('nbsp;')?.join(' ')} ) for the dataset`
+                            msg = ` ${action} an issue (${actionType[2]
+                                ?.split('nbsp;')
+                                ?.join(' ')} ) for the dataset`
+                        } else if (action === 'commented') {
+                            msg = ` ${action} on an issue (${actionType[2]
+                                ?.split('nbsp;')
+                                ?.join(' ')} ) for the dataset`
+                        } else if (action === 'closed') {
+                            msg = ` ${action} an issue (${actionType[2]
+                                ?.split('nbsp;')
+                                ?.join(' ')} ) for the dataset`
+                        } else if (action === 'open') {
+                            msg = ` re-${action} an issue (${actionType[2]
+                                ?.split('nbsp;')
+                                ?.join(' ')} ) for the dataset`
+                        } else if (action === 'deleted') {
+                            msg = ` ${action} an issue (${actionType[2]
+                                ?.split('nbsp;')
+                                ?.join(' ')} ) for the dataset`
                         }
-                        else if (action === 'commented') {
-                            msg = ` ${action} on an issue (${actionType[2]?.split('nbsp;')?.join(' ')} ) for the dataset`
-                        }
-                        else if (action === 'closed') {
-                             msg = ` ${action} an issue (${actionType[2]?.split('nbsp;')?.join(' ')} ) for the dataset`
-                        }
-                        else if (action === 'open') {
-                             msg = ` re-${action} an issue (${actionType[2]?.split('nbsp;')?.join(' ')} ) for the dataset`
-                        }
-                        else if (action === "deleted") {
-                             msg = ` ${action} an issue (${actionType[2]?.split('nbsp;')?.join(' ')} ) for the dataset`
-                        }
-                        
-                    }
-                    else {
+                    } else if (actionType[0] === 'pending') {
+                        msg = ` created ${actionType[0]}  ${actionType[1]} `
+                    } else {
                         if (notification.activity_type.includes(' ')) {
                             msg = ` ${notification.activity_type} `
                         } else {

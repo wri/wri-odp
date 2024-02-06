@@ -25,12 +25,14 @@ export default function NotificationList() {
 
             const start = query.page.start
             const rows = query.page.rows
-            const slicedData = data.slice(start, start + rows)
-            slicedData.sort(
-                (a, b) =>
-                    new Date(a.time_sent!).getTime() -
-                    new Date(b.time_sent!).getTime()
-            )
+            let slicedData = data.slice(start, start + rows)
+            slicedData = slicedData.sort((a, b) => {
+                const digitA = parseInt(a.time_text.split(' ')[0]!.trim())
+                const digitB = parseInt(b.time_text.split(' ')[0]!.trim())
+                console.log('DIGIT A-B: C', digitA, digitB, digitA - digitB)
+                return digitA - digitB
+            })
+
             return slicedData
         },
         {

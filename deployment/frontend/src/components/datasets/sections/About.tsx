@@ -14,7 +14,7 @@ export function About({
     diffFields: string[]
 }) {
     const higlighted = (field: string) => {
-        if (diffFields && isCurrentVersion) {
+        if (diffFields && !isCurrentVersion) {
             if (diffFields.includes(field)) {
                 return 'bg-yellow-200'
             }

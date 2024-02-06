@@ -33,6 +33,7 @@ import { TabularResource } from './visualizations/Visualizations'
 import TabularViewIcon from './view-icons/TabularViewIcon'
 import MapViewIcon from './view-icons/MapViewIcon'
 import ToggleVersion from './ToogleVersion'
+import { useToggleLayergroups } from '@/utils/storeHooks'
 import { useActiveCharts } from '@/utils/storeHooks'
 import { View } from '@/interfaces/dataset.interface'
 import ChartViewIcon from './view-icons/ChartViewIcon'
@@ -133,6 +134,8 @@ export function DatasetHeader({
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
 }) {
+    const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
+        useToggleLayergroups()
     const { activeCharts, addCharts, removeCharts } = useActiveCharts()
     const [open, setOpen] = useState(false)
     const [fopen, setFOpen] = useState(false)
@@ -157,7 +160,8 @@ export function DatasetHeader({
             await refetch()
             setOpen(false)
             notify(
-                `Successfully added the ${dataset?.title ?? dataset?.name
+                `Successfully added the ${
+                    dataset?.title ?? dataset?.name
                 } dataset to your favorites`,
                 'success'
             )
@@ -169,7 +173,8 @@ export function DatasetHeader({
             await refetch()
             setFOpen(false)
             notify(
-                `Successfully removed the ${dataset?.title ?? dataset?.name
+                `Successfully removed the ${
+                    dataset?.title ?? dataset?.name
                 } dataset from your favorites`,
                 'error'
             )
@@ -185,7 +190,7 @@ export function DatasetHeader({
     } as const
 
     const higlighted = (field: string) => {
-        if (diffFields && isCurrentVersion) {
+        if (diffFields && !isCurrentVersion) {
             if (diffFields.includes(field)) {
                 return 'bg-yellow-200'
             }
@@ -221,7 +226,13 @@ export function DatasetHeader({
                         {diffFields.length > 0 && (
                             <ToggleVersion
                                 enabled={isCurrentVersion!}
-                                setEnabled={setIsCurrentVersion}
+                                setEnabled={(enabled) => {
+                                    setToggleLayergroups(
+                                        prevLayerGroups,
+                                        tempLayerAsLayerobj
+                                    )
+                                    setIsCurrentVersion(enabled)
+                                }}
                             />
                         )}
                         {isLoading ? (
@@ -395,10 +406,11 @@ export function DatasetHeader({
                     </h2>
                     <div className="flex items-center gap-x-3">
                         <h1
-                            className={`w-fit text-3xl font-bold text-black ${dataset?.title
+                            className={`w-fit text-3xl font-bold text-black ${
+                                dataset?.title
                                     ? higlighted('title')
                                     : higlighted('name')
-                                }  `}
+                            }  `}
                         >
                             {dataset?.title ?? dataset?.name}{' '}
                         </h1>
@@ -455,16 +467,17 @@ export function DatasetHeader({
                             </div>
                         </div>
                         {dataset?.temporal_coverage_start ||
-                            dataset?.temporal_coverage_end ? (
+                        dataset?.temporal_coverage_end ? (
                             <div className="flex gap-x-1">
                                 <ClockIcon className="h-5 w-5 text-blue-800" />
                                 <div>
                                     <div
-                                        className={`whitespace-nowrap text-sm font-semibold text-neutral-700 ${higlighted(
-                                            'temporal_coverage_start'
-                                        ) ??
+                                        className={`whitespace-nowrap text-sm font-semibold text-neutral-700 ${
+                                            higlighted(
+                                                'temporal_coverage_start'
+                                            ) ??
                                             higlighted('temporal_coverage_end')
-                                            }`}
+                                        }`}
                                     >
                                         Temporal coverage
                                     </div>
@@ -589,7 +602,7 @@ export function DatasetHeader({
                     {dataset?.provider && dataset?.rw_id && (
                         <div className="py-4">
                             {tabularResource &&
-                                tabularResource.id === dataset.rw_id ? (
+                            tabularResource.id === dataset.rw_id ? (
                                 <Button
                                     size="sm"
                                     onClick={() => setTabularResource(null)}
@@ -630,7 +643,9 @@ export function DatasetHeader({
                                         size="sm"
                                         onClick={() => {
                                             removeCharts(
-                                                datasetViews?.map((v: View) => v.id ?? "") 
+                                                datasetViews?.map(
+                                                    (v: View) => v.id ?? ''
+                                                )
                                             )
                                         }}
                                     >

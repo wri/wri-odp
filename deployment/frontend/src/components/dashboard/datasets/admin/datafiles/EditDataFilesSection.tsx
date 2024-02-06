@@ -11,7 +11,7 @@ import { WriDataset } from '@/schema/ckan.schema'
 
 export function EditDataFilesSection({
     formObj,
-    dataset
+    dataset,
 }: {
     formObj: UseFormReturn<DatasetFormType>
     dataset: WriDataset
@@ -30,7 +30,7 @@ export function EditDataFilesSection({
         isLoading: isDatasetViewsLoading,
         error: datasetViewsError,
     } = api.rw.getDatasetViews.useQuery(
-        { rwDatasetId: rwId ?? "" },
+        { rwDatasetId: rwId ?? '' },
         { enabled: !!rwId }
     )
 

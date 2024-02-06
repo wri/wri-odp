@@ -25,6 +25,7 @@ export default function ToggleVersion({
                 side="bottom"
             >
                 <Switch
+                    id="toggle-version"
                     checked={enabled}
                     onChange={setEnabled}
                     className={classNames(
