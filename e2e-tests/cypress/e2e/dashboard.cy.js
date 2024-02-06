@@ -7,11 +7,11 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
+const datasetName = `${uuid()}tttt${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 const parentOrg2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const datasetName2 = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
+const datasetName2 = `${uuid()}pppp${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 const group = `${uuid()}${Cypress.env("GROUP_SUFFIX")}`;
 const user = `${uuid()}-user`;

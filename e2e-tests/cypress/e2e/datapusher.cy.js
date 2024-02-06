@@ -5,7 +5,7 @@ const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
 
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
-const dataset = `${uuid()}-test-dataset`;
+const dataset = `${uuid()}-test-datasettytytyty`;
 
 describe("Upload file and create dataset", () => {
   beforeEach(function () {
@@ -37,12 +37,10 @@ describe("Upload file and create dataset", () => {
     cy.wait(5000);
     cy.contains("Next: Preview").click();
     //get button of type submit
-    cy.get('button[type="submit"]').click().then(() => {
-      cy.wait(15000)
-      cy.contains(`Successfully created the "${dataset}" dataset`, {
-      timeout: 15000,
+    cy.get('button[type="submit"]').click();
+    cy.contains(`Successfully created the "${dataset}" dataset`, {
+      timeout: 20000,
     });
-    })
     
     cy.wait(20000);
   });
