@@ -8,7 +8,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
   const steps = [
     { id: 0, name: "Metadata", href: "#" },
     { id: 1, name: "Datafiles", href: "#" },
-    { id: 2, name: "Vizualizations", href: "#" },
+    { id: 2, name: "Map Visualizations", href: "#" },
     { id: 3, name: "Preview", href: "#" },
   ].map((step) => {
     return match(step.id - currentStep)

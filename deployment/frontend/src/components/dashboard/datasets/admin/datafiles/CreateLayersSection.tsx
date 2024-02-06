@@ -15,6 +15,7 @@ import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import { v4 as uuidv4 } from 'uuid'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import { RWDatasetForm } from '../metadata/RWDataset'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
 export function CreateLayersSection({
     formObj,
@@ -135,6 +136,7 @@ export function AddLayer({
                                 }
                             >
                                 {({ selected }) => (
+                                    <DefaultTooltip content="This option will try to guide you torward building some of the most common map specs, its more limited but easier overrall">
                                     <span
                                         className={classNames(
                                             'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
@@ -147,11 +149,11 @@ export function AddLayer({
                                         <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                         <div
                                             className={classNames(
-                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col',
+                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col px-4',
                                                 selected ? 'font-bold' : ''
                                             )}
                                         >
-                                            Build a layer
+                                            Build a layer (simple, no code)
                                             {watch('rw_dataset') === false && (
                                                 <span>
                                                     Toggle RW Data to enable
@@ -159,6 +161,7 @@ export function AddLayer({
                                             )}
                                         </div>
                                     </span>
+                                    </DefaultTooltip>
                                 )}
                             </Tab>
                             <Tab
@@ -172,30 +175,33 @@ export function AddLayer({
                                 }
                             >
                                 {({ selected }) => (
-                                    <span
-                                        className={classNames(
-                                            'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                            selected ? 'bg-amber-400' : '',
-                                            datafile.type === 'upload'
-                                                ? 'hidden'
-                                                : ''
-                                        )}
-                                    >
-                                        <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                        <div
+                                    <DefaultTooltip content="This require you to understand the layer config that our maps expect, useful if you want to use less common providers, such as GFW, Document, ArcGIS etc">
+                                        <span
                                             className={classNames(
-                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col',
-                                                selected ? 'font-bold' : ''
+                                                'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                                selected ? 'bg-amber-400' : '',
+                                                datafile.type === 'upload'
+                                                    ? 'hidden'
+                                                    : ''
                                             )}
                                         >
-                                            Build a layer (RAW)
-                                            {watch('rw_dataset') === false && (
-                                                <span>
-                                                    Toggle RW Data to enable
-                                                </span>
-                                            )}
-                                        </div>
-                                    </span>
+                                            <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                            <div
+                                                className={classNames(
+                                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col px-4',
+                                                    selected ? 'font-bold' : ''
+                                                )}
+                                            >
+                                                Build a layer (JSON Code)
+                                                {watch('rw_dataset') ===
+                                                    false && (
+                                                    <span>
+                                                        Toggle RW Data to enable
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </span>
+                                    </DefaultTooltip>
                                 )}
                             </Tab>
                         </Tab.List>

@@ -64,11 +64,11 @@ describe("Create dataset", () => {
     cy.get(".tiptap.ProseMirror").eq(1).type("RICH TEXT EDITOR");
     cy.get(".tiptap.ProseMirror").eq(2).type("RICH TEXT EDITOR");
     cy.get("input[name=learn_more]").type("https://google.com");
-    cy.contains("Open In").click();
-    cy.get("button").contains("Add a open-in field").click();
+    cy.contains("Link to Another WRI Product").click();
+    cy.get("button").contains("Add a link to another wri product").click();
     cy.get('input[name="open_in.0.title"]').type("Test");
     cy.get('input[name="open_in.0.url"]').type("https://google.com");
-    cy.get("button").contains("Add a open-in field").click();
+    cy.get("button").contains("Add a link to another wri product").click();
     cy.get('input[name="open_in.1.title"]').type("Test");
     cy.get('input[name="open_in.1.url"]').type("https://google.com");
     cy.contains("Custom Fields").click();
@@ -84,6 +84,7 @@ describe("Create dataset", () => {
     });
     cy.get('input[name="resources.0.title"]').clear().type("Logo");
     cy.wait(5000);
+    cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     //get button of type submit
     cy.get('button[type="submit"]').click();

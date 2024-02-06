@@ -58,7 +58,7 @@ export function ChooseTemplates(props: IProps) {
         <Modal open={open} setOpen={setOpen} className="max-w-2xl">
             <div className="p-6">
                 <div className="border-b border-zinc-100 pb-5">
-                    <div className="font-acumin text-3xl font-normal text-black">
+                    <div className="font-acumin text-3xl  text-neutral-700">
                         Use a template
                     </div>
                     <div className="font-acumin text-base font-light text-neutral-600">
@@ -66,10 +66,9 @@ export function ChooseTemplates(props: IProps) {
                         a basis
                     </div>
                 </div>
-                <ScrollArea className="h-[300px]">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="flex flex-col gap-4">
-                            <h2 className="font-acumin text-xl font-normal text-black">
+                            <h2 className="font-acumin text-base font-bold  text-neutral-700">
                                 Continous Data - Polygon - Using filters
                             </h2>
                             <Image
@@ -84,7 +83,7 @@ export function ChooseTemplates(props: IProps) {
                             />
                         </div>
                         <div className="flex flex-col gap-4">
-                            <h2 className="font-acumin text-xl font-normal text-black">
+                            <h2 className="font-acumin text-base font-bold  text-neutral-700">
                                 Continous Data - Polygon - Using steps
                             </h2>
                             <Image
@@ -97,7 +96,7 @@ export function ChooseTemplates(props: IProps) {
                             />
                         </div>
                         <div className="flex flex-col gap-4">
-                            <h2 className="font-acumin text-xl font-normal text-black">
+                            <h2 className="font-acumin text-base font-bold  text-neutral-700">
                                 Categorical Data - Lines - Using filters
                             </h2>
                             <Image
@@ -110,7 +109,7 @@ export function ChooseTemplates(props: IProps) {
                             />
                         </div>
                         <div className="flex flex-col gap-4">
-                            <h2 className="font-acumin text-xl font-normal text-black">
+                            <h2 className="font-acumin text-base font-bold  text-neutral-700">
                                 Categorical Data - Polygon - Using filters
                             </h2>
                             <Image
@@ -125,7 +124,7 @@ export function ChooseTemplates(props: IProps) {
                             />
                         </div>
                         <div className="flex flex-col gap-4">
-                            <h2 className="font-acumin text-xl font-normal text-black">
+                            <h2 className="font-acumin text-base font-bold  text-neutral-700">
                                 Continous Data - Polygon - Using ramps
                             </h2>
                             <Image
@@ -138,7 +137,7 @@ export function ChooseTemplates(props: IProps) {
                             />
                         </div>
                         <div className="flex flex-col gap-4">
-                            <h2 className="font-acumin text-xl font-normal text-black">
+                            <h2 className="font-acumin text-base font-bold  text-neutral-700">
                                 Continous Data - Point - Using filters
                             </h2>
                             <Image
@@ -153,7 +152,6 @@ export function ChooseTemplates(props: IProps) {
                             />
                         </div>
                     </div>
-                </ScrollArea>
                 <div>
                     <div className="font-acumin text-base font-light pt-6 text-neutral-600">
                         Or type the ID/Slug of the layer you want to fetch from

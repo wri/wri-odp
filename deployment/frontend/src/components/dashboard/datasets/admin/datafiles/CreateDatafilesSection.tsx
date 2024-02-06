@@ -294,10 +294,10 @@ function AddDataFile({
                                 <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                 <div
                                     className={classNames(
-                                        'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
+                                        'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm px-4'
                                     )}
                                 >
-                                    Upload a file
+                  Upload file from my computer
                                 </div>
                             </Tab>
                             <Tab
@@ -319,11 +319,11 @@ function AddDataFile({
                                         <LinkIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                         <div
                                             className={classNames(
-                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm px-4',
                                                 selected ? 'font-bold' : ''
                                             )}
                                         >
-                                            Link External File
+                      Link to file in cloud storage
                                         </div>
                                     </span>
                                 )}

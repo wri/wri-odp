@@ -33,6 +33,7 @@ import {
     LayerFormType,
     RawLayerFormType,
 } from '../datafiles/sections/BuildALayer/layer.schema'
+import { InfoAlert } from '@/components/_shared/Alerts'
 
 export function Preview({
     formObj,
@@ -253,6 +254,10 @@ export function Preview({
                             </div>
                         </div>
                     )}
+                    <InfoAlert
+                        text="Once you create the dataset, vizualizations such as charts will be availble for creation"
+                        title="Attention"
+                    />
                     {watch('resources') && watch('resources').length > 0 && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
@@ -263,7 +268,10 @@ export function Preview({
                                     <Datafile
                                         key={resource.resourceId}
                                         name={
-                                            resource.name ?? resource.url ?? resource.title ?? '-'
+                                            resource.name ??
+                                            resource.url ??
+                                            resource.title ??
+                                            '-'
                                         }
                                         title={resource.title ?? '-'}
                                         type={resource.type ?? 'empty-file'}
@@ -376,7 +384,13 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
 }
 
 interface DatafilePreviewProps {
-    type: 'link' | 'upload' | 'layer' | 'empty-file' | 'empty-layer' | 'layer-raw'
+    type:
+        | 'link'
+        | 'upload'
+        | 'layer'
+        | 'empty-file'
+        | 'empty-layer'
+        | 'layer-raw'
     name: string
     title: string
     format: string
