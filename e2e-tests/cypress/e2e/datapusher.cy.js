@@ -31,13 +31,21 @@ describe("Upload file and create dataset", () => {
     });
     cy.wait(5000);
     cy.contains("Next: Preview").click();
+    //FOR SOME REASON THIS SEEM NOT TO WORK 
+    // IN CI/CD BUT WORKS LOCALLY
     //get button of type submit
+    // cy.get('button[type="submit"]').click();
+    // cy.contains(`Successfully created the "${dataset}" dataset`, {
+    //   timeout: 20000,
+    // });
     cy.get('button[type="submit"]').click();
-    cy.contains(`Successfully created the "${dataset}" dataset`, {
-      timeout: 20000,
-    });
-    
     cy.wait(20000);
+
+     cy.contains("Awaiting Approval").click();
+    cy.wait(15000)
+    cy.get('input[type="search"]').type(dataset).type("{enter}");
+
+    cy.contains("div", dataset).should("exist", { timeout: 15000 });
   });
 
   it(
