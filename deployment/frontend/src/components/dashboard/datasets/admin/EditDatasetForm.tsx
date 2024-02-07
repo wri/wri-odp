@@ -282,7 +282,10 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
-                            <EditRwSection formObj={formObj} dataset={dataset} />
+                            <EditRwSection
+                                formObj={formObj}
+                                dataset={dataset}
+                            />
                         </Tab.Panel>
                         {canEditCollaborators && (
                             <Tab.Panel
@@ -318,8 +321,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     type="submit"
                     onClick={formObj.handleSubmit(
                         (data) => {
-                            console.log('DIRTY FIELDS', dirtyFields)
-
                             const diffLayerResources =
                                 dirtyFields?.resources?.filter(
                                     (r) => !r?.layerObj && !r?.layerObjRaw
@@ -341,7 +342,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             const storedDirty =
                                 sessionStorage.getItem('dirtyFields')
 
-                            //check if layerobj was updated
+                            // check if layerobj was updated
                             if (storedDirty) {
                                 sessionStorage.removeItem('dirtyFields')
                                 return editDataset.mutate(toBeSavedData)
@@ -374,6 +375,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                                 ].includes(key)
                                         )
                                     )
+
                                     return editDataset.mutate(newData)
                                 } else if (
                                     changedFields.length === 2 &&
@@ -383,7 +385,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                     // language is set to dirty if `Add another {collaborator | data file} is clicked
                                     // so we need to check if the language is different from the default
                                     const defaultLang = defaultvalues?.language
-                                        ? defaultvalues?.language.value
+                                        ? defaultvalues?.language
                                         : { value: '', label: '' }
                                     if (
                                         newData.language?.value !==
@@ -406,6 +408,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                                     ].includes(key)
                                                 )
                                             )
+
                                             return editDataset.mutate(newData)
                                         } else {
                                             return editDataset.mutate(
