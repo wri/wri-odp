@@ -72,6 +72,10 @@ export function BuildALayer({
         formObj.setValue(`resources.${index}.layerObj`, values)
     }
 
+    useEffect(() => {
+        syncValues()
+    }, [layerFormObj.watch()])
+
     const updatePreview = () => {
         syncValues()
         console.log('UPDATING PREVIEW', layerFormObj.getValues())
