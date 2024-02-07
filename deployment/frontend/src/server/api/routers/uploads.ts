@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import { z } from 'zod'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
@@ -6,7 +6,7 @@ import { GetObjectCommand } from '@aws-sdk/client-s3'
 import s3 from '@/server/s3'
 
 export const uploadsRouter = createTRPCRouter({
-    getPresignedUrl: protectedProcedure
+    getPresignedUrl: publicProcedure
         .input(z.object({ key: z.string() }))
         .query(async ({ input }) => {
             let s3keyPaths = input.key.split('/')

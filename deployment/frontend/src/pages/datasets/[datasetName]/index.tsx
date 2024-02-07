@@ -35,8 +35,6 @@ import { TabularResource } from '@/components/datasets/visualizations/Visualizat
 import { useIsAddingLayers } from '@/utils/storeHooks'
 import { decodeMapParam } from '@/utils/urlEncoding'
 import { WriDataset } from '@/schema/ckan.schema'
-import { User } from '@portaljs/ckan'
-import { record, string } from 'zod'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),

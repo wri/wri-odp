@@ -23,6 +23,12 @@ _TYPE_MAPPING = {
     "Date": "timestamp",
     "NULL": "text",
 }
+_S3_CONFIG = {
+        "S3_ACCESS_KEY_ID": os.environ['S3_ACCESS_KEY_ID'],
+        "S3_SECRET_KEY_ID": os.environ['S3_SECRET_KEY_ID'],
+        "S3_BUCKET_NAME": os.environ['S3_BUCKET_NAME'],
+        "S3_BUCKET_REGION": os.environ['S3_BUCKET_REGION']
+        }
 
 
 class DataPusherPlusError(Exception):
@@ -38,6 +44,7 @@ class DataPusherPlusConfig(MutableMapping):
     # ckan_service_provider settings
     DEPLOYMENT_NAME: str = _DEPLOYMENT_NAME
     CKAN_URL: str = _CKAN_URL
+    S3_CONFIG: dict = _S3_CONFIG
     SQLALCHEMY_DATABASE_URI: str = _DATABASE_URI
     WRITE_ENGINE_URL: str = _WRITE_ENGINE_URL
     DEBUG: bool = False

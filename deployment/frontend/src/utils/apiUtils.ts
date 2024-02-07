@@ -512,7 +512,6 @@ export async function getOneDataset(
     datasetName: string,
     session: Session | null
 ) {
-    console.log("!!!!")
     const user = session?.user
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
@@ -523,7 +522,6 @@ export async function getOneDataset(
             },
         }
     )
-    console.log("!!!!")
     const dataset: CkanResponse<WriDataset> = await datasetRes.json()
     if (!dataset.success && dataset.error) {
         if (dataset.error.message) throw Error(dataset.error.message)
@@ -597,8 +595,6 @@ export async function getOneDataset(
         })
     )
 
-    console.log("!!!!")
-
     return {
         ...dataset.result,
         resources,
@@ -641,9 +637,46 @@ export async function getOnePendingDataset(
             console.log(e)
         }
     }
+
+    const resources = await Promise.all(
+        dataset.resources.map(async (r) => {
+            const _views = await getResourceViews({
+                id: r.id,
+                session: session,
+            })
+
+            if (r.url_type === 'upload' || r.url_type === 'link') {
+                const resourceHasChartView =
+                    r.datastore_active &&
+                    _views.some(
+                        (v) =>
+                            v.view_type == 'custom' &&
+                            v.config_obj.type == 'chart'
+                    )
+
+                r._hasChartView = resourceHasChartView
+
+                return { ...r, _views }
+            }
+            if (!r.url) return r
+            const layerObj = await getLayerRw(r.url)
+            if (r.url_type === 'layer')
+                return {
+                    ...r,
+                    layerObj: convertLayerObjToForm(layerObj),
+                }
+            if (r.url_type === 'layer-raw')
+                return {
+                    ...r,
+                    layerObjRaw: getRawObjFromApiSpec(layerObj),
+                }
+            return r
+        })
+    )
     
     return {
         ...data.result.package_data,
+        resources,
         open_in: dataset.open_in ? JSON.parse(dataset.open_in as unknown as string) as OpenIn[] : [],
         spatial
     }

@@ -60,7 +60,11 @@ import { sendMemberNotifications } from '@/utils/apiUtils'
 import { TRPCError } from '@trpc/server'
 import { CommentSchema, IssueSchema } from '@/schema/issue.schema'
 import { throws } from 'assert'
-import { createViewFormSchema, editViewFormSchema, viewFormSchema } from '@/schema/view.schema'
+import {
+    createViewFormSchema,
+    editViewFormSchema,
+    viewFormSchema,
+} from '@/schema/view.schema'
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -331,8 +335,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                              ? JSON.stringify(input.spatial)
-                              : null,
+                                ? JSON.stringify(input.spatial)
+                                : null,
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -407,27 +411,27 @@ export const DatasetRouter = createTRPCRouter({
             }
             const resourcesToEditLayer = input.rw_id
                 ? await Promise.all(
-                      input.resources
-                          .filter(
-                              (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
-                          )
-                          .map(async (r) => {
-                              return await editLayerRw(r)
-                          })
-                  )
+                    input.resources
+                        .filter(
+                            (r) => (r.layerObj || r.layerObjRaw) && r.rw_id
+                        )
+                        .map(async (r) => {
+                            return await editLayerRw(r)
+                        })
+                )
                 : []
             const resourcesToCreateLayer =
                 rw_id !== null
                     ? await Promise.all(
-                          input.resources
-                              .filter(
-                                  (r) =>
-                                      (r.layerObj || r.layerObjRaw) && !r.rw_id
-                              )
-                              .map(async (r) => {
-                                  return await createLayerRw(r, rw_id ?? '')
-                              })
-                      )
+                        input.resources
+                            .filter(
+                                (r) =>
+                                    (r.layerObj || r.layerObjRaw) && !r.rw_id
+                            )
+                            .map(async (r) => {
+                                return await createLayerRw(r, rw_id ?? '')
+                            })
+                    )
                     : []
             const resources = [
                 ...resourcesWithoutLayer,
@@ -485,8 +489,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                              ? JSON.stringify(input.spatial)
-                              : null,
+                                ? JSON.stringify(input.spatial)
+                                : null,
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -1515,7 +1519,11 @@ export const DatasetRouter = createTRPCRouter({
 
             return {
                 ...data.result.package_data,
-                open_in: dataset.open_in ? JSON.parse(dataset.open_in as unknown as string) as OpenIn[] : [],
+                open_in: dataset.open_in
+                    ? (JSON.parse(
+                        dataset.open_in as unknown as string
+                    ) as OpenIn[])
+                    : [],
                 spatial,
             }
         }),
@@ -1584,5 +1592,37 @@ export const DatasetRouter = createTRPCRouter({
             }
 
             return packageData.result
+        }),
+
+    requestDatafileConversion: publicProcedure
+        .input(
+            z.object({
+                resource_id: z.string(),
+                provider: z.enum(['datastore', 'rw']),
+                format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON']),
+                sql: z.string(),
+                email: z.string(),
+                rw_id: z.string().optional(),
+            })
+        )
+        .mutation(async ({ input }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/prefect_download_from_store`,
+                {
+                    method: 'POST',
+                    headers: {
+                        // Authorization: ctx.session.user.apikey, // TODO: is this needed?
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(input),
+                }
+            )
+
+            const data = (await response.json()) as CkanResponse<boolean>
+            if (response.ok) {
+                console.log(data)
+                return data
+            }
+            throw data
         }),
 })

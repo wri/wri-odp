@@ -1,4 +1,5 @@
-import { Button } from '@/components/_shared/Button'
+import { Button, LoaderButton } from '@/components/_shared/Button'
+import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import Modal from '@/components/_shared/Modal'
 import {
     Popover,
@@ -9,16 +10,20 @@ import Spinner from '@/components/_shared/Spinner'
 import { Resource } from '@/interfaces/dataset.interface'
 import { api } from '@/utils/api'
 import { convertBytes } from '@/utils/convertBytes'
+import { useDataset } from '@/utils/storeHooks'
 import {
     ArrowDownTrayIcon,
     PaperAirplaneIcon,
 } from '@heroicons/react/24/outline'
-import Link from 'next/link'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import { z } from 'zod'
 
 export function DownloadButton({ datafile }: { datafile: Resource }) {
-    console.log(datafile)
-    const [convertTo, setConvertTo] = useState<string>()
+    const { dataset } = useDataset()
+    const [convertTo, setConvertTo] = useState<'CSV' | 'XLSX' | 'TSV' | 'XML'>()
     const [open, setOpen] = useState(false)
     const { data: signedUrl, isLoading } = api.uploads.getPresignedUrl.useQuery(
         {
@@ -27,9 +32,13 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
         { enabled: !!datafile.key }
     )
 
-    // Resource doesn't have a file or it is layer
-    // TODO: if it's a layer show other conversion options
-    if (datafile.format == 'Layer' || (!datafile.key && !datafile.url)) {
+    if (
+        (datafile.format == 'Layer' &&
+            // @ts-ignore
+            datafile?.layerObj?.provider !=
+            'cartodb') ||
+        (!datafile.key && !datafile.url)
+    ) {
         return null
     }
 
@@ -46,7 +55,7 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
     const Component =
         isLoading && mode == 'SIGNED_URL' ? `span` : PopoverTrigger
 
-    const conversibleFormats = ['CSV', 'XLSX', 'JSON', 'TSV']
+    const conversibleFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
 
     const format = datafile.format ?? ''
     const isConversible =
@@ -76,44 +85,62 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                     )}
                 </Component>
                 <PopoverContent>
-                    <Button
-                        className="w-full"
-                        variant="ghost"
-                        onClick={() => download(originalResourceDownloadUrl)}
-                    >
-                        Original Format{' '}
-                        {mode == 'SIGNED_URL' && datafile.format
-                            ? `(${datafile.format})`
-                            : ''}
-                    </Button>
-                    {isConversible &&
-                        conversionOptions.map((f) => (
+                    {datafile.format != 'Layer' ? (
+                        <>
                             <Button
-                                variant="ghost"
                                 className="w-full"
-                                onClick={() => {
-                                    // TODO: check if converted file is in cache
-                                    const cachedUrl = ''
-                                    const isCached = !!cachedUrl
-
-                                    if (isCached) {
-                                        return download(cachedUrl)
-                                    }
-
-                                    setConvertTo(f)
-                                    setOpen(true)
-                                }}
+                                variant="ghost"
+                                onClick={() =>
+                                    download(originalResourceDownloadUrl)
+                                }
                             >
-                                {f}
+                                Original Format{' '}
+                                {mode == 'SIGNED_URL' && datafile.format
+                                    ? `(${datafile.format})`
+                                    : ''}
                             </Button>
-                        ))}
+                            {isConversible &&
+                                conversionOptions.map((f) => (
+                                    <Button
+                                        variant="ghost"
+                                        className="w-full"
+                                        onClick={() => {
+                                            // @ts-ignore
+                                            setConvertTo(f)
+                                            setOpen(true)
+                                        }}
+                                    >
+                                        {f}
+                                    </Button>
+                                ))}
+                        </>
+                    ) : (
+                        <>
+                            {conversibleFormats.map((f) => (
+                                <Button
+                                    variant="ghost"
+                                    className="w-full"
+                                    onClick={() => {
+                                        // @ts-ignore
+                                        setConvertTo(f)
+                                        setOpen(true)
+                                    }}
+                                >
+                                    {f}
+                                </Button>
+                            ))}
+                        </>
+                    )}
                 </PopoverContent>
             </Popover>
-            <DownloadModal
-                convertTo={convertTo ?? ''}
-                open={open}
-                setOpen={setOpen}
-            />
+            {convertTo && (
+                <DownloadModal
+                    format={convertTo}
+                    open={open}
+                    setOpen={setOpen}
+                    datafile={datafile}
+                />
+            )}
         </>
     )
 }
@@ -121,37 +148,130 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
 function DownloadModal({
     open,
     setOpen,
-    convertTo,
+    format,
+    datafile,
 }: {
     open: boolean
     setOpen: (open: boolean) => void
-    convertTo: string
+    format: 'XLSX' | 'CSV' | 'TSV' | 'XML'
+    datafile: Resource
 }) {
+    const formSchema = z.object({
+        email: z.string().email(),
+    })
+
+    type FormSchema = z.infer<typeof formSchema>
+
+    const requestDatafileConversionMutation =
+        api.dataset.requestDatafileConversion.useMutation()
+
+    const formObj = useForm<FormSchema>({ resolver: zodResolver(formSchema) })
+    const {
+        handleSubmit,
+        formState: { errors },
+        register,
+    } = formObj
+
+    let isLoading = false
+
+    let tableName = datafile.id
+
+    // @ts-ignore
+    if (datafile?.layerObj?.provider == "cartodb") {
+        const { data: fieldsData, isLoading: isLoadingFields } =
+            api.rw.getFields.useQuery({
+                id:
+                    // @ts-ignore
+                    datafile?.layerObj?.dataset,
+            })
+
+        isLoading = isLoadingFields
+        if (fieldsData) {
+            tableName = fieldsData.tableName
+        }
+    }
+
     return (
         <Modal open={open} setOpen={setOpen} className="max-w-[48rem]">
             <div className="p-6">
                 <div className="border-b border-zinc-100 pb-5">
                     <div className="font-acumin text-3xl font-normal text-black">
-                        This {convertTo} file is being prepared for download
+                        This {format} file is being prepared for download
                     </div>
                     <div className="font-acumin text-base font-light text-neutral-600">
                         Please enter your email address so that you receive the
                         download link via email when it's ready.
                     </div>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-5 pt-6">
-                    <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        className="block w-full rounded-md border-b border-wri-green py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
-                        placeholder="you@example.com"
-                    />
-                    <Button className="whitespace-nowrap">
-                        <PaperAirplaneIcon className="mr-2 h-5 w-5" />
-                        Get via email
-                    </Button>
-                </div>
+                {isLoading && (
+                    <div className="w-full flex items-center my-10 justify-center">
+                        <Spinner />
+                    </div>
+                )}
+                {!isLoading && (
+                    <form
+                        onSubmit={handleSubmit(
+                            async (data) => {
+                                requestDatafileConversionMutation.mutate(
+                                    {
+                                        email: data.email,
+                                        format: format,
+                                        // @ts-ignore
+                                        rw_id: datafile?.layerObj?.dataset ?? "",
+                                        provider: datafile.rw_id
+                                            ? 'rw'
+                                            : 'datastore',
+                                        sql: `SELECT * FROM  "${tableName}"`,
+                                        resource_id: datafile.id,
+                                    },
+                                    {
+                                        onSuccess: () => {
+                                            toast(
+                                                "You'll receive an email when the file is ready",
+                                                { type: 'success' }
+                                            )
+
+                                            setOpen(false)
+                                        },
+                                        onError: (err) => {
+                                            console.log(err)
+
+                                            toast('Failed to request file', {
+                                                type: 'error',
+                                            })
+                                        },
+                                    }
+                                )
+                            },
+                            (err) => {
+                                console.log(err)
+                                toast('Failed to request file', {
+                                    type: 'error',
+                                })
+                            }
+                        )}
+                        className="flex flex-col sm:flex-row gap-5 pt-6"
+                    >
+                        <input
+                            type="email"
+                            id="email"
+                            className="block w-full rounded-md border-b border-wri-green py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
+                            placeholder="you@example.com"
+                            {...register('email')}
+                        />
+                        <LoaderButton
+                            className="whitespace-nowrap"
+                            type="submit"
+                            loading={
+                                requestDatafileConversionMutation.isLoading
+                            }
+                        >
+                            <PaperAirplaneIcon className="mr-2 h-5 w-5" />
+                            Get via email
+                        </LoaderButton>
+                    </form>
+                )}
+                <ErrorDisplay errors={errors} name="email" />
             </div>
         </Modal>
     )
