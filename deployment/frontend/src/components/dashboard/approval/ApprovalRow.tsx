@@ -25,6 +25,23 @@ export type IApprovalRow = {
     status: boolean
 }
 
+// Define an array of patterns
+const patterns: RegExp[] = [
+    /resource\[\d+\]\.connector/,
+    /modified/,
+    /datastore_active/,
+    /rw_id/,
+    /new/,
+    /preview/,
+    /hash/,
+    /total_record_count/,
+]
+
+// Function to test if any pattern matches the string
+function matchesAnyPattern(item: string): boolean {
+    return patterns.some((pattern) => pattern.test(item))
+}
+
 // a function that will return this following keys and value from Wridataset object
 function filteredDataset(dataset: WriDataset) {
     return [
@@ -66,13 +83,7 @@ function Card({ approvalInfo }: { approvalInfo: WriDataset }) {
     // the orange indicator should stand for if nay issue has being created or not
     return (
         <div className="flex flex-col sm:flex-row gap-y-3 sm:items-center  py-2 pt-4 sm:pt-2 sm:pl-6 w-full  font-normal text-[15px]">
-            {approvalInfo.issue_count == 0 ? (
-                <DefaultTooltip content="pending" side="bottom">
-                    <div className="w-2 h-2 rounded-full bg-wri-gold my-auto hidden sm:block"></div>
-                </DefaultTooltip>
-            ) : (
-                <div className="w-2 h-2 rounded-full  my-auto hidden sm:block"></div>
-            )}
+            <div className="w-2 h-2 rounded-full  my-auto hidden sm:block"></div>
             <div className="flex items-center sm:w-[30%]  gap-x-8 ml-2 ">
                 {/* <div className="flex gap-x-2">
                     {approvalInfo.status && (
@@ -108,7 +119,9 @@ function SubCardProfile({
     console.log('Diff data: ', diff)
     return (
         <div className=" mx-auto w-4/5 my-4 max-h-[300px] overflow-auto">
-            {diff ? (
+            {diff &&
+            Object.keys(diff).filter((x) => !matchesAnyPattern(x)).length >
+                0 ? (
                 <>
                     <p className="mb-3">Version Table:</p>
                     <Table>
@@ -126,25 +139,33 @@ function SubCardProfile({
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {Object.keys(diff).length > 0 &&
-                                Object.keys(diff).map((key) => {
-                                    return (
-                                        <TableRow
-                                            key={key}
-                                            className="border-0"
-                                        >
-                                            <TableCell className="font-acumin text-xs font-normal text-black">
-                                                {key}
-                                            </TableCell>
-                                            <TableCell className="font-acumin text-xs font-normal text-black">
-                                                {diff[key]?.old_value}
-                                            </TableCell>
-                                            <TableCell className="font-acumin text-xs font-normal text-black">
-                                                {diff[key]?.new_value}
-                                            </TableCell>
-                                        </TableRow>
-                                    )
-                                })}
+                            {Object.keys(diff).filter(
+                                (x) => !matchesAnyPattern(x)
+                            ).length > 0 &&
+                                Object.keys(diff)
+                                    .filter((x) => !matchesAnyPattern(x))
+                                    .map((key) => {
+                                        return (
+                                            <TableRow
+                                                key={key}
+                                                className="border-0"
+                                            >
+                                                <TableCell className="font-acumin text-xs font-normal text-black">
+                                                    {key}
+                                                </TableCell>
+                                                <TableCell className="font-acumin text-xs font-normal text-black">
+                                                    {JSON.stringify(
+                                                        diff[key]?.new_value
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="font-acumin text-xs font-normal text-black">
+                                                    {JSON.stringify(
+                                                        diff[key]?.old_value
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    })}
                         </TableBody>
                     </Table>
                 </>

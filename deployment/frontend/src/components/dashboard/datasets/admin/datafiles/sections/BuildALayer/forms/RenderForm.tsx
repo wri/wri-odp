@@ -3,7 +3,11 @@ import { Button } from '@/components/_shared/Button'
 import { InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { ChevronDownIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
+import {
+    ChevronDownIcon,
+    InformationCircleIcon,
+    PlusCircleIcon,
+} from '@heroicons/react/24/outline'
 import { Path, useFieldArray, useFormContext } from 'react-hook-form'
 import { match } from 'ts-pattern'
 import {
@@ -18,10 +22,70 @@ import classNames from '@/utils/classnames'
 import { useColumns } from '../useColumns'
 import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
 import { Accordion } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion'
+import { ScrollArea } from '@/components/_shared/ScrollArea'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/_shared/Popover'
 
 interface InteractionFormProps {
     onNext: () => void
     onPrev: () => void
+}
+
+export function RampObjExplanation() {
+    return (
+        <Popover>
+            <PopoverTrigger className="cursor-pointer">
+                <InformationCircleIcon className="h-5 w-5 text-gray-500" />
+                <PopoverContent className="p-4 bg-white shadow-lg rounded-lg max-w-sm w-full">
+                    <p className="text-sm pb-4">
+                        A Ramp object will have basically three properties
+                    </p>
+                    <ul className="text-sm flex flex-col gap-y-2 list-disc px-4 pb-4">
+                        <li>
+                            <p className="text-sm font-light">
+                                The ramp type, which can be of type 'Steps',
+                                'Interpolate', 'Interpolate(CIELAB color space)'
+                                and 'Interpolate(HCL Color Space)'
+                            </p>
+                        </li>
+                        <li>
+                            <p className="text-sm font-light">
+                                The column that we are going to match, this
+                                needs to be the name of the column in carto that
+                                we want to use to get our values
+                            </p>
+                        </li>
+                        <li>
+                            <p className="text-sm font-light">
+                                A list of colors + values to step, this
+                                basically means that from 0 to the first value
+                                to step, we will use the fist column, from the
+                                first value to step to the second we will use
+                                the second color and so on
+                            </p>
+                        </li>
+                    </ul>
+                    <p className="text-sm font-light">
+                        You can get more information about the ramps and the
+                        types of ramps by reading the{' '}
+                        <a
+                            target="_blank"
+                            className="text-blue-800 underline"
+                            href="https://docs.mapbox.com/style-spec/reference/expressions/#ramps-scales-curves"
+                        >
+                            Mapbox specification
+                        </a>{' '}
+                        just note that we do not support currently all types of
+                        interpolation (linear/exponential/cubic-bezier) only the
+                        first one{' '}
+                    </p>
+                </PopoverContent>
+            </PopoverTrigger>
+        </Popover>
+    )
 }
 
 export default function RenderForm({ onPrev, onNext }: InteractionFormProps) {
@@ -211,88 +275,92 @@ function ItemsArray() {
     )
 
     return (
-        <div className="flex flex-col gap-y-4 max-h-[375px] overflow-auto">
-            {fields.map((field, index) => (
-                <Accordion key={field.id} text="Render Item">
-                    <div>
-                        <Accordion text="Render Properties">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <InputGroup
-                                    label="Render Type"
-                                    className="sm:grid-cols-1 gap-x-2"
-                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                >
-                                    <SimpleSelect
-                                        formObj={formObj}
-                                        name={`layerConfig.render.layers.${index}.type`}
-                                        placeholder="Select the type of render"
-                                        options={renderTypeOptions}
-                                    />
-                                </InputGroup>
-                                <InputGroup
-                                    className="sm:grid-cols-1 gap-x-2"
-                                    label="Source Layer"
-                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                >
-                                    <Input
-                                        defaultValue={'layer0'}
-                                        {...register(
-                                            `layerConfig.render.layers.${index}.source-layer`
-                                        )}
-                                        type="text"
-                                    />
-                                </InputGroup>
-                            </div>
-                        </Accordion>
-                        <Accordion text="Paint Properties">
-                            {match(watch('layerConfig.render.layers')[index])
-                                .with({ type: { value: 'circle' } }, () =>
-                                    RenderCirclePaint(index)
+        <ScrollArea className="h-[375px]">
+            <div className="flex flex-col gap-y-4">
+                {fields.map((field, index) => (
+                    <Accordion key={field.id} text="Render Item">
+                        <div>
+                            <Accordion text="Render Properties">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <InputGroup
+                                        label="Render Type"
+                                        className="sm:grid-cols-1 gap-x-2"
+                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                    >
+                                        <SimpleSelect
+                                            formObj={formObj}
+                                            name={`layerConfig.render.layers.${index}.type`}
+                                            placeholder="Select the type of render"
+                                            options={renderTypeOptions}
+                                        />
+                                    </InputGroup>
+                                    <InputGroup
+                                        className="sm:grid-cols-1 gap-x-2"
+                                        label="Source Layer"
+                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                    >
+                                        <Input
+                                            defaultValue={'layer0'}
+                                            {...register(
+                                                `layerConfig.render.layers.${index}.source-layer`
+                                            )}
+                                            type="text"
+                                        />
+                                    </InputGroup>
+                                </div>
+                            </Accordion>
+                            <Accordion text="Paint Properties">
+                                {match(
+                                    watch('layerConfig.render.layers')[index]
                                 )
-                                .with({ type: { value: 'fill' } }, () =>
-                                    RenderFillPaint(index)
-                                )
-                                .with({ type: { value: 'line' } }, () =>
-                                    RenderLinePaint(index)
-                                )
-                                .otherwise(() => (
-                                    <></>
-                                ))}
-                        </Accordion>
-                        <FilterExpressions layerIdx={index} />
-                    </div>
-                    <div className="w-full flex justify-end">
-                        <Button
-                            variant="destructive"
-                            type="button"
-                            className="mb-4 ml-auto"
-                            onClick={() => remove(index)}
-                        >
-                            Delete Render Item
-                        </Button>
-                    </div>
-                </Accordion>
-            ))}
-            <button
-                onClick={() =>
-                    append({
-                        type: {
-                            value: 'circle',
-                            label: 'Circle',
-                        },
-                        'source-layer': 'layer0',
-                        filter: ['all'],
-                    })
-                }
-                type="button"
-                className="ml-auto flex items-center justify-end gap-x-1"
-            >
-                <PlusCircleIcon className="h-5 w-5 text-amber-400" />
-                <span className="font-acumin text-lg font-normal leading-tight text-black">
-                    Add a render item
-                </span>
-            </button>
-        </div>
+                                    .with({ type: { value: 'circle' } }, () =>
+                                        RenderCirclePaint(index)
+                                    )
+                                    .with({ type: { value: 'fill' } }, () =>
+                                        RenderFillPaint(index)
+                                    )
+                                    .with({ type: { value: 'line' } }, () =>
+                                        RenderLinePaint(index)
+                                    )
+                                    .otherwise(() => (
+                                        <></>
+                                    ))}
+                            </Accordion>
+                            <FilterExpressions layerIdx={index} />
+                        </div>
+                        <div className="w-full flex justify-end">
+                            <Button
+                                variant="destructive"
+                                type="button"
+                                className="mb-4 ml-auto"
+                                onClick={() => remove(index)}
+                            >
+                                Delete Render Item
+                            </Button>
+                        </div>
+                    </Accordion>
+                ))}
+                <button
+                    onClick={() =>
+                        append({
+                            type: {
+                                value: 'circle',
+                                label: 'Circle',
+                            },
+                            'source-layer': 'layer0',
+                            filter: ['all'],
+                        })
+                    }
+                    type="button"
+                    className="ml-auto flex items-center justify-end gap-x-1"
+                >
+                    <PlusCircleIcon className="h-5 w-5 text-amber-400" />
+                    <span className="font-acumin text-lg font-normal leading-tight text-black">
+                        Add a render item
+                    </span>
+                </button>
+            </div>
+        </ScrollArea>
     )
 }
 
@@ -435,29 +503,35 @@ function ColorPicker({
     )
     return (
         <div className="flex flex-col gap-y-4">
-            <Switch.Group as="div" className="flex items-center">
-                <Switch
-                    checked={rampObjEnabled}
-                    onChange={setRampObjEnabled}
-                    className={classNames(
-                        rampObjEnabled ? 'bg-blue-800' : 'bg-gray-200',
-                        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-800 focus:ring-offset-2'
-                    )}
-                >
-                    <span
-                        aria-hidden="true"
+            <div className="flex items-center gap-x-2">
+                <Switch.Group as="div" className="flex items-center">
+                    <Switch
+                        checked={rampObjEnabled}
+                        onChange={setRampObjEnabled}
                         className={classNames(
-                            rampObjEnabled ? 'translate-x-5' : 'translate-x-0',
-                            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
+                            rampObjEnabled ? 'bg-blue-800' : 'bg-gray-200',
+                            'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-800 focus:ring-offset-2'
                         )}
-                    />
-                </Switch>
-                <Switch.Label as="span" className="ml-3 text-sm">
-                    <span className="font-medium text-gray-900">
-                        Use a {rampObjEnabled ? 'plain color' : 'ramp object'}
-                    </span>{' '}
-                </Switch.Label>
-            </Switch.Group>
+                    >
+                        <span
+                            aria-hidden="true"
+                            className={classNames(
+                                rampObjEnabled
+                                    ? 'translate-x-5'
+                                    : 'translate-x-0',
+                                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
+                            )}
+                        />
+                    </Switch>
+                    <Switch.Label as="span" className="ml-3 text-sm">
+                        <span className="font-medium text-gray-900 flex items-center gap-x-2">
+                            Use a{' '}
+                            {rampObjEnabled ? 'plain color' : 'ramp object'}{' '}
+                        </span>{' '}
+                    </Switch.Label>
+                </Switch.Group>
+                <RampObjExplanation />
+            </div>
             {rampObjEnabled ? (
                 <RampObj name={name} />
             ) : (

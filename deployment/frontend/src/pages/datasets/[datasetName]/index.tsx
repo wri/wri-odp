@@ -32,9 +32,14 @@ import { useState, useEffect } from 'react'
 
 import SyncUrl from '@/components/_shared/map/SyncUrl'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
-import { useIsAddingLayers } from '@/utils/storeHooks'
+import { useIsAddingLayers, useToggleLayergroups } from '@/utils/storeHooks'
 import { decodeMapParam } from '@/utils/urlEncoding'
 import { WriDataset } from '@/schema/ckan.schema'
+
+import { User } from '@portaljs/ckan'
+import { record, string } from 'zod'
+import { matchesAnyPattern } from '@/utils/general'
+
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -60,12 +65,14 @@ export async function getServerSideProps(
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
     try {
-        const prevdataset = await getOneDataset(datasetName, session)
+        let prevdataset = await getOneDataset(datasetName, session)
+        console.log('GET HERE DATASET')
         const pendingDataset = await getOnePendingDataset(
             prevdataset.id,
             session
         )
-        let dataset: WriDataset = prevdataset
+
+        let dataset = prevdataset
 
         const pendingExist =
             pendingDataset && Object.keys(pendingDataset).length > 0
@@ -84,10 +91,11 @@ export async function getServerSideProps(
                 fq:
                     dataset?.groups && dataset.groups.length > 0
                         ? `groups:
-                          ${dataset?.groups
-                            ?.map((group) => group.name)
-                            .join(' OR ') ?? ''
-                        }
+                          ${
+                              dataset?.groups
+                                  ?.map((group) => group.name)
+                                  .join(' OR ') ?? ''
+                          }+approval_status:approved+draft:false
                   `
                         : '',
             })
@@ -106,10 +114,11 @@ export async function getServerSideProps(
                     fq:
                         prevdataset?.groups && prevdataset.groups.length > 0
                             ? `groups:
-                              ${prevdataset?.groups
-                                ?.map((group) => group.name)
-                                .join(' OR ') ?? ''
-                            }
+                              ${
+                                  prevdataset?.groups
+                                      ?.map((group) => group.name)
+                                      .join(' OR ') ?? ''
+                              }+approval_status:approved+draft:false
                       `
                             : '',
                 })
@@ -130,22 +139,25 @@ export async function getServerSideProps(
                     ...dataset,
                     spatial: dataset.spatial ?? null,
                 }),
-                prevdataset: JSON.stringify({
-                    ...prevdataset,
-                    spatial: prevdataset.spatial ?? null,
-                }),
+                prevdataset: pendingExist
+                    ? JSON.stringify({
+                          ...prevdataset,
+                          spatial: prevdataset.spatial ?? null,
+                      })
+                    : null,
                 pendingExist: pendingExist,
                 datasetName,
                 datasetId: dataset.id,
                 initialZustandState: {
                     dataset: JSON.stringify(dataset),
                     relatedDatasets,
+                    prevRelatedDatasets,
                     mapView: mapState,
                 },
             },
         }
     } catch (e) {
-        console.log("DATASET PAGE ERROR")
+        console.log('DATASET PAGE ERROR')
         console.log(e)
         console.log((e as any)?.message)
         return {
@@ -210,7 +222,7 @@ export default function DatasetPage(
         }
     )
     if (!datasetData && datasetError) {
-        router.replace('/datasets/404')
+        // router.replace('/datasets/404')
     }
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
@@ -256,7 +268,7 @@ export default function DatasetPage(
 
     const openIssueLength =
         issues.data &&
-            issues.data.filter((issue) => issue.status === 'open').length
+        issues.data.filter((issue) => issue.status === 'open').length
             ? issues.data.filter((issue) => issue.status === 'open').length
             : undefined
 
@@ -315,8 +327,12 @@ export default function DatasetPage(
     let diffFields: string[] | never[] = []
 
     if (pendingExist && diffData) {
-        diffFields = Object.keys(diffData)
+        diffFields = Object.keys(diffData).filter((item) =>
+            matchesAnyPattern(item)
+        )
     }
+
+    console.log('DIFFFIELDS: ', diffFields)
 
     let resourceDiffValues: Array<
         Record<string, { old_value: string; new_value: string }>
@@ -389,6 +405,7 @@ export default function DatasetPage(
                     ) : (
                         <>
                             <DatasetHeader
+                                //@ts-ignore
                                 dataset={
                                     isCurrentVersion
                                         ? prevDatasetData
@@ -470,6 +487,7 @@ export default function DatasetPage(
                                             </Tab.Panel>
                                             <Tab.Panel as="div">
                                                 <Contact
+                                                    //@ts-ignore
                                                     dataset={datasetData}
                                                 />
                                             </Tab.Panel>

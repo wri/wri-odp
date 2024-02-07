@@ -49,7 +49,12 @@ const QueryInstructions = () => {
         provider: dataset.provider,
     })
 
-    const ckanBaseUrl = `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action`
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    publicCkanUrl = publicCkanUrl.endsWith('/')
+        ? publicCkanUrl.slice(0, -1)
+        : publicCkanUrl
+
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
     const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.id}`
 
     const rwBaseUrl = `https://api.resourcewatch.org/v1`
@@ -100,7 +105,11 @@ const JavaScriptInstructions = () => {
         provider: dataset.provider,
     })
 
-    const ckanBaseUrl = `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action`
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    publicCkanUrl = publicCkanUrl.endsWith('/')
+        ? publicCkanUrl.slice(0, -1)
+        : publicCkanUrl
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
 
     const ckanPackageShowUrl = `${ckanBaseUrl}/package_show?id=${dataset.id}`
     const ckanPackageShowSnippet = getSnippet(ckanPackageShowUrl)
