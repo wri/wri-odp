@@ -24,12 +24,12 @@ describe("Upload file and create dataset", () => {
     cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
     cy.get("input[name=maintainer]").type("Luccas");
     cy.get("input[name=maintainer_email]").type("luccasmmg@gmail.com");
-    cy.contains("Open In").click();
     cy.contains("Next: Datafiles").click();
     cy.get("input[type=file]").selectFile("cypress/fixtures/cities.csv", {
       force: true,
     });
     cy.wait(5000);
+    cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     //FOR SOME REASON THIS SEEM NOT TO WORK 
     // IN CI/CD BUT WORKS LOCALLY

@@ -2,6 +2,7 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { CreateDatasetTabs } from '@/components/dashboard/datasets/admin/CreateDatasetTabs'
 import { CreateDataFilesSection } from '@/components/dashboard/datasets/admin/datafiles/CreateDatafilesSection'
+import { CreateLayersSection } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection'
 import { CustomFieldsForm } from '@/components/dashboard/datasets/admin/metadata/CustomFields'
 import { DescriptionForm } from '@/components/dashboard/datasets/admin/metadata/DescriptionForm'
 import { MoreDetailsForm } from '@/components/dashboard/datasets/admin/metadata/MoreDetails'
@@ -66,7 +67,14 @@ export default function CreateDatasetForm() {
                 {
                     resourceId: uuidv4(),
                     title: 'Example title',
-                    type: 'empty',
+                    type: 'empty-file',
+                    format: '',
+                    schema: [],
+                },
+                {
+                    resourceId: uuidv4(),
+                    title: 'Example layer',
+                    type: 'empty-layer',
                     format: '',
                     schema: [],
                 },
@@ -131,6 +139,9 @@ export default function CreateDatasetForm() {
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <CreateDataFilesSection formObj={formObj} />
                     </Tab.Panel>
+                    <Tab.Panel as="div" className="flex flex-col gap-y-12">
+                        <CreateLayersSection formObj={formObj} />
+                    </Tab.Panel>
                     <Tab.Panel as="div">
                         <form
                             className="flex flex-col gap-y-12"
@@ -159,7 +170,7 @@ export default function CreateDatasetForm() {
             <div
                 className={classNames(
                     'flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] justify-between font-acumin text-2xl font-semibold text-black px-4 xl:px-0',
-                    selectedIndex === 2 ? 'max-w-[71rem] xxl:px-0' : ''
+                    selectedIndex === 3 ? 'max-w-[71rem] xxl:px-0' : ''
                 )}
             >
                 <Button
@@ -183,7 +194,7 @@ export default function CreateDatasetForm() {
                             Back
                         </Button>
                     )}
-                    {selectedIndex !== 2 && (
+                    {selectedIndex !== 3 && (
                         <Button
                             type="button"
                             onClick={async () => {
@@ -195,10 +206,11 @@ export default function CreateDatasetForm() {
                             Next:{' '}
                             {match(selectedIndex)
                                 .with(0, () => 'Datafiles')
+                                .with(1, () => 'Map Visualizations')
                                 .otherwise(() => 'Preview')}
                         </Button>
                     )}
-                    {selectedIndex === 2 && (
+                    {selectedIndex === 3 && (
                         <LoaderButton
                             loading={createDataset.isLoading}
                             type="submit"

@@ -20,6 +20,7 @@ import Tooltip from './preview/Tooltip'
 import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import LayerManagerPreview from './preview/LayerManagerPreview'
+import { slugify } from '@/utils/slugify'
 
 export function BuildALayer({
     formObj,
@@ -99,6 +100,9 @@ export function BuildALayer({
     ])
 
     useEffect(() => {
+        if (!dirtyFields['slug']) setValue('slug', slugify(watch('name')))
+    }, [watch('name')]) 
+     useEffect(() => {
         if (
             Object.keys(dirtyFields).length > 0 ||
             Object.keys(touchedFields).length > 0
@@ -112,7 +116,6 @@ export function BuildALayer({
     }, [watch()])
 
     console.log('IN HERE TO SEE')
-
     return (
         <FormProvider {...layerFormObj}>
             <Steps state={current.toStrings()[0] ?? 'setSourceConfig'} />
