@@ -182,7 +182,7 @@ function DownloadModal({
             api.rw.getFields.useQuery({
                 id:
                     // @ts-ignore
-                    datafile?.layerObj?.dataset,
+                    datafile?.layerObj?.dataset ?? "",
             })
 
         isLoading = isLoadingFields
