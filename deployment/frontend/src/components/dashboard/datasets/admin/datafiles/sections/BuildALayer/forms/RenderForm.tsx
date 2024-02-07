@@ -18,6 +18,7 @@ import classNames from '@/utils/classnames'
 import { useColumns } from '../useColumns'
 import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
 import { Accordion } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion'
+import { ScrollArea } from '@/components/_shared/ScrollArea'
 
 interface InteractionFormProps {
     onNext: () => void
@@ -211,88 +212,92 @@ function ItemsArray() {
     )
 
     return (
-        <div className="flex flex-col gap-y-4 max-h-[375px] overflow-auto">
-            {fields.map((field, index) => (
-                <Accordion key={field.id} text="Render Item">
-                    <div>
-                        <Accordion text="Render Properties">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <InputGroup
-                                    label="Render Type"
-                                    className="sm:grid-cols-1 gap-x-2"
-                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                >
-                                    <SimpleSelect
-                                        formObj={formObj}
-                                        name={`layerConfig.render.layers.${index}.type`}
-                                        placeholder="Select the type of render"
-                                        options={renderTypeOptions}
-                                    />
-                                </InputGroup>
-                                <InputGroup
-                                    className="sm:grid-cols-1 gap-x-2"
-                                    label="Source Layer"
-                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                                >
-                                    <Input
-                                        defaultValue={'layer0'}
-                                        {...register(
-                                            `layerConfig.render.layers.${index}.source-layer`
-                                        )}
-                                        type="text"
-                                    />
-                                </InputGroup>
-                            </div>
-                        </Accordion>
-                        <Accordion text="Paint Properties">
-                            {match(watch('layerConfig.render.layers')[index])
-                                .with({ type: { value: 'circle' } }, () =>
-                                    RenderCirclePaint(index)
+        <ScrollArea className="h-[375px]">
+            <div className="flex flex-col gap-y-4">
+                {fields.map((field, index) => (
+                    <Accordion key={field.id} text="Render Item">
+                        <div>
+                            <Accordion text="Render Properties">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <InputGroup
+                                        label="Render Type"
+                                        className="sm:grid-cols-1 gap-x-2"
+                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                    >
+                                        <SimpleSelect
+                                            formObj={formObj}
+                                            name={`layerConfig.render.layers.${index}.type`}
+                                            placeholder="Select the type of render"
+                                            options={renderTypeOptions}
+                                        />
+                                    </InputGroup>
+                                    <InputGroup
+                                        className="sm:grid-cols-1 gap-x-2"
+                                        label="Source Layer"
+                                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                    >
+                                        <Input
+                                            defaultValue={'layer0'}
+                                            {...register(
+                                                `layerConfig.render.layers.${index}.source-layer`
+                                            )}
+                                            type="text"
+                                        />
+                                    </InputGroup>
+                                </div>
+                            </Accordion>
+                            <Accordion text="Paint Properties">
+                                {match(
+                                    watch('layerConfig.render.layers')[index]
                                 )
-                                .with({ type: { value: 'fill' } }, () =>
-                                    RenderFillPaint(index)
-                                )
-                                .with({ type: { value: 'line' } }, () =>
-                                    RenderLinePaint(index)
-                                )
-                                .otherwise(() => (
-                                    <></>
-                                ))}
-                        </Accordion>
-                        <FilterExpressions layerIdx={index} />
-                    </div>
-                    <div className="w-full flex justify-end">
-                        <Button
-                            variant="destructive"
-                            type="button"
-                            className="mb-4 ml-auto"
-                            onClick={() => remove(index)}
-                        >
-                            Delete Render Item
-                        </Button>
-                    </div>
-                </Accordion>
-            ))}
-            <button
-                onClick={() =>
-                    append({
-                        type: {
-                            value: 'circle',
-                            label: 'Circle',
-                        },
-                        'source-layer': 'layer0',
-                        filter: ['all'],
-                    })
-                }
-                type="button"
-                className="ml-auto flex items-center justify-end gap-x-1"
-            >
-                <PlusCircleIcon className="h-5 w-5 text-amber-400" />
-                <span className="font-acumin text-lg font-normal leading-tight text-black">
-                    Add a render item
-                </span>
-            </button>
-        </div>
+                                    .with({ type: { value: 'circle' } }, () =>
+                                        RenderCirclePaint(index)
+                                    )
+                                    .with({ type: { value: 'fill' } }, () =>
+                                        RenderFillPaint(index)
+                                    )
+                                    .with({ type: { value: 'line' } }, () =>
+                                        RenderLinePaint(index)
+                                    )
+                                    .otherwise(() => (
+                                        <></>
+                                    ))}
+                            </Accordion>
+                            <FilterExpressions layerIdx={index} />
+                        </div>
+                        <div className="w-full flex justify-end">
+                            <Button
+                                variant="destructive"
+                                type="button"
+                                className="mb-4 ml-auto"
+                                onClick={() => remove(index)}
+                            >
+                                Delete Render Item
+                            </Button>
+                        </div>
+                    </Accordion>
+                ))}
+                <button
+                    onClick={() =>
+                        append({
+                            type: {
+                                value: 'circle',
+                                label: 'Circle',
+                            },
+                            'source-layer': 'layer0',
+                            filter: ['all'],
+                        })
+                    }
+                    type="button"
+                    className="ml-auto flex items-center justify-end gap-x-1"
+                >
+                    <PlusCircleIcon className="h-5 w-5 text-amber-400" />
+                    <span className="font-acumin text-lg font-normal leading-tight text-black">
+                        Add a render item
+                    </span>
+                </button>
+            </div>
+        </ScrollArea>
     )
 }
 

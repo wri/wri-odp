@@ -37,6 +37,7 @@ import Modal from '@/components/_shared/Modal'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
+import { EditRwSection } from './datafiles/EditRwSection'
 import form from '@/components/vizzuality/1.3-components/form'
 
 //change image
@@ -177,6 +178,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     const tabs = [
         { name: 'Metadata', enabled: true },
         { name: 'Data Files', enabled: true },
+        { name: 'Layers / Dataset Views', enabled: true },
         { name: 'Collaborators', enabled: canEditCollaborators },
     ]
 
@@ -246,6 +248,12 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 formObj={formObj}
                                 dataset={dataset}
                             />
+                        </Tab.Panel>
+                        <Tab.Panel
+                            as="div"
+                            className="flex flex-col gap-y-12 mt-8"
+                        >
+                            <EditRwSection formObj={formObj} dataset={dataset} />
                         </Tab.Panel>
                         {canEditCollaborators && (
                             <Tab.Panel

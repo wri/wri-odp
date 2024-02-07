@@ -63,7 +63,8 @@ describe("Chart view", () => {
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
-      cy.contains("Views").first().click();
+      cy.wait(2000)
+      cy.get(".views-tab").click();
 
       cy.contains("Add a view").click();
 
@@ -78,11 +79,11 @@ describe("Chart view", () => {
       cy.get("@chart-container").contains("Data").click({ force: true });
 
       cy.get("@chart-container").get("#dimension").click({ force: true });
-
+      cy.wait(500)
       cy.get("@chart-container").contains("Month").click({ force: true });
-
+      cy.wait(500)
       cy.get("@chart-container").get("#measure").click({ force: true });
-
+      cy.wait(500)
       cy.get("@chart-container").contains("1958").click({ force: true });
 
       cy.get("@chart-container")
@@ -101,7 +102,7 @@ describe("Chart view", () => {
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
-      cy.contains("Views").first().click();
+      cy.get(".views-tab").click();
 
       cy.contains("This is my new chart");
     },
@@ -120,7 +121,7 @@ describe("Chart view", () => {
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
-      cy.contains("Views").first().click();
+      cy.get(".views-tab").click();
 
       cy.contains("This is my new chart").click({ force: true });
 
@@ -142,7 +143,7 @@ describe("Chart view", () => {
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
-      cy.contains("Views").first().click();
+      cy.get(".views-tab").click();
 
       cy.contains("This is my awesome chart");
     },

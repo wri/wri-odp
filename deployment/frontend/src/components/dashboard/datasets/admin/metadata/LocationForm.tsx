@@ -35,11 +35,10 @@ export function LocationForm({
 
     const uploadInputRef = useRef<HTMLInputElement>(null)
 
-
     /*
-    * This useEffect prevents page from scrolling to the map
-    *
-    */
+     * This useEffect prevents page from scrolling to the map
+     *
+     */
     useEffect(() => {
         const chooseAddress = document.getElementById('choose-address')
 
@@ -94,7 +93,7 @@ export function LocationForm({
             label={
                 <>
                     <MapPinIcon className="h-7 w-7" />
-                    Location
+                    Location Coverage
                     <DefaultTooltip content="This field defines whether a dataset will show up on the results or not when doing a search by location">
                         <InformationCircleIcon
                             className="h-5 w-5 text-neutral-500"
