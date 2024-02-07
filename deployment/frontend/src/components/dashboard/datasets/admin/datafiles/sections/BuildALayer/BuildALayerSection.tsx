@@ -72,6 +72,10 @@ export function BuildALayer({
         formObj.setValue(`resources.${index}.layerObj`, values)
     }
 
+    useEffect(() => {
+        syncValues()
+    }, [layerFormObj.watch()])
+
     const updatePreview = () => {
         syncValues()
         console.log('UPDATING PREVIEW', layerFormObj.getValues())
@@ -101,8 +105,8 @@ export function BuildALayer({
 
     useEffect(() => {
         if (!dirtyFields['slug']) setValue('slug', slugify(watch('name')))
-    }, [watch('name')]) 
-     useEffect(() => {
+    }, [watch('name')])
+    useEffect(() => {
         if (
             Object.keys(dirtyFields).length > 0 ||
             Object.keys(touchedFields).length > 0

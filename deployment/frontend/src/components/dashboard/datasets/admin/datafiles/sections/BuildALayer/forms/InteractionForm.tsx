@@ -1,4 +1,9 @@
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
+import {
+    PlusCircleIcon,
+} from '@heroicons/react/20/solid'
+import {
+    InformationCircleIcon,
+} from '@heroicons/react/24/outline'
 import { MinusCircleIcon } from '@heroicons/react/24/outline'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -15,6 +20,7 @@ import { Button } from '@/components/_shared/Button'
 import { useState } from 'react'
 import { Accordion } from '../Accordion'
 import { ScrollArea } from '@/components/_shared/ScrollArea'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
 interface InteractionFormProps {
     onNext: () => void
@@ -115,9 +121,15 @@ function ItemsArray({
                                             `interactionConfig.output.${index}.column`
                                         )}
                                         type="text"
+                                        icon={
+                                            <DefaultTooltip content="The column that you want to show the data, needs to be spelled exactly like in the database">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
                                     />
                                 </InputGroup>
-                                <InputGroup
+                                {/*
+                <InputGroup
                                     label="Format"
                                     className="sm:grid-cols-1 gap-x-2"
                                     labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
@@ -128,7 +140,7 @@ function ItemsArray({
                                         )}
                                         type="text"
                                     />
-                                </InputGroup>
+                                </InputGroup> */}
                                 <InputGroup
                                     label="Prefix"
                                     className="sm:grid-cols-1 gap-x-2"
@@ -139,6 +151,11 @@ function ItemsArray({
                                             `interactionConfig.output.${index}.prefix`
                                         )}
                                         type="text"
+                                        icon={
+                                            <DefaultTooltip  contentClassName="max-w-[30rem]" content="Allows you to add a prefix to tooltip displaying this item">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
                                     />
                                 </InputGroup>
                                 <InputGroup
@@ -151,6 +168,11 @@ function ItemsArray({
                                             `interactionConfig.output.${index}.property`
                                         )}
                                         type="text"
+                                        icon={
+                                            <DefaultTooltip contentClassName="max-w-[30rem]" content="Allows you to give a title to this item, for example instead of showing the column name country_index you could show 'Country Index'">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
                                     />
                                 </InputGroup>
                                 <InputGroup
@@ -163,10 +185,15 @@ function ItemsArray({
                                             `interactionConfig.output.${index}.suffix`
                                         )}
                                         type="text"
+                                        icon={
+                                            <DefaultTooltip  contentClassName="max-w-[30rem]" content="Allows you to add a prefix to the tooltip displaying this item e.g: tonnes, degrees etc">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
                                     />
                                 </InputGroup>
                                 <InputGroup
-                                    label="Property"
+                                    label="Type"
                                     className="sm:grid-cols-1 gap-x-2"
                                     labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                 >
@@ -175,9 +202,14 @@ function ItemsArray({
                                             `interactionConfig.output.${index}.type`
                                         )}
                                         type="text"
+                                        icon={
+                                            <DefaultTooltip  contentClassName="max-w-[30rem]" content="Allows you to define the type for this column, e.g: datetime/number/year etc">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
                                     />
                                 </InputGroup>
-                                <div className="relative flex justify-start">
+                                <div className="relative flex justify-start col-span-full">
                                     <div className="flex h-6 items-center">
                                         <input
                                             id="featured_dataset"
@@ -192,6 +224,9 @@ function ItemsArray({
                                     <div className="ml-3 text-sm leading-6">
                                         <label className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800">
                                             Enable
+                                            <DefaultTooltip  contentClassName="max-w-[10rem]" content="Toggle this to enable the tooltip for this item">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
                                         </label>
                                     </div>
                                 </div>
