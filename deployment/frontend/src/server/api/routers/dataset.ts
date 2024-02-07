@@ -610,7 +610,7 @@ export const DatasetRouter = createTRPCRouter({
                                 : null,
                         visibility_type: input.visibility_type?.value ?? '',
                         resources: input.resources
-                            ?.filter((resource) => resource.type !== 'empty')
+                            ?.filter((resource) => resource.type !== 'empty-file' && resource.type !=='empty-layer')
                             .map((resource) => {
                                 const rr = prevDataset?.resources.find(
                                     (r) => r.id === resource.id
