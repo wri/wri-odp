@@ -39,6 +39,35 @@ import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
 import form from '@/components/vizzuality/1.3-components/form'
 
+function getDiff<T>(dirtyObject: T, changedFields: string[]) {
+    for (const key in dirtyObject) {
+        const value = dirtyObject[key]
+        if (typeof value !== 'boolean') {
+            if (Array.isArray(value) && value.length > 0) {
+                const arrayChanged: string[] = []
+                const changed = getDiff(value, arrayChanged)
+                if (changed.length > 0) {
+                    changedFields.push(key)
+                }
+            } else if (typeof value === 'object') {
+                //@ts-ignore
+                if (Object.keys(value).length > 0) {
+                    const objChange: string[] = []
+                    const changed = getDiff(value, objChange)
+                    if (changed.length > 0) {
+                        changedFields.push(key)
+                    }
+                }
+            }
+        } else {
+            if (value) {
+                changedFields.push(key)
+            }
+        }
+    }
+    return changedFields
+}
+
 //change image
 //change title
 //change some rich text field
@@ -281,52 +310,112 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     type="submit"
                     onClick={formObj.handleSubmit(
                         (data) => {
-                            // const modifiedKeys = Object.keys(
-                            //     formObj.formState.dirtyFields
-                            // )
+                            console.log('DIRTY FIELDS', dirtyFields)
 
-                            // const touchedKeys = Object.keys(
-                            //     formObj.formState.touchedFields
-                            // )
+                            const diffLayerResources =
+                                dirtyFields?.resources?.filter(
+                                    (r) => !r?.layerObj && !r?.layerObjRaw
+                                )
 
-                            // modifiedKeys.concat(touchedKeys)
+                            const newDirtyFields = {
+                                ...dirtyFields,
+                                resources: diffLayerResources
+                                    ? diffLayerResources
+                                    : false,
+                            }
 
-                            // const storedDirty =
-                            //     sessionStorage.getItem('dirtyFields')
+                            const changedFields: string[] = []
 
-                            // if (storedDirty) {
-                            //     const storedDirtyArray = JSON.parse(
-                            //         storedDirty
-                            //     ) as string[]
+                            getDiff(newDirtyFields, changedFields)
 
-                            //     if (storedDirtyArray.length > 0) {
-                            //         modifiedKeys.push(...storedDirtyArray)
-                            //     }
-                            //     sessionStorage.removeItem('dirtyFields')
-                            // }
+                            const toBeSavedData: Partial<DatasetFormType> = data
 
-                            // let newData: Partial<DatasetFormType> = data
+                            const storedDirty =
+                                sessionStorage.getItem('dirtyFields')
 
-                            // if (
-                            //     modifiedKeys.length === 1 &&
-                            //     modifiedKeys[0] === 'collaborators'
-                            // ) {
-                            //     newData = Object.fromEntries(
-                            //         Object.entries(data).filter(([key]) =>
-                            //             modifiedKeys.includes(key)
-                            //         )
-                            //     )
-                            // }
+                            //check if layerobj was updated
+                            if (storedDirty) {
+                                sessionStorage.removeItem('dirtyFields')
+                                return editDataset.mutate(toBeSavedData)
+                            } else {
+                                const defaultvalues = structuredClone(
+                                    formObj.formState.defaultValues
+                                )
+                                const newData = structuredClone(data)
 
-                            // console.log('MODIFIED KEYS', modifiedKeys)
+                                // check if new resource was added
+                                if (
+                                    newData.resources?.length !==
+                                    defaultvalues?.resources?.length
+                                ) {
+                                    return editDataset.mutate(toBeSavedData)
+                                }
 
-                            // if (modifiedKeys.length === 0) {
-                            //     router.push('/dashboard/datasets')
-                            //     return
-                            // } else {
-                            //     editDataset.mutate(newData)
-                            // }
-                            editDataset.mutate(data)
+                                // check if changefield is just collaborators
+                                if (
+                                    changedFields.length === 1 &&
+                                    changedFields[0] === 'collaborators'
+                                ) {
+                                    // filter out collaborators and id
+                                    const newData = Object.fromEntries(
+                                        Object.entries(toBeSavedData).filter(
+                                            ([key]) =>
+                                                [
+                                                    'collaborators',
+                                                    'id',
+                                                ].includes(key)
+                                        )
+                                    )
+                                    return editDataset.mutate(newData)
+                                } else if (
+                                    changedFields.length === 2 &&
+                                    changedFields.includes('language')
+                                ) {
+                                    // check for language
+                                    // language is set to dirty if `Add another {collaborator | data file} is clicked
+                                    // so we need to check if the language is different from the default
+                                    const defaultLang = defaultvalues?.language
+                                        ? defaultvalues?.language.value
+                                        : { value: '', label: '' }
+                                    if (
+                                        newData.language?.value !==
+                                        defaultLang?.value
+                                    ) {
+                                        return editDataset.mutate(toBeSavedData)
+                                    } else {
+                                        if (
+                                            changedFields.includes(
+                                                'collaborators'
+                                            )
+                                        ) {
+                                            const newData = Object.fromEntries(
+                                                Object.entries(
+                                                    toBeSavedData
+                                                ).filter(([key]) =>
+                                                    [
+                                                        'collaborators',
+                                                        'id',
+                                                    ].includes(key)
+                                                )
+                                            )
+                                            return editDataset.mutate(newData)
+                                        } else {
+                                            return editDataset.mutate(
+                                                toBeSavedData
+                                            )
+                                        }
+                                    }
+                                } else if (changedFields.length > 0) {
+                                    // if by anymeans the changed fields get here and is not empty
+                                    return editDataset.mutate(toBeSavedData)
+                                } else {
+                                    notify(
+                                        'No changes to the dataset',
+                                        'success'
+                                    )
+                                    router.push('/dashboard/datasets')
+                                }
+                            }
                         },
                         (err) => {
                             console.log(err)
