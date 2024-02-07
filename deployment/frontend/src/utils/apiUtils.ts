@@ -716,14 +716,14 @@ export async function getOnePendingDataset(
                     return {
                         ...r,
                         layerObj: convertLayerObjToForm(r.layerObj),
-                        rw_id: r.id,
+                        rw_id: r.url ? r.rw_id : r.id,
                     }
                 }
                 if (r.layerObjRaw) {
                     return {
                         ...r,
                         layerObjRaw: getRawObjFromApiSpec(r.layerObjRaw),
-                        rw_id: r.id,
+                        rw_id: r.url ? r.rw_id : r.id,
                     }
                 }
             }

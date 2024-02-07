@@ -107,6 +107,7 @@ export function BuildALayer({
         if (!dirtyFields['slug']) setValue('slug', slugify(watch('name')))
     }, [watch('name')])
     useEffect(() => {
+        syncValues()
         if (
             Object.keys(dirtyFields).length > 0 ||
             Object.keys(touchedFields).length > 0

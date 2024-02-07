@@ -155,12 +155,12 @@ function SubCardProfile({
                                                 </TableCell>
                                                 <TableCell className="font-acumin text-xs font-normal text-black">
                                                     {JSON.stringify(
-                                                        diff[key]?.old_value
+                                                        diff[key]?.new_value
                                                     )}
                                                 </TableCell>
                                                 <TableCell className="font-acumin text-xs font-normal text-black">
                                                     {JSON.stringify(
-                                                        diff[key]?.new_value
+                                                        diff[key]?.old_value
                                                     )}
                                                 </TableCell>
                                             </TableRow>
