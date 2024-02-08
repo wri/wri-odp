@@ -41,19 +41,22 @@ def download_request(context: Context, data_dict: dict[str, Any]):
 
     res_last_modified = resource_dict.get("metadata_modified")
     filename = (res_id + "-" + res_last_modified + "." + format).lower()
+    download_filename = resource_dict.get("title") or resource_dict.get("name") or resource_dict.get("id") or "file"
+    download_filename += ".{}".format(format.lower())
 
     s3 = uploader.BaseS3Uploader()
 
     cached_file_url = None
     try:
-        cached_file_url = s3.get_signed_url_to_key("_downloads_cache/" + filename)
+        cached_file_url = s3.get_signed_url_to_key("_downloads_cache/" + filename,
+                                                   extra_params={"ResponseContentDisposition": 'attachment; filename="{}"'.format(download_filename)})
     except Exception as e:
         log.error(e)
 
     resource_title = resource_dict.get("title", resource_dict.get("name"))
 
     if cached_file_url:
-        send_email([email], cached_file_url, resource_title)
+        send_email([email], cached_file_url, download_filename)
         return True
 
     prefect_url: str = config.get("ckanext.wri.prefect_url")
@@ -78,7 +81,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
             context,
             {"entity_id": res_id, "task_type": "download", "key": format},
         )
-        stale_time = 600
+        stale_time = 30
         assume_task_stale_after = datetime.timedelta(
             seconds=stale_time
         )
@@ -156,7 +159,8 @@ def download_request(context: Context, data_dict: dict[str, Any]):
                         "sql": sql,
                         "rw_id": rw_id,
                         "filename": filename,
-                        "format": format
+                        "format": format,
+                        "download_filename": download_filename
                     },
                     "state": {"type": "SCHEDULED", "state_details": {}},
                 }
@@ -201,7 +205,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
     if email:
         value["emails"] = [email]
 
-    value["resource_title"] = resource_title
+    value["download_filename"] = download_filename
 
     task["value"] = json.dumps(value)
     task["state"] = "pending"
@@ -234,13 +238,13 @@ def download_callback(context: Context, data_dict: dict[str, Any]):
 
     value = json.loads(task["value"])
     emails = value.get("emails", [])
-    resource_title = value.get("resource_title")
+    download_filename = value.get("download_filename")
 
     if state == "complete":
         url = data_dict.get("url")
-        send_email(emails, url, resource_title)
+        send_email(emails, url, download_filename)
     else:
-        send_error(emails, resource_title)
+        send_error(emails, download_filename)
         log.error(error)
 
 
@@ -249,7 +253,7 @@ FILE_EMAIL_HTML = '''
     <body>
         <p>The file you requested is ready. Click the link below to download it:</p>
         <br>
-        <a target="_blank" href="{}">Download</a>
+        <a target="_blank" href="{}">{}</a>
         <br>
         <br>
         <br>
@@ -260,12 +264,12 @@ FILE_EMAIL_HTML = '''
 '''
 
 
-def send_email(emails: list[str], url: str, resource_title: str):
+def send_email(emails: list[str], url: str, download_filename: str):
     for email in emails:
         mail_recipient("", email,
-                       "WRI - Your file is ready ({})".format(resource_title),
+                       "WRI - Your file is ready ({})".format(download_filename),
                        "",
-                       FILE_EMAIL_HTML.format(url, odp_url, odp_url)
+                       FILE_EMAIL_HTML.format(url, download_filename, odp_url, odp_url)
                        )
 
 
