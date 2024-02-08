@@ -73,7 +73,9 @@ import {
     editViewFormSchema,
     viewFormSchema,
 } from '@/schema/view.schema'
+
 import { Organization } from '@portaljs/ckan'
+
 
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
@@ -385,8 +387,10 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
+
                             ? JSON.stringify(input.spatial)
                             : null,
+
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
@@ -546,7 +550,9 @@ export const DatasetRouter = createTRPCRouter({
                     throw Error(JSON.stringify(pendingData.error))
                 }
             }
+
             let prevDataset: WriDataset | null = null
+
 
             if (pendingData.result) {
                 prevDataset = pendingData.result.package_data
@@ -731,6 +737,7 @@ export const DatasetRouter = createTRPCRouter({
                         spatial_address: input.spatial_address
                             ? input.spatial_address
                             : null,
+
                     }
 
                     const newBodyDataset = filterDatasetFields(
@@ -753,6 +760,7 @@ export const DatasetRouter = createTRPCRouter({
                             visibility_type:
                                 responseData.visibility_type ?? 'draft',
                             draft: true,
+
                         },
                         session: ctx.session,
                     })
@@ -2194,8 +2202,10 @@ export const DatasetRouter = createTRPCRouter({
                 ...data.result.package_data,
                 open_in: dataset.open_in
                     ? (JSON.parse(
+
                           dataset.open_in as unknown as string
                       ) as OpenIn[])
+
                     : [],
                 spatial,
             }
@@ -2244,5 +2254,37 @@ export const DatasetRouter = createTRPCRouter({
             }
 
             return packageData.result
+        }),
+
+    requestDatafileConversion: publicProcedure
+        .input(
+            z.object({
+                resource_id: z.string(),
+                provider: z.enum(['datastore', 'rw']),
+                format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON']),
+                sql: z.string(),
+                email: z.string(),
+                rw_id: z.string().optional(),
+            })
+        )
+        .mutation(async ({ input }) => {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/prefect_download_from_store`,
+                {
+                    method: 'POST',
+                    headers: {
+                        // Authorization: ctx.session.user.apikey, // TODO: is this needed?
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(input),
+                }
+            )
+
+            const data = (await response.json()) as CkanResponse<boolean>
+            if (response.ok) {
+                console.log(data)
+                return data
+            }
+            throw data
         }),
 })

@@ -524,7 +524,7 @@ export async function getOneDataset(
     datasetName: string,
     session: Session | null
 ) {
-    console.log('!!!!')
+
     const user = session?.user
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
@@ -535,7 +535,7 @@ export async function getOneDataset(
             },
         }
     )
-    console.log('!!!!')
+
     const dataset: CkanResponse<WriDataset> = await datasetRes.json()
     if (!dataset.success && dataset.error) {
         if (dataset.error.message) throw Error(dataset.error.message)
@@ -743,6 +743,7 @@ export async function getOnePendingDataset(
     if (!dataset.spatial || !dataset.spatial_address) {
         delete dataset.spatial
         delete dataset.spatial_address
+
     }
 
     if (!dataset.metadata_modified) {
