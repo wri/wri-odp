@@ -620,7 +620,7 @@ export function DatasetHeader({
                                         })
                                     }
                                 >
-                                    Add Tabular View
+                                    View Table Preview
                                 </Button>
                             )}
                         </div>
@@ -649,7 +649,7 @@ export function DatasetHeader({
                                             )
                                         }}
                                     >
-                                        Remove Chart View
+                                        Remove Chart Preview
                                     </Button>
                                 ) : (
                                     <Button
@@ -658,7 +658,7 @@ export function DatasetHeader({
                                             addCharts(datasetViews)
                                         }}
                                     >
-                                        Add Chart View
+                                        View Chart Preview
                                     </Button>
                                 )}
                             </div>
