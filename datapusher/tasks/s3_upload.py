@@ -27,7 +27,7 @@ def s3_upload(filepath: str, object_name: str):
 
     url = s3_client.generate_presigned_url(
             'get_object',
-            ExpiresIn=1000 * 60 * 60 * 24 * 30 * 12, # 1 year
+            ExpiresIn=60 * 60 * 24 * 5, 
             Params={
                 'Bucket': s3_config.get("S3_BUCKET_NAME"),
                 'Key': object_name}
