@@ -76,7 +76,6 @@ import {
 
 import { Organization } from '@portaljs/ckan'
 
-
 async function createDatasetRw(dataset: DatasetFormType) {
     const rwDataset: Record<string, any> = {
         name: dataset.title ?? '',
@@ -312,7 +311,11 @@ export const DatasetRouter = createTRPCRouter({
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
                     resources: input.resources
-                        .filter((resource) => resource.type !== 'empty-file' && resource.type !== 'empty-layer')
+                        .filter(
+                            (resource) =>
+                                resource.type !== 'empty-file' &&
+                                resource.type !== 'empty-layer'
+                        )
                         .map((resource) => {
                             let description = ''
                             let title = ''
@@ -387,7 +390,6 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-
                             ? JSON.stringify(input.spatial)
                             : null,
 
@@ -466,16 +468,22 @@ export const DatasetRouter = createTRPCRouter({
                         dataset.result.id,
                         ctx.session.user.apikey
                     )
-                    await sendGroupNotification({
-                        owner_org: dataset.result.owner_org
-                            ? dataset.result.owner_org
-                            : null,
-                        creator_id: dataset.result.creator_user_id!,
-                        collaborator_id: collab,
-                        dataset_id: dataset.result.id,
-                        session: ctx.session,
-                        action: 'pending_dataset',
-                    })
+                    if (
+                        !['private', 'draft'].includes(
+                            dataset.result.visibility_type!
+                        )
+                    ) {
+                        await sendGroupNotification({
+                            owner_org: dataset.result.owner_org
+                                ? dataset.result.owner_org
+                                : null,
+                            creator_id: dataset.result.creator_user_id!,
+                            collaborator_id: collab,
+                            dataset_id: dataset.result.id,
+                            session: ctx.session,
+                            action: 'pending_dataset',
+                        })
+                    }
                 } catch (error) {
                     console.log(error)
                     throw Error('Error in sending issue /comment notification')
@@ -553,7 +561,6 @@ export const DatasetRouter = createTRPCRouter({
 
             let prevDataset: WriDataset | null = null
 
-
             if (pendingData.result) {
                 prevDataset = pendingData.result.package_data
             } else {
@@ -616,7 +623,11 @@ export const DatasetRouter = createTRPCRouter({
                                 : null,
                         visibility_type: input.visibility_type?.value ?? '',
                         resources: input.resources
-                            ?.filter((resource) => resource.type !== 'empty-file' && resource.type !=='empty-layer')
+                            ?.filter(
+                                (resource) =>
+                                    resource.type !== 'empty-file' &&
+                                    resource.type !== 'empty-layer'
+                            )
                             .map((resource) => {
                                 const rr = prevDataset?.resources.find(
                                     (r) => r.id === resource.id
@@ -737,7 +748,6 @@ export const DatasetRouter = createTRPCRouter({
                         spatial_address: input.spatial_address
                             ? input.spatial_address
                             : null,
-
                     }
 
                     const newBodyDataset = filterDatasetFields(
@@ -760,7 +770,6 @@ export const DatasetRouter = createTRPCRouter({
                             visibility_type:
                                 responseData.visibility_type ?? 'draft',
                             draft: true,
-
                         },
                         session: ctx.session,
                     })
@@ -813,16 +822,23 @@ export const DatasetRouter = createTRPCRouter({
                                     pendingDataset.id,
                                     ctx.session.user.apikey
                                 )
-                                await sendGroupNotification({
-                                    owner_org: pendingDataset.owner_org
-                                        ? pendingDataset.owner_org
-                                        : null,
-                                    creator_id: pendingDataset.creator_user_id,
-                                    collaborator_id: collab,
-                                    dataset_id: pendingDataset.id,
-                                    session: ctx.session,
-                                    action: 'pending_dataset',
-                                })
+                                if (
+                                    !['private', 'draft'].includes(
+                                        pendingDataset.visibility_type
+                                    )
+                                ) {
+                                    await sendGroupNotification({
+                                        owner_org: pendingDataset.owner_org
+                                            ? pendingDataset.owner_org
+                                            : null,
+                                        creator_id:
+                                            pendingDataset.creator_user_id,
+                                        collaborator_id: collab,
+                                        dataset_id: pendingDataset.id,
+                                        session: ctx.session,
+                                        action: 'pending_dataset',
+                                    })
+                                }
                             } catch (error) {
                                 console.log(error)
                                 throw Error(
@@ -1014,16 +1030,22 @@ export const DatasetRouter = createTRPCRouter({
                             pendingDataset.id,
                             ctx.session.user.apikey
                         )
-                        await sendGroupNotification({
-                            owner_org: pendingDataset.owner_org
-                                ? pendingDataset.owner_org
-                                : null,
-                            creator_id: pendingDataset.creator_user_id,
-                            collaborator_id: collab,
-                            dataset_id: pendingDataset.id,
-                            session: ctx.session,
-                            action: 'pending_dataset',
-                        })
+                        if (
+                            !['private', 'draft'].includes(
+                                pendingDataset.visibility_type
+                            )
+                        ) {
+                            await sendGroupNotification({
+                                owner_org: pendingDataset.owner_org
+                                    ? pendingDataset.owner_org
+                                    : null,
+                                creator_id: pendingDataset.creator_user_id,
+                                collaborator_id: collab,
+                                dataset_id: pendingDataset.id,
+                                session: ctx.session,
+                                action: 'pending_dataset',
+                            })
+                        }
                     } catch (error) {
                         console.log(error)
                         throw Error(
@@ -2202,10 +2224,8 @@ export const DatasetRouter = createTRPCRouter({
                 ...data.result.package_data,
                 open_in: dataset.open_in
                     ? (JSON.parse(
-
                           dataset.open_in as unknown as string
                       ) as OpenIn[])
-
                     : [],
                 spatial,
             }
