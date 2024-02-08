@@ -32,11 +32,18 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
         { enabled: !!datafile.key }
     )
 
+    const layerObj = datafile.layerObj
+    const layerCfg = layerObj?.layerConfig
+    const layerSrc = layerCfg?.source
+    const layerProvider = layerSrc?.provider
+    const sql = layerProvider?.layers?.at(0)?.options?.sql
     if (
         (datafile.format == 'Layer' &&
             // @ts-ignore
             datafile?.layerObj?.provider !=
-            'cartodb') ||
+            // @ts-ignore
+            'cartodb' &&
+            sql) ||
         (!datafile.key && !datafile.url)
     ) {
         return null
@@ -173,22 +180,13 @@ function DownloadModal({
     } = formObj
 
     let isLoading = false
-
-    let tableName = datafile.id
-
-    // @ts-ignore
-    if (datafile?.layerObj?.provider == "cartodb") {
-        const { data: fieldsData, isLoading: isLoadingFields } =
-            api.rw.getFields.useQuery({
-                id:
-                    // @ts-ignore
-                    datafile?.layerObj?.dataset ?? "",
-            })
-
-        isLoading = isLoadingFields
-        if (fieldsData) {
-            tableName = fieldsData.tableName
-        }
+    let sql = `SELECT * FROM "${datafile.id}"`
+    if (datafile.format == 'Layer') {
+        const layerObj = datafile.layerObj
+        const layerCfg = layerObj?.layerConfig
+        const layerSrc = layerCfg?.source
+        const layerProvider = layerSrc?.provider
+        sql = layerProvider?.layers?.at(0)?.options?.sql
     }
 
     return (
@@ -217,11 +215,12 @@ function DownloadModal({
                                         email: data.email,
                                         format: format,
                                         // @ts-ignore
-                                        rw_id: datafile?.layerObj?.dataset ?? "",
+                                        rw_id:
+                                            datafile?.layerObj?.dataset ?? '',
                                         provider: datafile.rw_id
                                             ? 'rw'
                                             : 'datastore',
-                                        sql: `SELECT * FROM  "${tableName}"`,
+                                        sql: sql,
                                         resource_id: datafile.id,
                                     },
                                     {
