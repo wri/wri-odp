@@ -68,6 +68,7 @@ export function EditDataFile({
                 icon={<></>}
                 title={`Data File ${index + 1}`}
                 className="py-0"
+                remove={remove}
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
                         {match(datafile.type)

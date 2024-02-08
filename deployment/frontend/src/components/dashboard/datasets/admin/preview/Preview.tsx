@@ -255,7 +255,7 @@ export function Preview({
                         </div>
                     )}
                     <InfoAlert
-                        text="Once you create the dataset, vizualizations such as charts will be availble for creation"
+                        text="Once you create the dataset, visualizations such as charts will be availble for creation"
                         title="Attention"
                     />
                     {watch('resources') && watch('resources').length > 0 && (

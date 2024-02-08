@@ -165,6 +165,7 @@ export function AddDataFile({
                 className="hidden"
             />
             <DataFileAccordion
+                remove={remove}
                 icon={<FolderPlusIcon className="h-7 w-7" />}
                 title={`Data File ${index + 1}`}
                 preview={
