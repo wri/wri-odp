@@ -222,6 +222,7 @@ function AddDataFile({
             <DataFileAccordion
                 icon={<FolderPlusIcon className="h-7 w-7" />}
                 title={`Data File ${index + 1}`}
+                remove={remove}
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
                         {match(datafile.type)
@@ -297,7 +298,7 @@ function AddDataFile({
                                         'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm px-4'
                                     )}
                                 >
-                  Upload file from my computer
+                                    Upload file from my computer
                                 </div>
                             </Tab>
                             <Tab
@@ -323,7 +324,7 @@ function AddDataFile({
                                                 selected ? 'font-bold' : ''
                                             )}
                                         >
-                      Link to file in cloud storage
+                                            Link to file in cloud storage
                                         </div>
                                     </span>
                                 )}
