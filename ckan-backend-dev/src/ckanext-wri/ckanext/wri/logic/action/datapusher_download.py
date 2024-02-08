@@ -78,9 +78,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
             context,
             {"entity_id": res_id, "task_type": "download", "key": format},
         )
-        # TODO: make it 1hour for release
-        # stale_time = 3600
-        stale_time = 5
+        stale_time = 600
         assume_task_stale_after = datetime.timedelta(
             seconds=stale_time
         )
@@ -216,9 +214,11 @@ def download_request(context: Context, data_dict: dict[str, Any]):
 def download_callback(context: Context, data_dict: dict[str, Any]):
     task_id = data_dict.get("task_id")
     entity_id = data_dict.get("entity_id")
+    key = data_dict.get("key")
     task = p.toolkit.get_action("task_status_show")(
         context,
-        {"id": task_id, "entity_id": entity_id, "task_type": "download"},
+        {"id": task_id, "entity_id": entity_id, "task_type": "download",
+         "key": key},
     )
 
     if not task:
