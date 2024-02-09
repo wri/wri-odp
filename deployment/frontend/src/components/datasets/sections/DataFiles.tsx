@@ -272,7 +272,7 @@ function DatafileCard({
                                                 })
                                             }
                                         >
-                                            Add Tabular View
+                                            View Table Preview
                                         </Button>
                                     )}
                                 </>
@@ -300,7 +300,7 @@ function DatafileCard({
                                                 }
                                             }}
                                         >
-                                            Remove Chart View
+                                            Remove Chart Preview
                                         </Button>
                                     ) : (
                                         <Button
@@ -310,7 +310,7 @@ function DatafileCard({
                                                     addCharts(datafile._views)
                                             }}
                                         >
-                                            Add Chart View
+                                            View Chart Preview
                                         </Button>
                                     )}
                                 </>

@@ -3,6 +3,7 @@ from helpers import get_url, check_response
 import requests
 
 
+# NOTE: this only works for CartoDB layers
 @task(retries=3, retry_delay_seconds=15)
 def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id: str = ""):
     logger = get_run_logger()
@@ -10,7 +11,7 @@ def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id:
     if provider == "datastore":
         url = get_url("datastore_search_sql", ckan_url)
     elif provider == "rw":
-        url = "https://api.resourcewatch.org/v1/query/{}".format(rw_id)
+        url = "https://wri-rw.carto.com/api/v1/sql"
 
     if ";" in sql:
         sql = sql.split(";")[0]
@@ -22,6 +23,8 @@ def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id:
     current_page = 0
     results = []
     limit = 30000
+    if provider == "rw":
+        limit = 200
 
     headers = {}
 
@@ -31,7 +34,10 @@ def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id:
     while fetch_next_page:
         limited_sql = sql + " LIMIT {} OFFSET {}".format(limit,
                                                          current_page * limit)
-        page_url = url + "?sql={}".format(limited_sql)
+        if provider == "datastore":
+            page_url = url + "?sql={}".format(limited_sql)
+        else:
+            page_url = url + "?q={}".format(limited_sql)
 
         logger.info(page_url)
 
@@ -43,7 +49,7 @@ def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id:
 
         check_response(r, url, "CKAN")
 
-        new_results = r.json()["result" if provider == "datastore" else "data"]
+        new_results = r.json()["result" if provider == "datastore" else "rows"]
 
         if new_results:
             if provider == "datastore":
