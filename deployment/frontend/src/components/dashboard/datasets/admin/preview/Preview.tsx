@@ -255,7 +255,7 @@ export function Preview({
                         </div>
                     )}
                     <InfoAlert
-                        text="Once you create the dataset, visualizations such as charts will be availble for creation"
+                        text="To add a chart view to your dataset, the system first needs to load your data file. Please wait 10-15 minutes and then choose to edit your dataset. You will then be able to add a chart."
                         title="Attention"
                     />
                     {watch('resources') && watch('resources').length > 0 && (
