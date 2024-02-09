@@ -90,6 +90,7 @@ export function AddLayer({
             <DataFileAccordion
                 icon={<FolderPlusIcon className="h-7 w-7" />}
                 title={`Layer ${index + 1}`}
+                remove={remove}
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
                         {match(datafile.type)
@@ -137,30 +138,31 @@ export function AddLayer({
                             >
                                 {({ selected }) => (
                                     <DefaultTooltip content="This option will try to guide you torward building some of the most common map specs, its more limited but easier overrall">
-                                    <span
-                                        className={classNames(
-                                            'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                            selected ? 'bg-amber-400' : '',
-                                            datafile.type === 'upload'
-                                                ? 'hidden'
-                                                : ''
-                                        )}
-                                    >
-                                        <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                        <div
+                                        <span
                                             className={classNames(
-                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col px-4',
-                                                selected ? 'font-bold' : ''
+                                                'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                                selected ? 'bg-amber-400' : '',
+                                                datafile.type === 'upload'
+                                                    ? 'hidden'
+                                                    : ''
                                             )}
                                         >
-                                            Build a layer (simple, no code)
-                                            {watch('rw_dataset') === false && (
-                                                <span>
-                                                    Toggle RW Data to enable
-                                                </span>
-                                            )}
-                                        </div>
-                                    </span>
+                                            <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                            <div
+                                                className={classNames(
+                                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col px-4',
+                                                    selected ? 'font-bold' : ''
+                                                )}
+                                            >
+                                                Build a layer (simple, no code)
+                                                {watch('rw_dataset') ===
+                                                    false && (
+                                                    <span>
+                                                        Toggle RW Data to enable
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </span>
                                     </DefaultTooltip>
                                 )}
                             </Tab>

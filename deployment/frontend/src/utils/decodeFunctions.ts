@@ -59,6 +59,18 @@ const decodeParams = {
         startYear: 2001,
         endYear: 2022,
     },
+    '929662b6-3bf8-4413-b4b3-9b8c116f68bb': {
+        startYear: 2001,
+        endYear: 2022,
+    },
+    '0ffc5ce2-e284-42e0-aa00-89e0728f476e': {
+        startYear: 2001,
+        endYear: 2020,
+    },
+    '04774cb7-912c-4612-bbd8-ba982d532c88': {
+        startYear: 2001,
+        endYear: 2019,
+    },
 } as const
 
 export function createDeckLayer(
@@ -71,7 +83,7 @@ export function createDeckLayer(
     let layerConfig = {
         id,
         type: TileLayer,
-        data: tileUrl.replace('{thresh}', layerState?.threshold ?? 75),
+        data: tileUrl.replace('{thresh}', layerState?.threshold ?? 75).replace('{threshold}', layerState?.threshold ?? 75),
         tileSize: 256,
         refinementStrategy: 'no-overlap',
         visible: true,

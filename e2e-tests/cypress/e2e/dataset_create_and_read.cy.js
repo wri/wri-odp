@@ -15,14 +15,15 @@ const user_email_2 = `${uuid()}@gmail.com`;
 
 describe("Create dataset", () => {
   before(() => {
-    cy.createOrganizationAPI(org);
-    cy.createGroupAPI(topic);
     cy.createUserApi(user, user_email, "test_user");
     cy.createUserApi(user_2, user_email_2, "test_user_2");
+    cy.createOrganizationAPI(org);
+    cy.createOrganizationMemberAPI(org, user, "admin");
+    cy.createGroupAPI(topic);
   });
 
   beforeEach(function () {
-    cy.login(ckanUserName, ckanUserPassword);
+    cy.login(user, "test_user");
   });
 
   it("Should create dataset", () => {
@@ -135,10 +136,10 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.addPackageCollaboratorApi(user, dataset, "editor");
+      cy.addPackageCollaboratorApi(user_2, dataset, "editor");
       cy.visit("/datasets/" + dataset);
       cy.contains("Collaborators").click();
-      cy.contains(user);
+      cy.contains(user_2);
     },
   );
 
@@ -219,3 +220,4 @@ describe("Create dataset", () => {
     cy.deleteDatasetAPI(dataset);
   });
 });
+

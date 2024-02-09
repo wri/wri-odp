@@ -161,7 +161,7 @@ describe("Chart view", () => {
     () => {
       cy.visit(`/datasets/${datasetName}`);
 
-      cy.contains("Add Chart View").click({ force: true });
+      cy.contains("View Chart Preview").click({ force: true });
       cy.wait(15000)
       cy.contains("This is my awesome chart")
     },

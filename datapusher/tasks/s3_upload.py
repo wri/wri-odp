@@ -4,7 +4,7 @@ import boto3
 
 
 @task(retries=3, retry_delay_seconds=15)
-def s3_upload(filepath: str, object_name: str):
+def s3_upload(filepath: str, object_name: str, download_filename: str):
     logger = get_run_logger()
     s3_config = config.get("S3_CONFIG")
 
@@ -23,6 +23,7 @@ def s3_upload(filepath: str, object_name: str):
             # TODO: should this be public? Resoning: we don't know when the user is going
             # to access the email
             # ExtraArgs={'ACL': 'public-read'}
+            ExtraArgs={'ContentDisposition': 'attachment; filename="{}"'.format(download_filename)}
             )
 
     url = s3_client.generate_presigned_url(
