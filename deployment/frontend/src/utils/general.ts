@@ -167,6 +167,7 @@ export function formatDiff(
                 if (key.includes('display_name')) {
                     let newKey = key.split('[')[0]
                     newKey = newKey === 'groups' ? 'Topics' : newKey
+                    //@ts-ignore
                     outputDiff[newKey] = outputDiff[newKey] || {
                         old_value: [],
                         new_value: [],
