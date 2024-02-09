@@ -113,7 +113,7 @@ def push_to_datastore(resource_id, api_key):
 
 @flow(log_prints=True)
 def convert_store_to_file(resource_id, api_key, task_id, provider, sql, rw_id,
-                          format, filename):
+                          format, filename, download_filename):
     logger = get_run_logger()
     ckan_url = config.get('CKAN_URL')
 
@@ -125,7 +125,7 @@ def convert_store_to_file(resource_id, api_key, task_id, provider, sql, rw_id,
         data_to_file(data, tmp_filepath, format)
 
         logger.info("Uploading data...")
-        url = s3_upload(tmp_filepath, "_downloads_cache/{}".format(filename))
+        url = s3_upload(tmp_filepath, "_downloads_cache/{}".format(filename), download_filename)
 
     # TODO: send error/success (send status)
     send_callback(api_key, ckan_url, "prefect_download_callback",
@@ -150,7 +150,8 @@ if __name__ == "__main__":
             "sql": "sql",
             "rw_id": "rw_id",
             "format": "format",
-            "filename": "filename"
+            "filename": "filename",
+            "download_filename": "download_filename"
             },
         enforce_parameter_schema=False,
         is_schedule_active=False,
