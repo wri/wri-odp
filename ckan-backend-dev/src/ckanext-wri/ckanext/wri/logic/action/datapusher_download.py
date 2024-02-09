@@ -15,8 +15,6 @@ import json
 import logging
 log = logging.getLogger(__name__)
 
-odp_url = config.get('ckanext.wri.odp_url')
-
 # TODO: rename this file
 def download_request(context: Context, data_dict: dict[str, Any]):
     format = data_dict.get("format")
@@ -265,6 +263,7 @@ FILE_EMAIL_HTML = '''
 
 
 def send_email(emails: list[str], url: str, download_filename: str):
+    odp_url = config.get('ckanext.wri.odp_url')
     for email in emails:
         mail_recipient("", email,
                        "WRI - Your file is ready ({})".format(download_filename),
@@ -286,6 +285,7 @@ ERROR_EMAIL_HTML = '''
 
 
 def send_error(emails: list[str], resource_title):
+    odp_url = config.get('ckanext.wri.odp_url')
     for email in emails:
         mail_recipient("", email,
                        "WRI - Failed to process file ({})".format(resource_title),
