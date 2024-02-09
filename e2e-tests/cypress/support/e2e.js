@@ -216,6 +216,20 @@ Cypress.Commands.add("createOrganizationAPI", (name) => {
 });
 
 // Command for frontend test sepecific
+Cypress.Commands.add("createOrganizationMemberAPI", (org, member, role = 'editor') => {
+  cy.request({
+    method: "POST",
+    url: apiUrl("organization_member_create"),
+    headers: headers,
+    body: {
+      id: org,
+      username: member,
+      role,
+    },
+  });
+});
+
+// Command for frontend test sepecific
 Cypress.Commands.add("createGroupAPI", (name) => {
   cy.request({
     method: "POST",
