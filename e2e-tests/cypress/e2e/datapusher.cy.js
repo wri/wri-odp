@@ -94,7 +94,7 @@ describe("Upload file and create dataset", () => {
       cy.visit("/datasets/" + dataset);
       cy.get("#toggle-version").click();
       cy.wait(10000)
-      cy.contains("Add Tabular View", { timeout: 30000 }).click();
+      cy.contains("View Table Preview", { timeout: 30000 }).click();
       cy.contains("01D2539e270CEbd", { timeout: 15000 });
     },
   );
