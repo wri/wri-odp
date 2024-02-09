@@ -524,7 +524,6 @@ export async function getOneDataset(
     datasetName: string,
     session: Session | null
 ) {
-
     const user = session?.user
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
@@ -743,7 +742,6 @@ export async function getOnePendingDataset(
     if (!dataset.spatial || !dataset.spatial_address) {
         delete dataset.spatial
         delete dataset.spatial_address
-
     }
 
     if (!dataset.metadata_modified) {
@@ -1803,13 +1801,19 @@ export async function sendGroupNotification({
                 session: session,
             }))!
             recipientIds = recipientUsers.map((user) => user.id!)
-        } else if (creator_id) {
+        }
+        if (creator_id) {
             recipientIds = [creator_id]
             const creatorUser = await getUser({
                 userId: creator_id,
                 apiKey: session.user.apikey,
             })
-            recipientUsers = [creatorUser as WriUser]
+
+            if (recipientUsers) {
+                recipientUsers = recipientUsers.concat([creatorUser as WriUser])
+            } else {
+                recipientUsers = [creatorUser as WriUser]
+            }
         }
 
         if (collaborator_id) {
@@ -1861,9 +1865,11 @@ export async function sendGroupNotification({
                             const body = `<p>Hi ${
                                 user.name ?? user.display_name ?? 'There'
                             }</p>
-                        <p>The approval status for the dataset ${
+                        <p>The approval status for the dataset <a href="${
+                            env.NEXTAUTH_URL
+                        }/datasets/${dataset.name}">${
                             dataset.title
-                        } is now <b><string>${mainAction}</strong><b></p>`
+                        }</a> is now <b><string>${mainAction}</strong><b></p>`
                             const email = user.email!
                             return await sendEmail(email, subject, body)
                         })

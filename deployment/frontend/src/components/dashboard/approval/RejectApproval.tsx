@@ -53,7 +53,11 @@ export default function RejectApproval({
             setRejectOpen()
             notify(`Dataset ${dataset.title} is successfully rejected`, 'error')
         },
-        onError: (error) => setErrorMessage(error.message),
+        onError: (error) => {
+            formObj.reset()
+            setErrorMessage(error.message)
+            setRejectOpen()
+        },
     })
 
     return (
