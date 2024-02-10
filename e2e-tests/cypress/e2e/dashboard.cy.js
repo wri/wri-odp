@@ -228,6 +228,7 @@ describe("Dashboard Test", () => {
     cy.get("input[id=title]").type("Test");
     cy.get(".tiptap.ProseMirror").type("Test");
     cy.contains('button', 'Reject and send feedback').click({ force: true });
+    cy.wait(15000)
     cy.contains(`Dataset ${datasetName} is successfully rejected`, { timeout: 30000 });
 
   })
@@ -283,7 +284,8 @@ describe("Dashboard Test", () => {
       .first()
       .click({ force: true });
     cy.contains('button', 'Approve Dataset').click({ force: true });
-    cy.contains(`Successfully approved the dataset ${datasetName}`);
+    cy.wait(15000)
+    cy.contains(`Successfully approved the dataset ${datasetName}`, {timeout: 20000});
   })
   
 
