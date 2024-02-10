@@ -14,6 +14,7 @@ describe("Chart view", () => {
     cy.createOrganizationAPI(parentOrg);
     cy.createDatasetAPI(parentOrg, datasetName, true, {
       visibility_type: "public",
+      is_approved: true,
       technical_notes: "http://google.com",
     });
 
