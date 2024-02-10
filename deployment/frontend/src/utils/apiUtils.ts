@@ -524,14 +524,13 @@ export async function getOneDataset(
     datasetName: string,
     session: Session | null
 ) {
-
     const user = session?.user
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
         {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `${user?.apikey ?? ''}`,
+                Authorization: env.SYS_ADMIN_API_KEY,
             },
         }
     )
@@ -663,7 +662,7 @@ export async function getOnePendingDataset(
         `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
         {
             headers: {
-                Authorization: `${user?.apikey ?? ''}`,
+                Authorization: env.SYS_ADMIN_API_KEY,
                 'Content-Type': 'application/json',
             },
         }
@@ -743,7 +742,6 @@ export async function getOnePendingDataset(
     if (!dataset.spatial || !dataset.spatial_address) {
         delete dataset.spatial
         delete dataset.spatial_address
-
     }
 
     if (!dataset.metadata_modified) {
@@ -1482,7 +1480,7 @@ export async function getRecipient({
             `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
             {
                 headers: {
-                    Authorization: `${session.user?.apikey ?? ''}`,
+                    Authorization: env.SYS_ADMIN_API_KEY,
                     'Content-Type': 'application/json',
                 },
             }
@@ -1851,24 +1849,24 @@ export async function sendGroupNotification({
 
             await Promise.all(notificationPromises)
 
-            if (recipientUsers) {
-                await Promise.all(
-                    recipientUsers
-                        .filter((user) => user.email)
-                        .map(async (user) => {
-                            const mainAction = action.split('_')[0]
-                            const subject = `Approval status on dataset ${dataset.title}`
-                            const body = `<p>Hi ${
-                                user.name ?? user.display_name ?? 'There'
-                            }</p>
-                        <p>The approval status for the dataset ${
-                            dataset.title
-                        } is now <b><string>${mainAction}</strong><b></p>`
-                            const email = user.email!
-                            return await sendEmail(email, subject, body)
-                        })
-                )
-            }
+            // if (recipientUsers) {
+            //     await Promise.all(
+            //         recipientUsers
+            //             .filter((user) => user.email)
+            //             .map(async (user) => {
+            //                 const mainAction = action.split('_')[0]
+            //                 const subject = `Approval status on dataset ${dataset.title}`
+            //                 const body = `<p>Hi ${
+            //                     user.name ?? user.display_name ?? 'There'
+            //                 }</p>
+            //             <p>The approval status for the dataset ${
+            //                 dataset.title
+            //             } is now <b><string>${mainAction}</strong><b></p>`
+            //                 const email = user.email!
+            //                 return await sendEmail(email, subject, body)
+            //             })
+            //     )
+            // }
         }
     } catch (error) {
         console.error(error)
@@ -2096,6 +2094,7 @@ export const datsetFields = [
     'tags',
     'relationships_as_subject',
     'relationships_as_object',
+    'notes',
 ]
 
 export function filterDatasetFields(dataset: any) {

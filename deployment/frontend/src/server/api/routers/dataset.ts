@@ -291,6 +291,7 @@ export const DatasetRouter = createTRPCRouter({
                 const body = {
                     ...input,
                     draft: true,
+                    is_approved: false,
                     approval_status: 'pending',
                     tags: input.tags
                         ? input.tags.map((tag) => ({ name: tag }))
@@ -570,6 +571,11 @@ export const DatasetRouter = createTRPCRouter({
                 })
             }
 
+            let datasetDetails = await getDatasetDetails({
+                id: input.id ?? '',
+                session: ctx.session,
+            })
+
             const rw_id = input.rw_id ?? null
 
             let org: WriOrganization | null = null
@@ -602,10 +608,26 @@ export const DatasetRouter = createTRPCRouter({
                         draft: true,
                         approval_status: 'pending',
                         tags: input.tags
-                            ? input.tags.map((tag) => ({ name: tag }))
+                            ? input.tags.map((tag) => {
+                                  const ptag = datasetDetails?.tags?.find(
+                                      (x) => x.name === tag
+                                  )
+                                  return {
+                                      ...ptag,
+                                      name: tag,
+                                  }
+                              })
                             : [],
                         groups: input.topics
-                            ? input.topics.map((topic) => ({ name: topic }))
+                            ? input.topics.map((topic) => {
+                                  const pgroups = datasetDetails?.groups?.find(
+                                      (x) => x.name === topic
+                                  )
+                                  return {
+                                      ...pgroups,
+                                      name: topic,
+                                  }
+                              })
                             : [],
                         open_in: JSON.stringify(input.open_in) ?? '',
                         language: input.language?.value ?? '',
@@ -769,7 +791,6 @@ export const DatasetRouter = createTRPCRouter({
                             approval_status: 'pending',
                             visibility_type:
                                 responseData.visibility_type ?? 'draft',
-                            draft: true,
                         },
                         session: ctx.session,
                     })
@@ -1217,6 +1238,10 @@ export const DatasetRouter = createTRPCRouter({
                     fq += `+(${temporalCoverageFqList
                         .map((f) => `(${f})`)
                         .join(' AND ')})`
+            }
+
+            if (!fq.includes('is_approved')) {
+                fq += '+is_approved:true'
             }
 
             const dataset = (await getAllDatasetFq({
@@ -1796,10 +1821,10 @@ export const DatasetRouter = createTRPCRouter({
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             let fq =
-                'approval_status:pending+draft:true+visibility_type:(public OR internal)'
+                'approval_status:pending+visibility_type:(public OR internal)'
 
             if (input._isUserSearch) {
-                fq = `visibility_type:(public OR internal)+approval_status:(pending OR rejected)+draft:true+creator_user_id:${ctx.session.user.id}`
+                fq = `visibility_type:(public OR internal)+approval_status:(pending OR rejected)+creator_user_id:${ctx.session.user.id}`
             }
 
             if (!ctx.session.user.sysadmin && !input._isUserSearch) {
@@ -1886,6 +1911,7 @@ export const DatasetRouter = createTRPCRouter({
                 submittedDataset = data.result.package_data
                 submittedDataset.approval_status = 'approved'
                 submittedDataset.draft = false
+                submittedDataset.is_approved = true
             } else {
                 // fetch dataset from package_show
                 const datasetRes = await fetch(
@@ -1906,6 +1932,7 @@ export const DatasetRouter = createTRPCRouter({
                 submittedDataset = dataset.result
                 submittedDataset.approval_status = 'approved'
                 submittedDataset.draft = false
+                submittedDataset.is_approved = true
             }
 
             // delete pending dataset

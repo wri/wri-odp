@@ -18,7 +18,7 @@ export default function DatasetLCardList() {
         page: { start: 0, rows: 10 },
         _isUserSearch: true,
         fq: {
-            approval_status: 'approved',
+            is_approved: 'true',
             draft: 'false',
         },
     })

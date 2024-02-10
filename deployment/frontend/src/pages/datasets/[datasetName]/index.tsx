@@ -20,6 +20,7 @@ import {
     getAllDatasetFq,
     getOneDataset,
     getOnePendingDataset,
+    getRecipient,
 } from '@/utils/apiUtils'
 import { Tab } from '@headlessui/react'
 import { Index } from 'flexsearch'
@@ -39,7 +40,6 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { User } from '@portaljs/ckan'
 import { record, string } from 'zod'
 import { matchesAnyPattern } from '@/utils/general'
-
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -66,7 +66,7 @@ export async function getServerSideProps(
     const session = await getServerAuthSession(context)
     try {
         let prevdataset = await getOneDataset(datasetName, session)
-        console.log('GET HERE DATASET')
+
         const pendingDataset = await getOnePendingDataset(
             prevdataset.id,
             session
@@ -74,12 +74,33 @@ export async function getServerSideProps(
 
         let dataset = prevdataset
 
+        const isSysAdmin = session?.user.sysadmin
+        let userAuthorize = false
+        let approvalAuth = false
+        if (prevdataset.owner_org) {
+            const orgdetails = await getRecipient({
+                owner_org: prevdataset.owner_org,
+                session: session!,
+            })
+            userAuthorize = !!orgdetails?.find((x) => x.id === session?.user.id)
+            approvalAuth = !!orgdetails
+                .filter((x) => x.capacity === 'admin')
+                .find((x) => x.id === session?.user.id)
+        } else if (prevdataset.creator_user_id === session?.user.id) {
+            userAuthorize = true
+        }
+
+        approvalAuth = isSysAdmin || approvalAuth ? true : false
+        const generalAuthorized = isSysAdmin ? isSysAdmin : userAuthorize
+
         const pendingExist =
-            pendingDataset && Object.keys(pendingDataset).length > 0
+            pendingDataset &&
+            generalAuthorized &&
+            Object.keys(pendingDataset).length > 0
                 ? true
                 : false
 
-        if (pendingExist && pendingDataset) {
+        if (pendingExist && pendingDataset && generalAuthorized) {
             dataset = pendingDataset
         }
 
@@ -146,6 +167,11 @@ export async function getServerSideProps(
                       })
                     : null,
                 pendingExist: pendingExist,
+                is_approved: pendingExist
+                    ? prevdataset.is_approved ?? null
+                    : dataset.is_approved ?? null,
+                generalAuthorized: generalAuthorized,
+                approvalAuth: approvalAuth,
                 datasetName,
                 datasetId: dataset.id,
                 initialZustandState: {
@@ -182,9 +208,13 @@ export default function DatasetPage(
     const datasetName = props.datasetName as string
     const datasetId = props.datasetId!
     const pendingExist = props.pendingExist!
+    const datasetAuth = props.generalAuthorized!
+    const is_approved = props.is_approved!
+    const approvalAuth = props.approvalAuth!
     const router = useRouter()
     const { query } = router
-    const isApprovalRequest = query?.approval === 'true'
+    const isApprovalRequest =
+        query?.approval === 'true' || (approvalAuth && pendingExist)
     const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers()
     const session = useSession()
 
@@ -416,6 +446,8 @@ export default function DatasetPage(
                                 isCurrentVersion={isCurrentVersion}
                                 diffFields={diffFields}
                                 setIsCurrentVersion={setIsCurrentVersion}
+                                datasetAuth={datasetAuth}
+                                is_approved={is_approved}
                             />
                             <div className="px-4 sm:px-6">
                                 <Tab.Group

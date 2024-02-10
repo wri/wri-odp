@@ -126,6 +126,8 @@ export function DatasetHeader({
     diffFields,
     isCurrentVersion,
     setIsCurrentVersion,
+    datasetAuth,
+    is_approved,
 }: {
     dataset?: WriDataset
     isCurrentVersion?: boolean
@@ -133,6 +135,8 @@ export function DatasetHeader({
     setIsCurrentVersion: React.Dispatch<React.SetStateAction<boolean>>
     setTabularResource: (tabularResource: TabularResource | null) => void
     tabularResource: TabularResource | null
+    datasetAuth?: boolean
+    is_approved?: boolean
 }) {
     const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
         useToggleLayergroups()
@@ -223,7 +227,7 @@ export function DatasetHeader({
                         <OpenInButton open_in={dataset?.open_in ?? []} />
                     </div>
                     <div className="flex items-center gap-x-2">
-                        {diffFields.length > 0 && (
+                        {datasetAuth && diffFields.length > 0 && (
                             <ToggleVersion
                                 enabled={isCurrentVersion!}
                                 setEnabled={(enabled) => {
