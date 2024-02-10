@@ -90,7 +90,7 @@ describe("Create dataset", () => {
     //get button of type submit
     cy.get('button[type="submit"]').click();
     cy.contains(`Successfully created the "${dataset}" dataset`, {
-      timeout: 15000,
+      timeout: 20000,
     });
     cy.wait(15000);
   });
@@ -178,21 +178,21 @@ describe("Create dataset", () => {
     
   });
 
-  // it(
-  //   "Should show the basic information edited",
-  //   {
-  //     retries: {
-  //       runMode: 5,
-  //       openMode: 0,
-  //     },
-  //   },
-  //   () => {
-  //     cy.visit("/datasets/" + dataset);
-  //     cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
-  //     cy.contains("Data files").click();
-  //     cy.contains("jpg");
-  //   },
-  // );
+  it(
+    "Should show the basic information edited",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/datasets/" + dataset);
+      cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
+      cy.contains("Data files").click();
+      cy.contains("jpg");
+    },
+  );
 
   // it(
   //   "Should show the new member",

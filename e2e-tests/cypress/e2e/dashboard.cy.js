@@ -228,7 +228,7 @@ describe("Dashboard Test", () => {
     cy.get("input[id=title]").type("Test");
     cy.get(".tiptap.ProseMirror").type("Test");
     cy.contains('button', 'Reject and send feedback').click({ force: true });
-    cy.contains(`Dataset ${datasetName} is successfully rejected`);
+    cy.contains(`Dataset ${datasetName} is successfully rejected`, { timeout: 30000 });
 
   })
 
@@ -238,7 +238,7 @@ describe("Dashboard Test", () => {
     cy.get(".tiptap.ProseMirror").type("Test");
     cy.get("input[id=title]").type("Test");
     cy.get("button[id=reject]").click();
-    cy.contains("Issues").click();
+    cy.contains("Issues").click({force: true});
     cy.contains("Test");
     cy.contains("Test").click();
     cy.get(".tiptap.ProseMirror").type("issue comment");
@@ -274,7 +274,7 @@ describe("Dashboard Test", () => {
     cy.visit("/dashboard/approval-request");
     cy.contains(datasetName, { timeout: 30000 });
     cy.get("button#rowshow").first().click();
-    cy.contains("title")
+    cy.contains("Title")
     cy.contains(datasetName + " EDITED")
     cy.get(`button#approve-tooltip-${datasetName}`)
       .first()

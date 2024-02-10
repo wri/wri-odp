@@ -1079,6 +1079,7 @@ export async function sendEmail(
             user: env.SMTP_USER,
             pass: env.SMTP_PASSWORD,
         },
+        connectionTimeout: 10 * 1000,
     })
 
     try {
