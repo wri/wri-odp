@@ -5,6 +5,7 @@ import { TileLayer } from '@deck.gl/geo-layers'
 import { DecodedLayer } from '@vizzuality/layer-manager-layers-deckgl'
 import { LayerState } from '@/interfaces/state.interface'
 import { layerConfigSpec } from '@/interfaces/layer.interface'
+import { differenceInDays } from 'date-fns'
 
 //interface DecodeParam {
 //  key: string,
@@ -53,23 +54,134 @@ import { layerConfigSpec } from '@/interfaces/layer.interface'
 //    return newObj;
 //  }, {});
 //};
+//
+export const getDayRange = (params: any) => {
+    console.log('PARAMS', params)
+    const {
+        startDate,
+        endDate,
+        minDate,
+        maxDate,
+        weeks,
+        minDateAbsolut = null,
+    } = params || {}
+    // If min date absolut, always take its value (dynamic timeline)
+    const minDateTime = new Date(minDateAbsolut || minDate)
+    const maxDateTime = new Date(maxDate)
+    const numberOfDays = differenceInDays(maxDateTime, minDateTime)
 
-const decodeParams = {
-    '3c4225a4-a8d8-4d73-b12d-0c47dec84c76': {
+    // timeline or hover effect active range
+    const startDateTime = new Date(startDate)
+    const endDateTime = new Date(endDate)
+    const activeStartDay =
+        numberOfDays - differenceInDays(maxDateTime, startDateTime)
+    const activeEndDay =
+        numberOfDays - differenceInDays(maxDateTime, endDateTime)
+
+    // show specified weeks from end date
+    const rangeStartDate = weeks && numberOfDays - 7 * weeks
+
+    // get start and end day
+    const startDayIndex = activeStartDay || rangeStartDate || 0
+    const endDayIndex = activeEndDay || numberOfDays
+    const obj = {
+        startDayIndex,
+        endDayIndex,
+        numberOfDays,
+    }
+    return obj
+}
+
+export const getDecodeParams = {
+    '3c4225a4-a8d8-4d73-b12d-0c47dec84c76': async () => ({
         startYear: 2001,
         endYear: 2022,
-    },
-    '929662b6-3bf8-4413-b4b3-9b8c116f68bb': {
+    }),
+    '929662b6-3bf8-4413-b4b3-9b8c116f68bb': async () => ({
         startYear: 2001,
         endYear: 2022,
-    },
-    '0ffc5ce2-e284-42e0-aa00-89e0728f476e': {
+    }),
+    '0ffc5ce2-e284-42e0-aa00-89e0728f476e': async () => ({
         startYear: 2001,
         endYear: 2020,
-    },
-    '04774cb7-912c-4612-bbd8-ba982d532c88': {
+    }),
+    '04774cb7-912c-4612-bbd8-ba982d532c88': async () => ({
         startYear: 2001,
         endYear: 2019,
+    }),
+    'ff797c8d-0c1b-4df5-beb3-20a9b900716a': async () => {
+        const endDateRes = await fetch(
+            'https://data-api.globalforestwatch.org/dataset/umd_glad_landsat_alerts/latest'
+        )
+        const endDateJson = await endDateRes.json()
+        const {
+            metadata: {
+                content_date_range: { end_date },
+            },
+        } = endDateJson.data
+        const dayRange = getDayRange({
+            endDate: '2023-09-22',
+            endDateAbsolute: '2023-09-22',
+            gladLOnly: 0,
+            gladSOnly: 0,
+            latestUrl: 'dataset/gfw_integrated_alerts/latest',
+            maxDate: '2023-09-22',
+            minDate: '2021-09-22',
+            minDateAbsolut: '2014-12-31',
+            raddOnly: 0,
+            startDate: '2021-09-22',
+            startDateAbsolute: '2022-03-22',
+            trimEndDate: '2023-09-22',
+        })
+        return { ...dayRange, confirmedOnly: 0 }
+    },
+    '7248e9a8-e7ee-4c3b-9a35-52ac4f40f8b1': async () => {
+        const endDateRes = await fetch(
+            'https://data-api.globalforestwatch.org/dataset/umd_glad_landsat_alerts/latest'
+        )
+        const endDateJson = await endDateRes.json()
+        const {
+            metadata: {
+                content_date_range: { end_date },
+            },
+        } = endDateJson.data
+        const dayRange = getDayRange({
+            endDate: '2023-09-22',
+            endDateAbsolute: '2023-09-22',
+            gladLOnly: 0,
+            gladSOnly: 0,
+            latestUrl: 'dataset/gfw_integrated_alerts/latest',
+            maxDate: '2023-09-22',
+            minDate: '2021-09-22',
+            minDateAbsolut: '2014-12-31',
+            raddOnly: 0,
+            startDate: '2021-09-22',
+            startDateAbsolute: '2022-03-22',
+            trimEndDate: '2023-09-22',
+        })
+        return { ...dayRange, confirmedOnly: 0 }
+    },
+    '49534709-21ed-4a18-b46c-bf51c57e4d41': async () => {
+        const endDateRes = await fetch(
+            'https://data-api.globalforestwatch.org/dataset/umd_glad_landsat_alerts/latest'
+        )
+        const endDateJson = await endDateRes.json()
+        const {
+            metadata: {
+                content_date_range: { end_date },
+            },
+        } = endDateJson.data
+        const dayRange = getDayRange({
+            endDate: '2024-02-01',
+            endDateAbsolute: '2024-31-01',
+            latestUrl: 'dataset/gfw_integrated_alerts/latest',
+            maxDate: '2024-01-01',
+            minDate: '2019-01-01',
+            minDateAbsolut: '2014-12-31',
+            startDate: '2019-01-01',
+            startDateAbsolute: '2019-01-01',
+        })
+        return { ...dayRange, confirmedOnly: 0 }
     },
 } as const
 
@@ -83,7 +195,9 @@ export function createDeckLayer(
     let layerConfig = {
         id,
         type: TileLayer,
-        data: tileUrl.replace('{thresh}', layerState?.threshold ?? 75).replace('{threshold}', layerState?.threshold ?? 75),
+        data: tileUrl
+            .replace('{thresh}', layerState?.threshold ?? 75)
+            .replace('{threshold}', layerState?.threshold ?? 75),
         tileSize: 256,
         refinementStrategy: 'no-overlap',
         visible: true,
@@ -99,6 +213,7 @@ export function createDeckLayer(
                 : false,
         }
     }
+    console.log('DECODE PARAMS', layer.decodeParams)
     return {
         type: 'deck' as const,
         id,
@@ -106,8 +221,7 @@ export function createDeckLayer(
             new MapboxLayer({
                 decodeFunction:
                     decodes[layer.decode_function as keyof typeof decodes],
-                //decodeFunction: null,
-                decodeParams: decodeParams[id as keyof typeof decodeParams],
+                decodeParams: layer.decodeParams,
                 ...layerConfig,
                 renderSubLayers: (sl: any) => {
                     const {
