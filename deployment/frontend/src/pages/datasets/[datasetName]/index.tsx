@@ -171,6 +171,9 @@ export async function getServerSideProps(
                     ? prevdataset.is_approved ?? null
                     : dataset.is_approved ?? null,
                 generalAuthorized: generalAuthorized,
+                isPendingState: pendingExist
+                    ? dataset.approval_status === 'pending'
+                    : false,
                 approvalAuth: approvalAuth,
                 datasetName,
                 datasetId: dataset.id,
@@ -209,12 +212,14 @@ export default function DatasetPage(
     const datasetId = props.datasetId!
     const pendingExist = props.pendingExist!
     const datasetAuth = props.generalAuthorized!
+    const isPendingState = props.isPendingState!
     const is_approved = props.is_approved!
     const approvalAuth = props.approvalAuth!
     const router = useRouter()
     const { query } = router
     const isApprovalRequest =
-        query?.approval === 'true' || (approvalAuth && pendingExist)
+        query?.approval === 'true' ||
+        (approvalAuth && pendingExist && isPendingState)
     const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers()
     const session = useSession()
 

@@ -230,6 +230,8 @@ export function DatasetHeader({
                         {datasetAuth && diffFields.length > 0 && (
                             <ToggleVersion
                                 enabled={isCurrentVersion!}
+                                is_approved={is_approved!}
+                                approval_status={dataset?.approval_status!}
                                 setEnabled={(enabled) => {
                                     setToggleLayergroups(
                                         prevLayerGroups,
