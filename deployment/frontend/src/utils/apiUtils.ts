@@ -1804,7 +1804,8 @@ export async function sendGroupNotification({
             recipientIds = recipientUsers.map((user) => user.id!)
         }
         if (creator_id) {
-            recipientIds = [creator_id]
+            console.log('here recipient')
+            recipientIds = recipientIds.concat([creator_id])
             const creatorUser = await getUser({
                 userId: creator_id,
                 apiKey: session.user.apikey,

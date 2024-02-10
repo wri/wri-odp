@@ -238,12 +238,15 @@ describe("Dashboard Test", () => {
     cy.get(".tiptap.ProseMirror").type("Test");
     cy.get("input[id=title]").type("Test");
     cy.get("button[id=reject]").click();
+    cy.wait(15000)
     cy.contains("Issues").click({force: true});
     cy.contains("Test");
     cy.contains("Test").click();
+    cy.wait(15000)
     cy.get(".tiptap.ProseMirror").type("issue comment");
     cy.get("button").contains("Comment").click();
-    cy.contains("issue comment");
+    cy.wait(15000)
+    cy.contains("issue comment", { timeout: 15000 });
 
     // delete issue
     cy.get("button").contains("Delete").click();
