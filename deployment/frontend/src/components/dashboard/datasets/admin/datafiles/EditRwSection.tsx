@@ -35,10 +35,6 @@ export function EditRwSection({
         { enabled: !!rwId }
     )
 
-    console.log(
-        'fields',
-        fields.map((f) => f.type)
-    )
     return (
         <>
             <RWDatasetForm formObj={formObj} editing={true} />

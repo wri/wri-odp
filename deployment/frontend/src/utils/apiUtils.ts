@@ -562,7 +562,6 @@ export async function getOneDataset(
         dataset.result.provider = datasetRw.data.attributes.provider
         dataset.result.tableName = datasetRw.data.attributes.tableName
     } else {
-        console.log('IN BLAHBLAH BLAH HERE')
         const resource = dataset.result.resources.filter(
             (x) => x.format?.toLowerCase() === 'layer'
         )

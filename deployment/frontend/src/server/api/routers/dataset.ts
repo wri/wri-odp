@@ -1052,10 +1052,10 @@ export const DatasetRouter = createTRPCRouter({
                             'Error in sending approval status notification'
                         )
                     }
-                    const resource = data.result.package_data.resources.find(
+                    const _resource = data.result.package_data.resources.find(
                         (x) => x.id === input.id
                     )!
-                    return resource
+                    return _resource
                 } else {
                     const pendingPackage = datapending.result.package_data
                     const resourcetoUpdate = pendingPackage.resources.map(
@@ -1092,10 +1092,10 @@ export const DatasetRouter = createTRPCRouter({
                     if (!data.success && data.error)
                         throw Error(data.error.message)
 
-                    const resource = data.result.package_data.resources.find(
+                    const _resource = data.result.package_data.resources.find(
                         (x) => x.id === input.id
                     )!
-                    return resource
+                    return _resource
                 }
             } catch (e) {
                 let error =
