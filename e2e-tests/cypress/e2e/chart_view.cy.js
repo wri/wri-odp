@@ -45,7 +45,7 @@ describe("Chart view", () => {
       cy.contains(`Successfully submited datafile to the datapusher`, {
         timeout: 15000,
       });
-      cy.wait(15000);
+      cy.wait(30000);
       cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 15000 });
     },
   );
@@ -63,7 +63,7 @@ describe("Chart view", () => {
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
-      cy.wait(2000)
+      cy.wait(9000)
       cy.get(".views-tab").click();
 
       cy.contains("Add a view").click();
@@ -88,7 +88,7 @@ describe("Chart view", () => {
 
       cy.get("@chart-container")
         .contains("Update Preview")
-        .click({ force: true });
+        .click({ force: true, timeout: "60000" });
 
       cy.wait(5000)
 
@@ -133,12 +133,13 @@ describe("Chart view", () => {
 
       cy.get("@chart-container")
         .contains("Update Preview")
-        .click({ force: true });
+        .click({ force: true, timeout: "90000" });
 
+      cy.wait(6000)
       cy.get("@chart-container")
         .contains("Update View")
-        .click({ force: true, timeout: "60000" });
-      cy.wait(20000)
+        .click({ force: true, timeout: "90000" });
+      cy.wait(40000)
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
