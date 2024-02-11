@@ -7,6 +7,7 @@ import { useQuery } from 'react-query'
 import Pagination from '../_shared/Pagination'
 import type { SearchInput } from '@/schema/search.schema'
 import { NotificationType } from '@/schema/notification.schema'
+import { date } from 'zod'
 
 export default function NotificationList() {
     const { data, isLoading } = api.notification.getAllNotifications.useQuery()
@@ -25,14 +26,17 @@ export default function NotificationList() {
 
             const start = query.page.start
             const rows = query.page.rows
-            let slicedData = data.slice(start, start + rows)
-            slicedData = slicedData.sort((a, b) => {
-                const digitA = parseInt(a.time_text.split(' ')[0]!.trim())
-                const digitB = parseInt(b.time_text.split(' ')[0]!.trim())
-                console.log('DIGIT A-B: C', digitA, digitB, digitA - digitB)
-                return digitA - digitB
+
+            let slicedData = data.sort((a, b) => {
+                const dateA =
+                    Number(new Date()) - Number(new Date(a.time_sent!))
+                const dateB =
+                    Number(new Date()) - Number(new Date(b.time_sent!))
+                return dateA - dateB
             })
 
+            slicedData = data.slice(start, start + rows)
+            console.log
             return slicedData
         },
         {

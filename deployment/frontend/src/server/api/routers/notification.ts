@@ -34,7 +34,7 @@ export const notificationRouter = createTRPCRouter({
             `${env.CKAN_URL}/api/3/action/notification_get_all?recipient_id=${ctx.session.user.id}`,
             {
                 headers: {
-                    Authorization: ctx.session.user.apikey,
+                    Authorization: env.SYS_ADMIN_API_KEY,
                 },
             }
         )
@@ -176,7 +176,7 @@ export const notificationRouter = createTRPCRouter({
                             {
                                 method: 'POST',
                                 headers: {
-                                    Authorization: ctx.session.user.apikey,
+                                    Authorization: env.SYS_ADMIN_API_KEY,
                                     'Content-Type': 'application/json',
                                 },
                                 body: JSON.stringify(payload),

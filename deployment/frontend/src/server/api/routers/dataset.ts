@@ -1219,6 +1219,10 @@ export const DatasetRouter = createTRPCRouter({
                         .join(' AND ')})`
             }
 
+            if (!fq.includes('approval_status')) {
+                fq += '+approval_status:approved'
+            }
+
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session?.user.apikey ?? '',
                 fq: `${fq}${input.appendRawFq ?? ''}`,
