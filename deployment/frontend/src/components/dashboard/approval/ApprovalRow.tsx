@@ -1,6 +1,6 @@
 import React from 'react'
 import Row from '../_shared/Row'
-import RowProfile from '../_shared/RowProfile'
+import { RowProfilev2 } from '../_shared/RowProfile'
 import type { IRowProfile } from '../_shared/RowProfile'
 import { api } from '@/utils/api'
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
@@ -13,7 +13,7 @@ import {
     TableRow,
 } from '@/components/_shared/Table'
 import { User, WriDataset } from '@/schema/ckan.schema'
-import { formatDate } from '@/utils/general'
+import { formatDate, formatDiff } from '@/utils/general'
 import Spinner from '@/components/_shared/Spinner'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
@@ -27,6 +27,7 @@ export type IApprovalRow = {
 
 // Define an array of patterns
 const patterns: RegExp[] = [
+    /metadata_modified/,
     /resource\[\d+\]\.connector/,
     /modified/,
     /datastore_active/,
@@ -46,16 +47,16 @@ function matchesAnyPattern(item: string): boolean {
 function filteredDataset(dataset: WriDataset) {
     return [
         {
-            title: 'title',
+            title: 'Title',
             description: dataset.title,
         },
 
         {
-            title: 'maintainer',
+            title: 'Maintainer Name',
             description: dataset?.maintainer ?? '',
         },
         {
-            title: 'maintainer_email',
+            title: 'Maintainer Email',
             description: dataset?.maintainer_email ?? '',
         },
         {
@@ -67,7 +68,7 @@ function filteredDataset(dataset: WriDataset) {
             description: dataset?.technical_notes ?? '',
         },
         {
-            title: 'update_frequency',
+            title: 'Update Frequency',
             description: dataset?.update_frequency ?? '',
         },
     ]
@@ -98,8 +99,12 @@ function Card({ approvalInfo }: { approvalInfo: WriDataset }) {
                     {' '}
                     {formatDate(approvalInfo.metadata_modified!)}
                 </div>
-                <div className="lg:max-w-[200px] lg:w-full lg:overflow-x-auto xl:max-w-fit xl:w-fit">
-                    <RowProfile profile={user} imgStyle="w-8 h-8 mt-2" isPad />
+                <div className="lg:max-w-[200px] lg:w-fit xl:max-w-fit xl:w-fit">
+                    <RowProfilev2
+                        profile={user}
+                        imgStyle="w-8 h-8 mt-2"
+                        isPad
+                    />
                 </div>
             </div>
         </div>
@@ -116,7 +121,9 @@ function SubCardProfile({
     data: WriDataset
 }) {
     if (isLoading) return <Spinner className="mx-auto my-2" />
-    console.log('Diff data: ', diff)
+    const diff2 = formatDiff(diff)
+    console.log('DIFF: ', diff)
+    console.log('DIFFFF2: ', diff2)
     return (
         <div className=" mx-auto w-4/5 my-4 max-h-[300px] overflow-auto">
             {diff &&
@@ -142,38 +149,40 @@ function SubCardProfile({
                             {Object.keys(diff).filter(
                                 (x) => !matchesAnyPattern(x)
                             ).length > 0 &&
-                                Object.keys(diff)
-                                    .filter((x) => !matchesAnyPattern(x))
-                                    .map((key) => {
-                                        return (
-                                            <TableRow
-                                                key={key}
-                                                className="border-0"
-                                            >
-                                                <TableCell className="font-acumin text-xs font-normal text-black">
-                                                    {key}
-                                                </TableCell>
-                                                <TableCell className="font-acumin text-xs font-normal text-black">
-                                                    {JSON.stringify(
-                                                        diff[key]?.new_value
-                                                    )}
-                                                </TableCell>
-                                                <TableCell className="font-acumin text-xs font-normal text-black">
-                                                    {JSON.stringify(
-                                                        diff[key]?.old_value
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        )
-                                    })}
+                                Object.keys(diff2).map((key) => {
+                                    return (
+                                        <TableRow
+                                            key={key}
+                                            className="border-0"
+                                        >
+                                            <TableCell className="font-acumin text-xs font-normal text-black">
+                                                {key}
+                                            </TableCell>
+                                            <TableCell className="font-acumin text-xs font-normal text-black">
+                                                {JSON.stringify(
+                                                    diff2[key]?.new_value,
+                                                    null,
+                                                    2
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="font-acumin text-xs font-normal text-black">
+                                                {JSON.stringify(
+                                                    diff2[key]?.old_value,
+                                                    null,
+                                                    2
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })}
                         </TableBody>
                     </Table>
                 </>
             ) : (
                 <>
                     <p className="mb-3">
-                        No changes were made to this dataset. Table shows the
-                        current values.
+                        This is a new dataset, a previous version does not
+                        exist. Table shows the current values.
                     </p>
                     <Table>
                         <TableHeader>

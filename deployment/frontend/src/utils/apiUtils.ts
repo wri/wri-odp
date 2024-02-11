@@ -1079,6 +1079,7 @@ export async function sendEmail(
             user: env.SMTP_USER,
             pass: env.SMTP_PASSWORD,
         },
+        connectionTimeout: 100 * 1000,
     })
 
     try {
@@ -1801,13 +1802,20 @@ export async function sendGroupNotification({
                 session: session,
             }))!
             recipientIds = recipientUsers.map((user) => user.id!)
-        } else if (creator_id) {
-            recipientIds = [creator_id]
+        }
+        if (creator_id) {
+            console.log('here recipient')
+            recipientIds = recipientIds.concat([creator_id])
             const creatorUser = await getUser({
                 userId: creator_id,
                 apiKey: session.user.apikey,
             })
-            recipientUsers = [creatorUser as WriUser]
+
+            if (recipientUsers) {
+                recipientUsers = recipientUsers.concat([creatorUser as WriUser])
+            } else {
+                recipientUsers = [creatorUser as WriUser]
+            }
         }
 
         if (collaborator_id) {
@@ -1849,24 +1857,26 @@ export async function sendGroupNotification({
 
             await Promise.all(notificationPromises)
 
-            // if (recipientUsers) {
-            //     await Promise.all(
-            //         recipientUsers
-            //             .filter((user) => user.email)
-            //             .map(async (user) => {
-            //                 const mainAction = action.split('_')[0]
-            //                 const subject = `Approval status on dataset ${dataset.title}`
-            //                 const body = `<p>Hi ${
-            //                     user.name ?? user.display_name ?? 'There'
-            //                 }</p>
-            //             <p>The approval status for the dataset ${
-            //                 dataset.title
-            //             } is now <b><string>${mainAction}</strong><b></p>`
-            //                 const email = user.email!
-            //                 return await sendEmail(email, subject, body)
-            //             })
-            //     )
-            // }
+            if (recipientUsers) {
+                await Promise.all(
+                    recipientUsers
+                        .filter((user) => user.email)
+                        .map(async (user) => {
+                            const mainAction = action.split('_')[0]
+                            const subject = `Approval status on dataset ${dataset.title}`
+                            const body = `<p>Hi ${
+                                user.name ?? user.display_name ?? 'There'
+                            }</p>
+                        <p>The approval status for the dataset <a href="${
+                            env.NEXTAUTH_URL
+                        }/datasets/${dataset.name}">${
+                            dataset.title
+                        }</a> is now <b><string>${mainAction}</strong><b></p>`
+                            const email = user.email!
+                            return await sendEmail(email, subject, body)
+                        })
+                )
+            }
         }
     } catch (error) {
         console.error(error)
