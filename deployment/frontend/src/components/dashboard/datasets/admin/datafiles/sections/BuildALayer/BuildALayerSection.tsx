@@ -120,7 +120,6 @@ export function BuildALayer({
         }
     }, [watch()])
 
-    console.log('IN HERE TO SEE')
     return (
         <FormProvider {...layerFormObj}>
             <Steps state={current.toStrings()[0] ?? 'setSourceConfig'} />
