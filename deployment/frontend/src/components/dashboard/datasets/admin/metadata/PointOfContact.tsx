@@ -39,7 +39,7 @@ export function PointOfContactForm({
                         />
                         <ErrorDisplay name="author" errors={errors} />
                     </InputGroup>
-                    <InputGroup label="Author Email" required>
+                    <InputGroup label="Author Email">
                         <Input
                             {...register('author_email')}
                             placeholder="email@gmail.com"

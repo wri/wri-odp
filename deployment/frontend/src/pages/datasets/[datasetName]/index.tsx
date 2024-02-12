@@ -20,6 +20,7 @@ import {
     getAllDatasetFq,
     getOneDataset,
     getOnePendingDataset,
+    getRecipient,
 } from '@/utils/apiUtils'
 import { Tab } from '@headlessui/react'
 import { Index } from 'flexsearch'
@@ -32,11 +33,13 @@ import { useState, useEffect } from 'react'
 
 import SyncUrl from '@/components/_shared/map/SyncUrl'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
-import { useIsAddingLayers } from '@/utils/storeHooks'
+import { useIsAddingLayers, useToggleLayergroups } from '@/utils/storeHooks'
 import { decodeMapParam } from '@/utils/urlEncoding'
 import { WriDataset } from '@/schema/ckan.schema'
+
 import { User } from '@portaljs/ckan'
 import { record, string } from 'zod'
+import { matchesAnyPattern } from '@/utils/general'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -62,19 +65,42 @@ export async function getServerSideProps(
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
     try {
-        const prevdataset = await getOneDataset(datasetName, session)
+        let prevdataset = await getOneDataset(datasetName, session)
+
         const pendingDataset = await getOnePendingDataset(
             prevdataset.id,
             session
         )
-        let dataset: WriDataset = prevdataset
+
+        let dataset = prevdataset
+
+        const isSysAdmin = session?.user.sysadmin
+        let userAuthorize = false
+        let approvalAuth = false
+        if (prevdataset.owner_org) {
+            const orgdetails = await getRecipient({
+                owner_org: prevdataset.owner_org,
+                session: session!,
+            })
+            userAuthorize = !!orgdetails?.find((x) => x.id === session?.user.id)
+            approvalAuth = !!orgdetails
+                .filter((x) => x.capacity === 'admin')
+                .find((x) => x.id === session?.user.id)
+        } else if (prevdataset.creator_user_id === session?.user.id) {
+            userAuthorize = true
+        }
+
+        approvalAuth = isSysAdmin || approvalAuth ? true : false
+        const generalAuthorized = isSysAdmin ? isSysAdmin : userAuthorize
 
         const pendingExist =
-            pendingDataset && Object.keys(pendingDataset).length > 0
+            pendingDataset &&
+            generalAuthorized &&
+            Object.keys(pendingDataset).length > 0
                 ? true
                 : false
 
-        if (pendingExist && pendingDataset) {
+        if (pendingExist && pendingDataset && generalAuthorized) {
             dataset = pendingDataset
         }
 
@@ -86,10 +112,11 @@ export async function getServerSideProps(
                 fq:
                     dataset?.groups && dataset.groups.length > 0
                         ? `groups:
-                          ${dataset?.groups
-                            ?.map((group) => group.name)
-                            .join(' OR ') ?? ''
-                        }
+                          ${
+                              dataset?.groups
+                                  ?.map((group) => group.name)
+                                  .join(' OR ') ?? ''
+                          }+approval_status:approved+draft:false
                   `
                         : '',
             })
@@ -108,10 +135,11 @@ export async function getServerSideProps(
                     fq:
                         prevdataset?.groups && prevdataset.groups.length > 0
                             ? `groups:
-                              ${prevdataset?.groups
-                                ?.map((group) => group.name)
-                                .join(' OR ') ?? ''
-                            }
+                              ${
+                                  prevdataset?.groups
+                                      ?.map((group) => group.name)
+                                      .join(' OR ') ?? ''
+                              }+approval_status:approved+draft:false
                       `
                             : '',
                 })
@@ -132,22 +160,33 @@ export async function getServerSideProps(
                     ...dataset,
                     spatial: dataset.spatial ?? null,
                 }),
-                prevdataset: JSON.stringify({
-                    ...prevdataset,
-                    spatial: prevdataset.spatial ?? null,
-                }),
+                prevdataset: pendingExist
+                    ? JSON.stringify({
+                          ...prevdataset,
+                          spatial: prevdataset.spatial ?? null,
+                      })
+                    : null,
                 pendingExist: pendingExist,
+                is_approved: pendingExist
+                    ? prevdataset.is_approved ?? null
+                    : dataset.is_approved ?? null,
+                generalAuthorized: generalAuthorized,
+                isPendingState: pendingExist
+                    ? dataset.approval_status === 'pending'
+                    : false,
+                approvalAuth: approvalAuth,
                 datasetName,
                 datasetId: dataset.id,
                 initialZustandState: {
                     dataset: JSON.stringify(dataset),
                     relatedDatasets,
+                    prevRelatedDatasets,
                     mapView: mapState,
                 },
             },
         }
     } catch (e) {
-        console.log("DATASET PAGE ERROR")
+        console.log('DATASET PAGE ERROR')
         console.log(e)
         console.log((e as any)?.message)
         return {
@@ -172,9 +211,15 @@ export default function DatasetPage(
     const datasetName = props.datasetName as string
     const datasetId = props.datasetId!
     const pendingExist = props.pendingExist!
+    const datasetAuth = props.generalAuthorized!
+    const isPendingState = props.isPendingState!
+    const is_approved = props.is_approved!
+    const approvalAuth = props.approvalAuth!
     const router = useRouter()
     const { query } = router
-    const isApprovalRequest = query?.approval === 'true'
+    const isApprovalRequest =
+        query?.approval === 'true' ||
+        (approvalAuth && pendingExist && isPendingState)
     const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers()
     const session = useSession()
 
@@ -212,7 +257,7 @@ export default function DatasetPage(
         }
     )
     if (!datasetData && datasetError) {
-        router.replace('/datasets/404')
+        // router.replace('/datasets/404')
     }
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
@@ -258,7 +303,7 @@ export default function DatasetPage(
 
     const openIssueLength =
         issues.data &&
-            issues.data.filter((issue) => issue.status === 'open').length
+        issues.data.filter((issue) => issue.status === 'open').length
             ? issues.data.filter((issue) => issue.status === 'open').length
             : undefined
 
@@ -317,8 +362,12 @@ export default function DatasetPage(
     let diffFields: string[] | never[] = []
 
     if (pendingExist && diffData) {
-        diffFields = Object.keys(diffData)
+        diffFields = Object.keys(diffData).filter((item) =>
+            matchesAnyPattern(item)
+        )
     }
+
+    console.log('DIFFFIELDS: ', diffFields)
 
     let resourceDiffValues: Array<
         Record<string, { old_value: string; new_value: string }>
@@ -391,6 +440,7 @@ export default function DatasetPage(
                     ) : (
                         <>
                             <DatasetHeader
+                                //@ts-ignore
                                 dataset={
                                     isCurrentVersion
                                         ? prevDatasetData
@@ -401,6 +451,8 @@ export default function DatasetPage(
                                 isCurrentVersion={isCurrentVersion}
                                 diffFields={diffFields}
                                 setIsCurrentVersion={setIsCurrentVersion}
+                                datasetAuth={datasetAuth}
+                                is_approved={is_approved}
                             />
                             <div className="px-4 sm:px-6">
                                 <Tab.Group
@@ -472,6 +524,7 @@ export default function DatasetPage(
                                             </Tab.Panel>
                                             <Tab.Panel as="div">
                                                 <Contact
+                                                    //@ts-ignore
                                                     dataset={datasetData}
                                                 />
                                             </Tab.Panel>

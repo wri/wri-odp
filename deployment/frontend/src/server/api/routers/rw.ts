@@ -30,6 +30,7 @@ export const rwRouter = createTRPCRouter({
                 `https://api.resourcewatch.org/v1/fields/${input.id}`
             )
             const fields: FieldsResponse = await fieldsRes.json()
+
             const columns = {
                 tableName: fields.tableName,
                 columns: Object.keys(fields.fields)

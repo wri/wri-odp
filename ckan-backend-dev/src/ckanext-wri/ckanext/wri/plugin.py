@@ -15,6 +15,7 @@ from ckanext.wri.logic.action.get import package_search, notification_get_all, p
 from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
 from ckan.lib.navl.validators import ignore_missing
+from ckanext.wri.logic.action.datapusher_download import download_request, download_callback
 
 import logging
 log = logging.getLogger(__name__)
@@ -126,6 +127,9 @@ class WriPlugin(plugins.SingletonPlugin):
             'pending_diff_show': pending_diff_show,
             'prefect_datapusher_submit': datapusher_submit,
             'prefect_latest_task': datapusher_latest_task,
+            'prefect_download_from_store': download_request,
+            'prefect_download_callback': download_callback
+
         }
 
     # IPermissionLabels
@@ -294,4 +298,5 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def can_view(self):
         return True
+
 

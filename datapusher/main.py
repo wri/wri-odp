@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import time
 from datasize import DataSize
@@ -16,6 +17,11 @@ from tasks.normalize_resource import normalize_resource
 from tasks.normalize_timestamps import normalize_timestamps
 from tasks.sort_and_dedup import sort_and_dedup
 from tasks.validate_csv import validate_csv
+from tasks.data_to_file import data_to_file
+from tasks.s3_upload import s3_upload
+
+from tasks.send_callback import send_callback
+from tasks.query_datastore import query_datastore
 
 
 MINIMUM_QSV_VERSION = "0.108.0"
@@ -105,6 +111,28 @@ def push_to_datastore(resource_id, api_key):
         logger.info(end_msg)
 
 
+@flow(log_prints=True)
+def convert_store_to_file(resource_id, api_key, task_id, provider, sql, rw_id,
+                          format, filename, download_filename):
+    logger = get_run_logger()
+    ckan_url = config.get('CKAN_URL')
+
+    logger.info("Fetching data...")
+    data = query_datastore(api_key, ckan_url, sql, provider, rw_id)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        logger.info("Converting data..." + " " + format)
+        tmp_filepath = os.path.join(tmp_dir, filename)
+        data_to_file(data, tmp_filepath, format)
+
+        logger.info("Uploading data...")
+        url = s3_upload(tmp_filepath, "_downloads_cache/{}".format(filename), download_filename)
+
+    # TODO: send error/success (send status)
+    send_callback(api_key, ckan_url, "prefect_download_callback",
+                  {"task_id": task_id, "url": url, "state": "complete", "entity_id": resource_id, 
+                   "key": format})
+
+
 if __name__ == "__main__":
     datastore_deployment = push_to_datastore.to_deployment(
         name=config.get('DEPLOYMENT_NAME'),
@@ -112,4 +140,20 @@ if __name__ == "__main__":
         enforce_parameter_schema=False,
         is_schedule_active=False,
     )
-    serve(datastore_deployment)
+    conversion_deployment = convert_store_to_file.to_deployment(
+        name=config.get('DEPLOYMENT_NAME'),
+        parameters={
+            "resource_id": "test_id",
+            "api_key": "api_key",
+            "task_id": "task_id",
+            "provider": "provider",
+            "sql": "sql",
+            "rw_id": "rw_id",
+            "format": "format",
+            "filename": "filename",
+            "download_filename": "download_filename"
+            },
+        enforce_parameter_schema=False,
+        is_schedule_active=False,
+    )
+    serve(datastore_deployment, conversion_deployment)

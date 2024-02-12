@@ -46,7 +46,7 @@ export default function ApprovalRequestCard({
         defaultValues: {
             title: '',
             description: '',
-            dataset_id: datasetName,
+            dataset_id: datasetId,
             owner_org: owner_org,
             creator_id: creator_id,
         },
@@ -71,6 +71,7 @@ export default function ApprovalRequestCard({
                 `Successfully approved the dataset ${datasetName}`,
                 'success'
             )
+            router.push(`/dashboard/datasets`)
         },
         onError: (error) => {
             setErrorMessage(error.message)
@@ -90,6 +91,8 @@ export default function ApprovalRequestCard({
             formObj.reset()
             setOpen(false)
             notify('Issue successfully created', 'success')
+            notify(`Dataset ${datasetName} successfully rejected`, 'error')
+            router.push('/dashboard/datasets')
         },
         onError: (error) => setErrorMessage(error.message),
     })
@@ -186,7 +189,7 @@ export default function ApprovalRequestCard({
                 className="sm:w-full sm:max-w-lg"
             >
                 <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
                         <InformationCircleIcon
                             className="h-6 w-6 text-green-600"
                             aria-hidden="true"
@@ -208,7 +211,7 @@ export default function ApprovalRequestCard({
                 </div>
                 <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
                     <LoaderButton
-                        variant="destructive"
+                        variant="default"
                         loading={approveDataset.isLoading}
                         onClick={() => approveDataset.mutate({ id: datasetId })}
                     >

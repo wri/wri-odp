@@ -17,6 +17,7 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
 import { TabularResource } from '../visualizations/Visualizations'
+import { APIButton } from './datafiles/API'
 
 export function DataFiles({
     dataset,
@@ -41,8 +42,8 @@ export function DataFiles({
     const filteredDatafiles =
         q !== ''
             ? datafiles?.filter((datafile) =>
-                index.search(q).includes(datafile.id)
-            )
+                  index.search(q).includes(datafile.id)
+              )
             : datafiles
 
     return (
@@ -142,12 +143,12 @@ function DatafileCard({
     } as const
 
     const higlighted = (field: string, value: string) => {
-        if (diffFields && isCurrentVersion) {
+        if (diffFields && !isCurrentVersion) {
             if (
                 diffFields.some(
                     (diffField) =>
                         diffField[field] &&
-                        diffField[field]?.old_value === value
+                        diffField[field]?.new_value === value
                 )
             ) {
                 return 'bg-yellow-200'
@@ -186,13 +187,14 @@ function DatafileCard({
                             )}
                             <Disclosure.Button>
                                 <h3
-                                    className={`font-acumin text-lg font-semibold leading-loose text-stone-900 ${datafile.title
+                                    className={`font-acumin text-lg font-semibold leading-loose text-stone-900 ${
+                                        datafile.title
                                             ? higlighted(
-                                                'title',
-                                                datafile.title
-                                            )
+                                                  'title',
+                                                  datafile.title
+                                              )
                                             : higlighted('name', datafile.name!)
-                                        }`}
+                                    }`}
                                 >
                                     {datafile.title ?? datafile.name}
                                 </h3>
@@ -202,8 +204,10 @@ function DatafileCard({
                             {/* @ts-ignore */}
                             {datafile?.rw_id && (
                                 <>
-                                    {activeLayers.some((a) =>
-                                        datafile.url?.endsWith(a.id)
+                                    {activeLayers.some(
+                                        (a) =>
+                                            datafile.url?.endsWith(a.id) ||
+                                            datafile.id === a.id
                                     ) ? (
                                         <Button
                                             variant="light"
@@ -248,7 +252,7 @@ function DatafileCard({
                             {datafile.datastore_active && (
                                 <>
                                     {tabularResource &&
-                                        tabularResource.id === datafile.id ? (
+                                    tabularResource.id === datafile.id ? (
                                         <Button
                                             variant="outline"
                                             size="sm"
@@ -268,7 +272,7 @@ function DatafileCard({
                                                 })
                                             }
                                         >
-                                            Add Tabular View
+                                            View Table Preview
                                         </Button>
                                     )}
                                 </>
@@ -296,7 +300,7 @@ function DatafileCard({
                                                 }
                                             }}
                                         >
-                                            Remove Chart View
+                                            Remove Chart Preview
                                         </Button>
                                     ) : (
                                         <Button
@@ -306,7 +310,7 @@ function DatafileCard({
                                                     addCharts(datafile._views)
                                             }}
                                         >
-                                            Add Chart View
+                                            View Chart Preview
                                         </Button>
                                     )}
                                 </>
@@ -314,10 +318,11 @@ function DatafileCard({
 
                             <Disclosure.Button>
                                 <ChevronDownIcon
-                                    className={`${open
+                                    className={`${
+                                        open
                                             ? 'rotate-180 transform  transition'
                                             : ''
-                                        } h-5 w-5 text-stone-900`}
+                                    } h-5 w-5 text-stone-900`}
                                 />
                             </Disclosure.Button>
                         </div>
@@ -332,13 +337,14 @@ function DatafileCard({
                     >
                         <Disclosure.Panel className="py-3">
                             <p
-                                className={`font-acumin text-base font-light text-stone-900 ${datafile.description
+                                className={`font-acumin text-base font-light text-stone-900 ${
+                                    datafile.description
                                         ? higlighted(
-                                            'description',
-                                            datafile.description
-                                        )
+                                              'description',
+                                              datafile.description
+                                          )
                                         : ''
-                                    }`}
+                                }`}
                             >
                                 {datafile.description ?? 'No Description'}
                             </p>
@@ -366,6 +372,7 @@ function DatafileCard({
                                 <DownloadButton datafile={datafile} />
                                 {/*<LearnMoreButton datafile={datafile} dataset={dataset} />*/}
                                 <OpenInButton />
+                                <APIButton datafile={datafile} />
                             </div>
                         </Disclosure.Panel>
                     </Transition>

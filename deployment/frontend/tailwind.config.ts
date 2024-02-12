@@ -16,6 +16,8 @@ export default {
             },
             animation: {
                 'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;',
+                'accordion-down': 'accordion-down 0.2s ease-out',
+                'accordion-up': 'accordion-up 0.2s ease-out',
             },
             colors: {
                 border: 'hsl(var(--border))',
@@ -75,6 +77,16 @@ export default {
                 '8xl': '1350px',
                 '9xl': '1440px',
             },
+            keyframes: {
+                'accordion-down': {
+                    from: { height: '0' },
+                    to: { height: 'var(--radix-accordion-content-height)' },
+                },
+                'accordion-up': {
+                    from: { height: 'var(--radix-accordion-content-height)' },
+                    to: { height: '0' },
+                },
+            },
         },
     },
     plugins: [
@@ -86,6 +98,7 @@ export default {
         }) {
             addVariant('not-last', '&:not(:last-child)')
         }),
+        require('tailwindcss-animate'),
         require('@tailwindcss/forms'),
         require('@tailwindcss/typography'),
     ],

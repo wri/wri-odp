@@ -18,6 +18,7 @@ import { useState } from 'react'
 import { useColumns } from '../useColumns'
 import classNames from '@/utils/classnames'
 import { ChooseTemplates } from './ChooseTemplates'
+import { ScrollArea } from '@/components/_shared/ScrollArea'
 
 export default function SourceForm({
     onNext,
@@ -88,218 +89,225 @@ export default function SourceForm({
                         Use Template
                     </Button>
                 </div>
-                <div className="grid gap-x-6 gap-y-4 max-h-[375px] overflow-auto">
-                    <InputGroup
-                        label="Name of Layer"
-                        className="sm:grid-cols-1 gap-x-2"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                    >
-                        <Input {...register('name')} type="text" />
-                    </InputGroup>
-                    <InputGroup
-                        label="Slug of layer"
-                        className="sm:grid-cols-1 gap-x-2"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                    >
-                        <Input {...register('slug')} type="text" />
-                    </InputGroup>
-                    <InputGroup
-                        label="Description of Layer"
-                        className="sm:grid-cols-1 gap-x-2"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                    >
-                        <Input {...register('description')} type="text" />
-                    </InputGroup>
-                    <div className="relative flex justify-start">
-                        <div className="flex h-6 items-center">
-                            <input
-                                id="featured_dataset"
-                                aria-describedby="comments-description"
-                                {...register(`default`)}
-                                type="checkbox"
-                                className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
-                            />
-                        </div>
-                        <div className="ml-3 text-sm leading-6">
-                            <label className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800">
-                                Default Layer
-                            </label>
-                        </div>
-                    </div>
-                    <InputGroup
-                        label="Layer Type"
-                        className="sm:grid-cols-1 gap-x-2"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                    >
-                        <SimpleSelect
-                            id="layer_type"
-                            formObj={formObj}
-                            maxWidth=""
-                            name="layerConfig.type"
-                            placeholder="Select layer type"
-                            options={layerTypeOptions}
-                        />
-                    </InputGroup>
-                    <InputGroup
-                        label="Provider"
-                        className="sm:grid-cols-1 gap-x-2"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                    >
-                        <SimpleSelect
-                            maxWidth=""
-                            id="provider"
-                            formObj={formObj}
-                            name="layerConfig.source.provider.type"
-                            placeholder="Select a provider"
-                            options={providerOptions}
-                        />
-                    </InputGroup>
-                    {watch('layerConfig.type')?.value === 'raster' &&
-                        watch('layerConfig.source.provider.type')?.value ===
-                            'wms' && (
-                            <InputGroup
-                                label="Tiles of your data"
-                                className="sm:grid-cols-1 gap-x-2"
-                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                            >
-                                <Input
-                                    {...register('layerConfig.source.tiles')}
-                                    type="text"
-                                />
-                                <ErrorDisplay errors={errors} name="tiles" />
-                            </InputGroup>
-                        )}
-                    {watch('layerConfig.source.provider.type')?.value ===
-                        'gee' && (
+                <ScrollArea className="h-[375px]">
+                    <div className="grid gap-x-6 gap-y-4">
                         <InputGroup
-                            label="Layer ID"
+                            label="Name of Layer"
                             className="sm:grid-cols-1 gap-x-2"
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
-                            <Input {...register('id')} type="text" />
-                            <ErrorDisplay errors={errors} name="id" />
+                            <Input {...register('name')} type="text" />
                         </InputGroup>
-                    )}
-                    {watch('layerConfig.source.provider.type')?.value ===
-                        'carto' && (
-                        <>
-                            <InputGroup
-                                label="Account"
-                                className="sm:grid-cols-1 gap-x-2"
-                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                            >
-                                <Input
-                                    {...register(
-                                        'layerConfig.source.provider.account'
-                                    )}
-                                    type="text"
-                                    defaultValue="wri-rw"
+                        <InputGroup
+                            label="Slug of layer"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                        >
+                            <Input {...register('slug')} type="text" />
+                        </InputGroup>
+                        <InputGroup
+                            label="Description of Layer"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                        >
+                            <Input {...register('description')} type="text" />
+                        </InputGroup>
+                        <div className="relative flex justify-start">
+                            <div className="flex h-6 items-center">
+                                <input
+                                    id="featured_dataset"
+                                    aria-describedby="comments-description"
+                                    {...register(`default`)}
+                                    type="checkbox"
+                                    className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
                                 />
-                                {/* TODO Parse SQL and show errors*/}
-                                <ErrorDisplay
-                                    errors={errors}
-                                    name="provider.account"
-                                />
-                            </InputGroup>
-                            <InputGroup
-                                label="SQL Query"
-                                className="sm:grid-cols-1 gap-x-2"
-                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                            >
-                                <TextArea
-                                    {...register(
-                                        'layerConfig.source.provider.layers.0.options.sql'
-                                    )}
-                                    type="text"
-                                    defaultValue=""
-                                />
-                                {/* TODO Parse SQL and show errors*/}
-                                <ErrorDisplay
-                                    errors={errors}
-                                    name="provider.options.sql"
-                                />
-                            </InputGroup>
-                            <InputGroup
-                                label="Columns URL"
-                                className="sm:grid-cols-1 gap-x-2"
-                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                            >
-                                <div className="flex gap-x-2 items-center">
+                            </div>
+                            <div className="ml-3 text-sm leading-6">
+                                <label className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800">
+                                    Default Layer
+                                </label>
+                            </div>
+                        </div>
+                        <InputGroup
+                            label="Layer Type"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                        >
+                            <SimpleSelect
+                                id="layer_type"
+                                formObj={formObj}
+                                maxWidth=""
+                                name="layerConfig.type"
+                                placeholder="Select layer type"
+                                options={layerTypeOptions}
+                            />
+                        </InputGroup>
+                        <InputGroup
+                            label="Provider"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                        >
+                            <SimpleSelect
+                                maxWidth=""
+                                id="provider"
+                                formObj={formObj}
+                                name="layerConfig.source.provider.type"
+                                placeholder="Select a provider"
+                                options={providerOptions}
+                            />
+                        </InputGroup>
+                        {watch('layerConfig.type')?.value === 'raster' &&
+                            watch('layerConfig.source.provider.type')?.value ===
+                                'wms' && (
+                                <InputGroup
+                                    label="Tiles of your data"
+                                    className="sm:grid-cols-1 gap-x-2"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                >
                                     <Input
-                                        {...register('connectorUrl')}
+                                        {...register(
+                                            'layerConfig.source.tiles'
+                                        )}
                                         type="text"
-                                        defaultValue="https://wri-rw.carto.com:443/api/v2/sql?q="
-                                        icon={
-                                            <DefaultTooltip content="URL to get fetch columns from, this allows the form to autofill the interaction and some of the render sections with predefined values from the SQL Table">
-                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
-                                            </DefaultTooltip>
-                                        }
                                     />
-                                    <DefaultTooltip content="Try to fetch columns (this will clear the interaction config)">
-                                        <Button
-                                            onClick={() => {
-                                                formObj.setValue(
-                                                    'interactionConfig.output',
-                                                    []
-                                                )
-                                                columns.refetch()
-                                            }}
-                                            className="px-2"
-                                            type="button"
-                                        >
-                                            <ArrowPathIcon
-                                                className={classNames(
-                                                    'h-4 w-4 text-white',
-                                                    columns.isLoading
-                                                        ? 'animate-spin'
-                                                        : ''
-                                                )}
-                                            />
-                                        </Button>
-                                    </DefaultTooltip>
-                                </div>
+                                    <ErrorDisplay
+                                        errors={errors}
+                                        name="tiles"
+                                    />
+                                </InputGroup>
+                            )}
+                        {watch('layerConfig.source.provider.type')?.value ===
+                            'gee' && (
+                            <InputGroup
+                                label="Layer ID"
+                                className="sm:grid-cols-1 gap-x-2"
+                                labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                            >
+                                <Input {...register('id')} type="text" />
+                                <ErrorDisplay errors={errors} name="id" />
                             </InputGroup>
-                        </>
-                    )}
-                    <InputGroup
-                        label="Min Zoom"
-                        className="sm:grid-cols-1 gap-x-2"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                    >
-                        <Input
-                            {...register('layerConfig.source.minzoom', {
-                                setValueAs: (v) =>
-                                    v === '' ? undefined : parseInt(v),
-                            })}
-                            icon={
-                                <DefaultTooltip content="Min zoom in which content will appera">
-                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
-                                </DefaultTooltip>
-                            }
-                            type="text"
-                        />
-                        <ErrorDisplay errors={errors} name="zoom" />
-                    </InputGroup>
-                    <InputGroup
-                        label="Max Zoom"
-                        className="sm:grid-cols-1 gap-x-2"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                    >
-                        <Input
-                            {...register('layerConfig.source.maxzoom', {
-                                setValueAs: (v) =>
-                                    v === '' ? undefined : parseInt(v),
-                            })}
-                            icon={
-                                <DefaultTooltip content="Max zoom in which content will appera">
-                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
-                                </DefaultTooltip>
-                            }
-                            type="text"
-                        />
-                        <ErrorDisplay errors={errors} name="zoom" />
-                    </InputGroup>
-                </div>
+                        )}
+                        {watch('layerConfig.source.provider.type')?.value ===
+                            'carto' && (
+                            <>
+                                <InputGroup
+                                    label="Account"
+                                    className="sm:grid-cols-1 gap-x-2"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                >
+                                    <Input
+                                        {...register(
+                                            'layerConfig.source.provider.account'
+                                        )}
+                                        type="text"
+                                        defaultValue="wri-rw"
+                                    />
+                                    {/* TODO Parse SQL and show errors*/}
+                                    <ErrorDisplay
+                                        errors={errors}
+                                        name="provider.account"
+                                    />
+                                </InputGroup>
+                                <InputGroup
+                                    label="SQL Query"
+                                    className="sm:grid-cols-1 gap-x-2"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                >
+                                    <TextArea
+                                        {...register(
+                                            'layerConfig.source.provider.layers.0.options.sql'
+                                        )}
+                                        type="text"
+                                        defaultValue=""
+                                    />
+                                    {/* TODO Parse SQL and show errors*/}
+                                    <ErrorDisplay
+                                        errors={errors}
+                                        name="provider.options.sql"
+                                    />
+                                </InputGroup>
+                                <InputGroup
+                                    label="Columns URL"
+                                    className="sm:grid-cols-1 gap-x-2"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                >
+                                    <div className="flex gap-x-2 items-center">
+                                        <Input
+                                            {...register('connectorUrl')}
+                                            type="text"
+                                            defaultValue="https://wri-rw.carto.com:443/api/v2/sql?q="
+                                            icon={
+                                                <DefaultTooltip content="URL to get fetch columns from, this allows the form to autofill the interaction and some of the render sections with predefined values from the SQL Table">
+                                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                                </DefaultTooltip>
+                                            }
+                                        />
+                                        <DefaultTooltip content="Try to fetch columns (this will clear the interaction config)">
+                                            <Button
+                                                onClick={() => {
+                                                    formObj.setValue(
+                                                        'interactionConfig.output',
+                                                        []
+                                                    )
+                                                    columns.refetch()
+                                                }}
+                                                className="px-2"
+                                                type="button"
+                                            >
+                                                <ArrowPathIcon
+                                                    className={classNames(
+                                                        'h-4 w-4 text-white',
+                                                        columns.isLoading
+                                                            ? 'animate-spin'
+                                                            : ''
+                                                    )}
+                                                />
+                                            </Button>
+                                        </DefaultTooltip>
+                                    </div>
+                                </InputGroup>
+                            </>
+                        )}
+                        <InputGroup
+                            label="Min Zoom"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                        >
+                            <Input
+                                {...register('layerConfig.source.minzoom', {
+                                    setValueAs: (v) =>
+                                        v === '' ? undefined : parseInt(v),
+                                })}
+                                icon={
+                                    <DefaultTooltip content="Min zoom in which content will appera">
+                                        <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                    </DefaultTooltip>
+                                }
+                                type="text"
+                            />
+                            <ErrorDisplay errors={errors} name="zoom" />
+                        </InputGroup>
+                        <InputGroup
+                            label="Max Zoom"
+                            className="sm:grid-cols-1 gap-x-2"
+                            labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                        >
+                            <Input
+                                {...register('layerConfig.source.maxzoom', {
+                                    setValueAs: (v) =>
+                                        v === '' ? undefined : parseInt(v),
+                                })}
+                                icon={
+                                    <DefaultTooltip content="Max zoom in which content will appera">
+                                        <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                    </DefaultTooltip>
+                                }
+                                type="text"
+                            />
+                            <ErrorDisplay errors={errors} name="zoom" />
+                        </InputGroup>
+                    </div>
+                </ScrollArea>
                 <Button
                     form="layerForm"
                     type="submit"

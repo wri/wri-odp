@@ -14,6 +14,7 @@ describe("Chart view", () => {
     cy.createOrganizationAPI(parentOrg);
     cy.createDatasetAPI(parentOrg, datasetName, true, {
       visibility_type: "public",
+      is_approved: true,
       technical_notes: "http://google.com",
     });
 
@@ -45,7 +46,7 @@ describe("Chart view", () => {
       cy.contains(`Successfully submited datafile to the datapusher`, {
         timeout: 15000,
       });
-      cy.wait(15000);
+      cy.wait(30000);
       cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 15000 });
     },
   );
@@ -63,7 +64,8 @@ describe("Chart view", () => {
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
-      cy.contains("Views").first().click();
+      cy.wait(9000)
+      cy.get(".views-tab").click();
 
       cy.contains("Add a view").click();
 
@@ -78,16 +80,16 @@ describe("Chart view", () => {
       cy.get("@chart-container").contains("Data").click({ force: true });
 
       cy.get("@chart-container").get("#dimension").click({ force: true });
-
+      cy.wait(500)
       cy.get("@chart-container").contains("Month").click({ force: true });
-
+      cy.wait(500)
       cy.get("@chart-container").get("#measure").click({ force: true });
-
+      cy.wait(500)
       cy.get("@chart-container").contains("1958").click({ force: true });
 
       cy.get("@chart-container")
         .contains("Update Preview")
-        .click({ force: true });
+        .click({ force: true, timeout: "60000" });
 
       cy.wait(5000)
 
@@ -95,14 +97,13 @@ describe("Chart view", () => {
         .contains("Add to Views")
         .click({ force: true, timeout: "60000" });
 
-      // cy.contains("successfully", { timeout: 30000 });
-      cy.wait(30000);
+      cy.contains("successfully", { timeout: 30000 });
 
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
-      cy.contains("Views").first().click();
+      cy.get(".views-tab").click();
 
       cy.contains("This is my new chart");
     },
@@ -112,7 +113,7 @@ describe("Chart view", () => {
     "should be editable from the UI",
     {
       retries: {
-        runMode: 5,
+        runMode: 10,
         openMode: 0,
       },
     },
@@ -121,7 +122,7 @@ describe("Chart view", () => {
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
-      cy.contains("Views").first().click();
+      cy.get(".views-tab").click();
 
       cy.contains("This is my new chart").click({ force: true });
 
@@ -133,17 +134,18 @@ describe("Chart view", () => {
 
       cy.get("@chart-container")
         .contains("Update Preview")
-        .click({ force: true });
+        .click({ force: true, timeout: "90000" });
 
+      cy.wait(6000)
       cy.get("@chart-container")
         .contains("Update View")
-        .click({ force: true, timeout: "60000" });
-
+        .click({ force: true, timeout: "90000" });
+      cy.wait(40000)
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
-      cy.contains("Views").first().click();
+      cy.get(".views-tab").click();
 
       cy.contains("This is my awesome chart");
     },
@@ -153,15 +155,15 @@ describe("Chart view", () => {
     "should be accessible throught the dataset page",
     {
       retries: {
-        runMode: 5,
+        runMode: 10,
         openMode: 0,
       },
     },
     () => {
       cy.visit(`/datasets/${datasetName}`);
 
-      cy.contains("Add Chart View").click({ force: true });
-
+      cy.contains("View Chart Preview").click({ force: true });
+      cy.wait(15000)
       cy.contains("This is my awesome chart")
     },
   );

@@ -256,6 +256,10 @@ User can go do `dashboard/datasets` and click Awaiting approval to see list of a
 
 ![](./approv6.png)
 
+you can filter base on pending and rejected
+
+![](./approv15.png)
+
 click on `view issues` to go to dataset page to see if any issues
 
 ![](./approv8.png)

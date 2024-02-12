@@ -10,6 +10,8 @@ import { useState } from 'react'
 import { DatastoreViewCard } from './DatastoreViewCard'
 import { RwViewCard } from './RwViewCard'
 import { WriDataset } from '@/schema/ckan.schema'
+import { DefaultTooltip } from '../_shared/Tooltip'
+import { InformationCircleIcon } from '@heroicons/react/24/outline'
 
 let uniqueId = 0
 const getUniqueInternalId = () => {
@@ -82,6 +84,11 @@ export default function ViewsList(props: ViewsListProps) {
         ])
     }
 
+    const isCanCreateChartview = !!(
+        (datafile && datafile.datastore_active) ||
+        rwDatasetId
+    )
+
     return (
         <div>
             <div className="w-full flex justify-end">
@@ -92,22 +99,35 @@ export default function ViewsList(props: ViewsListProps) {
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-full md:w-[10rem] lg:w-[10rem] xl:w-[10rem] bg-white p-0">
-                        {(datafile && datafile.datastore_active) ||
-                            rwDatasetId ? (
+                        {
                             // TODO: is rwDatasetId enough? Is the provider needed?
                             /* TODO: Button cannot be descend of button */
-                            <PopoverClose className="w-full">
-                                <Button
-                                    variant="ghost"
-                                    className="w-full"
-                                    onClick={addNewChartView}
-                                >
-                                    <div className="text-left w-full">
-                                        Chart
-                                    </div>
-                                </Button>
-                            </PopoverClose>
-                        ) : null}
+                        }
+                        <PopoverClose className="w-full">
+                            <DefaultTooltip
+                                content={'Data file must be in DataStore '}
+                                disabled={isCanCreateChartview}
+                            >
+                                <div className='flex items-center'>
+                                    <Button
+                                        variant="ghost"
+                                        className="w-full"
+                                        onClick={addNewChartView}
+                                        disabled={!isCanCreateChartview}
+                                    >
+                                        <div className="text-left w-full">
+                                            Chart
+                                        </div>
+                                    </Button>
+                                    {!isCanCreateChartview ? (
+                                        <InformationCircleIcon
+                                            className={`transition-all h-8 w-8 text-red-500 ml-1 l-1 mr-5`}
+                                            aria-hidden="true"
+                                        />
+                                    ) : null}
+                                </div>
+                            </DefaultTooltip>
+                        </PopoverClose>
                     </PopoverContent>
                 </Popover>
             </div>
