@@ -1802,8 +1802,7 @@ export async function sendGroupNotification({
             }))!
             recipientIds = recipientUsers.map((user) => user.id!)
         }
-        if (creator_id) {
-            console.log('here recipient')
+        if (!recipientUsers?.some((x) => x.id === creator_id) && creator_id) {
             recipientIds = recipientIds.concat([creator_id])
             const creatorUser = await getUser({
                 userId: creator_id,
@@ -1835,6 +1834,19 @@ export async function sendGroupNotification({
             } else {
                 recipientUsers = collaboratorUsersw
             }
+        }
+
+        // get all admin users
+        let allUsers = await getAllUsers({ apiKey: env.SYS_ADMIN_API_KEY })
+        allUsers = allUsers.filter(
+            (x) => !recipientUsers?.find((s) => s.id === x.id)
+        )
+        const allUserIds = allUsers.map((x) => x.id) as string[]
+        recipientIds = recipientIds.concat(allUserIds)
+        if (recipientUsers) {
+            recipientUsers = recipientUsers.concat(allUsers as WriUser)
+        } else {
+            recipientUsers = allUsers
         }
 
         const dataset = await getDatasetDetails({

@@ -145,7 +145,7 @@ export function About({
                 {dataset?.notes && (
                     <div>
                         <h3
-                            className={`font-acumin text-base font-normal text-black ${higlighted(
+                            className={`font-acumin text-base font-normal w-fit text-black ${higlighted(
                                 'notes'
                             )}`}
                         >
