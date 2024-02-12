@@ -122,7 +122,7 @@ function ItemsArray({
                                         )}
                                         type="text"
                                         icon={
-                                            <DefaultTooltip content="The column that you want to show the data, needs to be spelled exactly like in the database">
+                                            <DefaultTooltip contentClassName='max-w-[20rem]' content="The column that you want to show the data, needs to be spelled exactly like in the database">
                                                 <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                             </DefaultTooltip>
                                         }
@@ -152,7 +152,7 @@ function ItemsArray({
                                         )}
                                         type="text"
                                         icon={
-                                            <DefaultTooltip  contentClassName="max-w-[30rem]" content="Allows you to add a prefix to tooltip displaying this item">
+                                            <DefaultTooltip  side="left" contentClassName="max-w-[20rem]" content="Allows you to add a prefix to tooltip displaying this item">
                                                 <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                             </DefaultTooltip>
                                         }
@@ -186,7 +186,7 @@ function ItemsArray({
                                         )}
                                         type="text"
                                         icon={
-                                            <DefaultTooltip  contentClassName="max-w-[30rem]" content="Allows you to add a prefix to the tooltip displaying this item e.g: tonnes, degrees etc">
+                                            <DefaultTooltip  side="left" contentClassName="max-w-[20rem]" content="Allows you to add a suffix to the tooltip displaying this item e.g: tonnes, degrees etc">
                                                 <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                             </DefaultTooltip>
                                         }
@@ -203,7 +203,7 @@ function ItemsArray({
                                         )}
                                         type="text"
                                         icon={
-                                            <DefaultTooltip  contentClassName="max-w-[30rem]" content="Allows you to define the type for this column, e.g: datetime/number/year etc">
+                                            <DefaultTooltip  contentClassName="max-w-[20rem]" content="Allows you to define the type for this column, e.g: datetime/number/year etc">
                                                 <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                             </DefaultTooltip>
                                         }
