@@ -1,5 +1,7 @@
 import { z } from 'zod'
 const emptyStringToUndefined = z.literal('').transform(() => undefined)
+const emptyStringToStep = z.literal('').transform(() => 'step' as const)
+const emptyStringToStepLabel = z.literal(undefined).transform(() => 'Step')
 const nanToUndefined = z.literal(NaN).transform(() => undefined)
 
 const sourceSchema = z
@@ -87,8 +89,8 @@ const rampObj = z
                 'interpolate',
                 'interpolate-lab',
                 'interpolate-hcl',
-            ]),
-            label: z.string(),
+            ]).or(emptyStringToStep),
+            label: z.string().or(emptyStringToStepLabel),
         }),
         interpolationType: z
             .object({

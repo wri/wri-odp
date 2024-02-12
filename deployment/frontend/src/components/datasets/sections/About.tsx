@@ -14,8 +14,8 @@ export function About({
     diffFields: string[]
 }) {
     const higlighted = (field: string) => {
-        if (diffFields && isCurrentVersion) {
-            if (diffFields.includes(field)) {
+        if (diffFields && !isCurrentVersion) {
+            if (diffFields.find((f) => f.includes(field))) {
                 return 'bg-yellow-200'
             }
         }
@@ -74,14 +74,18 @@ export function About({
                 {dataset.groups && dataset.groups.length > 0 && (
                     <div className="flex items-center gap-x-1">
                         <>
-                            <dt className="font-acumin text-sm font-semibold text-neutral-700">
+                            <dt
+                                className={`font-acumin text-sm font-semibold text-neutral-700 ${higlighted(
+                                    'groups'
+                                )}`}
+                            >
                                 {' '}
                                 Topics:{' '}
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
                                 {dataset.groups.map((topic, topicIdx) => (
                                     <Link href={`/topics/${topic.name}`}>
-                                        {topic.display_name}
+                                        {topic.display_name ?? topic.name}
                                         {dataset.groups &&
                                         topicIdx !== dataset.groups?.length - 1
                                             ? ', '
@@ -141,7 +145,7 @@ export function About({
                 {dataset?.notes && (
                     <div>
                         <h3
-                            className={`font-acumin text-base font-normal text-black ${higlighted(
+                            className={`font-acumin text-base font-normal w-fit text-black ${higlighted(
                                 'notes'
                             )}`}
                         >

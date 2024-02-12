@@ -4,18 +4,22 @@ import { CheckIcon } from "@heroicons/react/20/solid";
 import { match } from "ts-pattern";
 
 export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
+  console.log('CURRENT STEP', currentStep)
   const steps = [
     { id: 0, name: "Metadata", href: "#" },
     { id: 1, name: "Datafiles", href: "#" },
-    { id: 2, name: "Preview", href: "#" },
+    { id: 2, name: "Map Visualizations", href: "#" },
+    { id: 3, name: "Preview", href: "#" },
   ].map((step) => {
     return match(step.id - currentStep)
       .with(0, () => ({ ...step, status: "current" }))
       .with(1, () => ({ ...step, status: "upcoming" }))
       .with(2, () => ({ ...step, status: "upcoming" }))
+      .with(3, () => ({ ...step, status: "upcoming" }))
       .otherwise(() => ({ ...step, status: "complete" }));
   });
 
+  console.log('STEPS', steps.length)
   return (
     <Tab.List
       as="nav"

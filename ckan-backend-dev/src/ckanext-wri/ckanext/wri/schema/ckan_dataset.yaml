@@ -3,7 +3,6 @@ dataset_type: dataset
 about: A reimplementation of the default CKAN dataset schema
 about_url: http://github.com/ckan/ckanext-scheming
 
-
 dataset_fields:
 
 - field_name: approval_status
@@ -18,6 +17,12 @@ dataset_fields:
     label: Rejected
 
 - field_name: draft
+  label: Draft
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
+- field_name: is_approved
   label: Draft
   validators: boolean_validator
   output_validators: boolean_validator
@@ -140,6 +145,8 @@ dataset_fields:
     label: Internal
   - value: public
     label: Public
+  - value: draft
+    label: Draft
 
 - field_name: license_id
   label: License
@@ -231,27 +238,26 @@ dataset_fields:
   form_placeholder: 'eg. {"title": "External site", "url": "http://example.com"}'
 
 resource_fields:
+  - field_name: url
+    label: URL
+    preset: resource_url_upload
 
-- field_name: url
-  label: URL
-  preset: resource_url_upload
+  - field_name: rw_id
+    label: RW ID
 
-- field_name: rw_id
-  label: RW ID
+  - field_name: name
+    label: Name
+    form_placeholder: eg. January 2011 Gold Prices
 
-- field_name: name
-  label: Name
-  form_placeholder: eg. January 2011 Gold Prices
+  - field_name: description
+    label: Description
+    form_snippet: markdown.html
+    form_placeholder: Some useful notes about the data
 
-- field_name: description
-  label: Description
-  form_snippet: markdown.html
-  form_placeholder: Some useful notes about the data
+  - field_name: format
+    label: Format
+    preset: resource_format_autocomplete
 
-- field_name: format
-  label: Format
-  preset: resource_format_autocomplete
-
-- field_name: schema
-  label: Schema
-  preset: json_object
+  - field_name: schema
+    label: Schema
+    preset: json_object

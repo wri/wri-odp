@@ -63,7 +63,7 @@ def pending_dataset_create(context: Context, data_dict: DataDict):
     if not package_data:
         raise tk.ValidationError(_("package_data is required"))
 
-    tk.check_access("pending_dataset_create", context, package_data)
+    tk.check_access("package_update", context, package_data)
 
     pending_dataset = None
 

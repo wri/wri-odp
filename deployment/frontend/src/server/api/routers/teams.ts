@@ -10,7 +10,12 @@ import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
 import { searchSchema } from '@/schema/search.schema'
-import type { GroupTree, GroupsmDetails, User, WriOrganization } from '@/schema/ckan.schema'
+import type {
+    GroupTree,
+    GroupsmDetails,
+    User,
+    WriOrganization,
+} from '@/schema/ckan.schema'
 import {
     getGroups,
     getAllOrganizations,
@@ -257,7 +262,7 @@ export const teamRouter = createTRPCRouter({
                     acc[org.id] = {
                         img_url: org.image_display_url ?? '',
                         description: org.description ?? '',
-                        package_count: org.package_count,
+                        package_count: org.package_count!,
                     }
                     return acc
                 },

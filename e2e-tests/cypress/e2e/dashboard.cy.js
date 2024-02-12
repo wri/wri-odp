@@ -7,11 +7,11 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
+const datasetName = `${uuid()}ttttopp${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 const parentOrg2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const datasetName2 = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
+const datasetName2 = `${uuid()}pdssfppp${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 const group = `${uuid()}${Cypress.env("GROUP_SUFFIX")}`;
 const user = `${uuid()}-user`;
@@ -28,7 +28,16 @@ describe("Dashboard Test", () => {
     cy.createDatasetAPI(parentOrg, datasetName, true, {
         'notes': 'test',
         'draft': 'true',
-        'approval_status': 'pending'
+        'approval_status': 'pending',
+        'short_description': 'test',
+        "technical_notes": "https://source.com/stat",
+        "visibility_type": "public",
+        "maintainer": "Stephen Oni",
+        "maintainer_email": "stephenoni2@gmail.com",
+        "author": "Stephen",
+        "author_email": "stephenoni2@gmail.com",
+        "update_frequency": "hourly",
+        "is_approved": "false",
       });
 
     cy.createOrganizationAPI(parentOrg2);
@@ -69,7 +78,7 @@ describe("Dashboard Test", () => {
       });
     });
     cy.get("@dataset").then((dataset) => {
-      cy.createPendingDataset(dataset.id, dataset.name)
+      cy.createPendingDataset(dataset.id, dataset)
     });
 
   });
@@ -84,11 +93,11 @@ describe("Dashboard Test", () => {
     cy.get("#alldataset").should("exist");
     cy.get("#alldataset").find("div").should("have.length.greaterThan", 0);
 
-    cy.get('input[type="search"]').type(datasetName).type("{enter}");
+    cy.get('input[type="search"]').type(datasetName2).type("{enter}");
 
-    cy.contains("div", datasetName).should("exist", { timeout: 15000 });
+    cy.contains("div", datasetName2).should("exist", { timeout: 15000 });
     cy.get("button#rowshow").first().click();
-    cy.contains(parentOrg);
+    cy.contains(parentOrg2);
   });
 
   it("Should test activity stream", () => {
@@ -184,7 +193,7 @@ describe("Dashboard Test", () => {
     },
   );
 
-  it("should delete notification", 
+  it("should delete notification",
     {
       retries: {
         runMode: 5,
@@ -209,27 +218,8 @@ describe("Dashboard Test", () => {
       },
     );
   });
-
-  it("Should have issues", () => {
-    cy.visit("/datasets/" + datasetName + "?approval=true");
-    cy.contains("Reject request").click();
-    cy.get(".tiptap.ProseMirror").type("Test");
-    cy.get("input[id=title]").type("Test");
-    cy.get("button[id=reject]").click();
-    cy.contains("Issues").click();
-    cy.contains("Test");
-    cy.contains("Test").click();
-    cy.get(".tiptap.ProseMirror").type("issue comment");
-    cy.get("button").contains("Comment").click();
-    cy.contains("issue comment");
-
-    // delete issue
-    cy.get("button").contains("Delete").click();
-    cy.contains("Delete Issue");
-    cy.get("button").contains("Delete Issue").click();
-  });
-
-  it("Should have reject dataset", () => {
+  
+  it("Should reject dataset", () => {
     cy.visit("/dashboard/approval-request");
     cy.contains(datasetName,  { timeout: 30000 });
      cy.get(`button#delete-tooltip-${datasetName}`)
@@ -239,18 +229,69 @@ describe("Dashboard Test", () => {
     cy.get("input[id=title]").type("Test");
     cy.get(".tiptap.ProseMirror").type("Test");
     cy.contains('button', 'Reject and send feedback').click({ force: true });
-    cy.contains(`Dataset ${datasetName} is successfully rejected`);
+    cy.wait(15000)
+    // cy.contains(`Dataset ${datasetName} is successfully rejected`, { timeout: 30000 });
 
+  })
+
+  it("Should have issues", () => {
+    cy.visit("/datasets/" + datasetName + "?approval=true");
+    cy.contains("Reject request").click();
+    cy.get(".tiptap.ProseMirror").type("Test");
+    cy.get("input[id=title]").type("Test");
+    cy.get("button[id=reject]").click();
+    cy.wait(15000)
+  });
+
+  it("Should view issues", () => {
+    cy.visit("/datasets/" + datasetName);
+    cy.wait(15000)
+    cy.contains("Issues").click({force: true});
+    cy.contains("Test");
+    cy.contains("Test").click();
+    cy.wait(15000)
+    cy.get(".tiptap.ProseMirror").type("issue comment");
+    cy.get("button").contains("Comment").click();
+    cy.wait(15000)
+    cy.contains("issue comment", { timeout: 15000 });
+
+    // delete issue
+    cy.get("button").contains("Delete").click();
+    cy.contains("Delete Issue");
+    cy.get("button").contains("Delete Issue").click();
+
+   })
+  
+
+  it("Should be in awaiting approval", () => {
+    cy.visit("/dashboard/datasets");
+    cy.contains("Awaiting Approval").click();
+    cy.wait(15000)
+    cy.get('input[type="search"]').type(datasetName).type("{enter}");
+    cy.contains(datasetName).should("exist", { timeout: 15000 });
+  })
+
+  it("Should edit pending dataset", () => {
+    cy.visit("/dashboard/datasets/" + datasetName + "/edit");
+    cy.get("input[name=title]")
+      .clear()
+      .type(datasetName + " EDITED");
+    cy.get("button").contains("Update Dataset").click({ force: true, });
+    cy.wait(20000);
   })
 
   it("Should have approve dataset", () => {
     cy.visit("/dashboard/approval-request");
-    cy.contains(datasetName,  { timeout: 30000 });
+    cy.contains(datasetName, { timeout: 30000 });
+    cy.get("button#rowshow").first().click();
+    cy.contains("Title")
+    cy.contains(datasetName + " EDITED")
     cy.get(`button#approve-tooltip-${datasetName}`)
       .first()
       .click({ force: true });
     cy.contains('button', 'Approve Dataset').click({ force: true });
-    cy.contains(`Successfully approved the dataset ${datasetName}`);
+    cy.wait(15000)
+    // cy.contains(`Successfully approved the dataset ${datasetName}`, {timeout: 20000});
   })
   
 

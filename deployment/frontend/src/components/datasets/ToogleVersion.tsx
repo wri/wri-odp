@@ -6,8 +6,12 @@ import classNames from '@/utils/classnames'
 export default function ToggleVersion({
     enabled,
     setEnabled,
+    approval_status,
+    is_approved,
 }: {
     enabled: boolean
+    approval_status: string
+    is_approved: boolean
     setEnabled: (enabled: boolean) => void
 }) {
     return (
@@ -19,12 +23,17 @@ export default function ToggleVersion({
                 content={`
             ${
                 enabled
-                    ? 'toggle to see current version'
-                    : 'toggle to see previous version'
+                    ? `toggle to see ${
+                          approval_status === 'pending' ? 'pending' : 'rejected'
+                      } version`
+                    : `toggle to see ${
+                          is_approved ? 'approved' : 'early'
+                      } version`
             }`}
                 side="bottom"
             >
                 <Switch
+                    id="toggle-version"
                     checked={enabled}
                     onChange={setEnabled}
                     className={classNames(

@@ -27,8 +27,8 @@ export default function RejectApproval({
         defaultValues: {
             title: '',
             description: '',
-            dataset_id: dataset.name,
-            owner_org: dataset.owner_org,
+            dataset_id: dataset.id,
+            owner_org: dataset.owner_org ? dataset.owner_org : null,
             creator_id: dataset.creator_user_id,
         },
     })
@@ -53,7 +53,11 @@ export default function RejectApproval({
             setRejectOpen()
             notify(`Dataset ${dataset.title} is successfully rejected`, 'error')
         },
-        onError: (error) => setErrorMessage(error.message),
+        onError: (error) => {
+            formObj.reset()
+            setErrorMessage(error.message)
+            setRejectOpen()
+        },
     })
 
     return (

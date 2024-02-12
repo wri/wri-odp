@@ -20,6 +20,7 @@ import Tooltip from './preview/Tooltip'
 import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import LayerManagerPreview from './preview/LayerManagerPreview'
+import { slugify } from '@/utils/slugify'
 
 export function BuildALayer({
     formObj,
@@ -71,6 +72,10 @@ export function BuildALayer({
         formObj.setValue(`resources.${index}.layerObj`, values)
     }
 
+    useEffect(() => {
+        syncValues()
+    }, [layerFormObj.watch()])
+
     const updatePreview = () => {
         syncValues()
         console.log('UPDATING PREVIEW', layerFormObj.getValues())
@@ -80,7 +85,7 @@ export function BuildALayer({
     const {
         watch,
         setValue,
-        formState: { dirtyFields },
+        formState: { dirtyFields, touchedFields },
     } = layerFormObj
     useEffect(() => {
         if (!dirtyFields['connectorUrl'])
@@ -97,6 +102,23 @@ export function BuildALayer({
         watch('layerConfig.source.provider.account'),
         watch('layerConfig.source.provider.layers.0.options.sql'),
     ])
+
+    useEffect(() => {
+        if (!dirtyFields['slug']) setValue('slug', slugify(watch('name')))
+    }, [watch('name')])
+    useEffect(() => {
+        syncValues()
+        if (
+            Object.keys(dirtyFields).length > 0 ||
+            Object.keys(touchedFields).length > 0
+        ) {
+            const dirty = Object.keys(dirtyFields)
+            const touched = Object.keys(touchedFields)
+            dirty.push(...touched)
+            //session storage
+            sessionStorage.setItem('dirtyFields', JSON.stringify(dirty))
+        }
+    }, [watch()])
 
     return (
         <FormProvider {...layerFormObj}>

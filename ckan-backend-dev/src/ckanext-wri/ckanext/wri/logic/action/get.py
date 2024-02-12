@@ -495,6 +495,7 @@ def pending_diff_show(context: Context, data_dict: DataDict):
         # raise logic.NotFound(
         #     _("Diff not found for Pending Dataset: {}".format(package_id))
         # )
+
     return dataset_diff
 
 

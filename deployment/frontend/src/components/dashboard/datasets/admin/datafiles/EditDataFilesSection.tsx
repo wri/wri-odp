@@ -11,7 +11,7 @@ import { WriDataset } from '@/schema/ckan.schema'
 
 export function EditDataFilesSection({
     formObj,
-    dataset
+    dataset,
 }: {
     formObj: UseFormReturn<DatasetFormType>
     dataset: WriDataset
@@ -30,24 +30,20 @@ export function EditDataFilesSection({
         isLoading: isDatasetViewsLoading,
         error: datasetViewsError,
     } = api.rw.getDatasetViews.useQuery(
-        { rwDatasetId: rwId ?? "" },
+        { rwDatasetId: rwId ?? '' },
         { enabled: !!rwId }
     )
 
     return (
         <>
-            {rwId && provider && !isDatasetViewsLoading && (
-                <MetadataAccordion label="Dataset views" defaultOpen={false}>
-                    <ViewsList
-                        provider="rw"
-                        rwDatasetId={rwId}
-                        views={datasetViews ?? []}
-                        dataset={dataset}
-                    />
-                </MetadataAccordion>
-            )}
-            {fields.map((field, index) =>
-                field.new ? (
+              {fields.map((field, index) => {
+                if (
+                    field.type === 'layer' ||
+                    field.type === 'layer-raw' ||
+                    field.type === 'empty-layer'
+                )
+                    return <></>
+                return field.new ? (
                     <AddDataFile
                         key={index}
                         index={index}
@@ -65,7 +61,7 @@ export function EditDataFilesSection({
                         dataset={dataset}
                     />
                 )
-            )}
+            })}
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>
@@ -73,7 +69,7 @@ export function EditDataFilesSection({
                             resourceId: uuidv4(),
                             package_id: watch('id'),
                             title: '',
-                            type: 'empty',
+                            type: 'empty-file',
                             format: '',
                             new: true,
                             schema: [],

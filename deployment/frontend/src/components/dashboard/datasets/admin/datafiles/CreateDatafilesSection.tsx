@@ -41,22 +41,30 @@ export function CreateDataFilesSection({
         })
     return (
         <>
-            {fields.map((field, index) => (
-                <AddDataFile
-                    key={index}
-                    index={index}
-                    field={field}
-                    remove={() => remove(index)}
-                    formObj={formObj}
-                />
-            ))}
+            {fields.map((field, index) => {
+                if (
+                    field.type === 'layer' ||
+                    field.type === 'layer-raw' ||
+                    field.type === 'empty-layer'
+                )
+                    return <></>
+                return (
+                    <AddDataFile
+                        key={index}
+                        index={index}
+                        field={field}
+                        remove={() => remove(index)}
+                        formObj={formObj}
+                    />
+                )
+            })}
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>
                         append({
                             resourceId: uuidv4(),
                             title: '',
-                            type: 'empty',
+                            type: 'empty-file',
                             format: '',
                             schema: [],
                             layerObj: null,
@@ -111,7 +119,8 @@ function AddDataFile({
                         id: item.name,
                         info: {
                             label: item.name,
-                            type_override: (types[item.type as keyof typeof types]),
+                            type_override:
+                                types[item.type as keyof typeof types],
                             default: '',
                         },
                     })
@@ -213,6 +222,7 @@ function AddDataFile({
             <DataFileAccordion
                 icon={<FolderPlusIcon className="h-7 w-7" />}
                 title={`Data File ${index + 1}`}
+                remove={remove}
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
                         {match(datafile.type)
@@ -247,19 +257,6 @@ function AddDataFile({
                                     </button>
                                 </>
                             ))
-                            .with(P.union('layer', 'layer-raw'), () => (
-                                <>
-                                    <div className="flex items-center gap-x-2">
-                                        <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
-                                        <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
-                                            {field.title}
-                                        </span>
-                                    </div>
-                                    <button onClick={() => remove()}>
-                                        <MinusCircleIcon className="h-6 w-6 text-red-500" />
-                                    </button>
-                                </>
-                            ))
                             .otherwise(() => (
                                 <>
                                     <div className="flex items-center gap-x-2"></div>
@@ -274,11 +271,9 @@ function AddDataFile({
                 <div className="px-4 py-8">
                     <Tab.Group
                         selectedIndex={match(datafile.type)
-                            .with('empty', () => 0)
+                            .with('empty-file', () => 0)
                             .with('upload', () => 1)
                             .with('link', () => 2)
-                            .with('layer', () => 3)
-                            .with('layer-raw', () => 4)
                             .otherwise(() => 0)}
                     >
                         <Tab.List
@@ -300,10 +295,10 @@ function AddDataFile({
                                 <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                 <div
                                     className={classNames(
-                                        'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
+                                        'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm px-4'
                                     )}
                                 >
-                                    Upload a file
+                                    Upload file from my computer
                                 </div>
                             </Tab>
                             <Tab
@@ -325,82 +320,11 @@ function AddDataFile({
                                         <LinkIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                         <div
                                             className={classNames(
-                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm px-4',
                                                 selected ? 'font-bold' : ''
                                             )}
                                         >
-                                            Link External File
-                                        </div>
-                                    </span>
-                                )}
-                            </Tab>
-                            <Tab
-                                id="tabLayer"
-                                disabled={watch('rw_dataset') === false}
-                                onClick={() =>
-                                    setValue(`resources.${index}.type`, 'layer')
-                                }
-                            >
-                                {({ selected }) => (
-                                    <span
-                                        className={classNames(
-                                            'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                            selected ? 'bg-amber-400' : '',
-                                            datafile.type === 'upload'
-                                                ? 'hidden'
-                                                : ''
-                                        )}
-                                    >
-                                        <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                        <div
-                                            className={classNames(
-                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col',
-                                                selected ? 'font-bold' : ''
-                                            )}
-                                        >
-                                            Build a layer
-                                            {watch('rw_dataset') === false && (
-                                                <span>
-                                                    Toggle RW Data to enable
-                                                </span>
-                                            )}
-                                        </div>
-                                    </span>
-                                )}
-                            </Tab>
-                            <Tab
-                                id="tabLayerRaw"
-                                disabled={watch('rw_dataset') === false}
-                                onClick={() =>
-                                    setValue(
-                                        `resources.${index}.type`,
-                                        'layer-raw'
-                                    )
-                                }
-                            >
-                                {({ selected }) => (
-                                    <span
-                                        className={classNames(
-                                            'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                            selected ? 'bg-amber-400' : '',
-                                            datafile.type === 'upload'
-                                                ? 'hidden'
-                                                : ''
-                                        )}
-                                    >
-                                        <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                        <div
-                                            className={classNames(
-                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col',
-                                                selected ? 'font-bold' : ''
-                                            )}
-                                        >
-                                            Build a layer (RAW)
-                                            {watch('rw_dataset') === false && (
-                                                <span>
-                                                    Toggle RW Data to enable
-                                                </span>
-                                            )}
+                                            Link to file in cloud storage
                                         </div>
                                     </span>
                                 )}
@@ -419,7 +343,7 @@ function AddDataFile({
                                         setValue(`resources.${index}`, {
                                             resourceId: uuidv4(),
                                             title: '',
-                                            type: 'empty',
+                                            type: 'empty-file',
                                             schema: [],
                                             layerObj: null,
                                         })
@@ -428,15 +352,6 @@ function AddDataFile({
                             </Tab.Panel>
                             <Tab.Panel>
                                 <LinkExternalForm
-                                    formObj={formObj}
-                                    index={index}
-                                />
-                            </Tab.Panel>
-                            <Tab.Panel>
-                                <BuildALayer formObj={formObj} index={index} />
-                            </Tab.Panel>
-                            <Tab.Panel>
-                                <BuildALayerRaw
                                     formObj={formObj}
                                     index={index}
                                 />

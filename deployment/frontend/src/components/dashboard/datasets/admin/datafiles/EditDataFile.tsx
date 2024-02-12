@@ -33,7 +33,7 @@ export function EditDataFile({
     field,
     index,
     formObj,
-    dataset
+    dataset,
 }: {
     remove: () => void
     index: number
@@ -61,7 +61,6 @@ export function EditDataFile({
 
     const datafile = watch(`resources.${index}`)
 
-
     return (
         <>
             <DataFileAccordion
@@ -69,6 +68,7 @@ export function EditDataFile({
                 icon={<></>}
                 title={`Data File ${index + 1}`}
                 className="py-0"
+                remove={remove}
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
                         {match(datafile.type)
@@ -205,7 +205,7 @@ export function EditDataFile({
                                             {({ selected }) => (
                                                 <div
                                                     className={classNames(
-                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
+                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer views-tab',
                                                         selected
                                                             ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                             : 'text-black'
@@ -270,7 +270,10 @@ export function EditDataFile({
                                                                 : undefined
                                                         }
                                                     >
-                                                        Datapusher <DatapusherStatus datafile={datafile} />
+                                                        Datapusher{' '}
+                                                        <DatapusherStatus
+                                                            datafile={datafile}
+                                                        />
                                                     </div>
                                                 )}
                                             </Tab>
@@ -380,10 +383,12 @@ export function EditDataFile({
                         <LoaderButton
                             variant="muted"
                             type="button"
-                            onClick={() => editResource.mutate(datafile)}
+                            onClick={() => {
+                                editResource.mutate(datafile)
+                            }}
                             loading={editResource.isLoading}
                         >
-                            Update Data File 
+                            Update Data File
                         </LoaderButton>
                     </div>
                 </div>

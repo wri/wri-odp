@@ -12,7 +12,7 @@ export default function EditCard({
     teamName,
 }: {
     isLoading: boolean
-    orgDetails: Organization & { groups: Organization[] }
+    orgDetails: WriOrganization & { groups: Organization[] }
     userName: string
     teamName: string
 }) {

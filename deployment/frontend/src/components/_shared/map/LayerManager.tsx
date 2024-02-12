@@ -1,25 +1,26 @@
-import VizzLayerManager from './VizzLayerManager'
-import Layer from './Layer'
+//import VizzLayerManager from './VizzLayerManager'
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl'
 import { useMap } from 'react-map-gl'
 import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
+import { Layer, LayerManager as VizzLayerManager } from '@vizzuality/layer-manager-react'
 import pick from 'lodash/pick'
 import CartoProvider from '@vizzuality/layer-manager-provider-carto'
 import { TileProvider } from '@/utils/providers/tileProvider'
 import { GeeProvider } from '@/utils/providers/geeProvider'
-import { APILayerSpec } from '@/interfaces/layer.interface'
+import { APILayerSpec, DeckLayerSpec } from '@/interfaces/layer.interface'
 import { useLayerStates } from '@/utils/storeHooks'
 import { LayerState } from '@/interfaces/state.interface'
 import { useMemo } from 'react'
+import { createDeckLayer } from '@/utils/decodeFunctions'
 
 export const parseLayers = (
     layers: APILayerSpec[],
     layerStates: Map<string, LayerState>
 ): any[] => {
-    return layers.map((layer): LayerSpec => {
+    return layers.map((layer: APILayerSpec) => {
         const { id, layerConfig } = layer
-
         const layerState = layerStates.get(id)
+        if (layerConfig.decode_function) return createDeckLayer(layerConfig, id, layerState)
         let layerProps: any = pick(layerConfig, [
             'deck',
             'images',
@@ -66,28 +67,12 @@ const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
     const { currentLayers } = useLayerStates()
     const parsedLayers = useMemo(() => {
         const parsedLayers = parseLayers(layers, currentLayers)
-
-        parsedLayers.forEach((pl) => {
-            if (!pl.threshold) {
-              pl.threshold = 30;
-            }
-
-            // @ts-ignore
-            if (pl.source.tiles && pl._ogSource) {
-                // @ts-ignore
-                pl.source.tiles = pl._ogSource.tiles.map((tile: any) =>
-                    tile.replace('{thresh}', pl.threshold)
-                )
-            }
-
-        })
-
         return parsedLayers
     }, [layers, currentLayers])
 
-    return map ? (
+    return map && map.getMap() ? (
         <VizzLayerManager
-            map={map?.getMap()}
+            map={map.getMap()}
             plugin={PluginMapboxGl}
             providers={providers}
         >
