@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -154,6 +155,7 @@ export const datasetFormFieldmap: Record<string, string> = {
     owner_org: 'Team',
 }
 
+//@ts-nocheck
 export function formatDiff(
     data: Record<string, { old_value: string; new_value: string }>
 ) {
@@ -167,35 +169,48 @@ export function formatDiff(
                 !key.startsWith('resource') &&
                 (key.match(/\[\d+\]\.\w+/) || key.match(/\[\d+\]/))
             ) {
+                const keyoldNew = data[key]?.old_value ?? data[key]?.new_value
+                if (key.includes('groups')) {
+                    console.log('KEY: ', keyoldNew)
+                }
                 if (
                     key.includes('display_name') ||
-                    //@ts-ignore
-                    Object.keys(data[key]?.old_value).includes('display_name')
+                    key.includes('name') ||
+                    (keyoldNew && Object.keys(keyoldNew).includes('name'))
                 ) {
+                    if (key.includes('display_name')) {
+                        continue
+                    }
                     let newKey = key.split('[')[0]
                     newKey = newKey === 'groups' ? 'Topics' : newKey
-                    //@ts-ignore
+
                     outputDiff[newKey] = outputDiff[newKey] || {
                         old_value: [],
                         new_value: [],
                     }
-                    if (
-                        //@ts-ignore
-                        Object.keys(data[key]?.old_value).includes(
-                            'display_name'
-                        )
-                    ) {
-                        //@ts-ignore
-                        outputDiff[newKey].old_value.push(
-                            //@ts-ignore
-                            data[key]?.old_value['display_name']
-                        )
-                        //@ts-ignore
-                        outputDiff[newKey].new_value.push(data[key]?.new_value)
+                    if (Object.keys(keyoldNew).includes('name')) {
+                        if (data[key]?.old_value) {
+                            outputDiff[newKey].old_value.push(
+                                data[key]?.old_value['name']
+                            )
+                        } else {
+                            outputDiff[newKey].old_value.push(
+                                data[key]?.old_value
+                            )
+                        }
+
+                        if (data[key]?.new_value) {
+                            outputDiff[newKey].new_value.push(
+                                data[key]?.new_value['name']
+                            )
+                        } else {
+                            outputDiff[newKey].new_value.push(
+                                data[key]?.new_value
+                            )
+                        }
                     } else {
-                        //@ts-ignore
                         outputDiff[newKey].old_value.push(data[key]?.old_value)
-                        //@ts-ignore
+
                         outputDiff[newKey].new_value.push(data[key]?.new_value)
                     }
                 }
@@ -203,9 +218,7 @@ export function formatDiff(
                 if (matchesAnyPattern(key)) {
                     const mainKey = key.split('.')[0]!
                     const subKey = key.split('.').slice(1).join('.')!
-                    console.log('MAINKEY, SUBKEY: ', mainKey, subKey)
                     if (subKey) {
-                        //@ts-ignore
                         outputDiff[mainKey] = outputDiff[mainKey] || {
                             old_value: [],
                             new_value: [],
@@ -224,23 +237,62 @@ export function formatDiff(
                             null,
                             2
                         )}`
-                        //@ts-ignore
+
+                        if (
+                            subKey.includes('layerObj') ||
+                            subKey.includes('layerRaw')
+                        ) {
+                            if (!subKey.includes('.')) {
+                                const layerold = data[key]?.old_value
+                                const layerNew = data[key]?.new_value
+                                if (layerold === null || layerold === 'null') {
+                                    outputDiff[mainKey].old_value.push(layerold)
+
+                                    outputDiff[mainKey].new_value.push(
+                                        layerNew['name']
+                                    )
+                                } else if (
+                                    layerNew === null ||
+                                    layerNew === 'null'
+                                ) {
+                                    outputDiff[mainKey].old_value.push(
+                                        layerold['name']
+                                    )
+
+                                    outputDiff[mainKey].new_value.push(layerNew)
+                                }
+                            } else {
+                                outputDiff[mainKey].old_value.push(old_value)
+
+                                outputDiff[mainKey].new_value.push(new_value)
+                            }
+                        }
+
                         outputDiff[mainKey].old_value.push(old_value)
-                        //@ts-ignore
+
                         outputDiff[mainKey].new_value.push(new_value)
                     } else {
                         outputDiff[mainKey] = {
-                            //@ts-ignore
-                            old_value: data[key]?.old_value,
-                            //@ts-ignore
-                            new_value: data[key]?.new_value,
+                            old_value:
+                                data[key]?.old_value === null ||
+                                data[key]?.old_value === 'null'
+                                    ? null
+                                    : data[key]?.old_value['name'] ??
+                                      data[key]?.old_value['title'],
+
+                            new_value:
+                                data[key]?.new_value === null ||
+                                data[key]?.new_value === 'null'
+                                    ? null
+                                    : data[key]?.new_value['name'] ??
+                                      data[key]?.new_value['title'],
                         }
                     }
                 }
             } else {
                 if (key in datasetFormFieldmap) {
                     const newKey = datasetFormFieldmap[key]!
-                    //@ts-ignore
+
                     outputDiff[newKey] = data[key]
                 } else {
                     if (
@@ -248,7 +300,7 @@ export function formatDiff(
                         !['draft', 'state'].includes(key)
                     ) {
                         const newKey = key.split('_').join(' ')
-                        //@ts-ignore
+
                         outputDiff[newKey] = data[key]
                     }
                 }

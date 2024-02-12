@@ -85,7 +85,7 @@ export function About({
                             <dd className="mb-1 text-sm font-light text-stone-900">
                                 {dataset.groups.map((topic, topicIdx) => (
                                     <Link href={`/topics/${topic.name}`}>
-                                        {topic.display_name}
+                                        {topic.display_name ?? topic.name}
                                         {dataset.groups &&
                                         topicIdx !== dataset.groups?.length - 1
                                             ? ', '
@@ -145,7 +145,7 @@ export function About({
                 {dataset?.notes && (
                     <div>
                         <h3
-                            className={`font-acumin text-base font-normal text-black ${higlighted(
+                            className={`font-acumin text-base font-normal w-fit text-black ${higlighted(
                                 'notes'
                             )}`}
                         >

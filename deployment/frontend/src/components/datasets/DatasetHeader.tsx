@@ -431,7 +431,7 @@ export function DatasetHeader({
                         )}
                     </div>
                     <p
-                        className={`text-justify text-base font-light leading-snug text-stone-900 ${higlighted(
+                        className={`text-justify text-base font-light leading-snug text-stone-900 w-fit ${higlighted(
                             'short_description'
                         )}`}
                     >
