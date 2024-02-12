@@ -1839,7 +1839,7 @@ export async function sendGroupNotification({
         // get all admin users
         let allUsers = await getAllUsers({ apiKey: env.SYS_ADMIN_API_KEY })
         allUsers = allUsers.filter(
-            (x) => !recipientUsers?.find((s) => s.id === x.id)
+            (x) => !recipientUsers?.find((s) => s.id === x.id) && x.sysadmin
         )
         const allUserIds = allUsers.map((x) => x.id) as string[]
         recipientIds = recipientIds.concat(allUserIds)
