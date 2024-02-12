@@ -163,8 +163,15 @@ export function formatDiff(
     > = {}
     if (data) {
         for (const key in data) {
-            if (!key.startsWith('resource') && key.match(/\[\d+\]\.\w+/)) {
-                if (key.includes('display_name')) {
+            if (
+                !key.startsWith('resource') &&
+                (key.match(/\[\d+\]\.\w+/) || key.match(/\[\d+\]/))
+            ) {
+                if (
+                    key.includes('display_name') ||
+                    //@ts-ignore
+                    Object.keys(data[key]?.old_value).includes('display_name')
+                ) {
                     let newKey = key.split('[')[0]
                     newKey = newKey === 'groups' ? 'Topics' : newKey
                     //@ts-ignore
@@ -172,10 +179,25 @@ export function formatDiff(
                         old_value: [],
                         new_value: [],
                     }
-                    //@ts-ignore
-                    outputDiff[newKey].old_value.push(data[key]?.old_value)
-                    //@ts-ignore
-                    outputDiff[newKey].new_value.push(data[key]?.new_value)
+                    if (
+                        //@ts-ignore
+                        Object.keys(data[key]?.old_value).includes(
+                            'display_name'
+                        )
+                    ) {
+                        //@ts-ignore
+                        outputDiff[newKey].old_value.push(
+                            //@ts-ignore
+                            data[key]?.old_value['display_name']
+                        )
+                        //@ts-ignore
+                        outputDiff[newKey].new_value.push(data[key]?.new_value)
+                    } else {
+                        //@ts-ignore
+                        outputDiff[newKey].old_value.push(data[key]?.old_value)
+                        //@ts-ignore
+                        outputDiff[newKey].new_value.push(data[key]?.new_value)
+                    }
                 }
             } else if (key.startsWith('resources[')) {
                 if (matchesAnyPattern(key)) {
@@ -206,6 +228,13 @@ export function formatDiff(
                         outputDiff[mainKey].old_value.push(old_value)
                         //@ts-ignore
                         outputDiff[mainKey].new_value.push(new_value)
+                    } else {
+                        outputDiff[mainKey] = {
+                            //@ts-ignore
+                            old_value: data[key]?.old_value,
+                            //@ts-ignore
+                            new_value: data[key]?.new_value,
+                        }
                     }
                 }
             } else {
@@ -214,7 +243,10 @@ export function formatDiff(
                     //@ts-ignore
                     outputDiff[newKey] = data[key]
                 } else {
-                    if (matchesAnyPattern(key)) {
+                    if (
+                        matchesAnyPattern(key) &&
+                        !['draft', 'state'].includes(key)
+                    ) {
                         const newKey = key.split('_').join(' ')
                         //@ts-ignore
                         outputDiff[newKey] = data[key]

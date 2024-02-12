@@ -530,7 +530,7 @@ export async function getOneDataset(
         {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `${user?.apikey ?? ''}`,
+                Authorization: env.SYS_ADMIN_API_KEY,
             },
         }
     )
@@ -661,7 +661,7 @@ export async function getOnePendingDataset(
         `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
         {
             headers: {
-                Authorization: `${user?.apikey ?? ''}`,
+                Authorization: env.SYS_ADMIN_API_KEY,
                 'Content-Type': 'application/json',
             },
         }
@@ -1480,7 +1480,7 @@ export async function getRecipient({
             `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
             {
                 headers: {
-                    Authorization: `${session.user?.apikey ?? ''}`,
+                    Authorization: env.SYS_ADMIN_API_KEY,
                     'Content-Type': 'application/json',
                 },
             }
@@ -2103,6 +2103,7 @@ export const datsetFields = [
     'tags',
     'relationships_as_subject',
     'relationships_as_object',
+    'notes',
 ]
 
 export function filterDatasetFields(dataset: any) {

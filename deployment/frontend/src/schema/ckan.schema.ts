@@ -121,6 +121,7 @@ export interface WriDataset extends Dataset {
     issue_count?: number
     resources: Resource[]
     rw_dataset?: boolean
+    is_approved?: boolean
 }
 
 export interface Extra {

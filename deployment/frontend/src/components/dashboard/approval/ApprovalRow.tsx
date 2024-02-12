@@ -159,18 +159,22 @@ function SubCardProfile({
                                                 {key}
                                             </TableCell>
                                             <TableCell className="font-acumin text-xs font-normal text-black">
-                                                {JSON.stringify(
-                                                    diff2[key]?.new_value,
-                                                    null,
-                                                    2
-                                                )}
+                                                <pre>
+                                                    {JSON.stringify(
+                                                        diff2[key]?.new_value,
+                                                        null,
+                                                        2
+                                                    )}
+                                                </pre>
                                             </TableCell>
                                             <TableCell className="font-acumin text-xs font-normal text-black">
-                                                {JSON.stringify(
-                                                    diff2[key]?.old_value,
-                                                    null,
-                                                    2
-                                                )}
+                                                <pre>
+                                                    {JSON.stringify(
+                                                        diff2[key]?.old_value,
+                                                        null,
+                                                        2
+                                                    )}
+                                                </pre>
                                             </TableCell>
                                         </TableRow>
                                     )
