@@ -17,6 +17,13 @@ import { Input } from '@/components/_shared/SimpleInput'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { convertLayerObjToForm, getApiSpecFromRawObj } from './convertObjects'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { InformationCircleIcon } from '@heroicons/react/24/outline'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/_shared/Popover'
+import Image from 'next/image'
 
 export function BuildALayerRaw({
     formObj,
@@ -34,8 +41,12 @@ export function BuildALayerRaw({
 
     const getLayerObj = () => {
         try {
-            const apiSpec = getApiSpecFromRawObj(getValues(`resources.${index}.layerObjRaw`))
-            return getValues(`resources.${index}.layerObjRaw`) ? { ...apiSpec, id: uuidv4() } : null
+            const apiSpec = getApiSpecFromRawObj(
+                getValues(`resources.${index}.layerObjRaw`)
+            )
+            return getValues(`resources.${index}.layerObjRaw`)
+                ? { ...apiSpec, id: uuidv4() }
+                : null
         } catch (e) {
             return null
         }
@@ -43,7 +54,6 @@ export function BuildALayerRaw({
 
     const convertToForm = () => {
         const layerObj = getLayerObj()
-        console.log('LAYER OBJ', layerObj)
         if (layerObj) {
             setValue(`resources.${index}.type`, 'layer')
             setValue(`resources.${index}.layerObjRaw`, null)
@@ -103,6 +113,19 @@ export function BuildALayerRaw({
                         />
                     </InputGroup>
                     <Accordion text="General Config">
+                        <label
+                            htmlFor="wri_data"
+                            className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
+                        >
+                            As a general rule you should start with the{' '}
+                            <a
+                                target="_blank"
+                                className="text-blue-800"
+                                href="https://resource-watch.github.io/doc-api/reference.html#what-is-a-layer"
+                            >
+                                resourcewatch api layer reference
+                            </a>
+                        </label>
                         <div className="mt-4">
                             <CodeEditor
                                 formObj={formObj}
@@ -111,6 +134,29 @@ export function BuildALayerRaw({
                         </div>
                     </Accordion>
                     <Accordion text="Layer Config">
+                        <label
+                            htmlFor="wri_data"
+                            className="font-acumin text-lg font-light text-zinc-800"
+                        >
+                            You can start with the{' '}
+                            <a
+                                target="_blank"
+                                className="text-blue-800"
+                                href="https://github.com/Vizzuality/layer-manager/blob/main/docs/LAYER-SPEC.md"
+                            >
+                                layer-manager docs
+                            </a>{' '}
+                            and on top of that, if the layer is from a vector
+                            provider, you will probably need to refresh on the
+                            mapbox{' '}
+                            <a
+                                href="https://docs.mapbox.com/style-spec/reference/expressions/"
+                                target="_blank"
+                                className="text-blue-800"
+                            >
+                                spec documentation
+                            </a>
+                        </label>
                         <div className="mt-4">
                             <CodeEditor
                                 formObj={formObj}
@@ -119,6 +165,55 @@ export function BuildALayerRaw({
                         </div>
                     </Accordion>
                     <Accordion text="Legends Config">
+                        <label
+                            htmlFor="wri_data"
+                            className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
+                        >
+                            More info
+                            <Popover>
+                                <PopoverTrigger className="cursor-pointer">
+                                    <InformationCircleIcon className="h-5 w-5 text-gray-500" />
+                                    <PopoverContent className="p-4 bg-white shadow-lg rounded-lg max-w-sm w-full">
+                                        <p className="text-md font-semibold">
+                                            The type of legend to be displayed
+                                            for the layer. The options are:
+                                        </p>
+                                        <ul className="text-sm">
+                                            <li>
+                                                Basic
+                                                <Image
+                                                    src="/docs/legends/basic.png"
+                                                    alt="Image of basic legend"
+                                                    layout="responsive"
+                                                    width={300}
+                                                    height={120}
+                                                />
+                                            </li>
+                                            <li>
+                                                Choropleth
+                                                <Image
+                                                    src="/docs/legends/choropleth.png"
+                                                    alt="Image of choropleth legend"
+                                                    layout="responsive"
+                                                    width={300}
+                                                    height={120}
+                                                />
+                                            </li>
+                                            <li>
+                                                Gradient
+                                                <Image
+                                                    src="/docs/legends/gradient.png"
+                                                    alt="Image of gradient legend"
+                                                    layout="responsive"
+                                                    width={300}
+                                                    height={120}
+                                                />
+                                            </li>
+                                        </ul>
+                                    </PopoverContent>
+                                </PopoverTrigger>
+                            </Popover>
+                        </label>
                         <div className="mt-4">
                             <CodeEditor
                                 formObj={formObj}
@@ -127,6 +222,58 @@ export function BuildALayerRaw({
                         </div>
                     </Accordion>
                     <Accordion text="Interaction Config">
+                        <label
+                            htmlFor="wri_data"
+                            className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
+                        >
+                            More info
+                            <Popover>
+                                <PopoverTrigger className="cursor-pointer">
+                                    <InformationCircleIcon className="h-5 w-5 text-gray-500" />
+                                    <PopoverContent className="p-4 bg-white shadow-lg rounded-lg max-w-sm lg:max-w-md w-full">
+                                        <p className="text-md font-semibold">
+                                            This allow you to configure the
+                                            tooltip that appears on top when a
+                                            user clicks on a feature of a layer,
+                                            its an object called output that
+                                            contains an array of interaction
+                                            objects
+                                        </p>
+                                        <ul className="text-sm flex flex-col gap-y-2 mt-4">
+                                            <li>
+                                                column: The column that you want
+                                                to show the data, needs to be
+                                                spelled exactly like in the
+                                                database
+                                            </li>
+                                            <li>
+                                                prefix: Allows you to add a
+                                                prefix to tooltip displaying
+                                                this item
+                                            </li>
+                                            <li>
+                                                property: Allows you to give a
+                                                title to this item, for example
+                                                instead of showing the column
+                                                name country_index you could
+                                                show 'Country Index'
+                                            </li>
+                                            <li>
+                                                suffix: Allows you to add a
+                                                prefix to the tooltip displaying
+                                                this item e.g: tonnes, degrees
+                                                etc
+                                            </li>
+                                            <li>
+                                                type: Allows you to define the
+                                                type for this column, e.g:
+                                                datetime/number/year etc
+                                            </li>
+                                        </ul>
+                                    </PopoverContent>
+                                </PopoverTrigger>
+                            </Popover>
+                        </label>
                         <div className="mt-4">
                             <CodeEditor
                                 formObj={formObj}
