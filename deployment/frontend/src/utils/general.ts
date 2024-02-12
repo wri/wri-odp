@@ -187,6 +187,7 @@ export function formatDiff(
                     ) {
                         //@ts-ignore
                         outputDiff[newKey].old_value.push(
+                            //@ts-ignore
                             data[key]?.old_value['display_name']
                         )
                         //@ts-ignore
