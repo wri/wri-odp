@@ -5,7 +5,13 @@ import { Fragment, useState } from 'react'
 import classNames from '@/utils/classnames'
 import { env } from '@/env.mjs'
 import { Resource } from '@/interfaces/dataset.interface'
-import { JsEndpoint, QueryEndpoint, getSnippet } from '../APIEndpoint'
+import {
+    SnippetEndpoint,
+    QueryEndpoint,
+    getJsSnippet,
+    getPythonSnippet,
+    getRSnippet,
+} from '../APIEndpoint'
 
 export function APIButton({ datafile }: { datafile: Resource }) {
     const [open, setOpen] = useState(false)
@@ -35,7 +41,12 @@ function OpenInModal({
     setOpen: (open: boolean) => void
     datafile: Resource
 }) {
-    const tabs = [{ name: 'Query' }, { name: 'JavaScript' }]
+    const tabs = [
+        { name: 'Query' },
+        { name: 'JavaScript' },
+        { name: 'Python' },
+        { name: 'R' },
+    ]
     return (
         <Modal open={open} setOpen={setOpen} className="max-w-[64rem]">
             <div className="flex flex-col gap-y-4 p-5 font-acumin">
@@ -72,7 +83,25 @@ function OpenInModal({
                             <QueryInstructions datafile={datafile} />
                         </Tab.Panel>
                         <Tab.Panel>
-                            <JavascriptInstructions datafile={datafile} />
+                            <SnippetInstructions
+                                datafile={datafile}
+                                language="javascript"
+                                getSnippetFn={getJsSnippet}
+                            />
+                        </Tab.Panel>
+                        <Tab.Panel>
+                            <SnippetInstructions
+                                datafile={datafile}
+                                language="python"
+                                getSnippetFn={getPythonSnippet}
+                            />
+                        </Tab.Panel>
+                        <Tab.Panel>
+                            <SnippetInstructions
+                                datafile={datafile}
+                                language="r"
+                                getSnippetFn={getRSnippet}
+                            />
                         </Tab.Panel>
                     </Tab.Panels>
                 </Tab.Group>
@@ -159,21 +188,29 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
     )
 }
 
-const JavascriptInstructions = ({ datafile }: { datafile: Resource }) => {
+const SnippetInstructions = ({
+    datafile,
+    getSnippetFn,
+    language,
+}: {
+    datafile: Resource
+    getSnippetFn: (url: string, method?: string, body?: string) => string
+    language: 'javascript' | 'python' | 'r'
+}) => {
     let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
     publicCkanUrl = publicCkanUrl.endsWith('/')
         ? publicCkanUrl.slice(0, -1)
         : publicCkanUrl
     const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
     const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafile.id}`
-    const ckanResourcGetSnippet = getSnippet(ckanResourcGetUrl)
+    const ckanResourcGetSnippet = getSnippetFn(ckanResourcGetUrl)
 
     let ckanResourcGetFileUrl
     let ckanResourcGetFileSnippet
 
     if (datafile.url) {
         ckanResourcGetFileUrl = datafile.url
-        ckanResourcGetFileSnippet = getSnippet(datafile.url)
+        ckanResourcGetFileSnippet = getSnippetFn(datafile.url)
     }
 
     let ckanGetDatastoreInfoUrl
@@ -187,19 +224,19 @@ const JavascriptInstructions = ({ datafile }: { datafile: Resource }) => {
 
     if (datafile.datastore_active) {
         ckanGetDatastoreInfoUrl = `${ckanBaseUrl}/datastore_info`
-        ckanGetDatastoreInfoSnippet = getSnippet(
+        ckanGetDatastoreInfoSnippet = getSnippetFn(
             ckanGetDatastoreInfoUrl,
             'POST',
             `{ "id": "${datafile.id}" }`
         )
 
         ckanResourceGetDatastoreSearchUrl = `${ckanBaseUrl}/datastore_search?resource_id=${datafile.id}&q=foo`
-        ckanResourceGetDatastoreSearchSnippet = getSnippet(
+        ckanResourceGetDatastoreSearchSnippet = getSnippetFn(
             ckanResourceGetDatastoreSearchUrl
         )
 
         ckanResourceGetDatastoreSqlUrl = `${ckanBaseUrl}/datastore_search_sql?sql=SELECT * FROM "${datafile.id}" LIMIT 10`
-        ckanResourceGetDatastoreSqlSnippet = getSnippet(
+        ckanResourceGetDatastoreSqlSnippet = getSnippetFn(
             ckanResourceGetDatastoreSqlUrl
         )
     }
@@ -207,38 +244,43 @@ const JavascriptInstructions = ({ datafile }: { datafile: Resource }) => {
     const rwBaseUrl = `https://api.resourcewatch.org/v1`
 
     const rwDatasetGetLayerUrl = `${rwBaseUrl}/layer/${datafile.rw_id}`
-    const rwDatasetGetLayerSnippet = getSnippet(rwDatasetGetLayerUrl)
+    const rwDatasetGetLayerSnippet = getSnippetFn(rwDatasetGetLayerUrl)
 
     return (
         <>
             <h2 className="text-lg font-bold mb-5">Data Files API</h2>
-            <JsEndpoint
+            <SnippetEndpoint
                 description="Get this data file's metadata"
                 snippet={ckanResourcGetSnippet}
+                language={language}
             />
             {ckanResourcGetFileSnippet && (
-                <JsEndpoint
+                <SnippetEndpoint
                     description="Get raw file"
                     snippet={ckanResourcGetFileSnippet}
+                    language={language}
                 />
             )}
             {ckanGetDatastoreInfoSnippet && (
-                <JsEndpoint
+                <SnippetEndpoint
                     description="Get this data file's records metadata"
                     snippet={ckanGetDatastoreInfoSnippet}
+                    language={language}
                 />
             )}
             {ckanResourceGetDatastoreSearchSnippet && (
-                <JsEndpoint
+                <SnippetEndpoint
                     description="Search this data file's records"
                     snippet={ckanResourceGetDatastoreSearchSnippet}
+                    language={language}
                 />
             )}
 
             {ckanResourceGetDatastoreSqlSnippet && (
-                <JsEndpoint
+                <SnippetEndpoint
                     description="Run a SQL query against this data file's records"
                     snippet={ckanResourceGetDatastoreSqlSnippet}
+                    language={language}
                 />
             )}
 
@@ -248,9 +290,10 @@ const JavascriptInstructions = ({ datafile }: { datafile: Resource }) => {
                         Resource Watch API
                     </h2>
 
-                    <JsEndpoint
+                    <SnippetEndpoint
                         description="Get the layer object associated with this data file"
                         snippet={rwDatasetGetLayerSnippet}
+                        language={language}
                     />
                 </>
             )}
