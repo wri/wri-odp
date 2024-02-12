@@ -21,6 +21,7 @@ import { useSession } from 'next-auth/react'
 import { type Session } from 'next-auth'
 import { convertFormToLayerObj } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
 import { Resource } from '@/interfaces/dataset.interface'
+import { getDecodeParams } from './decodeFunctions'
 
 export async function packageSearch() {
     const ckan = new CKAN('https://ckan.x.demo.datopian.com')
@@ -68,11 +69,19 @@ export async function getLayersFromRW(
                             const layerData = await response.json()
                             const { id, attributes } = layerData.data
                             const currentLayer = currentLayers.get(id)
+                            let decodeParams = null
+                            console.log('GOT HERE')
+                            if (attributes.layerConfig.decode_config) {
+                                decodeParams = await (getDecodeParams[
+                                    id as keyof typeof decodeParams
+                                ] as any)()
+                            }
                             return {
                                 id: id,
                                 ...attributes,
                                 layerConfig: {
                                     ...attributes.layerConfig,
+                                    decodeParams,
                                     zIndex: countdown - index,
                                     visibility:
                                         layers.length > 1
