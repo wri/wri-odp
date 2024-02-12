@@ -241,6 +241,11 @@ describe("Dashboard Test", () => {
     cy.get("input[id=title]").type("Test");
     cy.get("button[id=reject]").click();
     cy.wait(15000)
+  });
+
+  it("Should view issues", () => {
+    cy.visit("/datasets/" + datasetName);
+    cy.wait(15000)
     cy.contains("Issues").click({force: true});
     cy.contains("Test");
     cy.contains("Test").click();
@@ -254,8 +259,8 @@ describe("Dashboard Test", () => {
     cy.get("button").contains("Delete").click();
     cy.contains("Delete Issue");
     cy.get("button").contains("Delete Issue").click();
-  });
 
+   })
   
 
   it("Should be in awaiting approval", () => {
