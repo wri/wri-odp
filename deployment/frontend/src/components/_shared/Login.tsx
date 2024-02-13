@@ -122,6 +122,7 @@ function SignInForm({
                             } else {
                                 notify('Sign in successful')
                                 onSignIn ? onSignIn() : router.reload()
+                                router.push("/dashboard")
                             }
                         })(data)
                     }}
