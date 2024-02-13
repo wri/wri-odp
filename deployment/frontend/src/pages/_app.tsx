@@ -186,7 +186,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     <SessionProvider session={session}>
                         <ReactToastContainer />
                         <main className={`${acumin.variable} font-sans`}>
-                            <Component {...pageProps} />
+                            <Component {...pageProps}  />
                         </main>
                     </SessionProvider>
                 </Provider>

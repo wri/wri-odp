@@ -78,6 +78,7 @@ export async function getServerSideProps(
 export default function TopicPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
+    const router = useRouter()
     const { topics } = props
     const topicName = props.topicName as string
     const topicTitle = props.topicTitle as string
@@ -128,7 +129,7 @@ export default function TopicPage(
                         topicsDetails={data?.topicDetails!}
                     />
                     <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
-                        <DatasetTopic topics={data?.topics!} />
+                        <DatasetTopic topics={data?.topics!} key={router.asPath}/>
                     </div>
                 </>
             )}
