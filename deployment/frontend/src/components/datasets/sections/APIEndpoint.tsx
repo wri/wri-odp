@@ -4,7 +4,6 @@ import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { Button } from '@/components/_shared/Button'
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import dynamic from 'next/dynamic'
 
 export const QueryEndpoint = ({
     description,
@@ -57,12 +56,14 @@ export const QueryEndpoint = ({
     )
 }
 
-export const JsEndpoint = ({
+export const SnippetEndpoint = ({
     description,
     snippet,
+    language
 }: {
     description: string
     snippet: string
+    language: "javascript" | "python" | "r"
 }) => {
     return (
         <div className="mb-10 pr-5">
@@ -74,7 +75,7 @@ export const JsEndpoint = ({
                     <div className="absolute right-5 top-5">
                         <CopyButton content={snippet} />
                     </div>
-                    <SyntaxHighlighter language={'javascript'}>
+                    <SyntaxHighlighter language={language}>
                         {snippet}
                     </SyntaxHighlighter>
                 </div>
@@ -98,7 +99,7 @@ const CopyButton = ({ content }: { content: string }) => {
     )
 }
 
-export const getSnippet = (
+export const getJsSnippet = (
     url: string,
     method: string = 'GET',
     body: string = ''
@@ -114,4 +115,42 @@ const data = await response.json();
 
 console.log(data);
 `
+}
+
+export const getPythonSnippet = (
+    url: string,
+    method: string = 'GET',
+    body: string = ''
+) => {
+    return `import requests
+
+response = requests.request(
+    "${method}",
+    "${url}",
+    ${body ? `data=${body}, headers={"Content-Type": "application/json"}` : ''}
+)
+
+data = response.json()
+
+print(data)
+`;
+}
+
+export const getRSnippet = (
+    url: string,
+    method: string = 'GET',
+    body: string = ''
+) => {
+    return `library(httr)
+
+response <- httr::VERB(
+    "${method}",
+    "${url}",
+    ${body ? `body = toJSON(${body}), add_headers("Content-Type" = "application/json")` : ''}
+)
+
+data <- httr::content(response, "parsed")
+
+print(data)
+`;
 }

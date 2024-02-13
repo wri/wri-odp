@@ -70,10 +70,9 @@ export async function getLayersFromRW(
                             const { id, attributes } = layerData.data
                             const currentLayer = currentLayers.get(id)
                             let decodeParams = null
-                            console.log('GOT HERE')
-                            if (attributes.layerConfig.decode_config) {
+                            if (attributes.layerConfig.decode_config && getDecodeParams[id as keyof typeof getDecodeParams] !== undefined) {
                                 decodeParams = await (getDecodeParams[
-                                    id as keyof typeof decodeParams
+                                    id as keyof typeof getDecodeParams
                                 ] as any)()
                             }
                             return {
@@ -96,7 +95,6 @@ export async function getLayersFromRW(
                                         : true,
                             }
                         } else if (layerInfo === 'pending') {
-                            console.log('Coming herewwwwww')
                             // something here
                             const fieldsRes = await fetch(
                                 `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetId}`,

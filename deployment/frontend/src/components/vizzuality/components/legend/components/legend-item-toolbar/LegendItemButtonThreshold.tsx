@@ -39,7 +39,7 @@ export default function LegendItemButtonThreshold<
         value: item,
         default: activeLayer.threshold
             ? item == activeLayer.threshold
-            : item == 30,
+            : item == 20,
     }))
 
     return hasThreshold ? (
