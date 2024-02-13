@@ -63,6 +63,7 @@ function SignInForm({
     const router = useRouter()
     const [errorMessage, setErrorMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [isLoadingAzure, setIsLoadingAzure] = useState(false)
 
     const {
         register,
@@ -77,7 +78,7 @@ function SignInForm({
         errorMessage || errors.username?.message || errors.password?.message
 
     const handleAzureSignIn = async () => {
-        setIsLoading(true)
+        setIsLoadingAzure(true)
         try {
             await signIn('azure-ad', {
                 callbackUrl: '/dashboard',
@@ -87,7 +88,7 @@ function SignInForm({
             console.error('Azure AD Sign-in error:', error)
             setErrorMessage('Azure AD Sign-in failed')
         }
-        setIsLoading(false)
+        setIsLoadingAzure(false)
     }
 
     return (
@@ -188,12 +189,13 @@ function SignInForm({
                 type="button"
                 className="flex  mt-8 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 cursor-pointer"
                 onClick={handleAzureSignIn}
+                disabled={isLoadingAzure}
             >
                 <div className="w-4 h-4 relative my-auto">
                     <Image src="/images/wri_logo.png" alt="WRI Logo" fill />
                 </div>
                 <div className="ml-2 w-fit font-semibold text-base text-wri-black ">
-                    Sign In with your WRI Credentials
+                    {!isLoadingAzure ? "Sign In with your WRI Credentials" : "Signing in..."}
                 </div>
             </button>
         </>
