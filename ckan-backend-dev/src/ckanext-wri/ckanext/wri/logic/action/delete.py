@@ -16,7 +16,7 @@ def pending_dataset_delete(context: Context, data_dict: DataDict):
     if not package_id:
         raise tk.ValidationError(_("package_id is required"))
 
-    tk.check_access("pending_dataset_delete", context, {"id": package_id})
+    tk.check_access("package_delete", context, {"id": package_id})
 
     pending_dataset = None
     try:

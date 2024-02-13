@@ -264,7 +264,7 @@ export function Preview({
                                 Data files
                             </h3>
                             <div>
-                                {watch('resources').map((resource) => (
+                                {watch('resources').filter(r => !['empty-file', 'empty-layer'].includes(r.type)).map((resource) => (
                                     <Datafile
                                         key={resource.resourceId}
                                         name={
