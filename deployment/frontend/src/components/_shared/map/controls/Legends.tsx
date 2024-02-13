@@ -7,13 +7,11 @@ import {
     LegendItemToolbar,
     LegendItemButtonLayers,
     LegendItemButtonOpacity,
-    LegendItemButtonVisibility,
     LegendItemTimeStep,
+    LegendItemButtonVisibility,
     Icons,
     // @ts-ignore
 } from 'vizzuality-components'
-
-import { LegendItemTypes } from '@/components/vizzuality/components'
 
 // @ts-ignore
 import { LegendItemTimeline } from 'old-vizzuality-components'
@@ -60,6 +58,18 @@ export function Legends() {
                                 key={`legend-list-item-${i}`}
                                 layerGroup={{
                                     ...lg,
+                                    visibility: !currentLayers.size || lg.layers
+                                        .map((l: APILayerSpec) => {
+                                            const layerState =
+                                                currentLayers.get(l.id)
+
+                                            if (layerState?.active) {
+                                                return layerState.visibility
+                                            }
+
+                                            return false
+                                        })
+                                        .some((l: boolean) => l),
                                     layers: lg.layers.map((l: APILayerSpec) => {
                                         const layerState = currentLayers.get(
                                             l.id
@@ -70,6 +80,32 @@ export function Legends() {
                                         }
                                     }),
                                 }}
+                                // visibility={
+                                //     currentLayers.size &&
+                                //     (() => {
+                                //         const lgLayersIds = lg.layers.map(
+                                //             (l: any) => l.id
+                                //         )
+                                //
+                                //         const lgCurrentLayers = lgLayersIds
+                                //             .map((id: string) =>
+                                //                 currentLayers.get(id)
+                                //             )
+                                //             .filter((l: any) => l.active)
+                                //
+                                //         if (lgCurrentLayers) {
+                                //             let visibility = false
+                                //
+                                //             for (let currentLayer of lgCurrentLayers) {
+                                //                 visibility = visibility || currentLayer.visibility
+                                //             }
+                                //
+                                //             return visibility
+                                //         }
+                                //
+                                //         return false
+                                //     })()
+                                // }
                                 toolbar={
                                     <LegendItemToolbar>
                                         <LegendItemButtonLayers />
@@ -105,7 +141,10 @@ export function Legends() {
                                             : !layerState?.visibility
                                     )
                                 }}
-                                onChangeThreshold={(layer: any, threshold: number) => {
+                                onChangeThreshold={(
+                                    layer: any,
+                                    threshold: number
+                                ) => {
                                     const layerState = currentLayers.get(
                                         layer.id
                                     )
