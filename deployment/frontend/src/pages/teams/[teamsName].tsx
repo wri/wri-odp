@@ -82,7 +82,7 @@ export async function getServerSideProps(
 export default function teams(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    // const router = useRouter()
+    const router = useRouter()
     // const { teamsName } = router.query
 
     const { teams } = props
@@ -133,7 +133,7 @@ export default function teams(
                         teamsDetails={data?.teamsDetails!}
                     />
                     <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
-                        <DatasetTeams teams={data?.teams!} />
+                        <DatasetTeams teams={data?.teams!} key={router.asPath}/>
                     </div>
                 </>
             )}
