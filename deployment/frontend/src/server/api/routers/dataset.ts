@@ -2319,15 +2319,21 @@ export const DatasetRouter = createTRPCRouter({
                 rw_id: z.string().optional(),
             })
         )
-        .mutation(async ({ input }) => {
+        .mutation(async ({ input, ctx }) => {
+            const headers: any = {
+                'Content-Type': 'application/json',
+            }
+
+            const user = ctx?.session?.user;
+            if(user) {
+                headers["Authorization"] = user.apikey;
+            }
+
             const response = await fetch(
                 `${env.CKAN_URL}/api/3/action/prefect_download_from_store`,
                 {
                     method: 'POST',
-                    headers: {
-                        // Authorization: ctx.session.user.apikey, // TODO: is this needed?
-                        'Content-Type': 'application/json',
-                    },
+                    headers,                    
                     body: JSON.stringify(input),
                 }
             )
