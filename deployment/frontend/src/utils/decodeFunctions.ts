@@ -5,6 +5,7 @@ import { TileLayer } from '@deck.gl/geo-layers'
 import { DecodedLayer } from '@vizzuality/layer-manager-layers-deckgl'
 import { LayerState } from '@/interfaces/state.interface'
 import { layerConfigSpec } from '@/interfaces/layer.interface'
+import { differenceInDays } from 'date-fns'
 
 //interface DecodeParam {
 //  key: string,
@@ -53,23 +54,155 @@ import { layerConfigSpec } from '@/interfaces/layer.interface'
 //    return newObj;
 //  }, {});
 //};
+//
+export const getDayRange = (params: any) => {
+    console.log('PARAMS', params)
+    const {
+        startDate,
+        endDate,
+        minDate,
+        maxDate,
+        weeks,
+        minDateAbsolut = null,
+    } = params || {}
+    // If min date absolut, always take its value (dynamic timeline)
+    const minDateTime = new Date(minDateAbsolut || minDate)
+    const maxDateTime = new Date(maxDate)
+    const numberOfDays = differenceInDays(maxDateTime, minDateTime)
 
-const decodeParams = {
-    '3c4225a4-a8d8-4d73-b12d-0c47dec84c76': {
+    // timeline or hover effect active range
+    const startDateTime = new Date(startDate)
+    const endDateTime = new Date(endDate)
+    const activeStartDay =
+        numberOfDays - differenceInDays(maxDateTime, startDateTime)
+    const activeEndDay =
+        numberOfDays - differenceInDays(maxDateTime, endDateTime)
+
+    // show specified weeks from end date
+    const rangeStartDate = weeks && numberOfDays - 7 * weeks
+
+    // get start and end day
+    const startDayIndex = activeStartDay || rangeStartDate || 0
+    const endDayIndex = activeEndDay || numberOfDays
+    const obj = {
+        startDayIndex,
+        endDayIndex,
+        numberOfDays,
+    }
+    return obj
+}
+
+export const getDecodeParams = {
+    '3c4225a4-a8d8-4d73-b12d-0c47dec84c76': async () => ({
         startYear: 2001,
         endYear: 2022,
-    },
-    '929662b6-3bf8-4413-b4b3-9b8c116f68bb': {
+    }),
+    '929662b6-3bf8-4413-b4b3-9b8c116f68bb': async () => ({
         startYear: 2001,
         endYear: 2022,
-    },
-    '0ffc5ce2-e284-42e0-aa00-89e0728f476e': {
+    }),
+    '0ffc5ce2-e284-42e0-aa00-89e0728f476e': async () => ({
         startYear: 2001,
         endYear: 2020,
-    },
-    '04774cb7-912c-4612-bbd8-ba982d532c88': {
+    }),
+    '04774cb7-912c-4612-bbd8-ba982d532c88': async () => ({
         startYear: 2001,
         endYear: 2019,
+    }),
+    '1e7f2868-7fcd-46b2-bbc8-64ec78f95cca': async () => {
+        const endDateRes = await fetch(
+            'https://data-api.globalforestwatch.org/dataset/gfw_integrated_alerts/latest'
+        )
+        const endDateJson = await endDateRes.json()
+        const {
+            metadata: {
+                content_date_range: { end_date },
+            },
+        } = endDateJson.data
+        const dayRange = getDayRange({
+            endDate: end_date,
+            endDateAbsolute: end_date,
+            latestUrl: 'dataset/gfw_integrated_alerts/latest',
+            maxDate: end_date,
+            minDate: '2022-02-11',
+            minDateAbsolut: '2014-12-31',
+            raddOnly: 0,
+            startDate: '2022-08-01',
+            startDateAbsolute: '2022-08-01',
+            trimEndDate: 549,
+        })
+        return { ...dayRange, confirmedOnly: 0 }
+    },
+    'ff797c8d-0c1b-4df5-beb3-20a9b900716a': async () => {
+        const endDateRes = await fetch(
+            'https://data-api.globalforestwatch.org/dataset/gfw_integrated_alerts/latest'
+        )
+        const endDateJson = await endDateRes.json()
+        const {
+            metadata: {
+                content_date_range: { end_date },
+            },
+        } = endDateJson.data
+        const dayRange = getDayRange({
+            endDate: end_date,
+            endDateAbsolute: end_date,
+            maxDate: end_date,
+            minDate: '2022-02-11',
+            minDateAbsolut: '2014-12-31',
+            raddOnly: 0,
+            startDate: '2022-08-01',
+            startDateAbsolute: '2022-08-01',
+            trimEndDate: 549,
+        })
+        return { ...dayRange, confirmedOnly: 0 }
+    },
+    'cb184858-4501-4e18-bdf4-8fc4150b9f6e': async () => {
+        const endDateRes = await fetch(
+            'https://data-api.globalforestwatch.org/dataset/umd_glad_sentinel2_alerts/latest'
+        )
+        const endDateJson = await endDateRes.json()
+        const {
+            metadata: {
+                content_date_range: { end_date },
+            },
+        } = endDateJson.data
+        const dayRange = getDayRange({
+            endDate: end_date,
+            endDateAbsolute: end_date,
+            latestUrl: 'dataset/gfw_integrated_alerts/latest',
+            maxDate: end_date,
+            minDate: '2022-02-11',
+            minDateAbsolut: '2014-12-31',
+            raddOnly: 0,
+            startDate: '2022-08-01',
+            startDateAbsolute: '2022-08-01',
+            trimEndDate: 549,
+        })
+        return { ...dayRange, confirmedOnly: 0 }
+    },
+    '5f6819a7-ad89-4c40-8715-9f859cb5e827': async () => {
+        const endDateRes = await fetch(
+            'https://data-api.globalforestwatch.org/dataset/wur_radd_alerts/latest'
+        )
+        const endDateJson = await endDateRes.json()
+        const {
+            metadata: {
+                content_date_range: { end_date },
+            },
+        } = endDateJson.data
+        const dayRange = getDayRange({
+            endDate: end_date,
+            endDateAbsolute: end_date,
+            latestUrl: 'dataset/gfw_integrated_alerts/latest',
+            maxDate: end_date,
+            minDate: '2022-02-11',
+            minDateAbsolut: '2014-12-31',
+            raddOnly: 0,
+            startDate: '2022-08-01',
+            startDateAbsolute: '2022-08-01',
+            trimEndDate: 549,
+        })
+        return { ...dayRange, confirmedOnly: 0 }
     },
 } as const
 
@@ -83,7 +216,9 @@ export function createDeckLayer(
     let layerConfig = {
         id,
         type: TileLayer,
-        data: tileUrl.replace('{thresh}', layerState?.threshold ?? 75).replace('{threshold}', layerState?.threshold ?? 75),
+        data: tileUrl
+            .replace('{thresh}', layerState?.threshold ?? 20)
+            .replace('{threshold}', layerState?.threshold ?? 20),
         tileSize: 256,
         refinementStrategy: 'no-overlap',
         visible: true,
@@ -106,8 +241,7 @@ export function createDeckLayer(
             new MapboxLayer({
                 decodeFunction:
                     decodes[layer.decode_function as keyof typeof decodes],
-                //decodeFunction: null,
-                decodeParams: decodeParams[id as keyof typeof decodeParams],
+                decodeParams: layer.decodeParams ?? {},
                 ...layerConfig,
                 renderSubLayers: (sl: any) => {
                     const {

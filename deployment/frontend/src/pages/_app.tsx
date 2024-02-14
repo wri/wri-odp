@@ -18,7 +18,7 @@ import '@/styles/rte.css'
 import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
-import { useRouter } from 'next/router'
+
 
 const acumin = localFont({
     src: [
@@ -51,7 +51,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
     pageProps: { session, ...pageProps },
 }: AppProps) => {
     const [queryClient] = useState(() => new QueryClient())
-    const router = useRouter()
     const { initialZustandState } = pageProps
     let { dataset, prevdataset } = pageProps
 
@@ -188,7 +187,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     <SessionProvider session={session}>
                         <ReactToastContainer />
                         <main className={`${acumin.variable} font-sans`}>
-                            <Component {...pageProps} key={router.asPath} />
+                            <Component {...pageProps}  />
                         </main>
                     </SessionProvider>
                 </Provider>

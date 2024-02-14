@@ -19,7 +19,6 @@ export const parseLayers = (
 ): any[] => {
     return layers.map((layer: APILayerSpec) => {
         const { id, layerConfig } = layer
-
         const layerState = layerStates.get(id)
         if (layerConfig.decode_function) return createDeckLayer(layerConfig, id, layerState)
         let layerProps: any = pick(layerConfig, [

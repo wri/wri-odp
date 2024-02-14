@@ -251,3 +251,9 @@ $dark-pink: #c32d7b;
 .rdp-vhidden {
   @apply hidden;
 }
+
+.vizzuality__toggle-legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
