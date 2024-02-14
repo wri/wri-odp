@@ -116,7 +116,7 @@ export async function getServerSideProps(
                               dataset?.groups
                                   ?.map((group) => group.name)
                                   .join(' OR ') ?? ''
-                          }+approval_status:approved+draft:false
+                          }+is_approved:true
                   `
                         : '',
             })
@@ -139,7 +139,7 @@ export async function getServerSideProps(
                                   prevdataset?.groups
                                       ?.map((group) => group.name)
                                       .join(' OR ') ?? ''
-                              }+approval_status:approved+draft:false
+                              }+is_approved:true
                       `
                             : '',
                 })

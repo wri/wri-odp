@@ -909,11 +909,23 @@ export async function getOrganizationTreeDetails({
                 img_url: org.image_display_url ?? '',
                 description: org.description ?? '',
                 package_count: org.package_count!,
+                name: org.name,
             }
             return acc
         },
         {} as Record<string, GroupsmDetails>
     )
+
+    for ( const group in teamDetails) {
+        const team = teamDetails[group]!
+        const packagedetails = (await getAllDatasetFq({
+            apiKey: session?.user.apikey ?? '',
+            fq: `organization:${team.name}+is_approved:true`,
+            query: {search: '', page: {start: 0, rows: 10000}},
+        }))!
+        team.package_count = packagedetails.count
+        
+    }
 
     if (input.search) {
         groupTree = await searchHierarchy({
@@ -963,11 +975,23 @@ export async function getTopicTreeDetails({
                 img_url: org.image_display_url,
                 description: org.description,
                 package_count: org.package_count,
+                name: org.name,
             }
             return acc
         },
         {} as Record<string, GroupsmDetails>
     )
+
+    for ( const group in topicDetails) {
+        const topic = topicDetails[group]!
+        const packagedetails = (await getAllDatasetFq({
+            apiKey: session?.user.apikey ?? '',
+            fq: `groups:${topic.name}+is_approved:true`,
+            query: {search: '', page: {start: 0, rows: 10000}},
+        }))!
+        topic.package_count = packagedetails.count
+        
+    }
     if (input.search) {
         groupTree = await searchHierarchy({
             isSysadmin: true,
