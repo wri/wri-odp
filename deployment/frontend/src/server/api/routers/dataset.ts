@@ -419,8 +419,6 @@ export const DatasetRouter = createTRPCRouter({
                 inputKeys.length == 2 && inputKeys.includes('collaborators')
             )
 
-            console.log('isUpdate ', isUpdate)
-
             const pendingResponse = await fetch(
                 `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${input.id}`,
                 {
@@ -478,6 +476,8 @@ export const DatasetRouter = createTRPCRouter({
                 }
             }
 
+            //console.log('PREV DATASET', prevDataset)
+            //console.log('CURRENT DATASET', input)
             try {
                 if (isUpdate) {
                     const user = ctx.session.user
