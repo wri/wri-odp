@@ -19,6 +19,7 @@ import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
 
+
 const acumin = localFont({
     src: [
         {
