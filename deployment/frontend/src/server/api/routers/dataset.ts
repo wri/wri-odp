@@ -169,6 +169,7 @@ export const DatasetRouter = createTRPCRouter({
                     open_in: JSON.stringify(input.open_in) ?? '',
                     language: input.language?.value ?? '',
                     license_id: input.license_id?.value ?? '',
+                    license_title: input.license_id?.label ?? '',
                     owner_org: input.team ? input.team.value : '',
                     collaborators: null,
                     rw_id: '',
@@ -511,6 +512,7 @@ export const DatasetRouter = createTRPCRouter({
                         open_in: JSON.stringify(input.open_in) ?? '',
                         language: input.language?.value ?? '',
                         license_id: input.license_id?.value ?? '',
+                        license_title: input.license_id?.label ?? '',
                         rw_id: rw_id ?? '',
                         owner_org: input.team
                             ? datasetDetails.organization?.name ===
@@ -1927,16 +1929,16 @@ export const DatasetRouter = createTRPCRouter({
                 'Content-Type': 'application/json',
             }
 
-            const user = ctx?.session?.user;
-            if(user) {
-                headers["Authorization"] = user.apikey;
+            const user = ctx?.session?.user
+            if (user) {
+                headers['Authorization'] = user.apikey
             }
 
             const response = await fetch(
                 `${env.CKAN_URL}/api/3/action/prefect_download_from_store`,
                 {
                     method: 'POST',
-                    headers,                    
+                    headers,
                     body: JSON.stringify(input),
                 }
             )
