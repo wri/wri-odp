@@ -2362,7 +2362,7 @@ export async function approvePendingDataset(
     return dataset.result
 }
 
-export const datsetFields = [
+export const datasetFields = [
     'application',
     'approval_status',
     'author',
@@ -2405,11 +2405,30 @@ export const datsetFields = [
     'relationships_as_subject',
     'relationships_as_object',
     'notes',
+    'open_in',
+    'extras',
+    'temporal_coverage_start',
+    'temporal_coverage_end',
+    'topics',
+    'citation',
+    'notes',
+    'featured_dataset',
+    'featured_image',
+    'function',
+    'restrictions',
+    'reason_for_adding',
+    'learn_more',
+    'spatial',
+    'spatial_address',
+    'spatial_type',
+    'methodology',
+    'cautions',
+    'function',
 ]
 
 export function filterDatasetFields(dataset: any) {
     const filteredDataset: any = {}
-    for (const field of datsetFields) {
+    for (const field of datasetFields) {
         if (dataset[field]) {
             filteredDataset[field] = dataset[field]
         }
@@ -2520,7 +2539,10 @@ async function editLayerRw(r: ResourceFormType) {
     return r
 }
 
-export async function fetchDatasetCollabIds(datasetId: string, userApiKey: string) {
+export async function fetchDatasetCollabIds(
+    datasetId: string,
+    userApiKey: string
+) {
     const res = await fetch(
         `${env.CKAN_URL}/api/3/action/package_collaborator_list?id=${datasetId}`,
         {

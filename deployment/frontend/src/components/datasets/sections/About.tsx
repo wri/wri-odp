@@ -1,6 +1,7 @@
 import { Button } from '@/components/_shared/Button'
 import { TextWithReadMore } from '@/components/_shared/TextWithReadMore'
 import { WriDataset } from '@/schema/ckan.schema'
+import classNames from '@/utils/classnames'
 import { LinkIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 
@@ -13,13 +14,28 @@ export function About({
     isCurrentVersion?: boolean
     diffFields: string[]
 }) {
-    const higlighted = (field: string) => {
+    const highlighted = (field: string) => {
         if (diffFields && !isCurrentVersion) {
             if (diffFields.find((f) => f.includes(field))) {
                 return 'bg-yellow-200'
             }
         }
         return ''
+    }
+
+    const highlightExtras = (index: number) => {
+        return highlighted(`extras[${index}].key`) !== ''
+            ? highlighted(`extras[${index}].key`)
+            : highlighted(`extras[${index}].value`) !== ''
+            ? highlighted(`extras[${index}].value`)
+            : highlighted(`extras[${index}]`)
+    }
+    const highlightTags = (index: number) => {
+        return highlighted(`tags[${index}].display_name`) !== ''
+            ? highlighted(`tags[${index}].display_name`)
+            : highlighted(`tags[${index}].name`) !== ''
+            ? highlighted(`tags[${index}].name`)
+            : highlighted(`tags[${index}]`)
     }
     return (
         <div className="flex flex-col gap-y-4 py-2">
@@ -31,11 +47,12 @@ export function About({
                     href={dataset.technical_notes}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex gap-x-1 font-acumin text-sm font-semibold text-wri-green"
+                    className={classNames(
+                        'w-fit inline-flex gap-x-1 font-acumin text-sm font-semibold text-wri-green',
+                        highlighted('technical_notes')
+                    )}
                 >
-                    <LinkIcon
-                        className={`h-4 w-4  ${higlighted('technical_notes')}`}
-                    />
+                    <LinkIcon className="h-4 w-4" />
                     Technical Notes
                 </a>
             )}
@@ -45,10 +62,7 @@ export function About({
                         key={index}
                         text={tag.display_name ?? tag.name}
                         className={`
-                        ${
-                            higlighted(`tags[${index}].display_name`) ??
-                            higlighted(`tags[${index}].name`)
-                        }
+                        ${highlightTags(index)}
                     `}
                     />
                 ))}
@@ -58,7 +72,7 @@ export function About({
                     <div className="flex items-center gap-x-1">
                         <>
                             <dt
-                                className={`font-acumin text-sm font-semibold text-neutral-700 ${higlighted(
+                                className={`font-acumin text-sm font-semibold text-neutral-700 ${highlighted(
                                     'project'
                                 )}`}
                             >
@@ -75,7 +89,7 @@ export function About({
                     <div className="flex items-center gap-x-1">
                         <>
                             <dt
-                                className={`font-acumin text-sm font-semibold text-neutral-700 ${higlighted(
+                                className={`font-acumin text-sm font-semibold text-neutral-700 ${highlighted(
                                     'groups'
                                 )}`}
                             >
@@ -100,7 +114,7 @@ export function About({
                     <div className="flex items-center gap-x-1">
                         <>
                             <dt
-                                className={`font-acumin text-sm font-semibold text-neutral-700 ${higlighted(
+                                className={`font-acumin text-sm font-semibold text-neutral-700 ${highlighted(
                                     'license_title'
                                 )}`}
                             >
@@ -112,10 +126,15 @@ export function About({
                         </>
                     </div>
                 )}
-                {dataset.extras?.map((extra) => (
+                {dataset.extras?.map((extra, index) => (
                     <div key={extra.key} className="flex items-center gap-x-1">
                         <>
-                            <dt className="font-acumin text-sm font-semibold text-neutral-700">
+                            <dt
+                                className={classNames(
+                                    'font-acumin text-sm font-semibold text-neutral-700',
+                                    highlightExtras(index)
+                                )}
+                            >
                                 {extra.key}:{' '}
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
@@ -129,12 +148,14 @@ export function About({
                 <div>
                     {dataset.citation && (
                         <>
-                            <h3
-                                className={`font-acumin text-base font-normal text-black ${higlighted(
-                                    'citation'
-                                )}`}
-                            >
-                                Citation
+                            <h3 className="font-acumin text-base font-normal text-black">
+                                <span
+                                    className={classNames(
+                                        highlighted('citation')
+                                    )}
+                                >
+                                    Citation
+                                </span>
                             </h3>
                             <p className="text-justify font-acumin text-sm font-light text-stone-900">
                                 {dataset.citation ?? ' - '}
@@ -145,7 +166,7 @@ export function About({
                 {dataset?.notes && (
                     <div>
                         <h3
-                            className={`font-acumin text-base font-normal w-fit text-black ${higlighted(
+                            className={`font-acumin text-base font-normal w-fit text-black ${highlighted(
                                 'notes'
                             )}`}
                         >
@@ -171,7 +192,7 @@ export function About({
                 {dataset?.reason_for_adding && (
                     <div>
                         <h3
-                            className={`font-acumin text-base font-normal text-black ${higlighted(
+                            className={`font-acumin text-base font-normal w-fit text-black ${highlighted(
                                 'reason_for_adding'
                             )}`}
                         >
@@ -197,7 +218,7 @@ export function About({
                 {dataset?.restrictions && (
                     <div>
                         <h3
-                            className={`font-acumin text-base font-normal text-black ${higlighted(
+                            className={`font-acumin text-base font-normal w-fit text-black ${highlighted(
                                 'restrictions'
                             )}`}
                         >

@@ -29,7 +29,7 @@ export function InfoAlert({
   text,
   title = "There was an error",
 }: {
-  text: string;
+  text: string | React.ReactNode;
   title?: string;
 }) {
   return (

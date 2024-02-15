@@ -186,9 +186,6 @@ export async function getServerSideProps(
             },
         }
     } catch (e) {
-        console.log('DATASET PAGE ERROR')
-        console.log(e)
-        console.log((e as any)?.message)
         return {
             props: {
                 redirect: {
@@ -333,23 +330,6 @@ export default function DatasetPage(
         }
     }, [issues.data, query.tab])
 
-    const tabs = [
-        { name: 'Data files', enabled: true },
-        { name: 'About', enabled: true },
-        { name: 'Methodology', enabled: !!datasetData?.methodology },
-        { name: 'Related Datasets', enabled: true },
-        { name: 'Contact', enabled: true },
-        { name: 'API', enabled: true },
-        {
-            name: 'Collaborators',
-            enabled: collaborators.data,
-        },
-        {
-            name: 'Issues',
-            count: openIssueLength,
-            enabled: issues.data && issues.data.length > 0,
-        },
-    ]
     const links = [
         { label: 'Explore Data', url: '/search', current: false },
         {
@@ -366,8 +346,6 @@ export default function DatasetPage(
             matchesAnyPattern(item)
         )
     }
-
-    console.log('DIFFFIELDS: ', diffFields)
 
     let resourceDiffValues: Array<
         Record<string, { old_value: string; new_value: string }>
@@ -399,6 +377,64 @@ export default function DatasetPage(
 
         resourceDiffValues = Object.values(resourceDiff)
     }
+
+    const tabs = [
+        { name: 'Data files', enabled: true, highlighted: !isCurrentVersion && diffFields && datasetData?.resources?.length !== prevDatasetData?.resources?.length },
+        {
+            name: 'About',
+            enabled: true,
+            highlighted:
+                !isCurrentVersion &&
+                diffFields &&
+                diffFields.some((f) =>
+                    [
+                        'extras',
+                        'tags',
+                        'notes',
+                        'technical_notes' ,
+                        'project',
+                        'license_id',
+                        'groups',
+                        'license_title',
+                        'citation',
+                        'reason_for_adding',
+                        'restrictions',
+                    ].some((x) => f.includes(x))
+                ),
+        },
+        {
+            name: 'Methodology',
+            enabled: !!datasetData?.methodology,
+            highlighted:
+                !isCurrentVersion &&
+                diffFields &&
+                diffFields.some((f) => f.includes('methodology')),
+        },
+        { name: 'Related Datasets', enabled: true },
+        { name: 'Contact', enabled: true,
+            highlighted:
+                !isCurrentVersion &&
+                diffFields &&
+                diffFields.some((f) =>
+                    [
+                        'maintainer',
+                        'author',
+                        'maintainer_email',
+                        'author_email',
+                    ].some((x) => f.includes(x))
+                ),
+    },
+        { name: 'API', enabled: true },
+        {
+            name: 'Collaborators',
+            enabled: collaborators.data,
+        },
+        {
+            name: 'Issues',
+            count: openIssueLength,
+            enabled: issues.data && issues.data.length > 0,
+        },
+    ]
 
     const shouldLoad = pendingExist ? isLoadingDiff : false
 
@@ -514,7 +550,9 @@ export default function DatasetPage(
                                                 <Tab.Panel as="div">
                                                     <Methodology
                                                         methodology={
-                                                            datasetData.methodology
+                                                            isCurrentVersion
+                                                                ? prevDatasetData.methodology
+                                                                : datasetData.methodology
                                                         }
                                                     />
                                                 </Tab.Panel>
@@ -525,7 +563,15 @@ export default function DatasetPage(
                                             <Tab.Panel as="div">
                                                 <Contact
                                                     //@ts-ignore
-                                                    dataset={datasetData}
+                                                    dataset={
+                                                        isCurrentVersion
+                                                            ? prevDatasetData
+                                                            : datasetData
+                                                    }
+                                                    isCurrentVersion={
+                                                        isCurrentVersion
+                                                    }
+                                                    diffFields={diffFields}
                                                 />
                                             </Tab.Panel>
                                             <Tab.Panel as="div">
