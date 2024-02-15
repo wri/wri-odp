@@ -379,7 +379,7 @@ export default function DatasetPage(
     }
 
     const tabs = [
-        { name: 'Data files', enabled: true, highlighted: !isCurrentVersion && diffFields && datasetData?.resources?.length !== prevDatasetData?.resources?.length },
+        { name: 'Data files', enabled: true, highlighted: !isCurrentVersion && diffFields && diffFields.some((f) => f.includes('resources')) },
         {
             name: 'About',
             enabled: true,
