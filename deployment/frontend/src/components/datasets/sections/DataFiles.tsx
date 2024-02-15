@@ -98,7 +98,7 @@ export function DataFiles({
                 </div>
             </div>
             <div className="flex flex-col gap-y-4">
-                {filteredDatafiles?.map((datafile) => (
+                {filteredDatafiles?.map((datafile, index) => (
                     <DatafileCard
                         tabularResource={tabularResource}
                         setTabularResource={setTabularResource}
@@ -107,6 +107,7 @@ export function DataFiles({
                         dataset={dataset}
                         diffFields={diffFields}
                         isCurrentVersion={isCurrentVersion}
+                        index={index}
                     />
                 ))}
             </div>
@@ -121,6 +122,7 @@ function DatafileCard({
     tabularResource,
     diffFields,
     isCurrentVersion,
+    index,
 }: {
     datafile: Resource
     dataset: WriDataset
@@ -128,6 +130,7 @@ function DatafileCard({
     tabularResource: TabularResource | null
     isCurrentVersion?: boolean
     diffFields: Array<Record<string, { old_value: string; new_value: string }>>
+    index: number
 }) {
     const { activeCharts, addCharts, removeCharts } = useActiveCharts()
     const { data: activeLayers } = useLayersFromRW()
@@ -156,6 +159,14 @@ function DatafileCard({
         }
         return ''
     }
+    const newDatafile = () => {
+        if (diffFields && !isCurrentVersion) {
+            if (diffFields[index] && diffFields[index]?.undefined?.old_value === null) {
+                return 'bg-yellow-200'
+            }
+        }
+        return ''
+    }
 
     return (
         <Disclosure>
@@ -163,7 +174,8 @@ function DatafileCard({
                 <div
                     className={classNames(
                         'flex flex-col gap-y-2 border-b-2 border-green-700 p-5 shadow transition hover:bg-slate-100',
-                        open ? 'bg-slate-100' : ''
+                        open ? 'bg-slate-100' : '',
+                        newDatafile()
                     )}
                 >
                     <div

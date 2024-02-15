@@ -19,6 +19,7 @@ import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
 
+
 const acumin = localFont({
     src: [
         {
@@ -186,7 +187,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     <SessionProvider session={session}>
                         <ReactToastContainer />
                         <main className={`${acumin.variable} font-sans`}>
-                            <Component {...pageProps} />
+                            <Component {...pageProps}  />
                         </main>
                     </SessionProvider>
                 </Provider>

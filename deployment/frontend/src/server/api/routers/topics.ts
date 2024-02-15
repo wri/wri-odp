@@ -11,6 +11,7 @@ import {
     searchHierarchy,
     getUserGroups,
     findAllNameInTree,
+    getAllDatasetFq,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -316,11 +317,24 @@ export const TopicRouter = createTRPCRouter({
                         img_url: org.image_display_url,
                         description: org.description,
                         package_count: org.package_count,
+                        name: org.name,
                     }
                     return acc
                 },
                 {} as Record<string, GroupsmDetails>
             )
+
+            for ( const group in topicDetails) {
+                const topic = topicDetails[group]!
+                const packagedetails = (await getAllDatasetFq({
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    fq: `groups:${topic.name}+is_approved:true`,
+                    query: {search: '', page: {start: 0, rows: 10000}},
+                }))!
+                topic.package_count = packagedetails.count
+                
+            }
+     
             if (input.search) {
                 groupTree = await searchHierarchy({
                     isSysadmin: true,
