@@ -1499,7 +1499,6 @@ export const DatasetRouter = createTRPCRouter({
                     input.dataset_id,
                     ctx.session.user.apikey
                 )
-                console.log('COLLAB IDS: ', collab)
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
                     creator_id: input.creator_id,
@@ -1759,6 +1758,7 @@ export const DatasetRouter = createTRPCRouter({
                             },
                         }
                     )
+                    console.log('ISSUES', issuesRes.status)
                     const issues: CkanResponse<{
                         count: number
                         results: Issue[]
