@@ -54,14 +54,15 @@ export function DataFiles({
 
     useEffect(() => {
         if (filteredDatafiles?.length) {
+            const resource = filteredDatafiles[0] as Resource
             if (filteredDatafiles[0]?.rw_id) {
                 setMapDisplayPreview(true)
-                addLayerToLayerGroup(filteredDatafiles[0]?.rw_id, dataset.id)
+                addLayerToLayerGroup(resource.rw_id!, dataset.id)
                 setDisplayNoPreview(false)
-            } else if (filteredDatafiles[0].datastore_active) {
+            } else if (resource.datastore_active) {
                 setTabularResource({
                     provider: 'datastore',
-                    id: filteredDatafiles[0]?.id as string,
+                    id: resource?.id,
                 })
                 setDisplayNoPreview(false)
             } else {
@@ -69,7 +70,7 @@ export function DataFiles({
                     (d) => d.format === 'Layer' || d.rw_id
                 )
 
-                if (foundLayer) {
+                if (foundLayer && foundLayer.rw_id) {
                     setMapDisplayPreview(true)
                     addLayerToLayerGroup(foundLayer?.rw_id!, dataset.id)
                     setDisplayNoPreview(false)
@@ -138,7 +139,7 @@ export function DataFiles({
                 {filteredDatafiles?.map((datafile, index) => (
                     <DatafileCard
                         setMapDisplayPreview={setMapDisplayPreview}
-                        mapDisplayPreview={mapDisplaypreview}
+                        mapDisplaypreview={mapDisplaypreview}
                         tabularResource={tabularResource}
                         setTabularResource={setTabularResource}
                         key={datafile.id}

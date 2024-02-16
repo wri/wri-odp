@@ -75,7 +75,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
     let activeLayerGroups =
         initialZustandState?.mapView?.activeLayerGroups || []
 
-    let prevLayerGroups = []
     const layerAsLayerObj = new Map()
     const tempLayerAsLayerobj = new Map()
 
@@ -83,13 +82,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
         const layers = dataset?.resources
             .filter((r: any) => r?.format == 'Layer')
             .map((r: any) => r?.rw_id)
-
-        // if (layers) {
-        //     activeLayerGroups.push({
-        //         layers: layers || [],
-        //         datasetId: dataset.id,
-        //     })
-        // }
 
         for (const resource of dataset?.resources) {
             if (
@@ -143,13 +135,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
             .filter((r: any) => r?.format == 'Layer')
             .map((r: any) => r?.rw_id)
 
-        // if (layers) {
-        //     prevLayerGroups.push({
-        //         layers: layers || [],
-        //         datasetId: prevdataset.id,
-        //     })
-        // }
-
         for (const resource of prevdataset?.resources) {
             if (
                 resource['layerObj'] ||
@@ -166,7 +151,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
         ...initialZustandState,
         layerAsLayerObj: layerAsLayerObj,
         tempLayerAsLayerobj: tempLayerAsLayerobj,
-        prevLayerGroups: prevLayerGroups,
         mapView: {
             ...initialZustandState?.mapView,
             basemap: initialZustandState?.mapView?.basemap ?? 'dark',
