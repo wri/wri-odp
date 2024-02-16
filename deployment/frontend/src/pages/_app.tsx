@@ -19,7 +19,6 @@ import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
 
-
 const acumin = localFont({
     src: [
         {
@@ -85,12 +84,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
             .filter((r: any) => r?.format == 'Layer')
             .map((r: any) => r?.rw_id)
 
-        if (layers) {
-            activeLayerGroups.push({
-                layers: layers || [],
-                datasetId: dataset.id,
-            })
-        }
+        // if (layers) {
+        //     activeLayerGroups.push({
+        //         layers: layers || [],
+        //         datasetId: dataset.id,
+        //     })
+        // }
 
         for (const resource of dataset?.resources) {
             if (
@@ -144,12 +143,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
             .filter((r: any) => r?.format == 'Layer')
             .map((r: any) => r?.rw_id)
 
-        if (layers) {
-            prevLayerGroups.push({
-                layers: layers || [],
-                datasetId: prevdataset.id,
-            })
-        }
+        // if (layers) {
+        //     prevLayerGroups.push({
+        //         layers: layers || [],
+        //         datasetId: prevdataset.id,
+        //     })
+        // }
 
         for (const resource of prevdataset?.resources) {
             if (
@@ -187,7 +186,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     <SessionProvider session={session}>
                         <ReactToastContainer />
                         <main className={`${acumin.variable} font-sans`}>
-                            <Component {...pageProps}  />
+                            <Component {...pageProps} />
                         </main>
                     </SessionProvider>
                 </Provider>

@@ -254,7 +254,7 @@ export default function DatasetPage(
         }
     )
     if (!datasetData && datasetError) {
-        // router.replace('/datasets/404')
+        router.replace('/datasets/404')
     }
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
@@ -275,6 +275,8 @@ export default function DatasetPage(
     const [tabularResource, setTabularResource] =
         useState<TabularResource | null>(null)
 
+    const [displayNoPreview, setDisplayNoPreview] = useState(false)
+    const [mapDisplayPreview, setMapDisplayPreview] = useState(false)
     const index = new Index({
         tokenize: 'full',
     })
@@ -379,7 +381,14 @@ export default function DatasetPage(
     }
 
     const tabs = [
-        { name: 'Data files', enabled: true, highlighted: !isCurrentVersion && diffFields && diffFields.some((f) => f.includes('resources')) },
+        {
+            name: 'Data files',
+            enabled: true,
+            highlighted:
+                !isCurrentVersion &&
+                diffFields &&
+                diffFields.some((f) => f.includes('resources')),
+        },
         {
             name: 'About',
             enabled: true,
@@ -391,7 +400,7 @@ export default function DatasetPage(
                         'extras',
                         'tags',
                         'notes',
-                        'technical_notes' ,
+                        'technical_notes',
                         'project',
                         'license_id',
                         'groups',
@@ -411,7 +420,9 @@ export default function DatasetPage(
                 diffFields.some((f) => f.includes('methodology')),
         },
         { name: 'Related Datasets', enabled: true },
-        { name: 'Contact', enabled: true,
+        {
+            name: 'Contact',
+            enabled: true,
             highlighted:
                 !isCurrentVersion &&
                 diffFields &&
@@ -423,7 +434,7 @@ export default function DatasetPage(
                         'author_email',
                     ].some((x) => f.includes(x))
                 ),
-    },
+        },
         { name: 'API', enabled: true },
         {
             name: 'Collaborators',
@@ -524,6 +535,15 @@ export default function DatasetPage(
                                                     setTabularResource={
                                                         setTabularResource
                                                     }
+                                                    setDisplayNoPreview={
+                                                        setDisplayNoPreview
+                                                    }
+                                                    setMapDisplayPreview={
+                                                        setMapDisplayPreview
+                                                    }
+                                                    mapDisplayPreview={
+                                                        mapDisplayPreview
+                                                    }
                                                     isCurrentVersion={
                                                         isCurrentVersion
                                                     }
@@ -617,7 +637,13 @@ export default function DatasetPage(
                         </>
                     )
                 }
-                rhs={<LazyViz tabularResource={tabularResource} />}
+                rhs={
+                    <LazyViz
+                        tabularResource={tabularResource}
+                        displayNoPreview={displayNoPreview}
+                        mapDisplayPreview={mapDisplayPreview}
+                    />
+                }
             />
         </>
     )

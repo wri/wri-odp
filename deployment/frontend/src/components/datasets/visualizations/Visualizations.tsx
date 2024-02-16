@@ -13,8 +13,12 @@ export type TabularResource = {
 
 export default function Visualizations({
     tabularResource,
+    displayNoPreview,
+    mapDisplayPreview,
 }: {
     tabularResource: TabularResource | null
+    displayNoPreview: boolean
+    mapDisplayPreview: boolean
 }) {
     const [prevTabularResource, setPrevTabularResource] =
         useState(tabularResource)
@@ -23,9 +27,13 @@ export default function Visualizations({
     const [prevActiveCharts, setPrevActiveCharts] = useState([])
 
     const tabs = [
-        { name: 'Map View', enabled: true },
+        { name: 'Map View', enabled: !!mapDisplayPreview },
         { name: 'Tabular View', enabled: !!tabularResource },
         { name: 'Chart View', enabled: activeCharts?.length }, // TODO: verify this
+        {
+            name: 'Preview',
+            enabled: !!displayNoPreview,
+        },
     ]
 
     useEffect(() => {
@@ -33,8 +41,13 @@ export default function Visualizations({
             // Charts view was enabled, focus it
             const index = tabs.findIndex((t) => t.name == 'Chart View')
             setVizIndex(index)
-        } else if (!activeCharts?.length && prevActiveCharts.length && vizIndex == 2) {
-            setVizIndex(0)
+        } else if (
+            !activeCharts?.length &&
+            prevActiveCharts.length &&
+            vizIndex == 2
+        ) {
+            const index = tabs.findIndex((t) => t.name == 'Preview')
+            setVizIndex(index)
         }
 
         setPrevActiveCharts(activeCharts)
@@ -45,11 +58,26 @@ export default function Visualizations({
             const index = tabs.findIndex((t) => t.name == 'Tabular View')
             setVizIndex(index)
         } else if (!tabularResource && vizIndex == 1) {
-            setVizIndex(0)
+            const index = tabs.findIndex((t) => t.name == 'Preview')
+            setVizIndex(index)
         }
 
         setPrevActiveCharts(activeCharts)
     }, [tabularResource])
+
+    useEffect(() => {
+        if (displayNoPreview) {
+            const index = tabs.findIndex((t) => t.name == 'Preview')
+            setVizIndex(index)
+        }
+    }, [displayNoPreview])
+
+    useEffect(() => {
+        if (mapDisplayPreview) {
+            const index = tabs.findIndex((t) => t.name == 'Map View')
+            setVizIndex(index)
+        }
+    }, [mapDisplayPreview])
 
     return (
         <div className="h-full grow flex flex-col">
@@ -68,6 +96,9 @@ export default function Visualizations({
                     </Tab.Panel>
                     <Tab.Panel>
                         <ChartView />
+                    </Tab.Panel>
+                    <Tab.Panel className="h-full grow flex flex-col justify-center items-center">
+                        <div>No Data Preview</div>
                     </Tab.Panel>
                 </Tab.Panels>
             </Tab.Group>
