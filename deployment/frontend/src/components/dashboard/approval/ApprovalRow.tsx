@@ -132,7 +132,7 @@ function FormatNewValue(
 ) {
     if (key === 'Open In') {
         const open_in_array = JSON.parse(value as string)
-
+        if (!Array.isArray(open_in_array)) return <span>Not specified</span>
         return (
             <span className="flex gap-x-2 items-center">
                 {(open_in_array as Array<{ title: string; url: string }>).map(
