@@ -142,6 +142,7 @@ export const datasetFormFieldmap: Record<string, string> = {
     featured_dataset: 'Featured dataset',
     featured_image: 'Featured image',
     spatial: 'spatial',
+    spatial_type: 'Spatial Type',
     short_description: ' Short Description',
     notes: 'Description',
     author: 'author',
@@ -149,7 +150,10 @@ export const datasetFormFieldmap: Record<string, string> = {
     maintainer: 'Maintainer Name',
     maintainer_email: 'Maintainer Email',
     learn_more: 'Learn more',
-    function: 'function',
+    open_in: 'Open In',
+    function: 'Function',
+    cautions: 'Cautions',
+    methodology: 'Methodology',
     restrictions: 'Restrictions',
     reason_for_adding: 'Reason for adding',
     owner_org: 'Team',
@@ -170,9 +174,6 @@ export function formatDiff(
                 (key.match(/\[\d+\]\.\w+/) || key.match(/\[\d+\]/))
             ) {
                 const keyoldNew = data[key]?.old_value ?? data[key]?.new_value
-                if (key.includes('groups')) {
-                    console.log('KEY: ', keyoldNew)
-                }
                 if (
                     key.includes('display_name') ||
                     key.includes('name') ||
