@@ -1059,7 +1059,10 @@ export async function getDatasetDetails({
             id,
             name: 'Not found',
             title: 'Not found',
-        }
+            temporal_coverage_start: 1970,
+            temporal_coverage_end: 1970,
+            visibility_type: 'private'
+        } as unknown as WriDataset
     }
 }
 
