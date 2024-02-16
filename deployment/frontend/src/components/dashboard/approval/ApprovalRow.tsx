@@ -270,12 +270,27 @@ function SubCardProfile({
                                             className="border-0"
                                         >
                                             <TableCell className="capitalize font-acumin text-xs font-normal text-black">
-                                                {key}
+                                                {match(key)
+                                                    .with(
+                                                        'organization',
+                                                        () => 'Team'
+                                                    )
+                                                    .otherwise(() =>
+                                                        key.includes(
+                                                            'resources'
+                                                        )
+                                                            ? key.replace(
+                                                                  'resources',
+                                                                  'datafiles'
+                                                              )
+                                                            : key
+                                                    )}
                                             </TableCell>
                                             <TableCell className="font-acumin text-xs font-normal text-black">
                                                 <pre>
                                                     {FormatNewValue(
-                                                        diff2[key]?.new_value as any,
+                                                        diff2[key]
+                                                            ?.new_value as any,
                                                         key
                                                     )}
                                                 </pre>
@@ -283,7 +298,8 @@ function SubCardProfile({
                                             <TableCell className="font-acumin text-xs font-normal text-black">
                                                 <pre>
                                                     {FormatNewValue(
-                                                        diff2[key]?.old_value as any,
+                                                        diff2[key]
+                                                            ?.old_value as any,
                                                         key
                                                     )}
                                                 </pre>
