@@ -1057,8 +1057,8 @@ export async function getDatasetDetails({
     } catch (e) {
         return {
             id,
-            name: 'Not found',
-            title: 'Not found',
+            name: id,
+            title: id,
             temporal_coverage_start: 1970,
             temporal_coverage_end: 1970,
             visibility_type: 'private'
