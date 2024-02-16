@@ -916,15 +916,14 @@ export async function getOrganizationTreeDetails({
         {} as Record<string, GroupsmDetails>
     )
 
-    for ( const group in teamDetails) {
+    for (const group in teamDetails) {
         const team = teamDetails[group]!
         const packagedetails = (await getAllDatasetFq({
             apiKey: session?.user.apikey ?? '',
             fq: `organization:${team.name}+is_approved:true`,
-            query: {search: '', page: {start: 0, rows: 10000}},
+            query: { search: '', page: { start: 0, rows: 10000 } },
         }))!
         team.package_count = packagedetails.count
-        
     }
 
     if (input.search) {
@@ -982,15 +981,14 @@ export async function getTopicTreeDetails({
         {} as Record<string, GroupsmDetails>
     )
 
-    for ( const group in topicDetails) {
+    for (const group in topicDetails) {
         const topic = topicDetails[group]!
         const packagedetails = (await getAllDatasetFq({
             apiKey: session?.user.apikey ?? '',
             fq: `groups:${topic.name}+is_approved:true`,
-            query: {search: '', page: {start: 0, rows: 10000}},
+            query: { search: '', page: { start: 0, rows: 10000 } },
         }))!
         topic.package_count = packagedetails.count
-        
     }
     if (input.search) {
         groupTree = await searchHierarchy({
@@ -1028,22 +1026,41 @@ export async function getDatasetDetails({
     id: string
     session: Session | null
 }) {
-    const user = session?.user
-    const datasetRes = await fetch(
-        `${env.CKAN_URL}/api/action/package_show?id=${id}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `${user?.apikey ?? ''}`,
-            },
+    try {
+        const user = session?.user
+        let datasetRes = await fetch(
+            `${env.CKAN_URL}/api/action/package_show?id=${id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${user?.apikey ?? ''}`,
+                },
+            }
+        )
+        if (datasetRes.status !== 200) {
+            datasetRes = await fetch(
+                `${env.CKAN_URL}/api/action/package_show?id=${id}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user?.apikey ?? ''}`,
+                    },
+                }
+            )
         }
-    )
-    const dataset: CkanResponse<WriDataset> = await datasetRes.json()
-    if (!dataset.success && dataset.error) {
-        if (dataset.error.message) throw Error(dataset.error.message)
-        throw Error(JSON.stringify(dataset.error))
+        const dataset: CkanResponse<WriDataset> = await datasetRes.json()
+        if (!dataset.success && dataset.error) {
+            if (dataset.error.message) throw Error(dataset.error.message)
+            throw Error(JSON.stringify(dataset.error))
+        }
+        return dataset.result
+    } catch (e) {
+        return {
+            id,
+            name: 'Not found',
+            title: 'Not found',
+        }
     }
-    return dataset.result
 }
 
 function cryptoRandomFloat(): number {
