@@ -10,9 +10,10 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number }[] }) {
+export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number, highlighted?: boolean }[] }) {
   const prevEl = `.nav-prev-button--tabs`;
   const nextEl = `.nav-next-button--tabs`;
+  console.log('TABS', tabs)
   return (
     <>
       <Swiper
@@ -35,6 +36,7 @@ export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number }[]
                       ? "border-wri-green text-wri-green"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
                     "whitespace-nowrap border-b-2 px-6 font-acumin font-semibold transition",
+                    tab.highlighted ? "bg-yellow-200" : ""
                   )}
                 >
                   {tab.name}

@@ -255,7 +255,21 @@ export function Preview({
                         </div>
                     )}
                     <InfoAlert
-                        text="To add a chart view to your dataset, the system first needs to load your data file. Please wait 10-15 minutes and then choose to edit your dataset. You will then be able to add a chart."
+                        text={
+                            <ul className="list-disc">
+                                <li>
+                                    To add a chart view to your dataset, the
+                                    system first needs to load your data file.
+                                    Please wait 10-15 minutes and then choose to
+                                    edit your dataset. You will then be able to
+                                    add a chart.
+                                </li>
+                                <li>
+                                    Charts views cannot be created while the dataset
+                                    is awaiting approval
+                                </li>
+                            </ul>
+                        }
                         title="Attention"
                     />
                     {watch('resources') && watch('resources').length > 0 && (
@@ -264,29 +278,39 @@ export function Preview({
                                 Data files
                             </h3>
                             <div>
-                                {watch('resources').filter(r => !['empty-file', 'empty-layer'].includes(r.type)).map((resource) => (
-                                    <Datafile
-                                        key={resource.resourceId}
-                                        name={
-                                            resource.name ??
-                                            resource.url ??
-                                            resource.title ??
-                                            '-'
-                                        }
-                                        title={resource.title ?? '-'}
-                                        type={resource.type ?? 'empty-file'}
-                                        format={resource.format ?? '-'}
-                                        size={resource.size ?? null}
-                                        layerObj={resource.layerObj ?? null}
-                                        layerObjRaw={
-                                            resource.layerObjRaw ?? null
-                                        }
-                                        description={
-                                            resource.description ?? '-'
-                                        }
-                                        dataDictionary={resource.schema ?? []}
-                                    />
-                                ))}
+                                {watch('resources')
+                                    .filter(
+                                        (r) =>
+                                            ![
+                                                'empty-file',
+                                                'empty-layer',
+                                            ].includes(r.type)
+                                    )
+                                    .map((resource) => (
+                                        <Datafile
+                                            key={resource.resourceId}
+                                            name={
+                                                resource.name ??
+                                                resource.url ??
+                                                resource.title ??
+                                                '-'
+                                            }
+                                            title={resource.title ?? '-'}
+                                            type={resource.type ?? 'empty-file'}
+                                            format={resource.format ?? '-'}
+                                            size={resource.size ?? null}
+                                            layerObj={resource.layerObj ?? null}
+                                            layerObjRaw={
+                                                resource.layerObjRaw ?? null
+                                            }
+                                            description={
+                                                resource.description ?? '-'
+                                            }
+                                            dataDictionary={
+                                                resource.schema ?? []
+                                            }
+                                        />
+                                    ))}
                             </div>
                         </div>
                     )}

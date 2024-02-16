@@ -219,6 +219,7 @@ export interface GroupsmDetails {
     img_url: string
     description: string
     package_count: number
+    name: string
 }
 
 export interface Member {

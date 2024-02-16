@@ -909,11 +909,23 @@ export async function getOrganizationTreeDetails({
                 img_url: org.image_display_url ?? '',
                 description: org.description ?? '',
                 package_count: org.package_count!,
+                name: org.name,
             }
             return acc
         },
         {} as Record<string, GroupsmDetails>
     )
+
+    for ( const group in teamDetails) {
+        const team = teamDetails[group]!
+        const packagedetails = (await getAllDatasetFq({
+            apiKey: session?.user.apikey ?? '',
+            fq: `organization:${team.name}+is_approved:true`,
+            query: {search: '', page: {start: 0, rows: 10000}},
+        }))!
+        team.package_count = packagedetails.count
+        
+    }
 
     if (input.search) {
         groupTree = await searchHierarchy({
@@ -963,11 +975,23 @@ export async function getTopicTreeDetails({
                 img_url: org.image_display_url,
                 description: org.description,
                 package_count: org.package_count,
+                name: org.name,
             }
             return acc
         },
         {} as Record<string, GroupsmDetails>
     )
+
+    for ( const group in topicDetails) {
+        const topic = topicDetails[group]!
+        const packagedetails = (await getAllDatasetFq({
+            apiKey: session?.user.apikey ?? '',
+            fq: `groups:${topic.name}+is_approved:true`,
+            query: {search: '', page: {start: 0, rows: 10000}},
+        }))!
+        topic.package_count = packagedetails.count
+        
+    }
     if (input.search) {
         groupTree = await searchHierarchy({
             isSysadmin: true,
@@ -2338,7 +2362,7 @@ export async function approvePendingDataset(
     return dataset.result
 }
 
-export const datsetFields = [
+export const datasetFields = [
     'application',
     'approval_status',
     'author',
@@ -2381,11 +2405,30 @@ export const datsetFields = [
     'relationships_as_subject',
     'relationships_as_object',
     'notes',
+    'open_in',
+    'extras',
+    'temporal_coverage_start',
+    'temporal_coverage_end',
+    'topics',
+    'citation',
+    'notes',
+    'featured_dataset',
+    'featured_image',
+    'function',
+    'restrictions',
+    'reason_for_adding',
+    'learn_more',
+    'spatial',
+    'spatial_address',
+    'spatial_type',
+    'methodology',
+    'cautions',
+    'function',
 ]
 
 export function filterDatasetFields(dataset: any) {
     const filteredDataset: any = {}
-    for (const field of datsetFields) {
+    for (const field of datasetFields) {
         if (dataset[field]) {
             filteredDataset[field] = dataset[field]
         }
@@ -2496,7 +2539,10 @@ async function editLayerRw(r: ResourceFormType) {
     return r
 }
 
-export async function fetchDatasetCollabIds(datasetId: string, userApiKey: string) {
+export async function fetchDatasetCollabIds(
+    datasetId: string,
+    userApiKey: string
+) {
     const res = await fetch(
         `${env.CKAN_URL}/api/3/action/package_collaborator_list?id=${datasetId}`,
         {

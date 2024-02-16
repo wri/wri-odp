@@ -75,8 +75,8 @@ function filteredDataset(dataset: WriDataset) {
 }
 
 function Card({ approvalInfo }: { approvalInfo: WriDataset }) {
-    const user = approvalInfo.user as User
-    user.name = user.email ?? user.name
+    const user = approvalInfo.user as User ?? { email: '', name: '' } 
+    user.name = user?.email ?? user?.name ?? 'Unknown'
     user.image_display_url = user?.image_display_url
         ? user?.image_display_url
         : `https://gravatar.com/avatar/${user?.email_hash}?s=270&d=identicon`
@@ -122,8 +122,6 @@ function SubCardProfile({
 }) {
     if (isLoading) return <Spinner className="mx-auto my-2" />
     const diff2 = formatDiff(diff)
-    console.log('DIFF: ', diff)
-    console.log('DIFFFF2: ', diff2)
     return (
         <div className=" mx-auto w-4/5 my-4 max-h-[300px] overflow-auto">
             {diff &&
@@ -241,6 +239,7 @@ export default function ApprovalRow({
         id: approvalInfo.id,
     })
 
+    console.log('APPROVAL INFO', approvalInfo)
     return (
         <Row
             className={`sm:pr-4 ${className ? className : ''}`}
