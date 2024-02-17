@@ -456,14 +456,20 @@ export default function DatasetPage(
     useEffect(() => {
         if (datasetData?.resources) {
             const resource = datasetData?.resources[0] as Resource
-            if (
-                resource?.rw_id &&
-                !activeLayers.some(
-                    (a) => resource.url?.endsWith(a.id) || resource.id === a.id
-                )
-            ) {
+
+            if (resource?.rw_id) {
+                removeLayerFromLayerGroup(resource.rw_id, datasetData.id!)
                 setMapDisplayPreview(true)
                 addLayerToLayerGroup(resource.rw_id!, datasetData.id)
+            } else if (
+                !resource?.rw_id &&
+                datasetData?.provider &&
+                datasetData?.rw_id
+            ) {
+                setTabularResource({
+                    provider: datasetData.provider as string,
+                    id: datasetData.rw_id as string,
+                })
             } else if (resource?.datastore_active) {
                 setTabularResource({
                     provider: 'datastore',
@@ -475,6 +481,10 @@ export default function DatasetPage(
                 )
 
                 if (foundLayer && foundLayer.rw_id) {
+                    removeLayerFromLayerGroup(
+                        foundLayer?.rw_id!,
+                        datasetData.id
+                    )
                     setMapDisplayPreview(true)
                     addLayerToLayerGroup(foundLayer?.rw_id!, datasetData.id)
                     setDisplayNoPreview(false)
@@ -502,7 +512,7 @@ export default function DatasetPage(
             </>
         )
     }
-
+    console.log('ACTIVELAYERS 345959', activeLayers)
     return (
         <>
             <SyncUrl />

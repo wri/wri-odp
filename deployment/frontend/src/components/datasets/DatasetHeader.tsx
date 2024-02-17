@@ -220,18 +220,6 @@ export function DatasetHeader({
         return ''
     }
 
-    useEffect(() => {
-        if (dataset?.resources) {
-            const resource = dataset.resources[0]
-            if (!resource?.rw_id && dataset?.provider && dataset?.rw_id) {
-                setTabularResource({
-                    provider: dataset.provider as string,
-                    id: dataset.rw_id as string,
-                })
-            }
-        }
-    }, [dataset])
-
     return (
         <div className="flex w-full flex-col pb-10 font-acumin">
             {!session.data?.user ? (

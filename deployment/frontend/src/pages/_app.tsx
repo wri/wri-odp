@@ -84,21 +84,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
             .map((r: any) => r?.rw_id)
 
         for (const resource of dataset?.resources) {
-            if (
-                (resource['layerObj'] || resource['layerObjRaw']) &&
-                !resource.url
-            ) {
-                layerAsLayerObj.set(resource.rw_id, 'pending')
-            } else {
-                layerAsLayerObj.set(resource.rw_id, 'approved')
-            }
-        }
-    }
-
-    if (initialZustandState && initialZustandState?.relatedDatasets.length) {
-        const datasets = initialZustandState?.relatedDatasets
-        for (const dataset of datasets) {
-            for (const resource of dataset?.resources) {
+            if (resource.format == 'Layer') {
                 if (
                     (resource['layerObj'] || resource['layerObjRaw']) &&
                     !resource.url
@@ -111,6 +97,24 @@ const MyApp: AppType<{ session: Session | null }> = ({
         }
     }
 
+    if (initialZustandState && initialZustandState?.relatedDatasets.length) {
+        const datasets = initialZustandState?.relatedDatasets
+        for (const dataset of datasets) {
+            for (const resource of dataset?.resources) {
+                if (resource.format == 'Layer') {
+                    if (
+                        (resource['layerObj'] || resource['layerObjRaw']) &&
+                        !resource.url
+                    ) {
+                        layerAsLayerObj.set(resource.rw_id, 'pending')
+                    } else {
+                        layerAsLayerObj.set(resource.rw_id, 'approved')
+                    }
+                }
+            }
+        }
+    }
+
     if (
         initialZustandState &&
         initialZustandState?.prevRelatedDatasets.length
@@ -118,13 +122,15 @@ const MyApp: AppType<{ session: Session | null }> = ({
         const datasets = initialZustandState?.prevRelatedDatasets
         for (const dataset of datasets) {
             for (const resource of dataset?.resources) {
-                if (
-                    (resource['layerObj'] || resource['layerObjRaw']) &&
-                    !resource.url
-                ) {
-                    tempLayerAsLayerobj.set(resource.rw_id, 'pending')
-                } else {
-                    tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                if (resource.format == 'Layer') {
+                    if (
+                        (resource['layerObj'] || resource['layerObjRaw']) &&
+                        !resource.url
+                    ) {
+                        tempLayerAsLayerobj.set(resource.rw_id, 'pending')
+                    } else {
+                        tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                    }
                 }
             }
         }
@@ -136,13 +142,15 @@ const MyApp: AppType<{ session: Session | null }> = ({
             .map((r: any) => r?.rw_id)
 
         for (const resource of prevdataset?.resources) {
-            if (
-                resource['layerObj'] ||
-                (resource['layerObjRaw'] && !resource.url)
-            ) {
-                tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')
-            } else {
-                tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+            if (resource.format == 'Layer') {
+                if (
+                    resource['layerObj'] ||
+                    (resource['layerObjRaw'] && !resource.url)
+                ) {
+                    tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')
+                } else {
+                    tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                }
             }
         }
     }
