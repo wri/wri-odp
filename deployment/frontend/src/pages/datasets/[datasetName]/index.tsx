@@ -467,11 +467,13 @@ export default function DatasetPage(
                 dataset?.provider &&
                 dataset?.rw_id
             ) {
+                setDisplayNoPreview(false)
                 setTabularResource({
                     provider: dataset.provider as string,
                     id: dataset.rw_id as string,
                 })
             } else if (resource?.datastore_active) {
+                setDisplayNoPreview(false)
                 setTabularResource({
                     provider: 'datastore',
                     id: resource?.id,
@@ -510,7 +512,7 @@ export default function DatasetPage(
             </>
         )
     }
-    console.log('ACTIVELAYERS 345959', activeLayers)
+
     return (
         <>
             <SyncUrl />
