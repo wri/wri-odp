@@ -54,12 +54,17 @@ export default function Visualizations({
     }, [activeCharts])
 
     useEffect(() => {
-        if (tabularResource && !prevTabularResource) {
+        if (tabularResource) {
             const index = tabs.findIndex((t) => t.name == 'Tabular View')
             setVizIndex(index)
         } else if (!tabularResource && vizIndex == 1) {
-            const index = tabs.findIndex((t) => t.name == 'Preview')
-            setVizIndex(index)
+            const mapExist = tabs.find((t) => t.name == 'Map View')
+            if (mapExist?.enabled) {
+                setVizIndex(0)
+            } else {
+                const index = tabs.findIndex((t) => t.name == 'Preview')
+                setVizIndex(index)
+            }
         }
 
         setPrevActiveCharts(activeCharts)

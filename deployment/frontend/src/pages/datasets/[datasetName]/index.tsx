@@ -40,6 +40,9 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { User } from '@portaljs/ckan'
 import { record, string } from 'zod'
 import { matchesAnyPattern } from '@/utils/general'
+import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
+import { Resource, View } from '@/interfaces/dataset.interface'
+import { useLayersFromRW } from '@/utils/queryHooks'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -205,6 +208,9 @@ export default function DatasetPage(
 
     const [isCurrentVersion, setIsCurrentVersion] = useState<boolean>(false)
     const [selectedIndex, setSelectedIndex] = useState(0)
+    const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
+        useActiveLayerGroups()
+    const { data: activeLayers } = useLayersFromRW()
     const datasetName = props.datasetName as string
     const datasetId = props.datasetId!
     const pendingExist = props.pendingExist!
@@ -446,6 +452,42 @@ export default function DatasetPage(
             enabled: issues.data && issues.data.length > 0,
         },
     ]
+
+    useEffect(() => {
+        if (datasetData?.resources) {
+            const resource = datasetData?.resources[0] as Resource
+            if (
+                resource?.rw_id &&
+                !activeLayers.some(
+                    (a) => resource.url?.endsWith(a.id) || resource.id === a.id
+                )
+            ) {
+                setMapDisplayPreview(true)
+                addLayerToLayerGroup(resource.rw_id!, datasetData.id)
+            } else if (resource?.datastore_active) {
+                setTabularResource({
+                    provider: 'datastore',
+                    id: resource?.id,
+                })
+            } else {
+                const foundLayer = datasetData?.resources.find(
+                    (d) => d.format === 'Layer' || d.rw_id
+                )
+
+                if (foundLayer && foundLayer.rw_id) {
+                    setMapDisplayPreview(true)
+                    addLayerToLayerGroup(foundLayer?.rw_id!, datasetData.id)
+                    setDisplayNoPreview(false)
+                } else {
+                    setTabularResource(null)
+                    setMapDisplayPreview(false)
+                    setDisplayNoPreview(true)
+                }
+            }
+        } else {
+            setDisplayNoPreview(true)
+        }
+    }, [isCurrentVersion])
 
     const shouldLoad = pendingExist ? isLoadingDiff : false
 

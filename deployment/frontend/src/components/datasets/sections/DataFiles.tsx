@@ -52,38 +52,6 @@ export function DataFiles({
               )
             : datafiles
 
-    useEffect(() => {
-        if (filteredDatafiles?.length) {
-            const resource = filteredDatafiles[0] as Resource
-            if (filteredDatafiles[0]?.rw_id) {
-                setMapDisplayPreview(true)
-                addLayerToLayerGroup(resource.rw_id!, dataset.id)
-                setDisplayNoPreview(false)
-            } else if (resource.datastore_active) {
-                setTabularResource({
-                    provider: 'datastore',
-                    id: resource?.id,
-                })
-                setDisplayNoPreview(false)
-            } else {
-                const foundLayer = filteredDatafiles.find(
-                    (d) => d.format === 'Layer' || d.rw_id
-                )
-
-                if (foundLayer && foundLayer.rw_id) {
-                    setMapDisplayPreview(true)
-                    addLayerToLayerGroup(foundLayer?.rw_id!, dataset.id)
-                    setDisplayNoPreview(false)
-                } else {
-                    setTabularResource(null)
-                    setMapDisplayPreview(false)
-                    setDisplayNoPreview(true)
-                }
-            }
-        } else {
-            setDisplayNoPreview(true)
-        }
-    }, [filteredDatafiles])
     return (
         <>
             <div className="relative py-4">
