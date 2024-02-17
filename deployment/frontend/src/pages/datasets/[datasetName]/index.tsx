@@ -454,21 +454,22 @@ export default function DatasetPage(
     ]
 
     useEffect(() => {
-        if (datasetData?.resources) {
-            const resource = datasetData?.resources[0] as Resource
+        const dataset = isCurrentVersion ? prevDatasetData : datasetData
+        if (dataset?.resources) {
+            const resource = dataset?.resources[0] as Resource
 
             if (resource?.rw_id) {
-                removeLayerFromLayerGroup(resource.rw_id, datasetData.id!)
+                removeLayerFromLayerGroup(resource.rw_id, dataset.id!)
                 setMapDisplayPreview(true)
-                addLayerToLayerGroup(resource.rw_id!, datasetData.id)
+                addLayerToLayerGroup(resource.rw_id!, dataset.id)
             } else if (
                 !resource?.rw_id &&
-                datasetData?.provider &&
-                datasetData?.rw_id
+                dataset?.provider &&
+                dataset?.rw_id
             ) {
                 setTabularResource({
-                    provider: datasetData.provider as string,
-                    id: datasetData.rw_id as string,
+                    provider: dataset.provider as string,
+                    id: dataset.rw_id as string,
                 })
             } else if (resource?.datastore_active) {
                 setTabularResource({
@@ -476,17 +477,14 @@ export default function DatasetPage(
                     id: resource?.id,
                 })
             } else {
-                const foundLayer = datasetData?.resources.find(
+                const foundLayer = dataset?.resources.find(
                     (d) => d.format === 'Layer' || d.rw_id
                 )
 
                 if (foundLayer && foundLayer.rw_id) {
-                    removeLayerFromLayerGroup(
-                        foundLayer?.rw_id!,
-                        datasetData.id
-                    )
+                    removeLayerFromLayerGroup(foundLayer?.rw_id!, dataset.id)
                     setMapDisplayPreview(true)
-                    addLayerToLayerGroup(foundLayer?.rw_id!, datasetData.id)
+                    addLayerToLayerGroup(foundLayer?.rw_id!, dataset.id)
                     setDisplayNoPreview(false)
                 } else {
                     setTabularResource(null)
