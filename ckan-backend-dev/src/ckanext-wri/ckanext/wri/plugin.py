@@ -11,7 +11,7 @@ from ckanext.wri.logic.auth import auth as auth
 from ckanext.wri.logic.action.datapusher import datapusher_latest_task, datapusher_submit
 from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
 from ckanext.wri.logic.action.update import notification_update, pending_dataset_update
-from ckanext.wri.logic.action.get import package_search, notification_get_all, pending_dataset_show, pending_diff_show
+from ckanext.wri.logic.action.get import package_search, notification_get_all, pending_dataset_show, pending_diff_show, dataset_release_notes
 from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
 from ckan.lib.navl.validators import ignore_missing
@@ -128,7 +128,8 @@ class WriPlugin(plugins.SingletonPlugin):
             'prefect_datapusher_submit': datapusher_submit,
             'prefect_latest_task': datapusher_latest_task,
             'prefect_download_from_store': download_request,
-            'prefect_download_callback': download_callback
+            'prefect_download_callback': download_callback,
+            'dataset_release_notes': dataset_release_notes
 
         }
 

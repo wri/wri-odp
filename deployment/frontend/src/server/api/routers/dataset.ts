@@ -28,6 +28,7 @@ import {
     patchDataset,
     fetchDatasetCollabIds,
     approvePendingDataset,
+    getDatasetReleaseNotes,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -210,9 +211,9 @@ export const DatasetRouter = createTRPCRouter({
                                     format: resource.format
                                         ? resource.format
                                         : resource.layerObj ||
-                                          resource.layerObjRaw
-                                        ? 'Layer'
-                                        : '',
+                                            resource.layerObjRaw
+                                          ? 'Layer'
+                                          : '',
                                     layerObj: resource.layerObj
                                         ? convertFormToLayerObj(
                                               resource.layerObj
@@ -259,8 +260,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                            ? JSON.stringify(input.spatial)
-                            : null,
+                              ? JSON.stringify(input.spatial)
+                              : null,
 
                     spatial_address: input.spatial_address
                         ? input.spatial_address
@@ -578,9 +579,9 @@ export const DatasetRouter = createTRPCRouter({
                                         format: resource.format
                                             ? resource.format
                                             : resource.layerObj ||
-                                              resource.layerObjRaw
-                                            ? 'Layer'
-                                            : '',
+                                                resource.layerObjRaw
+                                              ? 'Layer'
+                                              : '',
                                         id: resource.resourceId,
                                         datastore_active:
                                             resource.datastore_active === true
@@ -651,8 +652,8 @@ export const DatasetRouter = createTRPCRouter({
                             input.spatial && input.spatial_address
                                 ? null
                                 : JSON.stringify(input.spatial)
-                                ? JSON.stringify(input.spatial)
-                                : null,
+                                  ? JSON.stringify(input.spatial)
+                                  : null,
                         spatial_address: input.spatial_address
                             ? input.spatial_address
                             : null,
@@ -856,8 +857,8 @@ export const DatasetRouter = createTRPCRouter({
                         format: input.format
                             ? input.format
                             : input.layerObj || input.layerObjRaw
-                            ? 'Layer'
-                            : '',
+                              ? 'Layer'
+                              : '',
                         layerObj: input.layerObj
                             ? convertFormToLayerObj(input.layerObj)
                             : null,
@@ -1949,5 +1950,10 @@ export const DatasetRouter = createTRPCRouter({
                 return data
             }
             throw data
+        }),
+    getDatasetReleaseNotes: publicProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            return getDatasetReleaseNotes(input)
         }),
 })

@@ -10,6 +10,7 @@ import re
 from itertools import zip_longest
 
 from ckan.common import config, asbool
+from sqlalchemy import text, engine
 
 
 import ckan
@@ -37,6 +38,8 @@ from ckanext.wri.model.pending_datasets import PendingDatasets
 import datetime
 import ckan.plugins.toolkit as tk
 from ckanext.wri.logic.auth import schema
+from ckanext.activity.model import Activity
+
 
 log = logging.getLogger("ckan.logic")
 
@@ -538,3 +541,31 @@ def _process_lists(existing_list, pending_list, path):
             }
 
     return list_diff
+
+@logic.side_effect_free
+def dataset_release_notes(context: Context, data_dict: DataDict):
+    model = context["model"]
+    conn = model.Session.connection()
+
+    id = data_dict.get("id")
+    sql = text('''
+               select
+                   distinct on ((data::json->>'package')::json->>'release_notes')
+                   ((data::json->>'package')::json->>'release_notes') as release_notes,
+                    to_char(timestamp::date, 'YYYY-MM-DD') as date
+               from
+                    activity
+               where
+                    object_id='{}'
+                    and activity_type='changed package'
+                    and ((data::json->>'package')::json->>'release_notes') != ''
+               order by
+                    1, 2 DESC
+               '''.format(id))
+    q = conn.execute(sql)
+
+    results = q.all()
+
+    return results
+
+

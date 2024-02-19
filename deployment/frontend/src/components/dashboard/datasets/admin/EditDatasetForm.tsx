@@ -39,6 +39,7 @@ import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
 import { EditRwSection } from './datafiles/EditRwSection'
 import form from '@/components/vizzuality/1.3-components/form'
+import { VersioningForm } from './metadata/VersioningForm'
 
 function getDiff<T>(dirtyObject: T, changedFields: string[]) {
     for (const key in dirtyObject) {
@@ -267,6 +268,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 <PointOfContactForm formObj={formObj} />
                                 <MoreDetailsForm formObj={formObj} />
                                 <OpenInForm formObj={formObj} />
+                                <VersioningForm formObj={formObj} />
                                 <CustomFieldsForm formObj={formObj} />
                             </form>
                         </Tab.Panel>

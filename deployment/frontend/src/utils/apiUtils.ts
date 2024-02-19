@@ -1942,7 +1942,7 @@ export async function sendGroupNotification({
         }
     } catch (error) {
         console.error(error)
-        throw Error('Error in sending issue /comment notification')
+        throw Error('Error in sending issue/comment notification')
     }
 }
 
@@ -2444,6 +2444,7 @@ export const datasetFields = [
     'methodology',
     'cautions',
     'function',
+    'release_notes'
 ]
 
 export function filterDatasetFields(dataset: any) {
@@ -2591,4 +2592,21 @@ export async function fetchDatasetCollabIds(
     }
 
     return collaborators.result.map((collaborator) => collaborator.user_id)
+}
+
+
+export async function getDatasetReleaseNotes({ id }: { id: string }) {
+    const url = `${env.CKAN_URL}/api/3/action/dataset_release_notes?id=${id}`;
+    const response = await fetch(
+        url,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+
+    const releaseNotes: CkanResponse<{ release_notes: string, date: string }[]> = await response.json()
+
+    return releaseNotes.result
 }
