@@ -196,9 +196,15 @@ export const DatasetRouter = createTRPCRouter({
                                 )
 
                                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                                description = layerRaw.description
+                                description =
+                                    resource.description != ''
+                                        ? resource.description
+                                        : layerRaw.description
                                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                                title = layerRaw.name
+                                title =
+                                    resource.name != ''
+                                        ? resource.name
+                                        : layerRaw.name
                             }
                             if (resource.layerObj || resource.layerObjRaw) {
                                 return {
@@ -548,11 +554,18 @@ export const DatasetRouter = createTRPCRouter({
                                         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                                         resource.layerObjRaw
                                     )
-
                                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                                    description = layerRaw.description
+                                    description =
+                                        resource.description != ''
+                                            ? resource.description
+                                            : layerRaw.description
                                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                                    title = layerRaw.name
+                                    title =
+                                        resource.title != ''
+                                            ? resource.title
+                                            : layerRaw.name
+                                    console.log('TITLE', title)
+                                    console.log('DESCRIPTION', description)
                                 }
                                 if (resource.layerObj || resource.layerObjRaw) {
                                     return {
@@ -600,15 +613,9 @@ export const DatasetRouter = createTRPCRouter({
                                               )
                                             : null,
                                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                                        description:
-                                            resource.layerObj?.description ??
-                                            description ??
-                                            '',
+                                        description: resource.type === 'layer-raw' ? description : resource.layerObj?.description ?? '',
                                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                                        title:
-                                            resource.layerObj?.name ??
-                                            title ??
-                                            '',
+                                        title: resource.type === 'layer-raw' ? title : resource.layerObj?.name ?? '',
                                         url_type: resource.type,
                                         // schema: resource.schema
                                         //     ? { value: resource.schema }
