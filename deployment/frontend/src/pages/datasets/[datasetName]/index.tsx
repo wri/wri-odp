@@ -33,13 +33,12 @@ import { useState, useEffect } from 'react'
 
 import SyncUrl from '@/components/_shared/map/SyncUrl'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
-import { useIsAddingLayers, useToggleLayergroups } from '@/utils/storeHooks'
+import { useIsAddingLayers } from '@/utils/storeHooks'
 import { decodeMapParam } from '@/utils/urlEncoding'
 import { WriDataset } from '@/schema/ckan.schema'
 
-import { User } from '@portaljs/ckan'
-import { record, string } from 'zod'
 import { matchesAnyPattern } from '@/utils/general'
+import { Versioning } from '@/components/datasets/sections/Versioning'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -379,7 +378,14 @@ export default function DatasetPage(
     }
 
     const tabs = [
-        { name: 'Data files', enabled: true, highlighted: !isCurrentVersion && diffFields && diffFields.some((f) => f.includes('resources')) },
+        {
+            name: 'Data files',
+            enabled: true,
+            highlighted:
+                !isCurrentVersion &&
+                diffFields &&
+                diffFields.some((f) => f.includes('resources')),
+        },
         {
             name: 'About',
             enabled: true,
@@ -391,7 +397,7 @@ export default function DatasetPage(
                         'extras',
                         'tags',
                         'notes',
-                        'technical_notes' ,
+                        'technical_notes',
                         'project',
                         'license_id',
                         'groups',
@@ -411,7 +417,9 @@ export default function DatasetPage(
                 diffFields.some((f) => f.includes('methodology')),
         },
         { name: 'Related Datasets', enabled: true },
-        { name: 'Contact', enabled: true,
+        {
+            name: 'Contact',
+            enabled: true,
             highlighted:
                 !isCurrentVersion &&
                 diffFields &&
@@ -423,7 +431,7 @@ export default function DatasetPage(
                         'author_email',
                     ].some((x) => f.includes(x))
                 ),
-    },
+        },
         { name: 'API', enabled: true },
         {
             name: 'Collaborators',
@@ -433,6 +441,16 @@ export default function DatasetPage(
             name: 'Issues',
             count: openIssueLength,
             enabled: issues.data && issues.data.length > 0,
+        },
+        {
+            name: 'Release Notes',
+            enabled: true,
+            highlighted:
+                !isCurrentVersion &&
+                diffFields &&
+                diffFields.some((f) =>
+                    ['release_notes'].some((x) => f.includes(x))
+                ),
         },
     ]
 
@@ -449,6 +467,8 @@ export default function DatasetPage(
             </>
         )
     }
+
+    console.log(diffFields)
 
     return (
         <>
@@ -610,6 +630,20 @@ export default function DatasetPage(
                                                         />
                                                     </Tab.Panel>
                                                 )}
+                                            <Tab.Panel as="div">
+                                                <Versioning
+                                                    //@ts-ignore
+                                                    dataset={
+                                                        isCurrentVersion
+                                                            ? prevDatasetData
+                                                            : datasetData
+                                                    }
+                                                    isCurrentVersion={
+                                                        isCurrentVersion
+                                                    }
+                                                    diffFields={diffFields}
+                                                />
+                                            </Tab.Panel>
                                         </Tab.Panels>
                                     </div>
                                 </Tab.Group>

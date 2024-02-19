@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import type {
     Activity,
@@ -13,6 +13,22 @@ import { searchSchema } from '@/schema/search.schema'
 import { filterObjects } from '@/utils/general'
 
 export const activityStreamRouter = createTRPCRouter({
+    listPackageActivity: publicProcedure.input(z.object({id: z.string()})).query(async ({input, ctx}) => {
+        let url = `${env.CKAN_URL}/api/3/action/package_activity_list?id=${input.id}`
+        const fetchOps: any = { headers: {} }
+
+        const user = ctx.session?.user
+        if (user) {
+            fetchOps.headers['Authorization'] = user.apikey
+        }
+
+        const response = await fetch(url, fetchOps)
+
+        const data: CkanResponse<Activity[]> = await response.json()
+
+        return data.result
+        
+    }),
     listActivityStreamDashboard: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
