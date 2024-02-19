@@ -38,7 +38,13 @@ import { decodeMapParam } from '@/utils/urlEncoding'
 import { WriDataset } from '@/schema/ckan.schema'
 
 import { matchesAnyPattern } from '@/utils/general'
+
 import { Versioning } from '@/components/datasets/sections/Versioning'
+
+import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
+import { Resource, View } from '@/interfaces/dataset.interface'
+import { useLayersFromRW } from '@/utils/queryHooks'
+
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -204,6 +210,9 @@ export default function DatasetPage(
 
     const [isCurrentVersion, setIsCurrentVersion] = useState<boolean>(false)
     const [selectedIndex, setSelectedIndex] = useState(0)
+    const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
+        useActiveLayerGroups()
+    const { data: activeLayers } = useLayersFromRW()
     const datasetName = props.datasetName as string
     const datasetId = props.datasetId!
     const pendingExist = props.pendingExist!
@@ -253,7 +262,7 @@ export default function DatasetPage(
         }
     )
     if (!datasetData && datasetError) {
-        // router.replace('/datasets/404')
+        router.replace('/datasets/404')
     }
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
@@ -274,6 +283,8 @@ export default function DatasetPage(
     const [tabularResource, setTabularResource] =
         useState<TabularResource | null>(null)
 
+    const [displayNoPreview, setDisplayNoPreview] = useState(false)
+    const [mapDisplayPreview, setMapDisplayPreview] = useState(false)
     const index = new Index({
         tokenize: 'full',
     })
@@ -454,6 +465,52 @@ export default function DatasetPage(
         },
     ]
 
+    useEffect(() => {
+        const dataset = isCurrentVersion ? prevDatasetData : datasetData
+        if (dataset?.resources) {
+            const resource = dataset?.resources[0] as Resource
+
+            if (resource?.rw_id) {
+                removeLayerFromLayerGroup(resource.rw_id, dataset.id!)
+                setMapDisplayPreview(true)
+                addLayerToLayerGroup(resource.rw_id!, dataset.id)
+            } else if (
+                !resource?.rw_id &&
+                dataset?.provider &&
+                dataset?.rw_id
+            ) {
+                setDisplayNoPreview(false)
+                setTabularResource({
+                    provider: dataset.provider as string,
+                    id: dataset.rw_id as string,
+                })
+            } else if (resource?.datastore_active) {
+                setDisplayNoPreview(false)
+                setTabularResource({
+                    provider: 'datastore',
+                    id: resource?.id,
+                })
+            } else {
+                const foundLayer = dataset?.resources.find(
+                    (d) => d.format === 'Layer' || d.rw_id
+                )
+
+                if (foundLayer && foundLayer.rw_id) {
+                    removeLayerFromLayerGroup(foundLayer?.rw_id!, dataset.id)
+                    setMapDisplayPreview(true)
+                    addLayerToLayerGroup(foundLayer?.rw_id!, dataset.id)
+                    setDisplayNoPreview(false)
+                } else {
+                    setTabularResource(null)
+                    setMapDisplayPreview(false)
+                    setDisplayNoPreview(true)
+                }
+            }
+        } else {
+            setDisplayNoPreview(true)
+        }
+    }, [isCurrentVersion])
+
     const shouldLoad = pendingExist ? isLoadingDiff : false
 
     if (isLoading || !datasetData || isLoadingPrev || shouldLoad) {
@@ -543,6 +600,15 @@ export default function DatasetPage(
                                                     }
                                                     setTabularResource={
                                                         setTabularResource
+                                                    }
+                                                    setDisplayNoPreview={
+                                                        setDisplayNoPreview
+                                                    }
+                                                    setMapDisplayPreview={
+                                                        setMapDisplayPreview
+                                                    }
+                                                    mapDisplayPreview={
+                                                        mapDisplayPreview
                                                     }
                                                     isCurrentVersion={
                                                         isCurrentVersion
@@ -651,7 +717,13 @@ export default function DatasetPage(
                         </>
                     )
                 }
-                rhs={<LazyViz tabularResource={tabularResource} />}
+                rhs={
+                    <LazyViz
+                        tabularResource={tabularResource}
+                        displayNoPreview={displayNoPreview}
+                        mapDisplayPreview={mapDisplayPreview}
+                    />
+                }
             />
         </>
     )

@@ -12,7 +12,7 @@ import { OpenInButton } from './datafiles/OpenIn'
 import { Resource, View } from '@/interfaces/dataset.interface'
 import { getFormatColor } from '@/utils/formatColors'
 import { Index } from 'flexsearch'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
@@ -23,13 +23,19 @@ export function DataFiles({
     dataset,
     index,
     setTabularResource,
+    setDisplayNoPreview,
     tabularResource,
     isCurrentVersion,
     diffFields,
+    mapDisplaypreview,
+    setMapDisplayPreview,
 }: {
     dataset: WriDataset
     index: Index
     setTabularResource: (tabularResource: TabularResource | null) => void
+    setDisplayNoPreview: (displayNoPreview: boolean) => void
+    setMapDisplayPreview: (mapDisplaypreview: boolean) => void
+    mapDisplaypreview: boolean
     tabularResource: TabularResource | null
     isCurrentVersion?: boolean
     diffFields: Array<Record<string, { old_value: string; new_value: string }>>
@@ -100,6 +106,8 @@ export function DataFiles({
             <div className="flex flex-col gap-y-4">
                 {filteredDatafiles?.map((datafile, index) => (
                     <DatafileCard
+                        setMapDisplayPreview={setMapDisplayPreview}
+                        mapDisplaypreview={mapDisplaypreview}
                         tabularResource={tabularResource}
                         setTabularResource={setTabularResource}
                         key={datafile.id}
@@ -123,6 +131,8 @@ function DatafileCard({
     diffFields,
     isCurrentVersion,
     index,
+    mapDisplaypreview,
+    setMapDisplayPreview,
 }: {
     datafile: Resource
     dataset: WriDataset
@@ -131,6 +141,8 @@ function DatafileCard({
     isCurrentVersion?: boolean
     diffFields: Array<Record<string, { old_value: string; new_value: string }>>
     index: number
+    setMapDisplayPreview: (mapDisplaypreview: boolean) => void
+    mapDisplaypreview: boolean
 }) {
     const { activeCharts, addCharts, removeCharts } = useActiveCharts()
     const { data: activeLayers } = useLayersFromRW()
@@ -161,7 +173,10 @@ function DatafileCard({
     }
     const newDatafile = () => {
         if (diffFields && !isCurrentVersion) {
-            if (diffFields[index] && diffFields[index]?.undefined?.old_value === null) {
+            if (
+                diffFields[index] &&
+                diffFields[index]?.undefined?.old_value === null
+            ) {
                 return 'bg-yellow-200'
             }
         }
@@ -248,6 +263,11 @@ function DatafileCard({
                                             onClick={() => {
                                                 // @ts-ignore
                                                 if (datafile.rw_id) {
+                                                    if (!mapDisplaypreview) {
+                                                        setMapDisplayPreview(
+                                                            true
+                                                        )
+                                                    }
                                                     addLayerToLayerGroup(
                                                         // @ts-ignore
                                                         datafile.rw_id,

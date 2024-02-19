@@ -177,7 +177,7 @@ export const DatasetRouter = createTRPCRouter({
                     update_frequency: input.update_frequency?.value ?? '',
                     featured_image:
                         input.featured_image && input.featured_dataset
-                            ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
+                            ? `${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
                     resources: input.resources
@@ -527,7 +527,7 @@ export const DatasetRouter = createTRPCRouter({
                         featured_image:
                             input.featured_image && input.featured_dataset
                                 ? !isValidUrl(input.featured_image)
-                                    ? `${env.CKAN_URL}/uploads/group/${input.featured_image}`
+                                    ? `${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`
                                     : input.featured_image
                                 : null,
                         visibility_type: input.visibility_type?.value ?? '',
@@ -1364,7 +1364,7 @@ export const DatasetRouter = createTRPCRouter({
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             const dataset = (await getAllDatasetFq({
-                apiKey: ctx?.session?.user.apikey ?? '',
+                apiKey: '',
                 fq: `featured_dataset:true`,
                 query: input,
             }))!
@@ -1500,7 +1500,6 @@ export const DatasetRouter = createTRPCRouter({
                     input.dataset_id,
                     ctx.session.user.apikey
                 )
-                console.log('COLLAB IDS: ', collab)
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
                     creator_id: input.creator_id,
@@ -1760,6 +1759,7 @@ export const DatasetRouter = createTRPCRouter({
                             },
                         }
                     )
+                    console.log('ISSUES', issuesRes.status)
                     const issues: CkanResponse<{
                         count: number
                         results: Issue[]

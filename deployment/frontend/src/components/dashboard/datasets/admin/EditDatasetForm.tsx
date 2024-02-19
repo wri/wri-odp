@@ -127,6 +127,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             ...dataset,
             id: dataset.id,
             rw_id: dataset.rw_id,
+            author_email: dataset?.author_email ? dataset.author_email : null,
             rw_dataset: dataset.rw_id ? !!dataset.rw_id : !!dataset.rw_dataset,
             tags: dataset.tags ? dataset.tags.map((tag) => tag.name) : [],
             temporal_coverage_start: dataset.temporal_coverage_start
@@ -194,7 +195,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 `Successfully edited the "${title ?? name}" dataset`,
                 'success'
             )
-            window.location.href = '/dashboard/datasets';
+            window.location.href = '/dashboard/datasets'
         },
         onError: (error) => {
             setErrorMessage(error.message)
