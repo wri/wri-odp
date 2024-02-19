@@ -1061,7 +1061,7 @@ export async function getDatasetDetails({
             title: id,
             temporal_coverage_start: 1970,
             temporal_coverage_end: 1970,
-            visibility_type: 'private'
+            visibility_type: 'private',
         } as unknown as WriDataset
     }
 }
@@ -2515,8 +2515,8 @@ async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     const description = layerRw.data.attributes.description
     r.url = url
     r.name = name
-    r.title = title
-    r.description = description
+    r.title = r.name !== '' ? r.name : title
+    r.description = r.description !== '' ? r.description : description
     r.rw_id = layerRw.data.id
     r.format = 'Layer'
     return r
@@ -2546,8 +2546,8 @@ async function editLayerRw(r: ResourceFormType) {
                 )
             const title = layerRw.data.attributes.name
             const description = layerRw.data.attributes.description
-            r.title = title
-            r.description = description
+            r.title = r.title !== '' ? r.title : title
+            r.description = r.description !== '' ? r.description : description
             r.format = 'Layer'
             return r
         }
