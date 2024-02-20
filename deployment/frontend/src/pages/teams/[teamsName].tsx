@@ -125,19 +125,6 @@ export default function teams(
                     title: `${teamTitle} - Teams`,
                     description: `WRI Open Data Catalog Teams - ${teamTitle}`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/teams/${teamName}`,
-                    images: [
-                        {
-                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
-                            width: 800,
-                            height: 600,
-                            alt: 'Og Image Alt',
-                        },
-                    ],
-                }}
-                twitter={{
-                    handle: '@WorldResources',
-                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
-                    cardType: 'summary_large_image',
                 }}
             />
             <Header />

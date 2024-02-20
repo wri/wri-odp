@@ -119,19 +119,6 @@ export default function TopicPage(
                     title: `${topicTitle} - Teams`,
                     description: `WRI Open Data Catalog Topic - ${topicTitle}`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/topic/${topicName}`,
-                    images: [
-                        {
-                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
-                            width: 800,
-                            height: 600,
-                            alt: 'Og Image Alt',
-                        },
-                    ],
-                }}
-                twitter={{
-                    handle: '@WorldResources',
-                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
-                    cardType: 'summary_large_image',
                 }}
             />
             <Header />

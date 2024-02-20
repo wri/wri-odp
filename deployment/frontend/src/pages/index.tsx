@@ -20,19 +20,6 @@ export default function Home() {
                     title: `Home Page`,
                     description: `WRI Open Data Catalog - Home Page`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
-                    images: [
-                        {
-                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
-                            width: 800,
-                            height: 600,
-                            alt: 'Og Image Alt',
-                        },
-                    ],
-                }}
-                twitter={{
-                    handle: '@WorldResources',
-                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
-                    cardType: 'summary_large_image',
                 }}
             />
             <Hero />

@@ -18,6 +18,7 @@ import '@/styles/rte.css'
 import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
+import { env } from '@/env.mjs'
 
 const acumin = localFont({
     src: [
@@ -169,7 +170,24 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     return (
         <QueryClientProvider client={queryClient}>
-            <DefaultSeo titleTemplate="%s - WRI ODP" />
+            <DefaultSeo
+                titleTemplate="%s - WRI ODP"
+                openGraph={{
+                    images: [
+                        {
+                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
+                            width: 800,
+                            height: 600,
+                            alt: 'Og Image Alt',
+                        },
+                    ],
+                }}
+                twitter={{
+                    handle: '@WorldResources',
+                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
+                    cardType: 'summary_large_image',
+                }}
+            />
             <Hydrate
                 /* @ts-ignore */
                 state={pageProps.dehydratedState}

@@ -177,19 +177,6 @@ export default function SearchPage({
                     title: `Explore Data`,
                     description: `Explore WRI Open Data Catalog`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/search_advanced`,
-                    images: [
-                        {
-                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
-                            width: 800,
-                            height: 600,
-                            alt: 'Og Image Alt',
-                        },
-                    ],
-                }}
-                twitter={{
-                    handle: '@WorldResources',
-                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
-                    cardType: 'summary_large_image',
                 }}
             />
             <Search filters={filters} setFilters={setFilters} />
