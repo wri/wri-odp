@@ -187,8 +187,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         },
     })
 
-    console.log('EDITING ERRORS', formObj.formState.errors)
-
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
             notify(
@@ -326,7 +324,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         (data) => {
                             const diffLayerResources =
                                 dirtyFields?.resources?.filter(
-                                    (r) => !r?.layerObj && !r?.layerObjRaw
+                                    (r) => !r?.layerObj
                                 )
 
                             const newDirtyFields = {

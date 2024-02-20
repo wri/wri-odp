@@ -2211,7 +2211,7 @@ export async function approvePendingDataset(
     const resourcesToEditLayer = submittedDataset.rw_id
         ? await Promise.all(
               submittedDataset.resources
-                  .filter((r) => (r.layerObj || r.layerObjRaw) && r.rw_id)
+                  .filter((r) => (r.layerObj || r.layerObjRaw) && r.rw_id && r.url)
                   .map(async (r) => {
                       const rr = r as ResourceFormType
                       if (r.layerObj) {
@@ -2231,7 +2231,7 @@ export async function approvePendingDataset(
         rw_id !== null
             ? await Promise.allSettled(
                   submittedDataset.resources
-                      .filter((r) => (r.layerObj || r.layerObjRaw) && !r.rw_id)
+                      .filter((r) => (r.layerObj || r.layerObjRaw) && !r.url)
                       .map(async (r) => {
                           const rr = r as ResourceFormType
                           if (r.layerObj) {
@@ -2253,7 +2253,6 @@ export async function approvePendingDataset(
 
     // if there is some error, when creating layer, delete all layers and throw
     if (resourcesToCreateLayer.some((x) => x.status === 'rejected')) {
-        console.log('RESOURCES', resourcesToCreateLayer.filter(assertFullfilled).map((lp) => lp.value))
         const fulfilled = resourcesToCreateLayer
             .filter(assertFullfilled)
             .map((lp) => lp.value)
