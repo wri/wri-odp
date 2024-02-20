@@ -182,6 +182,9 @@ export const DatasetSchemaObject = z.object({
     spatial_address: z.string().optional(),
     spatial: z.any().optional(),
     spatial_type: z.enum(['address', 'geom']).optional(),
+    release_notes: z
+        .string()
+        .optional(),
 })
 
 export const DatasetSchema = DatasetSchemaObject.refine(

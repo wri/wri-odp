@@ -24,9 +24,7 @@ import { randomBytes } from 'crypto'
 import {
     RwDatasetResp,
     RwErrorResponse,
-    RwResponse,
     isRwError,
-    isRwLayerResp,
 } from '@/interfaces/rw.interface'
 import Team from '@/interfaces/team.interface'
 import Topic from '@/interfaces/topic.interface'
@@ -35,20 +33,21 @@ import type {
     NotificationType,
 } from '@/schema/notification.schema'
 import { Resource, View } from '@/interfaces/dataset.interface'
-import {
-    CreateViewFormSchema,
-    EditViewFormSchema,
-    ViewFormSchema,
-} from '@/schema/view.schema'
+import { CreateViewFormSchema, EditViewFormSchema } from '@/schema/view.schema'
 import { getLayerRw } from '@/server/api/routers/dataset'
 import {
-    convertFormToLayerObj,
     convertLayerObjToForm,
-    getApiSpecFromRawObj,
     getRawObjFromApiSpec,
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
 import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import { TRPCError } from '@trpc/server'
+import {
+    editLayerRw,
+    createLayerRw,
+    createDatasetRw,
+    deleteLayerRw,
+    assertFullfilled,
+} from './rwUtils'
 
 export async function searchHierarchy({
     isSysadmin,
@@ -916,15 +915,14 @@ export async function getOrganizationTreeDetails({
         {} as Record<string, GroupsmDetails>
     )
 
-    for ( const group in teamDetails) {
+    for (const group in teamDetails) {
         const team = teamDetails[group]!
         const packagedetails = (await getAllDatasetFq({
             apiKey: session?.user.apikey ?? '',
             fq: `organization:${team.name}+is_approved:true`,
-            query: {search: '', page: {start: 0, rows: 10000}},
+            query: { search: '', page: { start: 0, rows: 10000 } },
         }))!
         team.package_count = packagedetails.count
-        
     }
 
     if (input.search) {
@@ -982,15 +980,14 @@ export async function getTopicTreeDetails({
         {} as Record<string, GroupsmDetails>
     )
 
-    for ( const group in topicDetails) {
+    for (const group in topicDetails) {
         const topic = topicDetails[group]!
         const packagedetails = (await getAllDatasetFq({
             apiKey: session?.user.apikey ?? '',
             fq: `groups:${topic.name}+is_approved:true`,
-            query: {search: '', page: {start: 0, rows: 10000}},
+            query: { search: '', page: { start: 0, rows: 10000 } },
         }))!
         topic.package_count = packagedetails.count
-        
     }
     if (input.search) {
         groupTree = await searchHierarchy({
@@ -1028,22 +1025,44 @@ export async function getDatasetDetails({
     id: string
     session: Session | null
 }) {
-    const user = session?.user
-    const datasetRes = await fetch(
-        `${env.CKAN_URL}/api/action/package_show?id=${id}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `${user?.apikey ?? ''}`,
-            },
+    try {
+        const user = session?.user
+        let datasetRes = await fetch(
+            `${env.CKAN_URL}/api/action/package_show?id=${id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${user?.apikey ?? ''}`,
+                },
+            }
+        )
+        if (datasetRes.status !== 200) {
+            datasetRes = await fetch(
+                `${env.CKAN_URL}/api/action/package_show?id=${id}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${user?.apikey ?? ''}`,
+                    },
+                }
+            )
         }
-    )
-    const dataset: CkanResponse<WriDataset> = await datasetRes.json()
-    if (!dataset.success && dataset.error) {
-        if (dataset.error.message) throw Error(dataset.error.message)
-        throw Error(JSON.stringify(dataset.error))
+        const dataset: CkanResponse<WriDataset> = await datasetRes.json()
+        if (!dataset.success && dataset.error) {
+            if (dataset.error.message) throw Error(dataset.error.message)
+            throw Error(JSON.stringify(dataset.error))
+        }
+        return dataset.result
+    } catch (e) {
+        return {
+            id,
+            name: id,
+            title: id,
+            temporal_coverage_start: 1970,
+            temporal_coverage_end: 1970,
+            visibility_type: 'private',
+        } as unknown as WriDataset
     }
-    return dataset.result
 }
 
 function cryptoRandomFloat(): number {
@@ -1922,7 +1941,7 @@ export async function sendGroupNotification({
         }
     } catch (error) {
         console.error(error)
-        throw Error('Error in sending issue /comment notification')
+        throw Error('Error in sending issue/comment notification')
     }
 }
 
@@ -2147,23 +2166,6 @@ export async function approvePendingDataset(
         submittedDataset.is_approved = true
     }
 
-    // delete pending dataset
-    const deleteResponse = await fetch(
-        `${env.CKAN_URL}/api/3/action/pending_dataset_delete`,
-        {
-            method: 'POST',
-            body: JSON.stringify({ package_id: datasetId }),
-            headers: {
-                Authorization: `${env.SYS_ADMIN_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-        }
-    )
-
-    const deleteData = (await deleteResponse.json()) as CkanResponse<null>
-    if (!deleteData.success && deleteData.error)
-        throw Error(JSON.stringify(deleteData.error).concat('pending_delete'))
-
     // fix datastore not working for initial csv
     const initialdataset = await getOneDataset(datasetId, session)
     const InitialresourcesWithoutLayer = initialdataset.resources.filter(
@@ -2209,7 +2211,7 @@ export async function approvePendingDataset(
     const resourcesToEditLayer = submittedDataset.rw_id
         ? await Promise.all(
               submittedDataset.resources
-                  .filter((r) => (r.layerObj || r.layerObjRaw) && r.rw_id)
+                  .filter((r) => (r.layerObj || r.layerObjRaw) && r.rw_id && r.url)
                   .map(async (r) => {
                       const rr = r as ResourceFormType
                       if (r.layerObj) {
@@ -2227,9 +2229,9 @@ export async function approvePendingDataset(
 
     const resourcesToCreateLayer =
         rw_id !== null
-            ? await Promise.all(
+            ? await Promise.allSettled(
                   submittedDataset.resources
-                      .filter((r) => (r.layerObj || r.layerObjRaw) && !r.rw_id)
+                      .filter((r) => (r.layerObj || r.layerObjRaw) && !r.url)
                       .map(async (r) => {
                           const rr = r as ResourceFormType
                           if (r.layerObj) {
@@ -2249,9 +2251,27 @@ export async function approvePendingDataset(
               )
             : []
 
+    // if there is some error, when creating layer, delete all layers and throw
+    if (resourcesToCreateLayer.some((x) => x.status === 'rejected')) {
+        const fulfilled = resourcesToCreateLayer
+            .filter(assertFullfilled)
+            .map((lp) => lp.value)
+        await Promise.all(fulfilled.map(async (l) => await deleteLayerRw(l)))
+        const errorString = resourcesToCreateLayer.reduce((acc, cur) => {
+            if (cur.status === 'rejected') {
+                return acc + ' - ' + cur.reason
+            }
+            return acc
+        }, '')
+        throw Error(errorString)
+    }
+
+    // filter fulfillped promises so typescript doesnt complain
     const resources = [
         ...resourcesWithoutLayer,
-        ...resourcesToCreateLayer,
+        ...resourcesToCreateLayer
+            .filter(assertFullfilled)
+            .map((lp) => lp.value),
         ...resourcesToEditLayer,
     ]
 
@@ -2359,6 +2379,23 @@ export async function approvePendingDataset(
             throw Error('Error in sending issue /comment notification')
         }
     }
+
+    // delete pending dataset
+    const deleteResponse = await fetch(
+        `${env.CKAN_URL}/api/3/action/pending_dataset_delete`,
+        {
+            method: 'POST',
+            body: JSON.stringify({ package_id: datasetId }),
+            headers: {
+                Authorization: `${env.SYS_ADMIN_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+
+    const deleteData = (await deleteResponse.json()) as CkanResponse<null>
+    if (!deleteData.success && deleteData.error)
+        throw Error(JSON.stringify(deleteData.error).concat('pending_delete'))
     return dataset.result
 }
 
@@ -2424,6 +2461,7 @@ export const datasetFields = [
     'methodology',
     'cautions',
     'function',
+    'release_notes',
 ]
 
 export function filterDatasetFields(dataset: any) {
@@ -2435,110 +2473,6 @@ export function filterDatasetFields(dataset: any) {
     }
     return filteredDataset
 }
-
-async function createDatasetRw(dataset: DatasetFormType) {
-    const rwDataset: Record<string, any> = {
-        name: dataset.title ?? '',
-        connectorType: dataset.connectorType,
-        provider: dataset.provider,
-        published: false,
-        env: 'staging',
-        application: ['data-explorer'],
-    }
-    if (dataset.provider === 'gee') {
-        rwDataset.tableName = dataset.tableName
-    } else {
-        rwDataset.connectorUrl = dataset.connectorUrl
-    }
-    const body = JSON.stringify({ dataset: rwDataset })
-    const datasetRwRes = await fetch(
-        'https://api.resourcewatch.org/v1/dataset',
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${env.RW_API_KEY}`,
-            },
-            body,
-        }
-    )
-    const datasetRw: RwResponse = await datasetRwRes.json()
-    if (isRwError(datasetRw)) throw new Error(JSON.stringify(datasetRw.errors))
-    return datasetRw
-}
-
-async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
-    if (!r.layerObj && !r.layerObjRaw) return r
-    const body = r.layerObj
-        ? JSON.stringify(convertFormToLayerObj(r.layerObj))
-        : JSON.stringify({
-              ...getApiSpecFromRawObj(r.layerObjRaw),
-          })
-    const layerRwRes = await fetch(
-        `https://api.resourcewatch.org/v1/dataset/${datasetRwId}/layer`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${env.RW_API_KEY}`,
-            },
-            body,
-        }
-    )
-    const layerRw: RwResponse = await layerRwRes.json()
-    if (isRwError(layerRw)) throw new Error(JSON.stringify(layerRw.errors))
-    if (!isRwLayerResp(layerRw)) throw new Error('Invalid response from RW API')
-    const url = `https://api.resourcewatch.org/v1/dataset/${layerRw.data.attributes.dataset}/layer/${layerRw.data.id}`
-    const name = layerRw.data.id
-    const title = layerRw.data.attributes.name
-    const description = layerRw.data.attributes.description
-    r.url = url
-    r.name = name
-    r.title = title
-    r.description = description
-    r.rw_id = layerRw.data.id
-    r.format = 'Layer'
-    return r
-}
-
-async function editLayerRw(r: ResourceFormType) {
-    if ((!r.layerObj && !r.layerObjRaw) || !r.rw_id) return r
-    try {
-        if ((r.layerObj || r.layerObjRaw) && r.url) {
-            const body = r.layerObj
-                ? JSON.stringify(convertFormToLayerObj(r.layerObj))
-                : JSON.stringify(getApiSpecFromRawObj(r.layerObjRaw))
-            const layerRwRes = await fetch(r.url, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${env.RW_API_KEY}`,
-                },
-                body,
-            })
-            const layerRw: RwResponse = await layerRwRes.json()
-            if (isRwError(layerRw))
-                throw Error(
-                    `Error creating resource at the Resource Watch API - (${JSON.stringify(
-                        layerRw.errors
-                    )})`
-                )
-            const title = layerRw.data.attributes.name
-            const description = layerRw.data.attributes.description
-            r.title = title
-            r.description = description
-            r.format = 'Layer'
-            return r
-        }
-    } catch (e) {
-        let error =
-            'Something went wrong when we tried to create some resources in the Resource Watch API please contact the system administrator'
-        if (e instanceof Error) error = e.message
-        throw Error(error)
-    }
-    return r
-}
-
 export async function fetchDatasetCollabIds(
     datasetId: string,
     userApiKey: string
@@ -2571,4 +2505,19 @@ export async function fetchDatasetCollabIds(
     }
 
     return collaborators.result.map((collaborator) => collaborator.user_id)
+}
+
+export async function getDatasetReleaseNotes({ id }: { id: string }) {
+    const url = `${env.CKAN_URL}/api/3/action/dataset_release_notes?id=${id}`
+    const response = await fetch(url, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+    const releaseNotes: CkanResponse<
+        { release_notes: string; date: string }[]
+    > = await response.json()
+
+    return releaseNotes.result
 }

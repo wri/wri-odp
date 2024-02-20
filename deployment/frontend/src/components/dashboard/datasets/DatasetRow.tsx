@@ -35,6 +35,10 @@ function subFields(dataset: WriDataset) {
             title: 'Team',
             description: dataset?.organization?.title,
         },
+        {
+            title: 'Release Notes',
+            description: dataset?.release_notes,
+        },
     ]
 }
 

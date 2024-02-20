@@ -27,6 +27,7 @@ import { LocationForm } from './metadata/LocationForm'
 import Modal from '@/components/_shared/Modal'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
+import { VersioningForm } from './metadata/VersioningForm'
 
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -133,6 +134,7 @@ export default function CreateDatasetForm() {
                             <PointOfContactForm formObj={formObj} />
                             <MoreDetailsForm formObj={formObj} />
                             <OpenInForm formObj={formObj} />
+                            <VersioningForm formObj={formObj} />
                             <CustomFieldsForm formObj={formObj} />
                         </form>
                     </Tab.Panel>

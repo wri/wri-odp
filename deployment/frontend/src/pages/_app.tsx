@@ -19,7 +19,6 @@ import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
 
-
 const acumin = localFont({
     src: [
         {
@@ -76,7 +75,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
     let activeLayerGroups =
         initialZustandState?.mapView?.activeLayerGroups || []
 
-    let prevLayerGroups = []
     const layerAsLayerObj = new Map()
     const tempLayerAsLayerobj = new Map()
 
@@ -85,29 +83,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
             .filter((r: any) => r?.format == 'Layer')
             .map((r: any) => r?.rw_id)
 
-        if (layers) {
-            activeLayerGroups.push({
-                layers: layers || [],
-                datasetId: dataset.id,
-            })
-        }
-
         for (const resource of dataset?.resources) {
-            if (
-                (resource['layerObj'] || resource['layerObjRaw']) &&
-                !resource.url
-            ) {
-                layerAsLayerObj.set(resource.rw_id, 'pending')
-            } else {
-                layerAsLayerObj.set(resource.rw_id, 'approved')
-            }
-        }
-    }
-
-    if (initialZustandState && initialZustandState?.relatedDatasets.length) {
-        const datasets = initialZustandState?.relatedDatasets
-        for (const dataset of datasets) {
-            for (const resource of dataset?.resources) {
+            if (resource.format == 'Layer') {
                 if (
                     (resource['layerObj'] || resource['layerObjRaw']) &&
                     !resource.url
@@ -120,6 +97,24 @@ const MyApp: AppType<{ session: Session | null }> = ({
         }
     }
 
+    if (initialZustandState && initialZustandState?.relatedDatasets.length) {
+        const datasets = initialZustandState?.relatedDatasets
+        for (const dataset of datasets) {
+            for (const resource of dataset?.resources) {
+                if (resource.format == 'Layer') {
+                    if (
+                        (resource['layerObj'] || resource['layerObjRaw']) &&
+                        !resource.url
+                    ) {
+                        layerAsLayerObj.set(resource.rw_id, 'pending')
+                    } else {
+                        layerAsLayerObj.set(resource.rw_id, 'approved')
+                    }
+                }
+            }
+        }
+    }
+
     if (
         initialZustandState &&
         initialZustandState?.prevRelatedDatasets.length
@@ -127,13 +122,15 @@ const MyApp: AppType<{ session: Session | null }> = ({
         const datasets = initialZustandState?.prevRelatedDatasets
         for (const dataset of datasets) {
             for (const resource of dataset?.resources) {
-                if (
-                    (resource['layerObj'] || resource['layerObjRaw']) &&
-                    !resource.url
-                ) {
-                    tempLayerAsLayerobj.set(resource.rw_id, 'pending')
-                } else {
-                    tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                if (resource.format == 'Layer') {
+                    if (
+                        (resource['layerObj'] || resource['layerObjRaw']) &&
+                        !resource.url
+                    ) {
+                        tempLayerAsLayerobj.set(resource.rw_id, 'pending')
+                    } else {
+                        tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                    }
                 }
             }
         }
@@ -144,21 +141,16 @@ const MyApp: AppType<{ session: Session | null }> = ({
             .filter((r: any) => r?.format == 'Layer')
             .map((r: any) => r?.rw_id)
 
-        if (layers) {
-            prevLayerGroups.push({
-                layers: layers || [],
-                datasetId: prevdataset.id,
-            })
-        }
-
         for (const resource of prevdataset?.resources) {
-            if (
-                resource['layerObj'] ||
-                (resource['layerObjRaw'] && !resource.url)
-            ) {
-                tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')
-            } else {
-                tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+            if (resource.format == 'Layer') {
+                if (
+                    resource['layerObj'] ||
+                    (resource['layerObjRaw'] && !resource.url)
+                ) {
+                    tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')
+                } else {
+                    tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                }
             }
         }
     }
@@ -167,7 +159,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
         ...initialZustandState,
         layerAsLayerObj: layerAsLayerObj,
         tempLayerAsLayerobj: tempLayerAsLayerobj,
-        prevLayerGroups: prevLayerGroups,
         mapView: {
             ...initialZustandState?.mapView,
             basemap: initialZustandState?.mapView?.basemap ?? 'dark',
@@ -187,7 +178,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     <SessionProvider session={session}>
                         <ReactToastContainer />
                         <main className={`${acumin.variable} font-sans`}>
-                            <Component {...pageProps}  />
+                            <Component {...pageProps} />
                         </main>
                     </SessionProvider>
                 </Provider>

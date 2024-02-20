@@ -15,7 +15,7 @@ import {
 import Link from 'next/link'
 import { OpenIn, WriDataset } from '@/schema/ckan.schema'
 import { Menu, Transition } from '@headlessui/react'
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import classNames from '@/utils/classnames'
 import { getFormatColor } from '@/utils/formatColors'
 import { useSession } from 'next-auth/react'
@@ -570,8 +570,13 @@ export function DatasetHeader({
                     {session.data?.user ? (
                         dataset?.technical_notes ? (
                             <div
-                                className={classNames('flex items-center rounded-[3px] border border-green-500 bg-green-500', highlighted(
-                                    'technical_notes'), highlighted('technical_notes') !== '' ? 'border-yellow-200' : '')}
+                                className={classNames(
+                                    'flex items-center rounded-[3px] border border-green-500 bg-green-500',
+                                    highlighted('technical_notes'),
+                                    highlighted('technical_notes') !== ''
+                                        ? 'border-yellow-200'
+                                        : ''
+                                )}
                             >
                                 <div className="px-2 font-acumin text-xs font-medium text-white">
                                     RDI approved
@@ -579,8 +584,13 @@ export function DatasetHeader({
                             </div>
                         ) : (
                             <div
-                                className={classNames('flex items-center rounded-[3px] border border-orange-400 bg-orange-400', highlighted(
-                                    'technical_notes'), highlighted('technical_notes') !== '' ? 'border-yellow-200' : '')}
+                                className={classNames(
+                                    'flex items-center rounded-[3px] border border-orange-400 bg-orange-400',
+                                    highlighted('technical_notes'),
+                                    highlighted('technical_notes') !== ''
+                                        ? 'border-yellow-200'
+                                        : ''
+                                )}
                             >
                                 <div className="px-2 font-acumin text-xs font-medium text-white">
                                     Awaiting RDI approval
