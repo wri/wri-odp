@@ -1061,7 +1061,7 @@ export async function getDatasetDetails({
             title: id,
             temporal_coverage_start: 1970,
             temporal_coverage_end: 1970,
-            visibility_type: 'private'
+            visibility_type: 'private',
         } as unknown as WriDataset
     }
 }
@@ -1942,7 +1942,7 @@ export async function sendGroupNotification({
         }
     } catch (error) {
         console.error(error)
-        throw Error('Error in sending issue /comment notification')
+        throw Error('Error in sending issue/comment notification')
     }
 }
 
@@ -2444,6 +2444,7 @@ export const datasetFields = [
     'methodology',
     'cautions',
     'function',
+    'release_notes'
 ]
 
 export function filterDatasetFields(dataset: any) {
@@ -2514,8 +2515,8 @@ async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     const description = layerRw.data.attributes.description
     r.url = url
     r.name = name
-    r.title = title
-    r.description = description
+    r.title = r.name !== '' ? r.name : title
+    r.description = r.description !== '' ? r.description : description
     r.rw_id = layerRw.data.id
     r.format = 'Layer'
     return r
@@ -2545,8 +2546,8 @@ async function editLayerRw(r: ResourceFormType) {
                 )
             const title = layerRw.data.attributes.name
             const description = layerRw.data.attributes.description
-            r.title = title
-            r.description = description
+            r.title = r.title !== '' ? r.title : title
+            r.description = r.description !== '' ? r.description : description
             r.format = 'Layer'
             return r
         }
@@ -2591,4 +2592,21 @@ export async function fetchDatasetCollabIds(
     }
 
     return collaborators.result.map((collaborator) => collaborator.user_id)
+}
+
+
+export async function getDatasetReleaseNotes({ id }: { id: string }) {
+    const url = `${env.CKAN_URL}/api/3/action/dataset_release_notes?id=${id}`;
+    const response = await fetch(
+        url,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+
+    const releaseNotes: CkanResponse<{ release_notes: string, date: string }[]> = await response.json()
+
+    return releaseNotes.result
 }

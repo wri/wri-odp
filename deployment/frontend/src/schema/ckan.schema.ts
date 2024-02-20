@@ -122,6 +122,7 @@ export interface WriDataset extends Dataset {
     resources: Resource[]
     rw_dataset?: boolean
     is_approved?: boolean
+    release_notes: string
 }
 
 export interface Extra {

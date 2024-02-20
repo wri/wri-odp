@@ -19,6 +19,7 @@ import {
 import { User, WriDataset } from '@/schema/ckan.schema'
 import { formatDate, formatDiff } from '@/utils/general'
 import Spinner from '@/components/_shared/Spinner'
+
 import { match, P } from 'ts-pattern'
 import {
     Popover,
@@ -80,6 +81,10 @@ function filteredDataset(dataset: WriDataset) {
         {
             title: 'Update Frequency',
             description: dataset?.update_frequency ?? '',
+        },
+        {
+            title: 'Release Notes',
+            description: dataset?.release_notes ?? '',
         },
     ]
 }

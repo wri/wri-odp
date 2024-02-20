@@ -367,7 +367,12 @@ export function OverviewForm({
                         <ErrorDisplay name="license" errors={errors} />
                     </InputGroup>
 
-                    <div className="flex items-end flex-col justify-end space-y-5">
+                    <div
+                        className={classNames(
+                            'items-end flex-col justify-end space-y-5',
+                            watch('visibility_type') && watch('visibility_type')?.value === 'public' ? 'flex' : 'hidden'
+                        )}
+                    >
                         <div className="relative flex justify-end">
                             <div className="flex h-6 items-center">
                                 <input

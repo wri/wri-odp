@@ -75,11 +75,21 @@ export function ImageUploader({
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
         const files = e.target.files
         if (!files || !files[0]) return
-        uppy.addFile({
-            name: files[0].name,
-            type: files[0].type,
-            data: files[0],
-        })
+        try {
+            uppy.addFile({
+                name: files[0].name,
+                type: files[0].type,
+                data: files[0],
+            })
+        } catch (e) {
+            const firstFile = uppy.getFiles()[0]
+            uppy.removeFile(firstFile?.id ?? '')
+            uppy.addFile({
+                name: files[0].name,
+                type: files[0].type,
+                data: files[0],
+            })
+        }
         upload()
     }
 
@@ -161,23 +171,25 @@ export function ImageUploader({
                     </>
                 )}
             </button>
-            {clearImage && (presignedGetUrl.data || defaultImage) && !uploading && (
-                <div className="w-full flex justify-end">
-                    <Button
-                        type="button"
-                        variant="destructive"
-                        className="w-fit my-2"
-                        size="sm"
-                        onClick={() => {
-                            clearImage()
-                            setKey(null)
-                        }}
-                    >
-                        <MinusCircleIcon className="h-5 w-5 text-white mr-2" />{' '}
-                        Remove Image
-                    </Button>
-                </div>
-            )}
+            {clearImage &&
+                (presignedGetUrl.data || defaultImage) &&
+                !uploading && (
+                    <div className="w-full flex justify-end">
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            className="w-fit my-2"
+                            size="sm"
+                            onClick={() => {
+                                clearImage()
+                                setKey(null)
+                            }}
+                        >
+                            <MinusCircleIcon className="h-5 w-5 text-white mr-2" />{' '}
+                            Remove Image
+                        </Button>
+                    </div>
+                )}
         </>
     )
 }
