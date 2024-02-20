@@ -15,6 +15,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
+import { env } from '@/env.mjs'
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
@@ -72,7 +73,29 @@ export default function TeamsPage(
 
     return (
         <>
-            <NextSeo title="Teams" />
+            <NextSeo
+                title="Teams"
+                description="WRI Open Data Catalog Teams"
+                openGraph={{
+                    title: 'Teams',
+                    description: 'WRI Open Data Catalog Teams',
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/teams`,
+                    type: 'website',
+                    images: [
+                        {
+                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
+                            width: 800,
+                            height: 600,
+                            alt: 'Og Image Alt',
+                        },
+                    ],
+                }}
+                twitter={{
+                    handle: '@WorldResources',
+                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
+                    cardType: 'summary_large_image',
+                }}
+            />
             <Header />
             <TeamsSearch
                 isLoading={isLoading}

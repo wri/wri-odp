@@ -9,6 +9,8 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
+import { env } from '@/env.mjs'
+import { NextSeo } from 'next-seo'
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
@@ -35,6 +37,28 @@ export default function topics(
 ) {
     return (
         <>
+            <NextSeo
+                title={`Users - Dashboard`}
+                description={`Users - Dashboard -- WRI Open Data Catalog`}
+                openGraph={{
+                    title: `Users - Dashboard`,
+                    description: `Users - Dashboard -- WRI Open Data Catalog`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/users`,
+                    images: [
+                        {
+                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
+                            width: 800,
+                            height: 600,
+                            alt: 'Og Image Alt',
+                        },
+                    ],
+                }}
+                twitter={{
+                    handle: '@WorldResources',
+                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
+                    cardType: 'summary_large_image',
+                }}
+            />
             <Header />
             <Layout>
                 <UserList />

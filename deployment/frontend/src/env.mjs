@@ -49,6 +49,7 @@ export const env = createEnv({
      */
     client: {
         NEXT_PUBLIC_CKAN_URL: z.string(),
+        NEXT_PUBLIC_NEXTAUTH_URL: z.string(),
     },
 
     /**
@@ -76,6 +77,7 @@ export const env = createEnv({
         SMTP_USER: process.env.SMTP_USER,
         SMTP_PASSWORD: process.env.SMTP_PASSWORD,
         SMTP_FROM: process.env.SMTP_FROM,
+        NEXT_PUBLIC_NEXTAUTH_URL: process.env.NEXTAUTH_URL
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

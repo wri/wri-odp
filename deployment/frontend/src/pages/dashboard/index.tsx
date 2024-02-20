@@ -1,46 +1,70 @@
 import React from 'react'
 import Header from '@/components/_shared/Header'
-import Layout from "@/components/dashboard/Layout";
-import Dashboard from '@/components/dashboard/Dashboard';
-import Footer from "@/components/_shared/Footer";
-import { getServerAuthSession } from "../../server/auth";
-import type { GetServerSideProps } from "next";
-import {NextSeo} from 'next-seo';
+import Layout from '@/components/dashboard/Layout'
+import Dashboard from '@/components/dashboard/Dashboard'
+import Footer from '@/components/_shared/Footer'
+import { getServerAuthSession } from '../../server/auth'
+import type { GetServerSideProps } from 'next'
+import { NextSeo } from 'next-seo'
+import { env } from '@/env.mjs'
 
 export default function index() {
-  return (
-    <>
-      <NextSeo title={`Dashboard`} />
-      <Header />
-      <Layout >
-        <Dashboard />
-      </Layout>
-      <Footer
-        links={{
-          primary: { title: "Advanced Search", href: "/search" },
-          secondary: { title: "Explore Topics", href: "/topics" },
-        }}
-        style='mt-0'
-      />
-    </>
-  )
+    return (
+        <>
+            <NextSeo
+                title={`Dashboard`}
+                noindex={true}
+                nofollow={true}
+                description={`Dashboard - WRI Open Data Catalog`}
+                openGraph={{
+                    title: `Dashboard`,
+                    description: `Dashboard - WRI Open Data Catalog`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard`,
+                    images: [
+                        {
+                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
+                            width: 800,
+                            height: 600,
+                            alt: 'Og Image Alt',
+                        },
+                    ],
+                }}
+                twitter={{
+                    handle: '@WorldResources',
+                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
+                    cardType: 'summary_large_image',
+                }}
+            />
+            <Header />
+            <Layout>
+                <Dashboard />
+            </Layout>
+            <Footer
+                links={{
+                    primary: { title: 'Advanced Search', href: '/search' },
+                    secondary: { title: 'Explore Topics', href: '/topics' },
+                }}
+                style="mt-0"
+            />
+        </>
+    )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerAuthSession(context);
+    const session = await getServerAuthSession(context)
 
-  if (!session) {
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/auth/signin',
+                permanent: false,
+            },
+        }
+    }
+
     return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      session,
-    },
-  };
-};
+        props: {
+            session,
+        },
+    }
+}

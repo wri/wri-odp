@@ -18,6 +18,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
+import { env } from '@/env.mjs'
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
@@ -76,7 +77,29 @@ export default function TopicsPage(
 
     return (
         <>
-            <NextSeo title="Topics" />
+            <NextSeo
+                title="Topics"
+                description="WRI Open Data Catalog Topics"
+                openGraph={{
+                    title: 'Topics',
+                    description: 'WRI Open Data Catalog Topics',
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/topics`,
+                    type: 'website',
+                    images: [
+                        {
+                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
+                            width: 800,
+                            height: 600,
+                            alt: 'Og Image Alt',
+                        },
+                    ],
+                }}
+                twitter={{
+                    handle: '@WorldResources',
+                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
+                    cardType: 'summary_large_image',
+                }}
+            />
             <Header />
             <TopicsSearch
                 isLoading={isLoading}

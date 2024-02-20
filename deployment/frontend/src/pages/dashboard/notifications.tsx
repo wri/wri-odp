@@ -8,6 +8,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
+import { env } from '@/env.mjs'
 
 import { getServerAuthSession } from '@/server/auth'
 
@@ -29,7 +30,28 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 export default function Notifications() {
     return (
         <>
-            <NextSeo title={`Notifications - Dashboard`} />
+            <NextSeo
+                title={`Notifications - Dashboard`}
+                description={`Notifications - Dashboard -- WRI Open Data Catalog`}
+                openGraph={{
+                    title: `Notifications - Dashboard`,
+                    description: `Notifications - Dashboard -- WRI Open Data Catalog`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/notifications`,
+                    images: [
+                        {
+                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
+                            width: 800,
+                            height: 600,
+                            alt: 'Og Image Alt',
+                        },
+                    ],
+                }}
+                twitter={{
+                    handle: '@WorldResources',
+                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
+                    cardType: 'summary_large_image',
+                }}
+            />
             <Header />
             <Layout>
                 <NotificationList />
