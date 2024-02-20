@@ -237,6 +237,11 @@ dataset_fields:
   label: Open In
   form_placeholder: 'eg. {"title": "External site", "url": "http://example.com"}'
 
+- field_name: release_notes
+  label: Release Notes
+  form_snippet: markdown.html
+  form_placeholder: eg. A description of the dataset changes
+
 resource_fields:
   - field_name: url
     label: URL

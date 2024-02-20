@@ -191,6 +191,21 @@ export function Preview({
                             </div>
                         </div>
                     )}
+                    {watch('release_notes') && (
+                        <div className="border-b border-stone-50 py-8 pb-6">
+                            <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
+                                Versioning
+                            </h3>
+                            <div>
+                                <dl className="flex flex-col gap-y-6">
+                                    <SimpleDescription
+                                        label="Release Notes"
+                                        text={watch('release_notes') ?? '_'}
+                                    />
+                                </dl>
+                            </div>
+                        </div>
+                    )}
                     {(watch('function') ||
                         watch('restrictions') ||
                         watch('learn_more') ||
@@ -265,8 +280,8 @@ export function Preview({
                                     add a chart.
                                 </li>
                                 <li>
-                                    Charts views cannot be created while the dataset
-                                    is awaiting approval
+                                    Charts views cannot be created while the
+                                    dataset is awaiting approval
                                 </li>
                             </ul>
                         }

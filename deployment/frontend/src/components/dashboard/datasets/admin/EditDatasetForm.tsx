@@ -39,6 +39,7 @@ import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
 import { EditRwSection } from './datafiles/EditRwSection'
 import form from '@/components/vizzuality/1.3-components/form'
+import { VersioningForm } from './metadata/VersioningForm'
 
 function getDiff<T>(dirtyObject: T, changedFields: string[]) {
     for (const key in dirtyObject) {
@@ -126,6 +127,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             ...dataset,
             id: dataset.id,
             rw_id: dataset.rw_id,
+            author_email: dataset?.author_email ? dataset.author_email : null,
             rw_dataset: dataset.rw_id ? !!dataset.rw_id : !!dataset.rw_dataset,
             tags: dataset.tags ? dataset.tags.map((tag) => tag.name) : [],
             temporal_coverage_start: dataset.temporal_coverage_start
@@ -185,15 +187,13 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         },
     })
 
-    console.log('EDITING ERRORS', formObj.formState.errors)
-
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
             notify(
                 `Successfully edited the "${title ?? name}" dataset`,
                 'success'
             )
-            window.location.href = '/dashboard/datasets';
+            window.location.href = '/dashboard/datasets'
         },
         onError: (error) => {
             setErrorMessage(error.message)
@@ -266,6 +266,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 <PointOfContactForm formObj={formObj} />
                                 <MoreDetailsForm formObj={formObj} />
                                 <OpenInForm formObj={formObj} />
+                                <VersioningForm formObj={formObj} />
                                 <CustomFieldsForm formObj={formObj} />
                             </form>
                         </Tab.Panel>
@@ -323,7 +324,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         (data) => {
                             const diffLayerResources =
                                 dirtyFields?.resources?.filter(
-                                    (r) => !r?.layerObj && !r?.layerObjRaw
+                                    (r) => !r?.layerObj
                                 )
 
                             const newDirtyFields = {

@@ -75,7 +75,6 @@ export default function ApprovalRequestCard({
         },
         onError: (error) => {
             setErrorMessage(error.message)
-            setApproveOpen(false)
         },
     })
     const createIssueApi = api.dataset.createIssue.useMutation({
@@ -225,6 +224,11 @@ export default function ApprovalRequestCard({
                         Cancel
                     </Button>
                 </div>
+                {errorMessage && (
+                    <div className="py-4">
+                        <ErrorAlert text={errorMessage} />
+                    </div>
+                )}
             </Modal>
         </>
     )
