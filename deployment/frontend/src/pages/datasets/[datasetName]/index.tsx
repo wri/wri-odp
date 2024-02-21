@@ -26,11 +26,11 @@ import { Tab } from '@headlessui/react'
 import { Index } from 'flexsearch'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { useSession } from 'next-auth/react'
-import { NextSeo } from 'next-seo'
+import { NextSeo, DatasetJsonLd } from 'next-seo'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-
+import { env } from '@/env.mjs'
 import SyncUrl from '@/components/_shared/map/SyncUrl'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
 import { useIsAddingLayers } from '@/utils/storeHooks'
@@ -44,7 +44,6 @@ import { Versioning } from '@/components/datasets/sections/Versioning'
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
 import { Resource, View } from '@/interfaces/dataset.interface'
 import { useLayersFromRW } from '@/utils/queryHooks'
-
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -158,9 +157,10 @@ export async function getServerSideProps(
         if (!dataset?.resources) {
             dataset.resources = []
         }
-
+        const NEXTURL = env.NEXTAUTH_URL
         return {
             props: {
+                NEXTURL,
                 dataset: JSON.stringify({
                     ...dataset,
                     spatial: dataset.spatial ?? null,
@@ -220,6 +220,7 @@ export default function DatasetPage(
     const isPendingState = props.isPendingState!
     const is_approved = props.is_approved!
     const approvalAuth = props.approvalAuth!
+    const NEXTURL = props.NEXTURL!
     const router = useRouter()
     const { query } = router
     const isApprovalRequest =
@@ -532,6 +533,31 @@ export default function DatasetPage(
             <SyncUrl />
             <NextSeo
                 title={`${datasetData?.title ?? datasetData?.name} - Datasets`}
+                description={`${datasetData?.short_description} `}
+                openGraph={{
+                    title: `${
+                        datasetData?.title ?? datasetData?.name
+                    } - Datasets`,
+                    description: `${datasetData?.short_description} `,
+                    url: `${NEXTURL}/datasets/${datasetData?.name}`,
+                    images: [
+                        {
+                            url: `${NEXTURL}/images/WRI_logo_4c.png`,
+                            width: 800,
+                            height: 600,
+                            alt: 'Og Image Alt',
+                        },
+                    ],
+                }}
+                twitter={{
+                    handle: '@WorldResources',
+                    site: `${NEXTURL}`,
+                    cardType: 'summary_large_image',
+                }}
+            />
+            <DatasetJsonLd
+                description={`${datasetData?.short_description} `}
+                name={`${datasetData?.title ?? datasetData?.name} - Datasets`}
             />
             <Header />
             <Breadcrumbs links={links} />

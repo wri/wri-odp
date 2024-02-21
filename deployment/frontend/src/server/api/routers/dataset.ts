@@ -1766,7 +1766,6 @@ export const DatasetRouter = createTRPCRouter({
                             },
                         }
                     )
-                    console.log('ISSUES', issuesRes.status)
                     const issues: CkanResponse<{
                         count: number
                         results: Issue[]
