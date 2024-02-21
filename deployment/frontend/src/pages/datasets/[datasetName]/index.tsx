@@ -380,7 +380,7 @@ export default function DatasetPage(
                     ...resourceDiff,
                     [resource]: {
                         ...resourceDiff[resource],
-                        [field]: diffData[current]!,
+                        [field]: diffData.diff[current]!,
                     },
                 }
             }
