@@ -1,3 +1,4 @@
+import { ListBulletIcon } from "@heroicons/react/24/outline";
 import React from "react";
 
 export const Bold = ({ size = 16, color = "currentColor" }) => (
@@ -149,3 +150,4 @@ export const X = ({ size = 16, color = "currentColor" }) => (
   </svg>
 );
 
+export const ListItem = ListBulletIcon 
