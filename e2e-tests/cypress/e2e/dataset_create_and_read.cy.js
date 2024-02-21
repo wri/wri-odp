@@ -56,8 +56,7 @@ describe("Create dataset", () => {
       force: true,
     });
     cy.get("textarea[name=short_description]").type("test");
-    cy.contains("Description").parent().parent().as("description")
-    cy.get("@description").get(".tiptap.ProseMirror").type("RICH TEXT EDITOR");
+    cy.contains("Description").parent().parent().find(".tiptap.ProseMirror").type("RICH TEXT EDITOR");
     cy.get("input[name=author]").type("Luccas");
     cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
     cy.get("input[name=maintainer]").type("Luccas");
