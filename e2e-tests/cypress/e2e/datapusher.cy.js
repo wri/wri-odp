@@ -92,7 +92,10 @@ describe("Upload file and create dataset", () => {
       cy.viewport(1440, 900);
       cy.wait(15000);
       cy.visit("/datasets/" + dataset);
-      cy.get("#toggle-version").click();
+      cy.wait(10000)
+      cy.contains('button', 'Approve request', { timeout: 15000}).click({ force: true });
+      cy.contains('button', 'Approve Dataset', { timeout: 15000}).click({ force: true });
+      cy.visit("/datasets/" + dataset);
       cy.wait(10000)
       // cy.contains("View Table Preview", { timeout: 30000 }).click();
       cy.contains("01D2539e270CEbd", { timeout: 15000 });

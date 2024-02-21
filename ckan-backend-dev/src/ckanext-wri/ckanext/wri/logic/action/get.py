@@ -499,7 +499,11 @@ def pending_diff_show(context: Context, data_dict: DataDict):
         #     _("Diff not found for Pending Dataset: {}".format(package_id))
         # )
 
-    return dataset_diff
+    return {
+        "diff": dataset_diff,
+        "old_dataset": existing_dataset,
+        "new_dataset": pending_dataset,
+    }
 
 
 def _diff(existing, pending, path=""):
@@ -542,13 +546,15 @@ def _process_lists(existing_list, pending_list, path):
 
     return list_diff
 
+
 @logic.side_effect_free
 def dataset_release_notes(context: Context, data_dict: DataDict):
     model = context["model"]
     conn = model.Session.connection()
 
     id = data_dict.get("id")
-    sql = text('''
+    sql = text(
+        """
                select
                    distinct on ((data::json->>'package')::json->>'release_notes')
                    ((data::json->>'package')::json->>'release_notes') as release_notes,
@@ -561,11 +567,12 @@ def dataset_release_notes(context: Context, data_dict: DataDict):
                     and ((data::json->>'package')::json->>'release_notes') != ''
                order by
                     1, 2 DESC
-               '''.format(id))
+               """.format(
+            id
+        )
+    )
     q = conn.execute(sql)
 
     results = q.all()
 
     return results
-
-
