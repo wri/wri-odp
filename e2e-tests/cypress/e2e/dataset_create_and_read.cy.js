@@ -62,8 +62,9 @@ describe("Create dataset", () => {
     cy.get("input[name=maintainer]").type("Luccas");
     cy.get("input[name=maintainer_email]").type("luccasmmg@gmail.com");
     cy.contains("More Details").click();
-    cy.get(".tiptap.ProseMirror").eq(1).type("RICH TEXT EDITOR");
-    cy.get(".tiptap.ProseMirror").eq(2).type("RICH TEXT EDITOR");
+    cy.contains("More Details").parent().parent().as("moredetails")
+    cy.get("@moredetails").get(".tiptap.ProseMirror").eq(1).type("RICH TEXT EDITOR");
+    cy.get("@moredetails").get(".tiptap.ProseMirror").eq(2).type("RICH TEXT EDITOR");
     cy.get("input[name=learn_more]").type("https://google.com");
     cy.contains("Link to Another WRI Product").click();
     cy.get("button").contains("Add a link to another wri product").click();
