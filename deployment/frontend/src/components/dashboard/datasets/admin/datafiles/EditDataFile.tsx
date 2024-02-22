@@ -354,7 +354,7 @@ export function EditDataFile({
                                         'tab',
                                     ].includes(
                                         datafile.format?.toLowerCase() ?? 'none'
-                                    ) && (
+                                    ) && datafile.type === 'upload' && (
                                         <Tab.Panel>
                                             <Datapusher datafile={datafile} />
                                         </Tab.Panel>
