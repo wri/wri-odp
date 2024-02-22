@@ -21,7 +21,7 @@ describe("Data files", () => {
     cy.createResourceAPI(datasetName, {
       name: "Data File 1",
       format: "csv",
-      url_type: "link",
+      url_type: "upload",
       url: "https://people.sc.fsu.edu/~jburkardt/data/csv/airtravel.csv",
     });
   });
