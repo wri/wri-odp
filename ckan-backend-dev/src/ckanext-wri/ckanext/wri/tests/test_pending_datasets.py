@@ -114,7 +114,8 @@ def test_pending_diff_show():
 
     get_action("pending_dataset_update")(context, data_dict)
 
-    result = get_action("pending_diff_show")(context, {"package_id": dataset["id"]})
+    _result = get_action("pending_diff_show")(context, {"package_id": dataset["id"]})
+    result = _result['diff']
 
     assert result["title"]["new_value"] == "New Title"
     assert result["notes"]["new_value"] == "New description"

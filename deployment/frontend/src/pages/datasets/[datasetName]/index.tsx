@@ -353,7 +353,7 @@ export default function DatasetPage(
     let diffFields: string[] | never[] = []
 
     if (pendingExist && diffData) {
-        diffFields = Object.keys(diffData).filter((item) =>
+        diffFields = Object.keys(diffData.diff).filter((item) =>
             matchesAnyPattern(item)
         )
     }
@@ -367,7 +367,7 @@ export default function DatasetPage(
             Record<string, { old_value: string; new_value: string }>
         > = {}
 
-        for (const current in diffData) {
+        for (const current in diffData.diff) {
             if (current.includes('resource')) {
                 const resource = current.split('.')[0]!
                 const field = current.split('.')[1]!
@@ -380,7 +380,7 @@ export default function DatasetPage(
                     ...resourceDiff,
                     [resource]: {
                         ...resourceDiff[resource],
-                        [field]: diffData[current]!,
+                        [field]: diffData.diff[current]!,
                     },
                 }
             }
