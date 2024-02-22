@@ -254,7 +254,7 @@ export function EditDataFile({
                                         ].includes(
                                             datafile.format?.toLowerCase() ??
                                                 'none'
-                                        ) && (
+                                        ) && datafile.type === 'upload' && (
                                             <Tab as={Fragment}>
                                                 {({ selected }) => (
                                                     <div
