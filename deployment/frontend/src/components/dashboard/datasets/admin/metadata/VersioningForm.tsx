@@ -10,6 +10,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
+import { SimpleEditor } from './RTE/SimpleEditor'
 
 export function VersioningForm({
     formObj,
@@ -47,11 +48,11 @@ export function VersioningForm({
                     }
                     className="mb-2 flex  flex-col items-start whitespace-nowrap sm:flex-col"
                 >
-                    <TextArea
+                    <SimpleEditor
                         placeholder=""
-                        type="text"
-                        {...register('release_notes')}
-                        className="h-44 col-span-full"
+                        name="release_notes"
+                        formObj={formObj}
+                        className="min-h-[320px]"
                     />
                     <ErrorDisplay name="release_notes" errors={errors} />
                 </InputGroup>

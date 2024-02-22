@@ -92,7 +92,7 @@ function ReleaseNotesCard({
                 icon={<ClockIcon className="w-4" />}
             >
                 <div
-                    className="prose max-w-none prose-sm prose-a:text-wri-green max-w-[36rem] overflow-scroll min-h-[100px]"
+                    className="prose max-w-none prose-sm prose-a:text-wri-green min-h-[100px]"
                     dangerouslySetInnerHTML={{
                         __html: releaseNotes ?? '',
                     }}

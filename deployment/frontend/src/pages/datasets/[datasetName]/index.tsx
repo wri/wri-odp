@@ -353,7 +353,7 @@ export default function DatasetPage(
     let diffFields: string[] | never[] = []
 
     if (pendingExist && diffData) {
-        diffFields = Object.keys(diffData).filter((item) =>
+        diffFields = Object.keys(diffData.diff).filter((item) =>
             matchesAnyPattern(item)
         )
     }
@@ -367,7 +367,7 @@ export default function DatasetPage(
             Record<string, { old_value: string; new_value: string }>
         > = {}
 
-        for (const current in diffData) {
+        for (const current in diffData.diff) {
             if (current.includes('resource')) {
                 const resource = current.split('.')[0]!
                 const field = current.split('.')[1]!
@@ -380,7 +380,7 @@ export default function DatasetPage(
                     ...resourceDiff,
                     [resource]: {
                         ...resourceDiff[resource],
-                        [field]: diffData[current]!,
+                        [field]: diffData.diff[current]!,
                     },
                 }
             }
@@ -469,43 +469,32 @@ export default function DatasetPage(
     useEffect(() => {
         const dataset = isCurrentVersion ? prevDatasetData : datasetData
         if (dataset?.resources) {
-            const resource = dataset?.resources[0] as Resource
-
-            if (resource?.rw_id) {
-                removeLayerFromLayerGroup(resource.rw_id, dataset.id!)
+            const LayerResource = dataset?.resources.find(
+                (d) => d.format === 'Layer' || d.rw_id
+            )
+            if (LayerResource) {
+                removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id!)
                 setMapDisplayPreview(true)
-                addLayerToLayerGroup(resource.rw_id!, dataset.id)
-            } else if (
-                !resource?.rw_id &&
-                dataset?.provider &&
-                dataset?.rw_id
-            ) {
+                addLayerToLayerGroup(LayerResource.rw_id!, dataset.id)
+            } else if (dataset?.provider && dataset?.rw_id) {
                 setDisplayNoPreview(false)
                 setTabularResource({
                     provider: dataset.provider as string,
                     id: dataset.rw_id as string,
                 })
-            } else if (resource?.datastore_active) {
+            } else if (dataset?.resources.find((d) => d.datastore_active)) {
+                const resource = dataset?.resources.find(
+                    (d) => d.datastore_active
+                )
                 setDisplayNoPreview(false)
                 setTabularResource({
                     provider: 'datastore',
-                    id: resource?.id,
+                    id: resource?.id as string,
                 })
             } else {
-                const foundLayer = dataset?.resources.find(
-                    (d) => d.format === 'Layer' || d.rw_id
-                )
-
-                if (foundLayer && foundLayer.rw_id) {
-                    removeLayerFromLayerGroup(foundLayer?.rw_id!, dataset.id)
-                    setMapDisplayPreview(true)
-                    addLayerToLayerGroup(foundLayer?.rw_id!, dataset.id)
-                    setDisplayNoPreview(false)
-                } else {
-                    setTabularResource(null)
-                    setMapDisplayPreview(false)
-                    setDisplayNoPreview(true)
-                }
+                setTabularResource(null)
+                setMapDisplayPreview(false)
+                setDisplayNoPreview(true)
             }
         } else {
             setDisplayNoPreview(true)
