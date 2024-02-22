@@ -1,5 +1,4 @@
-import { Button } from '@/components/_shared/Button'
-import { TextWithReadMore } from '@/components/_shared/TextWithReadMore'
+import Loading from '@/components/_shared/Loading'
 import { Accordion } from '@/components/dashboard/datasets/admin/Accordion'
 import { WriDataset } from '@/schema/ckan.schema'
 import { api } from '@/utils/api'
@@ -22,37 +21,45 @@ export function Versioning({
         { id: dataset.id },
         {
             select: (data) => {
-                return (data || []).reverse()
+                return data || []
             },
         }
     )
 
-    const isReleaseNotesChanged = diffFields.includes('release_notes') && !isCurrentVersion
+    const isReleaseNotesChanged =
+        diffFields.includes('release_notes') && !isCurrentVersion
 
     return (
         <div className="flex flex-col gap-y-4 py-2">
-            <div className="flex flex-col gap-y-4">
-                {isReleaseNotesChanged && (
-                    <ReleaseNotesCard
-                        releaseNotes={dataset.release_notes}
-                        version={'Pending'}
-                        isPending={true}
-                        defaultOpen={true}
-                    />
-                )}
-                {releaseNotes?.map((rn, i) => (
-                    <ReleaseNotesCard
-                        releaseNotes={rn.release_notes}
-                        date={rn.date}
-                        version={`Version ${i + 1}`}
-                        key={`release-notes-${i}`}
-                        defaultOpen={!isReleaseNotesChanged && i == 0}
-                    />
-                ))}
-                {!isReleaseNotesChanged && !releaseNotes?.length && (
-                    <span>This dataset is at it's initial version</span>
-                )}
-            </div>
+            {isReleaseNotesLoading && (
+                <div className="w-full flex min-h-[100px] items-center justify-center">
+                    <Loading />{' '}
+                </div>
+            )}
+            {!isReleaseNotesLoading && (
+                <div className="flex flex-col gap-y-4">
+                    {isReleaseNotesChanged && (
+                        <ReleaseNotesCard
+                            releaseNotes={dataset.release_notes}
+                            version={'Pending'}
+                            isPending={true}
+                            defaultOpen={true}
+                        />
+                    )}
+                    {releaseNotes?.map((rn, i) => (
+                        <ReleaseNotesCard
+                            releaseNotes={rn.release_notes}
+                            date={rn.date}
+                            version={`Version ${releaseNotes?.length - i}`}
+                            key={`release-notes-${i}`}
+                            defaultOpen={!isReleaseNotesChanged && i == 0}
+                        />
+                    ))}
+                    {!isReleaseNotesChanged && !releaseNotes?.length && (
+                        <span>This dataset is at it's initial version</span>
+                    )}
+                </div>
+            )}
         </div>
     )
 }
