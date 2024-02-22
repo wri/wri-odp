@@ -26,12 +26,14 @@ export default function ApprovalRequestCard({
     creator_id,
     datasetId,
     diffField,
+    datasetTitle,
 }: {
     datasetName: string
     owner_org: string | null
     creator_id: string | null
     datasetId: string
     diffField: string[] | never[]
+    datasetTitle?: string
 }) {
     const [open, setOpen] = useState(false)
     const [approveOpen, setApproveOpen] = useState(false)
@@ -68,7 +70,7 @@ export default function ApprovalRequestCard({
             })
             setApproveOpen(false)
             notify(
-                `Successfully approved the dataset ${datasetName}`,
+                `Successfully approved the dataset ${datasetTitle ?? datasetName}`,
                 'success'
             )
             router.push(`/dashboard/datasets`)
@@ -90,7 +92,7 @@ export default function ApprovalRequestCard({
             formObj.reset()
             setOpen(false)
             notify('Issue successfully created', 'success')
-            notify(`Dataset ${datasetName} successfully rejected`, 'error')
+            notify(`Dataset ${datasetTitle ?? datasetName} successfully rejected`, 'error')
             router.push('/dashboard/datasets')
         },
         onError: (error) => setErrorMessage(error.message),

@@ -553,6 +553,7 @@ export default function DatasetPage(
             {isApprovalRequest && (
                 <ApprovalRequestCard
                     datasetName={datasetData.name}
+                    datasetTitle={datasetData.title}
                     owner_org={datasetData?.owner_org || null}
                     creator_id={datasetData?.creator_user_id || null}
                     datasetId={datasetData.id}
