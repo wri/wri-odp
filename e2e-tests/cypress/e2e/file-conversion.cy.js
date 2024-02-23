@@ -11,23 +11,30 @@ const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 // TODO: this test is not robust enoguh
 describe("Data files", () => {
-  before(() => {
-    cy.createOrganizationAPI(parentOrg);
-    cy.createDatasetAPI(parentOrg, datasetName, true, {
-      visibility_type: "public",
-      technical_notes: "http://google.com",
-    });
-
-    cy.createResourceAPI(datasetName, {
-      name: "Data File 1",
-      format: "csv",
-      url_type: "link",
-      url: "https://people.sc.fsu.edu/~jburkardt/data/csv/airtravel.csv",
-    });
-  });
-
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
+  });
+
+  it("Should create dataset", () => {
+    cy.visit("/dashboard/datasets/new");
+    cy.get("input[name=title]").type(datasetName);
+    cy.get("input[name=name]").should("have.value", datasetName);
+    cy.get("textarea[name=short_description]").type("test");
+    cy.get("input[name=author]").type("Luccas");
+    cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
+    cy.get("input[name=maintainer]").type("Luccas");
+    cy.get("input[name=maintainer_email]").type("luccasmmg@gmail.com");
+    cy.contains("Next: Datafiles").click();
+    cy.get("input[type=file]").selectFile("cypress/fixtures/airtravel.csv", {
+      force: true,
+    });
+    cy.wait(5000);
+    cy.contains("Next: Map Visualizations").click();
+    cy.contains("Next: Preview").click();
+    cy.get('button[type="submit"]').click();
+    cy.contains("Successfully created", {
+      timeout: 20000,
+    });
   });
 
   it(
@@ -62,7 +69,7 @@ describe("Data files", () => {
     () => {
       cy.visit(`/datasets/${datasetName}`);
 
-      cy.contains("Data File 1").click({ force: true });
+      cy.contains("Example title").click({ force: true });
       cy.contains("Download").click({force: true})
       cy.contains("Original Format")
     },
@@ -70,7 +77,6 @@ describe("Data files", () => {
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);
-    cy.deleteOrganizationAPI(parentOrg);
   });
 });
 
