@@ -69,7 +69,7 @@ describe("Data files", () => {
     () => {
       cy.visit(`/datasets/${datasetName}`);
 
-      cy.contains("Data File 1").click({ force: true });
+      cy.contains("Example title").click({ force: true });
       cy.contains("Download").click({force: true})
       cy.contains("Original Format")
     },
