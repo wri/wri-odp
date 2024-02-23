@@ -80,8 +80,7 @@ describe("Chart view", () => {
       .first()
       .click({ force: true });
     cy.contains('button', 'Approve Dataset').click({ force: true });
-    cy.wait(15000)
-    // cy.contains(`Successfully approved the dataset ${datasetName}`, {timeout: 20000});
+    cy.contains(`Successfully approved the dataset ${datasetName}`, {timeout: 20000});
   })
 
   it(
