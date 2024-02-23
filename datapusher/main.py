@@ -112,13 +112,13 @@ def push_to_datastore(resource_id, api_key):
 
 
 @flow(log_prints=True)
-def convert_store_to_file(resource_id, api_key, task_id, provider, sql, rw_id,
-                          format, filename, download_filename):
+def convert_store_to_file(resource_id, api_key, task_id, provider, sql, rw_id, 
+                          carto_account, format, filename, download_filename):
     logger = get_run_logger()
     ckan_url = config.get('CKAN_URL')
 
     logger.info("Fetching data...")
-    data = query_datastore(api_key, ckan_url, sql, provider, rw_id)
+    data = query_datastore(api_key, ckan_url, sql, provider, rw_id, carto_account)
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.info("Converting data..." + " " + format)
         tmp_filepath = os.path.join(tmp_dir, filename)
@@ -149,6 +149,7 @@ if __name__ == "__main__":
             "provider": "provider",
             "sql": "sql",
             "rw_id": "rw_id",
+            "carto_account": "carto_account",
             "format": "format",
             "filename": "filename",
             "download_filename": "download_filename"

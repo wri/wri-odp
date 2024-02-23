@@ -5,13 +5,14 @@ import requests
 
 # NOTE: this only works for CartoDB layers
 @task(retries=3, retry_delay_seconds=15)
-def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id: str = ""):
+def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id: str = "",
+                    carto_account: str = ""):
     logger = get_run_logger()
 
     if provider == "datastore":
         url = get_url("datastore_search_sql", ckan_url)
     elif provider == "rw":
-        url = "https://wri-rw.carto.com/api/v1/sql"
+        url = "https://{}.carto.com/api/v1/sql".format(carto_account)
 
     if ";" in sql:
         sql = sql.split(";")[0]

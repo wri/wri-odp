@@ -62,14 +62,16 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
     const Component =
         isLoading && mode == 'SIGNED_URL' ? `span` : PopoverTrigger
 
-    const conversibleFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
+    const conversibleTabularFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
+    const conversibleSpatialFormats = ['GeoJSON', 'KML', 'Shapefile']
 
     const format = datafile.format ?? ''
-    const isConversible =
+    const isConversibleTabular =
         datafile.datastore_active &&
-        conversibleFormats.includes(format.toUpperCase())
+        conversibleTabularFormats.includes(format.toUpperCase())
+    const isConversibleVector = datafile.format == 'Layer'
 
-    const conversionOptions = conversibleFormats.filter(
+    const tabularConversionOptions = conversibleTabularFormats.filter(
         (f) => f != format.toUpperCase()
     )
 
@@ -106,8 +108,8 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                                     ? `(${datafile.format})`
                                     : ''}
                             </Button>
-                            {isConversible &&
-                                conversionOptions.map((f) => (
+                            {isConversibleTabular &&
+                                tabularConversionOptions.map((f) => (
                                     <Button
                                         variant="ghost"
                                         className="w-full"
@@ -123,7 +125,7 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                         </>
                     ) : (
                         <>
-                            {conversibleFormats.map((f) => (
+                            {conversibleTabularFormats.map((f) => (
                                 <Button
                                     variant="ghost"
                                     className="w-full"
@@ -136,6 +138,20 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                                     {f}
                                 </Button>
                             ))}
+                            {isConversibleVector &&
+                                conversibleSpatialFormats.map((f) => (
+                                    <Button
+                                        variant="ghost"
+                                        className="w-full"
+                                        onClick={() => {
+                                            // @ts-ignore
+                                            setConvertTo(f)
+                                            setOpen(true)
+                                        }}
+                                    >
+                                        {f}
+                                    </Button>
+                                ))}
                         </>
                     )}
                 </PopoverContent>
@@ -181,12 +197,14 @@ function DownloadModal({
 
     let isLoading = false
     let sql = `SELECT * FROM "${datafile.id}"`
+    let cartoAccount: string | undefined = "";
     if (datafile.format == 'Layer') {
         const layerObj = datafile.layerObj
         const layerCfg = layerObj?.layerConfig
         const layerSrc = layerCfg?.source
         const layerProvider = layerSrc?.provider
         sql = layerProvider?.layers?.at(0)?.options?.sql
+        cartoAccount = layerProvider?.account;
     }
 
     return (
@@ -222,6 +240,7 @@ function DownloadModal({
                                             : 'datastore',
                                         sql: sql,
                                         resource_id: datafile.id,
+                                        carto_account: cartoAccount ?? ""
                                     },
                                     {
                                         onSuccess: () => {

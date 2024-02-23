@@ -1938,6 +1938,7 @@ export const DatasetRouter = createTRPCRouter({
                 sql: z.string(),
                 email: z.string(),
                 rw_id: z.string().optional(),
+                carto_account: z.string().optional()
             })
         )
         .mutation(async ({ input, ctx }) => {

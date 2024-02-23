@@ -23,6 +23,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
     sql = data_dict.get("sql")
     email = data_dict.get("email")
     rw_id = data_dict.get("rw_id")
+    carto_account = data_dict.get("carto_account")
 
     if None in (format, res_id, provider, sql):
         raise p.toolkit.ValidationError({"message": "Missing parameters"})
@@ -156,6 +157,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
                         "provider": provider,
                         "sql": sql,
                         "rw_id": rw_id,
+                        "carto_account": carto_account,
                         "filename": filename,
                         "format": format,
                         "download_filename": download_filename
