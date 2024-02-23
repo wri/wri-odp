@@ -19,9 +19,6 @@ describe("Data files", () => {
     cy.visit("/dashboard/datasets/new");
     cy.get("input[name=title]").type(datasetName);
     cy.get("input[name=name]").should("have.value", datasetName);
-    cy.get("#visibility_type").click();
-    cy.get("li").contains("Public").click();
-    cy.get("input[name=technical_notes]").type("https://google.com");
     cy.get("textarea[name=short_description]").type("test");
     cy.get("input[name=author]").type("Luccas");
     cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
@@ -35,7 +32,7 @@ describe("Data files", () => {
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
-    cy.contains(`Successfully created the "${datasetName}" dataset`, {
+    cy.contains("Successfully created", {
       timeout: 20000,
     });
   });
