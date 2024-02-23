@@ -51,18 +51,6 @@ describe("Chart view", () => {
     cy.contains("div", datasetName).should("exist", { timeout: 15000 });
   });
 
-  it("Should approve dataset", () => {
-    cy.visit("/dashboard/approval-request");
-    cy.contains(datasetName, { timeout: 30000 });
-    cy.get("button#rowshow").first().click();
-    cy.get(`button#approve-tooltip-${datasetName}`)
-      .first()
-      .click({ force: true });
-    cy.contains('button', 'Approve Dataset').click({ force: true });
-    cy.wait(15000)
-    // cy.contains(`Successfully approved the dataset ${datasetName}`, {timeout: 20000});
-  })
-
   it(
     "Submit datapusher",
     {
@@ -83,6 +71,18 @@ describe("Chart view", () => {
       cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 15000 });
     },
   );
+
+  it("Should approve dataset", () => {
+    cy.visit("/dashboard/approval-request");
+    cy.contains(datasetName, { timeout: 30000 });
+    cy.get("button#rowshow").first().click();
+    cy.get(`button#approve-tooltip-${datasetName}`)
+      .first()
+      .click({ force: true });
+    cy.contains('button', 'Approve Dataset').click({ force: true });
+    cy.wait(15000)
+    // cy.contains(`Successfully approved the dataset ${datasetName}`, {timeout: 20000});
+  })
 
   it(
     "should be creatable from the UI",
