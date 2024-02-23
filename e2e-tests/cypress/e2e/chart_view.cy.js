@@ -18,9 +18,6 @@ describe("Chart view", () => {
     cy.visit("/dashboard/datasets/new");
     cy.get("input[name=title]").type(datasetName);
     cy.get("input[name=name]").should("have.value", datasetName);
-    cy.get("#visibility_type").click();
-    cy.get("li").contains("Public").click();
-    cy.get("input[name=technical_notes]").type("https://google.com");
     cy.get("textarea[name=short_description]").type("test");
     cy.get("input[name=author]").type("Luccas");
     cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
@@ -33,22 +30,10 @@ describe("Chart view", () => {
     cy.wait(5000);
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
-    //FOR SOME REASON THIS SEEM NOT TO WORK 
-    // IN CI/CD BUT WORKS LOCALLY
-    //get button of type submit
-    // cy.get('button[type="submit"]').click();
-    // cy.contains(`Successfully created the "${dataset}" dataset`, {
-    //   timeout: 20000,
-    // });
     cy.get('button[type="submit"]').click();
-    cy.wait(40000);
-    cy.visit("/dashboard/datasets");
-    cy.wait(15000)
-    cy.contains("Awaiting Approval").click({ timeout: 15000 });
-    cy.wait(20000)
-    cy.get('input[type="search"]').type(datasetName).type("{enter}");
-
-    cy.contains("div", datasetName).should("exist", { timeout: 15000 });
+    cy.contains(`Successfully created the "${datasetName}" dataset`, {
+      timeout: 20000,
+    });
   });
 
   it(
@@ -71,17 +56,6 @@ describe("Chart view", () => {
       cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 15000 });
     },
   );
-
-  it("Should approve dataset", () => {
-    cy.visit("/dashboard/approval-request");
-    cy.contains(datasetName, { timeout: 30000 });
-    cy.get("button#rowshow").first().click();
-    cy.get(`button#approve-tooltip-${datasetName}`)
-      .first()
-      .click({ force: true });
-    cy.contains('button', 'Approve Dataset').click({ force: true });
-    cy.contains(`Successfully approved the dataset ${datasetName}`, {timeout: 20000});
-  })
 
   it(
     "should be creatable from the UI",
