@@ -481,6 +481,7 @@ def pending_diff_show(context: Context, data_dict: DataDict):
 
     dataset_diff = None
 
+    pending_dataset = None
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
         log.error("===============pending dataset=================")

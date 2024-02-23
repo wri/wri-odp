@@ -133,10 +133,7 @@ function FormatNewValue(
         | Record<string, string | number | unknown>
         | number
         | null,
-    key: string,
-    old_dataset: WriDataset,
-    new_dataset: WriDataset,
-    isNewValue: boolean
+    key: string
 ) {
     if (key === 'Open In') {
         const open_in_array = JSON.parse(value as string)
@@ -244,43 +241,47 @@ function SubCardProfile({
     isLoading: boolean
     diff: {
         diff: Record<string, { old_value: string; new_value: string }>
-        old_dataset: WriDataset
-        new_dataset: WriDataset
+        old_dataset: WriDataset | null
+        new_dataset: WriDataset | null
     }
     data: WriDataset
 }) {
     if (isLoading) return <Spinner className="mx-auto my-2" />
-    let diff2 = formatDiff(diff.diff)
+    let diff2 = formatDiff(diff ? diff.diff : null)
     // if the diff has tags or topics, instead of showing the diff we show the whole old and new values
-    if (Object.keys(diff2).some((x) => x.includes('tags'))) {
+    if (diff2 && Object.keys(diff2).some((x) => x.includes('tags'))) {
         diff2 = Object.fromEntries(
             Object.entries(diff2).filter(([key]) => !key.includes('tags'))
         )
         diff2 = {
             ...diff2,
             Tags: {
-                old_value: diff.old_dataset?.tags?.map(
-                    (t) => t.display_name ?? t.name
-                ) ?? [],
-                new_value: diff.new_dataset?.tags?.map(
-                    (t) => t.display_name ?? t.name
-                ) ?? [],
+                old_value:
+                    diff.old_dataset?.tags?.map(
+                        (t) => t.display_name ?? t.name
+                    ) ?? [],
+                new_value:
+                    diff.new_dataset?.tags?.map(
+                        (t) => t.display_name ?? t.name
+                    ) ?? [],
             },
         }
     }
-    if (Object.keys(diff2).some((x) => x.includes('Topics'))) {
+    if (diff2 && Object.keys(diff2).some((x) => x.includes('Topics'))) {
         diff2 = Object.fromEntries(
             Object.entries(diff2).filter(([key]) => !key.includes('Topics'))
         )
         diff2 = {
             ...diff2,
             Topics: {
-                old_value: diff.old_dataset?.groups?.map(
-                    (t) => t.display_name ?? t.name
-                ) ?? [],
-                new_value: diff.new_dataset?.groups?.map(
-                    (t) => t.display_name ?? t.name
-                ) ?? [],
+                old_value:
+                    diff.old_dataset?.groups?.map(
+                        (t) => t.display_name ?? t.name
+                    ) ?? [],
+                new_value:
+                    diff.new_dataset?.groups?.map(
+                        (t) => t.display_name ?? t.name
+                    ) ?? [],
             },
         }
     }
@@ -309,6 +310,7 @@ function SubCardProfile({
                             {Object.keys(diff).filter(
                                 (x) => !matchesAnyPattern(x)
                             ).length > 0 &&
+                                diff2 &&
                                 Object.keys(diff2).map((key) => {
                                     return (
                                         <TableRow
@@ -337,10 +339,7 @@ function SubCardProfile({
                                                     {FormatNewValue(
                                                         diff2[key]
                                                             ?.new_value as any,
-                                                        key,
-                                                        diff.old_dataset,
-                                                        diff.new_dataset,
-                                                        true
+                                                        key
                                                     )}
                                                 </pre>
                                             </TableCell>
@@ -349,10 +348,7 @@ function SubCardProfile({
                                                     {FormatNewValue(
                                                         diff2[key]
                                                             ?.old_value as any,
-                                                        key,
-                                                        diff.old_dataset,
-                                                        diff.new_dataset,
-                                                        false
+                                                        key
                                                     )}
                                                 </pre>
                                             </TableCell>
