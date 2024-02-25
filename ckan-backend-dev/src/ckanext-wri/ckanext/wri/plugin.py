@@ -9,7 +9,7 @@ from ckan.types import Action, AuthFunction, Context
 from ckan.lib.search import SearchError
 from ckanext.wri.logic.auth import auth as auth
 from ckanext.wri.logic.action.datapusher import datapusher_latest_task, datapusher_submit
-from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
+from ckanext.wri.logic.action.create import notification_create, pending_dataset_create, trigger_migration
 from ckanext.wri.logic.action.update import notification_update, pending_dataset_update
 from ckanext.wri.logic.action.get import package_search, notification_get_all, pending_dataset_show, pending_diff_show, dataset_release_notes
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -115,6 +115,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def get_actions(self):
         return {
+            'trigger_migration': trigger_migration,
             'package_search': package_search,
             'password_reset': action.password_reset,
             'notification_get_all': notification_get_all,

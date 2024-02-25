@@ -4,8 +4,9 @@ import logging
 from ckanext.wri.model.notification import Notification, notification_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
 from ckanext.wri.logic.auth import schema
+import ckan.logic as logic
 
-from ckan.common import _
+from ckan.common import _,config
 import ckan.plugins.toolkit as tk
 from ckan.types import Context, DataDict
 
@@ -77,3 +78,37 @@ def pending_dataset_create(context: Context, data_dict: DataDict):
         raise tk.ValidationError(_(f"Pending Dataset not found: {package_id}"))
 
     return pending_dataset
+
+import requests
+from urllib.parse import urljoin
+import json
+
+@logic.side_effect_free
+def trigger_migration(context: Context, data_dict: DataDict):
+
+    prefect_url: str = config.get("ckanext.wri.prefect_url")
+    deployment_name: str = config.get("ckanext.wri.migration_deployment_name")
+    flow_name: str = config.get("ckanext.wri.migration_flow_name")
+
+    try:
+        deployment = requests.get(
+            urljoin(prefect_url, f"/api/deployments/name/{flow_name}/{deployment_name}")
+        )
+        deployment = deployment.json()
+        deployment_id = deployment["id"]
+        r = requests.post(
+            urljoin(prefect_url, f"api/deployments/{deployment_id}/create_flow_run"),
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(
+                {
+                    "state": {"type": "SCHEDULED", "state_details": {}},
+                }
+            ),
+        )
+        return r.json()
+    except requests.exceptions.ConnectionError as e:
+        error: dict[str, Any] = {
+            "message": "Request Failed",
+            "details": str(e),
+        }
+        raise p.toolkit.ValidationError(error)
