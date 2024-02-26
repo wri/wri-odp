@@ -1387,8 +1387,8 @@ async function sendNotification(
                 })
                 if (senderUserObj) {
                     const email = await generateMemberEmail(
-                        userObj,
                         senderUserObj,
+                        userObj,
                         notification as NotificationType
                     )
                     await sendEmail(
