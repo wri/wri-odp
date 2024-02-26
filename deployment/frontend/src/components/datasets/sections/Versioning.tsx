@@ -21,7 +21,9 @@ export function Versioning({
         { id: dataset.id },
         {
             select: (data) => {
-                return data || []
+                return (data || []).sort((a, b) => {
+                    return b.date.localeCompare(a.date)
+                })
             },
         }
     )

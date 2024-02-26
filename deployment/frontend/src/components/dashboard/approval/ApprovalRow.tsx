@@ -85,6 +85,7 @@ function filteredDataset(dataset: WriDataset) {
         {
             title: 'Release Notes',
             description: dataset?.release_notes ?? '',
+            isHtml: true
         },
     ]
 }
@@ -388,7 +389,18 @@ function SubCardProfile({
                                                 {key.title}
                                             </TableCell>
                                             <TableCell className="font-acumin text-xs font-normal text-black">
-                                                {key.description}
+                                                {!key.isHtml ? (
+                                                    key.description
+                                                ) : (
+                                                    <div
+                                                        className="prose max-w-none prose-sm pr-8 text-justify prose-a:text-wri-green"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html:
+                                                                key?.description ??
+                                                                '',
+                                                        }}
+                                                    ></div>
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     )
