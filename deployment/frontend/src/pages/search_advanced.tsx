@@ -14,7 +14,8 @@ import { api } from '@/utils/api'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import {NextSeo} from 'next-seo'
+import { NextSeo } from 'next-seo'
+import { env } from '@/env.mjs'
 
 export function getServerSideProps({ query }: { query: any }) {
     const initialFilters = query.search
@@ -169,7 +170,15 @@ export default function SearchPage({
     return (
         <>
             <Header />
-            <NextSeo title="Advanced Search" />
+            <NextSeo
+                title="Advanced Search"
+                description={`Explore WRI Open Data Catalog`}
+                openGraph={{
+                    title: `Explore Data`,
+                    description: `Explore WRI Open Data Catalog`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/search_advanced`,
+                }}
+            />
             <Search filters={filters} setFilters={setFilters} />
             {session.status == 'loading' && (
                 <div className="flex w-full justify-center mt-20">

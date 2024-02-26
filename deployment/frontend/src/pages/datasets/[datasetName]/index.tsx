@@ -26,11 +26,11 @@ import { Tab } from '@headlessui/react'
 import { Index } from 'flexsearch'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { useSession } from 'next-auth/react'
-import { NextSeo } from 'next-seo'
+import { NextSeo, DatasetJsonLd } from 'next-seo'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-
+import { env } from '@/env.mjs'
 import SyncUrl from '@/components/_shared/map/SyncUrl'
 import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
 import { useIsAddingLayers } from '@/utils/storeHooks'
@@ -44,7 +44,6 @@ import { Versioning } from '@/components/datasets/sections/Versioning'
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
 import { Resource, View } from '@/interfaces/dataset.interface'
 import { useLayersFromRW } from '@/utils/queryHooks'
-
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -158,9 +157,11 @@ export async function getServerSideProps(
         if (!dataset?.resources) {
             dataset.resources = []
         }
-
+        const NEXTURL = env.NEXTAUTH_URL
         return {
             props: {
+                NEXTURL,
+                apiKey: session?.user.apikey ? session?.user.apikey : '',
                 dataset: JSON.stringify({
                     ...dataset,
                     spatial: dataset.spatial ?? null,
@@ -220,6 +221,8 @@ export default function DatasetPage(
     const isPendingState = props.isPendingState!
     const is_approved = props.is_approved!
     const approvalAuth = props.approvalAuth!
+    const NEXTURL = props.NEXTURL!
+    const apikey = props.apiKey!
     const router = useRouter()
     const { query } = router
     const isApprovalRequest =
@@ -352,7 +355,7 @@ export default function DatasetPage(
     let diffFields: string[] | never[] = []
 
     if (pendingExist && diffData) {
-        diffFields = Object.keys(diffData).filter((item) =>
+        diffFields = Object.keys(diffData.diff).filter((item) =>
             matchesAnyPattern(item)
         )
     }
@@ -366,7 +369,7 @@ export default function DatasetPage(
             Record<string, { old_value: string; new_value: string }>
         > = {}
 
-        for (const current in diffData) {
+        for (const current in diffData.diff) {
             if (current.includes('resource')) {
                 const resource = current.split('.')[0]!
                 const field = current.split('.')[1]!
@@ -379,7 +382,7 @@ export default function DatasetPage(
                     ...resourceDiff,
                     [resource]: {
                         ...resourceDiff[resource],
-                        [field]: diffData[current]!,
+                        [field]: diffData.diff[current]!,
                     },
                 }
             }
@@ -468,43 +471,33 @@ export default function DatasetPage(
     useEffect(() => {
         const dataset = isCurrentVersion ? prevDatasetData : datasetData
         if (dataset?.resources) {
-            const resource = dataset?.resources[0] as Resource
-
-            if (resource?.rw_id) {
-                removeLayerFromLayerGroup(resource.rw_id, dataset.id!)
+            const LayerResource = dataset?.resources.find(
+                (d) => d.format === 'Layer' || d.rw_id
+            )
+            if (LayerResource) {
+                removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id!)
                 setMapDisplayPreview(true)
-                addLayerToLayerGroup(resource.rw_id!, dataset.id)
-            } else if (
-                !resource?.rw_id &&
-                dataset?.provider &&
-                dataset?.rw_id
-            ) {
+                addLayerToLayerGroup(LayerResource.rw_id!, dataset.id)
+            } else if (dataset?.provider && dataset?.rw_id) {
                 setDisplayNoPreview(false)
                 setTabularResource({
                     provider: dataset.provider as string,
                     id: dataset.rw_id as string,
                 })
-            } else if (resource?.datastore_active) {
+            } else if (dataset?.resources.find((d) => d.datastore_active)) {
+                const resource = dataset?.resources.find(
+                    (d) => d.datastore_active
+                )
                 setDisplayNoPreview(false)
                 setTabularResource({
                     provider: 'datastore',
-                    id: resource?.id,
+                    id: resource?.id as string,
+                    apiKey: apikey,
                 })
             } else {
-                const foundLayer = dataset?.resources.find(
-                    (d) => d.format === 'Layer' || d.rw_id
-                )
-
-                if (foundLayer && foundLayer.rw_id) {
-                    removeLayerFromLayerGroup(foundLayer?.rw_id!, dataset.id)
-                    setMapDisplayPreview(true)
-                    addLayerToLayerGroup(foundLayer?.rw_id!, dataset.id)
-                    setDisplayNoPreview(false)
-                } else {
-                    setTabularResource(null)
-                    setMapDisplayPreview(false)
-                    setDisplayNoPreview(true)
-                }
+                setTabularResource(null)
+                setMapDisplayPreview(false)
+                setDisplayNoPreview(true)
             }
         } else {
             setDisplayNoPreview(true)
@@ -532,12 +525,38 @@ export default function DatasetPage(
             <SyncUrl />
             <NextSeo
                 title={`${datasetData?.title ?? datasetData?.name} - Datasets`}
+                description={`${datasetData?.short_description} `}
+                openGraph={{
+                    title: `${
+                        datasetData?.title ?? datasetData?.name
+                    } - Datasets`,
+                    description: `${datasetData?.short_description} `,
+                    url: `${NEXTURL}/datasets/${datasetData?.name}`,
+                    images: [
+                        {
+                            url: `${NEXTURL}/images/WRI_logo_4c.png`,
+                            width: 800,
+                            height: 600,
+                            alt: 'Og Image Alt',
+                        },
+                    ],
+                }}
+                twitter={{
+                    handle: '@WorldResources',
+                    site: `${NEXTURL}`,
+                    cardType: 'summary_large_image',
+                }}
+            />
+            <DatasetJsonLd
+                description={`${datasetData?.short_description} `}
+                name={`${datasetData?.title ?? datasetData?.name} - Datasets`}
             />
             <Header />
             <Breadcrumbs links={links} />
             {isApprovalRequest && (
                 <ApprovalRequestCard
                     datasetName={datasetData.name}
+                    datasetTitle={datasetData.title}
                     owner_org={datasetData?.owner_org || null}
                     creator_id={datasetData?.creator_user_id || null}
                     datasetId={datasetData.id}

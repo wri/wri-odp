@@ -10,6 +10,7 @@ import Spinner from '@/components/_shared/Spinner'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import RedirectedSearchInput from '@/components/search/RedirectedSearchInput'
 import { NextSeo } from 'next-seo'
+import { env } from '@/env.mjs'
 
 export default function SearchPage() {
     const {
@@ -34,7 +35,15 @@ export default function SearchPage() {
 
     return (
         <>
-            <NextSeo title="Explore Data" />
+            <NextSeo
+                title="Explore Data"
+                description={`Explore WRI Open Data Catalog`}
+                openGraph={{
+                    title: `Explore Data`,
+                    description: `Explore WRI Open Data Catalog`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/search`,
+                }}
+            />
             <Header />
             <RedirectedSearchInput />
             <Highlights />

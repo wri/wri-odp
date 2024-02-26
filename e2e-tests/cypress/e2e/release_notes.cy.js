@@ -40,6 +40,7 @@ describe("Release notes", () => {
       cy.get("#visibility_type").click();
       cy.get("li").contains("Public").click();
       cy.get("textarea[name=short_description]").type("test");
+
       cy.get("input[name=technical_notes]").type("https://google.com");
       cy.get("input[name=author]").type("Luccas");
       cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
@@ -69,7 +70,8 @@ describe("Release notes", () => {
     },
     () => {
       cy.visit(`/dashboard/datasets/${dataset}/edit`);
-      cy.get('textarea[name="release_notes"]').type("Testing release notes", {
+      cy.contains("Versioning").parent().parent().as("versioning")
+      cy.get("@versioning").get(".tiptap.ProseMirror").eq(1).type("Testing release notes", {
         force: true,
       });
       cy.get('[type="submit"]').click({ force: true });

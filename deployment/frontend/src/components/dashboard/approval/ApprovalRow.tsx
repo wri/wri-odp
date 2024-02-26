@@ -174,6 +174,7 @@ function FormatNewValue(
             return <div dangerouslySetInnerHTML={{ __html: value }}></div>
         })
         .with(null, () => <span>Not specified</span>)
+        .with(P.array(P.nullish), () => <span>Empty</span>)
         .with(P.number, (value) => <span>{value}</span>)
         .with(P.array(P.string), (value) => {
             if (
@@ -238,11 +239,52 @@ function SubCardProfile({
     data,
 }: {
     isLoading: boolean
-    diff: Record<string, { old_value: string; new_value: string }>
+    diff: {
+        diff: Record<string, { old_value: string; new_value: string }>
+        old_dataset: WriDataset | null
+        new_dataset: WriDataset | null
+    }
     data: WriDataset
 }) {
     if (isLoading) return <Spinner className="mx-auto my-2" />
-    const diff2 = formatDiff(diff)
+    let diff2 = formatDiff(diff ? diff.diff : null)
+    // if the diff has tags or topics, instead of showing the diff we show the whole old and new values
+    if (diff2 && Object.keys(diff2).some((x) => x.includes('tags'))) {
+        diff2 = Object.fromEntries(
+            Object.entries(diff2).filter(([key]) => !key.includes('tags'))
+        )
+        diff2 = {
+            ...diff2,
+            Tags: {
+                old_value:
+                    diff.old_dataset?.tags?.map(
+                        (t) => t.display_name ?? t.name
+                    ) ?? [],
+                new_value:
+                    diff.new_dataset?.tags?.map(
+                        (t) => t.display_name ?? t.name
+                    ) ?? [],
+            },
+        }
+    }
+    if (diff2 && Object.keys(diff2).some((x) => x.includes('Topics'))) {
+        diff2 = Object.fromEntries(
+            Object.entries(diff2).filter(([key]) => !key.includes('Topics'))
+        )
+        diff2 = {
+            ...diff2,
+            Topics: {
+                old_value:
+                    diff.old_dataset?.groups?.map(
+                        (t) => t.display_name ?? t.name
+                    ) ?? [],
+                new_value:
+                    diff.new_dataset?.groups?.map(
+                        (t) => t.display_name ?? t.name
+                    ) ?? [],
+            },
+        }
+    }
     return (
         <div className="pr-4 pl-2 sm:pl-10 mx-auto my-4 overflow-auto">
             {diff &&
@@ -268,6 +310,7 @@ function SubCardProfile({
                             {Object.keys(diff).filter(
                                 (x) => !matchesAnyPattern(x)
                             ).length > 0 &&
+                                diff2 &&
                                 Object.keys(diff2).map((key) => {
                                     return (
                                         <TableRow
