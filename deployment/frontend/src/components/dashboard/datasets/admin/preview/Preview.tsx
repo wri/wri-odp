@@ -200,7 +200,17 @@ export function Preview({
                                 <dl className="flex flex-col gap-y-6">
                                     <SimpleDescription
                                         label="Release Notes"
-                                        text={watch('release_notes') ?? '_'}
+                                        text={
+                                            <div
+                                                className="prose max-w-none prose-sm prose-a:text-wri-green min-h-[100px]"
+                                                dangerouslySetInnerHTML={{
+                                                    __html:
+                                                        watch(
+                                                            'release_notes'
+                                                        ) ?? '_',
+                                                }}
+                                            ></div>
+                                        }
                                     />
                                 </dl>
                             </div>
@@ -387,7 +397,13 @@ function FullDescription({
     )
 }
 
-function SimpleDescription({ label, text }: { label: string; text: string }) {
+function SimpleDescription({
+    label,
+    text,
+}: {
+    label: string
+    text: string | React.ReactNode
+}) {
     return (
         <div>
             <dt className="font-['Acumin Pro SemiCondensed'] text-lg font-semibold leading-tight text-black">
