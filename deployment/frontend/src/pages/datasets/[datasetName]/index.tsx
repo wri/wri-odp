@@ -161,6 +161,7 @@ export async function getServerSideProps(
         return {
             props: {
                 NEXTURL,
+                apiKey: session?.user.apikey ? session?.user.apikey : '',
                 dataset: JSON.stringify({
                     ...dataset,
                     spatial: dataset.spatial ?? null,
@@ -221,6 +222,7 @@ export default function DatasetPage(
     const is_approved = props.is_approved!
     const approvalAuth = props.approvalAuth!
     const NEXTURL = props.NEXTURL!
+    const apikey = props.apiKey!
     const router = useRouter()
     const { query } = router
     const isApprovalRequest =
@@ -490,6 +492,7 @@ export default function DatasetPage(
                 setTabularResource({
                     provider: 'datastore',
                     id: resource?.id as string,
+                    apiKey: apikey,
                 })
             } else {
                 setTabularResource(null)
@@ -553,6 +556,7 @@ export default function DatasetPage(
             {isApprovalRequest && (
                 <ApprovalRequestCard
                     datasetName={datasetData.name}
+                    datasetTitle={datasetData.title}
                     owner_org={datasetData?.owner_org || null}
                     creator_id={datasetData?.creator_user_id || null}
                     datasetId={datasetData.id}

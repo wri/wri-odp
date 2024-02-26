@@ -1912,8 +1912,8 @@ export const DatasetRouter = createTRPCRouter({
 
             const packageData = (await response.json()) as CkanResponse<{
                 diff: Record<string, { old_value: string; new_value: string }>
-                old_dataset: WriDataset
-                new_dataset: WriDataset
+                old_dataset: WriDataset | null
+                new_dataset: WriDataset | null
             }>
 
             if (!packageData.success && packageData.error) {
