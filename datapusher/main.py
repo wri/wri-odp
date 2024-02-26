@@ -118,7 +118,7 @@ def convert_store_to_file(resource_id, api_key, task_id, provider, sql, rw_id,
     ckan_url = config.get('CKAN_URL')
 
     logger.info("Fetching data...")
-    data = query_datastore(api_key, ckan_url, sql, provider, rw_id, carto_account)
+    data = query_datastore(api_key, ckan_url, sql, provider, rw_id, carto_account, format)
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.info("Converting data..." + " " + format)
         tmp_filepath = os.path.join(tmp_dir, filename)

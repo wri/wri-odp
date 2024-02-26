@@ -1934,7 +1934,7 @@ export const DatasetRouter = createTRPCRouter({
             z.object({
                 resource_id: z.string(),
                 provider: z.enum(['datastore', 'rw']),
-                format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON']),
+                format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON', "GeoJSON", "SHP", "KML"]),
                 sql: z.string(),
                 email: z.string(),
                 rw_id: z.string().optional(),

@@ -63,7 +63,7 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
         isLoading && mode == 'SIGNED_URL' ? `span` : PopoverTrigger
 
     const conversibleTabularFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
-    const conversibleSpatialFormats = ['GeoJSON', 'KML', 'Shapefile']
+    const conversibleSpatialFormats = ['GeoJSON', 'KML', 'SHP']
 
     const format = datafile.format ?? ''
     const isConversibleTabular =
