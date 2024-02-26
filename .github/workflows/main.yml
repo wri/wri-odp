@@ -2,13 +2,13 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - staging
+      - dev
   pull_request:
     branches:
-      - staging
+      - dev
 env:
   PROJECT_NAME: wri-odp
-  BRANCH_NAME: staging
+  BRANCH_NAME: dev
 permissions:
   id-token: write
   contents: read
@@ -47,15 +47,6 @@ jobs:
           mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
           docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
-      - name: Build and push Datapusher image to ECR
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
-          datapusher
-          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
       - name: Build and push Frontend image to ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -63,10 +54,11 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
-          --build-arg NEXTAUTH_SECRET=${{ secrets.STAGING_FRONTEND_NEXTAUTH_SECRET }} \
-          --build-arg NEXTAUTH_URL=${{ secrets.STAGING_FRONTEND_NEXTAUTH_URL }} \
-          --build-arg CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
-          --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
+          --build-arg NEXTAUTH_SECRET=${{ secrets.DEV_FRONTEND_NEXTAUTH_SECRET }} \
+          --build-arg NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
+          --build-arg CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Build and push Datapusher image to ECR
@@ -89,7 +81,7 @@ jobs:
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
-          wait-on: 'http://ckan-dev:5000'
+          wait-on: 'http://localhost:5000'
           wait-on-timeout: 120
           node-version: 18
           runTests: false

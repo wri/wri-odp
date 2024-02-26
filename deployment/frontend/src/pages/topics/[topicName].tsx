@@ -20,6 +20,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
+import { env } from '@/env.mjs'
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ topicName: string }>
@@ -113,6 +114,12 @@ export default function TopicPage(
         <>
             <NextSeo
                 title={`${topicTitle} - Topics`}
+                description={`WRI Open Data Catalog Topic - ${topicTitle}`}
+                openGraph={{
+                    title: `${topicTitle} - Teams`,
+                    description: `WRI Open Data Catalog Topic - ${topicTitle}`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/topic/${topicName}`,
+                }}
             />
             <Header />
             <Breadcrumbs links={links} />
@@ -129,7 +136,10 @@ export default function TopicPage(
                         topicsDetails={data?.topicDetails!}
                     />
                     <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
-                        <DatasetTopic topics={data?.topics!} key={router.asPath}/>
+                        <DatasetTopic
+                            topics={data?.topics!}
+                            key={router.asPath}
+                        />
                     </div>
                 </>
             )}
