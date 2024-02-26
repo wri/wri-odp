@@ -11,6 +11,8 @@ import Underline from '@tiptap/extension-underline'
 import Italic from '@tiptap/extension-italic'
 import Strike from '@tiptap/extension-strike'
 import Code from '@tiptap/extension-code'
+import BulletList from '@tiptap/extension-bullet-list'
+import ListItem from '@tiptap/extension-list-item'
 import History from '@tiptap/extension-history'
 // Custom
 import * as Icons from './Icons'
@@ -98,6 +100,12 @@ function TipTapEditor({
                 // Use a placeholder:
                 placeholder: placeholder ?? '',
             }),
+            BulletList,
+            ListItem.configure({
+                HTMLAttributes: {
+                    class: 'list-disc',
+                },
+            }),
         ],
     }) as Editor
 
@@ -151,6 +159,10 @@ function TipTapEditor({
 
     const toggleCode = useCallback(() => {
         editor.chain().focus().toggleCode().run()
+    }, [editor])
+
+    const toggleList = useCallback(() => {
+        editor.chain().focus().toggleBulletList().run()
     }, [editor])
 
     if (!editor) {
@@ -234,6 +246,15 @@ function TipTapEditor({
                     onClick={toggleCode}
                 >
                     <Icons.Code />
+                </button>
+                <button
+                    type="button"
+                    className={classNames('menu-button', {
+                        'is-active': editor.isActive('bulletList'),
+                    })}
+                    onClick={toggleList}
+                >
+                    <Icons.ListItem className='w-5' />
                 </button>
             </div>
 

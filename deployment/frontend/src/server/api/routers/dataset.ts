@@ -217,9 +217,9 @@ export const DatasetRouter = createTRPCRouter({
                                     format: resource.format
                                         ? resource.format
                                         : resource.layerObj ||
-                                            resource.layerObjRaw
-                                          ? 'Layer'
-                                          : '',
+                                          resource.layerObjRaw
+                                        ? 'Layer'
+                                        : '',
                                     layerObj: resource.layerObj
                                         ? convertFormToLayerObj(
                                               resource.layerObj
@@ -266,8 +266,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                              ? JSON.stringify(input.spatial)
-                              : null,
+                            ? JSON.stringify(input.spatial)
+                            : null,
 
                     spatial_address: input.spatial_address
                         ? input.spatial_address
@@ -592,9 +592,9 @@ export const DatasetRouter = createTRPCRouter({
                                         format: resource.format
                                             ? resource.format
                                             : resource.layerObj ||
-                                                resource.layerObjRaw
-                                              ? 'Layer'
-                                              : '',
+                                              resource.layerObjRaw
+                                            ? 'Layer'
+                                            : '',
                                         id: resource.resourceId,
                                         datastore_active:
                                             resource.datastore_active === true
@@ -614,9 +614,16 @@ export const DatasetRouter = createTRPCRouter({
                                               )
                                             : null,
                                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                                        description: resource.type === 'layer-raw' ? description : resource.layerObj?.description ?? '',
+                                        description:
+                                            resource.type === 'layer-raw'
+                                                ? description
+                                                : resource.layerObj
+                                                      ?.description ?? '',
                                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                                        title: resource.type === 'layer-raw' ? title : resource.layerObj?.name ?? '',
+                                        title:
+                                            resource.type === 'layer-raw'
+                                                ? title
+                                                : resource.layerObj?.name ?? '',
                                         url_type: resource.type,
                                         // schema: resource.schema
                                         //     ? { value: resource.schema }
@@ -659,8 +666,8 @@ export const DatasetRouter = createTRPCRouter({
                             input.spatial && input.spatial_address
                                 ? null
                                 : JSON.stringify(input.spatial)
-                                  ? JSON.stringify(input.spatial)
-                                  : null,
+                                ? JSON.stringify(input.spatial)
+                                : null,
                         spatial_address: input.spatial_address
                             ? input.spatial_address
                             : null,
@@ -864,8 +871,8 @@ export const DatasetRouter = createTRPCRouter({
                         format: input.format
                             ? input.format
                             : input.layerObj || input.layerObjRaw
-                              ? 'Layer'
-                              : '',
+                            ? 'Layer'
+                            : '',
                         layerObj: input.layerObj
                             ? convertFormToLayerObj(input.layerObj)
                             : null,
@@ -1903,9 +1910,11 @@ export const DatasetRouter = createTRPCRouter({
                 }
             )
 
-            const packageData = (await response.json()) as CkanResponse<
-                Record<string, { old_value: string; new_value: string }>
-            >
+            const packageData = (await response.json()) as CkanResponse<{
+                diff: Record<string, { old_value: string; new_value: string }>
+                old_dataset: WriDataset | null
+                new_dataset: WriDataset | null
+            }>
 
             if (!packageData.success && packageData.error) {
                 if (packageData.error.message)
@@ -1913,7 +1922,7 @@ export const DatasetRouter = createTRPCRouter({
                 throw Error(JSON.stringify(packageData.error))
             }
 
-            if (Object.keys(packageData.result).length === 0) {
+            if (Object.keys(packageData.result.diff).length === 0) {
                 return null
             }
 

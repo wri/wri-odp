@@ -56,14 +56,15 @@ describe("Create dataset", () => {
       force: true,
     });
     cy.get("textarea[name=short_description]").type("test");
-    cy.get(".tiptap.ProseMirror").type("RICH TEXT EDITOR");
+    cy.contains("Description").parent().parent().find(".tiptap.ProseMirror").type("RICH TEXT EDITOR");
     cy.get("input[name=author]").type("Luccas");
     cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
     cy.get("input[name=maintainer]").type("Luccas");
     cy.get("input[name=maintainer_email]").type("luccasmmg@gmail.com");
     cy.contains("More Details").click();
-    cy.get(".tiptap.ProseMirror").eq(1).type("RICH TEXT EDITOR");
-    cy.get(".tiptap.ProseMirror").eq(2).type("RICH TEXT EDITOR");
+    cy.contains("More Details").parent().parent().as("moredetails")
+    cy.get("@moredetails").get(".tiptap.ProseMirror").eq(1).type("RICH TEXT EDITOR");
+    cy.get("@moredetails").get(".tiptap.ProseMirror").eq(2).type("RICH TEXT EDITOR");
     cy.get("input[name=learn_more]").type("https://google.com");
     cy.contains("Link to Another WRI Product").click();
     cy.get("button").contains("Add a link to another wri product").click();
@@ -158,8 +159,9 @@ describe("Create dataset", () => {
       .clear()
       .type("https://google.com" + ".br");
     cy.contains("More Details").click();
-    cy.get(".tiptap.ProseMirror").eq(1).type("EDITED");
-    cy.get(".tiptap.ProseMirror").eq(2).type("EDITED");
+    cy.contains("More Details").parent().parent().as("moredetails")
+    cy.get("@moredetails").get(".tiptap.ProseMirror").eq(1).type("EDITED");
+    cy.get("@moredetails").get(".tiptap.ProseMirror").eq(2).type("EDITED");
     cy.contains("Data Files").click();
     cy.wait(5000);
     cy.get("button").contains("Add another data file").click();

@@ -210,6 +210,7 @@ class WriPlugin(plugins.SingletonPlugin):
             resource_format
             and resource_format.lower() in supported_formats
             and resource_dict.get('url_type') != u'datapusher'
+            and resource_dict.get('url_type') == u'upload'
         )
 
         if not submit:

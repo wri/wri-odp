@@ -1387,8 +1387,8 @@ async function sendNotification(
                 })
                 if (senderUserObj) {
                     const email = await generateMemberEmail(
-                        userObj,
                         senderUserObj,
+                        userObj,
                         notification as NotificationType
                     )
                     await sendEmail(
@@ -2520,4 +2520,53 @@ export async function getDatasetReleaseNotes({ id }: { id: string }) {
     > = await response.json()
 
     return releaseNotes.result
+}
+
+export async function generateDataSiteMap() {
+    const packagedetails = (await getAllDatasetFq({
+        apiKey: '',
+        fq: `is_approved:true`,
+        query: { search: '', page: { start: 0, rows: 100000 } },
+    }))!
+
+    const getAllOrg = await getAllOrganizations({ apiKey: '' })
+    const orgs = getAllOrg.map((org) => {
+        return {
+            loc: `${env.NEXTAUTH_URL}/teams/${org.name}`,
+            lastmod: new Date().toISOString(),
+        }
+    })
+
+    const getGroups = (await getUserGroups({ apiKey: '', userId: '' }))!
+    const groups = getGroups.map((group) => {
+        return {
+            loc: `${env.NEXTAUTH_URL}/topics/${group.name}`,
+            lastmod: new Date().toISOString(),
+        }
+    })
+
+    const sitemap = packagedetails.datasets.map((dataset) => {
+        return {
+            loc: `${env.NEXTAUTH_URL}/datasets/${dataset.name}`,
+            lastmod: new Date().toISOString(),
+        }
+    })
+    const general = [
+        {
+            loc: `${env.NEXTAUTH_URL}`,
+            lastmod: new Date().toISOString(),
+        },
+        {
+            loc: `${env.NEXTAUTH_URL}/topics`,
+            lastmod: new Date().toISOString(),
+        },
+        {
+            loc: `${env.NEXTAUTH_URL}/teams`,
+            lastmod: new Date().toISOString(),
+        },
+        ...groups,
+        ...orgs,
+    ]
+    sitemap.push(...general)
+    return sitemap
 }

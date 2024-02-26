@@ -161,7 +161,7 @@ export const datasetFormFieldmap: Record<string, string> = {
 
 //@ts-nocheck
 export function formatDiff(
-    data: Record<string, { old_value: string; new_value: string }>
+    data: Record<string, { old_value: string; new_value: string }> | null
 ) {
     const outputDiff: Record<
         string,

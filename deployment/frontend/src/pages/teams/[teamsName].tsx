@@ -19,6 +19,7 @@ import { GroupTree } from '@/schema/ckan.schema'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
+import { env } from '@/env.mjs'
 
 const links = [
     { label: 'Teams', url: '/teams', current: false },
@@ -117,7 +118,15 @@ export default function teams(
 
     return (
         <>
-            <NextSeo title={`${teamTitle} - Teams`} />
+            <NextSeo
+                title={`${teamTitle} - Teams`}
+                description={`WRI Open Data Catalog Teams - ${teamTitle}`}
+                openGraph={{
+                    title: `${teamTitle} - Teams`,
+                    description: `WRI Open Data Catalog Teams - ${teamTitle}`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/teams/${teamName}`,
+                }}
+            />
             <Header />
             <Breadcrumbs links={links} />
             {topicIsLoading ? (
@@ -133,7 +142,10 @@ export default function teams(
                         teamsDetails={data?.teamsDetails!}
                     />
                     <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
-                        <DatasetTeams teams={data?.teams!} key={router.asPath}/>
+                        <DatasetTeams
+                            teams={data?.teams!}
+                            key={router.asPath}
+                        />
                     </div>
                 </>
             )}
