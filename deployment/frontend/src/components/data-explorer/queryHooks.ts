@@ -18,7 +18,7 @@ export interface FieldsResponse {
     fields: Record<string, any>
 }
 
-export function useFields({ id, provider }: TabularResource) {
+export function useFields({ id, provider, apiKey }: TabularResource) {
     const session = useSession()
 
     console.log('PROVIDER', provider)
@@ -27,7 +27,9 @@ export function useFields({ id, provider }: TabularResource) {
         'Content-Type': 'application/json',
     } as any
 
-    if (session.data?.user.apikey) {
+    if (apiKey) {
+        headers['Authorization'] = apiKey
+    } else if (session.data?.user.apikey) {
         headers['Authorization'] = session.data?.user.apikey
     }
 

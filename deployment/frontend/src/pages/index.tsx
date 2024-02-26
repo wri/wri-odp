@@ -4,6 +4,8 @@ import { HighlightsCarousel } from '@/components/home/HighlightsCarousel'
 import { HomeFooter } from '@/components/home/HomeFooter'
 import { TopicsCarousel } from '@/components/home/TopicsCarousel'
 import Head from 'next/head'
+import { env } from '@/env.mjs'
+import { NextSeo } from 'next-seo'
 
 export default function Home() {
     return (
@@ -11,12 +13,21 @@ export default function Home() {
             <Head>
                 <title>WRI - ODP</title>
             </Head>
+            <NextSeo
+                title="Home Page"
+                description={`WRI Open Data Catalog - Home Page`}
+                openGraph={{
+                    title: `Home Page`,
+                    description: `WRI Open Data Catalog - Home Page`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
+                }}
+            />
             <Hero />
             <main className="default-home-container gap-x-[4.25rem] mx-auto grid grid-cols-1 py-24 md:grid-cols-5">
                 <div className="col-span-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
                     <h3 className="pt-1 font-acumin text-2xl font-bold leading-loose text-stone-900">
-                                      About the portal
+                        About the portal
                     </h3>
                 </div>
                 <div className="col-span-3 flex flex-col gap-y-4">

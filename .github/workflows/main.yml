@@ -67,6 +67,7 @@ jobs:
           --build-arg NEXTAUTH_URL=${{ secrets.STAGING_FRONTEND_NEXTAUTH_URL }} \
           --build-arg CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
           --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.STAGING_FRONTEND_NEXTAUTH_URL }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Build and push Datapusher image to ECR
