@@ -38,6 +38,7 @@ function subFields(dataset: WriDataset) {
         {
             title: 'Release Notes',
             description: dataset?.release_notes,
+            isHtml: true,
         },
     ]
 }
@@ -106,7 +107,16 @@ function SubCardProfile({ dataset }: { dataset: WriDataset }) {
                                 {item.title}
                             </p>
                             <p className="font-normal text-[14px] text-[#4B4B4B]">
-                                {item.description}
+                                {!item.isHtml ? (
+                                    item.description
+                                ) : (
+                                    <div
+                                        className="prose max-w-none prose-sm pr-8 text-justify prose-a:text-wri-green"
+                                        dangerouslySetInnerHTML={{
+                                            __html: item?.description ?? '',
+                                        }}
+                                    ></div>
+                                )}
                             </p>
                         </div>
                     )
