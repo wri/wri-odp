@@ -43,6 +43,7 @@ export interface RwDataset {
     provider: string
     userId: string
     connectorUrl: string
+    sources: string[]
     tableName: string
     status: string
     published: boolean
