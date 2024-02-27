@@ -347,7 +347,7 @@ export default function DatasetPage(
         { label: 'Explore Data', url: '/search', current: false },
         {
             label: datasetData?.title ?? datasetData?.name ?? '',
-            url: `/datasets/${datasetData?.title ?? datasetData?.name ?? ''}`,
+            url: `/datasets/${datasetData?.name ?? '404'}`,
             current: true,
         },
     ]
