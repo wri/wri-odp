@@ -1,13 +1,17 @@
 from prefect import task, get_run_logger
 from pandas import DataFrame
+import geopandas as gpd
+import fiona
 import json
+
+fiona.supported_drivers['KML'] = 'rw'
 
 
 @task(retries=3, retry_delay_seconds=15)
 def data_to_file(data: list, tmp_filepath: str, format: str):
     logger = get_run_logger()
     # TODO: convert to file
-    if format == "GeoJSON":
+    if format in ["GeoJSON", "SHP", "KML"]:
         geojson = {
                 "type": "FeatureCollection",
                 "features": []
@@ -25,8 +29,17 @@ def data_to_file(data: list, tmp_filepath: str, format: str):
 
                 geojson["features"].append(geojson_feature)
 
-        with open(tmp_filepath, "w+") as f:
-            json.dump(geojson, f)
+        if format == "GeoJSON":
+            with open(tmp_filepath, "w+") as f:
+                json.dump(geojson, f)
+
+        gdf = gpd.read_file(json.dumps(geojson), driver="GeoJSON")
+
+        if format == "KML":
+            gdf.to_file(tmp_filepath, driver="KML")
+
+        if format == "SHP":
+            gdf.to_file(tmp_filepath)
 
         return
 
