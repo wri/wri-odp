@@ -115,12 +115,12 @@ export function BuildALayerRaw({
                     <Accordion text="General Config">
                         <label
                             htmlFor="wri_data"
-                            className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
+                            className="flex items-center flex-wrap gap-x-2 font-acumin text-lg font-light text-zinc-800"
                         >
                             As a general rule you should start with the{' '}
                             <a
                                 target="_blank"
-                                className="text-blue-800"
+                                className="text-blue-800 "
                                 href="https://resource-watch.github.io/doc-api/reference.html#what-is-a-layer"
                             >
                                 resourcewatch api layer reference
