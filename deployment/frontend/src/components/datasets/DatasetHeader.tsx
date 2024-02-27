@@ -159,6 +159,7 @@ flex items-center gap-x-1 mt-4 w-fit
           "
                         href={data.connectorUrl}
                         target="_blank"
+                        rel="noopener noreferrer"
                     >
                         <LinkIcon className="h-4 w-4 text-wri-green" />
                         <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
@@ -181,6 +182,7 @@ flex items-center gap-x-1 mt-4 w-fit
                             '_'
                         )}`}
                         target="_blank"
+                        rel="noopener noreferrer"
                     >
                         <LinkIcon className="h-4 w-4 text-wri-green" />
                         <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
@@ -195,6 +197,7 @@ flex items-center gap-x-1 mt-4 w-fit
                                 className="text-wri-greenflex items-center gap-x-1 mt-4 w-fit"
                                 href={data.sources[0]}
                                 target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 <LinkIcon className="h-4 w-4 text-wri-green" />
                                 <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
@@ -209,7 +212,11 @@ flex items-center gap-x-1 mt-4 w-fit
                             className="relative inline-block text-left py-4"
                         >
                             <div>
-                                <Menu.Button><Button size="sm">Open external sources</Button></Menu.Button>
+                                <Menu.Button>
+                                    <Button size="sm">
+                                        Open external sources
+                                    </Button>
+                                </Menu.Button>
                             </div>
                             <Transition
                                 as={Fragment}
@@ -768,32 +775,34 @@ export function DatasetHeader({
                 )}
 
                 <div className="flex space-x-2">
-                    {dataset?.provider && dataset?.provider !== 'gee' && dataset?.rw_id && (
-                        <div className="pt-4">
-                            {tabularResource &&
-                            tabularResource.id === dataset.rw_id ? (
-                                <Button
-                                    size="sm"
-                                    onClick={() => setTabularResource(null)}
-                                >
-                                    Remove Tabular View
-                                </Button>
-                            ) : (
-                                <Button
-                                    size="sm"
-                                    onClick={() =>
-                                        setTabularResource({
-                                            provider:
-                                                dataset.provider as string,
-                                            id: dataset.rw_id as string,
-                                        })
-                                    }
-                                >
-                                    View Table Preview
-                                </Button>
-                            )}
-                        </div>
-                    )}
+                    {dataset?.provider &&
+                        dataset?.provider !== 'gee' &&
+                        dataset?.rw_id && (
+                            <div className="pt-4">
+                                {tabularResource &&
+                                tabularResource.id === dataset.rw_id ? (
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setTabularResource(null)}
+                                    >
+                                        Remove Tabular View
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            setTabularResource({
+                                                provider:
+                                                    dataset.provider as string,
+                                                id: dataset.rw_id as string,
+                                            })
+                                        }
+                                    >
+                                        View Table Preview
+                                    </Button>
+                                )}
+                            </div>
+                        )}
                     {dataset?.provider &&
                         dataset?.rw_id &&
                         !isDatasetViewsLoading &&
