@@ -74,10 +74,10 @@ describe("External sources", () => {
     },
   );
   after(() => {
-    cy.deleteDatasetAPI('gee-dataset');
-    cy.deleteDatasetAPI('arcgis-dataset');
-    cy.deleteDatasetAPI('carto-dataset');
-    cy.deleteDatasetAPI('document-dataset');
+    cy.deleteDatasetAPI(geeDataset);
+    cy.deleteDatasetAPI(arcgisDataset);
+    cy.deleteDatasetAPI(cartoDataset);
+    cy.deleteDatasetAPI(documentDataset);
     cy.deleteOrganizationAPI(parentOrg);
   });
 });
