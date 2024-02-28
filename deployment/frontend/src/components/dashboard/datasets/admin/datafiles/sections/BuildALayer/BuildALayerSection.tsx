@@ -63,6 +63,7 @@ export function BuildALayer({
         const layerObjRaw = getRawObjFromApiSpec(
             convertFormToLayerObj(layerFormObj.getValues())
         )
+        formObj.setValue(`resources.${index}.rw_id`, layerObjRaw.id ?? '')
         formObj.setValue(`resources.${index}.layerObjRaw`, layerObjRaw)
         formObj.setValue(`resources.${index}.layerObj`, null)
     }
@@ -197,6 +198,7 @@ export function PreviewMap({
     layerFormObj: APILayerSpec | null
     updatePreview?: () => void
 }) {
+    const [isReady, setReady] = useState(false)
     const [viewState, setViewState] = useState({
         longitude: -100,
         latitude: 40,
@@ -284,11 +286,14 @@ export function PreviewMap({
                 onMove={(evt) => setViewState(evt.viewState)}
                 onClick={onClickLayer}
                 interactiveLayerIds={interactiveLayerIds ?? []}
+                onLoad={() => {
+                    setReady(true)
+                }}
                 style={{
                     height: '400px',
                 }}
             >
-                {layerFormObj && (
+                {isReady && layerFormObj && (
                     <LayerManagerPreview layers={[layerFormObj]} />
                 )}
                 <Tooltip

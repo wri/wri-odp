@@ -224,12 +224,23 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     .refine(
         (obj) => {
             if (!obj.rw_dataset) return true
-            if (obj.rw_dataset && !obj.connectorUrl) return false
+            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName) return false
             return true
         },
         {
-            message: 'ConnectorUrl is required for RW datasets',
+            message: 'ConnectorUrl is required for RW datasets, unless a table name is provided',
             path: ['connectorUrl'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (!obj.rw_dataset) return true
+            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName) return false
+            return true
+        },
+        {
+            message: 'Tablename is required for RW datasets, unless a connectorUrl is provided',
+            path: ['tableName'],
         }
     )
     .refine(

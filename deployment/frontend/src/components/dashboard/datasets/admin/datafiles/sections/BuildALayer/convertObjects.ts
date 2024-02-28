@@ -26,6 +26,7 @@ export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
         iso: formData.iso ?? [],
         application: formData.application ?? ['data-explorer'],
         id: formData.id ?? uuidv4(),
+        rw_id: formData.id ?? uuidv4(),
         interactionConfig: formData.interactionConfig
             ? {
                   output: formData.interactionConfig.output.filter((item) => {
@@ -57,9 +58,9 @@ export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
             render:
                 formData.layerConfig.source?.provider.type.value === 'carto'
                     ? {
-                          layers: formData.layerConfig.render?.layers.map(
+                          layers: formData.layerConfig.render?.layers?.map(
                               (layer) => ({
-                                  type: layer.type.value,
+                                  type: layer?.type.value ?? '',
                                   'source-layer': layer['source-layer'],
                                   paint:
                                       layer.paint &&
@@ -192,7 +193,7 @@ export function convertLayerObjToForm(layerObj: APILayerSpec): LayerFormType {
         ...layerObj,
         interactionConfig: {
             output:
-                layerObj.interactionConfig?.output.map((item) => ({
+                layerObj.interactionConfig?.output?.map((item) => ({
                     ...item,
                     enabled: true,
                 })) ?? [],
@@ -302,7 +303,7 @@ function parsePaintColor(color: any) {
 
 function parseRender(render: any) {
     const _render = {
-        layers: render.layers.map((layer: any) => ({
+        layers: render.layers?.map((layer: any) => ({
             type: {
                 value: layer.type,
                 label: layer.type,
@@ -380,6 +381,7 @@ export const getRawObjFromApiSpec = (apiSpec: APILayerSpec) => {
         apiSpec
     return {
         id,
+        rw_id: id,
         generalConfig: JSON.stringify(attributes, null, 2),
         layerConfig: JSON.stringify(layerConfig, null, 2),
         interactionConfig: JSON.stringify(interactionConfig, null, 2),
