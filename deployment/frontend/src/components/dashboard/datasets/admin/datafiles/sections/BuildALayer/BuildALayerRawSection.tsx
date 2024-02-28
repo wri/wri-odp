@@ -44,8 +44,9 @@ export function BuildALayerRaw({
             const apiSpec = getApiSpecFromRawObj(
                 getValues(`resources.${index}.layerObjRaw`)
             )
+            console.log
             return getValues(`resources.${index}.layerObjRaw`)
-                ? { ...apiSpec, id: uuidv4() }
+                ? { ...apiSpec, id: getValues(`resources.${index}.rw_id`) ?? uuidv4() }
                 : null
         } catch (e) {
             return null
@@ -98,6 +99,23 @@ export function BuildALayerRaw({
                         <ErrorDisplay
                             name={`resources.${index}.title`}
                             errors={errors}
+                        />
+                    </InputGroup>
+                    <InputGroup
+                        label="GEE ID"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input
+                            placeholder="xxxx-xxxx-xxxxxx"
+                            {...register(`resources.${index}.rw_id`)}
+                            type="text"
+                            maxWidth="max-w-[70rem]"
+                            icon={
+                                <DefaultTooltip content="This is required if you want to setup a GEE layer, in this case the ID needs to match the tilecache ID on GEE">
+                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                </DefaultTooltip>
+                            }
                         />
                     </InputGroup>
                     <InputGroup
@@ -306,6 +324,7 @@ export function PreviewMap({
         zoom: 1,
     })
 
+    const [isReady, setReady] = useState(false)
     const mapRef = useRef<MapRef | null>(null)
     const interactiveLayerIds = layerFormObj
         ? getInteractiveLayers([layerFormObj])
@@ -331,7 +350,6 @@ export function PreviewMap({
     }) => {
         setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat })
         const layersInfo = []
-        console.log('LAYERS INSIDE ON CLICK', layers)
         for (let layer of layers) {
             const feature = features?.find(
                 //  @ts-ignore
@@ -387,11 +405,14 @@ export function PreviewMap({
                 onMove={(evt) => setViewState(evt.viewState)}
                 onClick={onClickLayer}
                 interactiveLayerIds={interactiveLayerIds ?? []}
+                onLoad={() => {
+                    setReady(true)
+                }}
                 style={{
                     height: '450px',
                 }}
             >
-                {layerFormObj && (
+                {isReady && layerFormObj && (
                     <LayerManagerPreview layers={[layerFormObj]} />
                 )}
                 <Tooltip

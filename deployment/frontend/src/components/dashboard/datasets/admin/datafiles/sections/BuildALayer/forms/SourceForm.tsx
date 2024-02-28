@@ -179,7 +179,7 @@ export default function SourceForm({
                         {watch('layerConfig.source.provider.type')?.value ===
                             'gee' && (
                             <InputGroup
-                                label="Layer ID"
+                                label="GEE ID"
                                 className="sm:grid-cols-1 gap-x-2"
                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                             >
