@@ -55,11 +55,10 @@ def download_request(context: Context, data_dict: dict[str, Any]):
 
     resource_title = resource_dict.get("title", resource_dict.get("name"))
 
-    # TODO: uncomment
-    # if cached_file_url:
-    #     log.info("File is cached")
-    #     send_email([email], cached_file_url, download_filename)
-    #     return True
+    if cached_file_url:
+        log.info("File is cached")
+        send_email([email], cached_file_url, download_filename)
+        return True
 
     prefect_url: str = config.get("ckanext.wri.prefect_url")
     deployment_name: str = config.get("ckanext.wri.datapusher_deployment_name")
