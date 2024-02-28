@@ -191,7 +191,7 @@ const renderSchema = z.object({
                 .optional()
                 .nullable(),
             filter: z.array(z.union([z.string(), filterExpression])),
-        }).optional().nullable()
+        })
     ).optional().nullable(),
 })
 

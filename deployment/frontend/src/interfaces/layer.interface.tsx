@@ -58,6 +58,7 @@ export interface APILayerSpec {
   provider: string;
   userId?: string;
   default: boolean;
+  rw_id?: string;
   protected: boolean;
   published: boolean;
   env: string;

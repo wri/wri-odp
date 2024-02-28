@@ -58,9 +58,9 @@ export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
             render:
                 formData.layerConfig.source?.provider.type.value === 'carto'
                     ? {
-                          layers: formData.layerConfig.render?.layers.map(
+                          layers: formData.layerConfig.render?.layers?.map(
                               (layer) => ({
-                                  type: layer.type.value,
+                                  type: layer?.type.value ?? '',
                                   'source-layer': layer['source-layer'],
                                   paint:
                                       layer.paint &&
