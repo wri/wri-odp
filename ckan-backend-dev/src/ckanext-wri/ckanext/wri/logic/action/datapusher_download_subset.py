@@ -11,64 +11,35 @@ import datetime
 import requests
 from urllib.parse import urljoin
 import json
+import base64
 
 import logging
 log = logging.getLogger(__name__)
 
 # TODO: rename this file
-def download_request(context: Context, data_dict: dict[str, Any]):
-    print("DATA DICT")
-    print(data_dict)
+def subset_download_request(context: Context, data_dict: dict[str, Any]):
     format = data_dict.get("format")
-    res_id = data_dict.get("resource_id")
+    id = data_dict.get("id")
     provider = data_dict.get("provider")
     sql = data_dict.get("sql")
     email = data_dict.get("email")
-    rw_id = data_dict.get("rw_id")
 
-    if None in (format, res_id, provider, sql):
+    if None in (format, id, provider, sql):
         raise p.toolkit.ValidationError({"message": "Missing parameters"})
-
-    try:
-        resource_dict = p.toolkit.get_action("resource_show")(
-            context,
-            {
-                "id": res_id,
-            },
-        )
-    except logic.NotFound:
-        return False
-
-    res_last_modified = resource_dict.get("metadata_modified")
-    filename = (res_id + "-" + res_last_modified + "." + format).lower()
-    download_filename = resource_dict.get("title") or resource_dict.get("name") or resource_dict.get("id") or "file"
-    download_filename += ".{}".format(format.lower())
-
-    s3 = uploader.BaseS3Uploader()
-
-    cached_file_url = None
-    try:
-        cached_file_url = s3.get_signed_url_to_key("_downloads_cache/" + filename,
-                                                   extra_params={"ResponseContentDisposition": 'attachment; filename="{}"'.format(download_filename)})
-    except Exception as e:
-        log.error(e)
-
-    resource_title = resource_dict.get("title", resource_dict.get("name"))
-
-    if cached_file_url:
-        send_email([email], cached_file_url, download_filename)
-        return True
 
     prefect_url: str = config.get("ckanext.wri.prefect_url")
     deployment_name: str = config.get("ckanext.wri.datapusher_deployment_name")
 
+    key = f"{sql}-{format}"
+    filename = str(base64.b64encode(key.encode()))
+    download_filename = "file.{}".format(format.lower())
     task = {
-        "entity_id": res_id,
+        "entity_id": id,
         "entity_type": "resource",
-        "task_type": "download",
+        "task_type": "download_subset",
         "last_updated": str(datetime.datetime.utcnow()),
         "state": "submitting",
-        "key": format,
+        "key": key,
         "value": "{}",
         "error": "{}",
     }
@@ -79,7 +50,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
     try:
         existing_task = p.toolkit.get_action("task_status_show")(
             context,
-            {"entity_id": res_id, "task_type": "download", "key": format},
+            {"entity_id": id, "task_type": "download_subset", "key": sql + key},
         )
         stale_time = 30
         assume_task_stale_after = datetime.timedelta(
@@ -126,7 +97,6 @@ def download_request(context: Context, data_dict: dict[str, Any]):
                     existing_task["id"],
                 )
                 return False
-
         task["id"] = existing_task["id"]
     except logic.NotFound:
         pass
@@ -141,7 +111,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
 
     try:
         deployment = requests.get(
-            urljoin(prefect_url, f"api/deployments/name/convert-store-to-file/{deployment_name}")
+            urljoin(prefect_url, f"api/deployments/name/download-subset-of-data/{deployment_name}")
         )
         deployment = deployment.json()
         deployment_id = deployment["id"]
@@ -153,11 +123,10 @@ def download_request(context: Context, data_dict: dict[str, Any]):
                 {
                     "parameters": {
                         "api_key": api_token,
-                        "resource_id": res_id,
+                        "id": id,
                         "task_id": task.get("id"),
                         "provider": provider,
                         "sql": sql,
-                        "rw_id": rw_id,
                         "filename": filename,
                         "format": format,
                         "download_filename": download_filename
@@ -175,7 +144,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email], resource_title)
+        send_error([email], 'Subset of data')
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -197,7 +166,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email], resource_title)
+        send_error([email], 'Subset of data')
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
@@ -215,7 +184,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
     return True
 
 
-def download_callback(context: Context, data_dict: dict[str, Any]):
+def subset_download_callback(context: Context, data_dict: dict[str, Any]):
     task_id = data_dict.get("task_id")
     entity_id = data_dict.get("entity_id")
     key = data_dict.get("key")
@@ -284,7 +253,6 @@ ERROR_EMAIL_HTML = '''
 </html>
 
 '''
-
 
 def send_error(emails: list[str], resource_title):
     odp_url = config.get('ckanext.wri.odp_url')

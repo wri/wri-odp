@@ -21,7 +21,7 @@ from tasks.data_to_file import data_to_file
 from tasks.s3_upload import s3_upload
 
 from tasks.send_callback import send_callback
-from tasks.query_datastore import query_datastore
+from tasks.query_datastore import query_datastore, query_rw
 
 
 MINIMUM_QSV_VERSION = "0.108.0"
@@ -132,6 +132,29 @@ def convert_store_to_file(resource_id, api_key, task_id, provider, sql, rw_id,
                   {"task_id": task_id, "url": url, "state": "complete", "entity_id": resource_id, 
                    "key": format})
 
+@flow(log_prints=True)
+def download_subset_of_data(id, api_key, task_id, provider, sql,
+                          format, filename, download_filename):
+    logger = get_run_logger()
+    ckan_url = config.get('CKAN_URL')
+
+    logger.info("Fetching data...")
+    data = []
+    if provider == "datastore":
+        data = query_datastore(api_key, ckan_url, sql, provider, '')
+    else:
+        data = query_rw(id, sql)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        logger.info("Converting data..." + " " + format)
+        tmp_filepath = os.path.join(tmp_dir, filename)
+        data_to_file(data, tmp_filepath, format)
+        logger.info("Uploading data...")
+        url = s3_upload(tmp_filepath, "_downloads_cache/{}".format(filename), download_filename)
+
+    # TODO: send error/success (send status)
+    send_callback(api_key, ckan_url, "prefect_download_subset_callback",
+                  {"task_id": task_id, "url": url, "state": "complete", "entity_id": id, 
+                   "key": format})
 
 if __name__ == "__main__":
     datastore_deployment = push_to_datastore.to_deployment(
@@ -156,4 +179,19 @@ if __name__ == "__main__":
         enforce_parameter_schema=False,
         is_schedule_active=False,
     )
-    serve(datastore_deployment, conversion_deployment)
+    download_subset_deployment = download_subset_of_data.to_deployment(
+        name=config.get('DEPLOYMENT_NAME'),
+        parameters={
+            "id": "test_id",
+            "api_key": "api_key",
+            "task_id": "task_id",
+            "provider": "provider",
+            "sql": "sql",
+            "format": "format",
+            "filename": "filename",
+            "download_filename": "download_filename"
+            },
+        enforce_parameter_schema=False,
+        is_schedule_active=False,
+    )
+    serve(datastore_deployment, conversion_deployment, download_subset_deployment)

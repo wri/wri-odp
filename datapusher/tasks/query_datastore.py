@@ -65,3 +65,50 @@ def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id:
             fetch_next_page = False
 
     return results
+
+# NOTE: this only works for CartoDB layers
+@task(retries=3, retry_delay_seconds=15)
+def query_rw(id: str, sql: str):
+    logger = get_run_logger()
+
+    url = f"https://api.resourcewatch.org/v1/query/{id}"
+
+    if ";" in sql:
+        sql = sql.split(";")[0]
+
+    if "LIMIT" in sql.upper():
+        sql = sql.split("LIMIT")[0]
+
+    fetch_next_page = True
+    current_page = 0
+    results = []
+    limit = 200
+
+    while fetch_next_page:
+        limited_sql = sql + " LIMIT {} OFFSET {}".format(limit,
+                                                         current_page * limit)
+        page_url = url + "?sql={}".format(limited_sql)
+
+        logger.info(page_url)
+
+        r = requests.get(
+            page_url,
+            verify=True,
+            headers={}
+        )
+
+        check_response(r, url, "CKAN")
+
+        new_results = r.json()["rows"]
+
+        if new_results:
+            new_records = new_results
+            if len(new_records):
+                results.extend(new_records)
+            else:
+                fetch_next_page = False
+            current_page += 1
+        else:
+            fetch_next_page = False
+
+    return results
