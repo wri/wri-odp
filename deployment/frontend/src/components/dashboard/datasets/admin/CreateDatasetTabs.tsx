@@ -4,7 +4,6 @@ import { CheckIcon } from "@heroicons/react/20/solid";
 import { match } from "ts-pattern";
 
 export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
-  console.log('CURRENT STEP', currentStep)
   const steps = [
     { id: 0, name: "Metadata", href: "#" },
     { id: 1, name: "Datafiles", href: "#" },
@@ -19,7 +18,6 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
       .otherwise(() => ({ ...step, status: "complete" }));
   });
 
-  console.log('STEPS', steps.length)
   return (
     <Tab.List
       as="nav"
