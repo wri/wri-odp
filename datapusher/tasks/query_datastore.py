@@ -1,23 +1,30 @@
 from prefect import task, get_run_logger
 from helpers import get_url, check_response
 import requests
+import re
 
 
 # NOTE: this only works for CartoDB layers
 @task(retries=3, retry_delay_seconds=15)
-def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id: str = ""):
+def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id: str = "",
+                    carto_account: str = "", format: str = ""):
     logger = get_run_logger()
 
     if provider == "datastore":
         url = get_url("datastore_search_sql", ckan_url)
     elif provider == "rw":
-        url = "https://wri-rw.carto.com/api/v1/sql"
+        url = "https://{}.carto.com/api/v1/sql".format(carto_account)
 
     if ";" in sql:
         sql = sql.split(";")[0]
 
     if "LIMIT" in sql.upper():
         sql = sql.split("LIMIT")[0]
+
+    if format in ["GeoJSON", "SHP", "KML"]:
+        pattern = re.compile("SELECT ", re.IGNORECASE)
+        sql = pattern.sub("SELECT ST_ASGEOJSON(the_geom) as geometry, ", sql)
+        logger.info(sql)
 
     fetch_next_page = True
     current_page = 0
