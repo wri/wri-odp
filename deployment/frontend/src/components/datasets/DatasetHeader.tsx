@@ -38,6 +38,9 @@ import { useActiveCharts } from '@/utils/storeHooks'
 import { View } from '@/interfaces/dataset.interface'
 import ChartViewIcon from './view-icons/ChartViewIcon'
 import Highlights from '../Highlights'
+import { useQuery } from 'react-query'
+import { RwDatasetResp, RwResponse, isRwError } from '@/interfaces/rw.interface'
+import { match } from 'ts-pattern'
 
 function OpenInButton({
     open_in,
@@ -93,7 +96,6 @@ function OpenInButton({
                     )}
                 </Menu.Button>
             </div>
-
             <Transition
                 as={Fragment}
                 enter="transition ease-out duration-100"
@@ -134,6 +136,128 @@ function OpenInButton({
                 </Menu.Items>
             </Transition>
         </Menu>
+    )
+}
+
+export function ExternalService({ rw_id }: { rw_id: string }) {
+    const { data } = useQuery([rw_id], async () => {
+        const datasetRes = await fetch(
+            `https://api.resourcewatch.org/v1/dataset/${rw_id}`
+        )
+        const dataset: RwDatasetResp = await datasetRes.json()
+        if (isRwError(dataset)) throw new Error(dataset.errors[0].detail)
+        return dataset.data.attributes
+    })
+    if (!data) return <></>
+    return (
+        <>
+            {match(data.provider)
+                .with('cartodb', 'featureservice', 'gfw', () => (
+                    <a
+                        className="text-wri-green
+flex items-center gap-x-1 mt-4 w-fit
+          "
+                        href={data.connectorUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <LinkIcon className="h-4 w-4 text-wri-green" />
+                        <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
+                            Open in{' '}
+                            {match(data.provider)
+                                .with('cartodb', () => 'Carto')
+                                .with('featureservice', () => 'ArcGIS')
+                                .with('gfw', () => 'GFW')
+                                .otherwise(() => '')}
+                        </div>
+                    </a>
+                ))
+                .with('gee', () => (
+                    <a
+                        className="text-wri-green
+flex items-center gap-x-1 mt-4 w-fit
+          "
+                        href={`https://developers.google.com/earth-engine/datasets/catalog/${data.tableName.replaceAll(
+                            '/',
+                            '_'
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <LinkIcon className="h-4 w-4 text-wri-green" />
+                        <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
+                            Open in GEE
+                        </div>
+                    </a>
+                ))
+                .with('csv', 'tsv', 'json', 'xml', () => {
+                    if (data.sources.length === 1) {
+                        return (
+                            <a
+                                className="text-wri-greenflex items-center gap-x-1 mt-4 w-fit"
+                                href={data.sources[0]}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <LinkIcon className="h-4 w-4 text-wri-green" />
+                                <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
+                                    Open {data.provider.toUpperCase()}
+                                </div>
+                            </a>
+                        )
+                    }
+                    return (
+                        <Menu
+                            as="div"
+                            className="relative inline-block text-left py-4"
+                        >
+                            <div>
+                                <Menu.Button>
+                                    <Button size="sm">
+                                        Open external sources
+                                    </Button>
+                                </Menu.Button>
+                            </div>
+                            <Transition
+                                as={Fragment}
+                                enter="transition ease-out duration-100"
+                                enterFrom="transform opacity-0 scale-95"
+                                enterTo="transform opacity-100 scale-100"
+                                leave="transition ease-in duration-75"
+                                leaveFrom="transform opacity-100 scale-100"
+                                leaveTo="transform opacity-0 scale-95"
+                            >
+                                <Menu.Items className="absolute left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                    <div className="py-1">
+                                        {data.sources.map((item, index) => (
+                                            <Menu.Item key={item}>
+                                                {({ active }) => (
+                                                    <a
+                                                        href={item}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className={classNames(
+                                                            active
+                                                                ? 'bg-gray-100 text-gray-900'
+                                                                : 'text-gray-700',
+                                                            'block px-4 py-2 text-sm'
+                                                        )}
+                                                    >
+                                                        Source {index + 1}
+                                                    </a>
+                                                )}
+                                            </Menu.Item>
+                                        ))}
+                                    </div>
+                                </Menu.Items>
+                            </Transition>
+                        </Menu>
+                    )
+                })
+                .otherwise(() => (
+                    <></>
+                ))}
+        </>
     )
 }
 
@@ -651,37 +775,39 @@ export function DatasetHeader({
                 )}
 
                 <div className="flex space-x-2">
-                    {dataset?.provider && dataset?.rw_id && (
-                        <div className="py-4">
-                            {tabularResource &&
-                            tabularResource.id === dataset.rw_id ? (
-                                <Button
-                                    size="sm"
-                                    onClick={() => setTabularResource(null)}
-                                >
-                                    Remove Tabular View
-                                </Button>
-                            ) : (
-                                <Button
-                                    size="sm"
-                                    onClick={() =>
-                                        setTabularResource({
-                                            provider:
-                                                dataset.provider as string,
-                                            id: dataset.rw_id as string,
-                                        })
-                                    }
-                                >
-                                    View Table Preview
-                                </Button>
-                            )}
-                        </div>
-                    )}
+                    {dataset?.provider &&
+                        dataset?.provider !== 'gee' &&
+                        dataset?.rw_id && (
+                            <div className="pt-4">
+                                {tabularResource &&
+                                tabularResource.id === dataset.rw_id ? (
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setTabularResource(null)}
+                                    >
+                                        Remove Tabular View
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            setTabularResource({
+                                                provider:
+                                                    dataset.provider as string,
+                                                id: dataset.rw_id as string,
+                                            })
+                                        }
+                                    >
+                                        View Table Preview
+                                    </Button>
+                                )}
+                            </div>
+                        )}
                     {dataset?.provider &&
                         dataset?.rw_id &&
                         !isDatasetViewsLoading &&
                         datasetViews?.some(
-                            (v: View) => v.config_obj.type == 'chart'
+                            (v: View) => v.config_obj?.type == 'chart'
                         ) && (
                             <div className="py-4">
                                 {activeCharts
@@ -716,6 +842,11 @@ export function DatasetHeader({
                             </div>
                         )}
                 </div>
+                {dataset?.rw_id && (
+                    <div>
+                        <ExternalService rw_id={dataset.rw_id} />
+                    </div>
+                )}
             </div>
         </div>
     )

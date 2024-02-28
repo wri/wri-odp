@@ -311,7 +311,7 @@ function ItemsArray() {
                             </Accordion>
                             <Accordion text="Paint Properties">
                                 {match(
-                                    watch('layerConfig.render.layers')[index]
+                                    watch('layerConfig.render.layers')?.[index]
                                 )
                                     .with({ type: { value: 'circle' } }, () =>
                                         RenderCirclePaint(index)

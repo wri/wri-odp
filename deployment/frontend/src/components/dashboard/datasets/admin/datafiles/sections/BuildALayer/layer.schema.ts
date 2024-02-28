@@ -192,7 +192,7 @@ const renderSchema = z.object({
                 .nullable(),
             filter: z.array(z.union([z.string(), filterExpression])),
         })
-    ),
+    ).optional().nullable(),
 })
 
 const legendsSchema = z.object({

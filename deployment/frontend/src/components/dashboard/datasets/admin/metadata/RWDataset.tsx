@@ -194,6 +194,7 @@ export function RWDatasetForm({
                                 </DefaultTooltip>
                             }
                         />
+                        <ErrorDisplay name="tableName" errors={errors} />
                     </InputGroup>
                 </div>
             </Disclosure.Panel>
