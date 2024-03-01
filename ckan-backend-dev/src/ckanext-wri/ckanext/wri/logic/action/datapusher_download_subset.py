@@ -11,16 +11,19 @@ import datetime
 import requests
 from urllib.parse import urljoin
 import json
-import base64
+import hashlib
 
 import logging
+
 log = logging.getLogger(__name__)
+
 
 # TODO: rename this file
 def subset_download_request(context: Context, data_dict: dict[str, Any]):
     format = data_dict.get("format")
     id = data_dict.get("id")
     provider = data_dict.get("provider")
+    connector_url = data_dict.get("connectorUrl")
     sql = data_dict.get("sql")
     email = data_dict.get("email")
 
@@ -31,7 +34,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
     deployment_name: str = config.get("ckanext.wri.datapusher_deployment_name")
 
     key = f"{sql}-{format}"
-    filename = str(base64.b64encode(key.encode()))
+    filename = str(hashlib.md5(key.encode()))
     download_filename = "file.{}".format(format.lower())
     task = {
         "entity_id": id,
@@ -39,7 +42,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
         "task_type": "download_subset",
         "last_updated": str(datetime.datetime.utcnow()),
         "state": "submitting",
-        "key": key,
+        "key": download_filename,
         "value": "{}",
         "error": "{}",
     }
@@ -53,14 +56,12 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
             {"entity_id": id, "task_type": "download_subset", "key": sql + key},
         )
         stale_time = 30
-        assume_task_stale_after = datetime.timedelta(
-            seconds=stale_time
-        )
+        assume_task_stale_after = datetime.timedelta(seconds=stale_time)
         if existing_task.get("state") == "pending":
-            existing_task_values = json.loads(existing_task.get('value'));
+            existing_task_values = json.loads(existing_task.get("value"))
 
             if existing_task_values:
-                existing_task_emails = existing_task_values.get('emails')
+                existing_task_emails = existing_task_values.get("emails")
 
                 update_emails = False
 
@@ -73,9 +74,11 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
                     update_emails = True
 
                 if update_emails:
-                    existing_task_values['emails'] = existing_task_emails
-                    existing_task['value'] = json.dumps(existing_task_values)
-                    p.toolkit.get_action("task_status_update")({ "ignore_auth": True }, existing_task)
+                    existing_task_values["emails"] = existing_task_emails
+                    existing_task["value"] = json.dumps(existing_task_values)
+                    p.toolkit.get_action("task_status_update")(
+                        {"ignore_auth": True}, existing_task
+                    )
 
             updated = datetime.datetime.strptime(
                 existing_task["last_updated"], "%Y-%m-%dT%H:%M:%S.%f"
@@ -107,11 +110,16 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
     )
 
     # TODO: is that right?
-    api_token = p.toolkit.get_action('api_token_create')({"ignore_auth": True}, {"user": "ckan_admin", "name": "datapusher"}).get('token')
+    api_token = p.toolkit.get_action("api_token_create")(
+        {"ignore_auth": True}, {"user": "ckan_admin", "name": "datapusher"}
+    ).get("token")
 
     try:
         deployment = requests.get(
-            urljoin(prefect_url, f"api/deployments/name/download-subset-of-data/{deployment_name}")
+            urljoin(
+                prefect_url,
+                f"api/deployments/name/download-subset-of-data/{deployment_name}",
+            )
         )
         deployment = deployment.json()
         deployment_id = deployment["id"]
@@ -129,7 +137,8 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
                         "sql": sql,
                         "filename": filename,
                         "format": format,
-                        "download_filename": download_filename
+                        "download_filename": download_filename,
+                        "connector_url": connector_url,
                     },
                     "state": {"type": "SCHEDULED", "state_details": {}},
                 }
@@ -144,7 +153,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email], 'Subset of data')
+        send_error([email], "Subset of data")
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -166,7 +175,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email], 'Subset of data')
+        send_error([email], "Subset of data")
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
@@ -185,13 +194,11 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
 
 
 def subset_download_callback(context: Context, data_dict: dict[str, Any]):
-    task_id = data_dict.get("task_id")
     entity_id = data_dict.get("entity_id")
     key = data_dict.get("key")
     task = p.toolkit.get_action("task_status_show")(
         context,
-        {"id": task_id, "entity_id": entity_id, "task_type": "download",
-         "key": key},
+        {"entity_id": entity_id, "task_type": "download_subset", "key": key},
     )
 
     if not task:
@@ -217,7 +224,7 @@ def subset_download_callback(context: Context, data_dict: dict[str, Any]):
         log.error(error)
 
 
-FILE_EMAIL_HTML = '''
+FILE_EMAIL_HTML = """
 <html>
     <body>
         <p>The file you requested is ready. Click the link below to download it:</p>
@@ -230,20 +237,22 @@ FILE_EMAIL_HTML = '''
     </body>
 </html>
 
-'''
+"""
 
 
 def send_email(emails: list[str], url: str, download_filename: str):
-    odp_url = config.get('ckanext.wri.odp_url')
+    odp_url = config.get("ckanext.wri.odp_url")
     for email in emails:
-        mail_recipient("", email,
-                       "WRI - Your file is ready ({})".format(download_filename),
-                       "",
-                       FILE_EMAIL_HTML.format(url, download_filename, odp_url, odp_url)
-                       )
+        mail_recipient(
+            "",
+            email,
+            "WRI - Your file is ready ({})".format(download_filename),
+            "",
+            FILE_EMAIL_HTML.format(url, download_filename, odp_url, odp_url),
+        )
 
 
-ERROR_EMAIL_HTML = '''
+ERROR_EMAIL_HTML = """
 <html>
     <body>
         <p>An error happened while preparing the file you requested for download. Please, try again.</p>
@@ -252,13 +261,16 @@ ERROR_EMAIL_HTML = '''
     </body>
 </html>
 
-'''
+"""
+
 
 def send_error(emails: list[str], resource_title):
-    odp_url = config.get('ckanext.wri.odp_url')
+    odp_url = config.get("ckanext.wri.odp_url")
     for email in emails:
-        mail_recipient("", email,
-                       "WRI - Failed to process file ({})".format(resource_title),
-                       "",
-                       ERROR_EMAIL_HTML.format(odp_url, odp_url)
-                       )
+        mail_recipient(
+            "",
+            email,
+            "WRI - Failed to process file ({})".format(resource_title),
+            "",
+            ERROR_EMAIL_HTML.format(odp_url, odp_url),
+        )

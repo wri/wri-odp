@@ -17,8 +17,6 @@ log = logging.getLogger(__name__)
 
 # TODO: rename this file
 def download_request(context: Context, data_dict: dict[str, Any]):
-    print("DATA DICT")
-    print(data_dict)
     format = data_dict.get("format")
     res_id = data_dict.get("resource_id")
     provider = data_dict.get("provider")

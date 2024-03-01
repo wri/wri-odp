@@ -134,7 +134,7 @@ def convert_store_to_file(resource_id, api_key, task_id, provider, sql, rw_id,
 
 @flow(log_prints=True)
 def download_subset_of_data(id, api_key, task_id, provider, sql,
-                          format, filename, download_filename):
+                          format, filename, download_filename, connector_url):
     logger = get_run_logger()
     ckan_url = config.get('CKAN_URL')
 
@@ -143,7 +143,7 @@ def download_subset_of_data(id, api_key, task_id, provider, sql,
     if provider == "datastore":
         data = query_datastore(api_key, ckan_url, sql, provider, '')
     else:
-        data = query_rw(id, sql)
+        data = query_rw(id, sql, connector_url)
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.info("Converting data..." + " " + format)
         tmp_filepath = os.path.join(tmp_dir, filename)
@@ -154,7 +154,7 @@ def download_subset_of_data(id, api_key, task_id, provider, sql,
     # TODO: send error/success (send status)
     send_callback(api_key, ckan_url, "prefect_download_subset_callback",
                   {"task_id": task_id, "url": url, "state": "complete", "entity_id": id, 
-                   "key": format})
+                   "key": download_filename})
 
 if __name__ == "__main__":
     datastore_deployment = push_to_datastore.to_deployment(
@@ -189,6 +189,7 @@ if __name__ == "__main__":
             "sql": "sql",
             "format": "format",
             "filename": "filename",
+            "connector_url": "https://wri-01.carto.com/tables/wdpa_protected_areas/table",
             "download_filename": "download_filename"
             },
         enforce_parameter_schema=False,

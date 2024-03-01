@@ -7,7 +7,8 @@ import { DataExplorer } from '@/components/data-explorer/DataExplorer'
 import ChartView from './ChartView'
 
 export type TabularResource = {
-    provider: string
+    provider: 'datastore' | 'cartodb' | 'featureservice' | 'gfw'
+    connectorUrl?: string
     id: string
     apiKey?: string
 }

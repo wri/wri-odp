@@ -1971,7 +1971,7 @@ export const DatasetRouter = createTRPCRouter({
             z.object({
                 id: z.string(),
                 provider: z.enum(['datastore', 'cartodb', 'featureservice', 'gfw']),
-                connectorUrl: z.string(),
+                connectorUrl: z.string().optional(),
                 format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON']),
                 sql: z.string(),
                 email: z.string(),
@@ -1987,6 +1987,7 @@ export const DatasetRouter = createTRPCRouter({
                 headers['Authorization'] = user.apikey
             }
 
+            console.log('INPUT', input)
             const response = await fetch(
                 `${env.CKAN_URL}/api/3/action/prefect_download_subset_from_store`,
                 {

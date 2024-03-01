@@ -187,12 +187,7 @@ function DataExplorerInner({
             </div>
             <div className="flex flex-row justify-between px-6">
                 <DownloadButton
-                    resourceId={tabularResource.id}
-                    provider={
-                        tabularResource.provider === 'datastore'
-                            ? tabularResource.provider
-                            : 'rw'
-                    }
+                    tabularResource={tabularResource}
                     sql={convertToSql({
                         tableName,
                         columns: columns.map((c) => c.key),

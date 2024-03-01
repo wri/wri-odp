@@ -17,14 +17,13 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { z } from 'zod'
+import { TabularResource } from '../datasets/visualizations/Visualizations'
 
 export function DownloadButton({
-    resourceId,
-    provider,
     sql,
+    tabularResource,
 }: {
-    resourceId: string
-    provider: 'datastore' | 'rw'
+    tabularResource: TabularResource
     sql: string
 }) {
     const conversibleFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
@@ -61,8 +60,7 @@ export function DownloadButton({
                 open={open}
                 setOpen={setOpen}
                 sql={sql}
-                provider={provider}
-                resourceId={resourceId}
+                tabularResource={tabularResource}
             />
         </>
     )
@@ -72,15 +70,13 @@ function DownloadModal({
     open,
     setOpen,
     format,
-    provider,
-    resourceId,
     sql,
+    tabularResource,
 }: {
     open: boolean
     setOpen: (open: boolean) => void
     format: 'XLSX' | 'CSV' | 'TSV' | 'XML'
-    provider: 'datastore' | 'rw'
-    resourceId: string
+    tabularResource: TabularResource
     sql: string
 }) {
     const formSchema = z.object({
@@ -124,9 +120,11 @@ function DownloadModal({
                                     {
                                         email: data.email,
                                         format: format,
-                                        provider,
+                                        provider: tabularResource.provider,
                                         sql: sql,
-                                        id: resourceId,
+                                        connectorUrl:
+                                            tabularResource.connectorUrl,
+                                        id: tabularResource.id,
                                     },
                                     {
                                         onSuccess: () => {
@@ -166,9 +164,7 @@ function DownloadModal({
                         <LoaderButton
                             className="whitespace-nowrap"
                             type="submit"
-                            loading={
-                                downloadSubset.isLoading
-                            }
+                            loading={downloadSubset.isLoading}
                         >
                             <PaperAirplaneIcon className="mr-2 h-5 w-5" />
                             Get via email

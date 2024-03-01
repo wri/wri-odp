@@ -1,3 +1,4 @@
+from urllib.parse import urlsplit, urlunsplit
 from prefect import task, get_run_logger
 from helpers import get_url, check_response
 import requests
@@ -8,6 +9,7 @@ import requests
 def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id: str = ""):
     logger = get_run_logger()
 
+    print("SQL", sql)
     if provider == "datastore":
         url = get_url("datastore_search_sql", ckan_url)
     elif provider == "rw":
@@ -66,12 +68,38 @@ def query_datastore(api_key: str, ckan_url: str, sql: str, provider: str, rw_id:
 
     return results
 
+def build_carto_url(connector_url: str):
+    # Split the URL into components
+    url_parts = urlsplit(connector_url)
+    # Create a new tuple without the pathname
+    new_url_parts = (url_parts.scheme, url_parts.netloc, '', '', '')
+    # Join the components to form the new URL
+    url = urlunsplit(new_url_parts)
+    return url + "/api/v1/sql?q="
+
+def build_feature_service(id: str):
+    return 'https://api.resourcewatch.org/v1/dataset/{}/query'.format(id) + '?sql='
+
+def build_url(id: str, connector_url: str, provider: str):
+    match provider:
+        case "cartodb":
+            return build_carto_url(connector_url)
+        case "featureservice":
+            return build_feature_service(id)
+
+def get_values(provider: str, data: dict):
+    match provider:
+        case "cartodb":
+            return data["rows"]
+        case "featureservice":
+            return data["data"]
+
 # NOTE: this only works for CartoDB layers
 @task(retries=3, retry_delay_seconds=15)
-def query_rw(id: str, sql: str):
+def query_rw(id: str, sql: str, connector_url: str, provider: str):
     logger = get_run_logger()
 
-    url = f"https://api.resourcewatch.org/v1/query/{id}"
+    url = build_url(id, connector_url, provider)
 
     if ";" in sql:
         sql = sql.split(";")[0]
@@ -87,7 +115,7 @@ def query_rw(id: str, sql: str):
     while fetch_next_page:
         limited_sql = sql + " LIMIT {} OFFSET {}".format(limit,
                                                          current_page * limit)
-        page_url = url + "?sql={}".format(limited_sql)
+        page_url = url + limited_sql
 
         logger.info(page_url)
 
@@ -99,7 +127,7 @@ def query_rw(id: str, sql: str):
 
         check_response(r, url, "CKAN")
 
-        new_results = r.json()["rows"]
+        new_results = get_values(provider, r.json())
 
         if new_results:
             new_records = new_results
