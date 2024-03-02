@@ -6,7 +6,13 @@ import {
     protectedProcedure,
     publicProcedure,
 } from '@/server/api/trpc'
-import { createDatasetView, deleteDatasetView, editDatasetView, getDatasetViews, updateDatasetHasChartsFlag } from '@/utils/apiUtils'
+import {
+    createDatasetView,
+    deleteDatasetView,
+    editDatasetView,
+    getDatasetViews,
+    updateDatasetHasChartsFlag,
+} from '@/utils/apiUtils'
 import { z } from 'zod'
 
 export interface NumOfRowsResponse {
@@ -22,14 +28,36 @@ export const rwRouter = createTRPCRouter({
         .input(
             z.object({
                 id: z.string(),
+                provider: z.string(),
             })
         )
         .query(async ({ input }) => {
-            const hiddenFields = ['the_geom', 'the_geom_webmercator']
+            const hiddenFields = [
+                'the_geom',
+                'the_geom_webmercator',
+                'geom',
+                'geom_wm',
+                'gfw_geojson',
+            ]
             const fieldsRes = await fetch(
                 `https://api.resourcewatch.org/v1/fields/${input.id}`
             )
             const fields: FieldsResponse = await fieldsRes.json()
+            if (input.provider === 'gfw') {
+                console.log('FIELDS', fields.fields)
+                return {
+                    tableName: 'gfw',
+                    columns: fields.fields
+                        .filter(
+                            (field: any) => !hiddenFields.includes(field.name)
+                        )
+                        .map((field: any) => ({
+                            key: field.name,
+                            name: field.alias,
+                            type: 'any',
+                        })),
+                }
+            }
 
             const columns = {
                 tableName: fields.tableName,
@@ -113,11 +141,10 @@ export const rwRouter = createTRPCRouter({
                 ' , '
             )} FROM ${tableName} ${sortSql} ${filtersSql} ${paginationSql}`
 
-            console.log(url)
             const tableDataRes = await fetch(url)
             const tableData: DataResponse = await tableDataRes.json()
             const data = tableData.data
-            if (provider === 'cartodb')
+            if (provider === 'cartodb' || provider === 'gfw')
                 return data.slice(
                     pagination.pageIndex * pagination.pageSize,
                     data.length
@@ -189,7 +216,7 @@ export const rwRouter = createTRPCRouter({
             z.object({ view: createViewFormSchema, ckanDatasetId: z.string() })
         )
         .mutation(async ({ input, ctx }) => {
-            return createDatasetView(input.view).then( async (res) => {
+            return createDatasetView(input.view).then(async (res) => {
                 await updateDatasetHasChartsFlag({
                     ckanDatasetId: input.ckanDatasetId,
                     session: ctx.session,
@@ -202,7 +229,7 @@ export const rwRouter = createTRPCRouter({
             z.object({ view: editViewFormSchema, ckanDatasetId: z.string() })
         )
         .mutation(async ({ input, ctx }) => {
-            return editDatasetView(input.view).then( async (res) => {
+            return editDatasetView(input.view).then(async (res) => {
                 await updateDatasetHasChartsFlag({
                     ckanDatasetId: input.ckanDatasetId,
                     session: ctx.session,

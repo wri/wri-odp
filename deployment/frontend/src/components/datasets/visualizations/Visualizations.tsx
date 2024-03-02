@@ -9,6 +9,7 @@ import ChartView from './ChartView'
 export type TabularResource = {
     provider: 'datastore' | 'cartodb' | 'featureservice' | 'gfw'
     connectorUrl?: string
+    datasetId?: string
     id: string
     apiKey?: string
 }

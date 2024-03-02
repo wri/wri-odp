@@ -185,7 +185,13 @@ function DataExplorerInner({
             <div className="flex flex-col gap-y-4 sm:flex-row justify-between items-end sm:items-center px-6">
                 <TopBar table={table} numOfRows={numOfRows ?? 0} />
             </div>
-            <div className="flex flex-row justify-between px-6">
+            <div className="flex flex-row justify-between gap-x-2 px-6">
+        <div className='flex flex-row justify-between grow'>
+                <ListOfFilters
+                    filters={filteredColumns}
+                    setFilters={setColumnFilters}
+                />
+                </div>
                 <DownloadButton
                     tabularResource={tabularResource}
                     sql={convertToSql({
@@ -194,12 +200,6 @@ function DataExplorerInner({
                         filters: filteredColumns,
                         sorting,
                     })}
-                />
-            </div>
-            <div className="flex flex-row justify-between px-6">
-                <ListOfFilters
-                    filters={filteredColumns}
-                    setFilters={setColumnFilters}
                 />
             </div>
             <div className="flex flex-col grow">

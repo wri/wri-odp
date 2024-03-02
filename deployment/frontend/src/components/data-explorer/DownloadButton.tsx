@@ -18,6 +18,8 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { z } from 'zod'
 import { TabularResource } from '../datasets/visualizations/Visualizations'
+import { ArrowDownCircleIcon } from '@heroicons/react/20/solid'
+import { DefaultTooltip } from '../_shared/Tooltip'
 
 export function DownloadButton({
     sql,
@@ -35,11 +37,19 @@ export function DownloadButton({
         <>
             <Popover>
                 <PopoverTrigger>
-                    <Button size="sm">
-                        <ArrowDownTrayIcon className="h-4 w-4" />
+                    <Button className="hidden group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
+                        Download Data
+                        <ArrowDownCircleIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
                     </Button>
+                    <div className="sm:hidden">
+                        <DefaultTooltip content="Download data">
+                            <button>
+                                <ArrowDownCircleIcon className="hover:text-blue-600 sm:hidden group-hover:text-white h-6 w-6 text-blue-800 sm:mb-1 mt-2 sm:mt-0" />
+                            </button>
+                        </DefaultTooltip>
+                    </div>
                 </PopoverTrigger>
-                <PopoverContent>
+                <PopoverContent className="flex justify-start flex-col w-fit">
                     {conversibleFormats.map((f) => (
                         <Button
                             variant="ghost"
@@ -121,6 +131,7 @@ function DownloadModal({
                                         email: data.email,
                                         format: format,
                                         provider: tabularResource.provider,
+                                        dataset_id: tabularResource.datasetId,
                                         sql: sql,
                                         connectorUrl:
                                             tabularResource.connectorUrl,

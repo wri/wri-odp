@@ -17,9 +17,103 @@ import logging
 
 log = logging.getLogger(__name__)
 
+def calculate_md5(input_string):
+    md5_hash = hashlib.md5()
+    md5_hash.update(input_string.encode('utf-8'))
+    return md5_hash.hexdigest()
+
+def check_for_existing_file_in_s3(filename: str, download_filename: str):
+    s3 = uploader.BaseS3Uploader()
+    cached_file_url = None
+    try:
+        cached_file_url = s3.get_signed_url_to_key(
+            "_downloads_cache/" + filename,
+            extra_params={
+                "ResponseContentDisposition": 'attachment; filename="{}"'.format(
+                    download_filename
+                )
+            },
+        )
+    except Exception as e:
+        log.error(e)
+    return cached_file_url
+
+
+def build_filename(sql: str, format: str, id: str, provider: str, context) -> str:
+    if provider == "datastore":
+        try:
+            resource_dict = p.toolkit.get_action("resource_show")(
+                context,
+                {
+                    "id": id,
+                },
+            )
+            res_last_modified = resource_dict.get("metadata_modified")
+            filename = (
+                id
+                + "-"
+                + calculate_md5(sql)
+                + "_"
+                + res_last_modified
+                + "."
+                + format
+            ).lower()
+            return filename
+        except logic.NotFound:
+            return False
+    else:
+        name = f"{sql}-{id}"
+        filename = calculate_md5(name) + f".{format.lower()}"
+        return filename
+
+
+def build_download_filename(
+    dataset_id: str, format: str, id: str, provider: str, context
+) -> str:
+    if provider == "datastore":
+        try:
+            resource_dict = p.toolkit.get_action("resource_show")(
+                context,
+                {
+                    "id": id,
+                },
+            )
+            download_filename = (
+                resource_dict.get("title")
+                or resource_dict.get("name")
+                or resource_dict.get("id")
+                or "file"
+            )
+            download_filename += ".{}".format(format.lower())
+            return download_filename
+        except logic.NotFound:
+            return False
+    else:
+        try:
+            dataset_dict = p.toolkit.get_action("package_show")(
+                context,
+                {
+                    "id": dataset_id,
+                },
+            )
+            download_filename = (
+                dataset_dict.get("title")
+                or dataset_dict.get("name")
+                or dataset_dict.get("id")
+                or "file"
+            )
+            download_filename += ".{}".format(format.lower())
+            return download_filename
+        except logic.NotFound:
+            return False
+
 
 # TODO: rename this file
 def subset_download_request(context: Context, data_dict: dict[str, Any]):
+    prefect_url: str = config.get("ckanext.wri.prefect_url")
+    deployment_name: str = config.get("ckanext.wri.datapusher_deployment_name")
+
+    dataset_id = data_dict.get("dataset_id")
     format = data_dict.get("format")
     id = data_dict.get("id")
     provider = data_dict.get("provider")
@@ -30,19 +124,23 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
     if None in (format, id, provider, sql):
         raise p.toolkit.ValidationError({"message": "Missing parameters"})
 
-    prefect_url: str = config.get("ckanext.wri.prefect_url")
-    deployment_name: str = config.get("ckanext.wri.datapusher_deployment_name")
+    filename = build_filename(sql, format, id, provider, context)
+    download_filename = build_download_filename(
+        dataset_id, format, id, provider, context
+    )
 
-    key = f"{sql}-{format}"
-    filename = str(hashlib.md5(key.encode()))
-    download_filename = "file.{}".format(format.lower())
+    cached_file_url = check_for_existing_file_in_s3(filename, download_filename)
+    if cached_file_url:
+        send_email([email], cached_file_url, download_filename)
+        return True
+
     task = {
-        "entity_id": id,
-        "entity_type": "resource",
+        "entity_id": id if provider == "datastore" else dataset_id,
+        "entity_type": "resource" if provider == "datastore" else "dataset",
         "task_type": "download_subset",
         "last_updated": str(datetime.datetime.utcnow()),
         "state": "submitting",
-        "key": download_filename,
+        "key": filename,
         "value": "{}",
         "error": "{}",
     }
@@ -53,8 +151,15 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
     try:
         existing_task = p.toolkit.get_action("task_status_show")(
             context,
-            {"entity_id": id, "task_type": "download_subset", "key": sql + key},
+            {
+                "entity_id": id if provider == "datastore" else dataset_id,
+                "entity_type": "resource" if provider == "datastore" else "dataset",
+                "task_type": "download_subset",
+                "key": filename,
+            },
         )
+        print("#######################################################################")
+        print("Existing task", existing_task)
         stale_time = 30
         assume_task_stale_after = datetime.timedelta(seconds=stale_time)
         if existing_task.get("state") == "pending":
@@ -134,6 +239,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
                         "id": id,
                         "task_id": task.get("id"),
                         "provider": provider,
+                        "dataset_id": dataset_id,
                         "sql": sql,
                         "filename": filename,
                         "format": format,

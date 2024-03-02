@@ -78,7 +78,10 @@ def build_carto_url(connector_url: str):
     return url + "/api/v1/sql?q="
 
 def build_feature_service(id: str):
-    return 'https://api.resourcewatch.org/v1/dataset/{}/query'.format(id) + '?sql='
+    return 'https://api.resourcewatch.org/v1/query/{}/'.format(id) + '?sql='
+
+def build_gfw(connector_url: str):
+    return connector_url + '/query/json?sql='
 
 def build_url(id: str, connector_url: str, provider: str):
     match provider:
@@ -86,11 +89,15 @@ def build_url(id: str, connector_url: str, provider: str):
             return build_carto_url(connector_url)
         case "featureservice":
             return build_feature_service(id)
+        case "gfw":
+            return build_gfw(connector_url)
 
 def get_values(provider: str, data: dict):
     match provider:
         case "cartodb":
             return data["rows"]
+        case "gfw":
+            return data["data"]
         case "featureservice":
             return data["data"]
 

@@ -15,7 +15,7 @@ import { useSession } from 'next-auth/react'
 
 export interface FieldsResponse {
     tableName: string
-    fields: Record<string, any>
+    fields: Record<string, any> | Array<{ name: string; alias: string }>
 }
 
 export function useFields({ id, provider, apiKey }: TabularResource) {
@@ -63,6 +63,7 @@ export function useFields({ id, provider, apiKey }: TabularResource) {
     })
     const rwHook = api.rw.getFields.useQuery({
         id,
+        provider,
     })
     if (provider === 'datastore') {
         return datastoreHook

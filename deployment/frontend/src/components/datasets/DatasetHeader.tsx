@@ -794,7 +794,8 @@ export function DatasetHeader({
                                         onClick={() =>
                                             setTabularResource({
                                                 provider:
-                                                    dataset.provider as string,
+                                                    dataset.provider as any,
+                                                datasetId: dataset.id,
                                                 id: dataset.rw_id as string,
                                                 connectorUrl:
                                                     dataset.connectorUrl as string,

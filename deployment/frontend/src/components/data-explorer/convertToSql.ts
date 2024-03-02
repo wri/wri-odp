@@ -49,9 +49,5 @@ export function convertToSql({
                   )
                   .join(' AND ')
             : ''
-    const parsedColumns = columns.map((column) => `"${column}"`)
-
-    return `SELECT ${parsedColumns.join(
-        ', '
-    )} FROM "${tableName}" ${filtersSql} ${sortSql}`
+    return `SELECT * FROM "${tableName}" ${filtersSql} ${sortSql}`
 }

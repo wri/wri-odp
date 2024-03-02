@@ -1970,7 +1970,13 @@ export const DatasetRouter = createTRPCRouter({
         .input(
             z.object({
                 id: z.string(),
-                provider: z.enum(['datastore', 'cartodb', 'featureservice', 'gfw']),
+                provider: z.enum([
+                    'datastore',
+                    'cartodb',
+                    'featureservice',
+                    'gfw',
+                ]),
+                dataset_id: z.string().optional(),
                 connectorUrl: z.string().optional(),
                 format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON']),
                 sql: z.string(),
