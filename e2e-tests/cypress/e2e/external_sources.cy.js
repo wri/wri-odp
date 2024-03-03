@@ -10,6 +10,7 @@ const geeDataset = `${uuid()}-gee-dataset`;
 const arcgisDataset = `${uuid()}-arcgis-dataset`;
 const cartoDataset = `${uuid()}-carto-dataset`;
 const documentDataset = `${uuid()}-document-dataset`;
+const gfwDataset = `${uuid()}-gfw-dataset`;
 
 describe("External sources", () => {
   before(() => {
@@ -27,7 +28,13 @@ describe("External sources", () => {
       technical_notes: "http://google.com",
     });
     cy.createDatasetAPI(parentOrg, cartoDataset, true, {
-      rw_id: "92fe644d-748c-44a7-a20f-534d5ea6d7de",
+      rw_id: "9a1731a7-e5e3-4ca0-b7f8-3f8070d7c6ab",
+      visibility_type: "public",
+      is_approved: true,
+      technical_notes: "http://google.com",
+    });
+    cy.createDatasetAPI(parentOrg, gfwDataset, true, {
+      rw_id: "5b71d915-b85b-4e37-b5fa-5ef13394bef4",
       visibility_type: "public",
       is_approved: true,
       technical_notes: "http://google.com",
@@ -59,10 +66,25 @@ describe("External sources", () => {
     },
   );
   it(
+    "should render gfw dataset",
+    () => {
+      cy.visit(`/datasets/${gfwDataset}`);
+      cy.contains('Open in GFW')
+      cy.contains("Ma'tan al-Sarra", { timeout: 15000 });
+      cy.contains("Download Data").click();
+      cy.contains("CSV").click();
+      cy.contains("Get via email")
+    },
+  );
+  it(
     "should render carto dataset",
     () => {
       cy.visit(`/datasets/${cartoDataset}`);
       cy.contains('Open in Carto')
+      cy.contains("port_name", { timeout: 15000 });
+      cy.contains("Download Data").click();
+      cy.contains("CSV").click();
+      cy.contains("Get via email")
     },
   );
   it(
