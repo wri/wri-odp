@@ -54,6 +54,7 @@ export function DownloadButton({
                         <Button
                             variant="ghost"
                             className="w-full"
+                            id={`download-subset-${f.toLowerCase()}`}
                             onClick={() => {
                                 // @ts-ignore
                                 setConvertTo(f)

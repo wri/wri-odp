@@ -97,7 +97,8 @@ describe("Upload file and create dataset", () => {
       // cy.contains("View Table Preview", { timeout: 30000 }).click();
       cy.contains("01D2539e270CEbd", { timeout: 15000 });
       cy.contains("Download Data").click();
-      cy.contains("CSV").click();
+      cy.get("#download-subset-csv").click();
+      cy.wait(5000)
       cy.contains("Get via email")
     },
   );
