@@ -775,7 +775,8 @@ export function DatasetHeader({
                 )}
 
                 <div className="flex space-x-2">
-                    {dataset?.provider &&
+                    {dataset?.connectorUrl &&
+                        dataset?.provider &&
                         dataset?.provider !== 'gee' &&
                         dataset?.rw_id && (
                             <div className="pt-4">
@@ -793,8 +794,11 @@ export function DatasetHeader({
                                         onClick={() =>
                                             setTabularResource({
                                                 provider:
-                                                    dataset.provider as string,
+                                                    dataset.provider as any,
+                                                datasetId: dataset.id,
                                                 id: dataset.rw_id as string,
+                                                connectorUrl:
+                                                    dataset.connectorUrl as string,
                                             })
                                         }
                                     >

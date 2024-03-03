@@ -3,6 +3,7 @@ import ckan.plugins.toolkit as toolkit
 import ckan.lib.plugins as lib_plugins
 from typing import Any, Callable, cast
 import ckanext.wri.logic.action as action
+from ckanext.wri.logic.action.datapusher_download_subset import subset_download_callback, subset_download_request
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
 from ckan.types import Action, AuthFunction, Context
@@ -129,6 +130,8 @@ class WriPlugin(plugins.SingletonPlugin):
             'prefect_latest_task': datapusher_latest_task,
             'prefect_download_from_store': download_request,
             'prefect_download_callback': download_callback,
+            'prefect_download_subset_from_store': subset_download_request,
+            'prefect_download_subset_callback': subset_download_callback,
             'dataset_release_notes': dataset_release_notes
 
         }
