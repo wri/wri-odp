@@ -17,12 +17,14 @@ log = logging.getLogger(__name__)
 
 # TODO: rename this file
 def download_request(context: Context, data_dict: dict[str, Any]):
+    log.info("Starting download task")
     format = data_dict.get("format")
     res_id = data_dict.get("resource_id")
     provider = data_dict.get("provider")
     sql = data_dict.get("sql")
     email = data_dict.get("email")
     rw_id = data_dict.get("rw_id")
+    carto_account = data_dict.get("carto_account")
 
     if None in (format, res_id, provider, sql):
         raise p.toolkit.ValidationError({"message": "Missing parameters"})
@@ -54,6 +56,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
     resource_title = resource_dict.get("title", resource_dict.get("name"))
 
     if cached_file_url:
+        log.info("File is cached")
         send_email([email], cached_file_url, download_filename)
         return True
 
@@ -156,6 +159,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
                         "provider": provider,
                         "sql": sql,
                         "rw_id": rw_id,
+                        "carto_account": carto_account,
                         "filename": filename,
                         "format": format,
                         "download_filename": download_filename
@@ -223,6 +227,8 @@ def download_callback(context: Context, data_dict: dict[str, Any]):
          "key": key},
     )
 
+    log.info("Download callback...")
+
     if not task:
         raise logic.NotFound("Task not found")
 
@@ -237,6 +243,8 @@ def download_callback(context: Context, data_dict: dict[str, Any]):
     value = json.loads(task["value"])
     emails = value.get("emails", [])
     download_filename = value.get("download_filename")
+
+    log.info("Preparing to send email...")
 
     if state == "complete":
         url = data_dict.get("url")
@@ -263,8 +271,10 @@ FILE_EMAIL_HTML = '''
 
 
 def send_email(emails: list[str], url: str, download_filename: str):
+    log.info("Sending email with file")
     odp_url = config.get('ckanext.wri.odp_url')
     for email in emails:
+        log.info(email)
         mail_recipient("", email,
                        "WRI - Your file is ready ({})".format(download_filename),
                        "",

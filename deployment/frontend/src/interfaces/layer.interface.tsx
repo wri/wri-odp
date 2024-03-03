@@ -26,6 +26,7 @@ export interface Render {
 
 export type Provider = {
   type: 'carto' | string
+  account?: string
   options: Record<string, unknown>
   layers: any[]
 };
