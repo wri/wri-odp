@@ -37,8 +37,10 @@ RUN apk del build-base python3-dev && \
 
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
+COPY setup/start_ckan.sh.override ${APP_DIR}/start_ckan.sh
 RUN chown -R ckan:ckan ${APP_DIR}/src/ckanext-wri
 RUN chmod +x ${APP_DIR}/prerun.py
+RUN chmod +x ${APP_DIR}/start_ckan.sh
 
 COPY patches ${APP_DIR}/patches
 RUN apk --no-cache add patch
