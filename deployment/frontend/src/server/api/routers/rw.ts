@@ -23,6 +23,16 @@ export interface DataResponse {
     data: Array<Record<string, any>>
 }
 
+interface GfwColumn {
+    name: string
+    alias: string
+    description: string | null
+    data_type: string
+    unit: string | null
+    is_feature_info: boolean
+    is_filter: boolean
+}
+
 export const rwRouter = createTRPCRouter({
     getFields: publicProcedure
         .input(
@@ -44,19 +54,24 @@ export const rwRouter = createTRPCRouter({
             )
             const fields: FieldsResponse = await fieldsRes.json()
             if (input.provider === 'gfw') {
-                console.log('FIELDS', fields.fields)
-                return {
+                const columns = {
                     tableName: 'gfw',
                     columns: fields.fields
                         .filter(
-                            (field: any) => !hiddenFields.includes(field.name)
+                            (field: GfwColumn) =>
+                                !hiddenFields.includes(field.name)
                         )
-                        .map((field: any) => ({
+                        .map((field: GfwColumn) => ({
                             key: field.name,
                             name: field.alias,
                             type: 'any',
+                            default: '',
                         })),
+                } as {
+                    tableName: string
+                    columns: { key: string; name: string; type: string }[]
                 }
+                return columns
             }
 
             const columns = {
@@ -67,6 +82,7 @@ export const rwRouter = createTRPCRouter({
                         name: field,
                         key: field,
                         type: 'any',
+                        default: '',
                     })),
             }
             return columns
