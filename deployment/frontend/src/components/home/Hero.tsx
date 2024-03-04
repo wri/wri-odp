@@ -173,12 +173,13 @@ export function Hero() {
             </header>
 
             <div className="relative isolate overflow-hidden pt-14">
-                <img
-                    src="/images/bg_hero_homepage.avif"
+                {/* <img
+                    src="/images/bg_hero_homepage.webp"
                     alt=""
                     className="absolute inset-0 -z-10 h-full w-full object-cover"
 
-                />
+                /> */}
+                <Image src="/images/bg_hero_homepage.webp" alt="" layout="fill" objectFit="cover" className='inset-0 -z-10 h-full w-full object-cover' priority/>
                 <div className="bg-black bg-opacity-50 absolute inset-0 -z-[9] h-full w-full object-cover" />
                 <div className="default-home-container mx-auto py-32 sm:py-48 lg:py-56">
                     <div className="text-start">

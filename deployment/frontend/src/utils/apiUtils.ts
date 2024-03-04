@@ -16,7 +16,7 @@ import type {
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
-import { Facets } from '@/interfaces/search.interface'
+import { Facets, Filter } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
 import nodemailer from 'nodemailer'
@@ -2569,4 +2569,85 @@ export async function generateDataSiteMap() {
     ]
     sitemap.push(...general)
     return sitemap
+}
+
+
+export function advance_search_query(filters: Filter[]) {
+    const keys = [...new Set(filters.map((f) => f.key))].filter(
+            (key) => key != 'search'
+    )
+    
+    const fq: any = {}
+    let extLocationQ = ''
+    let extAddressQ = ''
+
+     keys.forEach((key) => {
+            let keyFq
+
+            const keyFilters = filters.filter((f) => f.key == key)
+            if ((key as string) == 'temporal_coverage_start') {
+                if (keyFilters.length > 0) {
+                    const temporalCoverageStart = keyFilters[0]
+                    const temporalCoverageEnd = filters.find(
+                        (f) => f.key == 'temporal_coverage_end'
+                    )?.value
+
+                    keyFq = `[${temporalCoverageStart?.value} TO *]`
+
+                    if (temporalCoverageEnd) {
+                        keyFq = `[* TO ${temporalCoverageEnd}]`
+                    }
+                }
+            } else if ((key as string) == 'temporal_coverage_end') {
+                if (keyFilters.length > 0) {
+                    const temporalCoverageEnd = keyFilters[0]
+                    const temporalCoverageStart = filters.find(
+                        (f) => f.key == 'temporal_coverage_start'
+                    )?.value
+
+                    keyFq = `[* TO ${temporalCoverageEnd?.value}]`
+
+                    if (temporalCoverageStart) {
+                        keyFq = `[${temporalCoverageStart} TO *]`
+                    }
+                }
+            } else if (
+                key === 'metadata_modified_since' ||
+                key === 'metadata_modified_before'
+            ) {
+                const metadataModifiedSinceFilter = filters.find(
+                    (f) => f.key === 'metadata_modified_since'
+                )
+                const metadataModifiedSince = metadataModifiedSinceFilter
+                    ? metadataModifiedSinceFilter.value + 'T00:00:00Z'
+                    : '*'
+
+                const metadataModifiedBeforeFilter = filters.find(
+                    (f) => f.key === 'metadata_modified_before'
+                )
+                const metadataModifiedBefore = metadataModifiedBeforeFilter
+                    ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
+                    : '*'
+
+                fq[
+                    'metadata_modified'
+                ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+            } else if (key == 'spatial') {
+                const coordinates = keyFilters[0]?.value
+                const address = keyFilters[0]?.label
+
+                // @ts-ignore
+                if (coordinates) extLocationQ = coordinates.reverse().join(',')
+                if (address) extAddressQ = address
+            } else {
+                keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
+            }
+
+            if (keyFq) fq[key as string] = keyFq
+     })
+    
+    delete fq.metadata_modified_since
+    delete fq.metadata_modified_before
+    delete fq.spatial
+    return { fq, extLocationQ, extAddressQ ,  search: filters.find((e) => e?.key == 'search')?.value ?? ''}
 }
