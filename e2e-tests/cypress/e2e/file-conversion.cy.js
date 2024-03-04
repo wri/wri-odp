@@ -67,11 +67,11 @@ describe("Data files", () => {
       },
     },
     () => {
-      cy.viewport(1440, 900);
+      cy.viewport(1440, 1440);
       cy.visit(`/datasets/${datasetName}`);
+      cy.wait(5000);
       cy.contains("Example title").click({ force: true });
-      cy.get(".download-datafile").click({force: true})
-      cy.wait(2000);
+      cy.get(".download-datafile").click()
       cy.contains("Original Format")
     },
   );
