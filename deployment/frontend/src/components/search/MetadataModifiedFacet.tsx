@@ -72,7 +72,7 @@ export default function MetadataModifiedFacet({
                 key,
                 title:
                     'Last Updated ' +
-                    (key.endsWith('_since') ? 'Since' : 'Before'),
+                    (key.endsWith('_since') ? 'After' : 'Before'),
                 value,
                 label: value,
             })
