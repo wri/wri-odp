@@ -67,8 +67,8 @@ describe("Data files", () => {
       },
     },
     () => {
+      cy.viewport(1440, 900);
       cy.visit(`/datasets/${datasetName}`);
-
       cy.contains("Example title").click({ force: true });
       cy.contains("Download").click({force: true})
       cy.contains("Original Format")
