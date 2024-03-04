@@ -71,6 +71,7 @@ describe("Data files", () => {
       cy.visit(`/datasets/${datasetName}`);
       cy.contains("Example title").click({ force: true });
       cy.contains("Download").click({force: true})
+      cy.wait(2000);
       cy.contains("Original Format")
     },
   );
