@@ -1,29 +1,20 @@
-import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import type {
-    Activity,
-    ActivityDisplay,
     CkanResponse,
-    User,
 } from '@/schema/ckan.schema'
 import {
     getUser,
-    activityDetails,
     getDatasetDetails,
     getTeamDetails,
     getTopicDetails,
 } from '@/utils/apiUtils'
-import { searchArrayForKeyword } from '@/utils/general'
-import { searchSchema } from '@/schema/search.schema'
-import { filterObjects } from '@/utils/general'
+
 import {
-    NotificationSchema,
     NotificationInput,
 } from '@/schema/notification.schema'
 import type {
-    NotificationType,
-    NotificationInputType,
+    NotificationType
 } from '@/schema/notification.schema'
 import { timeAgo } from '@/utils/apiUtils'
 import { replaceNames } from '@/utils/replaceNames'

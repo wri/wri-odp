@@ -39,6 +39,7 @@ import datetime
 import ckan.plugins.toolkit as tk
 from ckanext.wri.logic.auth import schema
 from ckanext.activity.model import Activity
+import ckan.lib.dictization.model_dictize as model_dictize
 
 
 log = logging.getLogger("ckan.logic")
@@ -440,7 +441,18 @@ def notification_get_all(
         )
 
     if not notification_objecst_result:
-        raise logic.NotFound(_("Notification not found"))
+        return []
+    
+    for notification in notification_objecst_result:
+        notification['sender_obj'] = model_dictize.user_dictize(model.User.get(notification['sender_id']), context)
+
+        if notification['object_type'] == 'dataset':
+            notification['object_data'] = dict(model.Package.get(notification['object_id']).as_dict())
+        elif notification['object_type'] == 'topic':
+            notification['object_data'] = dict(model.Group.get(notification['object_id']).as_dict())
+        elif notification['object_type'] == 'team':
+            notification['object_data'] = dict(model.Group.get(notification['object_id']).as_dict())
+        
 
     return notification_objecst_result
 
