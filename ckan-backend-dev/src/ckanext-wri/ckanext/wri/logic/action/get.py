@@ -589,3 +589,35 @@ def dataset_release_notes(context: Context, data_dict: DataDict):
     results = q.all()
 
     return results
+
+
+@logic.side_effect_free
+def dashboard_activity_listv2(context: Context, data_dict: DataDict):
+    # get_action for dashboard_activity_list
+    model = context["model"]
+    results = get_action("dashboard_activity_list")(context, data_dict)
+    for result in results:
+        result["user"] = model_dictize.user_dictize(
+            model.User.get(result["user_id"]), context
+        )
+    return results
+
+@logic.side_effect_free
+def package_activity_list_wri(context: Context, data_dict: DataDict):
+    model = context["model"]
+    results = get_action("package_activity_list")(context, data_dict)
+    for result in results:
+        result["user"] = model_dictize.user_dictize(
+            model.User.get(result["user_id"]), context
+        )
+    return results
+
+@logic.side_effect_free
+def organization_activity_list_wri(context: Context, data_dict: DataDict):
+    model = context["model"]
+    results = get_action("organization_activity_list")(context, data_dict)
+    for result in results:
+        result["user"] = model_dictize.user_dictize(
+            model.User.get(result["user_id"]), context
+        )
+    return results
