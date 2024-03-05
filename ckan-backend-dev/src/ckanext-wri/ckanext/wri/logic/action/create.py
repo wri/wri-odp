@@ -3,6 +3,7 @@ import logging
 
 from ckanext.wri.model.notification import Notification, notification_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
+from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.auth import schema
 
 from ckan.common import _
@@ -77,3 +78,30 @@ def pending_dataset_create(context: Context, data_dict: DataDict):
         raise tk.ValidationError(_(f"Pending Dataset not found: {package_id}"))
 
     return pending_dataset
+
+
+# NOTE: not validating auth because this action is not meant to
+# be used via API and this way we prevent unnecessary DB queries
+def resource_location_create(context: Context, data_dict):
+    """Create resource location for a resource"""
+    resource_id = data_dict.get("resource_id")
+    spatial_address = data_dict.get("spatial_address")
+    spatial_geom = data_dict.get("spatial_geom")
+
+    if not resource_id:
+        raise tk.ValidationError(_("resource_id is required"))
+
+    resource_location = None
+    try:
+        resource_location = ResourceLocation.create(resource_id,
+                                                    spatial_address,
+                                                    spatial_geom)
+    except Exception as e:
+        log.error(e)
+        raise tk.ValidationError(e)
+
+    if not resource_location:
+        raise tk.ValidationError(
+                _(f"Resource Location not found: {resource_id}"))
+
+    return resource_location

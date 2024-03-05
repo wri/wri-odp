@@ -16,6 +16,7 @@ from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
 from ckan.lib.navl.validators import ignore_missing
 from ckanext.wri.logic.action.datapusher_download import download_request, download_callback
+from ckanext.wri.lib.resource_location import update_resource_location
 
 import logging
 log = logging.getLogger(__name__)
@@ -68,7 +69,13 @@ class WriPlugin(plugins.SingletonPlugin):
             from ckanext.wri.model import setup_pending_datasets
             setup_pending_datasets()
 
-        return [notificationdb, pendingdatasetsdb]
+        @click.command()
+        def resourcelocationdb():
+            """Creates resources location table"""
+            from ckanext.wri.model import setup_resource_location
+            setup_resource_location()
+
+        return [notificationdb, pendingdatasetsdb, resourcelocationdb]
 
     # IAuth
 
@@ -182,11 +189,18 @@ class WriPlugin(plugins.SingletonPlugin):
         return labels
 
     # IResourceController
+    def before_resource_create(self, context, resource_dict: dict[str, Any]):
+        resource_dict = update_resource_location(context, resource_dict)
+        return resource_dict
 
     def after_resource_create(
             self, context: Context, resource_dict: dict[str, Any]):
 
         self._submit_to_datapusher(resource_dict)
+
+    def before_resource_update(self, context, resource_dict: dict[str, Any]):
+        resource_dict = update_resource_location(context, resource_dict)
+        return resource_dict
 
     def after_resource_update(
             self, context: Context, resource_dict: dict[str, Any]):
@@ -238,11 +252,13 @@ class WriPlugin(plugins.SingletonPlugin):
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
                 self._submit_to_datapusher(resource)
+                update_resource_location(context, resource)
 
     def after_dataset_update(self, context, pkg_dict):
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
                 self._submit_to_datapusher(resource)
+                update_resource_location(context, resource)
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)

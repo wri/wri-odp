@@ -3,6 +3,7 @@ from typing_extensions import TypeAlias
 import logging
 from ckanext.wri.model.notification import Notification, notification_list_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
+from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.auth import schema
 import ckan.plugins.toolkit as tk
 import ckan.logic as logic
@@ -86,3 +87,31 @@ def pending_dataset_update(context: Context, data_dict: DataDict):
         raise logic.NotFound(_(f"Pending Dataset not found: {package_id}"))
 
     return pending_dataset
+
+
+# NOTE: not meant to be used via API, no auth validation
+def resource_location_update(context: Context, data_dict: DataDict):
+    """Update a resource location"""
+    resource_id = data_dict.get("resource_id")
+    spatial_address = data_dict.get("spatial_address")
+    spatial_geom = data_dict.get("spatial_geom")
+
+    if not resource_id:
+        raise tk.ValidationError(_("resource_id is required"))
+
+    resource_location = None
+
+    try:
+        resource_location = ResourceLocation.update(
+            resource_id=resource_id,
+            spatial_geom=spatial_geom,
+            spatial_address=spatial_address,
+        )
+    except Exception as e:
+        log.error(e)
+        raise tk.ValidationError(e)
+
+    if not resource_location:
+        raise logic.NotFound(_(f"Resource location not found: {resource_id}"))
+
+    return resource_location
