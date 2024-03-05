@@ -10,8 +10,18 @@ from ckan.lib.search import SearchError
 from ckanext.wri.logic.auth import auth as auth
 from ckanext.wri.logic.action.datapusher import datapusher_latest_task, datapusher_submit
 from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
-from ckanext.wri.logic.action.update import notification_update, pending_dataset_update
-from ckanext.wri.logic.action.get import package_search, notification_get_all, pending_dataset_show, pending_diff_show, dataset_release_notes
+from ckanext.wri.logic.action.update import notification_update, pending_dataset_update, notification_bulk_update
+from ckanext.wri.logic.action.get import (
+    package_search,
+    notification_get_all,
+    pending_dataset_show,
+    pending_diff_show,
+    dataset_release_notes,
+    dashboard_activity_listv2,
+    package_activity_list_wri,
+    organization_activity_list_wri
+)
+
 from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
 from ckan.lib.navl.validators import ignore_missing
@@ -120,6 +130,7 @@ class WriPlugin(plugins.SingletonPlugin):
             'notification_get_all': notification_get_all,
             'notification_create': notification_create,
             'notification_update': notification_update,
+            'notification_bulk_update': notification_bulk_update,
             'pending_dataset_create': pending_dataset_create,
             'pending_dataset_show': pending_dataset_show,
             'pending_dataset_update': pending_dataset_update,
@@ -129,8 +140,10 @@ class WriPlugin(plugins.SingletonPlugin):
             'prefect_latest_task': datapusher_latest_task,
             'prefect_download_from_store': download_request,
             'prefect_download_callback': download_callback,
-            'dataset_release_notes': dataset_release_notes
-
+            'dataset_release_notes': dataset_release_notes,
+            'dashboard_activity_listv2': dashboard_activity_listv2,
+            'package_activity_list_wri':package_activity_list_wri,
+            'organization_activity_list_wri': organization_activity_list_wri
         }
 
     # IPermissionLabels

@@ -154,41 +154,39 @@ export const notificationRouter = createTRPCRouter({
         .input(NotificationInput)
         .mutation(async ({ input, ctx }) => {
             try {
-                const response = await Promise.all(
-                    input.notifications.map(async (notification) => {
-                        const payload: NotificationType = notification
-                        if (input.state) payload.state = input.state
-                        if (input.is_unread !== undefined) {
-                            payload.is_unread = input.is_unread
-                        }
 
-                        const response = await fetch(
-                            `${env.CKAN_URL}/api/3/action/notification_update`,
-                            {
-                                method: 'POST',
-                                headers: {
-                                    Authorization: env.SYS_ADMIN_API_KEY,
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(payload),
-                            }
-                        )
-                        const data =
-                            (await response.json()) as CkanResponse<NotificationType>
-                        if (!data.success && data.error) {
-                            if (data.error.message)
-                                throw Error(
-                                    replaceNames(data.error.message, true)
-                                )
-                            throw Error(
-                                replaceNames(JSON.stringify(data.error), true)
-                            )
-                        }
-
-                        return data.result
-                    })
+                const noficicationPayload: NotificationType[] = input.notifications.map((notification) => {
+                    if (input.state) notification.state = input.state
+                    if (input.is_unread !== undefined) {
+                        notification.is_unread = input.is_unread
+                    }
+                    return notification
+                })
+                
+                const response = await fetch(
+                    `${env.CKAN_URL}/api/3/action/notification_bulk_update`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            Authorization: env.SYS_ADMIN_API_KEY,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({payload: noficicationPayload}),
+                    }
                 )
-                return response
+
+                const data = (await response.json()) as CkanResponse<number>
+                if (!data.success && data.error) {
+                    if (data.error.message)
+                        throw Error(
+                            replaceNames(data.error.message, true)
+                        )
+                    throw Error(
+                        replaceNames(JSON.stringify(data.error), true)
+                    )
+                }
+
+                return data.result
             } catch (e) {
                 let error =
                     'Something went wrong please contact the system administrator'
