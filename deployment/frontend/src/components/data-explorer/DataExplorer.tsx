@@ -16,6 +16,8 @@ import Spinner from '../_shared/Spinner'
 import { TabularResource } from '../datasets/visualizations/Visualizations'
 import { FilterObjType } from './search.schema'
 import '@tanstack/react-table'
+import { DownloadButton } from './DownloadButton'
+import { convertToSql } from './convertToSql'
 
 interface DataExplorerProps {
     tabularResource: TabularResource
@@ -57,7 +59,7 @@ export function DataExplorer({ tabularResource }: DataExplorerProps) {
 export interface DataExplorerInnerProps {
     tableName: string
     tabularResource: TabularResource
-    columns: { key: string; name: string; type: string, default?: string }[]
+    columns: { key: string; name: string; type: string; default?: string }[]
 }
 
 export interface DataExplorerColumnFilter {
@@ -183,10 +185,21 @@ function DataExplorerInner({
             <div className="flex flex-col gap-y-4 sm:flex-row justify-between items-end sm:items-center px-6">
                 <TopBar table={table} numOfRows={numOfRows ?? 0} />
             </div>
-            <div className="flex flex-row justify-between px-6">
+            <div className="flex flex-row justify-between gap-x-2 px-6">
+        <div className='flex flex-row justify-between grow'>
                 <ListOfFilters
                     filters={filteredColumns}
                     setFilters={setColumnFilters}
+                />
+                </div>
+                <DownloadButton
+                    tabularResource={tabularResource}
+                    sql={convertToSql({
+                        tableName,
+                        columns: columns.map((c) => c.key),
+                        filters: filteredColumns,
+                        sorting,
+                    })}
                 />
             </div>
             <div className="flex flex-col grow">
