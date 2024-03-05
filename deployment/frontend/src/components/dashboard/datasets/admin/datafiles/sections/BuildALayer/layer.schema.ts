@@ -84,12 +84,14 @@ const filterExpression = z.object({
 const rampObj = z
     .object({
         type: z.object({
-            value: z.enum([
-                'step',
-                'interpolate',
-                'interpolate-lab',
-                'interpolate-hcl',
-            ]).or(emptyStringToStep),
+            value: z
+                .enum([
+                    'step',
+                    'interpolate',
+                    'interpolate-lab',
+                    'interpolate-hcl',
+                ])
+                .or(emptyStringToStep),
             label: z.string().or(emptyStringToStepLabel),
         }),
         interpolationType: z
@@ -125,74 +127,77 @@ const colorPattern = z
     .or(emptyStringToUndefined)
 
 const renderSchema = z.object({
-    layers: z.array(
-        z.object({
-            type: z.object({
-                value: z.enum(['circle', 'line', 'fill']),
-                label: z.string(),
-            }),
-            'source-layer': z.string().default('layer0'),
-            paint: z
-                .object({
-                    'fill-color': colorPattern,
-                    'fill-opacity': z.coerce
-                        .number()
-                        .optional()
-                        .nullable()
-                        .or(nanToUndefined)
-                        .transform((val) => {
-                            if (val && isNaN(val)) return undefined
-                            if (val === 0) return undefined
-                            return val
-                        }),
-                    'line-color': colorPattern,
-                    'line-opacity': z.coerce
-                        .number()
-                        .optional()
-                        .nullable()
-                        .or(nanToUndefined)
-                        .transform((val) => {
-                            if (val && isNaN(val)) return undefined
-                            if (val === 0) return undefined
-                            return val
-                        }),
-                    'line-width': z.coerce
-                        .number()
-                        .optional()
-                        .nullable()
-                        .or(nanToUndefined)
-                        .transform((val) => {
-                            if (val && isNaN(val)) return undefined
-                            if (val === 0) return undefined
-                            return val
-                        }),
-                    'circle-color': colorPattern,
-                    'circle-radius': z.coerce
-                        .number()
-                        .optional()
-                        .nullable()
-                        .or(nanToUndefined)
-                        .transform((val) => {
-                            if (val && isNaN(val)) return undefined
-                            if (val === 0) return undefined
-                            return val
-                        }),
-                    'circle-opacity': z.coerce
-                        .number()
-                        .optional()
-                        .nullable()
-                        .or(nanToUndefined)
-                        .transform((val) => {
-                            if (val && isNaN(val)) return undefined
-                            if (val === 0) return undefined
-                            return val
-                        }),
-                })
-                .optional()
-                .nullable(),
-            filter: z.array(z.union([z.string(), filterExpression])),
-        })
-    ).optional().nullable(),
+    layers: z
+        .array(
+            z.object({
+                type: z.object({
+                    value: z.enum(['circle', 'line', 'fill']),
+                    label: z.string(),
+                }),
+                'source-layer': z.string().default('layer0'),
+                paint: z
+                    .object({
+                        'fill-color': colorPattern,
+                        'fill-opacity': z.coerce
+                            .number()
+                            .optional()
+                            .nullable()
+                            .or(nanToUndefined)
+                            .transform((val) => {
+                                if (val && isNaN(val)) return undefined
+                                if (val === 0) return undefined
+                                return val
+                            }),
+                        'line-color': colorPattern,
+                        'line-opacity': z.coerce
+                            .number()
+                            .optional()
+                            .nullable()
+                            .or(nanToUndefined)
+                            .transform((val) => {
+                                if (val && isNaN(val)) return undefined
+                                if (val === 0) return undefined
+                                return val
+                            }),
+                        'line-width': z.coerce
+                            .number()
+                            .optional()
+                            .nullable()
+                            .or(nanToUndefined)
+                            .transform((val) => {
+                                if (val && isNaN(val)) return undefined
+                                if (val === 0) return undefined
+                                return val
+                            }),
+                        'circle-color': colorPattern,
+                        'circle-radius': z.coerce
+                            .number()
+                            .optional()
+                            .nullable()
+                            .or(nanToUndefined)
+                            .transform((val) => {
+                                if (val && isNaN(val)) return undefined
+                                if (val === 0) return undefined
+                                return val
+                            }),
+                        'circle-opacity': z.coerce
+                            .number()
+                            .optional()
+                            .nullable()
+                            .or(nanToUndefined)
+                            .transform((val) => {
+                                if (val && isNaN(val)) return undefined
+                                if (val === 0) return undefined
+                                return val
+                            }),
+                    })
+                    .optional()
+                    .nullable(),
+                filter: z.array(z.union([z.string(), filterExpression])),
+            })
+        )
+        .optional()
+        .nullable(),
 })
 
 const legendsSchema = z.object({
@@ -251,6 +256,9 @@ export const layerSchema = z
                 value: z.enum(['raster', 'vector', 'geojson', 'deck']),
                 label: z.string(),
             }),
+            timelineLabel: z.string().optional().nullable(),
+            order: z.number().optional().nullable(),
+            timeline: z.boolean().default(false),
             source: sourceSchema.optional().nullable(),
             render: renderSchema.optional().nullable(),
         }),

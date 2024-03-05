@@ -43,6 +43,9 @@ export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
                 : {},
         layerConfig: {
             ...formData.layerConfig,
+            timelineLabel: formData.layerConfig.timelineLabel ?? undefined,
+            order: formData.layerConfig.order ?? undefined,
+            timeline: formData.layerConfig.timeline,
             source: removeKeysWithUndefined({
                 type: formData.layerConfig.type.value,
                 ...formData.layerConfig.source,
@@ -207,6 +210,7 @@ export function convertLayerObjToForm(layerObj: APILayerSpec): LayerFormType {
         type: layerObj.type ?? 'layer',
         layerConfig: {
             ...layerObj.layerConfig,
+            timeline: layerObj.layerConfig.timeline ?? false,
             type: {
                 value: layerObj.layerConfig.source?.type ?? 'raster',
                 label: layerObj.layerConfig.source.type ?? 'Raster',

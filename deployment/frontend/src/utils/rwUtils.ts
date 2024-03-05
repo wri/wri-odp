@@ -17,6 +17,11 @@ export const assertFullfilled = <T>(
     return input.status === 'fulfilled'
 }
 
+function isUUID ( uuid: string ) {
+    let s = "" + uuid;
+    return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i.test(s)
+}
+
 export async function deleteLayerRw(r: ResourceFormType) {
     const layerRes = await fetch(r.url ?? '', {
         method: 'DELETE',
@@ -86,6 +91,7 @@ export async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     r.url = url
     r.name = name
     r.title = r.name !== '' ? r.name : title
+    if (r.layerObj) r.title = title
     r.description = r.description !== '' ? r.description : description
     r.rw_id = layerRw.data.id
     r.format = 'Layer'
