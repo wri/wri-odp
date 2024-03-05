@@ -96,11 +96,18 @@ def trigger_migration(context: Context, data_dict: DataDict):
         )
         deployment = deployment.json()
         deployment_id = deployment["id"]
+        res_id = None
+        if data_dict.get('id'):
+            res_id = data_dict.get('id')
         r = requests.post(
             urljoin(prefect_url, f"api/deployments/{deployment_id}/create_flow_run"),
             headers={"Content-Type": "application/json"},
             data=json.dumps(
+
                 {
+                    "parameters": {
+                        "resource_id": res_id
+                    },
                     "state": {"type": "SCHEDULED", "state_details": {}},
                 }
             ),
