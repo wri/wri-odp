@@ -23,7 +23,7 @@ dataset_fields:
   preset: checkbox
 
 - field_name: is_approved
-  label: Draft
+  label: Is Approved
   validators: boolean_validator
   output_validators: boolean_validator
   preset: checkbox

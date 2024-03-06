@@ -1,10 +1,8 @@
 import Header from '@/components/_shared/Header'
 import Highlights from '@/components/Highlights'
-import Recent from '@/components/Recent'
 import Footer from '@/components/_shared/Footer'
 import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner'
-import { ErrorAlert } from '@/components/_shared/Alerts'
 import RedirectedSearchInput from '@/components/search/RedirectedSearchInput'
 import { NextSeo } from 'next-seo'
 import { env } from '@/env.mjs'
@@ -13,6 +11,15 @@ import superjson from 'superjson'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import { appRouter } from '@/server/api/root'
 import { getServerAuthSession } from '@/server/auth'
+import dynamic from 'next/dynamic';
+
+const ErrorAlert = dynamic<{ text: string; title?: string; }>(
+    () => import('@/components/_shared/Alerts').then(module => module.ErrorAlert), {
+        ssr: false,
+});
+
+const Recent = dynamic(()=> import('@/components/Recent'))
+    
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)

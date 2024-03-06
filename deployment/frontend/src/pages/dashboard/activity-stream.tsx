@@ -31,11 +31,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         sortBy: 'metadata_modified desc',
     })
     await helpers.dataset.getFavoriteDataset.prefetch()
-    await helpers.organization.getAllOrganizations.prefetch({
-        search: '',
-        fq: {},
-        page: { start: 0, rows: 1000 },
-    })
+    await helpers.organization.getAllOrganizations.prefetch()
 
     return {
         props: {

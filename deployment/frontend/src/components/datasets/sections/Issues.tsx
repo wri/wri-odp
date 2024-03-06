@@ -25,6 +25,7 @@ import {
 import { Dialog } from '@headlessui/react'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { ErrorAlert } from '@/components/_shared/Alerts'
+import Image from 'next/image'
 
 export default function Issues({
     issues,
@@ -249,15 +250,18 @@ function IssueCard({
                     </p>
                     {issue.comments.map((comment) => (
                         <li key={comment.id} className="flex gap-x-4 pt-2">
-                            <img
-                                className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                                src={
-                                    comment.user?.image_display_url
-                                        ? comment.user?.image_display_url
-                                        : `https://gravatar.com/avatar/${comment.user?.email_hash}?s=270&d=identicon`
-                                }
-                                alt=""
-                            />
+                            <div className='relative h-12 w-12 '>
+                                <Image
+                                    fill
+                                    className="flex-none rounded-full bg-gray-50"
+                                    src={
+                                        comment.user?.image_display_url
+                                            ? comment.user?.image_display_url
+                                            : `https://gravatar.com/avatar/${comment.user?.email_hash}?s=270&d=identicon`
+                                    }
+                                    alt=""
+                                />
+                            </div>
                             <div className="flex-auto">
                                 <div className="flex items-baseline justify-between gap-x-4">
                                     <p className="text-sm font-semibold leading-6 text-gray-900">

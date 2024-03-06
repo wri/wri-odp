@@ -318,6 +318,7 @@ export async function getAllDatasetFq({
     sortBy = '',
     extLocationQ = '',
     extAddressQ = '',
+    user = null,
 }: {
     apiKey: string
     fq: string
@@ -325,7 +326,8 @@ export async function getAllDatasetFq({
     facetFields?: string[]
     sortBy?: string
     extLocationQ?: string
-    extAddressQ?: string
+        extAddressQ?: string
+    user?: boolean | null
 }): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets }> {
     try {
         let url = `${env.CKAN_URL}/api/3/action/package_search?q=${query.search}`
@@ -348,6 +350,10 @@ export async function getAllDatasetFq({
 
         if (extAddressQ) {
             url += `&ext_address_q=${extAddressQ}`
+        }
+
+        if (user) {
+            url += `&user=true`
         }
 
         const response = await fetch(

@@ -1,9 +1,5 @@
-import Search from '@/components/Search'
 import Header from '@/components/_shared/Header'
-import Highlights from '@/components/Highlights'
-import Recent from '@/components/Recent'
 import Footer from '@/components/_shared/Footer'
-import TopicsSearchResults from '@/components/topics/TopicsSearchResults'
 import TopicsSearch from '@/components/topics/TopicsSearch'
 import { NextSeo } from 'next-seo'
 import { api } from '@/utils/api'
@@ -19,6 +15,8 @@ import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
 import { env } from '@/env.mjs'
+import dynamic from 'next/dynamic'
+const TopicsSearchResults = dynamic(() => import('@/components/topics/TopicsSearchResults'))
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)

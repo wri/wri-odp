@@ -1,5 +1,4 @@
 import Search from '@/components/Search'
-import { ErrorAlert } from '@/components/_shared/Alerts'
 import Footer from '@/components/_shared/Footer'
 import Header from '@/components/_shared/Header'
 import Pagination from '@/components/datasets/Pagination'

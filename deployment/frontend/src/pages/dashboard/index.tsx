@@ -42,7 +42,7 @@ export default function index(props: InferGetServerSidePropsType<typeof getServe
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
     const helpers = createServerSideHelpers({
         router: appRouter,

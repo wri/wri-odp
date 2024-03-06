@@ -1,7 +1,7 @@
 import Header from '@/components/_shared/Header'
 import Footer from '@/components/_shared/Footer'
 import TeamsSearch from '@/components/team/TeamsSearch'
-import TeamsSearchResults from '@/components/team/TeamsSearchResults'
+// import TeamsSearchResults from '@/components/team/TeamsSearchResults'
 import { NextSeo } from 'next-seo'
 import { api } from '@/utils/api'
 import { useState, useEffect } from 'react'
@@ -16,6 +16,8 @@ import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
 import { env } from '@/env.mjs'
+import dynamic from 'next/dynamic'
+const TeamsSearchResults = dynamic(() => import('@/components/team/TeamsSearchResults'))
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
