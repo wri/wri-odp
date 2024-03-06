@@ -24,10 +24,6 @@ If you select the `featured dataset` checkbox an image uploader will appear wher
 
 ![Featured dataset](./featured_dataset.png)
 
-If you want the data you define here to also live in the resource watch api, you will need to check the `RW Api` checkbox and provide the necessary values, this is necessary if you want to create layers
-
-![RW API Dataset](./rw_api_dataset.png)
-
 ### Location 
 
 Where you can select the location for your dataset which can then be queried in the search page
@@ -98,6 +94,18 @@ If you want to just link some data that lives outside the system, you can just s
 You can add multiple datafiles by selecting the `Add another datafile button`
 
 ![Add another datafile](./add_another_datafile.png)
+
+### Map Visualizations
+
+If you want the data you define here to also live in the resource watch api, you will need to check the `RW Api` checkbox thats is contained in the `Map Visualizations` tab (The third one) and provide the necessary values, this is necessary if you want to create layers
+
+![RW API Dataset](./rw_api_dataset.png)
+
+The connectorUrl and tablename fields can be used to allow users to get the data in their original places, for example: if you setup the provider to be cartodb a `Open in Carto` such as below
+
+![Open in Carto](./open_in_carto.png)
+
+For `featureservice`, `cartodb` and `gfw` we are just linking the connectorUrl, for GEE we try to build a url using the tablename e.g: the tablename `JRC/GSW1_0/GlobalSurfaceWater` becomes the following URL [https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_0_GlobalSurfaceWater](https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_0_GlobalSurfaceWater)
 
 ## Edit Datasets
 
