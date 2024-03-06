@@ -13,7 +13,6 @@ import "swiper/css/pagination";
 export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number, highlighted?: boolean }[] }) {
   const prevEl = `.nav-prev-button--tabs`;
   const nextEl = `.nav-next-button--tabs`;
-  console.log('TABS', tabs)
   return (
     <>
       <Swiper

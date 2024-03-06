@@ -26,3 +26,22 @@ Similar to what happens with tabular data files, layers can be converted to any 
 ### Other data files
 
 Data files that are not layers or tabular, such as images or URLs, will show only one option on the download dropdown: Original Format.
+
+## Download of subsets
+
+If you can use the button `View Tabular Preview` either at the dataset level of at the datafile level, then that means you can download a subset of that data, by clicking in `Download Data`
+
+![Download Data](./tabular_preview.png)
+
+The filters and sorting columns used to show the preview will also be used to download the data, in one of the following formats
+
+- CSV
+- TSV
+- JSON
+- XML
+- XLSX
+
+On clicking in one of the formats the user will be prompted with an email input, in which he's going to receive the datafile data converted to the desired file format.
+
+![Modal](./modal.png)
+

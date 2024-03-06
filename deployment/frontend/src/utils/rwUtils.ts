@@ -11,21 +11,25 @@ import {
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
 import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 
-export const assertFullfilled = <T>(input: PromiseSettledResult<T>): input is PromiseFulfilledResult<T> => {
-    return input.status === 'fulfilled';
+export const assertFullfilled = <T>(
+    input: PromiseSettledResult<T>
+): input is PromiseFulfilledResult<T> => {
+    return input.status === 'fulfilled'
+}
+
+function isUUID ( uuid: string ) {
+    let s = "" + uuid;
+    return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i.test(s)
 }
 
 export async function deleteLayerRw(r: ResourceFormType) {
-    const layerRes = await fetch(
-        r.url ?? '',
-        {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${env.RW_API_KEY}`,
-            },
-        }
-    )
+    const layerRes = await fetch(r.url ?? '', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${env.RW_API_KEY}`,
+        },
+    })
     const layerRw: RwResponse = await layerRes.json()
     if (isRwError(layerRw)) throw new Error(JSON.stringify(layerRw.errors))
     return layerRw
@@ -39,11 +43,8 @@ export async function createDatasetRw(dataset: DatasetFormType) {
         published: false,
         env: 'staging',
         application: ['data-explorer'],
-    }
-    if (dataset.provider === 'gee') {
-        rwDataset.tableName = dataset.tableName
-    } else {
-        rwDataset.connectorUrl = dataset.connectorUrl
+        connectorUrl: dataset.connectorUrl ?? '',
+        tableName: dataset.tableName ?? '',
     }
     const body = JSON.stringify({ dataset: rwDataset })
     const datasetRwRes = await fetch(
@@ -90,6 +91,7 @@ export async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     r.url = url
     r.name = name
     r.title = r.name !== '' ? r.name : title
+    if (r.layerObj) r.title = title
     r.description = r.description !== '' ? r.description : description
     r.rw_id = layerRw.data.id
     r.format = 'Layer'
@@ -133,5 +135,3 @@ export async function editLayerRw(r: ResourceFormType) {
     }
     return r
 }
-
-

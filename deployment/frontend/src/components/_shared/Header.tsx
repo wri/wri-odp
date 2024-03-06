@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Menu, Transition, Dialog } from '@headlessui/react'
 import { Bars3Icon } from '@heroicons/react/20/solid'
@@ -7,11 +7,26 @@ import { useRouter } from 'next/router'
 import Login from './Login'
 import UserMenu from './UserMenu'
 import { useSession } from 'next-auth/react'
+import { api } from '@/utils/api'
 
 export default function Header() {
     const { asPath } = useRouter()
     const [isOpen, setIsOpen] = useState(false)
     const session = useSession()
+
+    const apiTokenQuery = api.auth.getApiTokensList.useQuery(
+        {},
+        {
+            enabled: false,
+            cacheTime: 1,
+        }
+    )
+
+    useEffect(() => {
+        if (session.status == 'authenticated') {
+            apiTokenQuery.refetch()
+        }
+    }, [session?.status])
 
     function closeModal() {
         setIsOpen(false)
@@ -169,10 +184,9 @@ export default function Header() {
                                                 <Menu.Item>
                                                     {({ active }) => (
                                                         <Link
-                                                            className={`${
-                                                                active &&
+                                                            className={`${active &&
                                                                 'bg-blue-500'
-                                                            }`}
+                                                                }`}
                                                             href={item.href}
                                                         >
                                                             {item.title}

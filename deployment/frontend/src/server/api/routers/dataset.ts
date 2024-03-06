@@ -1934,10 +1934,11 @@ export const DatasetRouter = createTRPCRouter({
             z.object({
                 resource_id: z.string(),
                 provider: z.enum(['datastore', 'rw']),
-                format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON']),
+                format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON', "GeoJSON", "SHP", "KML"]),
                 sql: z.string(),
                 email: z.string(),
                 rw_id: z.string().optional(),
+                carto_account: z.string().optional()
             })
         )
         .mutation(async ({ input, ctx }) => {
@@ -1960,6 +1961,46 @@ export const DatasetRouter = createTRPCRouter({
             )
 
             const data = (await response.json()) as CkanResponse<boolean>
+            if (response.ok) {
+                console.log(data)
+                return data
+            }
+            throw data
+        }),
+    downloadSubsetOfData: publicProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                provider: z.string(),
+                dataset_id: z.string().optional(),
+                connectorUrl: z.string().optional(),
+                format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON']),
+                sql: z.string(),
+                email: z.string(),
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            const headers: any = {
+                'Content-Type': 'application/json',
+            }
+
+            const user = ctx?.session?.user
+            if (user) {
+                headers['Authorization'] = user.apikey
+            }
+
+            console.log('INPUT', input)
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/prefect_download_subset_from_store`,
+                {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(input),
+                }
+            )
+
+            const data = (await response.json()) as CkanResponse<boolean>
+            console.log('DATA', data)
             if (response.ok) {
                 console.log(data)
                 return data

@@ -26,12 +26,16 @@ export interface Render {
 
 export type Provider = {
   type: 'carto' | string
+  account?: string
   options: Record<string, unknown>
   layers: any[]
 };
 
 export interface layerConfigSpec {
   type: LayerType;
+  timeline?: boolean;
+  order?: number;
+  timelineLabel?: string;
   render_function?: string;
   render?: any;
   source: Partial<Source & { provider: Provider, maxzoom: number, minzoom: number }>;
