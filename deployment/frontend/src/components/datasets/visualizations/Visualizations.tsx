@@ -8,6 +8,8 @@ import ChartView from './ChartView'
 
 export type TabularResource = {
     provider: string
+    connectorUrl?: string
+    datasetId?: string
     id: string
     apiKey?: string
 }

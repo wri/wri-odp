@@ -93,15 +93,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     let activeLayerGroups =
         initialZustandState?.mapView?.activeLayerGroups || []
+    console.log('activeLayerGroups', activeLayerGroups)
 
     const layerAsLayerObj = new Map()
     const tempLayerAsLayerobj = new Map()
 
-    if (!activeLayerGroups?.length && dataset) {
-        const layers = dataset?.resources
-            .filter((r: any) => r?.format == 'Layer')
-            .map((r: any) => r?.rw_id)
-
+    if (dataset) {
         for (const resource of dataset?.resources) {
             if (resource.format == 'Layer') {
                 if (
@@ -116,7 +113,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         }
     }
 
-    if (initialZustandState && initialZustandState?.relatedDatasets.length) {
+    if (initialZustandState && initialZustandState?.relatedDatasets?.length) {
         const datasets = initialZustandState?.relatedDatasets
         for (const dataset of datasets) {
             for (const resource of dataset?.resources) {
@@ -136,7 +133,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     if (
         initialZustandState &&
-        initialZustandState?.prevRelatedDatasets.length
+        initialZustandState?.prevRelatedDatasets?.length
     ) {
         const datasets = initialZustandState?.prevRelatedDatasets
         for (const dataset of datasets) {
@@ -156,10 +153,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
     }
 
     if (prevdataset) {
-        const layers = prevdataset?.resources
-            .filter((r: any) => r?.format == 'Layer')
-            .map((r: any) => r?.rw_id)
-
         for (const resource of prevdataset?.resources) {
             if (resource.format == 'Layer') {
                 if (

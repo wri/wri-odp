@@ -2657,3 +2657,22 @@ export function advance_search_query(filters: Filter[]) {
     delete fq.spatial
     return { fq, extLocationQ, extAddressQ ,  search: filters.find((e) => e?.key == 'search')?.value ?? ''}
 }
+
+export async function getTokenList(session: Session)  {
+    const response = await fetch(
+        `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/api_token_list`,
+        {
+            method: 'POST',
+            body: JSON.stringify({ user_id: session.user.id }),
+            headers: {
+                Authorization: session.user.apikey,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+
+    const json = await response.json()
+
+    return json
+}
+
