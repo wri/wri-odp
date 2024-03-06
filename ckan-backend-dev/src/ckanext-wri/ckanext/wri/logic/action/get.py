@@ -318,6 +318,10 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                 if isinstance(package, str):
                     package = {result_fl[0]: package}
                 extras = cast("dict[str, Any]", package.pop("extras", {}))
+                user = model_dictize.user_dictize(
+                    model.User.get(package.get("creator_user_id")), context
+                )
+                package['user'] = user
                 package.update(extras)
                 results.append(package)
         else:
@@ -333,6 +337,11 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                             plugins.IPackageController
                         ):
                             package_dict = item.before_dataset_view(package_dict)
+                    
+                    user = model_dictize.user_dictize(
+                        model.User.get(package_dict.get("creator_user_id")), context
+                    )
+                    package_dict['user'] = user
                     results.append(package_dict)
                 else:
                     log.error(
