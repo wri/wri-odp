@@ -80,7 +80,7 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
     return (
         <>
             <Popover>
-                <Component className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400">
+                <Component className="download-datafile w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400">
                     <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
                     <div className="font-acumin text-xs sm:text-sm font-normal text-black">
                         {isLoading && mode == 'SIGNED_URL'

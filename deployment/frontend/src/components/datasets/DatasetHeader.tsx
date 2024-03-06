@@ -161,9 +161,9 @@ flex items-center gap-x-1 mt-4 w-fit
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        <LinkIcon className="h-4 w-4 text-wri-green" />
+                        <ArrowUpRightIcon className="h-4 w-4 text-wri-green" />
                         <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
-                            Open in{' '}
+                            Open table in{' '}
                             {match(data.provider)
                                 .with('cartodb', () => 'Carto')
                                 .with('featureservice', () => 'ArcGIS')
@@ -184,9 +184,9 @@ flex items-center gap-x-1 mt-4 w-fit
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        <LinkIcon className="h-4 w-4 text-wri-green" />
+                        <ArrowUpRightIcon className="h-4 w-4 text-wri-green" />
                         <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
-                            Open in GEE
+                            Open table in GEE
                         </div>
                     </a>
                 ))
@@ -199,9 +199,9 @@ flex items-center gap-x-1 mt-4 w-fit
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                <LinkIcon className="h-4 w-4 text-wri-green" />
+                                <ArrowUpRightIcon className="h-4 w-4 text-wri-green" />
                                 <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
-                                    Open {data.provider.toUpperCase()}
+                                    Open table {data.provider.toUpperCase()}
                                 </div>
                             </a>
                         )
@@ -214,7 +214,7 @@ flex items-center gap-x-1 mt-4 w-fit
                             <div>
                                 <Menu.Button>
                                     <Button size="sm">
-                                        Open external sources
+                                        Open external sources for table
                                     </Button>
                                 </Menu.Button>
                             </div>

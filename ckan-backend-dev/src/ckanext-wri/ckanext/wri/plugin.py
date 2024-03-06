@@ -148,7 +148,6 @@ class WriPlugin(plugins.SingletonPlugin):
             'prefect_download_subset_from_store': subset_download_request,
             'prefect_download_subset_callback': subset_download_callback,
             'dataset_release_notes': dataset_release_notes
-
         }
 
     # IPermissionLabels

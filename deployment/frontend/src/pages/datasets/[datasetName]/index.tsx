@@ -41,9 +41,7 @@ import { matchesAnyPattern } from '@/utils/general'
 
 import { Versioning } from '@/components/datasets/sections/Versioning'
 
-import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
-import { Resource, View } from '@/interfaces/dataset.interface'
-import { useLayersFromRW } from '@/utils/queryHooks'
+import { useActiveLayerGroups } from '@/utils/storeHooks'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -192,7 +190,6 @@ export async function getServerSideProps(
             },
         }
     } catch (e) {
-        console.log(e)
         return {
             props: {
                 redirect: {
@@ -214,7 +211,6 @@ export default function DatasetPage(
     const [selectedIndex, setSelectedIndex] = useState(0)
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
         useActiveLayerGroups()
-    const { data: activeLayers } = useLayersFromRW()
     const datasetName = props.datasetName as string
     const datasetId = props.datasetId!
     const pendingExist = props.pendingExist!
@@ -229,7 +225,7 @@ export default function DatasetPage(
     const isApprovalRequest =
         query?.approval === 'true' ||
         (approvalAuth && pendingExist && isPendingState)
-    const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers()
+    const { isAddingLayers } = useIsAddingLayers()
     const session = useSession()
 
     const {
@@ -518,8 +514,6 @@ export default function DatasetPage(
             </>
         )
     }
-
-    console.log(diffFields)
 
     return (
         <>

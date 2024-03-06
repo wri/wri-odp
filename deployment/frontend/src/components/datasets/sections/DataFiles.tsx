@@ -268,6 +268,11 @@ function DatafileCard({
                                                             true
                                                         )
                                                     }
+                                                    console.log('TEST', {
+                                                        // @ts-ignore
+                                                        rw_id: datafile.rw_id,
+                                                        dataset: dataset.id,
+                                                    })
                                                     addLayerToLayerGroup(
                                                         // @ts-ignore
                                                         datafile.rw_id,

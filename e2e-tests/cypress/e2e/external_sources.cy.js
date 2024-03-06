@@ -55,21 +55,21 @@ describe("External sources", () => {
     "should render gee dataset",
     () => {
       cy.visit(`/datasets/${geeDataset}`);
-      cy.contains('Open in GEE')
+      cy.contains('Open table in GEE')
     },
   );
   it(
     "should render arcgis dataset",
     () => {
       cy.visit(`/datasets/${arcgisDataset}`);
-      cy.contains('Open in ArcGIS')
+      cy.contains('Open table in ArcGIS')
     },
   );
   it(
     "should render gfw dataset",
     () => {
       cy.visit(`/datasets/${gfwDataset}`);
-      cy.contains('Open in GFW')
+      cy.contains('Open table in GFW')
       cy.contains("Ma'tan al-Sarra", { timeout: 15000 });
       cy.contains("Download Data").click();
       cy.contains("CSV").click();
@@ -80,7 +80,7 @@ describe("External sources", () => {
     "should render carto dataset",
     () => {
       cy.visit(`/datasets/${cartoDataset}`);
-      cy.contains('Open in Carto')
+      cy.contains('Open table in Carto')
       cy.contains("port_name", { timeout: 15000 });
       cy.contains("Download Data").click();
       cy.contains("CSV").click();
@@ -91,7 +91,7 @@ describe("External sources", () => {
     "should render document dataset",
     () => {
       cy.visit(`/datasets/${documentDataset}`);
-      cy.contains('Open external sources').click()
+      cy.contains('Open external sources for table').click()
       cy.contains('Source 1')
     },
   );
