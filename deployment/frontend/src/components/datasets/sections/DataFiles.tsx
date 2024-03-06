@@ -214,7 +214,7 @@ function DatafileCard({
                             )}
                             <Disclosure.Button>
                                 <h3
-                                    className={`font-acumin text-lg font-semibold leading-loose text-stone-900 ${
+                                    className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${
                                         datafile.title
                                             ? higlighted(
                                                   'title',
@@ -252,7 +252,7 @@ function DatafileCard({
                                                 }
                                             }}
                                         >
-                                            <span className="mt-1">
+                                            <span className="mt-1 text-xs 2xl:text-sm whitespace-nowrap">
                                                 Remove Layer
                                             </span>
                                         </Button>
@@ -268,11 +268,6 @@ function DatafileCard({
                                                             true
                                                         )
                                                     }
-                                                    console.log('TEST', {
-                                                        // @ts-ignore
-                                                        rw_id: datafile.rw_id,
-                                                        dataset: dataset.id,
-                                                    })
                                                     addLayerToLayerGroup(
                                                         // @ts-ignore
                                                         datafile.rw_id,
@@ -281,7 +276,9 @@ function DatafileCard({
                                                 }
                                             }}
                                         >
-                                            <span>Show Layer</span>
+                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
+                                                Show Layer
+                                            </span>
                                         </Button>
                                     )}
                                 </>
@@ -297,7 +294,9 @@ function DatafileCard({
                                                 setTabularResource(null)
                                             }
                                         >
-                                            Remove Tabular View
+                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
+                                                Remove Tabular View
+                                            </span>
                                         </Button>
                                     ) : (
                                         <Button
@@ -309,7 +308,9 @@ function DatafileCard({
                                                 })
                                             }
                                         >
-                                            View Table Preview
+                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
+                                                View Table Preview
+                                            </span>
                                         </Button>
                                     )}
                                 </>
@@ -337,7 +338,9 @@ function DatafileCard({
                                                 }
                                             }}
                                         >
-                                            Remove Chart Preview
+                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
+                                                Remove Chart Preview
+                                            </span>
                                         </Button>
                                     ) : (
                                         <Button
@@ -347,7 +350,9 @@ function DatafileCard({
                                                     addCharts(datafile._views)
                                             }}
                                         >
-                                            View Chart Preview
+                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
+                                                View Chart Preview
+                                            </span>
                                         </Button>
                                     )}
                                 </>
