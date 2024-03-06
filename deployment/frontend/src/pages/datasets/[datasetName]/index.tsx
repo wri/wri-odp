@@ -272,7 +272,7 @@ export default function DatasetPage(
 
     const issues = api.dataset.getDatasetIssues.useQuery(
         { id: datasetName },
-        { enabled: !!session.data?.user.apikey, retry: false }
+        { enabled: !!session.data?.user.apikey && pendingExist, retry: false }
     )
 
     const teamsDetails = api.teams.getTeam.useQuery(
@@ -453,7 +453,7 @@ export default function DatasetPage(
         {
             name: 'Issues',
             count: openIssueLength,
-            enabled: issues.data && issues.data.length > 0,
+            enabled: issues.data && issues.data.length > 0 && !isCurrentVersion,
         },
         {
             name: 'Release Notes',
@@ -688,7 +688,7 @@ export default function DatasetPage(
                                                     />
                                                 </Tab.Panel>
                                             )}
-                                            {issues.data &&
+                                            {issues.data && !isCurrentVersion &&
                                                 issues.data.length > 0 && (
                                                     <Tab.Panel as="div">
                                                         <Issues
