@@ -403,21 +403,23 @@ export default function DatasetPage(
             highlighted:
                 !isCurrentVersion &&
                 diffFields &&
-                diffFields.some((f) =>
-                    [
-                        'extras',
-                        'tags',
-                        'notes',
-                        'technical_notes',
-                        'project',
-                        'license_id',
-                        'groups',
-                        'license_title',
-                        'citation',
-                        'reason_for_adding',
-                        'restrictions',
-                    ].some((x) => f.includes(x))
-                ),
+                // for some reason the extra field acts weird on he diff, so we are removing it from the diffFields, it will still match subpatterns such as extras[0]
+                diffFields
+                    .filter((f) => f !== 'extras')
+                    .some((f) =>
+                        [
+                            'extras',
+                            'tags',
+                            'notes',
+                            'technical_notes',
+                            'project',
+                            'license_id',
+                            'license_title',
+                            'citation',
+                            'reason_for_adding',
+                            'restrictions',
+                        ].some((x) => f.includes(x))
+                    ),
         },
         {
             name: 'Methodology',
