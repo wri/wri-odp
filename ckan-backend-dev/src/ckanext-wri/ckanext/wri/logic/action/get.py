@@ -220,6 +220,7 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
 
     # Fix boolean Solr query for featured datasets
     q = data_dict.get("q")
+    return_user = data_dict.pop("user", False)
 
     for field in SOLR_BOOLEAN_FIELDS:
         if q and field in q:
@@ -318,10 +319,12 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                 if isinstance(package, str):
                     package = {result_fl[0]: package}
                 extras = cast("dict[str, Any]", package.pop("extras", {}))
-                user = model_dictize.user_dictize(
-                    model.User.get(package.get("creator_user_id")), context
-                )
-                package['user'] = user
+                
+                if return_user:
+                    user = model_dictize.user_dictize(
+                        model.User.get(package.get("creator_user_id")), context
+                    )
+                    package['user'] = user
                 package.update(extras)
                 results.append(package)
         else:
@@ -338,10 +341,11 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                         ):
                             package_dict = item.before_dataset_view(package_dict)
                     
-                    user = model_dictize.user_dictize(
-                        model.User.get(package_dict.get("creator_user_id")), context
-                    )
-                    package_dict['user'] = user
+                    if return_user:
+                        user = model_dictize.user_dictize(
+                            model.User.get(package_dict.get("creator_user_id")), context
+                        )
+                        package_dict['user'] = user
                     results.append(package_dict)
                 else:
                     log.error(
@@ -606,7 +610,7 @@ def dashboard_activity_listv2(context: Context, data_dict: DataDict):
     model = context["model"]
     results = get_action("dashboard_activity_list")(context, data_dict)
     for result in results:
-        result["user"] = model_dictize.user_dictize(
+        result["user_data"] = model_dictize.user_dictize(
             model.User.get(result["user_id"]), context
         )
     return results
@@ -616,7 +620,7 @@ def package_activity_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
     results = get_action("package_activity_list")(context, data_dict)
     for result in results:
-        result["user"] = model_dictize.user_dictize(
+        result["user_data"] = model_dictize.user_dictize(
             model.User.get(result["user_id"]), context
         )
     return results
@@ -626,7 +630,7 @@ def organization_activity_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
     results = get_action("organization_activity_list")(context, data_dict)
     for result in results:
-        result["user"] = model_dictize.user_dictize(
+        result["user_data"] = model_dictize.user_dictize(
             model.User.get(result["user_id"]), context
         )
     return results
