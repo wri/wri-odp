@@ -128,6 +128,64 @@ export default function SourceForm({
                                 </label>
                             </div>
                         </div>
+                        <div className="relative flex justify-start">
+                            <div className="flex h-6 items-center">
+                                <input
+                                    id="timeline"
+                                    aria-describedby="comments-description"
+                                    {...register(`layerConfig.timeline`)}
+                                    type="checkbox"
+                                    className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
+                                />
+                            </div>
+                            <div className="ml-3 text-sm leading-6">
+                                <label className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800">
+                                    Timeline
+                                    <DefaultTooltip content="Set this to true to allow to order the layers of this dataset in a timeline">
+                                        <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                    </DefaultTooltip>
+                                </label>
+                            </div>
+                        </div>
+                        {watch('layerConfig.timeline') === true && (
+                            <>
+                                <InputGroup
+                                    label="Timeline order"
+                                    className="sm:grid-cols-1 gap-x-2"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                >
+                                    <Input
+                                        {...register('layerConfig.order', {
+                                              valueAsNumber: true,
+                                        })}
+                                        defaultValue={0}
+                                        type="number"
+                                        icon={
+                                            <DefaultTooltip content="Integer that is going to be used to order the layers in the timeline, usually set to the year that the layer describes">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
+                                    />
+                                </InputGroup>
+                                <InputGroup
+                                    label="Timeline label"
+                                    className="sm:grid-cols-1 gap-x-2"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                >
+                                    <Input
+                                        {...register(
+                                            'layerConfig.timelineLabel'
+                                        )}
+                                        type="text"
+                                        icon={
+                                            <DefaultTooltip content="Label that will popup when the user hovers over the layer little circle in the timeline">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
+                                    />
+                                </InputGroup>
+                            </>
+                        )}
                         <InputGroup
                             label="Layer Type"
                             className="sm:grid-cols-1 gap-x-2"

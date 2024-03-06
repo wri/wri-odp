@@ -60,8 +60,9 @@ export async function getLayersFromRW(
                 if (layers.length === 0) return []
                 const layersData = await Promise.all(
                     layers.map(async (layer: string) => {
-                        const layerInfo = layerAsLayerObj.get(layer)
                         layer = layer.replace('prev', '')
+                        let layerInfo = layerAsLayerObj.get(layer)
+                        layerInfo = layerInfo ?? 'approved'
                         if (layerInfo === 'approved') {
                             const response = await fetch(
                                 `https://api.resourcewatch.org/v1/layer/${layer}`
@@ -70,10 +71,17 @@ export async function getLayersFromRW(
                             const { id, attributes } = layerData.data
                             const currentLayer = currentLayers.get(id)
                             let decodeParams = null
-                            if (attributes.layerConfig.decode_config && getDecodeParams[id as keyof typeof getDecodeParams] !== undefined) {
-                                decodeParams = await (getDecodeParams[
+                            if (
+                                attributes.layerConfig.decode_config &&
+                                getDecodeParams[
                                     id as keyof typeof getDecodeParams
-                                ] as any)()
+                                ] !== undefined
+                            ) {
+                                decodeParams = await (
+                                    getDecodeParams[
+                                        id as keyof typeof getDecodeParams
+                                    ] as any
+                                )()
                             }
                             return {
                                 id: id,
