@@ -164,6 +164,7 @@ export interface WriOrganization extends Organization {
 export interface WriUser extends CkanUser {
     capacity?: string
     gravatar_url?: string
+    organizations?: WriOrganization[]
 }
 
 export interface GroupTree {

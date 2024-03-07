@@ -40,6 +40,7 @@ import ckan.plugins.toolkit as tk
 from ckanext.wri.logic.auth import schema
 from ckanext.activity.model import Activity
 import ckan.lib.dictization.model_dictize as model_dictize
+import sqlalchemy
 
 
 log = logging.getLogger("ckan.logic")
@@ -53,6 +54,8 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = ckan.logic.get_action
+_select = sqlalchemy.sql.select
+_func = sqlalchemy.func
 
 
 NotificationGetUserViewedActivity: TypeAlias = None
@@ -633,4 +636,58 @@ def organization_activity_list_wri(context: Context, data_dict: DataDict):
         result["user_data"] = model_dictize.user_dictize(
             model.User.get(result["user_id"]), context
         )
+    return results
+
+
+@logic.side_effect_free
+def user_list_wri(context: Context, data_dict: DataDict):
+    model = context["model"]
+    results = get_action("user_list")(context, data_dict)
+    query= model.Session.query(
+        model.User,
+        model.User.name.label('name'),
+        model.User.fullname.label('fullname'),
+        model.User.about.label('about'),
+        model.User.email.label('email'),
+        model.User.created.label('created'),
+        _select(_func.count(model.Package.id)).where(
+            model.Package.creator_user_id == model.User.id,
+            model.Package.state == 'active',
+            model.Package.private == False,
+        ).label('number_created_packages')
+    )
+
+    query = query.filter(model.User.state != model.State.DELETED)
+    query = query.all()
+    results = []
+    org_details = {}
+    for q in query:
+        user = model_dictize.user_dictize(q[0], context)
+
+        member_query = model.Session.query(
+            model.Member
+        ).filter(
+            model.Member.state == 'active',
+            model.Member.table_name == 'user',
+            model.Member.table_id == user['id']
+        ).all()
+
+        user['organizations'] = []
+
+        for member in member_query:
+            if member.group_id in org_details:
+                organization = org_details[member.group_id]
+            else:
+                org_result = model.Session.query(model.Group).filter(model.Group.id == member.group_id, model.Group.is_organization == True).first()
+                if org_result:
+                    organization = model_dictize.group_dictize(org_result, context)
+                    org_details[member.group_id] = organization
+
+            if organization:
+                user_org = next(filter(lambda x: x['id'] == user['id'], organization['users']))
+                organization['capacity'] = user_org['capacity']
+                user['organizations'].append(organization)
+            
+        results.append(user)
+
     return results
