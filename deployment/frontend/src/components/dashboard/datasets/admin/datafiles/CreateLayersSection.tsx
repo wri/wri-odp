@@ -40,7 +40,7 @@ export function CreateLayersSection({
                     return <></>
                 return (
                     <AddLayer
-                        key={index}
+                        key={field.id}
                         index={index}
                         field={field}
                         remove={() => remove(index)}

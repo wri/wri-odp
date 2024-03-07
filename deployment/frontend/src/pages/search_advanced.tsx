@@ -1,5 +1,4 @@
 import Search from '@/components/Search'
-import { ErrorAlert } from '@/components/_shared/Alerts'
 import Footer from '@/components/_shared/Footer'
 import Header from '@/components/_shared/Header'
 import Pagination from '@/components/datasets/Pagination'
@@ -16,8 +15,15 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { NextSeo } from 'next-seo'
 import { env } from '@/env.mjs'
+import { appRouter } from '@/server/api/root'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import superjson from 'superjson'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { getServerAuthSession } from '@/server/auth'
+import { advance_search_query } from '@/utils/apiUtils'
 
-export function getServerSideProps({ query }: { query: any }) {
+export async function getServerSideProps(context: GetServerSidePropsContext<{ query: any }>) {
+   const { query } = context;
     const initialFilters = query.search
         ? JSON.parse(query.search as string)
         : []
@@ -27,15 +33,29 @@ export function getServerSideProps({ query }: { query: any }) {
     const initialSortBy = query.sort_by
         ? JSON.parse(query.sort_by as string)
         : 'relevance asc'
+    
+    const session = await getServerAuthSession(context)
+    const helpers = createServerSideHelpers({
+        router: appRouter,
+        ctx: { session },
+        transformer: superjson,
+    })
 
-    return { props: { initialFilters, initialPage, initialSortBy } }
+    
+    const searchQuery = advance_search_query(initialFilters as Filter[])
+
+    await helpers.dataset.getAllDataset.prefetch({
+        ...searchQuery,
+        page: initialPage,
+        sortBy: initialSortBy,
+    })
+    
+
+    return { props: {trpcState: helpers.dehydrate(), initialFilters, initialPage, initialSortBy } }
 }
 
-export default function SearchPage({
-    initialFilters,
-    initialPage,
-    initialSortBy,
-}: any) {
+export default function SearchPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const { initialFilters, initialPage, initialSortBy } = props
     const router = useRouter()
     const session = useSession()
 

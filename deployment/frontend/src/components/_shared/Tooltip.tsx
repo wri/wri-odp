@@ -59,3 +59,4 @@ export {
     TooltipContent,
     TooltipProvider,
 }
+export default DefaultTooltip

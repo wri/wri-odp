@@ -30,6 +30,7 @@ function LeftNode({
     const { data: activity, isLoading: isLoadingActivity } =
         api.dashboardActivity.listActivityStreamDashboard.useQuery({
             search: '',
+            fq: {},
             page: { start: 0, rows: 1000 },
         })
     const { data: organization, isLoading: isLoadingOrganization } =
