@@ -108,7 +108,7 @@ export const UserRouter = createTRPCRouter({
           users = o_users;
         }
       }
-      console.log("USERSS: ", users)
+      
 
       let result: IUsers[] = users.map((user) => {
         let rslt = {
@@ -138,6 +138,12 @@ export const UserRouter = createTRPCRouter({
       if (input.search) {
         result = searchArrayForKeyword<IUsers>(result, input.search);
       }
+
+      result = result.sort((a, b) => {
+        if (a.title! < b.title!) return -1;
+        if (a.title! > b.title!) return 1;
+        return 0;
+      })
 
       return {
         users: result.slice(input.page.start, input.page.start + input.page.rows),

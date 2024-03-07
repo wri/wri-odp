@@ -657,6 +657,8 @@ def user_list_wri(context: Context, data_dict: DataDict):
         ).label('number_created_packages')
     )
 
+    site_id = config.get('ckan.site_id')
+    query = query.filter(model.User.name != site_id)
     query = query.filter(model.User.state != model.State.DELETED)
     query = query.all()
     results = []
