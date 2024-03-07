@@ -1,32 +1,25 @@
-import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import type {
-    Activity,
-    ActivityDisplay,
-    CkanResponse,
-    User,
+    CkanResponse, WriDataset,
 } from '@/schema/ckan.schema'
 import {
     getUser,
-    activityDetails,
     getDatasetDetails,
     getTeamDetails,
     getTopicDetails,
 } from '@/utils/apiUtils'
-import { searchArrayForKeyword } from '@/utils/general'
-import { searchSchema } from '@/schema/search.schema'
-import { filterObjects } from '@/utils/general'
+
 import {
-    NotificationSchema,
     NotificationInput,
 } from '@/schema/notification.schema'
 import type {
-    NotificationType,
-    NotificationInputType,
+    NotificationType
 } from '@/schema/notification.schema'
 import { timeAgo } from '@/utils/apiUtils'
 import { replaceNames } from '@/utils/replaceNames'
+import Team from '@/interfaces/team.interface'
+import Topic from '@/interfaces/topic.interface'
 
 export const notificationRouter = createTRPCRouter({
     getAllNotifications: protectedProcedure.query(async ({ ctx }) => {
@@ -40,164 +33,153 @@ export const notificationRouter = createTRPCRouter({
         )
 
         const data = (await response.json()) as CkanResponse<NotificationType[]>
-        const activities = await Promise.all(
-            data.result.map(async (notification: NotificationType) => {
-                let user_data = await getUser({
-                    userId: notification.sender_id,
-                    apiKey: ctx.session.user.apikey,
-                })
 
-                user_data = user_data === undefined ? null : user_data
-                let objectName = ''
-                let objectIdName = ''
-                let msg = ''
-                if (notification.object_type === 'dataset') {
-                    const dataset = await getDatasetDetails({
-                        id: notification.object_id,
-                        session: ctx.session,
-                    })
-                    objectName = dataset?.title ?? dataset?.name ?? ''
-                    objectIdName = dataset?.name
+        let activities: NotificationType[] = []
 
-                    const actionType = notification.activity_type.split('_')
+        for (const notification of data.result) { 
 
-                    if (actionType[0] === 'collaborator') {
-                        const role = actionType[2]
-                        const action = actionType[1]
-                        if (action === 'removed') {
-                            msg = ` ${action} you as a collaborator (${role}) from the dataset`
-                        } else if (action === 'added') {
-                            msg = ` ${action} you as a collaborator (${role}) for the dataset`
-                        } else if (action === 'updated') {
-                            msg = ` ${action} your collaborator status to "${role}" for the dataset`
-                        }
-                    } else if (actionType[0] === 'issue') {
-                        const action = actionType[1]
-                        if (action === 'created') {
-                            msg = ` ${action} an issue (${actionType[2]
-                                ?.split('nbsp;')
-                                ?.join(' ')} ) for the dataset`
-                        } else if (action === 'commented') {
-                            msg = ` ${action} on an issue (${actionType[2]
-                                ?.split('nbsp;')
-                                ?.join(' ')} ) for the dataset`
-                        } else if (action === 'closed') {
-                            msg = ` ${action} an issue (${actionType[2]
-                                ?.split('nbsp;')
-                                ?.join(' ')} ) for the dataset`
-                        } else if (action === 'open') {
-                            msg = ` re-${action} an issue (${actionType[2]
-                                ?.split('nbsp;')
-                                ?.join(' ')} ) for the dataset`
-                        } else if (action === 'deleted') {
-                            msg = ` ${action} an issue (${actionType[2]
-                                ?.split('nbsp;')
-                                ?.join(' ')} ) for the dataset`
-                        }
-                    } else if (actionType[0] === 'pending') {
-                        msg = ` created ${actionType[0]}  ${actionType[1]} `
-                    } else {
-                        if (notification.activity_type.includes(' ')) {
-                            msg = ` ${notification.activity_type} `
-                        } else {
-                            msg = ` ${actionType[0]}  ${actionType[1]} `
-                        }
+            if (notification.state === 'deleted') continue
+
+            let user_data = notification.sender_obj!
+
+            let objectName = ''
+            let objectIdName = ''
+            let msg = ''
+            if (notification.object_type === 'dataset') {
+                const dataset = notification.object_data as WriDataset;
+                objectName = dataset?.title ?? dataset?.name ?? ''
+                objectIdName = dataset?.name
+
+                const actionType = notification.activity_type.split('_')
+
+                if (actionType[0] === 'collaborator') {
+                    const role = actionType[2]
+                    const action = actionType[1]
+                    if (action === 'removed') {
+                        msg = ` ${action} you as a collaborator (${role}) from the dataset`
+                    } else if (action === 'added') {
+                        msg = ` ${action} you as a collaborator (${role}) for the dataset`
+                    } else if (action === 'updated') {
+                        msg = ` ${action} your collaborator status to "${role}" for the dataset`
                     }
-                } else if (
-                    notification.object_type === 'team' ||
-                    notification.object_type === 'topic'
-                ) {
-                    const objectType = notification.object_type
-                    let teamOrTopic = null
-
-                    if (objectType === 'team') {
-                        teamOrTopic = await getTeamDetails({
-                            id: notification.object_id,
-                            session: ctx.session,
-                        })
-                    } else {
-                        teamOrTopic = await getTopicDetails({
-                            id: notification.object_id,
-                            session: ctx.session,
-                        })
+                } else if (actionType[0] === 'issue') {
+                    const action = actionType[1]
+                    if (action === 'created') {
+                        msg = ` ${action} an issue (${actionType[2]
+                            ?.split('nbsp;')
+                            ?.join(' ')} ) for the dataset`
+                    } else if (action === 'commented') {
+                        msg = ` ${action} on an issue (${actionType[2]
+                            ?.split('nbsp;')
+                            ?.join(' ')} ) for the dataset`
+                    } else if (action === 'closed') {
+                        msg = ` ${action} an issue (${actionType[2]
+                            ?.split('nbsp;')
+                            ?.join(' ')} ) for the dataset`
+                    } else if (action === 'open') {
+                        msg = ` re-${action} an issue (${actionType[2]
+                            ?.split('nbsp;')
+                            ?.join(' ')} ) for the dataset`
+                    } else if (action === 'deleted') {
+                        msg = ` ${action} an issue (${actionType[2]
+                            ?.split('nbsp;')
+                            ?.join(' ')} ) for the dataset`
                     }
-
-                    objectName = teamOrTopic?.title ?? teamOrTopic?.name ?? ''
-                    objectIdName = teamOrTopic?.name ?? ''
-
-                    const actionType = notification.activity_type.split('_')
-
-                    if (actionType[0] === 'member') {
-                        const role = actionType[2]
-                        const action = actionType[1]
-                        if (action === 'removed') {
-                            msg = ` ${action} you as a member (${role}) from the ${notification.object_type}`
-                        } else if (action === 'added') {
-                            msg = ` ${action} you as a member${
-                                role !== 'member' ? ` (${role})` : ''
-                            } in the ${notification.object_type}`
-                        } else if (action === 'updated') {
-                            msg = ` ${action} your member status to "${role}" in the ${notification.object_type}`
-                        }
+                } else if (actionType[0] === 'pending') {
+                    msg = ` created ${actionType[0]}  ${actionType[1]} `
+                } else {
+                    if (notification.activity_type.includes(' ')) {
+                        msg = ` ${notification.activity_type} `
+                    } else {
+                        msg = ` ${actionType[0]}  ${actionType[1]} `
                     }
                 }
-                const resultNotification = {
-                    ...notification,
-                    sender_name: user_data?.name,
-                    sender_image: user_data?.image_display_url ?? '',
-                    sender_emailHash: user_data?.email_hash,
-                    object_name: objectName,
-                    checked: false,
-                    time_text: timeAgo(notification.time_sent!),
-                    objectIdName: objectIdName,
-                    msg: msg ?? '',
+            } else if (
+                notification.object_type === 'team' ||
+                notification.object_type === 'topic'
+            ) {
+                const objectType = notification.object_type
+                let teamOrTopic = null
+
+                if (objectType === 'team') {
+                    teamOrTopic = notification.object_data as Team;
+                } else {
+                    teamOrTopic = notification.object_data as Topic
                 }
-                return resultNotification
-            })
-        )
-        return activities.filter(
-            (notification) => notification.state !== 'deleted'
-        )
+
+                objectName = teamOrTopic?.title ?? teamOrTopic?.name ?? ''
+                objectIdName = teamOrTopic?.name ?? ''
+
+                const actionType = notification.activity_type.split('_')
+
+                if (actionType[0] === 'member') {
+                    const role = actionType[2]
+                    const action = actionType[1]
+                    if (action === 'removed') {
+                        msg = ` ${action} you as a member (${role}) from the ${notification.object_type}`
+                    } else if (action === 'added') {
+                        msg = ` ${action} you as a member${
+                            role !== 'member' ? ` (${role})` : ''
+                        } in the ${notification.object_type}`
+                    } else if (action === 'updated') {
+                        msg = ` ${action} your member status to "${role}" in the ${notification.object_type}`
+                    }
+                }
+            }
+            const resultNotification = {
+                ...notification,
+                sender_name: user_data?.name,
+                sender_image: user_data?.image_display_url ?? '',
+                sender_emailHash: user_data?.email_hash,
+                object_name: objectName,
+                checked: false,
+                time_text: timeAgo(notification.time_sent!),
+                objectIdName: objectIdName,
+                msg: msg ?? '',
+            }
+            activities.push(resultNotification)
+                
+        }
+         
+        return activities
     }),
     updateNotification: protectedProcedure
         .input(NotificationInput)
         .mutation(async ({ input, ctx }) => {
             try {
-                const response = await Promise.all(
-                    input.notifications.map(async (notification) => {
-                        const payload: NotificationType = notification
-                        if (input.state) payload.state = input.state
-                        if (input.is_unread !== undefined) {
-                            payload.is_unread = input.is_unread
-                        }
 
-                        const response = await fetch(
-                            `${env.CKAN_URL}/api/3/action/notification_update`,
-                            {
-                                method: 'POST',
-                                headers: {
-                                    Authorization: env.SYS_ADMIN_API_KEY,
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(payload),
-                            }
-                        )
-                        const data =
-                            (await response.json()) as CkanResponse<NotificationType>
-                        if (!data.success && data.error) {
-                            if (data.error.message)
-                                throw Error(
-                                    replaceNames(data.error.message, true)
-                                )
-                            throw Error(
-                                replaceNames(JSON.stringify(data.error), true)
-                            )
-                        }
-
-                        return data.result
-                    })
+                const noficicationPayload: NotificationType[] = input.notifications.map((notification) => {
+                    if (input.state) notification.state = input.state
+                    if (input.is_unread !== undefined) {
+                        notification.is_unread = input.is_unread
+                    }
+                    return notification
+                })
+                
+                const response = await fetch(
+                    `${env.CKAN_URL}/api/3/action/notification_bulk_update`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            Authorization: env.SYS_ADMIN_API_KEY,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({payload: noficicationPayload}),
+                    }
                 )
-                return response
+
+                const data = (await response.json()) as CkanResponse<number>
+                if (!data.success && data.error) {
+                    if (data.error.message)
+                        throw Error(
+                            replaceNames(data.error.message, true)
+                        )
+                    throw Error(
+                        replaceNames(JSON.stringify(data.error), true)
+                    )
+                }
+
+                return data.result
             } catch (e) {
                 let error =
                     'Something went wrong please contact the system administrator'

@@ -1755,42 +1755,11 @@ export const DatasetRouter = createTRPCRouter({
                 apiKey: ctx.session.user.apikey,
                 fq: fq, // TODO: Vverify if organization admin can only see this and sysadmin
                 query: input,
+                user: true
             }))!
 
-            // using getUser function, get user details per dataset
-            const resultdata = await Promise.all(
-                dataset.datasets.map(async (dataset) => {
-                    const user = await getUser({
-                        userId: dataset.creator_user_id,
-                        apiKey: ctx.session.user.apikey,
-                    })
-                    const issuesRes = await fetch(
-                        `${env.CKAN_URL}/api/action/issue_search?dataset_id=${dataset.id}`,
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `${ctx.session.user.apikey}`,
-                            },
-                        }
-                    )
-                    const issues: CkanResponse<{
-                        count: number
-                        results: Issue[]
-                    }> = await issuesRes.json()
-                    if (!issues.success && issues.error) {
-                        if (issues.error.message)
-                            throw Error(issues.error.message)
-                        throw Error(JSON.stringify(issues.error))
-                    }
-                    return {
-                        ...dataset,
-                        user: user,
-                        issue_count: issues.result.count,
-                    }
-                })
-            )
             return {
-                datasets: resultdata as WriDataset[],
+                datasets: dataset.datasets,
                 count: dataset.count,
             }
         }),

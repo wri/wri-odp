@@ -39,6 +39,7 @@ import datetime
 import ckan.plugins.toolkit as tk
 from ckanext.wri.logic.auth import schema
 from ckanext.activity.model import Activity
+import ckan.lib.dictization.model_dictize as model_dictize
 
 
 log = logging.getLogger("ckan.logic")
@@ -219,6 +220,7 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
 
     # Fix boolean Solr query for featured datasets
     q = data_dict.get("q")
+    return_user = data_dict.pop("user", False)
 
     for field in SOLR_BOOLEAN_FIELDS:
         if q and field in q:
@@ -317,6 +319,12 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                 if isinstance(package, str):
                     package = {result_fl[0]: package}
                 extras = cast("dict[str, Any]", package.pop("extras", {}))
+                
+                if return_user:
+                    user = model_dictize.user_dictize(
+                        model.User.get(package.get("creator_user_id")), context
+                    )
+                    package['user'] = user
                 package.update(extras)
                 results.append(package)
         else:
@@ -332,6 +340,12 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                             plugins.IPackageController
                         ):
                             package_dict = item.before_dataset_view(package_dict)
+                    
+                    if return_user:
+                        user = model_dictize.user_dictize(
+                            model.User.get(package_dict.get("creator_user_id")), context
+                        )
+                        package_dict['user'] = user
                     results.append(package_dict)
                 else:
                     log.error(
@@ -440,7 +454,18 @@ def notification_get_all(
         )
 
     if not notification_objecst_result:
-        raise logic.NotFound(_("Notification not found"))
+        return []
+    
+    for notification in notification_objecst_result:
+        notification['sender_obj'] = model_dictize.user_dictize(model.User.get(notification['sender_id']), context)
+
+        if notification['object_type'] == 'dataset':
+            notification['object_data'] = dict(model.Package.get(notification['object_id']).as_dict())
+        elif notification['object_type'] == 'topic':
+            notification['object_data'] = dict(model.Group.get(notification['object_id']).as_dict())
+        elif notification['object_type'] == 'team':
+            notification['object_data'] = dict(model.Group.get(notification['object_id']).as_dict())
+        
 
     return notification_objecst_result
 
@@ -576,4 +601,36 @@ def dataset_release_notes(context: Context, data_dict: DataDict):
 
     results = q.all()
 
+    return results
+
+
+@logic.side_effect_free
+def dashboard_activity_listv2(context: Context, data_dict: DataDict):
+    # get_action for dashboard_activity_list
+    model = context["model"]
+    results = get_action("dashboard_activity_list")(context, data_dict)
+    for result in results:
+        result["user_data"] = model_dictize.user_dictize(
+            model.User.get(result["user_id"]), context
+        )
+    return results
+
+@logic.side_effect_free
+def package_activity_list_wri(context: Context, data_dict: DataDict):
+    model = context["model"]
+    results = get_action("package_activity_list")(context, data_dict)
+    for result in results:
+        result["user_data"] = model_dictize.user_dictize(
+            model.User.get(result["user_id"]), context
+        )
+    return results
+
+@logic.side_effect_free
+def organization_activity_list_wri(context: Context, data_dict: DataDict):
+    model = context["model"]
+    results = get_action("organization_activity_list")(context, data_dict)
+    for result in results:
+        result["user_data"] = model_dictize.user_dictize(
+            model.User.get(result["user_id"]), context
+        )
     return results

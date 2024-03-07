@@ -20,6 +20,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         transformer: superjson,
     })
     await helpers.notification.getAllNotifications.prefetch()
+    await helpers.user.getUserCapacity.prefetch()
+
+    await helpers.dataset.getPendingDatasets.prefetch({
+        search: '',
+        page: { start: 0, rows: 10 },
+        sortBy: 'metadata_modified desc',
+    })
     return {
         props: {
             trpcState: helpers.dehydrate(),

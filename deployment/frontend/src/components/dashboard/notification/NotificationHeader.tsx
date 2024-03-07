@@ -2,16 +2,29 @@ import React, { Fragment, useState } from 'react'
 import TableHeader from '../_shared/TableHeader'
 import { TrashIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline'
 import { Menu, Transition } from '@headlessui/react'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { NotificationType } from '@/schema/notification.schema'
-import Modal from '@/components/_shared/Modal'
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner'
 import { api } from '@/utils/api'
-import { ErrorAlert } from '@/components/_shared/Alerts'
+
+
+import dynamic from 'next/dynamic';
+
+const DefaultTooltip = dynamic(() => import('@/components/_shared/Tooltip'), {
+  ssr: false,
+});
+
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
+    
+const ErrorAlert = dynamic<{ text: string; title?: string; }>(
+    () => import('@/components/_shared/Alerts').then(module => module.ErrorAlert), {
+        ssr: false,
+    });
 
 function LeftNode({
     selected,
