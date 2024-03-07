@@ -21,7 +21,12 @@ from ckanext.wri.logic.action.get import (
     dashboard_activity_listv2,
     package_activity_list_wri,
     organization_activity_list_wri,
-    user_list_wri
+    user_list_wri,
+    organization_list_wri,
+    group_list_wri,
+    group_list_authz_wri,
+    organization_list_for_user_wri
+
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -149,7 +154,11 @@ class WriPlugin(plugins.SingletonPlugin):
             'prefect_download_subset_from_store': subset_download_request,
             'prefect_download_subset_callback': subset_download_callback,
             'dataset_release_notes': dataset_release_notes,
-            'user_list_wri': user_list_wri
+            'user_list_wri': user_list_wri,
+            'organization_list_wri': organization_list_wri,
+            'group_list_wri': group_list_wri,
+            'group_list_authz_wri': group_list_authz_wri,
+            'organization_list_for_user_wri': organization_list_for_user_wri
         }
 
     # IPermissionLabels

@@ -67,27 +67,28 @@ export async function searchHierarchy({
             let urLink = ''
             if (q) {
                 urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group' ? 'group_list' : 'organization_list'
-                }?q=${q}&all_fields=True`
+                    group_type == 'group' ? 'group_list_wri' : 'organization_list_wri'
+                }?q=${q}`
             } else {
                 urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group' ? 'group_list' : 'organization_list'
-                }?all_fields=True`
+                    group_type == 'group' ? 'group_list_wri' : 'organization_list_wri'
+                }`
             }
             response = await fetch(urLink, {
                 headers: {
                     Authorization: apiKey,
                 },
             })
+            
             const data = (await response.json()) as CkanResponse<GroupTree[]>
             groups = data.success === true ? data.result : []
         } else {
             response = await fetch(
                 `${env.CKAN_URL}/api/3/action/${
                     group_type == 'group'
-                        ? 'group_list_authz'
-                        : 'organization_list_for_user'
-                }?all_fields=True`,
+                        ? `group_list_authz_wri${q ? `?q=${q}` : ''}`   
+                        : `organization_list_for_user_wri${q ? `?q=${q}` : ''}`
+                }`,
                 {
                     headers: {
                         Authorization: apiKey,
@@ -97,43 +98,10 @@ export async function searchHierarchy({
 
             const data = (await response.json()) as CkanResponse<GroupTree[]>
             groups = data.success === true ? data.result : []
-            if (groups.length && q) {
-                groups = groups.filter((group) =>
-                    group.name.toLowerCase().includes(q.toLowerCase())
-                )
-            }
+            
         }
 
-        const groupTree: GroupTree[] = await Promise.all(
-            groups.map(async (group) => {
-                const g = await fetch(
-                    `${env.CKAN_URL}/api/3/action/group_tree_section?id=${group.id}&type=${group_type}&all_fields=True`,
-                    {
-                        headers: {
-                            Authorization: apiKey,
-                        },
-                    }
-                )
-                const d = (await g.json()) as CkanResponse<GroupTree>
-                const result: GroupTree =
-                    d.success === true ? d.result : ({} as GroupTree)
-                if (q) {
-                    result.highlighted = true
-                } else {
-                    result.highlighted = false
-                }
-                return result
-            })
-        )
-        const t = groupTree.reduce((acc: Record<string, GroupTree>, group) => {
-            const key = group.id
-            if (!acc[key]) {
-                acc[key] = group
-            }
-            return acc
-        }, {})
-
-        return Object.values(t)
+        return groups
     } catch (e) {
         console.log(e)
         throw new Error(e as string)

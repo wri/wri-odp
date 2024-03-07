@@ -693,3 +693,66 @@ def user_list_wri(context: Context, data_dict: DataDict):
         results.append(user)
 
     return results
+
+
+
+def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any):
+    def recurcive_tree_ids(org, group_hierarchy_ids=[]):
+        group_hierarchy_ids.append(org['name'])
+        for child in org['children']:
+            recurcive_tree_ids(child)
+        return group_hierarchy_ids
+    
+    group_hierarchy_ids = []
+    results = []
+    for group in groups:    
+        if group in group_hierarchy_ids:
+            continue
+        group_tree = get_action("group_tree_section")(context, {"id": group, "type": group_type})
+        if q:
+            group_tree["highlighted"] = True
+        group_hierarchy_ids += recurcive_tree_ids(group_tree)
+        results.append(group_tree)
+    return results
+
+@logic.side_effect_free
+def organization_list_wri(context: Context, data_dict: DataDict):
+    orgs = get_action("organization_list")(context, data_dict)
+    q = data_dict.get('q', False)
+    results = get_hierarchy_group(context, orgs, "organization", q)
+    return results
+
+
+@logic.side_effect_free
+def group_list_wri(context: Context, data_dict: DataDict):
+    orgs = get_action("group_list")(context, data_dict)
+    q = data_dict.get('q', False)
+    results = get_hierarchy_group(context, orgs, "group", q)
+    return results
+
+
+@logic.side_effect_free
+def group_list_authz_wri(context: Context, data_dict: DataDict):
+    orgs = get_action("group_list_authz")(context, data_dict)
+    # get list of name
+    q = data_dict.get('q', False)
+    if q:
+        grp_names = [org['name'] for org in orgs if q in org['name']]
+    else:
+        grp_names = [org['name'] for org in orgs]
+        results = get_hierarchy_group(context, grp_names, "group", q)
+    return results
+
+@logic.side_effect_free
+def organization_list_for_user_wri(context: Context, data_dict: DataDict):
+    orgs = get_action("organization_list_for_user")(context, data_dict)
+    q = data_dict.get('q', False)
+    if q:
+        orgs = [org['name'] for org in orgs if q in org['name']]
+    else:
+        orgs = [org['name'] for org in orgs]
+    results = get_hierarchy_group(context, orgs, "organization", q)
+    return results
+
+
+
