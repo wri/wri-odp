@@ -144,6 +144,8 @@ ckan:
     useProductionCerts: true
   ingress:
     domain: wri.staging.ckan.datopian.com
+    proxyBufferSize: 128k
+    proxyBuffersNumber: 4
     enable: true
     enableExternal: false
     extraAnnotations:
