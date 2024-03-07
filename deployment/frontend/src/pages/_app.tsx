@@ -3,7 +3,7 @@ import { SessionProvider } from 'next-auth/react'
 import { AppProps, type AppType } from 'next/app'
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { Provider, useCreateStore } from '@/utils/store'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import 'react-toastify/dist/ReactToastify.css'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -19,6 +19,8 @@ import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
 import { env } from '@/env.mjs'
+import NProgress from 'nprogress';
+import Router from 'next/router';
 
 const acumin = localFont({
     src: [
@@ -53,6 +55,22 @@ const MyApp: AppType<{ session: Session | null }> = ({
     const [queryClient] = useState(() => new QueryClient())
     const { initialZustandState } = pageProps
     let { dataset, prevdataset } = pageProps
+
+    useEffect(() => {
+        const handleRouteStart = () => NProgress.start();
+        const handleRouteDone = () => NProgress.done();
+
+        Router.events.on('routeChangeStart', handleRouteStart);
+        Router.events.on('routeChangeComplete', handleRouteDone);
+        Router.events.on('routeChangeError', handleRouteDone);
+
+        return () => {
+            Router.events.off('routeChangeStart', handleRouteStart);
+            Router.events.off('routeChangeComplete', handleRouteDone);
+            Router.events.off('routeChangeError', handleRouteDone);
+        };
+    }, []);
+
 
     if (typeof prevdataset == 'string') {
         prevdataset = JSON.parse(prevdataset)
@@ -95,7 +113,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         }
     }
 
-    if (initialZustandState && initialZustandState?.relatedDatasets.length) {
+    if (initialZustandState && initialZustandState?.relatedDatasets?.length) {
         const datasets = initialZustandState?.relatedDatasets
         for (const dataset of datasets) {
             for (const resource of dataset?.resources) {
@@ -115,7 +133,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     if (
         initialZustandState &&
-        initialZustandState?.prevRelatedDatasets.length
+        initialZustandState?.prevRelatedDatasets?.length
     ) {
         const datasets = initialZustandState?.prevRelatedDatasets
         for (const dataset of datasets) {

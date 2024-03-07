@@ -272,7 +272,7 @@ export default function DatasetPage(
 
     const issues = api.dataset.getDatasetIssues.useQuery(
         { id: datasetName },
-        { enabled: !!session.data?.user.apikey, retry: false }
+        { enabled: !!session.data?.user.apikey && pendingExist, retry: false }
     )
 
     const teamsDetails = api.teams.getTeam.useQuery(
@@ -403,21 +403,23 @@ export default function DatasetPage(
             highlighted:
                 !isCurrentVersion &&
                 diffFields &&
-                diffFields.some((f) =>
-                    [
-                        'extras',
-                        'tags',
-                        'notes',
-                        'technical_notes',
-                        'project',
-                        'license_id',
-                        'groups',
-                        'license_title',
-                        'citation',
-                        'reason_for_adding',
-                        'restrictions',
-                    ].some((x) => f.includes(x))
-                ),
+                // for some reason the extra field acts weird on he diff, so we are removing it from the diffFields, it will still match subpatterns such as extras[0]
+                diffFields
+                    .filter((f) => f !== 'extras')
+                    .some((f) =>
+                        [
+                            'extras',
+                            'tags',
+                            'notes',
+                            'technical_notes',
+                            'project',
+                            'license_id',
+                            'license_title',
+                            'citation',
+                            'reason_for_adding',
+                            'restrictions',
+                        ].some((x) => f.includes(x))
+                    ),
         },
         {
             name: 'Methodology',
@@ -451,7 +453,7 @@ export default function DatasetPage(
         {
             name: 'Issues',
             count: openIssueLength,
-            enabled: issues.data && issues.data.length > 0,
+            enabled: issues.data && issues.data.length > 0 && !isCurrentVersion,
         },
         {
             name: 'Release Notes',
@@ -686,7 +688,7 @@ export default function DatasetPage(
                                                     />
                                                 </Tab.Panel>
                                             )}
-                                            {issues.data &&
+                                            {issues.data && !isCurrentVersion &&
                                                 issues.data.length > 0 && (
                                                     <Tab.Panel as="div">
                                                         <Issues
