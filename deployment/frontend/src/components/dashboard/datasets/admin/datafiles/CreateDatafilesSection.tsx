@@ -12,7 +12,7 @@ import {
 import classNames from '@/utils/classnames'
 import { LinkExternalForm } from './sections/LinkExternalForm'
 import { UploadForm } from './sections/UploadForm'
-import { useMemo, useRef, useState } from 'react'
+import { Fragment, useMemo, useRef, useState } from 'react'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import { DataFileAccordion } from './DatafileAccordion'
@@ -47,10 +47,10 @@ export function CreateDataFilesSection({
                     field.type === 'layer-raw' ||
                     field.type === 'empty-layer'
                 )
-                    return <></>
+                    return <Fragment key={field.id}></Fragment>
                 return (
                     <AddDataFile
-                        key={index}
+                        key={field.id}
                         index={index}
                         field={field}
                         remove={() => remove(index)}

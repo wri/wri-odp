@@ -3,12 +3,7 @@ import { env } from '@/env.mjs'
 import type {
     CkanResponse, WriDataset,
 } from '@/schema/ckan.schema'
-import {
-    getUser,
-    getDatasetDetails,
-    getTeamDetails,
-    getTopicDetails,
-} from '@/utils/apiUtils'
+
 
 import {
     NotificationInput,

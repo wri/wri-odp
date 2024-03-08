@@ -363,7 +363,7 @@ export function DatasetHeader({
                     />
                 </div>
             ) : (
-                <div className="mb-4 flex justify-between gap-x-3 bg-white shadow sm:px-6 px-4 pb-4">
+                <div className="mb-4 flex justify-between gap-x-3 bg-white shadow sm:px-6 px-4 pb-4 sm:pr-12">
                     <div className="flex items-center gap-x-3">
                         <Link
                             className="flex gap-x-2 items-center text-center text-stone-900 text-base font-bold font-acumin"
