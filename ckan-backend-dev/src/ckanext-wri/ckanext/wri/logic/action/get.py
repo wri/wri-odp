@@ -460,15 +460,31 @@ def notification_get_all(
     if not notification_objecst_result:
         return []
     
+    sender_obj = {}
+    object_data = {}
+    
     for notification in notification_objecst_result:
-        notification['sender_obj'] = model_dictize.user_dictize(model.User.get(notification['sender_id']), context)
+        sender_id = notification['sender_id']
+        object_id = notification['object_id']
+        if sender_id in sender_obj:
+            notification['sender_obj'] = sender_obj[sender_id]
+        else:
+            temp = model_dictize.user_dictize(model.User.get(notification['sender_id']), context)
+            sender_obj[sender_id] = temp
+            notification['sender_obj'] = temp
 
-        if notification['object_type'] == 'dataset':
-            notification['object_data'] = dict(model.Package.get(notification['object_id']).as_dict())
-        elif notification['object_type'] == 'topic':
-            notification['object_data'] = dict(model.Group.get(notification['object_id']).as_dict())
-        elif notification['object_type'] == 'team':
-            notification['object_data'] = dict(model.Group.get(notification['object_id']).as_dict())
+        if object_id in object_data:
+            notification['object_data'] = object_data[object_id]
+        else:
+            if notification['object_type'] == 'dataset':
+                temp = dict(model.Package.get(notification['object_id']).as_dict())
+            elif notification['object_type'] == 'topic':
+                temp = dict(model.Group.get(notification['object_id']).as_dict())
+            elif notification['object_type'] == 'team':
+                temp= dict(model.Group.get(notification['object_id']).as_dict())
+
+            notification['object_data'] = temp
+            object_data[object_id] = temp
         
 
     return notification_objecst_result
@@ -613,30 +629,52 @@ def dashboard_activity_listv2(context: Context, data_dict: DataDict):
     # get_action for dashboard_activity_list
     model = context["model"]
     results = get_action("dashboard_activity_list")(context, data_dict)
+    user_data = {}
     for result in results:
-        result["user_data"] = model_dictize.user_dictize(
-            model.User.get(result["user_id"]), context
-        )
+        user_id = result["user_id"]
+        if user_id in user_data:
+            result["user_data"] = user_data[user_id]
+        else:
+            temp = model_dictize.user_dictize(
+                model.User.get(result["user_id"]), context
+            )
+            result["user_data"] = temp
+            user_data[user_id] = temp
+        
     return results
 
 @logic.side_effect_free
 def package_activity_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
     results = get_action("package_activity_list")(context, data_dict)
+    user_data = {}
     for result in results:
-        result["user_data"] = model_dictize.user_dictize(
-            model.User.get(result["user_id"]), context
-        )
+        user_id = result["user_id"]
+        if user_id in user_data:
+            result["user_data"] = user_data[user_id]
+        else:
+            temp = model_dictize.user_dictize(
+                model.User.get(result["user_id"]), context
+            )
+            result["user_data"] = temp
+            user_data[user_id] = temp
     return results
 
 @logic.side_effect_free
 def organization_activity_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
     results = get_action("organization_activity_list")(context, data_dict)
+    user_data = {}
     for result in results:
-        result["user_data"] = model_dictize.user_dictize(
-            model.User.get(result["user_id"]), context
-        )
+        user_id = result["user_id"]
+        if user_id in user_data:
+            result["user_data"] = user_data[user_id]
+        else:
+            temp = model_dictize.user_dictize(
+                model.User.get(result["user_id"]), context
+            )
+            result["user_data"] = temp
+            user_data[user_id] = temp
     return results
 
 
