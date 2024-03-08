@@ -67,11 +67,12 @@ export async function getServerSideProps(
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
     try {
-        let prevdataset = await getOneDataset(datasetName, session)
+        let prevdataset = await getOneDataset(datasetName, session, true)
 
         const pendingDataset = await getOnePendingDataset(
             prevdataset.id,
-            session
+            session,
+            true
         )
 
         let dataset = prevdataset
@@ -233,7 +234,7 @@ export default function DatasetPage(
         error: datasetError,
         isLoading,
     } = api.dataset.getOneActualOrPendingDataset.useQuery(
-        { id: datasetId, isPending: pendingExist },
+        { id: datasetId, isPending: pendingExist, noLayer: true },
         // @ts-ignore
         { retry: 0, initialData: dataset }
     )
@@ -243,7 +244,7 @@ export default function DatasetPage(
         error: prevDatasetError,
         isLoading: isLoadingPrev,
     } = api.dataset.getOneDataset.useQuery(
-        { id: datasetName },
+        { id: datasetName, noLayer: true },
         // @ts-ignore
         { retry: 0, initialData: prevdataset, enabled: !!pendingExist }
     )

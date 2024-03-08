@@ -502,7 +502,8 @@ export function activityDetails(activity: Activity): ActivityDisplay {
 
 export async function getOneDataset(
     datasetName: string,
-    session: Session | null
+    session: Session | null,
+    noLayer?: boolean
 ) {
     const user = session?.user
     const datasetRes = await fetch(
@@ -563,7 +564,7 @@ export async function getOneDataset(
             console.log(e)
         }
     }
-
+   
     const resources = await Promise.all(
         dataset.result.resources.map(async (r) => {
             const _views = await getResourceViews({
@@ -591,12 +592,13 @@ export async function getOneDataset(
                 if (r.url_type === 'layer')
                     return {
                         ...r,
-                        layerObj: convertLayerObjToForm(layerObj),
+                        layerObj: noLayer ? convertLayerObjToForm(layerObj) : true,
                     }
+                    
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
-                        layerObjRaw: getRawObjFromApiSpec(layerObj),
+                        layerObjRaw: !noLayer ?  getRawObjFromApiSpec(layerObj) : true,
                     }
             }
 
@@ -604,14 +606,14 @@ export async function getOneDataset(
                 if (r.layerObj) {
                     return {
                         ...r,
-                        layerObj: convertLayerObjToForm(r.layerObj),
+                        layerObj:  !noLayer ? convertLayerObjToForm(r.layerObj) : true,
                         rw_id: r.id,
                     }
                 }
                 if (r.layerObjRaw) {
                     return {
                         ...r,
-                        layerObjRaw: getRawObjFromApiSpec(r.layerObjRaw),
+                        layerObjRaw:  !noLayer ? getRawObjFromApiSpec(r.layerObjRaw) : true,
                         rw_id: r.id,
                     }
                 }
@@ -634,7 +636,8 @@ export async function getOneDataset(
 
 export async function getOnePendingDataset(
     datasetName: string,
-    session: Session | null
+    session: Session | null,
+    noLayer?: boolean
 ) {
     const user = session?.user
     const response = await fetch(
@@ -679,12 +682,12 @@ export async function getOnePendingDataset(
                 if (r.url_type === 'layer')
                     return {
                         ...r,
-                        layerObj: convertLayerObjToForm(layerObj),
+                        layerObj: !noLayer ? convertLayerObjToForm(layerObj) : true,
                     }
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
-                        layerObjRaw: getRawObjFromApiSpec(layerObj),
+                        layerObjRaw: !noLayer ? getRawObjFromApiSpec(layerObj) : true,
                     }
             }
 
@@ -693,14 +696,14 @@ export async function getOnePendingDataset(
                 if (r.layerObj) {
                     return {
                         ...r,
-                        layerObj: convertLayerObjToForm(r.layerObj),
+                        layerObj: !noLayer ? convertLayerObjToForm(r.layerObj) : true,
                         rw_id: r.url ? r.rw_id : r.id,
                     }
                 }
                 if (r.layerObjRaw) {
                     return {
                         ...r,
-                        layerObjRaw: getRawObjFromApiSpec(r.layerObjRaw),
+                        layerObjRaw: !noLayer ? getRawObjFromApiSpec(r.layerObjRaw) : true,
                         rw_id: r.url ? r.rw_id : r.id,
                     }
                 }

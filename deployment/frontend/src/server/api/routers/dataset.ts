@@ -1199,10 +1199,11 @@ export const DatasetRouter = createTRPCRouter({
             z.object({
                 id: z.string(),
                 includeViews: z.boolean().default(false).optional(),
+                noLayer: z.boolean().optional()
             })
         )
         .query(async ({ input, ctx }) => {
-            const dataset = await getOneDataset(input.id, ctx.session)
+            const dataset = await getOneDataset(input.id, ctx.session, input.noLayer)
             return dataset
         }),
     getPossibleCollaborators: protectedProcedure.query(async () => {
@@ -1799,7 +1800,7 @@ export const DatasetRouter = createTRPCRouter({
         }),
 
     getOneActualOrPendingDataset: publicProcedure
-        .input(z.object({ id: z.string(), isPending: z.boolean() }))
+        .input(z.object({ id: z.string(), isPending: z.boolean(), noLayer: z.boolean().optional() }))
         .query(async ({ input, ctx }) => {
             if (input.isPending) {
                 const dataset = await getOnePendingDataset(
@@ -1808,7 +1809,7 @@ export const DatasetRouter = createTRPCRouter({
                 )
                 return dataset
             }
-            const dataset = await getOneDataset(input.id, ctx.session)
+            const dataset = await getOneDataset(input.id, ctx.session, input.noLayer)
             return dataset
         }),
 
