@@ -69,7 +69,7 @@ function Notification({ items }: { items: NotificationType }) {
     )
 }
 export default function Notifications({ drag }: { drag: boolean }) {
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery()
+    const { data, isLoading } = api.notification.getAllNotifications.useQuery({returnLength: true})
 
     if (isLoading) return <Spinner className="mx-auto" />
 

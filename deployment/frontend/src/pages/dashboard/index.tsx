@@ -49,7 +49,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         transformer: superjson,
     })
 
-    await helpers.notification.getAllNotifications.prefetch()
+    await helpers.notification.getAllNotifications.prefetch({returnLength: true})
     await helpers.user.getUserCapacity.prefetch()
 
     await helpers.dataset.getPendingDatasets.prefetch({

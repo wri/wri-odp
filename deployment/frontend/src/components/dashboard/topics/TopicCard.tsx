@@ -229,9 +229,8 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
 
 
 export default function TopicCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10000 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const [pagination, setPagination] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
-  const {data: serverLoadData} =  api.topics.getUsersTopics.useQuery({ search: '', page: { start: 0, rows: 10 }, pageEnabled: true })
   const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
   const [open, setOpen] = useState(false)
   const router = useRouter()
@@ -249,7 +248,7 @@ export default function TopicCard() {
     setOpen(true)
   }
 
-  const ProcessedTopic1 = useQuery(['paginatedTopics', data, pagination], () => {
+  const ProcessedTopic = useQuery(['paginatedTopics', data, pagination], () => {
     if (!data) return { topics: [], topic2Image: {}, count: 0 };
     const topics = data?.topics.slice(pagination.page.start, pagination.page.start + pagination.page.rows)
     const topic2Image = data?.topic2Image
@@ -258,16 +257,6 @@ export default function TopicCard() {
     enabled: !!data
   })
 
-  const ProcessedTopic2 = useQuery(['paginatedTopicsServer', serverLoadData, pagination], () => {
-    if (! serverLoadData) return { topics: [], topic2Image: {}, count: 0 };
-    const topics = serverLoadData?.topics.slice(pagination.page.start, pagination.page.start + pagination.page.rows)
-    const topic2Image = serverLoadData?.topic2Image
-    return { topics, topic2Image, count: serverLoadData?.count }
-  }, {
-    enabled: !!serverLoadData
-  })
-
-  const ProcessedTopic = ProcessedTopic1.isLoading ? ProcessedTopic2 : ProcessedTopic1
 
   useEffect(() => {
     setPagination({ search: '', page: { start: 0, rows: 10 } })

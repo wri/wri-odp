@@ -21,9 +21,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         transformer: superjson,
     })
 
-    await helpers.notification.getAllNotifications.prefetch()
+    await helpers.notification.getAllNotifications.prefetch({})
     await helpers.user.getUserCapacity.prefetch()
-    await helpers.topics.getUsersTopics.prefetch({ search: '', page: { start: 0, rows: 10 }, pageEnabled: true })
+    await helpers.topics.getUsersTopics.prefetch({ search: '', page: { start: 0, rows: 10 } })
     if (!session) {
         return {
             redirect: {
