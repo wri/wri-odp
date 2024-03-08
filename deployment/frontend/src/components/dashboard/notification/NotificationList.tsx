@@ -26,7 +26,7 @@ export default function NotificationList() {
             const start = query.page.start
             const rows = query.page.rows
 
-            let slicedData = data.sort((a, b) => {
+            let slicedData = (data as NotificationType[]).sort((a, b) => {
                 const dateA =
                     Number(new Date()) - Number(new Date(a.time_sent!))
                 const dateB =
@@ -34,7 +34,7 @@ export default function NotificationList() {
                 return dateA - dateB
             })
 
-            slicedData = data.slice(start, start + rows)
+            slicedData = (data as NotificationType[]).slice(start, start + rows)
             console.log
             return slicedData
         },
@@ -58,7 +58,7 @@ export default function NotificationList() {
                         setQuery={setQuery}
                         query={query}
                         isLoading={paginatedData.isLoading}
-                        count={data?.length}
+                        count={(data as NotificationType[])?.length}
                     />
                 }
             />
