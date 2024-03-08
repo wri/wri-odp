@@ -25,7 +25,9 @@ from ckanext.wri.logic.action.get import (
     organization_list_wri,
     group_list_wri,
     group_list_authz_wri,
-    organization_list_for_user_wri
+    organization_list_for_user_wri,
+    issue_search_wri,
+    package_collaborator_list_wri
 
 )
 
@@ -158,7 +160,9 @@ class WriPlugin(plugins.SingletonPlugin):
             'organization_list_wri': organization_list_wri,
             'group_list_wri': group_list_wri,
             'group_list_authz_wri': group_list_authz_wri,
-            'organization_list_for_user_wri': organization_list_for_user_wri
+            'organization_list_for_user_wri': organization_list_for_user_wri,
+            'issue_search_wri': issue_search_wri,
+            'package_collaborator_list_wri': package_collaborator_list_wri
         }
 
     # IPermissionLabels

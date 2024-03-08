@@ -181,6 +181,7 @@ export interface Collaborator {
     user_id: string
     capacity: 'admin' | 'editor' | 'member'
     modified: string
+    user?: WriUser
 }
 
 export interface Issue {

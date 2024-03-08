@@ -56,6 +56,7 @@ ValidationError = logic.ValidationError
 get_action = ckan.logic.get_action
 _select = sqlalchemy.sql.select
 _func = sqlalchemy.func
+_get_or_bust = logic.get_or_bust
 
 
 NotificationGetUserViewedActivity: TypeAlias = None
@@ -755,4 +756,56 @@ def organization_list_for_user_wri(context: Context, data_dict: DataDict):
     return results
 
 
+@logic.side_effect_free
+def issue_search_wri(context: Context, data_dict: DataDict):
+    issues = get_action("issue_search")(context, data_dict)
+    issues = issues.get('results')
+    results = []
+    for issue in issues:
+        issue = dict(issue)
+        issue_details = get_action("issue_show")(context, {"issue_number": issue['number'], "dataset_id": issue['dataset_id'], 'include_reports': False})
+        results.append(issue_details)
+    return results
 
+
+@logic.side_effect_free
+def package_collaborator_list_wri(context: Context, data_dict: DataDict):
+    model = context['model']
+
+    package_id = _get_or_bust(data_dict, 'id')
+
+    package = model.Package.get(package_id)
+    if not package:
+        raise NotFound(_('Package not found'))
+
+    _check_access('package_collaborator_list', context, data_dict)
+
+    if not authz.check_config_permission('allow_dataset_collaborators'):
+        raise ValidationError({
+            'message': _('Dataset collaborators not enabled')
+        })
+
+    capacity = data_dict.get('capacity')
+
+    allowed_capacities = authz.get_collaborator_capacities()
+    if capacity and capacity not in allowed_capacities:
+        raise ValidationError(
+            {'message': _('Capacity must be one of "{}"').format(', '.join(
+                allowed_capacities))})
+    q = model.Session.query(model.PackageMember, model.User).\
+        filter(model.PackageMember.package_id == package.id).\
+        filter(model.PackageMember.user_id == model.User.id)
+
+    if capacity:
+        q = q.filter(model.PackageMember.capacity == capacity)
+
+    collaborators = q.all()
+
+    result = []
+    for collaborator, user in collaborators:
+        collaborator = collaborator.as_dict()
+        user_dict = model_dictize.user_dictize(user, context)
+        collaborator = {**collaborator, **user_dict}
+        result.append(collaborator)
+
+    return result
