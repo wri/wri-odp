@@ -1,4 +1,7 @@
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { Tab } from '@headlessui/react'
 import { BookOpenIcon } from '@heroicons/react/24/outline'
 import { Fragment, useState } from 'react'

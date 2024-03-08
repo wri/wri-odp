@@ -33,7 +33,10 @@ import { EditDataFilesSection } from './datafiles/EditDataFilesSection'
 import { useSession } from 'next-auth/react'
 import { match } from 'ts-pattern'
 import { Collaborators } from './metadata/Collaborators'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
