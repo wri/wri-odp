@@ -71,7 +71,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const { asPath } = useRouter()
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const { data: session } = useSession()
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery()
+    const { data, isLoading } = api.notification.getAllNotifications.useQuery({})
     const { data: pendingData, isLoading: isLoadingPending } =
         api.dataset.getPendingDatasets.useQuery({
             search: '',
@@ -89,7 +89,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }
         return item
     })
-
+    
+    const notificationCount = data ?  (data as {count: number}).count: 0
     return (
         <>
             {/*
@@ -256,16 +257,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                         'Notifications' ? (
                                                                             isLoading ? (
                                                                                 <Spinner className="w-2 h-2" />
-                                                                            ) : data?.length ? (
+                                                                            ) : notificationCount ?(
                                                                                 <div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
                                                                                     {
-                                                                                        data?.filter(
-                                                                                            (
-                                                                                                item
-                                                                                            ) =>
-                                                                                                item.is_unread
-                                                                                        )
-                                                                                            .length
+                                                                                        notificationCount
                                                                                     }
                                                                                 </div>
                                                                             ) : (
@@ -394,16 +389,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                 'Notifications' ? (
                                                                     isLoading ? (
                                                                         <Spinner className="w-2 h-2" />
-                                                                    ) : data?.length ? (
+                                                                    ) : notificationCount ? (
                                                                         <div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
                                                                             {
-                                                                                data?.filter(
-                                                                                    (
-                                                                                        item
-                                                                                    ) =>
-                                                                                        item.is_unread
-                                                                                )
-                                                                                    .length
+                                                                                notificationCount
                                                                             }
                                                                         </div>
                                                                     ) : (

@@ -19,7 +19,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await helpers.notification.getAllNotifications.prefetch()
+    await helpers.notification.getAllNotifications.prefetch({returnLength: true})
     await helpers.user.getUserCapacity.prefetch()
 
     await helpers.dataset.getPendingDatasets.prefetch({

@@ -20,9 +20,12 @@ import { timeAgo } from '@/utils/apiUtils'
 import { replaceNames } from '@/utils/replaceNames'
 import Team from '@/interfaces/team.interface'
 import Topic from '@/interfaces/topic.interface'
+import { z } from 'zod'
 
 export const notificationRouter = createTRPCRouter({
-    getAllNotifications: protectedProcedure.query(async ({ ctx }) => {
+    getAllNotifications: protectedProcedure
+        .input(z.object({ returnLength: z.boolean().optional() }))
+        .query(async ({input, ctx }) => {
         const response = await fetch(
             `${env.CKAN_URL}/api/3/action/notification_get_all?recipient_id=${ctx.session.user.id}`,
             {
@@ -33,6 +36,12 @@ export const notificationRouter = createTRPCRouter({
         )
 
         const data = (await response.json()) as CkanResponse<NotificationType[]>
+            
+        if (!input.returnLength) {
+            return {
+                count: data.result.filter((x)=> x.is_unread).length
+            }
+        }
 
         let activities: NotificationType[] = []
 

@@ -9,7 +9,7 @@ import type { SearchInput } from '@/schema/search.schema'
 import { NotificationType } from '@/schema/notification.schema'
 
 export default function NotificationList() {
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery()
+    const { data, isLoading } = api.notification.getAllNotifications.useQuery({returnLength: true})
     const [selected, setSelected] = useState<string[]>([])
     const [query, setQuery] = useState<SearchInput>({
         search: '',
