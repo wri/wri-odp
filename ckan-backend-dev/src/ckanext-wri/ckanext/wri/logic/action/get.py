@@ -716,6 +716,7 @@ def user_list_wri(context: Context, data_dict: DataDict):
         user['organizations'] = []
 
         for member in member_query:
+            organization = None
             if member.group_id in org_details:
                 organization = org_details[member.group_id]
             else:
