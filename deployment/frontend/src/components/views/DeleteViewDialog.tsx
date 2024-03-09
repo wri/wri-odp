@@ -1,5 +1,8 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { Dialog } from '@headlessui/react'
 import { Dispatch, SetStateAction } from 'react'
 import { Button, LoaderButton } from '@/components/_shared/Button'

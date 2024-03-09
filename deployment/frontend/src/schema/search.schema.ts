@@ -17,6 +17,7 @@ export const searchSchema = z.object({
     _isUserSearch: z.boolean().default(false).optional(),
     tree: z.boolean().optional(),
     allTree: z.boolean().optional(),
+    pageEnabled: z.boolean().optional(),
 })
 
 export type SearchInput = z.infer<typeof searchSchema>

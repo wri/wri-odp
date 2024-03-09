@@ -67,27 +67,28 @@ export async function searchHierarchy({
             let urLink = ''
             if (q) {
                 urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group' ? 'group_list' : 'organization_list'
-                }?q=${q}&all_fields=True`
+                    group_type == 'group' ? 'group_list_wri' : 'organization_list_wri'
+                }?q=${q}`
             } else {
                 urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group' ? 'group_list' : 'organization_list'
-                }?all_fields=True`
+                    group_type == 'group' ? 'group_list_wri' : 'organization_list_wri'
+                }`
             }
             response = await fetch(urLink, {
                 headers: {
                     Authorization: apiKey,
                 },
             })
+            
             const data = (await response.json()) as CkanResponse<GroupTree[]>
             groups = data.success === true ? data.result : []
         } else {
             response = await fetch(
                 `${env.CKAN_URL}/api/3/action/${
                     group_type == 'group'
-                        ? 'group_list_authz'
-                        : 'organization_list_for_user'
-                }?all_fields=True`,
+                        ? `group_list_authz_wri${q ? `?q=${q}` : ''}`   
+                        : `organization_list_for_user_wri${q ? `?q=${q}` : ''}`
+                }`,
                 {
                     headers: {
                         Authorization: apiKey,
@@ -97,43 +98,10 @@ export async function searchHierarchy({
 
             const data = (await response.json()) as CkanResponse<GroupTree[]>
             groups = data.success === true ? data.result : []
-            if (groups.length && q) {
-                groups = groups.filter((group) =>
-                    group.name.toLowerCase().includes(q.toLowerCase())
-                )
-            }
+            
         }
 
-        const groupTree: GroupTree[] = await Promise.all(
-            groups.map(async (group) => {
-                const g = await fetch(
-                    `${env.CKAN_URL}/api/3/action/group_tree_section?id=${group.id}&type=${group_type}&all_fields=True`,
-                    {
-                        headers: {
-                            Authorization: apiKey,
-                        },
-                    }
-                )
-                const d = (await g.json()) as CkanResponse<GroupTree>
-                const result: GroupTree =
-                    d.success === true ? d.result : ({} as GroupTree)
-                if (q) {
-                    result.highlighted = true
-                } else {
-                    result.highlighted = false
-                }
-                return result
-            })
-        )
-        const t = groupTree.reduce((acc: Record<string, GroupTree>, group) => {
-            const key = group.id
-            if (!acc[key]) {
-                acc[key] = group
-            }
-            return acc
-        }, {})
-
-        return Object.values(t)
+        return groups
     } catch (e) {
         console.log(e)
         throw new Error(e as string)
@@ -534,7 +502,8 @@ export function activityDetails(activity: Activity): ActivityDisplay {
 
 export async function getOneDataset(
     datasetName: string,
-    session: Session | null
+    session: Session | null,
+    noLayer?: boolean
 ) {
     const user = session?.user
     const datasetRes = await fetch(
@@ -595,7 +564,7 @@ export async function getOneDataset(
             console.log(e)
         }
     }
-
+   
     const resources = await Promise.all(
         dataset.result.resources.map(async (r) => {
             const _views = await getResourceViews({
@@ -623,12 +592,13 @@ export async function getOneDataset(
                 if (r.url_type === 'layer')
                     return {
                         ...r,
-                        layerObj: convertLayerObjToForm(layerObj),
+                        layerObj: noLayer ? convertLayerObjToForm(layerObj) : true,
                     }
+                    
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
-                        layerObjRaw: getRawObjFromApiSpec(layerObj),
+                        layerObjRaw: !noLayer ?  getRawObjFromApiSpec(layerObj) : true,
                     }
             }
 
@@ -636,14 +606,14 @@ export async function getOneDataset(
                 if (r.layerObj) {
                     return {
                         ...r,
-                        layerObj: convertLayerObjToForm(r.layerObj),
+                        layerObj:  !noLayer ? convertLayerObjToForm(r.layerObj) : true,
                         rw_id: r.id,
                     }
                 }
                 if (r.layerObjRaw) {
                     return {
                         ...r,
-                        layerObjRaw: getRawObjFromApiSpec(r.layerObjRaw),
+                        layerObjRaw:  !noLayer ? getRawObjFromApiSpec(r.layerObjRaw) : true,
                         rw_id: r.id,
                     }
                 }
@@ -666,7 +636,8 @@ export async function getOneDataset(
 
 export async function getOnePendingDataset(
     datasetName: string,
-    session: Session | null
+    session: Session | null,
+    noLayer?: boolean
 ) {
     const user = session?.user
     const response = await fetch(
@@ -711,12 +682,12 @@ export async function getOnePendingDataset(
                 if (r.url_type === 'layer')
                     return {
                         ...r,
-                        layerObj: convertLayerObjToForm(layerObj),
+                        layerObj: !noLayer ? convertLayerObjToForm(layerObj) : true,
                     }
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
-                        layerObjRaw: getRawObjFromApiSpec(layerObj),
+                        layerObjRaw: !noLayer ? getRawObjFromApiSpec(layerObj) : true,
                     }
             }
 
@@ -725,14 +696,14 @@ export async function getOnePendingDataset(
                 if (r.layerObj) {
                     return {
                         ...r,
-                        layerObj: convertLayerObjToForm(r.layerObj),
+                        layerObj: !noLayer ? convertLayerObjToForm(r.layerObj) : true,
                         rw_id: r.url ? r.rw_id : r.id,
                     }
                 }
                 if (r.layerObjRaw) {
                     return {
                         ...r,
-                        layerObjRaw: getRawObjFromApiSpec(r.layerObjRaw),
+                        layerObjRaw: !noLayer ? getRawObjFromApiSpec(r.layerObjRaw) : true,
                         rw_id: r.url ? r.rw_id : r.id,
                     }
                 }

@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { democracy_index } from '@/templateLayers/democracy_index'
 import { energy_facilities } from '@/templateLayers/energy_facilities'

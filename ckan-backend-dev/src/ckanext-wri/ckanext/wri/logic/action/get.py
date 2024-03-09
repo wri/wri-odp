@@ -40,6 +40,7 @@ import ckan.plugins.toolkit as tk
 from ckanext.wri.logic.auth import schema
 from ckanext.activity.model import Activity
 import ckan.lib.dictization.model_dictize as model_dictize
+import sqlalchemy
 
 
 log = logging.getLogger("ckan.logic")
@@ -53,6 +54,9 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = ckan.logic.get_action
+_select = sqlalchemy.sql.select
+_func = sqlalchemy.func
+_get_or_bust = logic.get_or_bust
 
 
 NotificationGetUserViewedActivity: TypeAlias = None
@@ -456,15 +460,31 @@ def notification_get_all(
     if not notification_objecst_result:
         return []
     
+    sender_obj = {}
+    object_data = {}
+    
     for notification in notification_objecst_result:
-        notification['sender_obj'] = model_dictize.user_dictize(model.User.get(notification['sender_id']), context)
+        sender_id = notification['sender_id']
+        object_id = notification['object_id']
+        if sender_id in sender_obj:
+            notification['sender_obj'] = sender_obj[sender_id]
+        else:
+            temp = model_dictize.user_dictize(model.User.get(notification['sender_id']), context)
+            sender_obj[sender_id] = temp
+            notification['sender_obj'] = temp
 
-        if notification['object_type'] == 'dataset':
-            notification['object_data'] = dict(model.Package.get(notification['object_id']).as_dict())
-        elif notification['object_type'] == 'topic':
-            notification['object_data'] = dict(model.Group.get(notification['object_id']).as_dict())
-        elif notification['object_type'] == 'team':
-            notification['object_data'] = dict(model.Group.get(notification['object_id']).as_dict())
+        if object_id in object_data:
+            notification['object_data'] = object_data[object_id]
+        else:
+            if notification['object_type'] == 'dataset':
+                temp = dict(model.Package.get(notification['object_id']).as_dict())
+            elif notification['object_type'] == 'topic':
+                temp = dict(model.Group.get(notification['object_id']).as_dict())
+            elif notification['object_type'] == 'team':
+                temp= dict(model.Group.get(notification['object_id']).as_dict())
+
+            notification['object_data'] = temp
+            object_data[object_id] = temp
         
 
     return notification_objecst_result
@@ -609,28 +629,221 @@ def dashboard_activity_listv2(context: Context, data_dict: DataDict):
     # get_action for dashboard_activity_list
     model = context["model"]
     results = get_action("dashboard_activity_list")(context, data_dict)
+    user_data = {}
     for result in results:
-        result["user_data"] = model_dictize.user_dictize(
-            model.User.get(result["user_id"]), context
-        )
+        user_id = result["user_id"]
+        if user_id in user_data:
+            result["user_data"] = user_data[user_id]
+        else:
+            temp = model_dictize.user_dictize(
+                model.User.get(result["user_id"]), context
+            )
+            result["user_data"] = temp
+            user_data[user_id] = temp
+        
     return results
 
 @logic.side_effect_free
 def package_activity_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
     results = get_action("package_activity_list")(context, data_dict)
+    user_data = {}
     for result in results:
-        result["user_data"] = model_dictize.user_dictize(
-            model.User.get(result["user_id"]), context
-        )
+        user_id = result["user_id"]
+        if user_id in user_data:
+            result["user_data"] = user_data[user_id]
+        else:
+            temp = model_dictize.user_dictize(
+                model.User.get(result["user_id"]), context
+            )
+            result["user_data"] = temp
+            user_data[user_id] = temp
     return results
 
 @logic.side_effect_free
 def organization_activity_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
     results = get_action("organization_activity_list")(context, data_dict)
+    user_data = {}
     for result in results:
-        result["user_data"] = model_dictize.user_dictize(
-            model.User.get(result["user_id"]), context
-        )
+        user_id = result["user_id"]
+        if user_id in user_data:
+            result["user_data"] = user_data[user_id]
+        else:
+            temp = model_dictize.user_dictize(
+                model.User.get(result["user_id"]), context
+            )
+            result["user_data"] = temp
+            user_data[user_id] = temp
     return results
+
+
+@logic.side_effect_free
+def user_list_wri(context: Context, data_dict: DataDict):
+    model = context["model"]
+    results = get_action("user_list")(context, data_dict)
+    query= model.Session.query(
+        model.User,
+        model.User.name.label('name'),
+        model.User.fullname.label('fullname'),
+        model.User.about.label('about'),
+        model.User.email.label('email'),
+        model.User.created.label('created'),
+        _select(_func.count(model.Package.id)).where(
+            model.Package.creator_user_id == model.User.id,
+            model.Package.state == 'active',
+            model.Package.private == False,
+        ).label('number_created_packages')
+    )
+
+    site_id = config.get('ckan.site_id')
+    query = query.filter(model.User.name != site_id)
+    query = query.filter(model.User.state != model.State.DELETED)
+    query = query.all()
+    results = []
+    org_details = {}
+    for q in query:
+        user = model_dictize.user_dictize(q[0], context)
+
+        member_query = model.Session.query(
+            model.Member
+        ).filter(
+            model.Member.state == 'active',
+            model.Member.table_name == 'user',
+            model.Member.table_id == user['id']
+        ).all()
+
+        user['organizations'] = []
+
+        for member in member_query:
+            if member.group_id in org_details:
+                organization = org_details[member.group_id]
+            else:
+                org_result = model.Session.query(model.Group).filter(model.Group.id == member.group_id, model.Group.is_organization == True).first()
+                if org_result:
+                    organization = model_dictize.group_dictize(org_result, context)
+                    org_details[member.group_id] = organization
+
+            if organization:
+                user_org = next(filter(lambda x: x['id'] == user['id'], organization['users']))
+                organization['capacity'] = user_org['capacity']
+                user['organizations'].append(organization)
+            
+        results.append(user)
+
+    return results
+
+
+
+def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any):
+    def recurcive_tree_ids(org, group_hierarchy_ids=[]):
+        group_hierarchy_ids.append(org['name'])
+        for child in org['children']:
+            recurcive_tree_ids(child)
+        return group_hierarchy_ids
+    
+    group_hierarchy_ids = []
+    results = []
+    for group in groups:    
+        if group in group_hierarchy_ids:
+            continue
+        group_tree = get_action("group_tree_section")(context, {"id": group, "type": group_type})
+        if q:
+            group_tree["highlighted"] = True
+        group_hierarchy_ids += recurcive_tree_ids(group_tree)
+        results.append(group_tree)
+    return results
+
+@logic.side_effect_free
+def organization_list_wri(context: Context, data_dict: DataDict):
+    orgs = get_action("organization_list")(context, data_dict)
+    q = data_dict.get('q', False)
+    results = get_hierarchy_group(context, orgs, "organization", q)
+    return results
+
+
+@logic.side_effect_free
+def group_list_wri(context: Context, data_dict: DataDict):
+    orgs = get_action("group_list")(context, data_dict)
+    q = data_dict.get('q', False)
+    results = get_hierarchy_group(context, orgs, "group", q)
+    return results
+
+
+@logic.side_effect_free
+def group_list_authz_wri(context: Context, data_dict: DataDict):
+    orgs = get_action("group_list_authz")(context, data_dict)
+    # get list of name
+    q = data_dict.get('q', False)
+    if q:
+        grp_names = [org['name'] for org in orgs if q in org['name']]
+    else:
+        grp_names = [org['name'] for org in orgs]
+        results = get_hierarchy_group(context, grp_names, "group", q)
+    return results
+
+@logic.side_effect_free
+def organization_list_for_user_wri(context: Context, data_dict: DataDict):
+    orgs = get_action("organization_list_for_user")(context, data_dict)
+    q = data_dict.get('q', False)
+    if q:
+        orgs = [org['name'] for org in orgs if q in org['name']]
+    else:
+        orgs = [org['name'] for org in orgs]
+    results = get_hierarchy_group(context, orgs, "organization", q)
+    return results
+
+
+@logic.side_effect_free
+def issue_search_wri(context: Context, data_dict: DataDict):
+    issues = get_action("issue_search")(context, data_dict)
+    issues = issues.get('results')
+    results = []
+    for issue in issues:
+        issue = dict(issue)
+        issue_details = get_action("issue_show")(context, {"issue_number": issue['number'], "dataset_id": issue['dataset_id'], 'include_reports': False})
+        results.append(issue_details)
+    return results
+
+
+@logic.side_effect_free
+def package_collaborator_list_wri(context: Context, data_dict: DataDict):
+    model = context['model']
+
+    package_id = _get_or_bust(data_dict, 'id')
+
+    package = model.Package.get(package_id)
+    if not package:
+        raise NotFound(_('Package not found'))
+
+    _check_access('package_collaborator_list', context, data_dict)
+
+    if not authz.check_config_permission('allow_dataset_collaborators'):
+        raise ValidationError({
+            'message': _('Dataset collaborators not enabled')
+        })
+
+    capacity = data_dict.get('capacity')
+
+    allowed_capacities = authz.get_collaborator_capacities()
+    if capacity and capacity not in allowed_capacities:
+        raise ValidationError(
+            {'message': _('Capacity must be one of "{}"').format(', '.join(
+                allowed_capacities))})
+    q = model.Session.query(model.PackageMember, model.User).\
+        filter(model.PackageMember.package_id == package.id).\
+        filter(model.PackageMember.user_id == model.User.id)
+
+    if capacity:
+        q = q.filter(model.PackageMember.capacity == capacity)
+
+    collaborators = q.all()
+
+    result = []
+    for collaborator, user in collaborators:
+        collaborator = collaborator.as_dict()
+        user_dict = model_dictize.user_dictize(user, context)
+        collaborator = {**collaborator, **user_dict}
+        result.append(collaborator)
+
+    return result

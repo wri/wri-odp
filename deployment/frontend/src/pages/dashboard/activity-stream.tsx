@@ -18,7 +18,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await helpers.notification.getAllNotifications.prefetch()
+    await helpers.notification.getAllNotifications.prefetch({})
     await helpers.user.getUserCapacity.prefetch()
     await helpers.dashboardActivity.listActivityStreamDashboard.prefetch({
         search: '',

@@ -7,13 +7,17 @@ import Pagination from '../_shared/Pagination'
 import { ApprovalDatasetRow } from './DatasetRow'
 import type { WriDataset } from '@/schema/ckan.schema'
 import notify from '@/utils/notify'
-import Modal from '@/components/_shared/Modal'
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import SelectFilter from '../_shared/SelectFilter'
 import { useQuery } from 'react-query'
 import { searchArrayForKeyword, filterObjects } from '@/utils/general'
+
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 
 function customSort(obj: WriDataset) {
     return [obj.approval_status === 'rejected', new Date(obj.metadata_created!)]

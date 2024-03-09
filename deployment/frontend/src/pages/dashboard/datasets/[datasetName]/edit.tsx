@@ -10,7 +10,10 @@ import { getServerAuthSession } from '@/server/auth'
 import { P, match } from 'ts-pattern'
 import EditDatasetForm from '@/components/dashboard/datasets/admin/EditDatasetForm'
 import { useRouter } from 'next/router'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import notify from '@/utils/notify'

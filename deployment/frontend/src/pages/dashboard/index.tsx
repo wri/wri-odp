@@ -4,7 +4,6 @@ import Layout from '@/components/dashboard/Layout'
 import Dashboard from '@/components/dashboard/Dashboard'
 import Footer from '@/components/_shared/Footer'
 import { getServerAuthSession } from '../../server/auth'
-import type { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
 import { env } from '@/env.mjs'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
@@ -50,7 +49,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         transformer: superjson,
     })
 
-    await helpers.notification.getAllNotifications.prefetch()
+    await helpers.notification.getAllNotifications.prefetch({returnLength: true})
     await helpers.user.getUserCapacity.prefetch()
 
     await helpers.dataset.getPendingDatasets.prefetch({
