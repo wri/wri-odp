@@ -34,7 +34,7 @@ export const notificationRouter = createTRPCRouter({
             
         if (!input.returnLength) {
             return {
-                count: data.result.filter((x)=> x.is_unread).length
+                 count: data.result.filter((x)=> x.is_unread && x.state !== "deleted").length
             }
         }
 

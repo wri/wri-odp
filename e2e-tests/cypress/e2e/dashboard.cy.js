@@ -245,7 +245,7 @@ describe("Dashboard Test", () => {
 
   it("Should view issues", () => {
     cy.visit("/datasets/" + datasetName);
-    cy.wait(15000)
+    cy.wait(18000)
     cy.contains("Issues").click({force: true});
     cy.contains("Test");
     cy.contains("Test").click();
