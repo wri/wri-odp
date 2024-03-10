@@ -21,7 +21,7 @@ from tasks.data_to_file import data_to_file
 from tasks.s3_upload import s3_upload
 
 from tasks.send_callback import send_callback
-from tasks.query_datastore import query_datastore, query_rw
+from tasks.query_datastore import query_datastore, query_rw, query_subset_datastore
 
 
 MINIMUM_QSV_VERSION = "0.108.0"
@@ -114,13 +114,25 @@ def push_to_datastore(resource_id, api_key):
 
 
 @flow(log_prints=True)
-def convert_store_to_file(resource_id, api_key, task_id, provider, sql, rw_id, 
-                          carto_account, format, filename, download_filename):
+def convert_store_to_file(
+    resource_id,
+    api_key,
+    task_id,
+    provider,
+    sql,
+    rw_id,
+    carto_account,
+    format,
+    filename,
+    download_filename,
+):
     logger = get_run_logger()
     ckan_url = config.get("CKAN_URL")
 
     logger.info("Fetching data...")
-    data = query_datastore(api_key, ckan_url, sql, provider, rw_id, carto_account, format)
+    data = query_datastore(
+        api_key, ckan_url, sql, provider, rw_id, carto_account, format
+    )
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.info("Converting data..." + " " + format)
         tmp_filepath = os.path.join(tmp_dir, filename)
@@ -158,6 +170,7 @@ def download_subset_of_data(
     download_filename,
     connector_url,
     dataset_id,
+    num_of_rows,
 ):
     logger = get_run_logger()
     ckan_url = config.get("CKAN_URL")
@@ -165,9 +178,9 @@ def download_subset_of_data(
     logger.info("Fetching data...")
     data = []
     if provider == "datastore":
-        data = query_datastore(api_key, ckan_url, sql, provider, "")
+        data = query_subset_datastore(id, sql, num_of_rows, ckan_url)
     else:
-        data = query_rw(id, sql, connector_url, provider)
+        data = query_rw(id, sql, connector_url, provider, num_of_rows)
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.info("Converting data..." + " " + format)
         tmp_filepath = os.path.join(tmp_dir, filename)
@@ -225,6 +238,7 @@ if __name__ == "__main__":
             "provider": "provider",
             "sql": "sql",
             "format": "format",
+            "num_of_rows": "count",
             "filename": "filename",
             "dataset_id": "dataset_id",
             "connector_url": "https://wri-01.carto.com/tables/wdpa_protected_areas/table",
