@@ -38,7 +38,8 @@ export async function getServerSideProps(
 
         const pendingDataset = await getOnePendingDataset(
             prevdataset.id,
-            session
+            session,
+            { includeRscSpatialData: true }
         )
         let initialDataset = prevdataset
         console.log('GET HERE getOnePendingDataset')
@@ -58,6 +59,7 @@ export async function getServerSideProps(
         await helpers.dataset.getOneActualOrPendingDataset.prefetch({
             id: initialDataset.id,
             isPending: pendingExist,
+            options: { includeRscSpatialData: true }
         })
         await helpers.dataset.getDatasetCollaborators.prefetch({
             id: datasetName,

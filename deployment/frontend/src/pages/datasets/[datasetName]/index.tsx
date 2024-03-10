@@ -518,7 +518,7 @@ export default function DatasetPage(
         )
     }
 
-    console.log(diffFields)
+    console.log(datasetData.resources)
 
     return (
         <>

@@ -528,11 +528,12 @@ export function activityDetails(activity: Activity): ActivityDisplay {
 
 export async function getOneDataset(
     datasetName: string,
-    session: Session | null
+    session: Session | null,
+    options?: { includeRscSpatialData: boolean }
 ) {
     const user = session?.user
     const datasetRes = await fetch(
-        `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
+        `${env.CKAN_URL}/api/action/package_show?id=${datasetName}&include_rsc_spatial_data=${!!options?.includeRscSpatialData}`,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -660,11 +661,12 @@ export async function getOneDataset(
 
 export async function getOnePendingDataset(
     datasetName: string,
-    session: Session | null
+    session: Session | null,
+    options?: { includeRscSpatialData: boolean }
 ) {
     const user = session?.user
     const response = await fetch(
-        `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
+        `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}&include_rsc_spatial_data=${!!options?.includeRscSpatialData}`,
         {
             headers: {
                 Authorization: env.SYS_ADMIN_API_KEY,

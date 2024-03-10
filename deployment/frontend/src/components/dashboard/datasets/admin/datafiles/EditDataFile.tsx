@@ -27,6 +27,7 @@ import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import ViewsList from '@/components/views/ViewsList'
 import { WriDataset } from '@/schema/ckan.schema'
+import { DatafileLocation } from './Location'
 
 export function EditDataFile({
     remove,
@@ -216,6 +217,25 @@ export function EditDataFile({
                                                             : undefined
                                                     }
                                                 >
+                                                    Location
+                                                </div>
+                                            )}
+                                        </Tab>
+                                        <Tab as={Fragment}>
+                                            {({ selected }) => (
+                                                <div
+                                                    className={classNames(
+                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer views-tab',
+                                                        selected
+                                                            ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
+                                                            : 'text-black'
+                                                    )}
+                                                    aria-current={
+                                                        selected
+                                                            ? 'page'
+                                                            : undefined
+                                                    }
+                                                >
                                                     Views
                                                 </div>
                                             )}
@@ -253,31 +273,31 @@ export function EditDataFile({
                                             'tab',
                                         ].includes(
                                             datafile.format?.toLowerCase() ??
-                                                'none'
+                                            'none'
                                         ) && (
-                                            <Tab as={Fragment}>
-                                                {({ selected }) => (
-                                                    <div
-                                                        className={classNames(
-                                                            'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
-                                                            selected
-                                                                ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
-                                                                : 'text-black'
-                                                        )}
-                                                        aria-current={
-                                                            selected
-                                                                ? 'page'
-                                                                : undefined
-                                                        }
-                                                    >
-                                                        Datapusher{' '}
-                                                        <DatapusherStatus
-                                                            datafile={datafile}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </Tab>
-                                        )}
+                                                <Tab as={Fragment}>
+                                                    {({ selected }) => (
+                                                        <div
+                                                            className={classNames(
+                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
+                                                                selected
+                                                                    ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
+                                                                    : 'text-black'
+                                                            )}
+                                                            aria-current={
+                                                                selected
+                                                                    ? 'page'
+                                                                    : undefined
+                                                            }
+                                                        >
+                                                            Datapusher{' '}
+                                                            <DatapusherStatus
+                                                                datafile={datafile}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </Tab>
+                                            )}
                                     </div>
                                 </Tab.List>
                                 <Tab.Panels className="px-4 sm:px-6 xxl:px-0 py-4">
@@ -328,6 +348,9 @@ export function EditDataFile({
                                         </div>
                                     </Tab.Panel>
                                     <Tab.Panel>
+                                        <DatafileLocation formObj={formObj} index={index} />
+                                    </Tab.Panel>
+                                    <Tab.Panel>
                                         <ViewsList
                                             provider="datastore"
                                             datafile={datafile as any}
@@ -355,10 +378,10 @@ export function EditDataFile({
                                     ].includes(
                                         datafile.format?.toLowerCase() ?? 'none'
                                     ) && (
-                                        <Tab.Panel>
-                                            <Datapusher datafile={datafile} />
-                                        </Tab.Panel>
-                                    )}
+                                            <Tab.Panel>
+                                                <Datapusher datafile={datafile} />
+                                            </Tab.Panel>
+                                        )}
                                 </Tab.Panels>
                             </div>
                         </Tab.Group>

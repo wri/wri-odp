@@ -8,15 +8,15 @@ from ckan import model, logic, authz
 from ckan.types import Action, AuthFunction, Context
 from ckan.lib.search import SearchError
 from ckanext.wri.logic.auth import auth as auth
+from ckanext.wri.lib.resource_location import update_resource_location
 from ckanext.wri.logic.action.datapusher import datapusher_latest_task, datapusher_submit
 from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
 from ckanext.wri.logic.action.update import notification_update, pending_dataset_update
-from ckanext.wri.logic.action.get import package_search, notification_get_all, pending_dataset_show, pending_diff_show, dataset_release_notes
+from ckanext.wri.logic.action.get import package_search, package_show, notification_get_all, pending_dataset_show, pending_diff_show, dataset_release_notes, resource_search
 from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
 from ckan.lib.navl.validators import ignore_missing
 from ckanext.wri.logic.action.datapusher_download import download_request, download_callback
-from ckanext.wri.lib.resource_location import update_resource_location
 
 import logging
 log = logging.getLogger(__name__)
@@ -123,6 +123,7 @@ class WriPlugin(plugins.SingletonPlugin):
     def get_actions(self):
         return {
             'package_search': package_search,
+            'package_show': package_show,
             'password_reset': action.password_reset,
             'notification_get_all': notification_get_all,
             'notification_create': notification_create,
@@ -136,7 +137,8 @@ class WriPlugin(plugins.SingletonPlugin):
             'prefect_latest_task': datapusher_latest_task,
             'prefect_download_from_store': download_request,
             'prefect_download_callback': download_callback,
-            'dataset_release_notes': dataset_release_notes
+            'dataset_release_notes': dataset_release_notes,
+            'resource_location_search': resource_search
 
         }
 
@@ -190,7 +192,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
     # IResourceController
     def before_resource_create(self, context, resource_dict: dict[str, Any]):
-        resource_dict = update_resource_location(context, resource_dict)
+        resource_dict = update_resource_location(context, resource_dict, False)
         return resource_dict
 
     def after_resource_create(
@@ -199,7 +201,7 @@ class WriPlugin(plugins.SingletonPlugin):
         self._submit_to_datapusher(resource_dict)
 
     def before_resource_update(self, context, resource_dict: dict[str, Any]):
-        resource_dict = update_resource_location(context, resource_dict)
+        resource_dict = update_resource_location(context, resource_dict, False)
         return resource_dict
 
     def after_resource_update(
@@ -252,13 +254,13 @@ class WriPlugin(plugins.SingletonPlugin):
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
                 self._submit_to_datapusher(resource)
-                update_resource_location(context, resource)
+                update_resource_location(context, resource, True)
 
     def after_dataset_update(self, context, pkg_dict):
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
                 self._submit_to_datapusher(resource)
-                update_resource_location(context, resource)
+                update_resource_location(context, resource, False)
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)

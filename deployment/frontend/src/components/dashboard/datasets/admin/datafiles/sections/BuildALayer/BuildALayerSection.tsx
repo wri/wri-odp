@@ -21,6 +21,7 @@ import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import LayerManagerPreview from './preview/LayerManagerPreview'
 import { slugify } from '@/utils/slugify'
+import { DatafileLocation } from '../../Location'
 
 export function BuildALayer({
     formObj,
@@ -126,17 +127,21 @@ export function BuildALayer({
             <div className="grid lg:grid-cols-2">
                 <div>
                     {current.matches('setSourceConfig') && (
-                        <SourceForm
-                            convertToRaw={convertToRaw}
-                            onNext={() => {
-                                syncValues()
-                                layerFormObj.watch(
-                                    'layerConfig.source.provider.type'
-                                ).value === 'carto'
-                                    ? send('GO_TO_RENDER')
-                                    : send('GO_TO_LEGEND')
-                            }}
-                        />
+                        <>
+                            <SourceForm
+                                convertToRaw={convertToRaw}
+                                onNext={() => {
+                                    syncValues()
+                                    layerFormObj.watch(
+                                            'layerConfig.source.provider.type'
+                                    ).value === 'carto'
+                                        ? send('GO_TO_RENDER')
+                                        : send('GO_TO_LEGEND')
+                                }}
+                                formObj={formObj}
+                                index={index}
+                            />
+                        </>
                     )}
                     {current.matches('setRenderConfig') && (
                         <RenderForm

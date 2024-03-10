@@ -59,6 +59,9 @@ export const ResourceSchema = z
         layerObj: layerSchema.optional().nullable(),
         datastore_active: z.boolean().optional().nullable(),
         layerObjRaw: z.any().optional().nullable(),
+        spatial_address: z.string().optional(),
+        spatial_geom: z.any().optional(),
+        spatial_type: z.enum(['address', 'geom']).optional(),
     })
     .refine(
         (obj) => {

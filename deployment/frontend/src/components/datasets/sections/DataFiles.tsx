@@ -6,6 +6,7 @@ import {
     ArrowPathIcon,
     FingerPrintIcon,
     MagnifyingGlassIcon,
+    MapPinIcon,
 } from '@heroicons/react/24/outline'
 import { DownloadButton } from './datafiles/Download'
 import { OpenInButton } from './datafiles/OpenIn'
@@ -48,8 +49,8 @@ export function DataFiles({
     const filteredDatafiles =
         q !== ''
             ? datafiles?.filter((datafile) =>
-                  index.search(q).includes(datafile.id)
-              )
+                index.search(q).includes(datafile.id)
+            )
             : datafiles
 
     return (
@@ -214,17 +215,24 @@ function DatafileCard({
                             )}
                             <Disclosure.Button>
                                 <h3
-                                    className={`font-acumin text-lg font-semibold leading-loose text-stone-900 ${
-                                        datafile.title
+                                    className={`font-acumin text-lg font-semibold text-stone-900 text-left ${datafile.title
                                             ? higlighted(
-                                                  'title',
-                                                  datafile.title
-                                              )
+                                                'title',
+                                                datafile.title
+                                            )
                                             : higlighted('name', datafile.name!)
-                                    }`}
+                                        }`}
                                 >
                                     {datafile.title ?? datafile.name}
                                 </h3>
+                                {datafile.spatial_address && (
+                                    <div className="flex items-center gap-x-1">
+                                        <MapPinIcon className="h-3 w-3 text-blue-800" />
+                                        <p className="font-['Acumin Pro SemiCondensed'] text-xs font-light leading-snug text-stone-900 sm:text-sm">
+                                            {datafile.spatial_address}
+                                        </p>
+                                    </div>
+                                )}
                             </Disclosure.Button>
                         </div>
                         <div className="flex gap-x-2">
@@ -284,7 +292,7 @@ function DatafileCard({
                             {datafile.datastore_active && (
                                 <>
                                     {tabularResource &&
-                                    tabularResource.id === datafile.id ? (
+                                        tabularResource.id === datafile.id ? (
                                         <Button
                                             variant="outline"
                                             size="sm"
@@ -350,11 +358,10 @@ function DatafileCard({
 
                             <Disclosure.Button>
                                 <ChevronDownIcon
-                                    className={`${
-                                        open
+                                    className={`${open
                                             ? 'rotate-180 transform  transition'
                                             : ''
-                                    } h-5 w-5 text-stone-900`}
+                                        } h-5 w-5 text-stone-900`}
                                 />
                             </Disclosure.Button>
                         </div>
@@ -369,14 +376,13 @@ function DatafileCard({
                     >
                         <Disclosure.Panel className="py-3">
                             <p
-                                className={`font-acumin text-base font-light text-stone-900 ${
-                                    datafile.description
+                                className={`font-acumin text-base font-light text-stone-900 ${datafile.description
                                         ? higlighted(
-                                              'description',
-                                              datafile.description
-                                          )
+                                            'description',
+                                            datafile.description
+                                        )
                                         : ''
-                                }`}
+                                    }`}
                             >
                                 {datafile.description ?? 'No Description'}
                             </p>

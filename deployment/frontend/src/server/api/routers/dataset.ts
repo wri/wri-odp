@@ -1883,12 +1883,13 @@ export const DatasetRouter = createTRPCRouter({
         }),
 
     getOneActualOrPendingDataset: publicProcedure
-        .input(z.object({ id: z.string(), isPending: z.boolean() }))
+        .input(z.object({ id: z.string(), isPending: z.boolean(), options: z.any() }))
         .query(async ({ input, ctx }) => {
             if (input.isPending) {
                 const dataset = await getOnePendingDataset(
                     input.id,
-                    ctx.session
+                    ctx.session,
+                    input.options
                 )
                 return dataset
             }
