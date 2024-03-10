@@ -186,14 +186,16 @@ function DataExplorerInner({
                 <TopBar table={table} numOfRows={numOfRows ?? 0} />
             </div>
             <div className="flex flex-row justify-between gap-x-2 px-6">
-        <div className='flex flex-row justify-between grow'>
-                <ListOfFilters
-                    filters={filteredColumns}
-                    setFilters={setColumnFilters}
-                />
+                <div className="flex flex-row justify-between grow">
+                    <ListOfFilters
+                        filters={filteredColumns}
+                        setFilters={setColumnFilters}
+                    />
                 </div>
                 <DownloadButton
                     tabularResource={tabularResource}
+                    //setting this to 200 cause thats the limit of rw, so it will only call one request
+                    numOfRows={numOfRows ?? 200}
                     sql={convertToSql({
                         tableName,
                         columns: columns.map((c) => c.key),

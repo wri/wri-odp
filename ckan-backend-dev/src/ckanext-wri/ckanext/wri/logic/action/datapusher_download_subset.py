@@ -117,6 +117,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
     format = data_dict.get("format")
     id = data_dict.get("id")
     provider = data_dict.get("provider")
+    num_of_rows = data_dict.get("numOfRows")
     connector_url = data_dict.get("connectorUrl")
     sql = data_dict.get("sql")
     email = data_dict.get("email")
@@ -241,6 +242,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
                         "provider": provider,
                         "dataset_id": dataset_id,
                         "sql": sql,
+                        "num_of_rows": int(num_of_rows),
                         "filename": filename,
                         "format": format,
                         "download_filename": download_filename,

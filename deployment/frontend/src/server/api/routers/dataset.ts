@@ -1755,7 +1755,7 @@ export const DatasetRouter = createTRPCRouter({
                 apiKey: ctx.session.user.apikey,
                 fq: fq, // TODO: Vverify if organization admin can only see this and sysadmin
                 query: input,
-                user: true
+                user: true,
             }))!
 
             return {
@@ -1903,11 +1903,20 @@ export const DatasetRouter = createTRPCRouter({
             z.object({
                 resource_id: z.string(),
                 provider: z.enum(['datastore', 'rw']),
-                format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON', "GeoJSON", "SHP", "KML"]),
+                format: z.enum([
+                    'CSV',
+                    'XLSX',
+                    'XML',
+                    'TSV',
+                    'JSON',
+                    'GeoJSON',
+                    'SHP',
+                    'KML',
+                ]),
                 sql: z.string(),
                 email: z.string(),
                 rw_id: z.string().optional(),
-                carto_account: z.string().optional()
+                carto_account: z.string().optional(),
             })
         )
         .mutation(async ({ input, ctx }) => {
@@ -1942,6 +1951,7 @@ export const DatasetRouter = createTRPCRouter({
                 id: z.string(),
                 provider: z.string(),
                 dataset_id: z.string().optional(),
+                numOfRows: z.number(),
                 connectorUrl: z.string().optional(),
                 format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON']),
                 sql: z.string(),
