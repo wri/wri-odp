@@ -156,8 +156,8 @@ def query_subset_datastore(id: str, sql: str, num_of_rows: int, ckan_url: str):
     url = build_url(id, "irrelevant", "datastore", ckan_url)
     offsets = [i * limit for i in range(num_of_rows // limit + 1)]
     possible_inputs = [
-        {"url": url, "sql": sql, "provider": "datastore", "offset": offset}
+        {"url": url, "sql": sql, "provider": "datastore", "offset": offset, "limit": limit}
         for offset in offsets
     ]
     results = np.array(request_data.map(possible_inputs))
-    return results.flatten().tolist()
+    return results.ravel().tolist()
