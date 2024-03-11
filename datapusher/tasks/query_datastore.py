@@ -4,6 +4,7 @@ from prefect import task, get_run_logger
 from helpers import get_url, check_response
 import requests
 import re
+import numpy as np
 
 
 # NOTE: this only works for CartoDB layers
@@ -97,7 +98,7 @@ def build_gfw(connector_url: str):
     return connector_url + "/query/json?sql="
 
 
-def build_url(id: str, connector_url: str, provider: str, ckan_url: Optional[str] = ''):
+def build_url(id: str, connector_url: str, provider: str, ckan_url: Optional[str] = ""):
     match provider:
         case "cartodb":
             return build_carto_url(connector_url)
@@ -127,15 +128,15 @@ def request_data(input: dict):
     provider = input["provider"]
     sql = input["sql"]
     offset = input["offset"]
+    limit = input["limit"]
     logger = get_run_logger()
-    limit = 200
     limited_sql = sql + " LIMIT {} OFFSET {}".format(limit, offset)
     page_url = url + limited_sql
     logger.info(page_url)
     r = requests.get(page_url, verify=True, headers={})
     check_response(r, url, "CKAN")
     new_results = get_values(provider, r.json())
-    return new_results
+    return np.array(new_results)
 
 
 def query_rw(id: str, sql: str, connector_url: str, provider: str, num_of_rows: int):
@@ -143,19 +144,20 @@ def query_rw(id: str, sql: str, connector_url: str, provider: str, num_of_rows: 
     url = build_url(id, connector_url, provider)
     offsets = [i * limit for i in range(num_of_rows // limit + 1)]
     possible_inputs = [
-        {"url": url, "sql": sql, "provider": provider, "offset": offset}
+        {"url": url, "sql": sql, "provider": provider, "offset": offset, "limit": limit}
         for offset in offsets
     ]
-    results = request_data.map(possible_inputs)
-    return results
+    results = np.array(request_data.map(possible_inputs))
+    return results.ravel().tolist()
+
 
 def query_subset_datastore(id: str, sql: str, num_of_rows: int, ckan_url: str):
     limit = 9999
-    url = build_url(id, 'irrelevant', 'datastore', ckan_url)
+    url = build_url(id, "irrelevant", "datastore", ckan_url)
     offsets = [i * limit for i in range(num_of_rows // limit + 1)]
     possible_inputs = [
-        {"url": url, "sql": sql, "provider": 'datastore', "offset": offset}
+        {"url": url, "sql": sql, "provider": "datastore", "offset": offset, "limit": limit}
         for offset in offsets
     ]
-    results = request_data.map(possible_inputs)
-    return results
+    results = np.array(request_data.map(possible_inputs))
+    return results.ravel().tolist()
