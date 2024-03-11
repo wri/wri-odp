@@ -118,8 +118,8 @@ class ResourceLocation(object):
 
             stmt = (
                 update(ResourceLocation)
-                .where(ResourceLocation.resource_id == resource_id
-                       and ResourceLocation.is_pending == is_pending)
+                .where(ResourceLocation.resource_id == resource_id,
+                       ResourceLocation.is_pending == is_pending)
                 .values(
                     spatial_address=spatial_address,
                     spatial_geom=spatial_geom,
@@ -135,10 +135,12 @@ class ResourceLocation(object):
             if extras:
                 extras.pop("spatial_geom")
 
-            geom_cleanup = update(Resource).where(
-                    Resource.id == resource_id).values(extras=extras)
-
-            meta.Session.execute(geom_cleanup)
+            # TODO: this breaks the approval workflow, but would reduce the
+            # overall database size
+            # geom_cleanup = update(Resource).where(
+            #         Resource.id == resource_id).values(extras=extras)
+            #
+            # meta.Session.execute(geom_cleanup)
 
             meta.Session.commit()
             return result.fetchall()
@@ -147,6 +149,7 @@ class ResourceLocation(object):
             meta.Session.rollback()
             raise e
 
+    @classmethod
     def get_geometry_from_geojson(self, spatial_geom):
         if spatial_geom:
             geometries = []
@@ -172,7 +175,7 @@ class ResourceLocation(object):
         return spatial_geom
 
     @classmethod
-    def index_resource_by_location(self, resource_dict: dict[str, Any], is_pending=False):
+    def index_resource_by_location(self, resource_dict: dict[str, Any], is_pending):
         resource_id = resource_dict.get("id")
         spatial_address = resource_dict.get("spatial_address")
         spatial_geom = resource_dict.get("spatial_geom")
@@ -180,25 +183,19 @@ class ResourceLocation(object):
         if not resource_id:
             raise tk.ValidationError(_("resource_id is required"))
 
-        log.info("Indexing resource by location: {}".format(resource_id))
+        log.info("Indexing resource by location: {} {}".format(resource_id, is_pending))
 
         current_resource_location = ResourceLocation.get(resource_id, is_pending=is_pending)
-
-        resource_location_dict = {
-                "resource_id": resource_id,
-                "spatial_address": spatial_address,
-                "spatial_geom": spatial_geom,
-                "is_pending": is_pending
-        }
 
         resource_location = None
 
         try:
             if current_resource_location is None:
-                resource_location = ResourceLocation.create(*resource_location_dict)
+                log.error(spatial_geom)
+                resource_location = ResourceLocation.create(resource_id, spatial_address, spatial_geom, is_pending=is_pending)
 
             else:
-                resource_location = ResourceLocation.update(*resource_location_dict)
+                resource_location = ResourceLocation.update(resource_id, spatial_address, spatial_geom, is_pending=is_pending)
 
         except Exception as e:
             log.error(e)

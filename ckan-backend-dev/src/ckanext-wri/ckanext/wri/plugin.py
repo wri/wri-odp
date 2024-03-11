@@ -28,8 +28,8 @@ from ckanext.wri.logic.action.get import (
     group_list_authz_wri,
     organization_list_for_user_wri,
     issue_search_wri,
-    package_collaborator_list_wri
-
+    package_collaborator_list_wri,
+    resource_search
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -169,7 +169,8 @@ class WriPlugin(plugins.SingletonPlugin):
             'group_list_authz_wri': group_list_authz_wri,
             'organization_list_for_user_wri': organization_list_for_user_wri,
             'issue_search_wri': issue_search_wri,
-            'package_collaborator_list_wri': package_collaborator_list_wri
+            'package_collaborator_list_wri': package_collaborator_list_wri,
+            'resource_location_search': resource_search
         }
 
     # IPermissionLabels
@@ -275,16 +276,25 @@ class WriPlugin(plugins.SingletonPlugin):
     # IPackageController
 
     def after_dataset_create(self, context, pkg_dict):
+        log.error("!@#!@#!@#!")
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
-                self._submit_to_datapusher(resource)
-        ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+                pass
+                # self._submit_to_datapusher(resource) #TODO: uncomment
+
+        if pkg_dict.get("is_approved", False):
+            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
+        log.error("!@#!@#!@#!")
+        log.error(pkg_dict)
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
-                self._submit_to_datapusher(resource)
-        ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+                pass
+                # self._submit_to_datapusher(resource) #TODO: uncomment
+
+        if pkg_dict.get("is_approved", False):
+            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)

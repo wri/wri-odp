@@ -137,6 +137,8 @@ export function BuildALayer({
                                     ? send('GO_TO_RENDER')
                                     : send('GO_TO_LEGEND')
                             }}
+                            formObj={formObj}
+                            index={index}
                         />
                     )}
                     {current.matches('setRenderConfig') && (
