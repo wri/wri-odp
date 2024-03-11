@@ -139,7 +139,7 @@ def request_data(input: dict):
 
 
 def query_rw(id: str, sql: str, connector_url: str, provider: str, num_of_rows: int):
-    limit = 200
+    limit = 1000
     url = build_url(id, connector_url, provider)
     offsets = [i * limit for i in range(num_of_rows // limit + 1)]
     possible_inputs = [
