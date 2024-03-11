@@ -10,7 +10,10 @@ import notify from '@/utils/notify'
 import { api } from '@/utils/api'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { useRouter } from 'next/router'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import Link from 'next/link'

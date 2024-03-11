@@ -63,11 +63,11 @@ ckan:
       DATAPUSHER_MAX_CONTENT_LENGTH: "5368709120"
     resources:
       limits:
-        cpu: 300m
-        memory: 1G
+        cpu: 800m
+        memory: 4.5G
       requests:
-        cpu: 200m
-        memory: 0.5G
+        cpu: 300m
+        memory: 4G
     hpa:
       enable: true
       minReplicas: 1

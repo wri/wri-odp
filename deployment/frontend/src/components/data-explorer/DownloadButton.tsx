@@ -1,6 +1,9 @@
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { ErrorDisplay } from '@/components/_shared/InputGroup'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import {
     Popover,
     PopoverContent,
@@ -24,9 +27,11 @@ import { DefaultTooltip } from '../_shared/Tooltip'
 export function DownloadButton({
     sql,
     tabularResource,
+    numOfRows,
 }: {
     tabularResource: TabularResource
     sql: string
+    numOfRows: number
 }) {
     const conversibleFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
     const [convertTo, setConvertTo] = useState<'CSV' | 'XLSX' | 'TSV' | 'XML'>(
@@ -67,6 +72,7 @@ export function DownloadButton({
                 </PopoverContent>
             </Popover>
             <DownloadModal
+                numOfRows={numOfRows}
                 format={convertTo}
                 open={open}
                 setOpen={setOpen}
@@ -82,12 +88,14 @@ function DownloadModal({
     setOpen,
     format,
     sql,
+    numOfRows,
     tabularResource,
 }: {
     open: boolean
     setOpen: (open: boolean) => void
     format: 'XLSX' | 'CSV' | 'TSV' | 'XML'
     tabularResource: TabularResource
+    numOfRows: number
     sql: string
 }) {
     const formSchema = z.object({
@@ -134,6 +142,7 @@ function DownloadModal({
                                         provider: tabularResource.provider,
                                         dataset_id: tabularResource.datasetId,
                                         sql: sql,
+                                        numOfRows: numOfRows,
                                         connectorUrl:
                                             tabularResource.connectorUrl,
                                         id: tabularResource.id,

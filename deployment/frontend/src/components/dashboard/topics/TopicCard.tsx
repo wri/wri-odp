@@ -10,7 +10,10 @@ import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
 import type { GroupTree } from '@/schema/ckan.schema';
 import notify from '@/utils/notify'
-import Modal from '@/components/_shared/Modal';
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});;
 import { useRouter } from 'next/router'
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
@@ -226,7 +229,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
 
 
 export default function TopicCard() {
-  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10000 } })
+  const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const [pagination, setPagination] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
   const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
   const [open, setOpen] = useState(false)
@@ -254,10 +257,12 @@ export default function TopicCard() {
     enabled: !!data
   })
 
+
   useEffect(() => {
     setPagination({ search: '', page: { start: 0, rows: 10 } })
 
   }, [query.search])
+
 
 
   return (
@@ -265,7 +270,7 @@ export default function TopicCard() {
       <SearchHeader leftStyle=' sm:pr-2 sm:pl-12' rightStyle=' px-2 sm:pr-6' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setPagination} query={pagination} isLoading={ProcessedTopic.isLoading} count={ProcessedTopic.data?.count} />} />
       <div className='w-full'>
         {
-          isLoading || ProcessedTopic.isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
+          ProcessedTopic.isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
             ProcessedTopic.data?.topics.map((topic, index) => {
               return (
                 <div key={topic.name}>

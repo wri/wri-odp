@@ -23,7 +23,10 @@ import { DefaultTooltip } from '../_shared/Tooltip'
 import { PencilSquareIcon } from '@heroicons/react/24/solid'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { LoaderButton } from '@/components/_shared/Button'
 import { Dialog } from '@headlessui/react'
 import { useState } from 'react'

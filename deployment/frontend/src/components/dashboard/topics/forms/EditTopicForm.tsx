@@ -12,7 +12,10 @@ import TopicForm from './TopicForm'
 import { useRouter } from 'next/router'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog, Tab } from '@headlessui/react'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import Link from 'next/link'
 import { RouterOutput } from '@/server/api/root'
 import { Fragment } from 'react'
