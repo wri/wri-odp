@@ -52,6 +52,7 @@ import {
 import type { Dataset, Resource } from '@/interfaces/dataset.interface'
 import type { License } from '@/interfaces/licenses.interface'
 import { isValidUrl } from '@/utils/isValidUrl'
+import { cleanUrl } from '@/utils/cleanUrl'
 import {
     convertFormToLayerObj,
     convertLayerObjToForm,
@@ -167,7 +168,9 @@ export const DatasetRouter = createTRPCRouter({
                     update_frequency: input.update_frequency?.value ?? '',
                     featured_image:
                         input.featured_image && input.featured_dataset
-                            ? `${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`
+                            ? !isValidUrl(cleanUrl(input.featured_image))
+                                ? cleanUrl(`${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`)
+                                : input.featured_image
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
                     resources: input.resources
@@ -522,8 +525,8 @@ export const DatasetRouter = createTRPCRouter({
                         update_frequency: input.update_frequency?.value ?? '',
                         featured_image:
                             input.featured_image && input.featured_dataset
-                                ? !isValidUrl(input.featured_image)
-                                    ? `${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`
+                                ? !isValidUrl(cleanUrl(input.featured_image))
+                                    ? cleanUrl(`${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`)
                                     : input.featured_image
                                 : null,
                         visibility_type: input.visibility_type?.value ?? '',
