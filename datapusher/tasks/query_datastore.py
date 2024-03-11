@@ -97,7 +97,7 @@ def build_gfw(connector_url: str):
     return connector_url + "/query/json?sql="
 
 
-def build_url(id: str, connector_url: str, provider: str, ckan_url: Optional[str] = ''):
+def build_url(id: str, connector_url: str, provider: str, ckan_url: Optional[str] = ""):
     match provider:
         case "cartodb":
             return build_carto_url(connector_url)
@@ -127,8 +127,8 @@ def request_data(input: dict):
     provider = input["provider"]
     sql = input["sql"]
     offset = input["offset"]
+    limit = input["limit"]
     logger = get_run_logger()
-    limit = 200
     limited_sql = sql + " LIMIT {} OFFSET {}".format(limit, offset)
     page_url = url + limited_sql
     logger.info(page_url)
@@ -143,18 +143,19 @@ def query_rw(id: str, sql: str, connector_url: str, provider: str, num_of_rows: 
     url = build_url(id, connector_url, provider)
     offsets = [i * limit for i in range(num_of_rows // limit + 1)]
     possible_inputs = [
-        {"url": url, "sql": sql, "provider": provider, "offset": offset}
+        {"url": url, "sql": sql, "provider": provider, "offset": offset, "limit": limit}
         for offset in offsets
     ]
     results = request_data.map(possible_inputs)
     return results
 
+
 def query_subset_datastore(id: str, sql: str, num_of_rows: int, ckan_url: str):
     limit = 9999
-    url = build_url(id, 'irrelevant', 'datastore', ckan_url)
+    url = build_url(id, "irrelevant", "datastore", ckan_url)
     offsets = [i * limit for i in range(num_of_rows // limit + 1)]
     possible_inputs = [
-        {"url": url, "sql": sql, "provider": 'datastore', "offset": offset}
+        {"url": url, "sql": sql, "provider": "datastore", "offset": offset}
         for offset in offsets
     ]
     results = request_data.map(possible_inputs)
