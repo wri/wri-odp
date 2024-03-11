@@ -87,7 +87,13 @@ class WriPlugin(plugins.SingletonPlugin):
             from ckanext.wri.model import setup_pending_datasets
             setup_pending_datasets()
 
-        return [notificationdb, pendingdatasetsdb]
+        @click.command()
+        def resourcelocationdb():
+            """Creates resources location table"""
+            from ckanext.wri.model import setup_resource_location
+            setup_resource_location()
+
+        return [notificationdb, pendingdatasetsdb, resourcelocationdb]
 
     # IAuth
 
