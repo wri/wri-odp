@@ -1,6 +1,7 @@
 from typing import Optional
 from urllib.parse import urlsplit, urlunsplit
-from prefect import task, get_run_logger
+from prefect import flow, task, get_run_logger
+from prefect.futures import resolve_futures_to_data
 from helpers import get_url, check_response
 import requests
 import re
@@ -138,7 +139,6 @@ def request_data(input: dict):
     new_results = get_values(provider, r.json())
     return np.array(new_results)
 
-
 def query_rw(id: str, sql: str, connector_url: str, provider: str, num_of_rows: int):
     limit = 1000
     url = build_url(id, connector_url, provider)
@@ -147,8 +147,8 @@ def query_rw(id: str, sql: str, connector_url: str, provider: str, num_of_rows: 
         {"url": url, "sql": sql, "provider": provider, "offset": offset, "limit": limit}
         for offset in offsets
     ]
-    results = np.array(request_data.map(possible_inputs))
-    return results.ravel().tolist()
+    results = request_data.map(possible_inputs)
+    return resolve_futures_to_data(results)
 
 
 def query_subset_datastore(id: str, sql: str, num_of_rows: int, ckan_url: str):
@@ -159,5 +159,5 @@ def query_subset_datastore(id: str, sql: str, num_of_rows: int, ckan_url: str):
         {"url": url, "sql": sql, "provider": "datastore", "offset": offset, "limit": limit}
         for offset in offsets
     ]
-    results = np.array(request_data.map(possible_inputs))
-    return results.ravel().tolist()
+    results = request_data.map(possible_inputs)
+    return resolve_futures_to_data(results)
