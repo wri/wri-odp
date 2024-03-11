@@ -4,6 +4,7 @@ from prefect import task, get_run_logger
 from helpers import get_url, check_response
 import requests
 import re
+import numpy as np
 
 
 # NOTE: this only works for CartoDB layers
@@ -135,7 +136,7 @@ def request_data(input: dict):
     r = requests.get(page_url, verify=True, headers={})
     check_response(r, url, "CKAN")
     new_results = get_values(provider, r.json())
-    return new_results
+    return np.array(new_results)
 
 
 def query_rw(id: str, sql: str, connector_url: str, provider: str, num_of_rows: int):
@@ -146,8 +147,8 @@ def query_rw(id: str, sql: str, connector_url: str, provider: str, num_of_rows: 
         {"url": url, "sql": sql, "provider": provider, "offset": offset, "limit": limit}
         for offset in offsets
     ]
-    results = request_data.map(possible_inputs)
-    return results
+    results = np.array(request_data.map(possible_inputs))
+    return results.ravel().tolist()
 
 
 def query_subset_datastore(id: str, sql: str, num_of_rows: int, ckan_url: str):
@@ -158,5 +159,5 @@ def query_subset_datastore(id: str, sql: str, num_of_rows: int, ckan_url: str):
         {"url": url, "sql": sql, "provider": "datastore", "offset": offset}
         for offset in offsets
     ]
-    results = request_data.map(possible_inputs)
-    return results
+    results = np.array(request_data.map(possible_inputs))
+    return results.flatten().tolist()
