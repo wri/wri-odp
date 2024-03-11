@@ -17,7 +17,10 @@ import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import {
     ExclamationTriangleIcon,
     InformationCircleIcon,

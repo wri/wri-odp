@@ -20,10 +20,9 @@ import {
 } from "@/utils/apiUtils";
 import { searchArrayForKeyword } from "@/utils/general";
 import { searchSchema } from "@/schema/search.schema";
-import type { CkanResponse, WriOrganization } from "@/schema/ckan.schema";
+import type { CkanResponse, WriOrganization, WriUser } from "@/schema/ckan.schema";
 import { UserFormInviteSchema, UserFormSchema } from '@/schema/user.schema';
 import { User } from "@portaljs/ckan";
-import { send } from "xstate";
 
 export const UserRouter = createTRPCRouter({
   getDashboardUser: protectedProcedure.query(async ({ ctx }) => {
@@ -64,60 +63,6 @@ export const UserRouter = createTRPCRouter({
         userCapacity?: string;
       };
 
-      let getAllUsersOrgFlat: IUser[] = [];
-      if (ctx.session.user.sysadmin) {
-
-        const orgs = (await getAllOrganizations({ apiKey: ctx.session.user.apikey }))!;
-        const orgDetails = await Promise.all(orgs.map(async (org) => {
-          const orgDetails = (await getOrgDetails({ orgId: org.id, apiKey: ctx.session.user.apikey }))!;
-          const users = orgDetails.users?.map((user) => {
-            return {
-              title: user.name,
-              id: user.id,
-              email_hash: user.email_hash,
-              description: user.email,
-              capacity: user.capacity,
-              image_display_url: user.image_url,
-              org: orgDetails.name,
-              orgId: orgDetails.id,
-              orgimage: orgDetails.image_display_url,
-              orgtitle: orgDetails.title,
-              userCapacity: org.capacity
-            }
-
-          });
-
-          return users;
-        }));
-        getAllUsersOrgFlat = orgDetails.flat() as IUser[];
-      }
-      else {
-        const userOrg = (await getUserOrganizations({ userId: ctx.session.user.id, apiKey: ctx.session.user.apikey }))!;
-        const getAllUsersOrg = await Promise.all(userOrg.map(async (org) => {
-          const orgDetails = (await getOrgDetails({ orgId: org.id, apiKey: ctx.session.user.apikey }))!;
-          const users = orgDetails.users?.map((user) => {
-            return {
-              title: user.name,
-              id: user.id,
-              email_hash: user.email_hash,
-              description: user.email,
-              capacity: user.capacity,
-              image_display_url: user.image_url,
-              org: orgDetails.name,
-              orgId: orgDetails.id,
-              orgimage: orgDetails.image_display_url,
-              orgtitle: orgDetails.title,
-              userCapacity: org.capacity
-            }
-
-          });
-
-          return users;
-        }));
-
-        getAllUsersOrgFlat = getAllUsersOrg.flat() as IUser[];
-      }
-
       type IUsers = {
         title?: string;
         id: string;
@@ -135,88 +80,70 @@ export const UserRouter = createTRPCRouter({
         }[]
 
       }
-      const userMap = new Map<string, IUsers>();
-      getAllUsersOrgFlat.forEach((user) => {
-        const {
-          title,
-          id,
-          description,
-          capacity,
-          image_display_url,
-          org,
-          orgId,
-          orgimage,
-          orgtitle,
-          userCapacity,
-          email_hash } = user;
-        const key = title ?? id;
 
-        if (userMap.has(key)) {
-          const existingUser = userMap.get(key)!;
-          existingUser.orgnumber = (existingUser.orgnumber ?? 1) + 1;
 
-          if (org && orgId) {
-            existingUser.orgs = [
-              ...(existingUser.orgs ?? []),
-              {
-                title: orgtitle ?? '',
-                capacity: capacity ?? '',
-                image_display_url: orgimage ?? '',
-                name: org || '',
-                userCapacity: userCapacity ?? '',
-              },
-            ];
-          }
-
-          userMap.set(key, existingUser);
-        } else {
-          const newUser: IUsers = {
-            title,
-            id,
-            description,
-            image_display_url,
-            orgnumber: 1,
-            email_hash,
-            orgs: org
-              ? [
-                {
-                  title: orgtitle ?? '',
-                  capacity: capacity ?? '',
-                  image_display_url: orgimage ?? '',
-                  name: org || '',
-                  userCapacity: userCapacity ?? ''
-                },
-              ]
-              : [],
-          };
-
-          userMap.set(key, newUser);
+      const response = await fetch(`${env.CKAN_URL}/api/3/action/user_list_wri`, {
+        headers: {
+          "Authorization": ctx.session.user.apikey,
+          "Content-Type": "application/json"
         }
       });
+      const data = (await response.json()) as CkanResponse<WriUser[]>;
+      if (!data.success && data.error) throw Error(data.error.message)
 
-      const allUsers = Array.from(userMap.values());
-      let result = allUsers
-      // non-organization users
-      if (ctx.session.user.sysadmin) {
-        const nonOrgUsers = (await getAllUsers({ apiKey: ctx.session.user.apikey }))!;
-        const orgUsers = Array.from(userMap.keys());
-        const nonOrgUsersFiltered = nonOrgUsers.filter((user) => !orgUsers.includes(user.name!));
-        const nonOrgUsersFormatted = nonOrgUsersFiltered.map((user) => {
-          return {
-            title: user.name,
-            id: user.id,
-            email_hash: user.email_hash,
-            description: user.email,
-            image_display_url: user.image_url,
-            orgnumber: 0,
-            orgs: []
+      let users = data.result
+      if (!ctx.session.user.sysadmin) {
+        let user = users.find((user) => user.id === ctx.session.user.id);
+        if (user) {
+          let o_users = [user];
+          let user_org = user.organizations;
+          if (user_org) {
+            o_users = []
+            for (const org of user_org) {
+              for (const user of org.users!) {
+                o_users.push(users.find((u) => u.id === user.id)!);
+              }
+            }
           }
-        });
-        result = [...allUsers, ...nonOrgUsersFormatted] as IUsers[];
+          users = o_users;
+        }
       }
+      
+
+      let result: IUsers[] = users.map((user) => {
+        let rslt = {
+          title: user.name!,
+          id: user.id!,
+          email_hash: user.email_hash!,
+          description: user.email!,
+          image_display_url: user.image_url!,
+          orgnumber: user.organizations?.length ?? 0,
+          orgs: [] as IUsers["orgs"]
+        }
+
+        if (user.organizations) {
+          rslt.orgs =  user.organizations.map((org) => {
+            return {
+              title: org.title,
+              capacity: org.capacity,
+              image_display_url: org.image_display_url,
+              name: org.name
+            }
+          })
+        }
+        return rslt;
+      })
+
+
       if (input.search) {
         result = searchArrayForKeyword<IUsers>(result, input.search);
       }
+
+      result = result.sort((a, b) => {
+        if (a.title! < b.title!) return -1;
+        if (a.title! > b.title!) return 1;
+        return 0;
+      })
 
       return {
         users: result.slice(input.page.start, input.page.start + input.page.rows),

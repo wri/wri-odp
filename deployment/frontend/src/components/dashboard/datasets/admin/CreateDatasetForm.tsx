@@ -24,7 +24,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { OpenInForm } from './metadata/OpenIn'
 import Link from 'next/link'
 import { LocationForm } from './metadata/LocationForm'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { VersioningForm } from './metadata/VersioningForm'

@@ -5,7 +5,6 @@ import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner'
 import RejectApproval from './RejectApproval'
 import { WriDataset } from '@/schema/ckan.schema'
-import Modal from '@/components/_shared/Modal'
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
@@ -14,6 +13,11 @@ import { SearchInput } from '@/schema/search.schema'
 import Pagination from '@/components/dashboard/_shared/Pagination'
 import { useSession } from 'next-auth/react'
 import notify from '@/utils/notify'
+
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 
 export default function Approvallist() {
     const { data: session } = useSession()
