@@ -12,6 +12,7 @@ from ckanext.wri.logic.auth import auth as auth
 from ckanext.wri.logic.action.datapusher import datapusher_latest_task, datapusher_submit
 from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
 from ckanext.wri.logic.action.update import notification_update, pending_dataset_update, notification_bulk_update
+from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
     package_search,
     notification_get_all,
@@ -277,11 +278,13 @@ class WriPlugin(plugins.SingletonPlugin):
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
                 self._submit_to_datapusher(resource)
+        ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
                 self._submit_to_datapusher(resource)
+        ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)

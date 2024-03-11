@@ -2,9 +2,11 @@
 
 import ckan.model.meta as meta
 import ckan.model.types as _types
+import ckan.plugins.toolkit as tk
 from ckan.model.resource import Resource
 from ckan.lib.dictization import table_dictize
 from ckan.types import Context
+from ckan.common import _
 
 from typing import Any, Iterable, Optional
 import sqlalchemy
@@ -87,26 +89,7 @@ class ResourceLocation(object):
         is_pending
     ) -> Optional[dict]:
         try:
-            if spatial_geom:
-                geometries = []
-
-                if spatial_geom["type"] == "GeometryCollection":
-                    geometries = spatial_geom["geometries"]
-                elif spatial_geom["type"] == "FeatureCollection":
-                    geometries = [x["geometry"] for x in spatial_geom["features"]]
-                else:
-                    geometries = [spatial_geom["geometry"]]
-
-                valid_geometries = []
-                for geom in geometries:
-                    json_str = json.dumps(geom)
-                    shape = shapely.from_geojson(json_str)
-                    if shape.is_valid:
-                        valid_geometries.append(shape)
-
-                merged_geometry = unary_union(valid_geometries)
-                spatial_geom = geo_funcs.ST_GeomFromText(merged_geometry.wkt)
-
+            spatial_geom = ResourceLocation.get_geometry_from_geojson(spatial_geom)
             resource_location = ResourceLocation(resource_id, spatial_address,
                                                  spatial_geom, is_pending)
             meta.Session.add(resource_location)
@@ -131,26 +114,7 @@ class ResourceLocation(object):
         is_pending
     ) -> Optional['ResourceLocation']:
         try:
-            if spatial_geom:
-                geometries = []
-
-                if spatial_geom["type"] == "GeometryCollection":
-                    geometries = spatial_geom["geometries"]
-                elif spatial_geom["type"] == "FeatureCollection":
-                    geometries = [x["geometry"] for x in spatial_geom["features"]]
-                else:
-                    geometries = [spatial_geom["geometry"]]
-
-                valid_geometries = []
-                for geom in geometries:
-                    json_str = json.dumps(geom)
-                    shape = shapely.from_geojson(json_str)
-                    if shape.is_valid:
-                        valid_geometries.append(shape)
-
-                merged_geometry = unary_union(valid_geometries)
-                spatial_geom = geoalchemy2.functions.ST_GeomFromText(
-                        merged_geometry.wkt)
+            spatial_geom = ResourceLocation.get_geometry_from_geojson(spatial_geom)
 
             stmt = (
                 update(ResourceLocation)
@@ -183,6 +147,83 @@ class ResourceLocation(object):
             meta.Session.rollback()
             raise e
 
+    def get_geometry_from_geojson(self, spatial_geom):
+        if spatial_geom:
+            geometries = []
+
+            if spatial_geom["type"] == "GeometryCollection":
+                geometries = spatial_geom["geometries"]
+            elif spatial_geom["type"] == "FeatureCollection":
+                geometries = [x["geometry"] for x in spatial_geom["features"]]
+            else:
+                geometries = [spatial_geom["geometry"]]
+
+            valid_geometries = []
+            for geom in geometries:
+                json_str = json.dumps(geom)
+                shape = shapely.from_geojson(json_str)
+                if shape.is_valid:
+                    valid_geometries.append(shape)
+
+            merged_geometry = unary_union(valid_geometries)
+            spatial_geom = geoalchemy2.functions.ST_GeomFromText(
+                    merged_geometry.wkt)
+
+        return spatial_geom
+
+    @classmethod
+    def index_resource_by_location(self, resource_dict: dict[str, Any], is_pending=False):
+        resource_id = resource_dict.get("id")
+        spatial_address = resource_dict.get("spatial_address")
+        spatial_geom = resource_dict.get("spatial_geom")
+
+        if not resource_id:
+            raise tk.ValidationError(_("resource_id is required"))
+
+        log.info("Indexing resource by location: {}".format(resource_id))
+
+        current_resource_location = ResourceLocation.get(resource_id, is_pending=is_pending)
+
+        resource_location_dict = {
+                "resource_id": resource_id,
+                "spatial_address": spatial_address,
+                "spatial_geom": spatial_geom,
+                "is_pending": is_pending
+        }
+
+        resource_location = None
+
+        try:
+            if current_resource_location is None:
+                resource_location = ResourceLocation.create(*resource_location_dict)
+
+            else:
+                resource_location = ResourceLocation.update(*resource_location_dict)
+
+        except Exception as e:
+            log.error(e)
+            raise tk.ValidationError(e)
+
+        if not resource_location:
+
+            raise tk.ValidationError(
+                    _(f"Resource Location not found: {resource_id}"))
+
+        log.info("Updated resource location index: {}".format(resource_id))
+
+        resource_dict.pop("spatial_geom", None)
+        resource_dict.pop("spatial_address", None)
+
+        return resource_dict
+
+    @classmethod
+    def index_dataset_resources_by_location(self, dataset, is_pending):
+        resources = dataset.get("resources", [])
+
+        for i, resource in enumerate(resources):
+            resources[i] = ResourceLocation.index_resource_by_location(resource, is_pending)
+
+        return resources
 
 def resource_location_dictize(resource_location: ResourceLocation,
                               context: Context) -> dict[str, Any]:
