@@ -220,7 +220,8 @@ class ResourceLocation(object):
         for i, resource in enumerate(resources):
             resources[i] = ResourceLocation.index_resource_by_location(resource, is_pending)
 
-        return resources
+        dataset["resources"] = resources
+        return dataset
 
 def resource_location_dictize(resource_location: ResourceLocation,
                               context: Context) -> dict[str, Any]:
