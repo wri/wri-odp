@@ -240,7 +240,7 @@ export default function UserCard({username}: {username: string}) {
                           id: `edit-tooltip-${user.title}`,
                           content: "Edit user"
                         },
-                        onClick: async () => { router.push(`/dashboard/users/edit/${user.title}`) }
+                        onClick: async () => { router.push(`/dashboard/settings/edit/${user.title}`) }
                       },
                       {
                         label: "Delete", color: 'bg-red-600 hover:bg-red-500',
