@@ -1,0 +1,18 @@
+diff --git a/ckan/model/__init__.py b/ckan/model/__init__.py
+--- ckan/model/__init__.py
++++ ckan/model/__init__.py
+@@ -219,9 +219,12 @@
+         with warnings.catch_warnings():
+             warnings.filterwarnings('ignore', '.*(reflection|tsvector).*')
+             meta.metadata.reflect()
+ 
+-        meta.metadata.drop_all()
++        try:
++            meta.metadata.drop_all()
++        except Exception as e:
++            print(e)
+         self.tables_created_and_initialised = False
+         log.info('Database tables dropped')
+ 
+     def create_db(self) -> None:
+
