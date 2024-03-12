@@ -279,8 +279,7 @@ class WriPlugin(plugins.SingletonPlugin):
         log.error("!@#!@#!@#!")
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
-                pass
-                # self._submit_to_datapusher(resource) #TODO: uncomment
+                self._submit_to_datapusher(resource)
 
         if pkg_dict.get("is_approved", False):
             ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
@@ -290,8 +289,7 @@ class WriPlugin(plugins.SingletonPlugin):
         log.error(pkg_dict)
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
-                pass
-                # self._submit_to_datapusher(resource) #TODO: uncomment
+                self._submit_to_datapusher(resource) #TODO: uncomment
 
         if pkg_dict.get("is_approved", False):
             ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
