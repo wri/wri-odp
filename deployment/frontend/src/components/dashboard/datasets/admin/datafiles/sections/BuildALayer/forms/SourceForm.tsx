@@ -19,13 +19,18 @@ import { useColumns } from '../useColumns'
 import classNames from '@/utils/classnames'
 import { ChooseTemplates } from './ChooseTemplates'
 import { ScrollArea } from '@/components/_shared/ScrollArea'
+import { DatafileLocation } from '../../../DatafileLocation'
 
 export default function SourceForm({
     onNext,
     convertToRaw,
+    formObj: _formObj,
+    index: _index
 }: {
     onNext: () => void
     convertToRaw: () => void
+    formObj: any,
+    index: number
 }) {
     const formObj = useFormContext<LayerFormType>()
     const [columnsFetchEnabled, setColumnsFetchEnabled] = useState(false)
@@ -156,7 +161,7 @@ export default function SourceForm({
                                 >
                                     <Input
                                         {...register('layerConfig.order', {
-                                              valueAsNumber: true,
+                                            valueAsNumber: true,
                                         })}
                                         defaultValue={0}
                                         type="number"
@@ -364,6 +369,18 @@ export default function SourceForm({
                             />
                             <ErrorDisplay errors={errors} name="zoom" />
                         </InputGroup>
+                        <div>
+                            <h2 className="text-lg flex items-center gap-x-2">
+                                Location Coverage
+                                <DefaultTooltip content="This field defines whether a data file will show up on the results or not when doing a search by location">
+                                    <InformationCircleIcon
+                                        className="h-5 w-5 text-neutral-500"
+                                        aria-hidden="true"
+                                    />
+                                </DefaultTooltip>
+                            </h2>
+                        </div>
+                        <DatafileLocation formObj={_formObj} index={_index} />
                     </div>
                 </ScrollArea>
                 <Button

@@ -10,13 +10,15 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/_shared/Table'
-import { MinusCircleIcon, PaperClipIcon } from '@heroicons/react/24/outline'
+import { InformationCircleIcon, MinusCircleIcon, PaperClipIcon } from '@heroicons/react/24/outline'
 import { DatasetFormType } from '@/schema/dataset.schema'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { convertBytes } from '@/utils/convertBytes'
 import Spinner from '@/components/_shared/Spinner'
 import FormatInput from '../FormatInput'
 import { DataDictionaryTable } from '../DataDictionaryTable'
+import DefaultTooltip from '@/components/_shared/Tooltip'
+import { DatafileLocation } from '../DatafileLocation'
 
 export function UploadForm({
     removeFile,
@@ -97,6 +99,18 @@ export function UploadForm({
             ) : (
                 <DataDictionaryTable formObj={formObj} resourceIndex={index} />
             )}
+            <div className="mt-10">
+                <h2 className="font-semibold text-lg flex items-center gap-x-2">
+                    Location Coverage
+                    <DefaultTooltip content="This field defines whether a data file will show up on the results or not when doing a search by location">
+                        <InformationCircleIcon
+                            className="h-5 w-5 text-neutral-500"
+                            aria-hidden="true"
+                        />
+                    </DefaultTooltip>
+                </h2>
+                <DatafileLocation formObj={formObj} index={index} />
+            </div>
         </div>
     )
 }

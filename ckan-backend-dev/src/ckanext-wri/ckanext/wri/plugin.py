@@ -12,6 +12,7 @@ from ckanext.wri.logic.auth import auth as auth
 from ckanext.wri.logic.action.datapusher import datapusher_latest_task, datapusher_submit
 from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
 from ckanext.wri.logic.action.update import notification_update, pending_dataset_update, notification_bulk_update
+from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
     package_search,
     notification_get_all,
@@ -27,8 +28,8 @@ from ckanext.wri.logic.action.get import (
     group_list_authz_wri,
     organization_list_for_user_wri,
     issue_search_wri,
-    package_collaborator_list_wri
-
+    package_collaborator_list_wri,
+    resource_search
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -87,7 +88,13 @@ class WriPlugin(plugins.SingletonPlugin):
             from ckanext.wri.model import setup_pending_datasets
             setup_pending_datasets()
 
-        return [notificationdb, pendingdatasetsdb]
+        @click.command()
+        def resourcelocationdb():
+            """Creates resources location table"""
+            from ckanext.wri.model import setup_resource_location
+            setup_resource_location()
+
+        return [notificationdb, pendingdatasetsdb, resourcelocationdb]
 
     # IAuth
 
@@ -162,7 +169,8 @@ class WriPlugin(plugins.SingletonPlugin):
             'group_list_authz_wri': group_list_authz_wri,
             'organization_list_for_user_wri': organization_list_for_user_wri,
             'issue_search_wri': issue_search_wri,
-            'package_collaborator_list_wri': package_collaborator_list_wri
+            'package_collaborator_list_wri': package_collaborator_list_wri,
+            'resource_location_search': resource_search
         }
 
     # IPermissionLabels
@@ -268,14 +276,23 @@ class WriPlugin(plugins.SingletonPlugin):
     # IPackageController
 
     def after_dataset_create(self, context, pkg_dict):
+        log.error("!@#!@#!@#!")
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
                 self._submit_to_datapusher(resource)
 
+        if pkg_dict.get("is_approved", False):
+            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+
     def after_dataset_update(self, context, pkg_dict):
+        log.error("!@#!@#!@#!")
+        log.error(pkg_dict)
         if pkg_dict.get('resources') is not None:
             for resource in pkg_dict.get('resources'):
-                self._submit_to_datapusher(resource)
+                self._submit_to_datapusher(resource) #TODO: uncomment
+
+        if pkg_dict.get("is_approved", False):
+            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)

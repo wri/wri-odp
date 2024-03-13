@@ -70,6 +70,8 @@ export interface Resource {
     _hasChartView?: boolean
     _views?: View[]
     total_record_count?: number
+    spatial_geom?: any
+    spatial_address?: string
 }
 
 export interface DatasetListQueryOptions {

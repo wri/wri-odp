@@ -6,6 +6,7 @@ import {
     ArrowPathIcon,
     FingerPrintIcon,
     MagnifyingGlassIcon,
+    MapPinIcon,
 } from '@heroicons/react/24/outline'
 import { DownloadButton } from './datafiles/Download'
 import { OpenInButton } from './datafiles/OpenIn'
@@ -225,6 +226,19 @@ function DatafileCard({
                                 >
                                     {datafile.title ?? datafile.name}
                                 </h3>
+                                {datafile.spatial_address && (
+                                    <div className="flex items-center gap-x-1">
+                                        <MapPinIcon className="h-3 w-3 text-blue-800" />
+                                        <p
+                                            className={`font-['Acumin Pro SemiCondensed'] text-xs font-light leading-snug text-stone-900 sm:text-sm ${higlighted(
+                                                'spatial_address',
+                                                datafile.spatial_address
+                                            )}`}
+                                        >
+                                            {datafile.spatial_address}
+                                        </p>
+                                    </div>
+                                )}
                             </Disclosure.Button>
                         </div>
                         <div className="flex gap-x-2">
