@@ -118,7 +118,7 @@ describe("Dashboard Test", () => {
   });
 
   it("Should test user form", () => {
-    cy.visit(`/dashboard/users/edit/${user}`);
+    cy.visit(`/dashboard/settings/edit/${user}`);
     cy.get('input[name="fullname"]').type(userfullname);
     cy.get('button[type="submit"]').click();
     cy.contains(`Successfully updated user: ${user}`);

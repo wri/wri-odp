@@ -7,71 +7,13 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { api } from '@/utils/api'
 import Spinner from '../_shared/Spinner'
-
-let routes = [
-    {
-        name: 'Dashboard',
-        href: 'default',
-        active: true,
-        count: 0,
-        isSysAdmin: false,
-    },
-    {
-        name: 'Notifications',
-        href: '/notifications',
-        active: false,
-        count: 3,
-        isSysAdmin: false,
-    },
-    {
-        name: 'Requests for approval',
-        href: '/approval-request',
-        active: false,
-        count: 1,
-        isSysAdmin: true,
-    },
-    {
-        name: 'Activity Stream',
-        href: '/activity-stream',
-        active: false,
-        count: 0,
-        isSysAdmin: false,
-    },
-    {
-        name: 'Datasets',
-        href: '/datasets',
-        active: false,
-        count: 0,
-        isSysAdmin: false,
-    },
-    {
-        name: 'Teams',
-        href: '/teams',
-        active: false,
-        count: 0,
-        isSysAdmin: false,
-    },
-    {
-        name: 'Topics',
-        href: '/topics',
-        active: false,
-        count: 0,
-        isSysAdmin: false,
-    },
-    {
-        name: 'Users',
-        href: '/users',
-        active: false,
-        count: 0,
-        isSysAdmin: false,
-    },
-]
-
 export default function Layout({ children }: { children: React.ReactNode }) {
     const { asPath } = useRouter()
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const { data: session } = useSession()
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery({})
+    const { data, isLoading } = api.notification.getAllNotifications.useQuery(
+        {}
+    )
     const { data: pendingData, isLoading: isLoadingPending } =
         api.dataset.getPendingDatasets.useQuery({
             search: '',
@@ -81,6 +23,72 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const { data: userIdentity, isLoading: isLoadingIUser } =
         api.user.getUserCapacity.useQuery()
 
+    let routes = [
+        {
+            name: 'Dashboard',
+            href: 'default',
+            active: true,
+            count: 0,
+            isSysAdmin: false,
+        },
+        {
+            name: 'Notifications',
+            href: '/notifications',
+            active: false,
+            count: 3,
+            isSysAdmin: false,
+        },
+        {
+            name: 'Requests for approval',
+            href: '/approval-request',
+            active: false,
+            count: 1,
+            isSysAdmin: true,
+        },
+        {
+            name: 'Activity Stream',
+            href: '/activity-stream',
+            active: false,
+            count: 0,
+            isSysAdmin: false,
+        },
+        {
+            name: 'Datasets',
+            href: '/datasets',
+            active: false,
+            count: 0,
+            isSysAdmin: false,
+        },
+        {
+            name: 'Teams',
+            href: '/teams',
+            active: false,
+            count: 0,
+            isSysAdmin: false,
+        },
+        {
+            name: 'Topics',
+            href: '/topics',
+            active: false,
+            count: 0,
+            isSysAdmin: false,
+        },
+        {
+            name: 'Users',
+            href: '/users',
+            active: false,
+            count: 0,
+            isSysAdmin: false,
+        },
+        {
+            name: 'Settings',
+            href: `/settings/edit/${session?.user?.name}`,
+            active: false,
+            count: 0,
+            isSysAdmin: false,
+        },
+    ]
+
     const navigation = routes.map((item) => {
         const isPath = asPath.split('/dashboard')[1]
         if (isPath && isPath.split('/').length > 1) {
@@ -89,8 +97,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }
         return item
     })
-    
-    const notificationCount = data ?  (data as {count: number}).count: 0
+
+    const notificationCount = data ? (data as { count: number }).count : 0
+
     return (
         <>
             {/*
@@ -257,7 +266,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                         'Notifications' ? (
                                                                             isLoading ? (
                                                                                 <Spinner className="w-2 h-2" />
-                                                                            ) : notificationCount ?(
+                                                                            ) : notificationCount ? (
                                                                                 <div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
                                                                                     {
                                                                                         notificationCount
