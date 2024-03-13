@@ -3,7 +3,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.general.projectId }}-migration-app
+  name: {{ .Values.ckan.general.projectId }}-migration-app
   labels:
     app: migration-app
 spec:
@@ -18,9 +18,9 @@ spec:
       labels:
         app: migration-app
     spec:
-      {{ if .Values.general.imagePullSecrets }}
+      {{ if .Values.ckan.general.imagePullSecrets }}
       imagePullSecrets:
-        - name: "{{ .Values.general.imagePullSecrets }}"
+        - name: "{{ .Values.ckan.general.imagePullSecrets }}"
       {{ end }}
       containers:
       - name: migration-app
@@ -34,7 +34,7 @@ spec:
         {{ if .Values.ckan.migrationApp.env }}
         envFrom:
           - secretRef:
-              name: {{ .Values.general.projectId }}-migration-app-envvars
+              name: {{ .Values.ckan.general.projectId }}-migration-app-envvars
         {{ end }}
         {{ if .Values.ckan.migrationApp.livenessProbe }}
         livenessProbe:
@@ -64,12 +64,12 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Values.general.projectId }}-migration-app-hpa
+  name: {{ .Values.ckan.general.projectId }}-migration-app-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Values.general.projectId }}-migration-app
+    name: {{ .Values.ckan.general.projectId }}-migration-app
   minReplicas: {{ .Values.ckan.migrationApp.hpa.minReplicas | default 1 }}
   maxReplicas: {{ .Values.ckan.migrationApp.hpa.maxReplicas | default 5 }}
   metrics:
@@ -97,7 +97,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.general.projectId }}-migration-app-svc
+  name: {{ .Values.ckan.general.projectId }}-migration-app-svc
 spec:
   ports:
   - port: {{ .Values.ckan.migrationApp.port | default 80 }}
@@ -111,7 +111,7 @@ apiVersion: v1
 kind: Secret
 type: Opaque
 metadata:
-  name: {{ .Values.general.projectId }}-migration-app-envvars
+  name: {{ .Values.ckan.general.projectId }}-migration-app-envvars
 {{- with .Values.ckan.migrationApp.env }}
 stringData:
   {{- toYaml . | nindent 2 }}
