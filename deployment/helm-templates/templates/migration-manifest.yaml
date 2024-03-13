@@ -30,7 +30,7 @@ spec:
         image: "{{ .Values.ckan.migrationApp.image.repository | default "registry.gitlab.com/viderum/docker-migration-app" }}:{{ .Values.ckan.migrationApp.image.tag }}"
         {{ end }}
 
-        imagePullPolicy: {{ .Values.ckan.image.pullPolicy | default "Always" }}
+        imagePullPolicy: {{ .Values.ckan.migrationApp.image.pullPolicy | default "Always" }}
         {{ if .Values.ckan.migrationApp.env }}
         envFrom:
           - secretRef:
