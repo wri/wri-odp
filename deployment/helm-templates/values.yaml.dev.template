@@ -96,9 +96,9 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: {{GITHUB_SHA}}
+      tag: {{GITHUB_SHA}}-migration
       pullPolicy: Always
-      repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}-migration
+      repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
   frontend:
     enable: true
