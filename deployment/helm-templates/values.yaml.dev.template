@@ -98,7 +98,7 @@ ckan:
     image:
       tag: {{GITHUB_SHA}}
       pullPolicy: Always
-      repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
+      repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}-migration
     replicaCount: 1
   frontend:
     enable: true
