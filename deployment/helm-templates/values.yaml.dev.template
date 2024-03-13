@@ -83,6 +83,8 @@ ckan:
     replicaCount: 1
   migrationApp:
     enable: enable
+    env:
+      DATAPUSHER_MAX_CONTENT_LENGTH: "5368709120"
     resources:
       limits:
         cpu: 300m
