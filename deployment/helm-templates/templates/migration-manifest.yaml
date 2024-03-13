@@ -1,0 +1,119 @@
+---
+{{- if .Values.ckan.migrationApp.enable -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.general.projectId }}-migration-app
+  labels:
+    app: migration-app
+spec:
+  {{ if not .Values.ckan.migrationApp.hpa.enable }}
+  replicas: {{ .Values.ckan.migrationApp.replicaCount | default 1 }}
+  {{ end }}
+  selector:
+    matchLabels:
+      app: migration-app
+  template:
+    metadata:
+      labels:
+        app: migration-app
+    spec:
+      {{ if .Values.general.imagePullSecrets }}
+      imagePullSecrets:
+        - name: "{{ .Values.general.imagePullSecrets }}"
+      {{ end }}
+      containers:
+      - name: migration-app
+        {{ if .Values.ckan.migrationApp.image.digest }}
+        image: "{{ .Values.ckan.migrationApp.image.repository | default "registry.gitlab.com/viderum/docker-migration-app" }}@{{ .Values.ckan.migrationApp.image.digest }}"
+        {{ else }}
+        image: "{{ .Values.ckan.migrationApp.image.repository | default "registry.gitlab.com/viderum/docker-migration-app" }}:{{ .Values.ckan.migrationApp.image.tag }}"
+        {{ end }}
+
+        imagePullPolicy: {{ .Values.ckan.image.pullPolicy | default "Always" }}
+        {{ if .Values.ckan.migrationApp.env }}
+        envFrom:
+          - secretRef:
+              name: {{ .Values.general.projectId }}-migration-app-envvars
+        {{ end }}
+        {{ if .Values.ckan.migrationApp.livenessProbe }}
+        livenessProbe:
+          {{ with .Values.ckan.migrationApp.livenessProbe }}
+          {{ toYaml . | nindent 12 }}
+          {{ end }}
+        {{ end }}
+        resources:
+          {{ if .Values.ckan.migrationApp.resources }}
+          {{ with .Values.ckan.migrationApp.resources }}
+          {{ toYaml . | nindent 12 }}
+          {{ end }}
+          {{ else }}
+          limits:
+            cpu: 1500m
+            memory: 4G
+          requests:
+            cpu: 800m
+            memory: 2G
+          {{ end }}
+        ports:
+        - containerPort: 8000
+{{ end }}
+---
+
+{{ if .Values.ckan.migrationApp.hpa.enable }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.general.projectId }}-migration-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.general.projectId }}-migration-app
+  minReplicas: {{ .Values.ckan.migrationApp.hpa.minReplicas | default 1 }}
+  maxReplicas: {{ .Values.ckan.migrationApp.hpa.maxReplicas | default 5 }}
+  metrics:
+  {{ if .Values.ckan.migrationApp.hpa.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.ckan.migrationApp.hpa.targetCPUUtilizationPercentage }}
+  {{ end }}
+  {{ if .Values.ckan.migrationApp.hpa.targetMemoryUtilizationPercentage}}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.ckan.migrationApp.hpa.targetMemoryUtilizationPercentage }}
+  {{ end }}
+{{ end }}
+
+---
+
+{{- if .Values.ckan.migrationApp.enable -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.general.projectId }}-migration-app-svc
+spec:
+  ports:
+  - port: {{ .Values.ckan.migrationApp.port | default 80 }}
+    targetPort: {{ .Values.ckan.migrationApp.targetPort | default 8000 }}
+  selector:
+    app: migration-app
+{{ end }}
+
+{{- if .Values.ckan.migrationApp.enable -}}
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: {{ .Values.general.projectId }}-migration-app-envvars
+{{- with .Values.ckan.migrationApp.env }}
+stringData:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end }}
