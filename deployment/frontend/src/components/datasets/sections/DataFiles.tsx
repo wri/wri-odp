@@ -6,6 +6,7 @@ import {
     ArrowPathIcon,
     FingerPrintIcon,
     MagnifyingGlassIcon,
+    MagnifyingGlassPlusIcon,
     MapPinIcon,
 } from '@heroicons/react/24/outline'
 import { DownloadButton } from './datafiles/Download'
@@ -13,12 +14,56 @@ import { OpenInButton } from './datafiles/OpenIn'
 import { Resource, View } from '@/interfaces/dataset.interface'
 import { getFormatColor } from '@/utils/formatColors'
 import { Index } from 'flexsearch'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
 import { TabularResource } from '../visualizations/Visualizations'
 import { APIButton } from './datafiles/API'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/_shared/Popover'
+import { Map, MapRef } from 'react-map-gl'
+import GeocoderControl from '@/components/search/GeocoderControl'
+import Draw from '@/components/search/Draw'
+
+export function LocationSearch() {
+    const mapRef = useRef<MapRef | null>(null)
+    return (
+        <Popover>
+            <PopoverTrigger>
+                <Button className="hidden group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
+                    Advanced search
+                    <MagnifyingGlassPlusIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="flex justify-start flex-col h-[300px] w-[600px]">
+                <Map
+                    ref={(_map) => {
+                        if (_map)
+                            mapRef.current = _map.getMap() as unknown as MapRef
+                    }}
+                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                    style={{ height: 300, width: 570 }}
+                    mapStyle="mapbox://styles/mapbox/streets-v9"
+                >
+                    <GeocoderControl
+                        mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                        position="bottom-right"
+                    />
+                    <Draw
+                        mapRef={mapRef}
+                        onDraw={(feature) => {
+                            console.log(feature)
+                        }}
+                    />
+                </Map>
+            </PopoverContent>
+        </Popover>
+    )
+}
 
 export function DataFiles({
     dataset,
@@ -102,6 +147,7 @@ export function DataFiles({
                     >
                         Hide All
                     </button>
+                    <LocationSearch />
                 </div>
             </div>
             <div className="flex flex-col gap-y-4">
