@@ -1,134 +1,75 @@
-import MapboxDraw, { DrawFeature } from '@mapbox/mapbox-gl-draw'
+// @ts-nocheck
+import MapboxDraw, { modes } from '@mapbox/mapbox-gl-draw'
 import DrawRectangle from 'mapbox-gl-draw-rectangle-mode'
+import { useEffect, useState } from 'react'
+import { useControl } from 'react-map-gl'
 
-import { Layer, Source } from 'react-map-gl'
+import type { MapRef, ControlPosition } from 'react-map-gl'
 
-import type { MapRef } from 'react-map-gl'
-import {
-    MutableRefObject,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-} from 'react'
-import { LineLayer } from 'mapbox-gl'
-
-export interface DrawProps {
-    mapRef: MutableRefObject<MapRef | null>
-    onDraw?: (feature: DrawFeature) => void
+type DrawControlProps = ConstructorParameters<typeof MapboxDraw>[0] & {
+    position?: ControlPosition
+    onCreate?: (evt: { features: object[] }) => void
+    onUpdate?: (evt: { features: object[]; action: string }) => void
+    onDelete?: (evt: { features: object[] }) => void
+    onClear?: () => void
 }
 
-export default function Draw({
-    mapRef,
-    onDraw = () => {},
-}: DrawProps): JSX.Element | null {
-    const [isDrawing, setIsDrawing] = useState(true)
-    const [features, setFeatures] = useState()
-    const drawControlRef = useRef<MapboxDraw>()
+export default function DrawControl(props: DrawControlProps) {
+    const [draw, setDraw] = useState(null)
+    function deleteAllFeatures() {
+        if (draw) {
+            const data = draw.getAll()
+            if (draw.getMode() == 'draw_polygon') {
+                var pids = []
 
-    useEffect(() => {
-        /*
-         * HACK: This weird logic prevents a bug on the
-         * first render
-         *
-         */
-        if (isDrawing === undefined) {
-            setIsDrawing(true)
-            return
-        }
+                // ID of the added template empty feature
+                const lid = data.features[data.features.length - 1].id
 
-        if (!isDrawing) {
-            startDrawing()
-        } else {
-            stopDrawing()
-        }
-
-        return () => {
-            removeDrawControl()
-        }
-    }, [isDrawing])
-
-    const drawControlOpts = {
-        displayControlsDefault: false,
-        defaultMode: 'draw_rectangle',
-    }
-
-    const onDrawCreate = useCallback((e: any) => {
-        const feature = e.features[0]
-        setFeatures(feature)
-        drawControlRef.current?.deleteAll()
-        onDraw(feature)
-    }, [])
-
-    const addDrawControl = () => {
-        if (mapRef.current) {
-            if (drawControlRef.current) {
-                removeDrawControl()
+                data.features.forEach((f) => {
+                    if (f.geometry.type === 'Polygon' && f.id !== lid) {
+                        pids.push(f.id)
+                    }
+                })
+                draw.delete(pids)
+                props.onUpdate({
+                    features: data.features,
+                    action: 'draw_polygon',
+                })
             }
-
-            const modes = {...MapboxDraw.modes, draw_rectangle: DrawRectangle}
-            console.log('MODES', modes)
-            drawControlRef.current = new MapboxDraw({
-                ...drawControlOpts,
-                modes,
-            })
-            mapRef.current.addControl(drawControlRef.current)
-            mapRef.current.on('draw.create', onDrawCreate)
         }
     }
-
-    const removeDrawControl = () => {
-        if (mapRef.current && drawControlRef.current) {
-            mapRef.current.off('draw.create', onDrawCreate)
-            mapRef.current.removeControl(drawControlRef.current)
-            drawControlRef.current = undefined
-        }
+    const _props = {
+        ...props,
+        defaultMode: 'draw_polygon',
+        modes: { ...MapboxDraw.modes, draw_polygon: DrawRectangle },
     }
-
-    const startDrawing = () => {
-        addDrawControl()
-    }
-
-    const stopDrawing = () => {
-        removeDrawControl()
-        setFeatures(undefined)
-    }
-
-    const toggleDrawing = () => {
-        setIsDrawing(!isDrawing)
-    }
-
-    const layerStyle: LineLayer = {
-        id: 'drawn-polygon-layer',
-        type: 'line',
-        paint: {
-            'line-color': '#ff0000',
-            'line-width': 5,
+    useControl<MapboxDraw>(
+        () => {
+            const _draw = new MapboxDraw(_props)
+            setDraw(_draw)
+            return _draw
         },
-    }
-
-    return (
-        <>
-            <button
-                className={`absolute left-10 top-10 px-5 py-2 ${
-                    isDrawing
-                        ? 'bg-neutral-200'
-                        : 'bg-neutral-500 text-neutral-200'
-                }`}
-                onClick={() => toggleDrawing()}
-            >
-                Draw
-            </button>
-            {features && (
-                <Source
-                    id={'drawn-polygon-source'}
-                    type="geojson"
-                    data={features}
-                >
-                    {/* @ts-ignore */}
-                    <Layer {...layerStyle} />
-                </Source>
-            )}
-        </>
+        ({ map }: { map: MapRef }) => {
+            map.on('draw.create', props.onCreate)
+            map.on('draw.update', props.onUpdate)
+            map.on('draw.modechange', deleteAllFeatures)
+        },
+        ({ map }: { map: MapRef }) => {
+            map.off('draw.create', props.onCreate)
+            map.off('draw.update', props.onUpdate)
+            map.off('draw.delete', props.onDelete)
+            map.off('draw.modechange', deleteAllFeatures)
+        },
+        {
+            position: props.position,
+        }
     )
+
+    return null
+}
+
+DrawControl.defaultProps = {
+    onCreate: () => {},
+    onUpdate: () => {},
+    onDelete: () => {},
 }
