@@ -132,7 +132,7 @@ function DownloadModal({
                     </div>
                 )}
                 {!isLoading && (
-                    <form
+                    <form id="download" data-resource={tabularResource.name}
                         onSubmit={handleSubmit(
                             async (data) => {
                                 downloadSubset.mutate(
