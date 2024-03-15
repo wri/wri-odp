@@ -13,10 +13,11 @@ import { Layer, Map, Source } from 'react-map-gl'
 import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner'
 import { UseFormReturn } from 'react-hook-form'
+import * as turf from "@turf/turf"
 
 export function DatafileLocation({
     formObj,
-    index
+    index,
 }: {
     formObj: UseFormReturn<DatasetFormType>
     index: number
@@ -28,11 +29,6 @@ export function DatafileLocation({
         setValue,
         watch,
     } = formObj
-
-    console.log(index)
-    console.log(watch(`resources.${index}`))
-
-
 
     const uploadInputRef = useRef<HTMLInputElement>(null)
 
@@ -77,8 +73,31 @@ export function DatafileLocation({
         reader.addEventListener('load', (event) => {
             setIsLoadingGeoJSON(false)
             try {
+
                 const json = JSON.parse(event?.target?.result as string)
-                setValue(`resources.${index}.spatial_geom`, json)
+                const geojsonType = json?.type
+
+                const geometries = []
+                if (geojsonType == 'Feature') {
+                    geometries.push(json.geometry)
+                } else if (geojsonType == 'FeatureCollection') {
+                    const features = json.features
+                    for (let feature of features) {
+                        geometries.push(feature.geometry)
+                    }
+                } else {
+                    geometries.push(json)
+                }
+
+                let union = geometries[0];
+                let i
+                for(i = 1; i < geometries.length; i++) {
+                    union = turf.union(union, geometries[i])
+                }
+
+                // union = turf.simplify(union, { tolerance: 1 })
+
+                setValue(`resources.${index}.spatial_geom`, union)
             } catch (e) {
                 console.log(e)
                 notify('Failed to parse GeoJSON file', 'error')
@@ -99,7 +118,9 @@ export function DatafileLocation({
             />
             <Disclosure.Panel className="flex flex-col gap-y-8 pb-12 pt-5">
                 <Tab.Group
-                    selectedIndex={match(watch(`resources.${index}.spatial_type`))
+                    selectedIndex={match(
+                        watch(`resources.${index}.spatial_type`)
+                    )
                         .with('geom', () => 0)
                         .with('address', () => 1)
                         .otherwise(() => undefined)}
@@ -114,10 +135,19 @@ export function DatafileLocation({
                             onClick={() => {
                                 !watch(`resources.${index}.spatial_geom`)
                                     ? uploadInputRef.current?.click()
-                                    : setValue(`resources.${index}.spatial_geom`, undefined)
+                                    : setValue(
+                                          `resources.${index}.spatial_geom`,
+                                          undefined
+                                      )
 
-                                setValue(`resources.${index}.spatial_type`, 'geom')
-                                setValue(`resources.${index}.spatial_address`, undefined)
+                                setValue(
+                                    `resources.${index}.spatial_type`,
+                                    'geom'
+                                )
+                                setValue(
+                                    `resources.${index}.spatial_address`,
+                                    undefined
+                                )
                             }}
                             id="locationUpload"
                             className={classNames(
@@ -136,8 +166,14 @@ export function DatafileLocation({
                         <Tab
                             id="locationString"
                             onClick={() => {
-                                setValue(`resources.${index}.spatial_type`, 'address')
-                                setValue(`resources.${index}.spatial_geom`, undefined)
+                                setValue(
+                                    `resources.${index}.spatial_type`,
+                                    'address'
+                                )
+                                setValue(
+                                    `resources.${index}.spatial_geom`,
+                                    undefined
+                                )
                             }}
                         >
                             {({ selected }) => (
@@ -171,7 +207,9 @@ export function DatafileLocation({
                                 >
                                     <Source
                                         type="geojson"
-                                        data={watch(`resources.${index}.spatial_geom`)}
+                                        data={watch(
+                                            `resources.${index}.spatial_geom`
+                                        )}
                                     >
                                         <Layer
                                             type="fill"
@@ -202,9 +240,14 @@ export function DatafileLocation({
                                         )
                                     }}
                                     onClear={(e) => {
-                                        setValue(`resources.${index}.spatial_address`, '')
+                                        setValue(
+                                            `resources.${index}.spatial_address`,
+                                            ''
+                                        )
                                     }}
-                                    initialValue={watch(`resources.${index}.spatial_address`)}
+                                    initialValue={watch(
+                                        `resources.${index}.spatial_address`
+                                    )}
                                 />
                             </Map>
                         </Tab.Panel>

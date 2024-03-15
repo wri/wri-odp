@@ -5,6 +5,9 @@ import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { DatasetFormType } from '@/schema/dataset.schema'
 import { UseFormReturn } from 'react-hook-form'
 import FormatInput from '../FormatInput'
+import { DatafileLocation } from '../DatafileLocation'
+import DefaultTooltip from '@/components/_shared/Tooltip'
+import { InformationCircleIcon } from '@heroicons/react/24/outline'
 
 export function LinkExternalForm({
     formObj,
@@ -54,6 +57,18 @@ export function LinkExternalForm({
                     name={`resources.${index}.format`}
                 />
             </InputGroup>
+<div className="mt-10">
+                <h2 className="font-semibold text-lg flex items-center gap-x-2">
+                    Location Coverage
+                    <DefaultTooltip content="This field defines whether a data file will show up on the results or not when doing a search by location">
+                        <InformationCircleIcon
+                            className="h-5 w-5 text-neutral-500"
+                            aria-hidden="true"
+                        />
+                    </DefaultTooltip>
+                </h2>
+                <DatafileLocation formObj={formObj} index={index} />
+            </div>
         </div>
     )
 }
