@@ -1,5 +1,6 @@
 from .notification import Notification, notification
 from .pending_datasets import pending_datasets
+from .resource_location import resource_location
 import logging
 
 log = logging.getLogger(__name__)
@@ -25,3 +26,10 @@ def setup_pending_datasets():
         log.info('Tables created for pending datasets')
     else:
         log.info('Pending Datasets Table already exists')
+
+def setup_resource_location():
+    if not resource_location.exists():
+        resource_location.create(checkfirst=True)
+        log.info('Resource location table created')
+    else:
+        log.info('Resource location table already exists')

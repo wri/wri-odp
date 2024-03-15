@@ -70,6 +70,15 @@ jobs:
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
           datapusher
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
+      - name: Build and push Migration image to ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration \
+          migration
+          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'

@@ -27,6 +27,7 @@ import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import ViewsList from '@/components/views/ViewsList'
 import { WriDataset } from '@/schema/ckan.schema'
+import { DatafileLocation } from './DatafileLocation'
 
 export function EditDataFile({
     remove,
@@ -325,6 +326,7 @@ export function EditDataFile({
                                                     />
                                                 </div>
                                             </InputGroup>
+                                            <DatafileLocation formObj={formObj} index={index} />
                                         </div>
                                     </Tab.Panel>
                                     <Tab.Panel>

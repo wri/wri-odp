@@ -43,9 +43,9 @@ export function convertToSql({
                                   (v) =>
                                       `( "${filter.id}" ${v.operation.value} '${
                                           v.value
-                                      }' ${v.link ?? ''} `
+                                      }' ) ${v.link ?? ''} `
                               )
-                              .join('')} )`
+                              .join('')}`
                   )
                   .join(' AND ')
             : ''

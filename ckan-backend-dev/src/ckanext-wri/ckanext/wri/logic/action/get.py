@@ -21,6 +21,7 @@ import ckan.logic.schema
 import ckan.lib.navl.dictization_functions
 import ckan.plugins as plugins
 import ckan.lib.search as search
+import ckan.plugins.toolkit as tk
 
 import ckan.lib.plugins as lib_plugins
 import ckan.authz as authz
@@ -41,6 +42,21 @@ from ckanext.wri.logic.auth import schema
 from ckanext.activity.model import Activity
 import ckan.lib.dictization.model_dictize as model_dictize
 import sqlalchemy
+import os
+import shapely
+from shapely.ops import unary_union
+import ckan.lib.dictization.model_dictize as model_dictize
+import ckan.model.misc as misc
+from ckanext.wri.model.resource_location import ResourceLocation
+import geoalchemy2
+import sqlalchemy
+from sqlalchemy import text
+
+_select = sqlalchemy.sql.select
+_or_ = sqlalchemy.or_
+_and_ = sqlalchemy.and_
+_func = sqlalchemy.func
+_case = sqlalchemy.case
 
 
 log = logging.getLogger("ckan.logic")
@@ -848,3 +864,208 @@ def package_collaborator_list_wri(context: Context, data_dict: DataDict):
         result.append(collaborator)
 
     return result
+
+@logic.side_effect_free
+def resource_search(context: Context, data_dict: DataDict):
+    _check_access('resource_search', context, data_dict)
+
+    model = context['model']
+
+    query = data_dict.get('query')
+    order_by = data_dict.get('order_by')
+    offset = data_dict.get('offset')
+    limit = data_dict.get('limit')
+    package_id = data_dict.get('package_id')
+    is_pending = data_dict.get('is_pending')
+
+    bbox = data_dict.get('bbox')
+
+    bbox_query = None
+    if bbox:
+        bbox_coordinates = bbox.split(',')
+
+        if len(bbox_coordinates) != 4:
+            raise ValidationError({'bbox': _('bbox parameter must be 4 coordinates separated by comma')})
+        # NOTE: input must be lng lat lng lat
+        bbox_geom = geoalchemy2.functions.ST_MakeEnvelope(*bbox_coordinates)
+
+        bbox_query = geoalchemy2.functions.ST_Intersects(
+                ResourceLocation.spatial_geom,
+                bbox_geom)
+
+        log.error(bbox_query)
+
+    point = data_dict.get('point')
+    point_query = None
+    if point:
+        point = point.split(',')
+        point_query = geoalchemy2.functions.ST_Intersects(
+                ResourceLocation.spatial_geom,
+                'POINT({} {})'.format(*point))
+
+    spatial_address = data_dict.get('spatial_address')
+
+    # if query is None:
+    #     raise ValidationError({'query': _('Missing value')})
+
+    if isinstance(query, str):
+        query = [query]
+
+    if query is None:
+        query = []
+
+    try:
+        fields = dict(pair.split(":", 1) for pair in query)
+    except ValueError:
+        pass
+        # raise ValidationError(
+        #     {'query': _('Must be <field>:<value> pair(s)')})
+
+    q = model.Session.query(model.Resource) \
+        .join(model.Package) \
+        .join(ResourceLocation) \
+        .filter(ResourceLocation.is_pending == (is_pending == "true")) \
+        .filter(model.Package.state == 'active') \
+        .filter(model.Package.private == False) \
+        .filter(model.Package.name == package_id) \
+        .filter(model.Resource.state == 'active') \
+
+    location_queries = []
+    if spatial_address:
+        cwd = os.path.abspath(os.path.dirname(__file__))
+        location_queries.append(ResourceLocation.spatial_address.endswith(spatial_address))
+
+        segments = spatial_address.split(',')
+        if len(segments) in [1, 2]:
+            # It's a country or a state
+            try:
+                if len(segments) == 1:
+                    path = os.path.join(cwd,
+                                        "../../world_geojsons/countries/{}.geojson"
+                                        .format(segments[0].strip()))
+                else:
+                    path = os.path.join(cwd,
+                                        "../../world_geojsons/states/{}/{}.geojson"
+                                        .format(segments[1].strip(), segments[0]
+                                                .strip()))
+
+                with open(path, 'r') as f:
+                    content = f.read()
+                    geojson = json.loads(content)
+                    geometries = []
+
+                    if geojson["type"] == "GeometryCollection":
+                        geometries = geojson["geometries"]
+                    elif geojson["type"] == "FeatureCollection":
+                        geometries = [x["geometry"] for x in geojson["features"]]
+                    else:
+                        geometries = [geojson]
+
+                    valid_geometries = []
+                    for geom in geometries:
+                        json_str = json.dumps(geom)
+                        shape = shapely.from_geojson(json_str)
+                        if shape.is_valid:
+                            valid_geometries.append(shape)
+
+                    merged_geometry = unary_union(valid_geometries)
+                    spatial_geom = geoalchemy2.functions.ST_GeomFromText(merged_geometry.wkt)
+
+                    location_queries.append(
+                            geoalchemy2.functions.ST_Intersects(
+                                ResourceLocation.spatial_geom,
+                                spatial_geom))
+
+            except Exception as e:
+                log.error(e)
+                if point:
+                    location_queries.append(point_query)
+
+        elif len(segments) == 3:
+            # It's a city
+            if point:
+                location_queries.append(point_query)
+
+    if len(location_queries) == 0 and point_query is not None:
+        location_queries.append(point_query)
+
+    if bbox_query is not None:
+        location_queries.append(bbox_query)
+
+    if location_queries:
+        q = q.filter(_or_(*location_queries))
+
+    resource_fields = model.Resource.get_columns()
+    for field, term in fields.items():
+
+        if field not in resource_fields:
+            msg = _('Field "{field}" not recognised in resource_search.')\
+                .format(field=field)
+
+            # Running in the context of the internal search api.
+            if context.get('search_query', False):
+                raise search.SearchError(msg)
+
+            # Otherwise, assume we're in the context of an external api
+            # and need to provide meaningful external error messages.
+            raise ValidationError({'query': msg})
+
+        # prevent pattern injection
+        term = misc.escape_sql_like_special_characters(term)
+
+        model_attr = getattr(model.Resource, field)
+
+        # Treat the has field separately, see docstring.
+        if field == 'hash':
+            q = q.filter(model_attr.ilike(str(term) + '%'))
+
+        # Resource extras are stored in a json blob.  So searching for
+        # matching fields is a bit trickier. See the docstring.
+        elif field in model.Resource.get_extra_columns():
+            model_attr = getattr(model.Resource, 'extras')
+
+            like = _or_(
+                model_attr.ilike(
+                    u'''%%"%s": "%%%s%%",%%''' % (field, term)),
+                model_attr.ilike(
+                    u'''%%"%s": "%%%s%%"}''' % (field, term))
+            )
+            q = q.filter(like)
+
+        # Just a regular field
+        else:
+            column = model_attr.property.columns[0]
+            if isinstance(column.type, sqlalchemy.UnicodeText):
+                q = q.filter(model_attr.ilike('%' + str(term) + '%'))
+            else:
+                q = q.filter(model_attr == term)
+
+    if order_by is not None:
+        if hasattr(model.Resource, order_by):
+            q = q.order_by(getattr(model.Resource, order_by))
+
+    count = q.count()
+    q = q.offset(offset)
+    q = q.limit(limit)
+
+    results = []
+    for result in q:
+        if isinstance(result, tuple) \
+                and isinstance(result[0], model.DomainObject):
+            # This is the case for order_by rank due to the add_column.
+            results.append(result[0])
+        else:
+            results.append(result)
+
+    # If run in the context of a search query, then don't dictize the results.
+    if not context.get('search_query', False):
+        results = model_dictize.resource_list_dictize(results, context)
+
+    # for i, result in enumerate(results):
+    #     results[i].pop("spatial_geom")
+
+    return {'count': count,
+            'results': results}
+
+# TODO:  customize package_show to include spatial_geom
+# conditionally (optimization of the data file geo indexing)

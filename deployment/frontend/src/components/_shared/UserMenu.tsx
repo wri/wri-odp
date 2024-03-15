@@ -4,25 +4,6 @@ import { UserCircleIcon } from '@heroicons/react/20/solid'
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 
-
-const navigation = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        active: false,
-    },
-    {
-        title: 'Settings',
-        href: '/dashboard/users/edit/',
-        active: false,
-    },
-    {
-        title: 'Log Out',
-        onClick: () =>
-            signOut({ redirect: true, callbackUrl: window.location.href }),
-    },
-]
-
 export default function UserMenu({
     colors = 'dark',
 }: {
@@ -30,9 +11,29 @@ export default function UserMenu({
 }) {
     const session = useSession()
 
+    const navigation = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+            active: false,
+        },
+        {
+            title: 'Settings',
+            href: `/dashboard/settings/edit/${session.data?.user.name}`,
+            active: false,
+        },
+        {
+            title: 'Log Out',
+            onClick: () =>
+                signOut({ redirect: true, callbackUrl: window.location.href }),
+        },
+    ]
 
     return (
-        <div className="text-right -ml-6 sm:ml-0 font-acumin" id="nav-user-menu">
+        <div
+            className="text-right -ml-6 sm:ml-0 font-acumin"
+            id="nav-user-menu"
+        >
             <Menu
                 as="div"
                 className="relative inline-block text-left  pr-1 z-50"
@@ -40,8 +41,16 @@ export default function UserMenu({
                 <div>
                     <Menu.Button>
                         <div className="flex ">
-                            <UserCircleIcon className={`text-black h-5 w-5 mr-2 ${colors == "light" ? "!text-white" : ""}`} />
-                            <div className={`font-normal text-[1.1251rem] border-b-2 border-b-wri-gold ${colors == "light" ? "!text-white" : ""}`}>
+                            <UserCircleIcon
+                                className={`text-black h-5 w-5 mr-2 ${
+                                    colors == 'light' ? '!text-white' : ''
+                                }`}
+                            />
+                            <div
+                                className={`font-normal text-[1.1251rem] border-b-2 border-b-wri-gold ${
+                                    colors == 'light' ? '!text-white' : ''
+                                }`}
+                            >
                                 {session.data?.user.name}
                             </div>
                         </div>
@@ -60,7 +69,7 @@ export default function UserMenu({
                         {navigation.map((item) => {
                             return (
                                 <div
-                                    className="hover:bg-slate-100"
+                                    className="hover:bg-slate-100 rounded-md"
                                     key={`nav-${item.title}`}
                                 >
                                     <div className="px-2 pr-4 py-4 ">
@@ -70,7 +79,7 @@ export default function UserMenu({
                                                     {item.title}
                                                 </button>
                                             ) : (
-                                                <Link href={ item.title === 'Settings' ? item.href+session.data?.user.name :item.href}>
+                                                <Link href={item.href}>
                                                     {item.title}
                                                 </Link>
                                             )}

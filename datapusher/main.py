@@ -1,3 +1,4 @@
+from itertools import chain
 import json
 import os
 import tempfile
@@ -159,7 +160,7 @@ def convert_store_to_file(
 
 
 @flow(log_prints=True)
-def download_subset_of_data(
+async def download_subset_of_data(
     id,
     api_key,
     task_id,
@@ -178,9 +179,11 @@ def download_subset_of_data(
     logger.info("Fetching data...")
     data = []
     if provider == "datastore":
-        data = query_subset_datastore(id, sql, num_of_rows, ckan_url)
+        tasks = await query_subset_datastore(id, sql, num_of_rows, ckan_url)
+        data = list(chain.from_iterable(tasks))
     else:
-        data = query_rw(id, sql, connector_url, provider, num_of_rows)
+        tasks = await query_rw(id, sql, connector_url, provider, num_of_rows)
+        data = list(chain.from_iterable(tasks))
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.info("Converting data..." + " " + format)
         tmp_filepath = os.path.join(tmp_dir, filename)
