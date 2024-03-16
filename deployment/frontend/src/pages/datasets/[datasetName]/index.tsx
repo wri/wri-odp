@@ -483,6 +483,7 @@ export default function DatasetPage(
                 setTabularResource({
                     provider: dataset.provider as string,
                     id: dataset.rw_id as string,
+                    name: dataset.name as string,
                 })
             } else if (dataset?.resources.find((d) => d.datastore_active)) {
                 const resource = dataset?.resources.find(
@@ -493,6 +494,7 @@ export default function DatasetPage(
                     provider: 'datastore',
                     id: resource?.id as string,
                     apiKey: apikey,
+                    name: resource?.title ?? resource?.name as string,
                 })
             } else {
                 setTabularResource(null)

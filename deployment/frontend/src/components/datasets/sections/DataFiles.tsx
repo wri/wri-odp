@@ -319,6 +319,7 @@ function DatafileCard({
                                                 setTabularResource({
                                                     provider: 'datastore',
                                                     id: datafile.id as string,
+                                                    name: datafile?.title ?? datafile.name as string,
                                                 })
                                             }
                                         >

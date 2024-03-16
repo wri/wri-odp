@@ -802,6 +802,7 @@ export function DatasetHeader({
                                                 id: dataset.rw_id as string,
                                                 connectorUrl:
                                                     dataset.connectorUrl as string,
+                                                name: dataset.name,
                                             })
                                         }
                                     >

@@ -12,6 +12,7 @@ export type TabularResource = {
     datasetId?: string
     id: string
     apiKey?: string
+    name?: string
 }
 
 export default function Visualizations({

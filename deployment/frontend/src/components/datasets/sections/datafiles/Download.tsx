@@ -102,6 +102,8 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                             <Button
                                 className="w-full"
                                 variant="ghost"
+                                id='download'
+                                data-resource={ datafile.title ??  datafile.name!}
                                 onClick={() =>
                                     download(originalResourceDownloadUrl)
                                 }
@@ -228,7 +230,7 @@ function DownloadModal({
                     </div>
                 )}
                 {!isLoading && (
-                    <form
+                    <form id="download"  data-resource={datafile.title ?? datafile.name!}
                         onSubmit={handleSubmit(
                             async (data) => {
                                 requestDatafileConversionMutation.mutate(
