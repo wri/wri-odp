@@ -50,7 +50,8 @@ export const env = createEnv({
     client: {
         NEXT_PUBLIC_CKAN_URL: z.string(),
         NEXT_PUBLIC_NEXTAUTH_URL: z.string(),
-        NEXT_PUBLIC_GTM_ID: z.string()
+        NEXT_PUBLIC_GTM_ID: z.string(),
+        NEXT_PUBLIC_DISABLE_HOTJAR: z.boolean()
     },
 
     /**
@@ -79,7 +80,8 @@ export const env = createEnv({
         SMTP_PASSWORD: process.env.SMTP_PASSWORD,
         SMTP_FROM: process.env.SMTP_FROM,
         NEXT_PUBLIC_NEXTAUTH_URL: process.env.NEXT_PUBLIC_NEXTAUTH_URL,
-        NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID
+        NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID, 
+        NEXT_PUBLIC_DISABLE_HOTJAR: process.env.NEXT_PUBLIC_DISABLE_HOTJAR || false,
         
     },
     /**
