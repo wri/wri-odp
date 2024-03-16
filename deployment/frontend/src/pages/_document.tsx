@@ -23,7 +23,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                         }}
                     />
                     {
-                        env.NEXT_PUBLIC_DISABLE_HOTJAR ? "" :
+                        env.NEXT_PUBLIC_DISABLE_HOTJAR === "disabled" ? "" :
                             <Script
                         strategy="afterInteractive"
                         id="hotjar"
