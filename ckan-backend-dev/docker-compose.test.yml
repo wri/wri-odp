@@ -44,6 +44,7 @@ services:
         - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000
         - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
         - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
+        - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000

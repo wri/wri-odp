@@ -22,7 +22,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','${env.NEXT_PUBLIC_GTM_ID}');`,
                         }}
                     />
-                    <Script
+                    {
+                        env.NEXT_PUBLIC_DISABLE_HOTJAR === "disabled" ? "" :
+                            <Script
                         strategy="afterInteractive"
                         id="hotjar"
                         dangerouslySetInnerHTML={{
@@ -37,6 +39,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 `,
                         }}
                     />
+                    }
+                    
                 </Head>
                 <body className="font-acumin">
                     <noscript
