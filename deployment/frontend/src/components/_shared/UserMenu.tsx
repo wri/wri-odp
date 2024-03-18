@@ -36,7 +36,7 @@ export default function UserMenu({
         >
             <Menu
                 as="div"
-                className="relative inline-block text-left  pr-1 z-50"
+                className="relative inline-block text-left  pr-1 "
             >
                 <div>
                     <Menu.Button>
@@ -65,7 +65,7 @@ export default function UserMenu({
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                 >
-                    <Menu.Items className="absolute right-0 mt-2 w-52 whitespace-nowrap  origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-md text-base font-semibold focus:outline-none">
+                    <Menu.Items className="absolute z-30 right-0 mt-2 w-52 whitespace-nowrap  origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-md text-base font-semibold focus:outline-none">
                         {navigation.map((item) => {
                             return (
                                 <div

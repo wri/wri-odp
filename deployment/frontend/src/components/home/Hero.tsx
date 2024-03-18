@@ -63,8 +63,8 @@ export function Hero() {
                             <Image
                                 src="/images/wri_logo_transparent.svg"
                                 alt="Picture of the author"
-                                width={150}
-                                height={300}
+                                width={120}
+                                height={250}
                                 className="block sm:hidden"
                             />
                         </Link>

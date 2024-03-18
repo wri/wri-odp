@@ -67,7 +67,7 @@ export default function Header() {
         <section className="w-full shadow">
             <section
                 id="header"
-                className="w-full py-10 px-4 sm:px-6 xxl:px-12  mx-auto flex font-acumin items-baseline"
+                className="w-full py-10 px-4 sm:px-6 xxl:px-12  mx-auto flex gap-x-1 font-acumin items-baseline"
             >
                 <Link href="/" className=" w-fit sm:w-52 h-fit">
                     <Image
@@ -80,8 +80,8 @@ export default function Header() {
                     <Image
                         src="/images/WRI_logo_4c.png"
                         alt="Picture of the author"
-                        width={150}
-                        height={300}
+                        width={120}
+                        height={250}
                         className="block sm:hidden"
                     />
                 </Link>
@@ -174,7 +174,7 @@ export default function Header() {
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <Menu.Items className="absolute right-0 mt-2 whitespace-nowrap p-2 origin-top-right divide-y divide-gray-100 rounded-sm bg-white shadow-lg text-base font-medium focus:outline-none">
+                                <Menu.Items className="absolute z-30 right-0 mt-2 whitespace-nowrap p-2 origin-top-right divide-y divide-gray-100 rounded-sm bg-white shadow-lg text-base font-medium focus:outline-none">
                                     {navigation.map((item) => {
                                         return (
                                             <div
