@@ -84,6 +84,7 @@ export function LocationSearch({
             <GeocoderControl
                 mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
                 position="bottom-right"
+                placeholder="Search datafiles by location"
                 initialValue={formObj.getValues('location')}
                 onResult={(e) => {
                     setValue('point', e.result.geometry.coordinates)
@@ -169,6 +170,7 @@ export function DataFiles({
         api.dataset.resourceLocationSearch.useQuery({
             ...formObj.watch(),
             package_id: dataset.name,
+            is_pending: false,
         })
     const [q, setQ] = useState('')
     const filteredDatafilesByName =
@@ -193,10 +195,10 @@ export function DataFiles({
         <>
             <div className="relative py-4">
                 <input
-                    className="block w-full rounded-md border-b border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
+                    className="block w-full rounded-t-md border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
                     onChange={(e) => setQ(e.target.value)}
                     value={q}
-                    placeholder="Search data"
+                    placeholder="Search datafiles by title or description"
                 />
                 <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
                 <LocationSearch geojsons={geojsons} formObj={formObj} />
@@ -492,7 +494,9 @@ function DatafileCard({
                                                 setTabularResource({
                                                     provider: 'datastore',
                                                     id: datafile.id as string,
-                                                    name: datafile?.title ?? datafile.name as string,
+                                                    name:
+                                                        datafile?.title ??
+                                                        (datafile.name as string),
                                                 })
                                             }
                                         >
