@@ -174,7 +174,7 @@ export default function Header() {
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <Menu.Items className="absolute right-0 mt-2 w-16 whitespace-nowrap p-2 origin-top-right divide-y divide-gray-100 rounded-sm bg-white shadow-lg text-xs font-medium focus:outline-none">
+                                <Menu.Items className="absolute right-0 mt-2 whitespace-nowrap p-2 origin-top-right divide-y divide-gray-100 rounded-sm bg-white shadow-lg text-base font-medium focus:outline-none">
                                     {navigation.map((item) => {
                                         return (
                                             <div

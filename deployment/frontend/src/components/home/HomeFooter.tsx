@@ -6,7 +6,7 @@ export function HomeFooter() {
   return (
     <>
       <section className="bg-green-700">
-        <div className="default-home-container mx-auto flex justify-between py-12">
+        <div className="default-home-container mx-auto md:flex justify-between py-12">
           <div className="flex flex-col gap-y-1">
             <h4 className="font-acumin text-2xl font-bold text-white">
               Some CTA here? Lorem ipsum dolor. Etiam porta sem malesuada magna.
@@ -15,7 +15,7 @@ export function HomeFooter() {
               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </h5>
           </div>
-          <Button>Read More</Button>
+          <Button className="mt-10 md:mt-0">Read More</Button>
         </div>
       </section>
       <div className="default-home-container mx-auto flex w-full flex-col pb-16">
@@ -39,7 +39,7 @@ export function HomeFooter() {
             <a href="/get-help" className=" font-normal">Get Help</a>
           </div>
           <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start xl:min-w-[420px]">
-            <div className="font-acumin text-[22px] font-bold text-gray-800">
+            <div className="font-acumin text-xl font-bold text-gray-800">
               STAY UP TO DATE WITH THE NEWS{" "}
             </div>
             <div className="flex w-full flex-col gap-x-2 gap-y-4 lg:flex-row justify-between">
@@ -55,7 +55,7 @@ export function HomeFooter() {
               </div>
               <Button>SUBSCRIBE</Button>
             </div>
-            <div className="flex flex-row gap-5">
+            <div className="flex flex-row gap-5 mt-10 sm:mt-0">
               <div className="relative h-5 w-5 ">
                 <Image src="/icons/fb.svg" alt="" fill />
               </div>
@@ -79,16 +79,18 @@ export function HomeFooter() {
               fill
             />
           </div>
-          <div className="mt-auto flex items-end gap-x-1  text-base font-normal sm:ml-auto">
-            <span>
-              Powered by{" "}
-              <a href="#" className=" text-wri-green">
-                Portal.js
-              </a>{" "}
-              from
-            </span>
-            <div className=" relative h-6 w-24">
-              <Image src="/images/datopian.png" alt="" fill></Image>
+          <div className="mt-auto flex justify-center md:items-end text-base font-normal md:ml-auto">
+            <div className="flex gap-x-1">
+                <span>
+                  Powered by{" "}
+                  <a href="#" className=" text-wri-green">
+                    Portal.js
+                  </a>{" "}
+                  from
+                </span>
+                <div className=" relative h-6 w-24">
+                  <Image src="/images/datopian.png" alt="" fill></Image>
+                </div>
             </div>
           </div>
         </div>

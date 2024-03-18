@@ -183,11 +183,11 @@ export function Hero() {
                 <div className="bg-black bg-opacity-50 absolute inset-0 -z-[9] h-full w-full object-cover" />
                 <div className="default-home-container mx-auto py-32 sm:py-48 lg:py-56">
                     <div className="text-start">
-                        <h1 className="max-w-[592px] font-acumin text-[40px] font-semibold text-white">
+                        <h1 className="max-w-[592px] pr-5 font-acumin text-4xl font-semibold text-white">
                             Welcome to the WRI Open Data Catalog. Neque porro
                             quisquam est qui dolorem...
                         </h1>
-                        <p className="font-['Acumin Pro SemiCondensed'] w-[705px] text-[23px] font-light text-neutral-200">
+                        <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
                             Lorem ipsum dolor sit amet, consectetur adipiscing
                             elit, sed do eiusmod tempor incididunt ut labore et
                             dolore.
