@@ -157,14 +157,21 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
     # This setting is checked on startup
     api_token = p.toolkit.config.get("ckan.datapusher.api_token")
     # Datapusher hack
-    api_token = p.toolkit.get_action('api_token_create')(None, {"user": "ckan_admin", "name": "datapusher"}).get('token') if force else api_token
+    api_token = (
+        p.toolkit.get_action("api_token_create")(
+            None, {"user": "ckan_admin", "name": "datapusher"}
+        ).get("token")
+        if force
+        else api_token
+    )
     try:
         deployment = requests.get(
-            urljoin(prefect_url, f"api/deployments/name/push-to-datastore/{deployment_name}")
+            urljoin(
+                prefect_url, f"api/deployments/name/push-to-datastore/{deployment_name}"
+            )
         )
         deployment = deployment.json()
         deployment_id = deployment["id"]
-        print("API TOKEN", api_token)
         r = requests.post(
             urljoin(prefect_url, f"api/deployments/{deployment_id}/create_flow_run"),
             headers={"Content-Type": "application/json"},

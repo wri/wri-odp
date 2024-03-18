@@ -67,11 +67,15 @@ export async function searchHierarchy({
             let urLink = ''
             if (q) {
                 urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group' ? 'group_list_wri' : 'organization_list_wri'
+                    group_type == 'group'
+                        ? 'group_list_wri'
+                        : 'organization_list_wri'
                 }?q=${q}`
             } else {
                 urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group' ? 'group_list_wri' : 'organization_list_wri'
+                    group_type == 'group'
+                        ? 'group_list_wri'
+                        : 'organization_list_wri'
                 }`
             }
             response = await fetch(urLink, {
@@ -79,14 +83,14 @@ export async function searchHierarchy({
                     Authorization: apiKey,
                 },
             })
-            
+
             const data = (await response.json()) as CkanResponse<GroupTree[]>
             groups = data.success === true ? data.result : []
         } else {
             response = await fetch(
                 `${env.CKAN_URL}/api/3/action/${
                     group_type == 'group'
-                        ? `group_list_authz_wri${q ? `?q=${q}` : ''}`   
+                        ? `group_list_authz_wri${q ? `?q=${q}` : ''}`
                         : `organization_list_for_user_wri${q ? `?q=${q}` : ''}`
                 }`,
                 {
@@ -98,7 +102,6 @@ export async function searchHierarchy({
 
             const data = (await response.json()) as CkanResponse<GroupTree[]>
             groups = data.success === true ? data.result : []
-            
         }
 
         return groups
@@ -294,7 +297,7 @@ export async function getAllDatasetFq({
     facetFields?: string[]
     sortBy?: string
     extLocationQ?: string
-        extAddressQ?: string
+    extAddressQ?: string
     user?: boolean | null
 }): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets }> {
     try {
@@ -564,7 +567,7 @@ export async function getOneDataset(
             console.log(e)
         }
     }
-   
+
     const resources = await Promise.all(
         dataset.result.resources.map(async (r) => {
             const _views = await getResourceViews({
@@ -592,13 +595,17 @@ export async function getOneDataset(
                 if (r.url_type === 'layer')
                     return {
                         ...r,
-                        layerObj: noLayer ? convertLayerObjToForm(layerObj) : true,
+                        layerObj: noLayer
+                            ? convertLayerObjToForm(layerObj)
+                            : true,
                     }
-                    
+
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
-                        layerObjRaw: !noLayer ?  getRawObjFromApiSpec(layerObj) : true,
+                        layerObjRaw: !noLayer
+                            ? getRawObjFromApiSpec(layerObj)
+                            : true,
                     }
             }
 
@@ -606,14 +613,18 @@ export async function getOneDataset(
                 if (r.layerObj) {
                     return {
                         ...r,
-                        layerObj:  !noLayer ? convertLayerObjToForm(r.layerObj) : true,
+                        layerObj: !noLayer
+                            ? convertLayerObjToForm(r.layerObj)
+                            : true,
                         rw_id: r.id,
                     }
                 }
                 if (r.layerObjRaw) {
                     return {
                         ...r,
-                        layerObjRaw:  !noLayer ? getRawObjFromApiSpec(r.layerObjRaw) : true,
+                        layerObjRaw: !noLayer
+                            ? getRawObjFromApiSpec(r.layerObjRaw)
+                            : true,
                         rw_id: r.id,
                     }
                 }
@@ -682,12 +693,16 @@ export async function getOnePendingDataset(
                 if (r.url_type === 'layer')
                     return {
                         ...r,
-                        layerObj: !noLayer ? convertLayerObjToForm(layerObj) : true,
+                        layerObj: !noLayer
+                            ? convertLayerObjToForm(layerObj)
+                            : true,
                     }
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
-                        layerObjRaw: !noLayer ? getRawObjFromApiSpec(layerObj) : true,
+                        layerObjRaw: !noLayer
+                            ? getRawObjFromApiSpec(layerObj)
+                            : true,
                     }
             }
 
@@ -696,14 +711,18 @@ export async function getOnePendingDataset(
                 if (r.layerObj) {
                     return {
                         ...r,
-                        layerObj: !noLayer ? convertLayerObjToForm(r.layerObj) : true,
+                        layerObj: !noLayer
+                            ? convertLayerObjToForm(r.layerObj)
+                            : true,
                         rw_id: r.url ? r.rw_id : r.id,
                     }
                 }
                 if (r.layerObjRaw) {
                     return {
                         ...r,
-                        layerObjRaw: !noLayer ? getRawObjFromApiSpec(r.layerObjRaw) : true,
+                        layerObjRaw: !noLayer
+                            ? getRawObjFromApiSpec(r.layerObjRaw)
+                            : true,
                         rw_id: r.url ? r.rw_id : r.id,
                     }
                 }
@@ -2188,7 +2207,9 @@ export async function approvePendingDataset(
     const resourcesToEditLayer = submittedDataset.rw_id
         ? await Promise.all(
               submittedDataset.resources
-                  .filter((r) => (r.layerObj || r.layerObjRaw) && r.rw_id && r.url)
+                  .filter(
+                      (r) => (r.layerObj || r.layerObjRaw) && r.rw_id && r.url
+                  )
                   .map(async (r) => {
                       const rr = r as ResourceFormType
                       if (r.layerObj) {
@@ -2548,88 +2569,92 @@ export async function generateDataSiteMap() {
     return sitemap
 }
 
-
 export function advance_search_query(filters: Filter[]) {
     const keys = [...new Set(filters.map((f) => f.key))].filter(
-            (key) => key != 'search'
+        (key) => key != 'search'
     )
-    
+
     const fq: any = {}
     let extLocationQ = ''
     let extAddressQ = ''
 
-     keys.forEach((key) => {
-            let keyFq
+    keys.forEach((key) => {
+        let keyFq
 
-            const keyFilters = filters.filter((f) => f.key == key)
-            if ((key as string) == 'temporal_coverage_start') {
-                if (keyFilters.length > 0) {
-                    const temporalCoverageStart = keyFilters[0]
-                    const temporalCoverageEnd = filters.find(
-                        (f) => f.key == 'temporal_coverage_end'
-                    )?.value
+        const keyFilters = filters.filter((f) => f.key == key)
+        if ((key as string) == 'temporal_coverage_start') {
+            if (keyFilters.length > 0) {
+                const temporalCoverageStart = keyFilters[0]
+                const temporalCoverageEnd = filters.find(
+                    (f) => f.key == 'temporal_coverage_end'
+                )?.value
 
-                    keyFq = `[${temporalCoverageStart?.value} TO *]`
+                keyFq = `[${temporalCoverageStart?.value} TO *]`
 
-                    if (temporalCoverageEnd) {
-                        keyFq = `[* TO ${temporalCoverageEnd}]`
-                    }
+                if (temporalCoverageEnd) {
+                    keyFq = `[* TO ${temporalCoverageEnd}]`
                 }
-            } else if ((key as string) == 'temporal_coverage_end') {
-                if (keyFilters.length > 0) {
-                    const temporalCoverageEnd = keyFilters[0]
-                    const temporalCoverageStart = filters.find(
-                        (f) => f.key == 'temporal_coverage_start'
-                    )?.value
-
-                    keyFq = `[* TO ${temporalCoverageEnd?.value}]`
-
-                    if (temporalCoverageStart) {
-                        keyFq = `[${temporalCoverageStart} TO *]`
-                    }
-                }
-            } else if (
-                key === 'metadata_modified_since' ||
-                key === 'metadata_modified_before'
-            ) {
-                const metadataModifiedSinceFilter = filters.find(
-                    (f) => f.key === 'metadata_modified_since'
-                )
-                const metadataModifiedSince = metadataModifiedSinceFilter
-                    ? metadataModifiedSinceFilter.value + 'T00:00:00Z'
-                    : '*'
-
-                const metadataModifiedBeforeFilter = filters.find(
-                    (f) => f.key === 'metadata_modified_before'
-                )
-                const metadataModifiedBefore = metadataModifiedBeforeFilter
-                    ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
-                    : '*'
-
-                fq[
-                    'metadata_modified'
-                ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
-            } else if (key == 'spatial') {
-                const coordinates = keyFilters[0]?.value
-                const address = keyFilters[0]?.label
-
-                // @ts-ignore
-                if (coordinates) extLocationQ = coordinates.reverse().join(',')
-                if (address) extAddressQ = address
-            } else {
-                keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             }
+        } else if ((key as string) == 'temporal_coverage_end') {
+            if (keyFilters.length > 0) {
+                const temporalCoverageEnd = keyFilters[0]
+                const temporalCoverageStart = filters.find(
+                    (f) => f.key == 'temporal_coverage_start'
+                )?.value
 
-            if (keyFq) fq[key as string] = keyFq
-     })
-    
+                keyFq = `[* TO ${temporalCoverageEnd?.value}]`
+
+                if (temporalCoverageStart) {
+                    keyFq = `[${temporalCoverageStart} TO *]`
+                }
+            }
+        } else if (
+            key === 'metadata_modified_since' ||
+            key === 'metadata_modified_before'
+        ) {
+            const metadataModifiedSinceFilter = filters.find(
+                (f) => f.key === 'metadata_modified_since'
+            )
+            const metadataModifiedSince = metadataModifiedSinceFilter
+                ? metadataModifiedSinceFilter.value + 'T00:00:00Z'
+                : '*'
+
+            const metadataModifiedBeforeFilter = filters.find(
+                (f) => f.key === 'metadata_modified_before'
+            )
+            const metadataModifiedBefore = metadataModifiedBeforeFilter
+                ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
+                : '*'
+
+            fq[
+                'metadata_modified'
+            ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+        } else if (key == 'spatial') {
+            const coordinates = keyFilters[0]?.value
+            const address = keyFilters[0]?.label
+
+            // @ts-ignore
+            if (coordinates) extLocationQ = coordinates.reverse().join(',')
+            if (address) extAddressQ = address
+        } else {
+            keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
+        }
+
+        if (keyFq) fq[key as string] = keyFq
+    })
+
     delete fq.metadata_modified_since
     delete fq.metadata_modified_before
     delete fq.spatial
-    return { fq, extLocationQ, extAddressQ ,  search: filters.find((e) => e?.key == 'search')?.value ?? ''}
+    return {
+        fq,
+        extLocationQ,
+        extAddressQ,
+        search: filters.find((e) => e?.key == 'search')?.value ?? '',
+    }
 }
 
-export async function getTokenList(session: Session)  {
+export async function getTokenList(session: Session) {
     const response = await fetch(
         `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/api_token_list`,
         {
@@ -2646,4 +2671,3 @@ export async function getTokenList(session: Session)  {
 
     return json
 }
-

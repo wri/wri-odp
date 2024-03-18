@@ -1963,7 +1963,9 @@ export const DatasetRouter = createTRPCRouter({
             z.object({
                 bbox: z.array(z.array(z.number())).nullable(),
                 point: z.array(z.number()).nullable(),
+                location: z.string(),
                 package_id: z.string(),
+                is_pending: z.boolean(),
             })
         )
         .query(async ({ input, ctx }) => {
@@ -1972,7 +1974,11 @@ export const DatasetRouter = createTRPCRouter({
             }
             const bbox = input.bbox ? `&bbox=${input.bbox?.join(',')}` : ''
             const point = input.point ? `&point=${input.point?.join(',')}` : ''
-            const url = `${env.CKAN_URL}/api/3/action/resource_location_search?package_id=${input.package_id}${bbox}${point}`
+            const spatial_address = input.location
+                ? `&spatial_address=${input.location}`
+                : ''
+            const is_pending = `&is_pending=${input.is_pending ? 'True' : 'False'}`
+            const url = `${env.CKAN_URL}/api/3/action/resource_location_search?package_id=${input.package_id}${bbox}${point}${spatial_address}${is_pending}`
             console.log('URL', url)
             const response = await fetch(url, {
                 headers: {
