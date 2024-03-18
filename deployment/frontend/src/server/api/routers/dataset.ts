@@ -1979,7 +1979,6 @@ export const DatasetRouter = createTRPCRouter({
                 : ''
             const is_pending = `&is_pending=${input.is_pending ? 'True' : 'False'}`
             const url = `${env.CKAN_URL}/api/3/action/resource_location_search?package_id=${input.package_id}${bbox}${point}${spatial_address}${is_pending}`
-            console.log('URL', url)
             const response = await fetch(url, {
                 headers: {
                     'Content-Type': 'application/json',

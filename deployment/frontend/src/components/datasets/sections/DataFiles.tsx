@@ -170,7 +170,7 @@ export function DataFiles({
         api.dataset.resourceLocationSearch.useQuery({
             ...formObj.watch(),
             package_id: dataset.name,
-            is_pending: !!!isCurrentVersion,
+            is_pending: false,
         })
     const [q, setQ] = useState('')
     const filteredDatafilesByName =

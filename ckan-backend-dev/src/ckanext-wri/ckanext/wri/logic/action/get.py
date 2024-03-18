@@ -968,12 +968,39 @@ def resource_search(context: Context, data_dict: DataDict):
     )
     location_queries = []
     if spatial_address:
+        log.info("SPATIAL ADDRESS")
+        log.info(spatial_address)
         cwd = os.path.abspath(os.path.dirname(__file__))
-        location_queries.append(
-            ResourceLocation.spatial_address.endswith(spatial_address)
-        )
 
         segments = spatial_address.split(",")
+        if len(segments) == 3:
+            full_address = (
+                f"{segments[0].strip()}, {segments[1].strip()}, {segments[2].strip()}"
+            )
+            region = f"{segments[1].strip()}, {segments[2].strip()}"
+            country = f"{segments[2].strip()}"
+            location_queries.append(
+                _or_(
+                    ResourceLocation.spatial_address.like(f"%{full_address}%"),
+                    ResourceLocation.spatial_address.like(f"%{region}%"),
+                    ResourceLocation.spatial_address.like(f"%{country}%"),
+                )
+            )
+        if len(segments) == 2:
+            region = f"{segments[0].strip()}, {segments[1].strip()}"
+            country = f"{segments[1].strip()}"
+            location_queries.append(
+                _or_(
+                    ResourceLocation.spatial_address.like(f"%{region}%"),
+                    ResourceLocation.spatial_address.like(f"%{country}%"),
+                )
+            )
+        if len(segments) == 1:
+            country = f"{segments[1].strip()}"
+            location_queries.append(
+                ResourceLocation.spatial_address.like(f"%{country}%"),
+            )
+
         if len(segments) in [1, 2]:
             # It's a country or a state
             try:
