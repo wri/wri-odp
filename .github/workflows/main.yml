@@ -82,7 +82,7 @@ jobs:
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
       - name: Set up Docker Containers
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
@@ -100,7 +100,7 @@ jobs:
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Set up Frontend Docker Container
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
       - name: Initialize the Extensions
@@ -170,7 +170,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_CKAN_REPO }}
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:dev-${{ github.sha }}'
           format: 'sarif'
           output: ckan-trivy-results.sarif
           exit-code: '0'
@@ -183,7 +183,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_FRONTEND_REPO }}
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:dev-${{ github.sha }}'
           format: 'sarif'
           output: frontend-trivy-results.sarif
           exit-code: '0'
