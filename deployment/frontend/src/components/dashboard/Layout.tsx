@@ -300,7 +300,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <>
                         <Disclosure.Panel
                             as="div"
-                            className="hidden w-full max-w-[300px] lg:z-10 lg:flex lg:flex-col "
+                            className="hidden w-full sm:max-w-[300px] lg:z-10 lg:flex lg:flex-col "
                         >
                             {/* Sidebar component, swap this element with another sidebar if you like */}
                             <div className="flex grow flex-col gap-y-5  pb-4  bg-wri-green">
