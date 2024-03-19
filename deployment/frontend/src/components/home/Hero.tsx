@@ -69,7 +69,7 @@ export function Hero() {
                             />
                         </Link>
                     </div>
-                    <div className="flex gap-x-2 lg:hidden">
+                    <div className="flex flex-wrap gap-x-2 lg:hidden">
                         <div>
                             {session.status == 'authenticated' ? (
                                 <UserMenu colors="light" />

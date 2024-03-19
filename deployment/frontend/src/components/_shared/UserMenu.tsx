@@ -47,7 +47,7 @@ export default function UserMenu({
                                 }`}
                             />
                             <div
-                                className={`font-normal text-[1.1251rem] border-b-2 border-b-wri-gold ${
+                                className={`font-normal text-sm sm:text-lg border-b-2 border-b-wri-gold ${
                                     colors == 'light' ? '!text-white' : ''
                                 }`}
                             >
