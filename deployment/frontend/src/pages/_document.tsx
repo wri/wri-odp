@@ -11,7 +11,11 @@ export default class CustomDocument extends Document {
                         rel="stylesheet"
                         href="https://use.typekit.net/ckz5ous.css"
                     />
-                    <Script
+                   
+                    {
+                        env.NEXT_PUBLIC_DISABLE_HOTJAR === "disabled" ? "" :
+                            <>
+                                 <Script
                         strategy="afterInteractive"
                         id="show-banner"
                         dangerouslySetInnerHTML={{
@@ -22,9 +26,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','${env.NEXT_PUBLIC_GTM_ID}');`,
                         }}
                     />
-                    {
-                        env.NEXT_PUBLIC_DISABLE_HOTJAR === "disabled" ? "" :
-                            <Script
+                                <Script
                         strategy="afterInteractive"
                         id="hotjar"
                         dangerouslySetInnerHTML={{
@@ -39,6 +41,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 `,
                         }}
                     />
+                            </>
+                            
                     }
                     
                 </Head>

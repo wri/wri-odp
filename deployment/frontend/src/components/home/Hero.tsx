@@ -196,6 +196,7 @@ export function Hero() {
                             <input
                                 name="search"
                                 placeholder="Search data"
+                                aria-label='search'
                                 className="placeholder:text-white text-white text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white bg-opacity-25 rounded-[3px] border-b-2 border-amber-400"
                             />
                             <MagnifyingGlassIcon className="w-7 h-7 text-white absolute top-[18px] right-4" />
