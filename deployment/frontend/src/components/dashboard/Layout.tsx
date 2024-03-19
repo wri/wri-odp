@@ -129,7 +129,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             <div className="fixed inset-0 bg-gray-900/80" />
                         </Transition.Child>
 
-                        <div className="fixed inset-0 flex">
+                        <div className="fixed z-[60] inset-0 flex">
                             <Transition.Child
                                 as={Fragment}
                                 enter="transition ease-in-out duration-300 transform"
@@ -300,7 +300,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <>
                         <Disclosure.Panel
                             as="div"
-                            className="hidden w-full max-w-[300px] lg:z-10 lg:flex lg:flex-col "
+                            className="hidden w-full sm:max-w-[300px] lg:z-10 lg:flex lg:flex-col "
                         >
                             {/* Sidebar component, swap this element with another sidebar if you like */}
                             <div className="flex grow flex-col gap-y-5  pb-4  bg-wri-green">
@@ -426,7 +426,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </Disclosure>
 
                 <div className="w-full">
-                    <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:hidden lg:px-8">
+                    {!sidebarOpen && <div className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:hidden lg:px-8">
                         <button
                             type="button"
                             className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
@@ -435,7 +435,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             <span className="sr-only">Open sidebar</span>
                             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
                         </button>
-                    </div>
+                    </div>}
 
                     <main className="w-full isolate mb-8">
                         <div className=" @container w-full ">{children}</div>

@@ -287,7 +287,7 @@ export function EditDataFile({
                                             <InputGroup
                                                 label="Title"
                                                 required
-                                                className="whitespace-nowrap"
+                                                className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <Input
                                                     placeholder="Some name"
@@ -304,7 +304,7 @@ export function EditDataFile({
                                             </InputGroup>
                                             <InputGroup
                                                 label="Description"
-                                                className="whitespace-nowrap"
+                                                className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <TextArea
                                                     placeholder="Add description"
@@ -317,7 +317,7 @@ export function EditDataFile({
                                             </InputGroup>
                                             <InputGroup
                                                 label="Format"
-                                                className="whitespace-nowrap"
+                                                className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <div className="max-w-[55rem] w-full">
                                                     <FormatInput

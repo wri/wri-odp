@@ -3,6 +3,9 @@ import defaultTheme from 'tailwindcss/defaultTheme'
 
 export default {
     content: ['./src/**/*.{js,ts,jsx,tsx}'],
+    safelist: [
+        'text-nowrap'
+    ],
     theme: {
         extend: {
             fontFamily: {

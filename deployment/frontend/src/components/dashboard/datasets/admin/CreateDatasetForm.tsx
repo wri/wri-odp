@@ -185,7 +185,7 @@ export default function CreateDatasetForm() {
                 >
                     Save as Draft
                 </Button>
-                <div className="flex items-center gap-x-2">
+                <div className="flex items-center gap-x-2 flex-wrap gap-y-5">
                     <Button type="button" variant="outline">
                         <Link href="/dashboard/datasets">Cancel</Link>
                     </Button>
