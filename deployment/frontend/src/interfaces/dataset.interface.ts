@@ -72,6 +72,7 @@ export interface Resource {
     total_record_count?: number
     spatial_geom?: any
     spatial_address?: string
+    spatial_coordinates?: any
 }
 
 export interface DatasetListQueryOptions {

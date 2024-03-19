@@ -22,7 +22,7 @@ export function InputGroup({
     return (
         <div
             className={classNames(
-                'grid sm:grid-cols-8 justify-between gap-x-14',
+                'grid sm:grid-cols-8 justify-between sm:gap-x-14',
                 className ?? ''
             )}
         >

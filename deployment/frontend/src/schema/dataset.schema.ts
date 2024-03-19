@@ -62,6 +62,7 @@ export const ResourceSchema = z
         layerObjRaw: z.any().optional().nullable(),
         spatial_address: z.string().optional(),
         spatial_geom: z.any().optional(),
+        spatial_coordinates: z.any().optional(),
         spatial_type: z.enum(['address', 'geom']).optional(),
     })
     .refine(

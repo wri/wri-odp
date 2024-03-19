@@ -14,7 +14,7 @@ export function InputGroup({
   return (
     <div
       className={classNames(
-        "flex items-center justify-between gap-x-14",
+        "flex items-center justify-between sm:gap-x-14",
         className ?? "",
       )}
     >
