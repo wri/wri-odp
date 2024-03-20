@@ -7,6 +7,10 @@ from ckanext.wri.logic.action.datapusher_download_subset import (
     subset_download_callback,
     subset_download_request,
 )
+from ckanext.wri.logic.action.datapusher_download_zip import (
+    zipped_download_request,
+    zipped_download_callback,
+)
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
 from ckan.types import Action, AuthFunction, Context
@@ -179,6 +183,8 @@ class WriPlugin(plugins.SingletonPlugin):
             "organization_activity_list_wri": organization_activity_list_wri,
             "prefect_download_subset_from_store": subset_download_request,
             "prefect_download_subset_callback": subset_download_callback,
+            "prefect_download_zipped": zipped_download_request,
+            "prefect_download_zipped_callback": zipped_download_callback,
             "dataset_release_notes": dataset_release_notes,
             "user_list_wri": user_list_wri,
             "organization_list_wri": organization_list_wri,

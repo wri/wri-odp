@@ -1953,6 +1953,39 @@ export const DatasetRouter = createTRPCRouter({
             }
             throw data
         }),
+    downloadZippedResources: publicProcedure
+        .input(
+            z.object({
+                dataset_id: z.string(),
+                keys: z.array(z.string()),
+                email: z.string(),
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            const headers: any = {
+                'Content-Type': 'application/json',
+            }
+
+            const user = ctx?.session?.user
+            if (user) {
+                headers['Authorization'] = user.apikey
+            }
+
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/prefect_download_zipped`,
+                {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(input),
+                }
+            )
+
+            const data = (await response.json()) as CkanResponse<boolean>
+            if (response.ok) {
+                return data
+            }
+            throw data
+        }),
     getDatasetReleaseNotes: publicProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
@@ -1977,7 +2010,9 @@ export const DatasetRouter = createTRPCRouter({
             const spatial_address = input.location
                 ? `&spatial_address=${input.location}`
                 : ''
-            const is_pending = `&is_pending=${input.is_pending ? 'True' : 'False'}`
+            const is_pending = `&is_pending=${
+                input.is_pending ? 'True' : 'False'
+            }`
             const url = `${env.CKAN_URL}/api/3/action/resource_location_search?package_id=${input.package_id}${bbox}${point}${spatial_address}${is_pending}`
             const response = await fetch(url, {
                 headers: {
