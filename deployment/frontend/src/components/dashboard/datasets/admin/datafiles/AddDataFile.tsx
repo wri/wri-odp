@@ -44,6 +44,7 @@ export function AddDataFile({
     const uploadInputRef = useRef<HTMLInputElement>(null)
     const { isLoading: dataDictionaryLoading } = useDataDictionary(
         watch(`resources.${index}.fileBlob`),
+        watch(`resources.${index}.resourceId`),
         (data) => {
             if (data) {
                 const types = {
