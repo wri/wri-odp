@@ -546,8 +546,9 @@ function DatafileCard({
                                 </>
                             )}
 
-                            <Disclosure.Button>
+                            <Disclosure.Button role='button' aria-label='expand'>
                                 <ChevronDownIcon
+                                    
                                     className={`${
                                         open
                                             ? 'rotate-180 transform  transition'
