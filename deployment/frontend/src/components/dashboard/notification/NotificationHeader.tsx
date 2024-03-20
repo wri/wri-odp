@@ -10,21 +10,25 @@ import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner'
 import { api } from '@/utils/api'
 
-
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 
 const DefaultTooltip = dynamic(() => import('@/components/_shared/Tooltip'), {
-  ssr: false,
-});
+    ssr: false,
+})
 
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
-    
-const ErrorAlert = dynamic<{ text: string; title?: string; }>(
-    () => import('@/components/_shared/Alerts').then(module => module.ErrorAlert), {
+})
+
+const ErrorAlert = dynamic<{ text: string; title?: string }>(
+    () =>
+        import('@/components/_shared/Alerts').then(
+            (module) => module.ErrorAlert
+        ),
+    {
         ssr: false,
-    });
+    }
+)
 
 function LeftNode({
     selected,
@@ -190,14 +194,21 @@ function LeftNode({
                         <LoaderButton
                             variant="destructive"
                             loading={UpdateNotfication.isLoading}
-                            onClick={() =>
+                            onClick={() => {
+                               let filteredData = data.filter((item) =>
+                                    selected.includes(item.id)
+                                )
+
+                                filteredData = filteredData.map((n) => {
+                                    delete n.object_data
+                                    return n
+                                })
+
                                 UpdateNotfication.mutate({
-                                    notifications: data.filter((item) =>
-                                        selected.includes(item.id)
-                                    ),
+                                    notifications: filteredData,
                                     state: 'deleted',
                                 })
-                            }
+                            }}
                             id="deletemodalnotification"
                         >
                             Delete Notification
