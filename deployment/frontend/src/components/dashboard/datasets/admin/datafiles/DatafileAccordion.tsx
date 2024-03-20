@@ -1,7 +1,13 @@
-import { ChevronDownIcon, MinusCircleIcon } from '@heroicons/react/24/outline'
+import {
+    ChevronDownIcon,
+    MinusCircleIcon,
+    Squares2X2Icon,
+} from '@heroicons/react/24/outline'
 import { Disclosure, Transition } from '@headlessui/react'
 import classNames from '@/utils/classnames'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { SortableKnob } from 'react-easy-sort'
+import { useEffect, useState } from 'react'
 
 interface DataFileAccordionProps {
     title: string
@@ -22,6 +28,14 @@ export function DataFileAccordion({
     id = '',
     remove,
 }: DataFileAccordionProps) {
+    const [canSort, setCanSort] = useState(false)
+
+    useEffect(() => {
+        setTimeout(() => {
+            setCanSort(true)
+        }, 3000)
+    }, [])
+
     return (
         <Disclosure
             as="div"
@@ -43,6 +57,11 @@ export function DataFileAccordion({
                                 className="sm:px-8 px-4 col-span-full flex w-full justify-between border-b border-stone-50 py-5"
                             >
                                 <h3 className="text-black text-xl font-normal font-['Acumin Pro SemiCondensed'] flex items-center gap-x-2">
+                                    {canSort && (
+                                        <SortableKnob>
+                                            <Squares2X2Icon className="w-4 h-4 mt-1 opacity-30" />
+                                        </SortableKnob>
+                                    )}
                                     {title}
                                     <DefaultTooltip content="Remove item">
                                         <button onClick={() => remove()}>
@@ -51,11 +70,10 @@ export function DataFileAccordion({
                                     </DefaultTooltip>{' '}
                                 </h3>
                                 <ChevronDownIcon
-                                    className={`${
-                                        open
+                                    className={`${open
                                             ? 'rotate-180 transform  transition'
                                             : ''
-                                    } h-5 w-5 text-blue-800`}
+                                        } h-5 w-5 text-blue-800`}
                                 />
                             </Disclosure.Button>
                             <Transition

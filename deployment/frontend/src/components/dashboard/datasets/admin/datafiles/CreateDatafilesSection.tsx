@@ -27,6 +27,7 @@ import { convertBytes } from '@/utils/convertBytes'
 import { useDataDictionary } from '@/utils/getDataDictionary'
 import { Field } from 'tableschema'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
+import SortableList, { SortableItem } from 'react-easy-sort'
 
 export function CreateDataFilesSection({
     formObj,
@@ -39,25 +40,37 @@ export function CreateDataFilesSection({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
         })
+
+    const datafiles = fields.filter(
+        (r) =>
+            r.type !== 'layer' &&
+            r.type !== 'layer-raw' &&
+            r.type !== 'empty-layer'
+    )
+
     return (
         <>
-            {fields.map((field, index) => {
-                if (
-                    field.type === 'layer' ||
-                    field.type === 'layer-raw' ||
-                    field.type === 'empty-layer'
-                )
-                    return <Fragment key={field.id}></Fragment>
-                return (
-                    <AddDataFile
-                        key={field.id}
-                        index={index}
-                        field={field}
-                        remove={() => remove(index)}
-                        formObj={formObj}
-                    />
-                )
-            })}
+            <SortableList
+                onSortEnd={(oldIdx, newIdx) => {
+                    swap(oldIdx, newIdx)
+                }}
+                className="list"
+                lockAxis="y"
+                draggedItemClassName="dragged"
+            >
+                {datafiles.map((field, index) => {
+                    return (
+                        <SortableItem key={field.id}>
+                            <AddDataFile
+                                index={index}
+                                field={field}
+                                remove={() => remove(index)}
+                                formObj={formObj}
+                            />
+                        </SortableItem>
+                    )
+                })}
+            </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>
@@ -143,9 +156,8 @@ function AddDataFile({
                 getUploadParameters(
                     file,
                     watch('team') && watch('team')?.value !== ''
-                        ? `${watch('team')?.id}/ckan/resources/${
-                              datafile.resourceId
-                          }`
+                        ? `${watch('team')?.id}/ckan/resources/${datafile.resourceId
+                        }`
                         : `ckan/resources/${datafile.resourceId}`
                 ),
         })
