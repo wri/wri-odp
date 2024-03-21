@@ -225,7 +225,7 @@ async def download_resources_zipped(
         tmp_filepath = os.path.join(temp_dir, zipped_file)
         logger.info("Uploading data...")
         url = s3_upload(
-            tmp_filepath, "_downloads_cache/{}".format(f"{filename}.zip"), download_filename
+            tmp_filepath, "_downloads_cache/{}".format(f"{filename}.zip"), f"{download_filename}.zip"
         )
     logger.info("Uploading data...")
     send_callback(

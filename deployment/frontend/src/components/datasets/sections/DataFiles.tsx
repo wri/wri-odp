@@ -763,7 +763,7 @@ function DownloadModal({
             <div className="p-6">
                 <div className="border-b border-zinc-100 pb-5">
                     <div className="font-acumin text-3xl font-normal text-black">
-                        The selected resources are being prepared for download
+                        The selected datafiles are being prepared for download
                     </div>
                     <div className="font-acumin text-base font-light text-neutral-600">
                         Please enter your email address so that you receive the
