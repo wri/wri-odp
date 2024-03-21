@@ -68,6 +68,7 @@ function LeftNode({
             <div className="flex h-6 items-center">
                 <DefaultTooltip content="Select all">
                     <input
+                        aria-label='select all notifications'
                         id="select_all_notifications"
                         aria-describedby="notifications-checkbox"
                         name="notifications"
@@ -86,6 +87,7 @@ function LeftNode({
             <div>
                 <DefaultTooltip content="delete">
                     <button
+                        aria-label='delete notification'
                         className="p-0 m-0 mt-2"
                         id="deletenotification"
                         onClick={() => setOpenDelete(true)}
@@ -107,7 +109,7 @@ function LeftNode({
                     className="relative inline-block text-left  pr-1 z-50"
                 >
                     <div>
-                        <Menu.Button id="markedaction">
+                        <Menu.Button id="markedaction" aria-label='actions'>
                             <div className="h-full mt-2">
                                 <DefaultTooltip content="read actions">
                                     <EllipsisVerticalIcon className="w-4 h-4 text-black" />

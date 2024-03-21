@@ -152,7 +152,7 @@ export function Steps({ state }: { state: string }) {
                                             </div>
                                             <span
                                                 className={classNames(
-                                                    'bg-white font-acumin text-base font-normal text-zinc-400',
+                                                    'bg-white font-acumin text-base font-normal text-zinc-500',
                                                     stepIdx !== steps.length - 1
                                                         ? 'pr-6'
                                                         : ''

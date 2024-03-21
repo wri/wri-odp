@@ -236,6 +236,7 @@ export function OverviewForm({
                                         options={data}
                                         title="Tags"
                                         tooltip="Remove tag"
+                                        aria-label="Remove tag"
                                     />
                                 )
                             )
@@ -307,6 +308,7 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup label="Citation" className="items-start">
                         <TextArea
+                            aria-label='Citation'
                             placeholder=""
                             type="text"
                             {...register('citation')}

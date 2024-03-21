@@ -65,6 +65,7 @@ function TokenCard({ token }: { token: ApiToken }) {
                 )}
             </div>
             <Button
+                aria-label='delete token'
                 variant="destructive"
                 size="sm"
                 className="rounded-full px-1.5 delete-token"

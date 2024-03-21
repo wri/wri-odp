@@ -101,25 +101,26 @@ export default function SourceForm({
                             className="sm:grid-cols-1 gap-x-2"
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
-                            <Input {...register('name')} type="text" />
+                            <Input {...register('name')} type="text" aria-label='layer name'/>
                         </InputGroup>
                         <InputGroup
                             label="Slug of layer"
                             className="sm:grid-cols-1 gap-x-2"
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
-                            <Input {...register('slug')} type="text" />
+                            <Input {...register('slug')} type="text" aria-label='slug of layer'/>
                         </InputGroup>
                         <InputGroup
                             label="Description of Layer"
                             className="sm:grid-cols-1 gap-x-2"
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
-                            <Input {...register('description')} type="text" />
+                            <Input {...register('description')} type="text" aria-label='layer description'/>
                         </InputGroup>
                         <div className="relative flex justify-start">
                             <div className="flex h-6 items-center">
                                 <input
+                                    aria-label='featured dataset'
                                     id="featured_dataset"
                                     aria-describedby="comments-description"
                                     {...register(`default`)}
@@ -136,6 +137,7 @@ export default function SourceForm({
                         <div className="relative flex justify-start">
                             <div className="flex h-6 items-center">
                                 <input
+                                    aria-label='timeline'
                                     id="timeline"
                                     aria-describedby="comments-description"
                                     {...register(`layerConfig.timeline`)}
@@ -160,6 +162,7 @@ export default function SourceForm({
                                     labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                 >
                                     <Input
+                                    aria-label='timeline order'
                                         {...register('layerConfig.order', {
                                             valueAsNumber: true,
                                         })}
@@ -181,6 +184,7 @@ export default function SourceForm({
                                         {...register(
                                             'layerConfig.timelineLabel'
                                         )}
+                                        aria-label='timeline label'
                                         type="text"
                                         icon={
                                             <DefaultTooltip content="Label that will popup when the user hovers over the layer little circle in the timeline">
@@ -259,6 +263,7 @@ export default function SourceForm({
                                     labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                 >
                                     <Input
+                                    aria-label='account'
                                         {...register(
                                             'layerConfig.source.provider.account'
                                         )}
@@ -280,6 +285,7 @@ export default function SourceForm({
                                         {...register(
                                             'layerConfig.source.provider.layers.0.options.sql'
                                         )}
+                                        aria-label='sql query'
                                         type="text"
                                         defaultValue=""
                                     />
@@ -297,6 +303,7 @@ export default function SourceForm({
                                     <div className="flex gap-x-2 items-center">
                                         <Input
                                             {...register('connectorUrl')}
+                                            aria-label='columns url'
                                             type="text"
                                             defaultValue="https://wri-rw.carto.com:443/api/v2/sql?q="
                                             icon={
@@ -307,6 +314,7 @@ export default function SourceForm({
                                         />
                                         <DefaultTooltip content="Try to fetch columns (this will clear the interaction config)">
                                             <Button
+                                                aria-label='refetch'
                                                 onClick={() => {
                                                     formObj.setValue(
                                                         'interactionConfig.output',
@@ -337,6 +345,7 @@ export default function SourceForm({
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
                             <Input
+                            aria-label='min zoom'
                                 {...register('layerConfig.source.minzoom', {
                                     setValueAs: (v) =>
                                         v === '' ? undefined : parseInt(v),
@@ -360,6 +369,7 @@ export default function SourceForm({
                                     setValueAs: (v) =>
                                         v === '' ? undefined : parseInt(v),
                                 })}
+                                aria-label='max zoom'
                                 icon={
                                     <DefaultTooltip content="Max zoom in which content will appera">
                                         <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
