@@ -33,8 +33,6 @@ resource_location = sqlalchemy.Table(
     sqlalchemy.Column(
         "resource_id",
         sqlalchemy.types.UnicodeText,
-        sqlalchemy.ForeignKey("resource.id", onupdate="CASCADE", ondelete="CASCADE"),
-        nullable=False,
     ),
     sqlalchemy.Column("spatial_address", sqlalchemy.types.UnicodeText, nullable=True),
     sqlalchemy.Column("spatial_coordinates", Geometry("POINT"), nullable=True),
@@ -248,7 +246,6 @@ class ResourceLocation(object):
             raise tk.ValidationError(e)
 
         if not resource_location:
-
             raise tk.ValidationError(_(f"Resource Location not found: {resource_id}"))
 
         log.info("Updated resource location index: {}".format(resource_id))
