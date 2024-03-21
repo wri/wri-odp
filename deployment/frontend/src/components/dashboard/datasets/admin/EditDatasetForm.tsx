@@ -219,7 +219,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             <Tab.Group>
                 <div>
                     <Tab.List
-                        className="max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
+                        className="max-w-screen sm:max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
                         aria-label="Tabs"
                     >
                         <div className="flex-col justify-start flex sm:flex-row gap-y-4 sm:gap-x-8 sm:border-b-2 border-gray-300 w-full">

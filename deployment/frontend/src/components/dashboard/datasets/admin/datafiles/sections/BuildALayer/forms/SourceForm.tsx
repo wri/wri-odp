@@ -81,7 +81,7 @@ export default function SourceForm({
                     open={templateModalOpen}
                     setOpen={() => setTemplateModalOpen(!open)}
                 />
-                <div className="mt-10 flex gap-x-2 w-full justify-end">
+                <div className="mt-10 flex gap-x-2 w-full justify-end flex-wrap gap-y-5 mb-10 sm:mb-0">
                     <DefaultTooltip content="This will convert this guided form to a raw JSON object that can be edited directly, this is useful for advanced users that want to use features that are not yet supported by the guided form">
                         <Button onClick={() => convertToRaw()} type="button">
                             Convert to raw object

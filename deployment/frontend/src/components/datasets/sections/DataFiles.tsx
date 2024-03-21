@@ -1,12 +1,14 @@
-import { Button } from '@/components/_shared/Button'
+import { Button, LoaderButton } from '@/components/_shared/Button'
 import classNames from '@/utils/classnames'
 import { Disclosure, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import {
+    ArrowDownCircleIcon,
     ArrowPathIcon,
     FingerPrintIcon,
     MagnifyingGlassIcon,
     MapPinIcon,
+    PaperAirplaneIcon,
 } from '@heroicons/react/24/outline'
 import { DownloadButton } from './datafiles/Download'
 import { OpenInButton } from './datafiles/OpenIn'
@@ -25,6 +27,13 @@ import { useQuery } from 'react-query'
 import { UseFormReturn, useForm } from 'react-hook-form'
 import { api } from '@/utils/api'
 import DrawControl from '@/components/search/Draw'
+import DefaultTooltip from '@/components/_shared/Tooltip'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import Modal from '@/components/_shared/Modal'
+import Spinner from '@/components/_shared/Spinner'
+import { toast } from 'react-toastify'
+import { ErrorDisplay } from '@/components/_shared/InputGroup'
 
 export function LocationSearch({
     geojsons,
@@ -84,6 +93,7 @@ export function LocationSearch({
             <GeocoderControl
                 mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
                 position="bottom-right"
+                placeholder="Search datafiles by location"
                 initialValue={formObj.getValues('location')}
                 onResult={(e) => {
                     setValue('point', e.result.geometry.coordinates)
@@ -157,6 +167,9 @@ export function DataFiles({
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
         useActiveLayerGroups()
     const { data: activeLayers } = useLayersFromRW()
+    const [datafilesToDownload, setDatafilesToDownload] = useState<Resource[]>(
+        []
+    )
     const datafiles = dataset?.resources
     const formObj = useForm<LocationSearchFormType>({
         defaultValues: {
@@ -169,6 +182,7 @@ export function DataFiles({
         api.dataset.resourceLocationSearch.useQuery({
             ...formObj.watch(),
             package_id: dataset.name,
+            is_pending: false,
         })
     const [q, setQ] = useState('')
     const filteredDatafilesByName =
@@ -189,23 +203,80 @@ export function DataFiles({
             id: df.id,
         }))
     }, [filteredDatafilesByName.length])
+
+    const addDatafileToDownload = (datafile: Resource) => {
+        setDatafilesToDownload((prev) => [...prev, datafile])
+    }
+    const removeDatafileToDownload = (datafile: Resource) => {
+        setDatafilesToDownload((prev) =>
+            prev.filter((r) => r.id !== datafile.id)
+        )
+    }
+
+    const filteredUploadedDatafiles = filteredDatafiles.filter(
+        (r) => r.url_type === 'upload'
+    )
+
+    const uploadedDatafiles = datafiles.filter((r) => r.url_type === 'upload')
+
+    const filteredDatafilesEqualToDownloadDatafiles = () => {
+        return (
+            datafilesToDownload.length === filteredDatafiles.length &&
+            datafilesToDownload.every((r) =>
+                filteredDatafiles.some((f) => f.id === r.id)
+            )
+        )
+    }
+
+    const [open, setOpen] = useState(false)
     return (
         <>
             <div className="relative py-4">
                 <input
-                    className="block w-full rounded-md border-b border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
+                    className="block w-full rounded-t-md border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
                     onChange={(e) => setQ(e.target.value)}
                     value={q}
-                    placeholder="Search data"
+                    placeholder="Search datafiles by title or description"
                 />
                 <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
                 <LocationSearch geojsons={geojsons} formObj={formObj} />
             </div>
-            <div className="flex justify-between pb-1">
+            <div className="flex justify-between pb-1 lg:flex-col xl:flex-row">
                 <span className="font-acumin text-base font-normal text-black">
                     {filteredDatafiles?.length ?? 0} Data Files
                 </span>
-                <div className="flex gap-x-4">
+                <div className="flex gap-x-4 lg:justify-end">
+                    {datafilesToDownload.length !== uploadedDatafiles.length && (
+                        <button
+                            onClick={() =>
+                                setDatafilesToDownload(uploadedDatafiles)
+                            }
+                            className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                        >
+                            Select all datafiles
+                        </button>
+                    )}
+                    {!filteredDatafilesEqualToDownloadDatafiles() &&
+                        datafilesToDownload.length !== uploadedDatafiles.length && (
+                            <button
+                                onClick={() =>
+                                    setDatafilesToDownload(
+                                        filteredUploadedDatafiles
+                                    )
+                                }
+                                className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                            >
+                                Select all filtered datafiles
+                            </button>
+                        )}
+                    {datafilesToDownload.length > 0 && (
+                        <button
+                            onClick={() => setDatafilesToDownload([])}
+                            className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                        >
+                            Unselect all datafiles
+                        </button>
+                    )}
                     <button
                         onClick={() => {
                             dataset.resources.forEach((r) => {
@@ -241,6 +312,15 @@ export function DataFiles({
                     </button>
                 </div>
             </div>
+            {datafilesToDownload.length > 0 && (
+                <Button
+                    onClick={() => setOpen(true)}
+                    className="group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3"
+                >
+                    Download Selected Datafiles
+                    <ArrowDownCircleIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
+                </Button>
+            )}
             <div className="flex flex-col gap-y-4">
                 {isLoadingLocationSearch &&
                 (formObj.watch('bbox') !== null ||
@@ -282,6 +362,13 @@ export function DataFiles({
                                 mapDisplaypreview={mapDisplaypreview}
                                 tabularResource={tabularResource}
                                 setTabularResource={setTabularResource}
+                                selected={datafilesToDownload.some(
+                                    (r) => r.id === datafile.id
+                                )}
+                                addDatafileToDownload={addDatafileToDownload}
+                                removeDatafileToDownload={
+                                    removeDatafileToDownload
+                                }
                                 key={datafile.id}
                                 datafile={datafile}
                                 dataset={dataset}
@@ -293,6 +380,12 @@ export function DataFiles({
                     </>
                 )}
             </div>
+            <DownloadModal
+                keys={datafilesToDownload.map((r) => r.key).filter(Boolean) as string[]}
+                dataset_id={dataset.id}
+                open={open}
+                setOpen={setOpen}
+            />
         </>
     )
 }
@@ -304,6 +397,9 @@ function DatafileCard({
     tabularResource,
     diffFields,
     isCurrentVersion,
+    selected,
+    addDatafileToDownload,
+    removeDatafileToDownload,
     index,
     mapDisplaypreview,
     setMapDisplayPreview,
@@ -315,6 +411,9 @@ function DatafileCard({
     isCurrentVersion?: boolean
     diffFields: Array<Record<string, { old_value: string; new_value: string }>>
     index: number
+    selected: boolean
+    addDatafileToDownload: (datafile: Resource) => void
+    removeDatafileToDownload: (datafile: Resource) => void
     setMapDisplayPreview: (mapDisplaypreview: boolean) => void
     mapDisplaypreview: boolean
 }) {
@@ -374,6 +473,24 @@ function DatafileCard({
                         )}
                     >
                         <div className="flex items-center gap-3">
+                            {datafile.url_type === 'upload' && (
+                                <DefaultTooltip content="Select to download">
+                                    <input
+                                        type="checkbox"
+                                        className="h-4 w-4  rounded  bg-white "
+                                        checked={selected}
+                                        onChange={() => {
+                                            if (selected) {
+                                                removeDatafileToDownload(
+                                                    datafile
+                                                )
+                                            } else {
+                                                addDatafileToDownload(datafile)
+                                            }
+                                        }}
+                                    />
+                                </DefaultTooltip>
+                            )}
                             {datafile?.format && (
                                 <span
                                     className={classNames(
@@ -492,7 +609,9 @@ function DatafileCard({
                                                 setTabularResource({
                                                     provider: 'datastore',
                                                     id: datafile.id as string,
-                                                    name: datafile?.title ?? datafile.name as string,
+                                                    name:
+                                                        datafile?.title ??
+                                                        (datafile.name as string),
                                                 })
                                             }
                                         >
@@ -610,5 +729,112 @@ function DatafileCard({
                 </div>
             )}
         </Disclosure>
+    )
+}
+
+function DownloadModal({
+    open,
+    setOpen,
+    dataset_id,
+    keys,
+}: {
+    open: boolean
+    setOpen: (open: boolean) => void
+    dataset_id: string
+    keys: string[]
+}) {
+    const formSchema = z.object({
+        email: z.string().email(),
+    })
+
+    type FormSchema = z.infer<typeof formSchema>
+
+    const downloadZipped = api.dataset.downloadZippedResources.useMutation()
+
+    const formObj = useForm<FormSchema>({ resolver: zodResolver(formSchema) })
+    const {
+        handleSubmit,
+        formState: { errors },
+        register,
+    } = formObj
+
+    let isLoading = false
+    return (
+        <Modal open={open} setOpen={setOpen} className="max-w-[48rem]">
+            <div className="p-6">
+                <div className="border-b border-zinc-100 pb-5">
+                    <div className="font-acumin text-3xl font-normal text-black">
+                        The selected datafiles are being prepared for download
+                    </div>
+                    <div className="font-acumin text-base font-light text-neutral-600">
+                        Please enter your email address so that you receive the
+                        download link via email when it's ready.
+                    </div>
+                </div>
+                {isLoading && (
+                    <div className="w-full flex items-center my-10 justify-center">
+                        <Spinner />
+                    </div>
+                )}
+                {!isLoading && (
+                    <form
+                        id="download"
+                        data-resource={dataset_id}
+                        onSubmit={handleSubmit(
+                            async (data) => {
+                                downloadZipped.mutate(
+                                    {
+                                        email: data.email,
+                                        dataset_id,
+                                        keys,
+                                    },
+                                    {
+                                        onSuccess: () => {
+                                            toast(
+                                                "You'll receive an email when the file is ready",
+                                                { type: 'success' }
+                                            )
+
+                                            setOpen(false)
+                                        },
+                                        onError: (err) => {
+                                            console.log(err)
+
+                                            toast('Failed to request file', {
+                                                type: 'error',
+                                            })
+                                        },
+                                    }
+                                )
+                            },
+                            (err) => {
+                                console.log(err)
+                                toast('Failed to request file', {
+                                    type: 'error',
+                                })
+                            }
+                        )}
+                        className="flex flex-col sm:flex-row gap-5 pt-6"
+                    >
+                        <input
+                            type="email"
+                            id="email"
+                            className="block w-full rounded-md border-b border-wri-green py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
+                            placeholder="you@example.com"
+                            {...register('email')}
+                        />
+                        <LoaderButton
+                            className="whitespace-nowrap"
+                            type="submit"
+                            loading={downloadZipped.isLoading}
+                        >
+                            <PaperAirplaneIcon className="mr-2 h-5 w-5" />
+                            Get via email
+                        </LoaderButton>
+                    </form>
+                )}
+                <ErrorDisplay errors={errors} name="email" />
+            </div>
+        </Modal>
     )
 }

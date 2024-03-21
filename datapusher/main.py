@@ -20,6 +20,7 @@ from tasks.sort_and_dedup import sort_and_dedup
 from tasks.validate_csv import validate_csv
 from tasks.data_to_file import data_to_file
 from tasks.s3_upload import s3_upload
+from tasks.zip_files import download_keys
 
 from tasks.send_callback import send_callback
 from tasks.query_datastore import query_datastore, query_rw, query_subset_datastore
@@ -208,10 +209,56 @@ async def download_subset_of_data(
     )
 
 
+@flow(log_prints=True)
+async def download_resources_zipped(
+    dataset_id,
+    api_key,
+    task_id,
+    keys,
+    filename,
+    download_filename,
+):
+    logger = get_run_logger()
+    ckan_url = config.get("CKAN_URL")
+    with tempfile.TemporaryDirectory() as temp_dir:
+        zipped_file = download_keys(keys, filename, temp_dir)
+        tmp_filepath = os.path.join(temp_dir, zipped_file)
+        logger.info("Uploading data...")
+        url = s3_upload(
+            tmp_filepath, "_downloads_cache/{}".format(f"{filename}.zip"), f"{download_filename}.zip"
+        )
+    logger.info("Uploading data...")
+    send_callback(
+        api_key,
+        ckan_url,
+        "prefect_download_zipped_callback",
+        {
+            "task_id": task_id,
+            "url": url,
+            "state": "complete",
+            "entity_id": dataset_id,
+            "key": filename,
+        },
+    )
+
+
 if __name__ == "__main__":
     datastore_deployment = push_to_datastore.to_deployment(
         name=config.get("DEPLOYMENT_NAME"),
         parameters={"resource_id": "test_id", "api_key": "api_key"},
+        enforce_parameter_schema=False,
+        is_schedule_active=False,
+    )
+    download_zipped_deployment = download_resources_zipped.to_deployment(
+        name=config.get("DEPLOYMENT_NAME"),
+        parameters={
+            "dataset_id": "test_id",
+            "api_key": "api_key",
+            "task_id": "task_id",
+            "keys": ["key 1", "key 2"],
+            "filename": "filename",
+            "download_filename": "download_filename",
+        },
         enforce_parameter_schema=False,
         is_schedule_active=False,
     )
@@ -250,4 +297,9 @@ if __name__ == "__main__":
         enforce_parameter_schema=False,
         is_schedule_active=False,
     )
-    serve(datastore_deployment, conversion_deployment, download_subset_deployment)
+    serve(
+        datastore_deployment,
+        conversion_deployment,
+        download_subset_deployment,
+        download_zipped_deployment,
+    )

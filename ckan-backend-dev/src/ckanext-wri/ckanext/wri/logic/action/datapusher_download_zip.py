@@ -41,90 +41,43 @@ def check_for_existing_file_in_s3(filename: str, download_filename: str):
     return cached_file_url
 
 
-def build_filename(sql: str, format: str, id: str, provider: str, context) -> str:
-    if provider == "datastore":
-        try:
-            resource_dict = p.toolkit.get_action("resource_show")(
-                context,
-                {
-                    "id": id,
-                },
-            )
-            res_last_modified = resource_dict.get("metadata_modified")
-            filename = (
-                id + "-" + calculate_md5(sql) + "_" + res_last_modified + "." + format
-            ).lower()
-            return filename
-        except logic.NotFound:
-            return False
-    else:
-        name = f"{sql}-{id}"
-        filename = calculate_md5(name) + f".{format.lower()}"
-        return filename
+def build_filename(dataset_id: str, keys: list[str]) -> str:
+    name = f"{dataset_id}-{','.join(keys)}"
+    return calculate_md5(name)
 
 
-def build_download_filename(
-    dataset_id: str, format: str, id: str, provider: str, context
-) -> str:
-    if provider == "datastore":
-        try:
-            resource_dict = p.toolkit.get_action("resource_show")(
-                context,
-                {
-                    "id": id,
-                },
-            )
-            download_filename = (
-                resource_dict.get("title")
-                or resource_dict.get("name")
-                or resource_dict.get("id")
-                or "file"
-            )
-            download_filename += ".{}".format(format.lower())
-            return download_filename
-        except logic.NotFound:
-            return False
-    else:
-        try:
-            dataset_dict = p.toolkit.get_action("package_show")(
-                context,
-                {
-                    "id": dataset_id,
-                },
-            )
-            download_filename = (
-                dataset_dict.get("title")
-                or dataset_dict.get("name")
-                or dataset_dict.get("id")
-                or "file"
-            )
-            download_filename += ".{}".format(format.lower())
-            return download_filename
-        except logic.NotFound:
-            return False
+def build_download_filename(dataset_id: str, context) -> str:
+    try:
+        dataset_dict = p.toolkit.get_action("package_show")(
+            context,
+            {
+                "id": dataset_id,
+            },
+        )
+        download_filename = (
+            dataset_dict.get("title")
+            or dataset_dict.get("name")
+            or dataset_dict.get("id")
+            or "file"
+        )
+        return download_filename
+    except logic.NotFound:
+        return False
 
 
-# TODO: rename this file
-def subset_download_request(context: Context, data_dict: dict[str, Any]):
+def zipped_download_request(context: Context, data_dict: dict[str, Any]):
     prefect_url: str = config.get("ckanext.wri.prefect_url")
     deployment_name: str = config.get("ckanext.wri.datapusher_deployment_name")
 
     dataset_id = data_dict.get("dataset_id")
-    format = data_dict.get("format")
-    id = data_dict.get("id")
-    provider = data_dict.get("provider")
-    num_of_rows = data_dict.get("numOfRows")
-    connector_url = data_dict.get("connectorUrl")
-    sql = data_dict.get("sql")
+    keys = data_dict.get("keys")
     email = data_dict.get("email")
 
-    if None in (format, id, provider, sql):
+    if None in (dataset_id, keys, email):
         raise p.toolkit.ValidationError({"message": "Missing parameters"})
 
-    filename = build_filename(sql, format, id, provider, context)
-    download_filename = build_download_filename(
-        dataset_id, format, id, provider, context
-    )
+    filename = build_filename(dataset_id, keys)
+    download_filename = build_download_filename(dataset_id, context)
 
     cached_file_url = check_for_existing_file_in_s3(filename, download_filename)
     if cached_file_url:
@@ -132,9 +85,9 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
         return True
 
     task = {
-        "entity_id": id if provider == "datastore" else dataset_id,
-        "entity_type": "resource" if provider == "datastore" else "dataset",
-        "task_type": "download_subset",
+        "entity_id": dataset_id,
+        "entity_type": "dataset",
+        "task_type": "download_zipped",
         "last_updated": str(datetime.datetime.utcnow()),
         "state": "submitting",
         "key": filename,
@@ -149,9 +102,9 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
         existing_task = p.toolkit.get_action("task_status_show")(
             context,
             {
-                "entity_id": id if provider == "datastore" else dataset_id,
-                "entity_type": "resource" if provider == "datastore" else "dataset",
-                "task_type": "download_subset",
+                "entity_id": dataset_id,
+                "entity_type": "dataset",
+                "task_type": "download_zipped",
                 "key": filename,
             },
         )
@@ -218,7 +171,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
         deployment = requests.get(
             urljoin(
                 prefect_url,
-                f"api/deployments/name/download-subset-of-data/{deployment_name}",
+                f"api/deployments/name/download-resources-zipped/{deployment_name}",
             )
         )
         deployment = deployment.json()
@@ -231,16 +184,11 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
                 {
                     "parameters": {
                         "api_key": api_token,
-                        "id": id,
                         "task_id": task.get("id"),
-                        "provider": provider,
                         "dataset_id": dataset_id,
-                        "sql": sql,
-                        "num_of_rows": int(num_of_rows),
+                        "keys": keys,
                         "filename": filename,
-                        "format": format,
                         "download_filename": download_filename,
-                        "connector_url": connector_url,
                     },
                     "state": {"type": "SCHEDULED", "state_details": {}},
                 }
@@ -255,7 +203,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email], "Subset of data")
+        send_error([email], "Zipped data")
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -277,7 +225,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email], "Subset of data")
+        send_error([email], "Zipped data")
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
@@ -295,12 +243,12 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
     return True
 
 
-def subset_download_callback(context: Context, data_dict: dict[str, Any]):
+def zipped_download_callback(context: Context, data_dict: dict[str, Any]):
     entity_id = data_dict.get("entity_id")
     key = data_dict.get("key")
     task = p.toolkit.get_action("task_status_show")(
         context,
-        {"entity_id": entity_id, "task_type": "download_subset", "key": key},
+        {"entity_id": entity_id, "task_type": "download_zipped", "key": key},
     )
 
     if not task:

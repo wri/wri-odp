@@ -8,7 +8,8 @@ export default function Footer({
     primary: { title: "Explore Topics", href: "#" },
     secondary: { title: "Advanced Search", href: "#" },
   },
-  style = "mt-16"
+  style = "mt-16",
+  isHome = false
 }) {
   return (
     <section
@@ -59,7 +60,7 @@ export default function Footer({
             <a href="/get-help" className=" font-normal">Get Help</a>
           </div>
           <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start xl:min-w-[420px]">
-            <div className="font-acumin text-[22px] font-bold text-gray-800">
+            <div className="font-acumin text-xl font-bold text-gray-800">
               STAY UP TO DATE WITH THE NEWS{" "}
             </div>
             <div className="flex w-full flex-col gap-x-2 gap-y-4 lg:flex-row justify-between">
@@ -76,7 +77,7 @@ export default function Footer({
               </div>
               <Button>SUBSCRIBE</Button>
             </div>
-            <div className="flex flex-row gap-5">
+            <div className="flex flex-row gap-5 mt-10 sm:mt-0">
               <div className="relative h-5 w-5 ">
                 <Image src="/icons/fb.svg" alt="" fill />
               </div>
@@ -92,6 +93,7 @@ export default function Footer({
             </div>
           </div>
         </div>
+
         <div className="items mx-auto flex w-full flex-col gap-y-8 pt-16 sm:flex-row sm:gap-y-4">
           <div className=" relative mx-auto h-16 w-52 sm:ml-0 sm:h-20 sm:w-56">
             <Image
@@ -100,20 +102,23 @@ export default function Footer({
               fill
             />
           </div>
-          <div className="mt-auto flex items-end gap-x-1  text-base font-normal sm:ml-auto">
-            <span>
-              Powered by{" "}
-              <a href="#" className=" text-wri-green">
-                Portal.js
-              </a>{" "}
-              from
-            </span>
-            <div className=" relative h-6 w-24">
-              <Image src="/images/datopian.png" alt="" fill></Image>
+          <div className="mt-auto flex justify-center md:items-end text-base font-normal md:ml-auto">
+            <div className="flex gap-x-1">
+                <span>
+                  Powered by{" "}
+                  <a href="#" className=" text-wri-green">
+                    Portal.js
+                  </a>{" "}
+                  from
+                </span>
+                <div className=" relative h-6 w-24">
+                  <Image src="/images/datopian.png" alt="" fill></Image>
+                </div>
             </div>
           </div>
         </div>
       </div>
+
 
     </section>
   );

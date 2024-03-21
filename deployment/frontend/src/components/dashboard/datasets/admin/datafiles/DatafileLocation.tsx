@@ -148,6 +148,10 @@ export function DatafileLocation({
                                     `resources.${index}.spatial_address`,
                                     undefined
                                 )
+                                setValue(
+                                    `resources.${index}.spatial_coordinates`,
+                                    undefined
+                                )
                             }}
                             id="locationUpload"
                             className={classNames(
@@ -238,11 +242,19 @@ export function DatafileLocation({
                                             `resources.${index}.spatial_address`,
                                             e?.result?.place_name
                                         )
+                                        setValue(
+                                            `resources.${index}.spatial_coordinates`,
+                                            e?.result?.center
+                                        )
                                     }}
                                     onClear={(e) => {
                                         setValue(
                                             `resources.${index}.spatial_address`,
                                             ''
+                                        )
+                                        setValue(
+                                            `resources.${index}.spatial_coordinates`,
+                                            undefined
                                         )
                                     }}
                                     initialValue={watch(
