@@ -10,6 +10,7 @@ import re
 from itertools import zip_longest
 
 from ckan.common import config, asbool
+from ckan.model import Package
 from sqlalchemy import text, engine
 
 
@@ -958,8 +959,8 @@ def resource_search(context: Context, data_dict: DataDict):
 
     q = (
         model.Session.query(model.Resource)
-        .join(model.Package)
-        .join(ResourceLocation)
+        .join(ResourceLocation, ResourceLocation.resource_id == model.Resource.id, isouter=True)
+        .join(Package, model.Package.id == model.Resource.package_id, isouter=True)
         .filter(ResourceLocation.is_pending == (is_pending == "true"))
         .filter(model.Package.state == "active")
         .filter(model.Package.private == False)
@@ -981,9 +982,9 @@ def resource_search(context: Context, data_dict: DataDict):
             country = f"{segments[2].strip()}"
             location_queries.append(
                 _or_(
-                    ResourceLocation.spatial_address.like(f"%{full_address}%"),
-                    ResourceLocation.spatial_address.like(f"%{region}%"),
-                    ResourceLocation.spatial_address.like(f"%{country}%"),
+                    ResourceLocation.spatial_address.like(f"{full_address}"),
+                    ResourceLocation.spatial_address.like(f"{region}"),
+                    ResourceLocation.spatial_address.like(f"{country}"),
                 )
             )
         if len(segments) == 2:
@@ -991,14 +992,14 @@ def resource_search(context: Context, data_dict: DataDict):
             country = f"{segments[1].strip()}"
             location_queries.append(
                 _or_(
-                    ResourceLocation.spatial_address.like(f"%{region}%"),
-                    ResourceLocation.spatial_address.like(f"%{country}%"),
+                    ResourceLocation.spatial_address.like(f"%{region}"),
+                    ResourceLocation.spatial_address.like(f"{country}"),
                 )
             )
         if len(segments) == 1:
             country = f"{segments[1].strip()}"
             location_queries.append(
-                ResourceLocation.spatial_address.like(f"%{country}%"),
+                ResourceLocation.spatial_address.like(f"%{country}"),
             )
 
         if len(segments) in [1, 2]:
