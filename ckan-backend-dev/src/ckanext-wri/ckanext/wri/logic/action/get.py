@@ -982,9 +982,9 @@ def resource_search(context: Context, data_dict: DataDict):
             country = f"{segments[2].strip()}"
             location_queries.append(
                 _or_(
-                    ResourceLocation.spatial_address.like(f"%{full_address}%"),
-                    ResourceLocation.spatial_address.like(f"%{region}%"),
-                    ResourceLocation.spatial_address.like(f"%{country}%"),
+                    ResourceLocation.spatial_address.like(f"{full_address}"),
+                    ResourceLocation.spatial_address.like(f"{region}"),
+                    ResourceLocation.spatial_address.like(f"{country}"),
                 )
             )
         if len(segments) == 2:
@@ -992,14 +992,14 @@ def resource_search(context: Context, data_dict: DataDict):
             country = f"{segments[1].strip()}"
             location_queries.append(
                 _or_(
-                    ResourceLocation.spatial_address.like(f"%{region}%"),
-                    ResourceLocation.spatial_address.like(f"%{country}%"),
+                    ResourceLocation.spatial_address.like(f"%{region}"),
+                    ResourceLocation.spatial_address.like(f"{country}"),
                 )
             )
         if len(segments) == 1:
             country = f"{segments[1].strip()}"
             location_queries.append(
-                ResourceLocation.spatial_address.like(f"%{country}%"),
+                ResourceLocation.spatial_address.like(f"%{country}"),
             )
 
         if len(segments) in [1, 2]:
