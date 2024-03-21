@@ -45,7 +45,7 @@ export function DataFileAccordion({
                                 <h3 className="text-black text-xl font-normal font-['Acumin Pro SemiCondensed'] flex items-center gap-x-2">
                                     {title}
                                     <DefaultTooltip content="Remove item">
-                                        <button onClick={() => remove()}>
+                                        <button onClick={() => remove()} aria-label='remove'>
                                             <MinusCircleIcon className="h-6 w-6 text-red-500" />
                                         </button>
                                     </DefaultTooltip>{' '}

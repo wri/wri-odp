@@ -178,6 +178,7 @@ function TipTapEditor({
         >
             <div className="menu">
                 <button
+                    aria-label='Undo'
                     type="button"
                     className="menu-button hover:bg-neutral-50"
                     onClick={() => editor.chain().focus().undo().run()}
@@ -186,6 +187,7 @@ function TipTapEditor({
                     <Icons.RotateLeft />
                 </button>
                 <button
+                    aria-label='Redo'
                     type="button"
                     className="menu-button hover:bg-neutral-50"
                     onClick={() => editor.chain().focus().redo().run()}
@@ -194,6 +196,7 @@ function TipTapEditor({
                     <Icons.RotateRight />
                 </button>
                 <button
+                    aria-label='Link'
                     type="button"
                     className={classNames('menu-button hover:bg-neutral-50', {
                         'is-active': editor.isActive('link'),
@@ -203,6 +206,7 @@ function TipTapEditor({
                     <Icons.Link />
                 </button>
                 <button
+                    aria-label='Bold'
                     type="button"
                     className={classNames('menu-button hover:text-blue-800', {
                         'is-active': editor.isActive('bold'),
@@ -212,6 +216,7 @@ function TipTapEditor({
                     <Icons.Bold />
                 </button>
                 <button
+                    aria-label='Underline'
                     type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('underline'),
@@ -221,6 +226,7 @@ function TipTapEditor({
                     <Icons.Underline />
                 </button>
                 <button
+                    aria-label='Italic'
                     type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('intalic'),
@@ -230,6 +236,7 @@ function TipTapEditor({
                     <Icons.Italic />
                 </button>
                 <button
+                    aria-label='Strike'
                     type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('strike'),
@@ -239,6 +246,7 @@ function TipTapEditor({
                     <Icons.Strikethrough />
                 </button>
                 <button
+                    aria-label='Code'
                     type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('code'),
@@ -248,6 +256,7 @@ function TipTapEditor({
                     <Icons.Code />
                 </button>
                 <button
+                    aria-label='List'
                     type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('bulletList'),
@@ -268,6 +277,7 @@ function TipTapEditor({
                 }}
             >
                 <Button
+                    aria-label='Edit'
                     size="sm"
                     variant="outline"
                     type="button"
@@ -277,6 +287,7 @@ function TipTapEditor({
                     Edit
                 </Button>
                 <Button
+                    aria-label='Remove'
                     size="sm"
                     variant="destructive"
                     onClick={removeLink}

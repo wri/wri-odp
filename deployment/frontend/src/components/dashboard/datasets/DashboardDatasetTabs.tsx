@@ -67,7 +67,7 @@ export default function DashboardDatasetTabs({ tabs }: { tabs: TabProps[] }) {
                     </SwiperSlide>
                 ))}
                 <SwiperSlide className="max-w-8xl">
-                    <Link href="/dashboard/datasets/new" className="text-base font-normal text-black accent-white">
+                    <Link href="/dashboard/datasets/new" className="text-base font-normal text-black accent-white" role='tab'>
                         <div className="w-full border-b-2 py-4 font-normal focus:outline-0">
                             <div className="flex lg:px-12 2xl:px-14 px-6 sm:px-8 ">
                                 <div className="mr-2  mt-[0.2rem] flex h-4 w-4 items-center  justify-center rounded-full bg-wri-gold">
@@ -79,10 +79,10 @@ export default function DashboardDatasetTabs({ tabs }: { tabs: TabProps[] }) {
                     </Link>
                 </SwiperSlide>
             </Swiper>
-            <button className="nav-prev-button--tabs">
+            <button className="nav-prev-button--tabs"  aria-label="previous button" role="tab">
                 <ChevronDoubleLeftIcon className="h-6 w-6 text-black" />
             </button>
-            <button className="nav-next-button--tabs">
+            <button className="nav-next-button--tabs" aria-label="next button" role="tab">
                 <ChevronDoubleRightIcon className="h-6 w-6 text-black" />
             </button>
         </>

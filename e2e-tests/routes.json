@@ -1,0 +1,21 @@
+[
+    "/",
+    "/search",
+    "/search_advanced",
+    "/teams",
+    "/topics",
+    "/teams/<name>",
+    "/topics/<name>",
+    "/datasets/<name>",
+    "/dashboard/datasets/<name>/edit",
+    "/dashboard/datasets/new",
+    "/dashboard",
+    "/dashboard/datasets",
+    "/dashboard/notifications",
+    "/dashboard/approval-request",
+    "/dashboard/activity-stream",
+    "/dashboard/teams",
+    "/dashboard/topics",
+    "/dashboard/users",
+    "/dashboard/settings/edit/<name>"
+]
