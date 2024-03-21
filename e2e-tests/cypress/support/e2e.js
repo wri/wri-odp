@@ -592,8 +592,6 @@ Cypress.Commands.add(
           type: "tag",
           values: [
             "wcag2aa",
-            "wcag2a",
-            "wcag***",
           ],
         },
       },
