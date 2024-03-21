@@ -23,6 +23,7 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import "cypress-axe";
 
 const cypressUpload = require("cypress-file-upload");
 const headers = { Authorization: Cypress.env("API_KEY") };
@@ -551,5 +552,53 @@ Cypress.Commands.add(
         package_data: dataset
       },
     });
+  }
+);
+
+function printAccessibilityViolations(violations) {
+  cy.task(
+    "table", violations.map(({ id, impact, description, nodes }) => ({
+      impact,
+      description: `${description} (${id})`,
+      nodes: nodes.map((el) => el.target).join(" / "),
+    }))
+  );
+}
+
+Cypress.Commands.add(
+  "checkAccessibility",
+  {
+    prevSubject: "optional",
+  },
+  ({ skipFailures = false, context = null, options = null } = {}) => {
+    //  By default, exclude CKAN debugger elements
+    const defaultContext = {
+      exclude: [
+        
+      ],
+    };
+
+    if (!context) {
+      context = defaultContext;
+    } else {
+      context = { ...defaultContext, ...context };
+    }
+    
+    cy.checkA11y(
+      context,
+      {
+        ...options,
+        runOnly: {
+          type: "tag",
+          values: [
+            "wcag2aa",
+            "wcag2a",
+            "wcag***",
+          ],
+        },
+      },
+      printAccessibilityViolations,
+      skipFailures
+    );
   }
 );
