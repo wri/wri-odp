@@ -9,14 +9,6 @@ function bypassApiTrackingFetch(url = '', options = {}) {
     options.headers = options.headers || {}
     console.log(`Using bypassApiTrackingFetch: ${url}`)
 
-    const setTrackingHeaders = (key, value) => {
-        if (options.headers instanceof Headers) {
-            options.headers.append(key, value)
-        } else {
-            options.headers[key] = value
-        }
-    }
-
     if (
         typeof url === 'string' &&
         (url.includes('/api/action/') ||
@@ -24,7 +16,10 @@ function bypassApiTrackingFetch(url = '', options = {}) {
             url.includes('/api/3/action/'))
     ) {
         console.log('Adding tracking headers to CKAN request')
-        setTrackingHeaders('X-From-Frontend-Portal', 'true')
+        options.headers = {
+            ...options.headers,
+            'X-From-Frontend-Portal': 'true',
+        }
         console.log(
             `Header added successfully to CKAN request: ${
                 (options.headers instanceof Headers
