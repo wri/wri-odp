@@ -22,10 +22,7 @@ function bypassApiTrackingFetch(url = '', options = {}) {
         }
         console.log(
             `Header added successfully to CKAN request: ${
-                (options.headers instanceof Headers
-                    ? options.headers.get('X-From-Frontend-Portal')
-                    : options.headers['X-From-Frontend-Portal']) === 'true' ??
-                false
+                options.headers['X-From-Frontend-Portal'] === 'true'
             }`
         )
     } else {
