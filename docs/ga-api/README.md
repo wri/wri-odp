@@ -27,7 +27,7 @@ The API tracking uses 2 important custom dimensions:
 - `action`: The action that was taken (e.g., `package_create`, `organization_show`, etc.)
 - `user_agent`: The user agent of the client that made the request (e.g., `curl/7.68.0`, `ckanapi/4.0`, etc.)
 
-These custom dimensions need to be created in your Google Analytics account before they will show up in your reports.
+These custom dimensions need to be created in your Google Analytics account before they will show up in your Explorations.
 
 To create custom dimensions:
 
@@ -37,7 +37,7 @@ To create custom dimensions:
 2. In the **Data display** section, click on **Custom Definitions**.
 ![](./ga-custom-definitions.png)
 
-3. Click on **Create custom dimension** to create a new custom dimension (create one for `action` and one for `user_agent`—**Dimension name** will be the name displayed in the reports and **Description** is optional—**Event parameter** _must_ be set to `action` and `user_agent` respectively).
+3. Click on **Create custom dimension** to create a new custom dimension (create one for `action` and one for `user_agent`—**Dimension name** will be the name displayed in the Explorations and **Description** is optional—**Event parameter** _must_ be set to `action` and `user_agent` respectively).
 ![](./ga-custom-dimension-action.png)
 ![](./ga-custom-dimension-user-agent.png)
 
@@ -74,4 +74,4 @@ Save.
 8. Once you've configured the Exploration, you should see the data.
 ![](./ga-exploration-with-data.png)
 
-**Additional Note**: If you recently created the custom dimensions, it may take up to 48 hours for the data to start showing up in your reports. Any data collected before the custom dimensions were created will not be retroactively updated. This is a limitation of Google Analytics itself.
+**Additional Note**: If you recently created the custom dimensions, it may take up to 48 hours for the data to start showing up in your Explorations. Any data collected before the custom dimensions were created will not be retroactively updated. This is a limitation of Google Analytics itself.
