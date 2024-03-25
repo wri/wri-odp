@@ -81,7 +81,7 @@ export function EditDataFilesSection({
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>
-                        append({
+                        insert(datafiles.length, {
                             resourceId: uuidv4(),
                             package_id: watch('id'),
                             title: '',

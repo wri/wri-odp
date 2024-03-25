@@ -155,6 +155,7 @@ export function DataFiles({
     isCurrentVersion?: boolean
     diffFields: Array<Record<string, { old_value: string; new_value: string }>>
 }) {
+    console.log(diffFields)
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
         useActiveLayerGroups()
     const { data: activeLayers } = useLayersFromRW()

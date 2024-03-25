@@ -74,7 +74,7 @@ export function CreateDataFilesSection({
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>
-                        append({
+                        insert(datafiles.length, {
                             resourceId: uuidv4(),
                             title: '',
                             type: 'empty-file',

@@ -591,6 +591,21 @@ def _diff(existing, pending, path=""):
 def _process_lists(existing_list, pending_list, path):
     list_diff = {}
 
+    if path == 'resources':
+        for index, pending_res in enumerate(pending_list):
+            item_path = f"{path}[{index}]"
+            item_existing_list = list(filter(
+                lambda r: r.get("id") == pending_res.get("id"),
+                existing_list))
+
+            if len(item_existing_list) > 0:
+                existing_res = item_existing_list[0]
+                item_diff = _diff(existing_res, pending_res, item_path)
+                list_diff.update(item_diff)
+
+        return list_diff
+
+
     for index, (item_existing, item_pending) in enumerate(
         zip_longest(existing_list, pending_list)
     ):
