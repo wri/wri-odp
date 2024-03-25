@@ -44,11 +44,11 @@ ckan:
       targetMemoryUtilizationPercentage: 80
     resources:
       limits:
-        cpu: 400m
-        memory: 1.5G
+        cpu: 800m
+        memory: 3G
       requests:
-        cpu: 300m
-        memory: 1G
+        cpu: 400m
+        memory: 2.5G
     image:
       pullPolicy: Always
       repository: {{REGISTRY}}/{{CKAN_REPO}}
