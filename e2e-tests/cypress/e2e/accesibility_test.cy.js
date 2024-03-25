@@ -39,7 +39,6 @@ const replaceParams = (route) => {
 describe("Pages meet the accessibility requirements onload ", () => {
   before(function () {
     cy.createOrganizationAPI(team);
-      cy.createDatasetAPI(team, datasetName2, true);
       cy.createDatasetAPI(team, datasetName, true, {
         'notes': 'test',
         'draft': 'true',
@@ -54,6 +53,20 @@ describe("Pages meet the accessibility requirements onload ", () => {
         "update_frequency": "hourly",
         "is_approved": "false",
       });
+    
+    cy.fixture('airtravel.csv').then(fileContent => {
+      cy.createDatasetAPI(team, datasetName2, true, {
+        'resources': [
+           {
+            
+            "format": "CSV",
+            "name": "airtravel",
+            "description": "airtravel",
+            "upload": fileContent
+          }
+         ]
+       });
+    });
       
     cy.createGroupAPI(topic);
 

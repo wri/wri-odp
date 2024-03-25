@@ -476,6 +476,7 @@ function DatafileCard({
                             {datafile.url_type === 'upload' && (
                                 <DefaultTooltip content="Select to download">
                                     <input
+                                        aria-label={`Select ${datafile.title}`}
                                         type="checkbox"
                                         className="h-4 w-4  rounded  bg-white "
                                         checked={selected}
