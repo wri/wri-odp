@@ -51,7 +51,8 @@ export const env = createEnv({
         NEXT_PUBLIC_CKAN_URL: z.string(),
         NEXT_PUBLIC_NEXTAUTH_URL: z.string(),
         NEXT_PUBLIC_GTM_ID: z.string(),
-        NEXT_PUBLIC_DISABLE_HOTJAR: z.string()
+        NEXT_PUBLIC_DISABLE_HOTJAR: z.string(),
+        NEXT_PUBLIC_HOTJAR_ID: z.string(),
     },
 
     /**
@@ -82,6 +83,7 @@ export const env = createEnv({
         NEXT_PUBLIC_NEXTAUTH_URL: process.env.NEXT_PUBLIC_NEXTAUTH_URL,
         NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID, 
         NEXT_PUBLIC_DISABLE_HOTJAR: process.env.NEXT_PUBLIC_DISABLE_HOTJAR || "enabled",
+        NEXT_PUBLIC_HOTJAR_ID: process.env.NEXT_PUBLIC_HOTJAR_ID,
         
     },
     /**
