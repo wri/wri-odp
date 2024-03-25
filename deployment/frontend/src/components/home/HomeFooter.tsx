@@ -11,7 +11,7 @@ export function HomeFooter() {
             <h4 className="font-acumin text-2xl font-bold text-white">
               Some CTA here? Lorem ipsum dolor. Etiam porta sem malesuada magna.
             </h4>
-            <h5 className="font-acumin text-xl font-normal text-gray-200">
+            <h5 className="font-acumin text-xl font-normal text-gray-100">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </h5>
           </div>
@@ -46,11 +46,12 @@ export function HomeFooter() {
               <div className="relative grow">
                 <input
                   type="text"
+                  aria-label="email"
                   className="h-11 w-full peer grow rounded border-0 shadow outline-0 ring-0 ring-offset-0 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 "
                 />
                 <div className="absolute pointer-events-none peer-focus:hidden inset-y-0 left-0 flex gap-x-2 items-center pl-3">
                   <EnvelopeIcon className="h-6 w-5 text-gray-400" />
-                  <span className="text-xs text-gray-400">Enter your email</span>
+                  <span className="text-xs text-gray-500">Enter your email</span>
                 </div>
               </div>
               <Button>SUBSCRIBE</Button>

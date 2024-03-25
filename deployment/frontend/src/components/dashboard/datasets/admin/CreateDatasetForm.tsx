@@ -186,9 +186,10 @@ export default function CreateDatasetForm() {
                     Save as Draft
                 </Button>
                 <div className="flex items-center gap-x-2 flex-wrap gap-y-5">
-                    <Button type="button" variant="outline">
-                        <Link href="/dashboard/datasets">Cancel</Link>
-                    </Button>
+                    <Link href="/dashboard/datasets"
+                        className='inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold h-11 px-6 py-4 rounded-[3px] text-base'>
+                        Cancel
+                    </Link>
                     {selectedIndex !== 0 && (
                         <Button
                             type="button"

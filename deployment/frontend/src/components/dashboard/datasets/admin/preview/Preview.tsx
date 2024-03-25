@@ -422,7 +422,7 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
             <dt className="font-['Acumin Pro SemiCondensed'] text-lg font-semibold leading-tight text-black">
                 {label}
             </dt>
-            <div className="flex flex-wrap gap-3">
+            <dd className="flex flex-wrap gap-3">
                 {items.map((item, index) => (
                     <span
                         key={index}
@@ -433,7 +433,7 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
                         </span>
                     </span>
                 ))}
-            </div>
+            </dd>
         </div>
     )
 }

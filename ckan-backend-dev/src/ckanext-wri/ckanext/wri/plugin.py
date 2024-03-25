@@ -7,6 +7,10 @@ from ckanext.wri.logic.action.datapusher_download_subset import (
     subset_download_callback,
     subset_download_request,
 )
+from ckanext.wri.logic.action.datapusher_download_zip import (
+    zipped_download_request,
+    zipped_download_callback,
+)
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
 from ckan.types import Action, AuthFunction, Context
@@ -49,7 +53,9 @@ from ckanext.wri.logic.action.datapusher_download import (
     download_request,
     download_callback,
 )
+import ckanext.wri.views.api as api_blueprint
 
+import queue
 import logging
 
 log = logging.getLogger(__name__)
@@ -179,6 +185,8 @@ class WriPlugin(plugins.SingletonPlugin):
             "organization_activity_list_wri": organization_activity_list_wri,
             "prefect_download_subset_from_store": subset_download_request,
             "prefect_download_subset_callback": subset_download_callback,
+            "prefect_download_zipped": zipped_download_request,
+            "prefect_download_zipped_callback": zipped_download_callback,
             "dataset_release_notes": dataset_release_notes,
             "user_list_wri": user_list_wri,
             "organization_list_wri": organization_list_wri,
@@ -354,6 +362,7 @@ class WriPlugin(plugins.SingletonPlugin):
         return search_params
 
     # IResourceView
+
     def info(self):
         return {
             "name": "custom",
@@ -366,3 +375,38 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def can_view(self):
         return True
+
+
+class WriApiTracking(plugins.SingletonPlugin):
+    plugins.implements(plugins.IBlueprint)
+    plugins.implements(plugins.IConfigurable)
+
+    analytics_queue = queue.Queue()
+
+    # IBlueprint
+
+    def get_blueprint(self):
+        return [api_blueprint.wri]
+
+    # IConfigurable
+
+    def configure(self, config):
+        self.wri_api_analytics_measurement_id = config.get(
+            'ckanext.wri.api_analytics.measurement_id'
+        )
+        self.wri_api_analytics_api_secret = config.get('ckanext.wri.api_analytics.api_secret')
+
+        variables = {
+            'ckanext.wri.api_analytics.measurement_id': self.wri_api_analytics_measurement_id,
+            'ckanext.wri.api_analytics.api_secret': self.wri_api_analytics_api_secret,
+        }
+        if not all(variables.values()):
+            missing_variables = '\n'.join([k for k, v in variables.items() if not v])
+            msg = f'The following variables are not configured:\n\n{missing_variables}\n'
+            raise RuntimeError(msg)
+
+        # spawn a pool of 5 threads, and pass them queue instance
+        for _ in range(5):
+            t = api_blueprint.AnalyticsPostThread(self.analytics_queue)
+            t.setDaemon(True)
+            t.start()

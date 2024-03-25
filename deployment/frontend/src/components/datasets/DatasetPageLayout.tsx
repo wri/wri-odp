@@ -36,6 +36,7 @@ export default function DatasetPageLayout({
                 {({ open }) => (
                     <>
                         <Disclosure.Button
+                            aria-label='Toggle left hand side'
                             onClick={() => {
                                 setLhsOpen(!open)
                             }}
@@ -84,6 +85,7 @@ export default function DatasetPageLayout({
                 {({ open }) => (
                     <>
                         <Disclosure.Button
+                            aria-label='Toggle right hand side'
                             onClick={() => {
                                 setRhsOpen(!open)
                             }}

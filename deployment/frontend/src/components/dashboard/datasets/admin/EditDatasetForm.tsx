@@ -317,9 +317,12 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 )}
             </div>
             <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-6 xxl:px-0">
-                <Button type="button" variant="outline">
-                    <Link href="/dashboard/datasets">Cancel</Link>
-                </Button>
+                {/* <Button type="button" variant="outline"> */}
+                <Link href="/dashboard/datasets"
+                    className='inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold h-11 px-6 py-4 rounded-[3px] text-base'>
+                    Cancel
+                </Link>
+                {/* </Button> */}
                 <LoaderButton
                     loading={editDataset.isLoading}
                     type="submit"

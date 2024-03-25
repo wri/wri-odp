@@ -46,6 +46,7 @@ export function DescriptionForm({
                     className="mb-2 flex  flex-col items-start whitespace-nowrap sm:flex-col"
                 >
                     <TextArea
+                        aria-label='Short Description'
                         placeholder=""
                         type="text"
                         {...register('short_description')}

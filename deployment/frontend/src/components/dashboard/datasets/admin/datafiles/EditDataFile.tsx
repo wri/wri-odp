@@ -80,13 +80,14 @@ export function EditDataFile({
                                         <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
                                             {datafile.name}
                                         </span>
-                                        <span className="font-['Acumin Pro SemiCondensed'] mt-0.5 text-right text-xs font-normal leading-tight text-neutral-500">
+                                        <span className="font-['Acumin Pro SemiCondensed'] mt-0.5 text-right text-xs font-normal leading-tight text-neutral-600">
                                             {datafile.size
                                                 ? convertBytes(datafile.size)
                                                 : 'N/A'}
                                         </span>
                                     </div>
                                     <button
+                                        aria-label='remove'
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -103,6 +104,7 @@ export function EditDataFile({
                                         </span>
                                     </div>
                                     <button
+                                        aria-label='remove'
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -119,6 +121,7 @@ export function EditDataFile({
                                         </span>
                                     </div>
                                     <button
+                                        aria-label='remove'
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -130,6 +133,7 @@ export function EditDataFile({
                                 <>
                                     <div className="flex items-center gap-x-2"></div>
                                     <button
+                                        aria-label='remove'
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -163,6 +167,7 @@ export function EditDataFile({
                         </span>
                     </div>
                     <button
+                        aria-label='remove'
                         type="button"
                         id={`remove_${index}_datafile`}
                         onClick={() => remove()}
