@@ -16,7 +16,7 @@ def download_resource(resource: Resource, get_resource: GetResource, temp_dir):
 
     # fetch the resource data
     print(f"Fetching from: {resource.url}...")
-    headers = {}
+    headers = {"X-From-Frontend-Portal": "true"}
     if resource.url_type == "upload":
         # If this is an uploaded file to CKAN, authenticate the request,
         # otherwise we won't get file from private resources
@@ -124,6 +124,3 @@ def download_resource(resource: Resource, get_resource: GetResource, temp_dir):
         return resource, tmp, fetch_elapsed
 
     return resource.model_copy(update={"hash": file_hash}), tmp, fetch_elapsed
-
-
-

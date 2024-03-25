@@ -16,6 +16,31 @@ class DatastoreEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
+
+def get_request_headers(api_key, content_type="application/json", **kwargs):
+    """
+    Add header to indicate that the request is coming from the frontend portal
+
+    :param api_key: The API key to use for the request
+    :type api_key: string
+
+    :param content_type: The content type of the request
+    :type content_type: string
+
+    :param kwargs: Additional headers to include in the request
+    :type kwargs: dict
+
+    :return: A dictionary of headers
+    :rtype: dict
+    """
+    return {
+        "Content-Type": content_type,
+        "Authorization": api_key,
+        "X-From-Frontend-Portal": "true",
+        **kwargs,
+    }
+
+
 def get_url(action, ckan_url):
     """
     Get url for ckan action
@@ -139,7 +164,7 @@ def datastore_resource_exists(resource_id, api_key, ckan_url):
             search_url,
             verify=False,
             data=json.dumps({"id": resource_id, "limit": 0}),
-            headers={"Content-Type": "application/json", "Authorization": api_key},
+            headers=get_request_headers(api_key),
         )
         if response.status_code == 404:
             return False
@@ -163,7 +188,7 @@ def delete_datastore_resource(resource_id, api_key, ckan_url):
             delete_url,
             verify=False,
             data=json.dumps({"id": resource_id, "force": True}),
-            headers={"Content-Type": "application/json", "Authorization": api_key},
+            headers=get_request_headers(api_key),
         )
         check_response(
             response,
@@ -214,7 +239,7 @@ def send_resource_to_datastore(
         url,
         verify=False,
         data=json.dumps(request, cls=DatastoreEncoder),
-        headers={"Content-Type": "application/json", "Authorization": api_key},
+        headers=get_request_headers(api_key),
     )
     check_response(r, url, "CKAN DataStore")
     return r.json()
@@ -228,7 +253,7 @@ def get_package(package_id, ckan_url, api_key) -> Package:
         url,
         verify=True,
         data=json.dumps({"id": package_id}),
-        headers={"Content-Type": "application/json", "Authorization": api_key},
+        headers=get_request_headers(api_key),
     )
     check_response(r, url, "CKAN")
 
@@ -241,7 +266,7 @@ def update_resource(resource, ckan_url, api_key) -> Resource:
         url,
         verify=True,
         data=json.dumps(resource),
-        headers={"Content-Type": "application/json", "Authorization": api_key},
+        headers=get_request_headers(api_key),
     )
 
     check_response(r, url, "CKAN")
