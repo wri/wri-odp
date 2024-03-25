@@ -37,11 +37,11 @@ export function convertToSql({
               filters
                   .map(
                       (filter) =>
-                          `${filter.value
+                          `( ${filter.value
                               .filter((v) => v.value !== '')
                               .map(
                                   (v) =>
-                                      `( "${filter.id}" ${v.operation.value} '${
+                                      `"${filter.id}" ${v.operation.value} '${
                                           v.value
                                       }' ${v.link ?? ''} `
                               )

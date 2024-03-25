@@ -21,6 +21,7 @@ import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import LayerManagerPreview from './preview/LayerManagerPreview'
 import { slugify } from '@/utils/slugify'
+import { SafeParseSuccess } from 'zod'
 
 export function BuildALayer({
     formObj,
@@ -33,9 +34,13 @@ export function BuildALayer({
     const [preview, setPreview] = useState<APILayerSpec | null>(
         formObj.getValues(`resources.${index}.layerObj`)
             ? convertFormToLayerObj(
-                  layerSchema.parse(
+                  !layerSchema.safeParse(
                       formObj.getValues(`resources.${index}.layerObj`)
-                  )
+                  ).success
+                      ? formObj.getValues(`resources.${index}.layerObj`)
+                      : (layerSchema.safeParse(
+                            formObj.getValues(`resources.${index}.layerObj`)
+                        ) as SafeParseSuccess<any>).data
               )
             : null
     )
@@ -79,7 +84,6 @@ export function BuildALayer({
 
     const updatePreview = () => {
         syncValues()
-        console.log('UPDATING PREVIEW', layerFormObj.getValues())
         setPreview(convertFormToLayerObj(layerFormObj.getValues()))
     }
 
@@ -137,6 +141,8 @@ export function BuildALayer({
                                     ? send('GO_TO_RENDER')
                                     : send('GO_TO_LEGEND')
                             }}
+                            formObj={formObj}
+                            index={index}
                         />
                     )}
                     {current.matches('setRenderConfig') && (

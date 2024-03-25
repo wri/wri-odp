@@ -42,7 +42,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: staging-${{ github.sha }}
         run: |
           mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
           docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
@@ -60,7 +60,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: staging-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
           --build-arg NEXTAUTH_SECRET=${{ secrets.STAGING_FRONTEND_NEXTAUTH_SECRET }} \
@@ -68,20 +68,31 @@ jobs:
           --build-arg CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
           --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
           --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.STAGING_FRONTEND_NEXTAUTH_URL }} \
+          --build-arg NEXT_PUBLIC_GTM_ID='GTM-NPWKXNB5' \
+          --build-arg NEXT_PUBLIC_HOTJAR_ID='333333' \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Build and push Datapusher image to ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: staging-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
           datapusher
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
+      - name: Build and push Migration image to ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
+          IMAGE_TAG: staging-${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration \
+          migration
+          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
       - name: Set up Docker Containers
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}'
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
@@ -99,7 +110,7 @@ jobs:
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Set up Frontend Docker Container
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
       - name: Initialize the Extensions
@@ -169,7 +180,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_CKAN_REPO }}
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:staging-${{ github.sha }}'
           format: 'sarif'
           output: ckan-trivy-results.sarif
           exit-code: '0'
@@ -182,7 +193,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_FRONTEND_REPO }}
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:staging-${{ github.sha }}'
           format: 'sarif'
           output: frontend-trivy-results.sarif
           exit-code: '0'

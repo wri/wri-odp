@@ -9,6 +9,9 @@ import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner'
 import UserForm from '@/components/dashboard/users/UserForm'
 import { User } from '@portaljs/ckan'
+import { Tab } from '@headlessui/react'
+import { SettingsTabs } from '@/components/dashboard/users/SettingsTabs'
+import { ApiKeys } from '@/components/dashboard/users/ApiKeys'
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ username: string }>
@@ -41,6 +44,7 @@ export default function User(
 ) {
     const username = props.username!
     const { data, isLoading } = api.user.getUser.useQuery(username)
+    const { data: apiTokens } = api.user.getUserApiTokens.useQuery()
 
     if (isLoading) {
         return <Spinner />
@@ -51,7 +55,19 @@ export default function User(
             <NextSeo title={`User Profile setting`} />
             <Header />
             <Layout>
-                <UserForm user={data?.userdetails as User} />
+                <Tab.Group>
+                    <Tab.List className="flex max-w-8xl mx-auto w-full pt-8">
+                        <SettingsTabs />
+                    </Tab.List>
+                    <Tab.Panels className="mt-2">
+                        <Tab.Panel>
+                            <UserForm user={data?.userdetails as User} />
+                        </Tab.Panel>
+                        <Tab.Panel>
+                            <ApiKeys apiTokens={apiTokens ?? []} />
+                        </Tab.Panel>
+                    </Tab.Panels>
+                </Tab.Group>
             </Layout>
             <Footer
                 links={{

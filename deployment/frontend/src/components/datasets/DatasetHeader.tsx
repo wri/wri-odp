@@ -400,6 +400,7 @@ export function DatasetHeader({
                                 side="bottom"
                             >
                                 <button
+                                    aria-label='remove from favorites'     
                                     className="p-0 m-0 "
                                     onClick={() => setFOpen(true)}
                                 >
@@ -412,6 +413,7 @@ export function DatasetHeader({
                                 side="bottom"
                             >
                                 <button
+                                    aria-label='add to favorite'
                                     className="p-0 m-0 "
                                     onClick={() => setOpen(true)}
                                 >
@@ -421,8 +423,9 @@ export function DatasetHeader({
                         )}
 
                         <DefaultTooltip content="Edit" side="bottom">
-                            <Link
-                                href={`/dashboard/datasets/${dataset?.name}/edit`}
+                                <Link
+                                    aria-label='edit dataset'
+                                    href={`/dashboard/datasets/${dataset?.name}/edit`}
                             >
                                 <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
                             </Link>
@@ -686,7 +689,7 @@ export function DatasetHeader({
                 )}
                 <div className="mt-4 flex justify-start gap-x-3">
                     {dataset?.wri_data ? (
-                        <div className="flex items-center rounded-[3px] border border-blue-400 bg-blue-400">
+                        <div className="flex items-center rounded-[3px] border border-blue-400 bg-blue-800">
                             <div className="px-2 font-acumin text-xs font-medium text-white">
                                 WRI Data
                             </div>
@@ -698,7 +701,7 @@ export function DatasetHeader({
                         dataset?.technical_notes ? (
                             <div
                                 className={classNames(
-                                    'flex items-center rounded-[3px] border border-green-500 bg-green-500',
+                                    'flex items-center rounded-[3px] border border-green-500 bg-green-800',
                                     highlighted('technical_notes'),
                                     highlighted('technical_notes') !== ''
                                         ? 'border-yellow-200'
@@ -712,7 +715,7 @@ export function DatasetHeader({
                         ) : (
                             <div
                                 className={classNames(
-                                    'flex items-center rounded-[3px] border border-orange-400 bg-orange-400',
+                                    'flex items-center rounded-[3px] border border-orange-400 bg-orange-800',
                                     highlighted('technical_notes'),
                                     highlighted('technical_notes') !== ''
                                         ? 'border-yellow-200'
@@ -802,6 +805,7 @@ export function DatasetHeader({
                                                 id: dataset.rw_id as string,
                                                 connectorUrl:
                                                     dataset.connectorUrl as string,
+                                                name: dataset.name,
                                             })
                                         }
                                     >

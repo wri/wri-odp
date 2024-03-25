@@ -451,9 +451,9 @@ export default function ChartViewEditor({
                 onSubmit={handleSubmit(onSubmit, (e) => {
                     console.log(e)
                 })}
-                className="mt-5 flex space-x-10 stretch flex-col xl:flex-row"
+                className="mt-5 flex sm:space-x-10 stretch flex-col xl:flex-row"
             >
-                <div className="min-w-[450px]">
+                <div className="sm:min-w-[450px]">
                     {!isFieldsLoading && !fieldsError && (
                         <div className="h-full">
                             <div className="flex flex-col h-full space-y-4">

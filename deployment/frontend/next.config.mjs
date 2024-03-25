@@ -38,6 +38,7 @@ const config = {
             'wri.prod.ckan.datopian.com',
             'test-bucket-wri.s3.ap-northeast-1.amazonaws.com',
             'ckan-dev',
+            'ckan',
             'gravatar.com',
             's3.amazonaws.com',
         ],

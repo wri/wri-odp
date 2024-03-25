@@ -14,6 +14,7 @@ const CarouselNavButton: React.FC<{
     <>
       <button
         className={`bg-white shadow ${sizes[size ?? 'medium']} rounded-full flex justify-center items-center`}
+        aria-label="Navigate"
       >
         <ChevronRightIcon className={`w-8 h-8 text-wri-black font-light ${orientation === "right" ? "block" : "hidden"}`} />
         <ChevronLeftIcon className={`w-8 h-8 text-wri-black font-light ${orientation === "left" ? "block" : "hidden"}`} />

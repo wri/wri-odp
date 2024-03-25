@@ -14,6 +14,8 @@
     "cypress": "^13.5.0"
   },
   "dependencies": {
+    "axe-core": "^4.8.4",
+    "cypress-axe": "^1.5.0",
     "cypress-file-upload": "^5.0.8"
   }
 }

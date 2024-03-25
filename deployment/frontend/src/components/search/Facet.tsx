@@ -50,6 +50,7 @@ export default function Facet({
         <Disclosure
             as="div"
             className="border-b border-r border-stone-200 shadow"
+            role="listitem"
         >
             {({ open }) => (
                 <>
