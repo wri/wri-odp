@@ -1,5 +1,3 @@
-version: "3"
-
 volumes:
   ckan_storage:
   pg_data:
@@ -30,12 +28,6 @@ services:
       - ckan_storage:/var/lib/ckan
       - ./src:/srv/app/src_extensions
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
-      interval: 40s
-      timeout: 30s
-      retries: 3
-      start_period: 60s
     image: ${CKAN_IMAGE}
 
       #  frontend:
@@ -97,26 +89,25 @@ services:
       retries: 3
       start_period: 60s
     depends_on:
-      prefect:
-        condition: service_healthy
+      - ckan-dev
 
-  # my-datapusher:
-  #   container_name: my-datapusher
-  #   build:
-  #     context: ../datapusher
-  #   restart: always
-  #   environment:
-  #     - PREFECT_API_URL=http://prefect:4200/api
-  #     - DEPLOYMENT_NAME=datapusher-dev
-  #     - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
-  #     - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
-  #     - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
-  #     - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
-  #     - S3_BUCKET_NAME=ckan
-  #     - S3_BUCKET_REGION=us-east-1
-  #   depends_on:
-  #     prefect:
-  #       condition: service_healthy
+          #  my-datapusher:
+          #    container_name: my-datapusher
+          #    build:
+          #      context: ../datapusher
+          #    restart: always
+          #    environment:
+          #      - PREFECT_API_URL=http://prefect:4200/api
+          #      - DEPLOYMENT_NAME=datapusher-dev
+          #      - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+          #      - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+          #      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+          #      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+          #      - S3_BUCKET_NAME=ckan
+          #      - S3_BUCKET_REGION=us-east-1
+          #    depends_on:
+          #      prefect:
+          #        condition: service_healthy
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}

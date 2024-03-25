@@ -12,6 +12,7 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
+
 def _adjust_longitude(value):
     if value < -180 or value > 180:
         value = value % 360
@@ -21,6 +22,7 @@ def _adjust_longitude(value):
             value = -360 + value
     return value
 
+
 def _adjust_latitude(value):
     if value < -90 or value > 90:
         value = value % 180
@@ -29,6 +31,7 @@ def _adjust_latitude(value):
         elif value > 90:
             value = -180 + value
     return value
+
 
 def fit_bbox(bbox_dict):
     """
@@ -46,13 +49,13 @@ def fit_bbox(bbox_dict):
 
     """
 
-
     return {
         "minx": _adjust_longitude(bbox_dict["minx"]),
         "maxx": _adjust_longitude(bbox_dict["maxx"]),
         "miny": _adjust_latitude(bbox_dict["miny"]),
         "maxy": _adjust_latitude(bbox_dict["maxy"]),
     }
+
 
 def fit_point(point_dict):
     """
@@ -68,14 +71,13 @@ def fit_point(point_dict):
 
     """
 
-
     return {
         "x": _adjust_longitude(point_dict["x"]),
         "y": _adjust_latitude(point_dict["y"]),
     }
 
 
-class SolrSpatialFieldSearchBackend():
+class SolrSpatialFieldSearchBackend:
     def parse_geojson(self, geom_from_metadata):
         try:
             geometry = json.loads(geom_from_metadata)
@@ -97,8 +99,6 @@ class SolrSpatialFieldSearchBackend():
             return None
 
         return shape
-
-
 
     def fit_linear_ring(self, lr):
         bbox = {
@@ -125,7 +125,7 @@ class SolrSpatialFieldSearchBackend():
             return dataset_dict
 
         geometry = self.parse_geojson(geom_from_metadata)
-        
+
         if not geometry:
             return dataset_dict
 
@@ -134,7 +134,7 @@ class SolrSpatialFieldSearchBackend():
             geometries = geometry["geometries"]
         elif geometry["type"] == "FeatureCollection":
             geometries = list(map(lambda x: x["geometry"], geometry["features"]))
-            geometry = { "type": "GeometryCollection", "geometries": geometries }
+            geometry = {"type": "GeometryCollection", "geometries": geometries}
         else:
             geometries = [geometry]
 
@@ -194,17 +194,19 @@ you need to split the geometry in order to fit the parts. Not indexing"""
         return dataset_dict
 
     def get_point_query(self, coordinates):
-        return "_query_:\"{{!field f=spatial_geom}}Contains({y}, {x})\"".format(**coordinates)
+        return '_query_:"{{!field f=spatial_geom}}Contains({y}, {x})"'.format(
+            **coordinates
+        )
 
     def get_wkt_query(self, wkt):
-        return "_query_:\"{{!field f=spatial_geom}}Intersects({})\"".format(wkt)
+        return '_query_:"{{!field f=spatial_geom}}Intersects({})"'.format(wkt)
 
     def get_wkt_for_geojson(self, geojson):
         wkt = None
-        geom_from_metadata = geojson 
+        geom_from_metadata = geojson
 
         geometry = self.parse_geojson(geom_from_metadata)
-        
+
         if geometry:
 
             # We allow multiple geometries as GeometryCollections
@@ -212,7 +214,7 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                 geometries = geometry["geometries"]
             elif geometry["type"] == "FeatureCollection":
                 geometries = list(map(lambda x: x["geometry"], geometry["features"]))
-                geometry = { "type": "GeometryCollection", "geometries": geometries }
+                geometry = {"type": "GeometryCollection", "geometries": geometries}
             else:
                 geometries = [geometry]
 
@@ -241,9 +243,8 @@ you need to split the geometry in order to fit the parts. Not indexing"""
             if not wkt:
                 shape = shapely.geometry.shape(geometry)
                 wkt = shape.wkt
-                
-            return wkt
 
+            return wkt
 
     def search_params(self, point, address, search_params):
 
@@ -253,19 +254,24 @@ you need to split the geometry in order to fit the parts. Not indexing"""
             search_params["fq_list"] = []
 
         queries = []
-        
+
         if address:
             cwd = os.path.abspath(os.path.dirname(__file__))
 
             queries.append("spatial_address:/.*{}/".format(address))
 
-            segments = address.split(',')
-            
+            segments = address.split(",")
+
             if len(segments) == 1:
                 # It's a country
                 try:
-                    path = os.path.join(cwd, "../world_geojsons/countries/{}.geojson".format(segments[0].strip()))
-                    with open(path, 'r') as f:
+                    path = os.path.join(
+                        cwd,
+                        "../world_geojsons/countries/{}.geojson".format(
+                            segments[0].strip()
+                        ),
+                    )
+                    with open(path, "r") as f:
                         content = f.read()
                         wkt = self.get_wkt_for_geojson(content)
 
@@ -273,7 +279,7 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                             queries.append(self.get_wkt_query(wkt))
                         elif point:
                             queries.append(self.get_point_query(point))
-                            
+
                 except Exception:
                     if point:
                         queries.append(self.get_point_query(point))
@@ -281,8 +287,13 @@ you need to split the geometry in order to fit the parts. Not indexing"""
             elif len(segments) == 2:
                 # It's a state
                 try:
-                    path = os.path.join(cwd, "../world_geojsons/states/{}/{}.geojson".format(segments[0].strip(), segments[1].strip()))
-                    with open(path, 'r') as f:
+                    path = os.path.join(
+                        cwd,
+                        "../world_geojsons/states/{}/{}.geojson".format(
+                            segments[0].strip(), segments[1].strip()
+                        ),
+                    )
+                    with open(path, "r") as f:
                         content = f.read()
                         wkt = self.get_wkt_for_geojson(content)
 
@@ -290,7 +301,7 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                             queries.append(self.get_wkt_query(wkt))
                         elif point:
                             queries.append(self.get_point_query(point))
-                            
+
                 except Exception:
                     if point:
                         queries.append(self.get_point_query(point))
@@ -302,4 +313,3 @@ you need to split the geometry in order to fit the parts. Not indexing"""
         search_params["fq_list"].append(" OR ".join(queries))
 
         return search_params
-

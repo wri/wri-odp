@@ -17,10 +17,12 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
 def calculate_md5(input_string):
     md5_hash = hashlib.md5()
-    md5_hash.update(input_string.encode('utf-8'))
+    md5_hash.update(input_string.encode("utf-8"))
     return md5_hash.hexdigest()
+
 
 def check_for_existing_file_in_s3(filename: str, download_filename: str):
     s3 = uploader.BaseS3Uploader()
@@ -50,13 +52,7 @@ def build_filename(sql: str, format: str, id: str, provider: str, context) -> st
             )
             res_last_modified = resource_dict.get("metadata_modified")
             filename = (
-                id
-                + "-"
-                + calculate_md5(sql)
-                + "_"
-                + res_last_modified
-                + "."
-                + format
+                id + "-" + calculate_md5(sql) + "_" + res_last_modified + "." + format
             ).lower()
             return filename
         except logic.NotFound:
@@ -159,8 +155,6 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
                 "key": filename,
             },
         )
-        print("#######################################################################")
-        print("Existing task", existing_task)
         stale_time = 30
         assume_task_stale_after = datetime.timedelta(seconds=stale_time)
         if existing_task.get("state") == "pending":

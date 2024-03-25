@@ -80,7 +80,7 @@ function LeftNode({
         )
 
     return (
-        <div className="flex w-full gap-x-4 pl-6 pr-2 sm:pr-0 pt-2 sm:pt-0">
+        <div className="flex w-full gap-x-4 pl-6 pr-2 sm:pr-0 pt-2 sm:pt-0 flex-col gap-y-2 sm:flex-row sm:gap-y-0">
             <SelectFilter
                 options={[{ id: 'None', label: 'All activity' }].concat(
                     getKeyValues2(

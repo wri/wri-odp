@@ -28,6 +28,9 @@ search-index-rebuild:
 access-db:
 	docker compose -f $(DOCKER_COMPOSE_YML) exec $(CKAN_DB_CONTAINER) /bin/bash -c "psql -U $(CKAN_DB_USER) $(CKAN_DB_NAME)"
 
+access-db-admin:
+	docker compose -f $(DOCKER_COMPOSE_YML) exec $(CKAN_DB_CONTAINER) /bin/bash -c "psql -U postgres $(CKAN_DB_NAME)"
+
 shell:
 	docker compose -f $(DOCKER_COMPOSE_YML) exec $(CKAN_CONTAINER) /bin/bash
 

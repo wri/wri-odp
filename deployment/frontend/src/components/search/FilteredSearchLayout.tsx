@@ -179,7 +179,7 @@ export default function FilteredSearchLayout({
                                                 className="flex flex-1 flex-col gap-y-7"
                                             >
                                                 <li>
-                                                    <ul role="list">
+                                                    <ul >
                                                         <LocationSearch filters={filters} setFilters={setFilters} />
                                                         {!isLoadingFacets &&
                                                             facetFields.map(
@@ -263,7 +263,7 @@ export default function FilteredSearchLayout({
                 <Disclosure defaultOpen>
                     {({ open }) => (
                         <>
-                            <Disclosure.Button className="absolute lg:block hidden left-[calc(25%-1.5rem)] top-[60vh] z-20">
+                            <Disclosure.Button aria-label='collapse sidebar' className="absolute lg:block hidden left-[calc(25%-1.5rem)] top-[60vh] z-20">
                                 <div
                                     className={classNames(
                                         'flex h-12 w-12 items-center rounded-full bg-white shadow-lg transition',

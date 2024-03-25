@@ -24,6 +24,7 @@ export default function TeamList() {
                         >
                             {({ selected }) => (
                                 <div
+                                    
                                     className={`font-normal  px-6 py-4 focus:outline-0  w-full  ${
                                         selected
                                             ? ' border-b-wri-dark-green border-b-2 text-wri-green'
@@ -37,7 +38,7 @@ export default function TeamList() {
                     ))}
                     <Link
                         href="/dashboard/teams/new"
-                        className="font-normal  px-6 py-4 focus:outline-0  w-full"
+                        className="font-normal  px-6 py-4 focus:outline-0  w-full" role='tab'
                     >
                         <div className="flex">
                             <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">

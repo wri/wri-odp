@@ -109,8 +109,7 @@ export async function fetchDatasetCollaborators(
             },
         }
     )
-    const collaborators: CkanResponse<any[]> =
-        await collaboratorsRes.json()
+    const collaborators: CkanResponse<any[]> = await collaboratorsRes.json()
     if (!collaborators.success && collaborators.error) {
         if (collaboratorsRes.status === 403)
             throw new TRPCError({
@@ -169,7 +168,9 @@ export const DatasetRouter = createTRPCRouter({
                     featured_image:
                         input.featured_image && input.featured_dataset
                             ? !isValidUrl(cleanUrl(input.featured_image))
-                                ? cleanUrl(`${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`)
+                                ? cleanUrl(
+                                      `${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`
+                                  )
                                 : input.featured_image
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
@@ -526,7 +527,9 @@ export const DatasetRouter = createTRPCRouter({
                         featured_image:
                             input.featured_image && input.featured_dataset
                                 ? !isValidUrl(cleanUrl(input.featured_image))
-                                    ? cleanUrl(`${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`)
+                                    ? cleanUrl(
+                                          `${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`
+                                      )
                                     : input.featured_image
                                 : null,
                         visibility_type: input.visibility_type?.value ?? '',
@@ -1188,13 +1191,12 @@ export const DatasetRouter = createTRPCRouter({
                     },
                 }
             )
-            const issues: CkanResponse<Issue[]> =
-                await issuesRes.json()
+            const issues: CkanResponse<Issue[]> = await issuesRes.json()
             if (!issues.success && issues.error) {
                 if (issues.error.message) throw Error(issues.error.message)
                 throw Error(JSON.stringify(issues.error))
             }
-            
+
             return issues.result
         }),
     getOneDataset: publicProcedure
@@ -1202,11 +1204,15 @@ export const DatasetRouter = createTRPCRouter({
             z.object({
                 id: z.string(),
                 includeViews: z.boolean().default(false).optional(),
-                noLayer: z.boolean().optional()
+                noLayer: z.boolean().optional(),
             })
         )
         .query(async ({ input, ctx }) => {
-            const dataset = await getOneDataset(input.id, ctx.session, input.noLayer)
+            const dataset = await getOneDataset(
+                input.id,
+                ctx.session,
+                input.noLayer
+            )
             return dataset
         }),
     getPossibleCollaborators: protectedProcedure.query(async () => {
@@ -1803,7 +1809,13 @@ export const DatasetRouter = createTRPCRouter({
         }),
 
     getOneActualOrPendingDataset: publicProcedure
-        .input(z.object({ id: z.string(), isPending: z.boolean(), noLayer: z.boolean().optional() }))
+        .input(
+            z.object({
+                id: z.string(),
+                isPending: z.boolean(),
+                noLayer: z.boolean().optional(),
+            })
+        )
         .query(async ({ input, ctx }) => {
             if (input.isPending) {
                 const dataset = await getOnePendingDataset(
@@ -1812,7 +1824,11 @@ export const DatasetRouter = createTRPCRouter({
                 )
                 return dataset
             }
-            const dataset = await getOneDataset(input.id, ctx.session, input.noLayer)
+            const dataset = await getOneDataset(
+                input.id,
+                ctx.session,
+                input.noLayer
+            )
             return dataset
         }),
 
@@ -1937,9 +1953,76 @@ export const DatasetRouter = createTRPCRouter({
             }
             throw data
         }),
+    downloadZippedResources: publicProcedure
+        .input(
+            z.object({
+                dataset_id: z.string(),
+                keys: z.array(z.string()),
+                email: z.string(),
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            const headers: any = {
+                'Content-Type': 'application/json',
+            }
+
+            const user = ctx?.session?.user
+            if (user) {
+                headers['Authorization'] = user.apikey
+            }
+
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/prefect_download_zipped`,
+                {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(input),
+                }
+            )
+
+            const data = (await response.json()) as CkanResponse<boolean>
+            if (response.ok) {
+                return data
+            }
+            throw data
+        }),
     getDatasetReleaseNotes: publicProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
             return getDatasetReleaseNotes(input)
+        }),
+    resourceLocationSearch: publicProcedure
+        .input(
+            z.object({
+                bbox: z.array(z.array(z.number())).nullable(),
+                point: z.array(z.number()).nullable(),
+                location: z.string(),
+                package_id: z.string(),
+                is_pending: z.boolean(),
+            })
+        )
+        .query(async ({ input, ctx }) => {
+            if (!input.bbox && !input.point) {
+                return null
+            }
+            const bbox = input.bbox ? `&bbox=${input.bbox?.join(',')}` : ''
+            const point = input.point ? `&point=${input.point?.join(',')}` : ''
+            const spatial_address = input.location
+                ? `&spatial_address=${input.location}`
+                : ''
+            const is_pending = `&is_pending=${
+                input.is_pending ? 'True' : 'False'
+            }`
+            const url = `${env.CKAN_URL}/api/3/action/resource_location_search?package_id=${input.package_id}${bbox}${point}${spatial_address}${is_pending}`
+            const response = await fetch(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            const results: CkanResponse<{
+                count: number
+                results: Resource[]
+            }> = await response.json()
+            return results.result.results
         }),
 })

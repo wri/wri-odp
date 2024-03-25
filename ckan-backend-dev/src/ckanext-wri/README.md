@@ -18,6 +18,7 @@
       - [POST /api/action/pending_dataset_delete](#post-apiactionpending_dataset_delete)
       - [GET /api/action/pending_dataset_show](#get-apiactionpending_dataset_show)
       - [GET /api/action/pending_diff_show](#get-apiactionpending_diff_show)
+  - [API Analytics Tracking](#api-analytics-tracking)
   - [Development](#development)
   - [Testing](#testing)
 
@@ -44,6 +45,7 @@ To initiate the database setup, use the following command:
 ```console
 ckan -c <path-to-ini-file> notificationdb
 ```
+
 ### API Endpoints
 
 #### POST /api/action/notification_create
@@ -185,6 +187,42 @@ Here's an example:
             "new_value": "The function of this dataset is to y..."
         },
     },
+}
+```
+
+## API Analytics Tracking
+
+**Note**: This plugin requires a Google Analytics account with a Measurement ID and API Secret to work. For more information on how to set up Google Analytics, see the [Google Analytics documentation](https://support.google.com/analytics/answer/9304153?hl=en). Steps to set up reports can be found in the main `docs` directory in this repo (see [`wri-odp/docs/ga-api/README.md`](../docs/ga-api/README.md)).
+
+This extension includes an optional plugin that sends API usage analytics to Google Analytics. To enable this feature, you need to add the `wri_api_tracking` plugin to the `ckan.plugins` list in your CKAN configuration file, just after the `wri` plugin:
+
+```
+ckan.plugins = ... wri wri_api_tracking ...
+```
+
+You also need to add the following configuration options to your CKAN configuration file (these are **required** if the `wri_api_tracking` plugin is enabled):
+
+```
+ckanext.wri.api_analytics.measurement_id = G-XXXXXXXXXX
+ckanext.wri.api_analytics.api_secret = XXXXXXXXXXX
+```
+
+The plugin sends a simple event to Google Analytics whenever an API request is made. The event is tracked in Google Analytics as `ckan_api` with a few params/dimensions (`action` and `user_agent` being the most useful). This is the object that's sent to Google Analytics:
+
+```
+{
+    'client_id': cid, # This is either a randomly generated UUID or the hash hex digest of the current CKAN user.
+    'events': [
+        {
+            'name': 'ckan_api', # The event name, used to group all API events.
+            'params': {
+                'action': tk.request.environ['PATH_INFO'].split('/')[-1], # The API action, extracted from the URL (e.g., 'package_show').
+                'user_agent': tk.request.environ.get('HTTP_USER_AGENT', ''), # The user agent of the request (e.g., "curl/8.6.0", "ckanapi/4.7", "node", etc.).
+                'session_id': uuid.uuid4().hex, # A randomly generated UUID to trigger a session.
+                'engagement_time_msec': 1, # Engagement time set to 1, just to trigger user engagement.
+            },
+        }
+    ],
 }
 ```
 

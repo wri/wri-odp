@@ -49,7 +49,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
                   aria-hidden="true"
                 />
               </span>
-              <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-300">
+              <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-600">
                 {step.name}
               </span>
             </div>
@@ -103,7 +103,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
                   <span className="text-xs text-stone-300">{step.id}</span>
                 </span>
               </span>
-              <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-300">
+              <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-600">
                 {step.name}
               </span>
             </div>

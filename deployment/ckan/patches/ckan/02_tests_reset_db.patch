@@ -1,0 +1,18 @@
+diff --git a/ckan/ckan/model/__init__.py b/ckan/ckan/model/__init__.py
+--- ckan/ckan/model/__init__.py
++++ ckan/ckan/model/__init__.py
+@@ -219,8 +219,13 @@
+         with warnings.catch_warnings():
+             warnings.filterwarnings('ignore', '.*(reflection|tsvector).*')
+             meta.metadata.reflect()
+ 
++        tables = meta.metadata.sorted_tables
++        for table in tables:
++            if table.name == "spatial_ref_sys":
++                meta.metadata.remove(table)
++
+         meta.metadata.drop_all()
+         self.tables_created_and_initialised = False
+         log.info('Database tables dropped')
+ 
+

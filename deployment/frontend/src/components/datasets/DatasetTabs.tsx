@@ -27,9 +27,10 @@ export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number, hi
       >
         {tabs.map((tab) => (
           <SwiperSlide key={tab.name} className="">
-            <Tab as="div">
+            <Tab as="div" >
               {({ selected }: { selected: boolean }) => (
-                <button
+                <div
+                  aria-label={tab.name}
                   className={classNames(
                     selected
                       ? "border-wri-green text-wri-green"
@@ -44,18 +45,18 @@ export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number, hi
                       {tab.count}
                     </span>
                   )}
-                </button>
+                </div>
               )}
             </Tab>
           </SwiperSlide>
         ))}
       </Swiper>
-      <button className="nav-prev-button--tabs">
+      <button className="nav-prev-button--tabs" aria-label="previous button" role="tab">
         <ChevronDoubleLeftIcon
           className="h-6 w-6 text-black"
         />
       </button>
-      <button className="nav-next-button--tabs">
+      <button className="nav-next-button--tabs" aria-label="next button" role="tab">
         <ChevronDoubleRightIcon
           className="h-6 w-6 text-black"
         />
