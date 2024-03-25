@@ -36,7 +36,14 @@ export const datastoreRouter = createTRPCRouter({
             })
         )
         .query(async ({ input, ctx }) => {
-            const { pagination, resourceId, columns, sorting, filters, groupBy } = input
+            const {
+                pagination,
+                resourceId,
+                columns,
+                sorting,
+                filters,
+                groupBy,
+            } = input
             const paginationSql = `LIMIT ${
                 pagination.pageIndex * pagination.pageSize + pagination.pageSize
             } OFFSET ${pagination.pageIndex * pagination.pageSize}`
@@ -56,23 +63,23 @@ export const datastoreRouter = createTRPCRouter({
                       filters
                           .map(
                               (filter) =>
-                                  `${filter.value
+                                  `(${filter.value
                                       .filter((v) => v.value !== '')
                                       .map(
                                           (v) =>
-                                              `( "${filter.id}" ${
+                                              `"${filter.id}" ${
                                                   v.operation.value
-                                              } '${v.value}' ${v.link ?? ''} `
+                                              } '${v.value}' ${v.link ?? ''}`
                                       )
-                                      .join('')} )`
+                                      .join('')})`
                           )
                           .join(' AND ')
                     : ''
             const groupBySql =
                 groupBy && groupBy.length
-                    ? 'GROUP BY ' + groupBy.map(item => `"${item}"`).join(', ')
+                    ? 'GROUP BY ' +
+                      groupBy.map((item) => `"${item}"`).join(', ')
                     : ''
-
 
             const parsedColumns = columns.map((column) => `"${column}"`)
             const url = `${
@@ -89,7 +96,7 @@ export const datastoreRouter = createTRPCRouter({
             const tableData: DataResponse = await tableDataRes.json()
             if (!tableData.success && tableData.error) {
                 console.log(tableData.error)
-                if (tableData.error.message){
+                if (tableData.error.message) {
                     throw Error(tableData.error.message)
                 }
                 throw Error(JSON.stringify(tableData.error))
@@ -118,7 +125,7 @@ export const datastoreRouter = createTRPCRouter({
                           filters
                               .map(
                                   (filter) =>
-                                      `( ${filter.value
+                                      `(${filter.value
                                           .filter((v) => v.value !== '')
                                           .map(
                                               (v) =>
@@ -126,9 +133,9 @@ export const datastoreRouter = createTRPCRouter({
                                                       v.operation.value
                                                   } '${v.value}' ${
                                                       v.link ?? ''
-                                                  } `
+                                                  }`
                                           )
-                                          .join('')} )`
+                                          .join('')})`
                               )
                               .join(' AND ')
                         : ''
@@ -148,7 +155,8 @@ export const datastoreRouter = createTRPCRouter({
                 if (
                     numRows.result &&
                     numRows.result.records[0] &&
-                    (numRows.result.records[0].count || numRows.result.records[0].count === 0)
+                    (numRows.result.records[0].count ||
+                        numRows.result.records[0].count === 0)
                 ) {
                     return numRows.result.records[0].count as number
                 }
