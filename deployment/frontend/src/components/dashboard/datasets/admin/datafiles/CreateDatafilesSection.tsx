@@ -61,12 +61,14 @@ export function CreateDataFilesSection({
                 {datafiles.map((field, index) => {
                     return (
                         <SortableItem key={field.id}>
-                            <AddDataFile
-                                index={index}
-                                field={field}
-                                remove={() => remove(index)}
-                                formObj={formObj}
-                            />
+                            <div>
+                                <AddDataFile
+                                    index={index}
+                                    field={field}
+                                    remove={() => remove(index)}
+                                    formObj={formObj}
+                                />
+                            </div>
                         </SortableItem>
                     )
                 })}

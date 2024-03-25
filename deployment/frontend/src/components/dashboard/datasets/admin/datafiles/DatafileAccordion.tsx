@@ -57,11 +57,6 @@ export function DataFileAccordion({
                                 className="sm:px-8 px-4 col-span-full flex w-full justify-between border-b border-stone-50 py-5"
                             >
                                 <h3 className="text-black text-xl font-normal font-['Acumin Pro SemiCondensed'] flex items-center gap-x-2">
-                                    {canSort && (
-                                        <SortableKnob>
-                                            <Squares2X2Icon className="w-4 h-4 mt-1 opacity-30" />
-                                        </SortableKnob>
-                                    )}
                                     {title}
                                     <DefaultTooltip content="Remove item">
                                         <button onClick={() => remove()}>
@@ -69,12 +64,19 @@ export function DataFileAccordion({
                                         </button>
                                     </DefaultTooltip>{' '}
                                 </h3>
-                                <ChevronDownIcon
-                                    className={`${open
-                                            ? 'rotate-180 transform  transition'
-                                            : ''
-                                        } h-5 w-5 text-blue-800`}
-                                />
+                                <div className='flex items-center gap-x-5'>
+                                    {canSort && (
+                                        <SortableKnob>
+                                            <Squares2X2Icon className="w-6 h-6 mt-1 opacity-80 text-wri-gold cursor-move" />
+                                        </SortableKnob>
+                                    )}
+                                    <ChevronDownIcon
+                                        className={`${open
+                                                ? 'rotate-180 transform  transition'
+                                                : ''
+                                            } h-5 w-5 text-blue-800`}
+                                    />
+                                </div>
                             </Disclosure.Button>
                             <Transition
                                 enter="transition duration-100 ease-out"
