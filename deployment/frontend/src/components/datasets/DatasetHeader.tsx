@@ -689,7 +689,7 @@ export function DatasetHeader({
                 )}
                 <div className="mt-4 flex justify-start gap-x-3">
                     {dataset?.wri_data ? (
-                        <div className="flex items-center rounded-[3px] border border-blue-400 bg-blue-400">
+                        <div className="flex items-center rounded-[3px] border border-blue-400 bg-blue-800">
                             <div className="px-2 font-acumin text-xs font-medium text-white">
                                 WRI Data
                             </div>
@@ -715,7 +715,7 @@ export function DatasetHeader({
                         ) : (
                             <div
                                 className={classNames(
-                                    'flex items-center rounded-[3px] border border-orange-400 bg-orange-400',
+                                    'flex items-center rounded-[3px] border border-orange-400 bg-orange-800',
                                     highlighted('technical_notes'),
                                     highlighted('technical_notes') !== ''
                                         ? 'border-yellow-200'
