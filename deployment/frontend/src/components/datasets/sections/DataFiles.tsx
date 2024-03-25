@@ -9,6 +9,7 @@ import {
     MagnifyingGlassIcon,
     MapPinIcon,
     PaperAirplaneIcon,
+    PlusCircleIcon,
 } from '@heroicons/react/24/outline'
 import { DownloadButton } from './datafiles/Download'
 import { OpenInButton } from './datafiles/OpenIn'
@@ -34,6 +35,11 @@ import Modal from '@/components/_shared/Modal'
 import Spinner from '@/components/_shared/Spinner'
 import { toast } from 'react-toastify'
 import { ErrorDisplay } from '@/components/_shared/InputGroup'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/_shared/Popover'
 
 export function LocationSearch({
     geojsons,
@@ -188,8 +194,8 @@ export function DataFiles({
     const filteredDatafilesByName =
         q !== ''
             ? datafiles?.filter((datafile) =>
-                  index.search(q).includes(datafile.id)
-              )
+                index.search(q).includes(datafile.id)
+            )
             : datafiles
     const filteredDatafilesIds = filteredDatafilesByName?.map((df) => df.id)
     const filteredDatafiles = searchedResources
@@ -246,18 +252,20 @@ export function DataFiles({
                     {filteredDatafiles?.length ?? 0} Data Files
                 </span>
                 <div className="flex gap-x-4 lg:justify-end">
-                    {datafilesToDownload.length !== uploadedDatafiles.length && (
-                        <button
-                            onClick={() =>
-                                setDatafilesToDownload(uploadedDatafiles)
-                            }
-                            className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                        >
-                            Select all datafiles
-                        </button>
-                    )}
+                    {datafilesToDownload.length !==
+                        uploadedDatafiles.length && (
+                            <button
+                                onClick={() =>
+                                    setDatafilesToDownload(uploadedDatafiles)
+                                }
+                                className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                            >
+                                Select all datafiles
+                            </button>
+                        )}
                     {!filteredDatafilesEqualToDownloadDatafiles() &&
-                        datafilesToDownload.length !== uploadedDatafiles.length && (
+                        datafilesToDownload.length !==
+                        uploadedDatafiles.length && (
                             <button
                                 onClick={() =>
                                     setDatafilesToDownload(
@@ -323,8 +331,8 @@ export function DataFiles({
             )}
             <div className="flex flex-col gap-y-4">
                 {isLoadingLocationSearch &&
-                (formObj.watch('bbox') !== null ||
-                    formObj.watch('point') !== null) ? (
+                    (formObj.watch('bbox') !== null ||
+                        formObj.watch('point') !== null) ? (
                     <div className="flex h-20">
                         <svg
                             className={classNames('h-5 w-5 animate-spin mr-2')}
@@ -381,7 +389,11 @@ export function DataFiles({
                 )}
             </div>
             <DownloadModal
-                keys={datafilesToDownload.map((r) => r.key).filter(Boolean) as string[]}
+                keys={
+                    datafilesToDownload
+                        .map((r) => r.key)
+                        .filter(Boolean) as string[]
+                }
                 dataset_id={dataset.id}
                 open={open}
                 setOpen={setOpen}
@@ -505,14 +517,13 @@ function DatafileCard({
                             )}
                             <Disclosure.Button>
                                 <h3
-                                    className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${
-                                        datafile.title
+                                    className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${datafile.title
                                             ? higlighted(
-                                                  'title',
-                                                  datafile.title
-                                              )
+                                                'title',
+                                                datafile.title
+                                            )
                                             : higlighted('name', datafile.name!)
-                                    }`}
+                                        }`}
                                 >
                                     {datafile.title ?? datafile.name}
                                 </h3>
@@ -531,7 +542,7 @@ function DatafileCard({
                                 )}
                             </Disclosure.Button>
                         </div>
-                        <div className="flex gap-x-2">
+                        <div className="gap-x-2 hidden sm:flex">
                             {/* @ts-ignore */}
                             {datafile?.rw_id && (
                                 <>
@@ -590,7 +601,7 @@ function DatafileCard({
                             {datafile.datastore_active && (
                                 <>
                                     {tabularResource &&
-                                    tabularResource.id === datafile.id ? (
+                                        tabularResource.id === datafile.id ? (
                                         <Button
                                             variant="outline"
                                             size="sm"
@@ -665,17 +676,162 @@ function DatafileCard({
                                 </>
                             )}
 
-                            <Disclosure.Button role='button' aria-label='expand'>
+                            <Disclosure.Button
+                                role="button"
+                                aria-label="expand"
+                            >
                                 <ChevronDownIcon
-                                    
-                                    className={`${
-                                        open
+                                    className={`${open
                                             ? 'rotate-180 transform  transition'
                                             : ''
-                                    } h-5 w-5 text-stone-900`}
+                                        } h-5 w-5 text-stone-900`}
                                 />
                             </Disclosure.Button>
                         </div>
+                        <Popover >
+                            <PopoverTrigger className="sm:hidden">
+                                <PlusCircleIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                            </PopoverTrigger>
+                            <PopoverContent className='w-fit flex flex-col'>
+                                {datafile?.rw_id && (
+                                    <>
+                                        {activeLayers.some(
+                                            (a) =>
+                                                datafile.url?.endsWith(a.id) ||
+                                                datafile.id === a.id
+                                        ) ? (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {
+                                                    {
+                                                    }
+                                                    // @ts-ignore
+                                                    if (datafile.rw_id) {
+                                                        removeLayerFromLayerGroup(
+                                                            // @ts-ignore
+                                                            datafile?.rw_id,
+                                                            dataset.id
+                                                        )
+                                                    }
+                                                }}
+                                            >
+                                                <span className="mt-1 text-xs 2xl:text-sm whitespace-nowrap">
+                                                    Remove Layer
+                                                </span>
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    // @ts-ignore
+                                                    if (datafile.rw_id) {
+                                                        if (
+                                                            !mapDisplaypreview
+                                                        ) {
+                                                            setMapDisplayPreview(
+                                                                true
+                                                            )
+                                                        }
+                                                        addLayerToLayerGroup(
+                                                            // @ts-ignore
+                                                            datafile.rw_id,
+                                                            dataset.id
+                                                        )
+                                                    }
+                                                }}
+                                            >
+                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
+                                                    Show Layer
+                                                </span>
+                                            </Button>
+                                        )}
+                                    </>
+                                )}
+                                {datafile.datastore_active && (
+                                    <>
+                                        {tabularResource &&
+                                            tabularResource.id === datafile.id ? (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() =>
+                                                    setTabularResource(null)
+                                                }
+                                            >
+                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
+                                                    Remove Tabular View
+                                                </span>
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() =>
+                                                    setTabularResource({
+                                                        provider: 'datastore',
+                                                        id: datafile.id as string,
+                                                        name:
+                                                            datafile?.title ??
+                                                            (datafile.name as string),
+                                                    })
+                                                }
+                                            >
+                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
+                                                    View Table Preview
+                                                </span>
+                                            </Button>
+                                        )}
+                                    </>
+                                )}
+
+                                {datafile._hasChartView && (
+                                    <>
+                                        {datafile?._views?.some((v) =>
+                                            activeCharts
+                                                .map((c: View) => c.id)
+                                                .includes(v.id)
+                                        ) ? (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {
+                                                    const viewIds =
+                                                        datafile._views?.map(
+                                                            (v: View) => v.id
+                                                        )
+                                                    if (viewIds) {
+                                                        removeCharts(
+                                                            viewIds as string[]
+                                                        )
+                                                    }
+                                                }}
+                                            >
+                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
+                                                    Remove Chart Preview
+                                                </span>
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {
+                                                    if (datafile._views)
+                                                        addCharts(
+                                                            datafile._views
+                                                        )
+                                                }}
+                                            >
+                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
+                                                    View Chart Preview
+                                                </span>
+                                            </Button>
+                                        )}
+                                    </>
+                                )}
+                            </PopoverContent>
+                        </Popover>
                     </div>
                     <Transition
                         enter="transition duration-100 ease-out"
@@ -687,14 +843,13 @@ function DatafileCard({
                     >
                         <Disclosure.Panel className="py-3">
                             <p
-                                className={`font-acumin text-base font-light text-stone-900 ${
-                                    datafile.description
+                                className={`font-acumin text-base font-light text-stone-900 ${datafile.description
                                         ? higlighted(
-                                              'description',
-                                              datafile.description
-                                          )
+                                            'description',
+                                            datafile.description
+                                        )
                                         : ''
-                                }`}
+                                    }`}
                             >
                                 {datafile.description ?? 'No Description'}
                             </p>
