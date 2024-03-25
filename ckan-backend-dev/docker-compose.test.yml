@@ -45,6 +45,7 @@ services:
         - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
         - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
         - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
+        - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000

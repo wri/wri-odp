@@ -395,6 +395,7 @@ export function DataFiles({
                         .filter(Boolean) as string[]
                 }
                 dataset_id={dataset.id}
+                resource_name={datafilesToDownload.map((r) => r.title || r.name).join(",")}
                 open={open}
                 setOpen={setOpen}
             />
@@ -893,11 +894,13 @@ function DownloadModal({
     setOpen,
     dataset_id,
     keys,
+    resource_name
 }: {
     open: boolean
     setOpen: (open: boolean) => void
     dataset_id: string
     keys: string[]
+    resource_name: string
 }) {
     const formSchema = z.object({
         email: z.string().email(),
@@ -935,7 +938,7 @@ function DownloadModal({
                 {!isLoading && (
                     <form
                         id="download"
-                        data-resource={dataset_id}
+                        data-resource={resource_name}
                         onSubmit={handleSubmit(
                             async (data) => {
                                 downloadZipped.mutate(
