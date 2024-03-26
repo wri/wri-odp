@@ -1,7 +1,13 @@
-import { ChevronDownIcon, MinusCircleIcon } from '@heroicons/react/24/outline'
+import {
+    ChevronDownIcon,
+    MinusCircleIcon,
+    Squares2X2Icon,
+} from '@heroicons/react/24/outline'
 import { Disclosure, Transition } from '@headlessui/react'
 import classNames from '@/utils/classnames'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { SortableKnob } from 'react-easy-sort'
+import { useEffect, useState } from 'react'
 
 interface DataFileAccordionProps {
     title: string
@@ -22,6 +28,14 @@ export function DataFileAccordion({
     id = '',
     remove,
 }: DataFileAccordionProps) {
+    const [canSort, setCanSort] = useState(false)
+
+    useEffect(() => {
+        setTimeout(() => {
+            setCanSort(true)
+        }, 3000)
+    }, [])
+
     return (
         <Disclosure
             as="div"
@@ -50,13 +64,19 @@ export function DataFileAccordion({
                                         </button>
                                     </DefaultTooltip>{' '}
                                 </h3>
-                                <ChevronDownIcon
-                                    className={`${
-                                        open
-                                            ? 'rotate-180 transform  transition'
-                                            : ''
-                                    } h-5 w-5 text-blue-800`}
-                                />
+                                <div className='flex items-center gap-x-5'>
+                                    {canSort && (
+                                        <SortableKnob>
+                                            <Squares2X2Icon className="w-6 h-6 mt-1 opacity-80 text-wri-gold cursor-move" />
+                                        </SortableKnob>
+                                    )}
+                                    <ChevronDownIcon
+                                        className={`${open
+                                                ? 'rotate-180 transform  transition'
+                                                : ''
+                                            } h-5 w-5 text-blue-800`}
+                                    />
+                                </div>
                             </Disclosure.Button>
                             <Transition
                                 enter="transition duration-100 ease-out"
