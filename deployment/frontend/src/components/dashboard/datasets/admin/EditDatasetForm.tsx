@@ -103,6 +103,8 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             id: dataset.name,
         })
 
+    console.log(dataset)
+
     const canEditCollaborators = match(session.data?.user.sysadmin ?? false)
         .with(true, () => true)
         .with(false, () => {
@@ -122,7 +124,31 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         })
         .otherwise(() => false)
 
-    const resourceForm = dataset.resources as unknown as ResourceFormType[]
+
+    const resourceForm = dataset.resources.sort((a, b) => {
+        const isLayer = (r: any) =>
+            r.type === 'layer' ||
+            r.type === 'layer-raw' ||
+            r.type === 'empty-layer'
+
+        const isALayer = isLayer(a)
+        const isBLayer = isLayer(b)
+
+        if (isALayer && isBLayer) {
+            return 0
+        }
+
+        if (!isALayer && isBLayer) {
+            return -1
+        }
+
+        if (isALayer && !isBLayer) {
+            return 1
+        }
+
+        return 0
+    }) as unknown as ResourceFormType[]
+        console.log(resourceForm.map(r => r.type))
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
