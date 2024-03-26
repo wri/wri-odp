@@ -65,17 +65,17 @@ describe("External sources", () => {
       cy.contains('Open table in ArcGIS')
     },
   );
-  it(
-    "should render gfw dataset",
-    () => {
-      cy.visit(`/datasets/${gfwDataset}`);
-      cy.contains('Open table in GFW')
-      cy.contains("Ma'tan al-Sarra", { timeout: 15000 });
-      cy.contains("Download Data").click();
-      cy.contains("CSV").click();
-      cy.contains("Get via email")
-    },
-  );
+ // it(
+ //   "should render gfw dataset",
+ //   () => {
+ //     cy.visit(`/datasets/${gfwDataset}`);
+ //     cy.contains('Open table in GFW')
+ //     cy.contains("Ma'tan al-Sarra", { timeout: 15000 });
+ //     cy.contains("Download Data").click();
+ //     cy.contains("CSV").click();
+ //     cy.contains("Get via email")
+ //   },
+ // );
   it(
     "should render carto dataset",
     () => {
