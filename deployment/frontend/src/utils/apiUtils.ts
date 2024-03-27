@@ -595,7 +595,7 @@ export async function getOneDataset(
                 if (r.url_type === 'layer')
                     return {
                         ...r,
-                        layerObj: noLayer
+                        layerObj: !noLayer
                             ? convertLayerObjToForm(layerObj)
                             : true,
                     }

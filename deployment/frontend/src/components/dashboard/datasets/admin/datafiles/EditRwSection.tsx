@@ -9,6 +9,7 @@ import { api } from '@/utils/api'
 import ViewsList from '@/components/views/ViewsList'
 import { AddLayer } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection'
 import { WriDataset } from '@/schema/ckan.schema'
+import SortableList, { SortableItem } from 'react-easy-sort'
 
 export function EditRwSection({
     formObj,
@@ -35,6 +36,16 @@ export function EditRwSection({
         { enabled: !!rwId }
     )
 
+    const layers = fields.filter(
+        (r) => r.type !== 'upload' &&
+            r.type !== 'link' &&
+            r.type !== 'empty-file')
+
+    const notLayers = fields.filter(
+        (r) => r.type === 'upload' ||
+            r.type === 'link' ||
+            r.type === 'empty-file')
+
     return (
         <>
             <RWDatasetForm formObj={formObj} editing={true} />
@@ -48,32 +59,40 @@ export function EditRwSection({
                     />
                 </MetadataAccordion>
             )}
-            {fields.map((field, index) => {
-                if (
-                    field.type === 'link' ||
-                    field.type === 'upload' ||
-                    field.type === 'empty-file'
-                )
-                    return <></>
-                return field.new ? (
-                    <AddLayer
-                        key={index}
-                        index={index}
-                        field={field}
-                        remove={() => remove(index)}
-                        formObj={formObj}
-                    />
-                ) : (
-                    <EditDataFile
-                        key={index}
-                        index={index}
-                        field={field}
-                        remove={() => remove(index)}
-                        formObj={formObj}
-                        dataset={dataset}
-                    />
-                )
-            })}
+            <SortableList
+                onSortEnd={(oldIdx, newIdx) => {
+                    swap(oldIdx, newIdx)
+                }}
+                className="list"
+                lockAxis="y"
+                draggedItemClassName="dragged"
+            >
+                {layers.map((field, index) => {
+                    index += notLayers.length
+                    return (
+                        <SortableItem key={field.id}>
+                            <div>
+                                {field.new ? (
+                                    <AddLayer
+                                        index={index}
+                                        field={field}
+                                        remove={() => remove(index)}
+                                        formObj={formObj}
+                                    />
+                                ) : (
+                                    <EditDataFile
+                                        index={index}
+                                        field={field}
+                                        remove={() => remove(index)}
+                                        formObj={formObj}
+                                        dataset={dataset}
+                                    />
+                                )}
+                            </div>
+                        </SortableItem>
+                    )
+                })}
+            </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>

@@ -16,6 +16,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import { RWDatasetForm } from '../metadata/RWDataset'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import SortableList, { SortableItem } from 'react-easy-sort'
 
 export function CreateLayersSection({
     formObj,
@@ -28,26 +29,44 @@ export function CreateLayersSection({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
         })
+
+    const layers = fields.filter(
+        (r) => r.type !== 'upload' &&
+            r.type !== 'link' &&
+            r.type !== 'empty-file')
+
+    const notLayers = fields.filter(
+        (r) => r.type === 'upload' ||
+            r.type === 'link' ||
+            r.type === 'empty-file')
+
     return (
         <>
             <RWDatasetForm formObj={formObj} />
-            {fields.map((field, index) => {
-                if (
-                    field.type === 'upload' ||
-                    field.type === 'link' ||
-                    field.type === 'empty-file'
-                )
-                    return <></>
-                return (
-                    <AddLayer
-                        key={field.id}
-                        index={index}
-                        field={field}
-                        remove={() => remove(index)}
-                        formObj={formObj}
-                    />
-                )
-            })}
+            <SortableList
+                onSortEnd={(oldIdx, newIdx) => {
+                    swap(oldIdx, newIdx)
+                }}
+                className="list"
+                lockAxis="y"
+                draggedItemClassName="dragged"
+            >
+                {layers.map((field, index) => {
+                    index += notLayers.length
+                    return (
+                        <SortableItem key={field.id}>
+                            <div>
+                                <AddLayer
+                                    index={index}
+                                    field={field}
+                                    remove={() => remove(index)}
+                                    formObj={formObj}
+                                />
+                            </div>
+                        </SortableItem>
+                    )
+                })}
+            </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>
