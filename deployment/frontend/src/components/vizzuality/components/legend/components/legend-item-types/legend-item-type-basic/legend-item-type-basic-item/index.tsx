@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 import PropTypes from 'prop-types';
-import Image from 'next/image';
+import Image from "next/image";
 
 class LegendItem extends React.PureComponent {
   static propTypes = {
@@ -56,7 +56,15 @@ class LegendItem extends React.PureComponent {
 
     return (
       <div className="relative w-[14px] h-[14px] flex-shrink-0 block mr-[5px] mt-[2px]">
-        <Image src={icon}  alt={name}  fill className='block w-[14px] h-[14px]'/>
+        <Image
+          src={icon}
+          alt={name}
+          fill
+          className='block w-[14px] h-[14px]'
+          style={{
+            maxWidth: "100%",
+            height: "auto"
+          }} />
       </div>
     );
   };

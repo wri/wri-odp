@@ -271,15 +271,14 @@ export const teamRouter = createTRPCRouter({
                 {} as Record<string, GroupsmDetails>
             )
 
-            for ( const group in teamDetails) {
+            for (const group in teamDetails) {
                 const team = teamDetails[group]!
                 const packagedetails = (await getAllDatasetFq({
                     apiKey: ctx?.session?.user.apikey ?? '',
                     fq: `organization:${team.name}+is_approved:true`,
-                    query: {search: '', page: {start: 0, rows: 10000}},
+                    query: { search: '', page: { start: 0, rows: 10000 } },
                 }))!
                 team.package_count = packagedetails.count
-                
             }
 
             if (input.search) {

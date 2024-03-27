@@ -179,13 +179,22 @@ export default function FilteredSearchLayout({
                                                 className="flex flex-1 flex-col gap-y-7"
                                             >
                                                 <li>
-                                                    <ul >
-                                                        <LocationSearch filters={filters} setFilters={setFilters} />
+                                                    <ul>
+                                                        <LocationSearch
+                                                            filters={filters}
+                                                            setFilters={
+                                                                setFilters
+                                                            }
+                                                        />
                                                         {!isLoadingFacets &&
                                                             facetFields.map(
                                                                 (ff) =>
-                                                                    ff.key === 'temporal_coverage' ? (
+                                                                    ff.key ===
+                                                                    'temporal_coverage' ? (
                                                                         <TemporalCoverageFacet
+                                                                            key={
+                                                                                ff.key
+                                                                            }
                                                                             filters={
                                                                                 filters
                                                                             }
@@ -193,8 +202,12 @@ export default function FilteredSearchLayout({
                                                                                 setFilters
                                                                             }
                                                                         />
-                                                                    ) : ff.key === 'metadata_modified' ? (
+                                                                    ) : ff.key ===
+                                                                      'metadata_modified' ? (
                                                                         <MetadataModifiedFacet
+                                                                            key={
+                                                                                ff.key
+                                                                            }
                                                                             filters={
                                                                                 filters
                                                                             }
@@ -206,6 +219,9 @@ export default function FilteredSearchLayout({
                                                                         <Facet
                                                                             text={
                                                                                 ff.title
+                                                                            }
+                                                                            key={
+                                                                                ff.key
                                                                             }
                                                                             options={
                                                                                 searchFacets &&
@@ -263,7 +279,10 @@ export default function FilteredSearchLayout({
                 <Disclosure defaultOpen>
                     {({ open }) => (
                         <>
-                            <Disclosure.Button aria-label='collapse sidebar' className="absolute lg:block hidden left-[calc(25%-1.5rem)] top-[60vh] z-20">
+                            <Disclosure.Button
+                                aria-label="collapse sidebar"
+                                className="absolute lg:block hidden left-[calc(25%-1.5rem)] top-[60vh] z-20"
+                            >
                                 <div
                                     className={classNames(
                                         'flex h-12 w-12 items-center rounded-full bg-white shadow-lg transition',
@@ -299,10 +318,14 @@ export default function FilteredSearchLayout({
                                         >
                                             <li>
                                                 <ul role="list">
-                                                    <LocationSearch setFilters={setFilters} filters={filters} />
+                                                    <LocationSearch
+                                                        setFilters={setFilters}
+                                                        filters={filters}
+                                                    />
                                                     {!isLoadingFacets &&
                                                         facetFields.map((ff) =>
-                                                            ff.key === 'temporal_coverage' ? (
+                                                            ff.key ===
+                                                            'temporal_coverage' ? (
                                                                 <TemporalCoverageFacet
                                                                     filters={
                                                                         filters
@@ -311,7 +334,8 @@ export default function FilteredSearchLayout({
                                                                         setFilters
                                                                     }
                                                                 />
-                                                            ) : ff.key === 'metadata_modified' ? (
+                                                            ) : ff.key ===
+                                                              'metadata_modified' ? (
                                                                 <MetadataModifiedFacet
                                                                     filters={
                                                                         filters

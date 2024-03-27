@@ -1,5 +1,5 @@
 import React from 'react'
-import Image from 'next/image'
+import Image from "next/image"
 import Link from 'next/link'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 
@@ -32,12 +32,15 @@ export default function SubtopicCard({
                     alt="higlight"
                     fill
                     className="object-contain"
-                />
+                    style={{
+                        maxWidth: "100%",
+                        height: "auto"
+                    }} />
             </div>
             <div className="text-black text-lg font-normal">{topic.title}</div>
             <div className="text-black text-sm font-normal">
                 {topicsDetails[topic.id]?.package_count} Datasets
             </div>
         </Link>
-    )
+    );
 }

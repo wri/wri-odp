@@ -1,6 +1,8 @@
 // https://www.khronos.org/files/opengles_shading_language.pdf
 import GL from '@luma.gl/constants'
+//@ts-ignore
 import { MapboxLayer } from '@deck.gl/mapbox'
+//@ts-ignore
 import { TileLayer } from '@deck.gl/geo-layers'
 import { DecodedLayer } from '@vizzuality/layer-manager-layers-deckgl'
 import { LayerState } from '@/interfaces/state.interface'

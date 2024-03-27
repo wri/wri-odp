@@ -1108,7 +1108,14 @@ export const DatasetRouter = createTRPCRouter({
             return view
         }),
     getAllDataset: publicProcedure
-        .input(searchSchema)
+        .input(
+            searchSchema.extend({
+                removeUnecessaryDataInResources: z
+                    .boolean()
+                    .optional()
+                    .default(false),
+            })
+        )
         .query(async ({ input, ctx }) => {
             let fq = `" "`
             let orgsFq = ''
@@ -1162,8 +1169,17 @@ export const DatasetRouter = createTRPCRouter({
                 extAddressQ: input.extAddressQ,
             }))!
 
+            const _datasets = input.removeUnecessaryDataInResources
+                ? dataset.datasets.map((d) => ({
+                      ...d,
+                      resources: d.resources.map((r) => ({
+                          datastore_active: r.datastore_active,
+                          format: r.format,
+                      })),
+                  }))
+                : dataset.datasets
             return {
-                datasets: dataset.datasets,
+                datasets: _datasets as unknown as WriDataset[],
                 count: dataset.count,
                 searchFacets: dataset.searchFacets,
             }
@@ -1332,15 +1348,32 @@ export const DatasetRouter = createTRPCRouter({
         }
     }),
     getFeaturedDatasets: publicProcedure
-        .input(searchSchema)
+        .input(
+            searchSchema.extend({
+                removeUnecessaryDataInResources: z
+                    .boolean()
+                    .optional()
+                    .default(false),
+            })
+        )
         .query(async ({ input, ctx }) => {
             const dataset = (await getAllDatasetFq({
                 apiKey: '',
                 fq: `featured_dataset:true`,
                 query: input,
             }))!
+            //This allows us to send less data to the client
+            const _datasets = input.removeUnecessaryDataInResources
+                ? dataset.datasets.map((d) => ({
+                      ...d,
+                      resources: d.resources.map((r) => ({
+                          datastore_active: r.datastore_active,
+                          format: r.format,
+                      })),
+                  }))
+                : dataset.datasets
             return {
-                datasets: dataset.datasets,
+                datasets: _datasets,
                 count: dataset.count,
             }
         }),

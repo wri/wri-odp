@@ -3,11 +3,11 @@ import Row from '../_shared/Row'
 import { NotificationType } from '@/schema/notification.schema'
 import Image from 'next/image'
 import Link from 'next/link'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 
 const DefaultTooltip = dynamic(() => import('@/components/_shared/Tooltip'), {
-  ssr: false,
-});
+    ssr: false,
+})
 function Card({
     rowProfile,
     selected,

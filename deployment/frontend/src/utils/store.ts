@@ -10,8 +10,8 @@ import {
 import { template } from 'lodash'
 import { useLayoutEffect } from 'react'
 import { ViewState } from 'react-map-gl'
-import create, { UseBoundStore } from 'zustand'
-import createContext from 'zustand/context'
+import { create, UseBoundStore } from 'zustand'
+import { createContext } from 'zustand-utils'
 import { combine } from 'zustand/middleware'
 
 let store: any

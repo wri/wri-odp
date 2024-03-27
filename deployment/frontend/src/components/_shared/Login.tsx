@@ -123,7 +123,7 @@ function SignInForm({
                             } else {
                                 notify('Sign in successful')
                                 onSignIn ? onSignIn() : router.reload()
-                                router.push("/dashboard")
+                                router.push('/dashboard')
                             }
                         })(data)
                     }}
@@ -195,7 +195,9 @@ function SignInForm({
                     <Image src="/images/wri_logo.png" alt="WRI Logo" fill />
                 </div>
                 <div className="ml-2 w-fit font-semibold text-base text-wri-black ">
-                    {!isLoadingAzure ? "Sign In with your WRI Credentials" : "Signing in..."}
+                    {!isLoadingAzure
+                        ? 'Sign In with your WRI Credentials'
+                        : 'Signing in...'}
                 </div>
             </button>
         </>

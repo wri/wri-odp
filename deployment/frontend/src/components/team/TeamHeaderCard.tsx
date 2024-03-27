@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Image from 'next/image'
+import Image from "next/image"
 import { ChevronLeftIcon } from '@heroicons/react/20/solid'
 import { Button } from '../_shared/Button'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
@@ -57,7 +57,10 @@ export default function TeamHeaderCard({
                             alt="Team card"
                             fill
                             className="object-contain"
-                        />
+                            style={{
+                                maxWidth: "100%",
+                                height: "auto"
+                            }} />
                     </div>
                 </div>
             </div>
@@ -111,7 +114,7 @@ export default function TeamHeaderCard({
                 </div>
             </div>
         </section>
-    )
+    );
 }
 
 function CopyLink() {

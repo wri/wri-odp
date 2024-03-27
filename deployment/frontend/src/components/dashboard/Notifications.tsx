@@ -69,7 +69,9 @@ function Notification({ items }: { items: NotificationType }) {
     )
 }
 export default function Notifications({ drag }: { drag: boolean }) {
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery({returnLength: true})
+    const { data, isLoading } = api.notification.getAllNotifications.useQuery({
+        returnLength: true,
+    })
 
     if (isLoading) return <Spinner className="mx-auto" />
 
@@ -98,11 +100,17 @@ export default function Notifications({ drag }: { drag: boolean }) {
                     ) : (data as NotificationType[])?.length ? (
                         <DefaultTooltip
                             content={`${
-                                (data as NotificationType[]).filter((item) => item.is_unread).length
+                                (data as NotificationType[]).filter(
+                                    (item) => item.is_unread
+                                ).length
                             } unread`}
                         >
                             <div className="rounded-full my-auto w-4 h-4 bg-wri-gold font-bold text-[11px] flex justify-center items-center">
-                                {(data as NotificationType[]).filter((item) => item.is_unread).length}
+                                {
+                                    (data as NotificationType[]).filter(
+                                        (item) => item.is_unread
+                                    ).length
+                                }
                             </div>
                         </DefaultTooltip>
                     ) : (

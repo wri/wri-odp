@@ -179,7 +179,17 @@ export function Hero() {
                     className="absolute inset-0 -z-10 h-full w-full object-cover"
 
                 /> */}
-                <Image src="/images/bg_hero_homepage.webp" alt="" layout="fill" objectFit="cover" className='inset-0 -z-10 h-full w-full object-cover' priority/>
+                <Image
+                    src="/images/bg_hero_homepage.webp"
+                    alt=""
+                    className="inset-0 -z-10 h-full w-full object-cover"
+                    priority
+                    fill
+                    sizes="100vw"
+                    style={{
+                        objectFit: 'cover',
+                    }}
+                />
                 <div className="bg-black bg-opacity-50 absolute inset-0 -z-[9] h-full w-full object-cover" />
                 <div className="default-home-container mx-auto py-32 sm:py-48 lg:py-56">
                     <div className="text-start">
@@ -196,7 +206,7 @@ export function Hero() {
                             <input
                                 name="search"
                                 placeholder="Search data"
-                                aria-label='search'
+                                aria-label="search"
                                 className="placeholder:text-white text-white text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white bg-opacity-25 rounded-[3px] border-b-2 border-amber-400"
                             />
                             <MagnifyingGlassIcon className="w-7 h-7 text-white absolute top-[18px] right-4" />
@@ -204,7 +214,7 @@ export function Hero() {
                     </div>
                 </div>
             </div>
-        
+
             <Transition appear show={isOpen} as={Fragment}>
                 <Dialog
                     as="div"
