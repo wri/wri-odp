@@ -104,11 +104,18 @@ export function AddLayer({
 }) {
     const { setValue, watch } = formObj
     const datafile = watch(`resources.${index}`)
+    const notLayers = watch("resources")?.filter(
+        (r) => r.type === 'upload' ||
+            r.type === 'link' ||
+            r.type === 'empty-file')
+
+    const notLayersCount = notLayers?.length ?? 0;
+
     return (
         <>
             <DataFileAccordion
                 icon={<FolderPlusIcon className="h-7 w-7" />}
-                title={`Layer ${index + 1}`}
+                title={`Layer ${index - notLayersCount + 1}`}
                 remove={remove}
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
