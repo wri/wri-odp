@@ -23,10 +23,10 @@ import { DefaultTooltip } from '../_shared/Tooltip'
 import { PencilSquareIcon } from '@heroicons/react/24/solid'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { LoaderButton } from '@/components/_shared/Button'
 import { Dialog } from '@headlessui/react'
 import { useState } from 'react'
@@ -400,7 +400,7 @@ export function DatasetHeader({
                                 side="bottom"
                             >
                                 <button
-                                    aria-label='remove from favorites'     
+                                    aria-label="remove from favorites"
                                     className="p-0 m-0 "
                                     onClick={() => setFOpen(true)}
                                 >
@@ -413,7 +413,7 @@ export function DatasetHeader({
                                 side="bottom"
                             >
                                 <button
-                                    aria-label='add to favorite'
+                                    aria-label="add to favorite"
                                     className="p-0 m-0 "
                                     onClick={() => setOpen(true)}
                                 >
@@ -423,9 +423,9 @@ export function DatasetHeader({
                         )}
 
                         <DefaultTooltip content="Edit" side="bottom">
-                                <Link
-                                    aria-label='edit dataset'
-                                    href={`/dashboard/datasets/${dataset?.name}/edit`}
+                            <Link
+                                aria-label="edit dataset"
+                                href={`/dashboard/datasets/${dataset?.name}/edit`}
                             >
                                 <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
                             </Link>
@@ -698,7 +698,7 @@ export function DatasetHeader({
                         ''
                     )}
                     {session.data?.user ? (
-                        dataset?.technical_notes ? (
+                        dataset?.technical_notes && (
                             <div
                                 className={classNames(
                                     'flex items-center rounded-[3px] border border-green-500 bg-green-800',
@@ -710,20 +710,6 @@ export function DatasetHeader({
                             >
                                 <div className="px-2 font-acumin text-xs font-medium text-white">
                                     RDI approved
-                                </div>
-                            </div>
-                        ) : (
-                            <div
-                                className={classNames(
-                                    'flex items-center rounded-[3px] border border-orange-400 bg-orange-800',
-                                    highlighted('technical_notes'),
-                                    highlighted('technical_notes') !== ''
-                                        ? 'border-yellow-200'
-                                        : ''
-                                )}
-                            >
-                                <div className="px-2 font-acumin text-xs font-medium text-white">
-                                    Awaiting RDI approval
                                 </div>
                             </div>
                         )

@@ -14,7 +14,7 @@ import localFont from 'next/font/local'
 import { api } from '@/utils/api'
 
 import '@/styles/globals.scss'
-import '@/styles/rte.css'
+import '@/styles/rte.scss'
 import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
@@ -174,6 +174,14 @@ const MyApp: AppType<{ session: Session | null }> = ({
             basemap: initialZustandState?.mapView?.basemap ?? 'dark',
             layers: newLayersState,
             activeLayerGroups,
+            viewState: {
+                ...initialZustandState?.mapView?.viewState,
+                latitude:
+                    initialZustandState?.mapView?.viewState?.latitude ?? 0,
+                longitude:
+                    initialZustandState?.mapView?.viewState?.longitude ?? 0,
+                zoom: initialZustandState?.mapView?.viewState?.zoom ?? 3,
+            },
         },
     })
 
