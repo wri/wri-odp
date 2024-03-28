@@ -302,14 +302,14 @@ export function DataFiles({
                                     dataset.resources.forEach((r) => {
                                         if (
                                             r.format == 'Layer' &&
+                                            r.rw_id &&
                                             // @ts-ignore
                                             !activeLayers.some(
                                                 (l) => l.id == r?.rw_id
                                             )
                                         ) {
-                                            // @ts-ignore
                                             addLayerToLayerGroup(
-                                                r.rw_id,
+                                                r.rw_id ?? '',
                                                 dataset.id
                                             )
                                         }
