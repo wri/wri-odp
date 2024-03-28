@@ -31,5 +31,22 @@ Then, to update the table of contents in a markdown file, for example, `README.m
 
     doctoc README.md
 
+## Syncing Strategy for Different Environments
+
+
+To synchronize the `dev`, `staging`, and `prod` environments, follow these steps:
+
+1. Raise a pull request (PR) from the `dev` branch to the `staging` branch. Once the changes are verified, proceed to merge them from `staging` to `prod`.
+
+When merging features from a feature branch to the `dev` branch, consider the following:
+
+- If there are too many non-relevant commits (e.g., debugging commits or unnecessary changes), **squash and merge** to avoid polluting the branch history.
+- When merging from `dev` to `staging` or `staging` to `prod`, do not squash. Squashing creates a new commit, which doesn't transfer the commits from `dev` to `staging`, thus failing to synchronize the branches effectively. Instead, use a **merge commit** to sync the `staging` and `prod` branches.
+
+Follow these additional steps:
+
+2. Create a release from the `dev` branch.
+3. Merge changes from `dev` into `staging`.
+
 
 
