@@ -184,9 +184,10 @@ export default function Header() {
                                                 <Menu.Item>
                                                     {({ active }) => (
                                                         <Link
-                                                            className={`${active &&
+                                                            className={`${
+                                                                active &&
                                                                 'bg-blue-500'
-                                                                }`}
+                                                            }`}
                                                             href={item.href}
                                                         >
                                                             {item.title}

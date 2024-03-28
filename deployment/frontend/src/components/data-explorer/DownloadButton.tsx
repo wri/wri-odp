@@ -1,9 +1,9 @@
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { ErrorDisplay } from '@/components/_shared/InputGroup'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import {
     Popover,
     PopoverContent,
@@ -42,7 +42,7 @@ export function DownloadButton({
         <>
             <Popover>
                 <PopoverTrigger>
-                <div className="hidden group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
+                    <div className="hidden group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
                         Download Data
                         <ArrowDownCircleIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
                     </div>
@@ -132,7 +132,9 @@ function DownloadModal({
                     </div>
                 )}
                 {!isLoading && (
-                    <form id="download" data-resource={tabularResource.name}
+                    <form
+                        id="download"
+                        data-resource={tabularResource.name}
                         onSubmit={handleSubmit(
                             async (data) => {
                                 downloadSubset.mutate(
@@ -157,7 +159,7 @@ function DownloadModal({
                                             setOpen(false)
                                         },
                                         onError: (err) => {
-                                            console.log(err)
+                                            console.error(err)
 
                                             toast('Failed to request file', {
                                                 type: 'error',
@@ -167,7 +169,7 @@ function DownloadModal({
                                 )
                             },
                             (err) => {
-                                console.log(err)
+                                console.error(err)
                                 toast('Failed to request file', {
                                     type: 'error',
                                 })

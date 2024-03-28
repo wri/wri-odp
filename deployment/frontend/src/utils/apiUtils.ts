@@ -106,7 +106,7 @@ export async function searchHierarchy({
 
         return groups
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw new Error(e as string)
     }
 }
@@ -564,7 +564,7 @@ export async function getOneDataset(
         try {
             spatial = JSON.parse(dataset.result.spatial)
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }
 
@@ -736,7 +736,7 @@ export async function getOnePendingDataset(
         try {
             spatial = JSON.parse(dataset.spatial)
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }
 
@@ -2373,7 +2373,7 @@ export async function approvePendingDataset(
                 action: 'approved_dataset',
             })
         } catch (error) {
-            console.log(error)
+            console.error(error)
             throw Error('Error in sending issue /comment notification')
         }
     }

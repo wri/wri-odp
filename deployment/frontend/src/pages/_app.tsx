@@ -19,8 +19,8 @@ import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
 import { env } from '@/env.mjs'
-import NProgress from 'nprogress';
-import Router from 'next/router';
+import NProgress from 'nprogress'
+import Router from 'next/router'
 
 const acumin = localFont({
     src: [
@@ -57,20 +57,19 @@ const MyApp: AppType<{ session: Session | null }> = ({
     let { dataset, prevdataset } = pageProps
 
     useEffect(() => {
-        const handleRouteStart = () => NProgress.start();
-        const handleRouteDone = () => NProgress.done();
+        const handleRouteStart = () => NProgress.start()
+        const handleRouteDone = () => NProgress.done()
 
-        Router.events.on('routeChangeStart', handleRouteStart);
-        Router.events.on('routeChangeComplete', handleRouteDone);
-        Router.events.on('routeChangeError', handleRouteDone);
+        Router.events.on('routeChangeStart', handleRouteStart)
+        Router.events.on('routeChangeComplete', handleRouteDone)
+        Router.events.on('routeChangeError', handleRouteDone)
 
         return () => {
-            Router.events.off('routeChangeStart', handleRouteStart);
-            Router.events.off('routeChangeComplete', handleRouteDone);
-            Router.events.off('routeChangeError', handleRouteDone);
-        };
-    }, []);
-
+            Router.events.off('routeChangeStart', handleRouteStart)
+            Router.events.off('routeChangeComplete', handleRouteDone)
+            Router.events.off('routeChangeError', handleRouteDone)
+        }
+    }, [])
 
     if (typeof prevdataset == 'string') {
         prevdataset = JSON.parse(prevdataset)
@@ -93,7 +92,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     let activeLayerGroups =
         initialZustandState?.mapView?.activeLayerGroups || []
-    console.log('activeLayerGroups', activeLayerGroups)
 
     const layerAsLayerObj = new Map()
     const tempLayerAsLayerobj = new Map()

@@ -154,7 +154,6 @@ function ItemsArray() {
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) => {
-                                    console.log('V', v)
                                     return v === '' ? undefined : parseFloat(v)
                                 },
                             }
@@ -426,7 +425,6 @@ function FilterExpression({
     const filterExpression: FilterFormType = watch(
         `layerConfig.render.layers.${layerIdx}.filter.${filterIdx}`
     ) as FilterFormType
-    console.log('FILTER EXPRESSION', filterExpression)
     return (
         <Accordion text={`Filter ${filterIdx}`}>
             <div className="py-4 flex flex-col gap-y-2">

@@ -170,7 +170,6 @@ export function DataFiles({
     isCurrentVersion?: boolean
     diffFields: Array<Record<string, { old_value: string; new_value: string }>>
 }) {
-    console.log(diffFields)
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
         useActiveLayerGroups()
     const { data: activeLayers } = useLayersFromRW()
@@ -195,8 +194,8 @@ export function DataFiles({
     const filteredDatafilesByName =
         q !== ''
             ? datafiles?.filter((datafile) =>
-                index.search(q).includes(datafile.id)
-            )
+                  index.search(q).includes(datafile.id)
+              )
             : datafiles
     const filteredDatafilesIds = filteredDatafilesByName?.map((df) => df.id)
     const filteredDatafiles = searchedResources
@@ -255,18 +254,18 @@ export function DataFiles({
                 <div className="flex gap-x-4 lg:justify-end">
                     {datafilesToDownload.length !==
                         uploadedDatafiles.length && (
-                            <button
-                                onClick={() =>
-                                    setDatafilesToDownload(uploadedDatafiles)
-                                }
-                                className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                            >
-                                Select all datafiles
-                            </button>
-                        )}
+                        <button
+                            onClick={() =>
+                                setDatafilesToDownload(uploadedDatafiles)
+                            }
+                            className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                        >
+                            Select all datafiles
+                        </button>
+                    )}
                     {!filteredDatafilesEqualToDownloadDatafiles() &&
                         datafilesToDownload.length !==
-                        uploadedDatafiles.length && (
+                            uploadedDatafiles.length && (
                             <button
                                 onClick={() =>
                                     setDatafilesToDownload(
@@ -332,8 +331,8 @@ export function DataFiles({
             )}
             <div className="flex flex-col gap-y-4">
                 {isLoadingLocationSearch &&
-                    (formObj.watch('bbox') !== null ||
-                        formObj.watch('point') !== null) ? (
+                (formObj.watch('bbox') !== null ||
+                    formObj.watch('point') !== null) ? (
                     <div className="flex h-20">
                         <svg
                             className={classNames('h-5 w-5 animate-spin mr-2')}
@@ -396,7 +395,9 @@ export function DataFiles({
                         .filter(Boolean) as string[]
                 }
                 dataset_id={dataset.id}
-                resource_name={datafilesToDownload.map((r) => r.title || r.name).join(",")}
+                resource_name={datafilesToDownload
+                    .map((r) => r.title || r.name)
+                    .join(',')}
                 open={open}
                 setOpen={setOpen}
             />
@@ -520,13 +521,14 @@ function DatafileCard({
                             )}
                             <Disclosure.Button>
                                 <h3
-                                    className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${datafile.title
+                                    className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${
+                                        datafile.title
                                             ? higlighted(
-                                                'title',
-                                                datafile.title
-                                            )
+                                                  'title',
+                                                  datafile.title
+                                              )
                                             : higlighted('name', datafile.name!)
-                                        }`}
+                                    }`}
                                 >
                                     {datafile.title ?? datafile.name}
                                 </h3>
@@ -604,7 +606,7 @@ function DatafileCard({
                             {datafile.datastore_active && (
                                 <>
                                     {tabularResource &&
-                                        tabularResource.id === datafile.id ? (
+                                    tabularResource.id === datafile.id ? (
                                         <Button
                                             variant="outline"
                                             size="sm"
@@ -684,18 +686,19 @@ function DatafileCard({
                                 aria-label="expand"
                             >
                                 <ChevronDownIcon
-                                    className={`${open
+                                    className={`${
+                                        open
                                             ? 'rotate-180 transform  transition'
                                             : ''
-                                        } h-5 w-5 text-stone-900`}
+                                    } h-5 w-5 text-stone-900`}
                                 />
                             </Disclosure.Button>
                         </div>
-                        <Popover >
+                        <Popover>
                             <PopoverTrigger className="sm:hidden">
                                 <PlusCircleIcon className="h-5 w-5 sm:h-9 sm:w-9" />
                             </PopoverTrigger>
-                            <PopoverContent className='w-fit flex flex-col'>
+                            <PopoverContent className="w-fit flex flex-col">
                                 {datafile?.rw_id && (
                                     <>
                                         {activeLayers.some(
@@ -755,7 +758,7 @@ function DatafileCard({
                                 {datafile.datastore_active && (
                                     <>
                                         {tabularResource &&
-                                            tabularResource.id === datafile.id ? (
+                                        tabularResource.id === datafile.id ? (
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -846,13 +849,14 @@ function DatafileCard({
                     >
                         <Disclosure.Panel className="py-3">
                             <p
-                                className={`font-acumin text-base font-light text-stone-900 ${datafile.description
+                                className={`font-acumin text-base font-light text-stone-900 ${
+                                    datafile.description
                                         ? higlighted(
-                                            'description',
-                                            datafile.description
-                                        )
+                                              'description',
+                                              datafile.description
+                                          )
                                         : ''
-                                    }`}
+                                }`}
                             >
                                 {datafile.description ?? 'No Description'}
                             </p>
@@ -895,7 +899,7 @@ function DownloadModal({
     setOpen,
     dataset_id,
     keys,
-    resource_name
+    resource_name,
 }: {
     open: boolean
     setOpen: (open: boolean) => void
@@ -958,7 +962,7 @@ function DownloadModal({
                                             setOpen(false)
                                         },
                                         onError: (err) => {
-                                            console.log(err)
+                                            console.error(err)
 
                                             toast('Failed to request file', {
                                                 type: 'error',
@@ -968,7 +972,7 @@ function DownloadModal({
                                 )
                             },
                             (err) => {
-                                console.log(err)
+                                console.error(err)
                                 toast('Failed to request file', {
                                     type: 'error',
                                 })

@@ -98,8 +98,8 @@ export function HighlightsCarousel() {
                     prevButton={<PrevButton />}
                     nextButton={<NextButton />}
                 >
-                    {highlights.map((highlight) => (
-                        <SwiperSlide key={highlight.title} className="">
+                    {highlights.map((highlight, index) => (
+                        <SwiperSlide key={index} className="">
                             <div className="w-72 pr-6">
                                 <HighlightCard highlight={highlight as any} />
                             </div>
