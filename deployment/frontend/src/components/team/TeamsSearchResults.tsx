@@ -14,7 +14,6 @@ export default function TeamsSearchResults({
     teamsDetails: Record<string, GroupsmDetails>
     count: number
 }) {
-    console.log('teamsL ', teams)
     return (
         <Container className="mb-28">
             <span className="font-semibold text-xl">{count} teams</span>

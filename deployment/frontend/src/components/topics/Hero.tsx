@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image from 'next/image'
 import { Button } from '../_shared/Button'
 import { ChevronLeftIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
@@ -42,10 +42,7 @@ export function Hero({
                             : '/images/placeholders/topics/topicsdefault.png'
                     }`}
                     className="object-contain"
-                    style={{
-                        maxWidth: "100%",
-                        height: "auto"
-                    }} />
+                />
                 <div className="absolute bottom-0 z-10 flex lg:h-[68px] lg:w-56 px-4 py-4 items-center justify-center rounded-t-[3px] bg-white">
                     <Link
                         href="/topics"
@@ -98,7 +95,7 @@ export function Hero({
                 <CopyLink />
             </div>
         </div>
-    );
+    )
 }
 
 function CopyLink() {

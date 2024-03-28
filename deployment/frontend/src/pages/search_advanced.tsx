@@ -83,8 +83,6 @@ export default function SearchPage(
         sortBy: initialSortBy,
         removeUnecessaryDataInResources: true,
     })
-
-    console.log('QUERY CLIENT', query)
     const [filters, setFilters] = useState<Filter[]>(initialFilters)
 
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)

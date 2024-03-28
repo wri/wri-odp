@@ -19,14 +19,6 @@ export default function Controls({
             <Zoom mapRef={mapRef} />
             <Search mapContainerRef={mapContainerRef} />
             <Settings mapRef={mapRef} />
-            {/* <Draw
-                mapRef={mapRef}
-                onDraw={(feature) => {
-                    console.log(feature)
-                }}
-            />
-            <Download />
-            */}
             <Export />
         </div>
     )

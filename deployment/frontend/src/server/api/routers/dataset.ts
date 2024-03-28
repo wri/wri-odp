@@ -355,7 +355,7 @@ export const DatasetRouter = createTRPCRouter({
                         })
                     }
                 } catch (error) {
-                    console.log(error)
+                    console.error(error)
                     throw Error('Error in sending issue /comment notification')
                 }
 
@@ -364,11 +364,10 @@ export const DatasetRouter = createTRPCRouter({
                         dataset.result.visibility_type ?? ''
                     )
                 ) {
-                    console.log('APPRIVING DATASET')
                     try {
                         approvePendingDataset(dataset.result.id, ctx.session)
                     } catch (e) {
-                        console.log(e)
+                        console.error(e)
                     }
                 }
                 return dataset.result
@@ -413,7 +412,7 @@ export const DatasetRouter = createTRPCRouter({
                     )
                 }
             } catch (e) {
-                console.log(e)
+                console.error(e)
             }
 
             const inputKeys = Object.keys(input)
@@ -478,8 +477,6 @@ export const DatasetRouter = createTRPCRouter({
                 }
             }
 
-            //console.log('PREV DATASET', prevDataset)
-            //console.log('CURRENT DATASET', input)
             try {
                 if (isUpdate) {
                     const user = ctx.session.user
@@ -561,8 +558,6 @@ export const DatasetRouter = createTRPCRouter({
                                         resource.title != ''
                                             ? resource.title
                                             : layerRaw.name
-                                    console.log('TITLE', title)
-                                    console.log('DESCRIPTION', description)
                                 }
                                 if (resource.layerObj || resource.layerObjRaw) {
                                     return {
@@ -758,7 +753,7 @@ export const DatasetRouter = createTRPCRouter({
                                     })
                                 }
                             } catch (error) {
-                                console.log(error)
+                                console.error(error)
                                 throw Error(
                                     'Error in sending approval status notification'
                                 )
@@ -804,7 +799,7 @@ export const DatasetRouter = createTRPCRouter({
                             )
                     )
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                 }
                 if (
                     ['draft', 'private'].includes(
@@ -814,7 +809,7 @@ export const DatasetRouter = createTRPCRouter({
                     try {
                         approvePendingDataset(input.id ?? '', ctx.session)
                     } catch (e) {
-                        console.log(e)
+                        console.error(e)
                     }
                 }
 
@@ -976,7 +971,7 @@ export const DatasetRouter = createTRPCRouter({
                             })
                         }
                     } catch (error) {
-                        console.log(error)
+                        console.error(error)
                         throw Error(
                             'Error in sending approval status notification'
                         )
@@ -1514,7 +1509,7 @@ export const DatasetRouter = createTRPCRouter({
                     action: 'commented',
                 })
             } catch (error) {
-                console.log(error)
+                console.error(error)
                 throw Error('Error in sending issue /comment notification')
             }
             return data
@@ -1570,7 +1565,7 @@ export const DatasetRouter = createTRPCRouter({
                     action: input.status!,
                 })
             } catch (error) {
-                console.log(error)
+                console.error(error)
                 throw Error('Error in sending issue /comment notification')
             }
             return input.status
@@ -1610,7 +1605,7 @@ export const DatasetRouter = createTRPCRouter({
                     action: 'deleted',
                 })
             } catch (error) {
-                console.log(error)
+                console.error(error)
                 throw Error('Error in sending issue /comment notification')
             }
             return input.issue_number
@@ -1713,7 +1708,7 @@ export const DatasetRouter = createTRPCRouter({
                     action: 'rejected_dataset',
                 })
             } catch (error) {
-                console.log(error)
+                console.error(error)
                 throw Error('Error in sending issue /approval notification')
             }
             return data
@@ -1826,7 +1821,7 @@ export const DatasetRouter = createTRPCRouter({
                 try {
                     spatial = JSON.parse(dataset.spatial)
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                 }
             }
 
@@ -1940,7 +1935,6 @@ export const DatasetRouter = createTRPCRouter({
 
             const data = (await response.json()) as CkanResponse<boolean>
             if (response.ok) {
-                console.log(data)
                 return data
             }
             throw data
@@ -1968,7 +1962,6 @@ export const DatasetRouter = createTRPCRouter({
                 headers['Authorization'] = user.apikey
             }
 
-            console.log('INPUT', input)
             const response = await fetch(
                 `${env.CKAN_URL}/api/3/action/prefect_download_subset_from_store`,
                 {
@@ -1979,9 +1972,7 @@ export const DatasetRouter = createTRPCRouter({
             )
 
             const data = (await response.json()) as CkanResponse<boolean>
-            console.log('DATA', data)
             if (response.ok) {
-                console.log(data)
                 return data
             }
             throw data

@@ -110,7 +110,6 @@ function AddDataFile({
 }) {
     const { setValue, watch } = formObj
     const datafile = watch(`resources.${index}`)
-    console.log(datafile)
     const uploadInputRef = useRef<HTMLInputElement>(null)
     const { isLoading: dataDictionaryLoading } = useDataDictionary(
         watch(`resources.${index}.fileBlob`),
@@ -159,8 +158,9 @@ function AddDataFile({
                 getUploadParameters(
                     file,
                     watch('team') && watch('team')?.value !== ''
-                        ? `${watch('team')?.id}/ckan/resources/${datafile.resourceId
-                        }`
+                        ? `${watch('team')?.id}/ckan/resources/${
+                              datafile.resourceId
+                          }`
                         : `ckan/resources/${datafile.resourceId}`
                 ),
         })

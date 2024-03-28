@@ -117,8 +117,6 @@ function SignInForm({
 
                             setIsLoading(false)
                             if (signInStatus?.error) {
-                                // TODO: we should get the error from the response
-                                console.log(signInStatus)
                                 setErrorMessage(signInStatus.error)
                             } else {
                                 notify('Sign in successful')

@@ -23,7 +23,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/_shared/Popover'
-import Image from "next/image"
+import Image from 'next/image'
 
 export function BuildALayerRaw({
     formObj,
@@ -44,9 +44,11 @@ export function BuildALayerRaw({
             const apiSpec = getApiSpecFromRawObj(
                 getValues(`resources.${index}.layerObjRaw`)
             )
-            console.log
             return getValues(`resources.${index}.layerObjRaw`)
-                ? { ...apiSpec, id: getValues(`resources.${index}.rw_id`) ?? uuidv4() }
+                ? {
+                      ...apiSpec,
+                      id: getValues(`resources.${index}.rw_id`) ?? uuidv4(),
+                  }
                 : null
         } catch (e) {
             return null
@@ -70,252 +72,257 @@ export function BuildALayerRaw({
         setPreview(getLayerObj())
     }
 
-    return <>
-        <div className="grid lg:grid-cols-2">
-            <div className="pt-4 pr-4 flex flex-col gap-y-2">
-                <div className="flex items-center justify-end">
-                    <DefaultTooltip content="This button will try to convert the layer config typed out directly as JSON into a form that can be edited by users that do not know the mapbox spec, there is the possiblity of data being lost">
-                        <Button
-                            onClick={() => convertToForm()}
-                            type="button"
+    return (
+        <>
+            <div className="grid lg:grid-cols-2">
+                <div className="pt-4 pr-4 flex flex-col gap-y-2">
+                    <div className="flex items-center justify-end">
+                        <DefaultTooltip content="This button will try to convert the layer config typed out directly as JSON into a form that can be edited by users that do not know the mapbox spec, there is the possiblity of data being lost">
+                            <Button
+                                onClick={() => convertToForm()}
+                                type="button"
+                            >
+                                Convert to form
+                            </Button>
+                        </DefaultTooltip>
+                    </div>
+                    <InputGroup
+                        label="Title"
+                        required
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input
+                            placeholder="Some name"
+                            {...register(`resources.${index}.title`)}
+                            type="text"
+                            maxWidth="max-w-[70rem]"
+                        />
+                        <ErrorDisplay
+                            name={`resources.${index}.title`}
+                            errors={errors}
+                        />
+                    </InputGroup>
+                    <InputGroup
+                        label="GEE ID"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <Input
+                            placeholder="xxxx-xxxx-xxxxxx"
+                            {...register(`resources.${index}.rw_id`)}
+                            type="text"
+                            maxWidth="max-w-[70rem]"
+                            icon={
+                                <DefaultTooltip content="This is required if you want to setup a GEE layer, in this case the ID needs to match the tilecache ID on GEE">
+                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                </DefaultTooltip>
+                            }
+                        />
+                    </InputGroup>
+                    <InputGroup
+                        label="Description"
+                        className="sm:grid-cols-1 gap-x-2"
+                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                    >
+                        <TextArea
+                            placeholder="Add description"
+                            {...register(`resources.${index}.description`)}
+                            type="text"
+                            maxWidth="max-w-[70rem]"
+                        />
+                    </InputGroup>
+                    <Accordion text="General Config">
+                        <label
+                            htmlFor="wri_data"
+                            className="flex items-center flex-wrap gap-x-2 font-acumin text-lg font-light text-zinc-800"
                         >
-                            Convert to form
-                        </Button>
-                    </DefaultTooltip>
+                            As a general rule you should start with the{' '}
+                            <a
+                                target="_blank"
+                                className="text-blue-800 "
+                                href="https://resource-watch.github.io/doc-api/reference.html#what-is-a-layer"
+                            >
+                                resourcewatch api layer reference
+                            </a>
+                        </label>
+                        <div className="mt-4">
+                            <CodeEditor
+                                formObj={formObj}
+                                name={`resources.${index}.layerObjRaw.generalConfig`}
+                            />
+                        </div>
+                    </Accordion>
+                    <Accordion text="Layer Config">
+                        <label
+                            htmlFor="wri_data"
+                            className="font-acumin text-lg font-light text-zinc-800"
+                        >
+                            You can start with the{' '}
+                            <a
+                                target="_blank"
+                                className="text-blue-800"
+                                href="https://github.com/Vizzuality/layer-manager/blob/main/docs/LAYER-SPEC.md"
+                            >
+                                layer-manager docs
+                            </a>{' '}
+                            and on top of that, if the layer is from a vector
+                            provider, you will probably need to refresh on the
+                            mapbox{' '}
+                            <a
+                                href="https://docs.mapbox.com/style-spec/reference/expressions/"
+                                target="_blank"
+                                className="text-blue-800"
+                            >
+                                spec documentation
+                            </a>
+                        </label>
+                        <div className="mt-4">
+                            <CodeEditor
+                                formObj={formObj}
+                                name={`resources.${index}.layerObjRaw.layerConfig`}
+                            />
+                        </div>
+                    </Accordion>
+                    <Accordion text="Legends Config">
+                        <label
+                            htmlFor="wri_data"
+                            className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
+                        >
+                            More info
+                            <Popover>
+                                <PopoverTrigger className="cursor-pointer">
+                                    <InformationCircleIcon className="h-5 w-5 text-gray-500" />
+                                    <PopoverContent className="p-4 bg-white shadow-lg rounded-lg max-w-sm w-full">
+                                        <p className="text-md font-semibold">
+                                            The type of legend to be displayed
+                                            for the layer. The options are:
+                                        </p>
+                                        <ul className="text-sm">
+                                            <li>
+                                                Basic
+                                                <Image
+                                                    src="/docs/legends/basic.png"
+                                                    alt="Image of basic legend"
+                                                    width={300}
+                                                    height={120}
+                                                    sizes="100vw"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: 'auto',
+                                                    }}
+                                                />
+                                            </li>
+                                            <li>
+                                                Choropleth
+                                                <Image
+                                                    src="/docs/legends/choropleth.png"
+                                                    alt="Image of choropleth legend"
+                                                    width={300}
+                                                    height={120}
+                                                    sizes="100vw"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: 'auto',
+                                                    }}
+                                                />
+                                            </li>
+                                            <li>
+                                                Gradient
+                                                <Image
+                                                    src="/docs/legends/gradient.png"
+                                                    alt="Image of gradient legend"
+                                                    width={300}
+                                                    height={120}
+                                                    sizes="100vw"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: 'auto',
+                                                    }}
+                                                />
+                                            </li>
+                                        </ul>
+                                    </PopoverContent>
+                                </PopoverTrigger>
+                            </Popover>
+                        </label>
+                        <div className="mt-4">
+                            <CodeEditor
+                                formObj={formObj}
+                                name={`resources.${index}.layerObjRaw.legendConfig`}
+                            />
+                        </div>
+                    </Accordion>
+                    <Accordion text="Interaction Config">
+                        <label
+                            htmlFor="wri_data"
+                            className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
+                        >
+                            More info
+                            <Popover>
+                                <PopoverTrigger className="cursor-pointer">
+                                    <InformationCircleIcon className="h-5 w-5 text-gray-500" />
+                                    <PopoverContent className="p-4 bg-white shadow-lg rounded-lg max-w-sm lg:max-w-md w-full">
+                                        <p className="text-md font-semibold">
+                                            This allow you to configure the
+                                            tooltip that appears on top when a
+                                            user clicks on a feature of a layer,
+                                            its an object called output that
+                                            contains an array of interaction
+                                            objects
+                                        </p>
+                                        <ul className="text-sm flex flex-col gap-y-2 mt-4">
+                                            <li>
+                                                column: The column that you want
+                                                to show the data, needs to be
+                                                spelled exactly like in the
+                                                database
+                                            </li>
+                                            <li>
+                                                prefix: Allows you to add a
+                                                prefix to tooltip displaying
+                                                this item
+                                            </li>
+                                            <li>
+                                                property: Allows you to give a
+                                                title to this item, for example
+                                                instead of showing the column
+                                                name country_index you could
+                                                show 'Country Index'
+                                            </li>
+                                            <li>
+                                                suffix: Allows you to add a
+                                                prefix to the tooltip displaying
+                                                this item e.g: tonnes, degrees
+                                                etc
+                                            </li>
+                                            <li>
+                                                type: Allows you to define the
+                                                type for this column, e.g:
+                                                datetime/number/year etc
+                                            </li>
+                                        </ul>
+                                    </PopoverContent>
+                                </PopoverTrigger>
+                            </Popover>
+                        </label>
+                        <div className="mt-4">
+                            <CodeEditor
+                                formObj={formObj}
+                                name={`resources.${index}.layerObjRaw.interactionConfig`}
+                            />
+                        </div>
+                    </Accordion>
                 </div>
-                <InputGroup
-                    label="Title"
-                    required
-                    className="sm:grid-cols-1 gap-x-2"
-                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                >
-                    <Input
-                        placeholder="Some name"
-                        {...register(`resources.${index}.title`)}
-                        type="text"
-                        maxWidth="max-w-[70rem]"
+                <div>
+                    <PreviewMap
+                        layerFormObj={preview ?? null}
+                        updatePreview={updatePreview}
                     />
-                    <ErrorDisplay
-                        name={`resources.${index}.title`}
-                        errors={errors}
-                    />
-                </InputGroup>
-                <InputGroup
-                    label="GEE ID"
-                    className="sm:grid-cols-1 gap-x-2"
-                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                >
-                    <Input
-                        placeholder="xxxx-xxxx-xxxxxx"
-                        {...register(`resources.${index}.rw_id`)}
-                        type="text"
-                        maxWidth="max-w-[70rem]"
-                        icon={
-                            <DefaultTooltip content="This is required if you want to setup a GEE layer, in this case the ID needs to match the tilecache ID on GEE">
-                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
-                            </DefaultTooltip>
-                        }
-                    />
-                </InputGroup>
-                <InputGroup
-                    label="Description"
-                    className="sm:grid-cols-1 gap-x-2"
-                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                >
-                    <TextArea
-                        placeholder="Add description"
-                        {...register(`resources.${index}.description`)}
-                        type="text"
-                        maxWidth="max-w-[70rem]"
-                    />
-                </InputGroup>
-                <Accordion text="General Config">
-                    <label
-                        htmlFor="wri_data"
-                        className="flex items-center flex-wrap gap-x-2 font-acumin text-lg font-light text-zinc-800"
-                    >
-                        As a general rule you should start with the{' '}
-                        <a
-                            target="_blank"
-                            className="text-blue-800 "
-                            href="https://resource-watch.github.io/doc-api/reference.html#what-is-a-layer"
-                        >
-                            resourcewatch api layer reference
-                        </a>
-                    </label>
-                    <div className="mt-4">
-                        <CodeEditor
-                            formObj={formObj}
-                            name={`resources.${index}.layerObjRaw.generalConfig`}
-                        />
-                    </div>
-                </Accordion>
-                <Accordion text="Layer Config">
-                    <label
-                        htmlFor="wri_data"
-                        className="font-acumin text-lg font-light text-zinc-800"
-                    >
-                        You can start with the{' '}
-                        <a
-                            target="_blank"
-                            className="text-blue-800"
-                            href="https://github.com/Vizzuality/layer-manager/blob/main/docs/LAYER-SPEC.md"
-                        >
-                            layer-manager docs
-                        </a>{' '}
-                        and on top of that, if the layer is from a vector
-                        provider, you will probably need to refresh on the
-                        mapbox{' '}
-                        <a
-                            href="https://docs.mapbox.com/style-spec/reference/expressions/"
-                            target="_blank"
-                            className="text-blue-800"
-                        >
-                            spec documentation
-                        </a>
-                    </label>
-                    <div className="mt-4">
-                        <CodeEditor
-                            formObj={formObj}
-                            name={`resources.${index}.layerObjRaw.layerConfig`}
-                        />
-                    </div>
-                </Accordion>
-                <Accordion text="Legends Config">
-                    <label
-                        htmlFor="wri_data"
-                        className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
-                    >
-                        More info
-                        <Popover>
-                            <PopoverTrigger className="cursor-pointer">
-                                <InformationCircleIcon className="h-5 w-5 text-gray-500" />
-                                <PopoverContent className="p-4 bg-white shadow-lg rounded-lg max-w-sm w-full">
-                                    <p className="text-md font-semibold">
-                                        The type of legend to be displayed
-                                        for the layer. The options are:
-                                    </p>
-                                    <ul className="text-sm">
-                                        <li>
-                                            Basic
-                                            <Image
-                                                src="/docs/legends/basic.png"
-                                                alt="Image of basic legend"
-                                                width={300}
-                                                height={120}
-                                                sizes="100vw"
-                                                style={{
-                                                    width: "100%",
-                                                    height: "auto"
-                                                }} />
-                                        </li>
-                                        <li>
-                                            Choropleth
-                                            <Image
-                                                src="/docs/legends/choropleth.png"
-                                                alt="Image of choropleth legend"
-                                                width={300}
-                                                height={120}
-                                                sizes="100vw"
-                                                style={{
-                                                    width: "100%",
-                                                    height: "auto"
-                                                }} />
-                                        </li>
-                                        <li>
-                                            Gradient
-                                            <Image
-                                                src="/docs/legends/gradient.png"
-                                                alt="Image of gradient legend"
-                                                width={300}
-                                                height={120}
-                                                sizes="100vw"
-                                                style={{
-                                                    width: "100%",
-                                                    height: "auto"
-                                                }} />
-                                        </li>
-                                    </ul>
-                                </PopoverContent>
-                            </PopoverTrigger>
-                        </Popover>
-                    </label>
-                    <div className="mt-4">
-                        <CodeEditor
-                            formObj={formObj}
-                            name={`resources.${index}.layerObjRaw.legendConfig`}
-                        />
-                    </div>
-                </Accordion>
-                <Accordion text="Interaction Config">
-                    <label
-                        htmlFor="wri_data"
-                        className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
-                    >
-                        More info
-                        <Popover>
-                            <PopoverTrigger className="cursor-pointer">
-                                <InformationCircleIcon className="h-5 w-5 text-gray-500" />
-                                <PopoverContent className="p-4 bg-white shadow-lg rounded-lg max-w-sm lg:max-w-md w-full">
-                                    <p className="text-md font-semibold">
-                                        This allow you to configure the
-                                        tooltip that appears on top when a
-                                        user clicks on a feature of a layer,
-                                        its an object called output that
-                                        contains an array of interaction
-                                        objects
-                                    </p>
-                                    <ul className="text-sm flex flex-col gap-y-2 mt-4">
-                                        <li>
-                                            column: The column that you want
-                                            to show the data, needs to be
-                                            spelled exactly like in the
-                                            database
-                                        </li>
-                                        <li>
-                                            prefix: Allows you to add a
-                                            prefix to tooltip displaying
-                                            this item
-                                        </li>
-                                        <li>
-                                            property: Allows you to give a
-                                            title to this item, for example
-                                            instead of showing the column
-                                            name country_index you could
-                                            show 'Country Index'
-                                        </li>
-                                        <li>
-                                            suffix: Allows you to add a
-                                            prefix to the tooltip displaying
-                                            this item e.g: tonnes, degrees
-                                            etc
-                                        </li>
-                                        <li>
-                                            type: Allows you to define the
-                                            type for this column, e.g:
-                                            datetime/number/year etc
-                                        </li>
-                                    </ul>
-                                </PopoverContent>
-                            </PopoverTrigger>
-                        </Popover>
-                    </label>
-                    <div className="mt-4">
-                        <CodeEditor
-                            formObj={formObj}
-                            name={`resources.${index}.layerObjRaw.interactionConfig`}
-                        />
-                    </div>
-                </Accordion>
+                </div>
             </div>
-            <div>
-                <PreviewMap
-                    layerFormObj={preview ?? null}
-                    updatePreview={updatePreview}
-                />
-            </div>
-        </div>
-    </>;
+        </>
+    )
 }
 
 export function PreviewMap({
@@ -364,7 +371,6 @@ export function PreviewMap({
             )
             const { interactionConfig } = layer
 
-            console.log('FOUND INTERACTION CONFIG', interactionConfig)
             const layerInfo = {
                 id: layer.id,
                 name: layer.name ?? 'sample-name',

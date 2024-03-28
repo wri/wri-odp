@@ -75,7 +75,6 @@ export default function Notifications({ drag }: { drag: boolean }) {
 
     if (isLoading) return <Spinner className="mx-auto" />
 
-    console.log('data: ', data)
     return (
         <section
             id="favourites"

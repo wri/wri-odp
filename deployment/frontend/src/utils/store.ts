@@ -351,7 +351,6 @@ export const initializeStore = (preloadedState: any = {}) => {
                             layers: layerIds,
                         })
                     } else {
-                        console.log(newActiveLayerGroups)
                         newActiveLayerGroups = newActiveLayerGroups.filter(
                             (lg: ActiveLayerGroup) => lg.datasetId != datasetId
                         )

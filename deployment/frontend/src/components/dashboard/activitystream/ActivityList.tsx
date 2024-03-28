@@ -35,7 +35,6 @@ export default function ActivityList() {
 
             const fq = query.fq!
             if (fq && Object.keys(fq).length > 0) {
-                console.log('in here fg: ', fq)
                 filteredActivity = filterObjects(filteredActivity, fq)
             }
 

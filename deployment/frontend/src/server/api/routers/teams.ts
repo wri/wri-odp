@@ -86,7 +86,7 @@ export const teamRouter = createTRPCRouter({
                         'team'
                     )
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                 }
                 input.users = newMembers
                 const body = JSON.stringify({
@@ -332,7 +332,6 @@ export const teamRouter = createTRPCRouter({
     getPossibleMembers: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ ctx, input }) => {
-            console.log(input)
             const user = ctx.session.user
             const teamRes = await fetch(
                 `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,

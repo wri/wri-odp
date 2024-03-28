@@ -58,7 +58,6 @@ import { differenceInDays } from 'date-fns'
 //};
 //
 export const getDayRange = (params: any) => {
-    console.log('PARAMS', params)
     const {
         startDate,
         endDate,
