@@ -23,10 +23,10 @@ import { DefaultTooltip } from '../_shared/Tooltip'
 import { PencilSquareIcon } from '@heroicons/react/24/solid'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { LoaderButton } from '@/components/_shared/Button'
 import { Dialog } from '@headlessui/react'
 import { useState } from 'react'
@@ -57,8 +57,13 @@ function OpenInButton({
     if (open_in.length === 1 && !session.data?.user) {
         return (
             <Button>
-                <a href={open_in[0]?.url} target="_blank" rel="noreferrer">
-                    Open in {open_in[0]?.title}
+                <a
+                    href={open_in[0]?.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    id="openin"
+                >
+                    Open in {open_in[0]?.title} steve
                     <ArrowUpRightIcon className="mb-1 h-6 w-6" />
                 </a>
             </Button>
@@ -70,6 +75,7 @@ function OpenInButton({
                 href={open_in[0]?.url}
                 target="_blank"
                 rel="noreferrer"
+                id="openin"
                 className="flex gap-x-2 items-center text-center text-stone-900 text-base font-bold font-acumin"
             >
                 Open in {open_in[0]?.title}
@@ -119,6 +125,7 @@ function OpenInButton({
                             <Menu.Item key={item.url}>
                                 {({ active }) => (
                                     <a
+                                        id="openin"
                                         href={item.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -400,7 +407,7 @@ export function DatasetHeader({
                                 side="bottom"
                             >
                                 <button
-                                    aria-label='remove from favorites'     
+                                    aria-label="remove from favorites"
                                     className="p-0 m-0 "
                                     onClick={() => setFOpen(true)}
                                 >
@@ -413,7 +420,7 @@ export function DatasetHeader({
                                 side="bottom"
                             >
                                 <button
-                                    aria-label='add to favorite'
+                                    aria-label="add to favorite"
                                     className="p-0 m-0 "
                                     onClick={() => setOpen(true)}
                                 >
@@ -423,9 +430,9 @@ export function DatasetHeader({
                         )}
 
                         <DefaultTooltip content="Edit" side="bottom">
-                                <Link
-                                    aria-label='edit dataset'
-                                    href={`/dashboard/datasets/${dataset?.name}/edit`}
+                            <Link
+                                aria-label="edit dataset"
+                                href={`/dashboard/datasets/${dataset?.name}/edit`}
                             >
                                 <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
                             </Link>
