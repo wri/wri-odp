@@ -705,7 +705,7 @@ export function DatasetHeader({
                         ''
                     )}
                     {session.data?.user ? (
-                        dataset?.technical_notes ? (
+                        dataset?.technical_notes && (
                             <div
                                 className={classNames(
                                     'flex items-center rounded-[3px] border border-green-500 bg-green-800',
@@ -717,20 +717,6 @@ export function DatasetHeader({
                             >
                                 <div className="px-2 font-acumin text-xs font-medium text-white">
                                     RDI approved
-                                </div>
-                            </div>
-                        ) : (
-                            <div
-                                className={classNames(
-                                    'flex items-center rounded-[3px] border border-orange-400 bg-orange-800',
-                                    highlighted('technical_notes'),
-                                    highlighted('technical_notes') !== ''
-                                        ? 'border-yellow-200'
-                                        : ''
-                                )}
-                            >
-                                <div className="px-2 font-acumin text-xs font-medium text-white">
-                                    Awaiting RDI approval
                                 </div>
                             </div>
                         )

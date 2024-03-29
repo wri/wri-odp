@@ -27,11 +27,24 @@ export function RWDatasetForm({
             label={
                 <>
                     <GlobeAmericasIcon className="h-7 w-7" />
-                    RW Dataset
+                    Dataset Layer Connection Information
                 </>
             }
         >
             <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-24 py-5 md:grid-cols-2">
+                <p className="col-span-full">
+                    Enter the connector information from where your dataset is
+                    currently stored. If you’re unsure where to find this
+                    information, please see the{' '}
+                    <a
+                        target="_blank"
+                        className="text-blue-800 underline"
+                        href="https://resource-watch.github.io/doc-api/reference.html#dataset"
+                    >
+                        {' '}
+                        RW API Docs
+                    </a>
+                </p>
                 <div className="relative flex justify-start pb-8">
                     <div className="flex h-6 items-center">
                         <input
@@ -47,8 +60,8 @@ export function RWDatasetForm({
                             htmlFor="rw_dataset"
                             className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
                         >
-                            RW Dataset
-                            <DefaultTooltip content="Settings this will create an equivalent dataset in the Resource Watch API, required if you want to show Mapbox Layers">
+                            Visualize my data on a map
+                            <DefaultTooltip content="Checking this box will create an equivalent dataset in the Resource Watch API, allowing you to display Mapbox Layers">
                                 <InformationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
                             </DefaultTooltip>
                         </label>
