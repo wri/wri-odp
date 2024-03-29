@@ -125,6 +125,10 @@ export interface WriDataset extends Dataset {
     release_notes: string
 }
 
+export type WriDatasetWithoutDetails = Omit<WriDataset, 'resources'> & {
+    resources: { datastore_active?: boolean | null; format?: string }[]
+}
+
 export interface Extra {
     key: string
     value: string

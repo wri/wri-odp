@@ -13,7 +13,6 @@ export default function GroupBreadcrumb({
     groupType: 'teams' | 'topics'
 }) {
     if (isLoading) return <Spinner className="mx-auto" />
-    console.log('gggg: ', groups)
     const group = groups[0] as GroupTree
 
     const links = [

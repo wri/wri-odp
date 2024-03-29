@@ -19,7 +19,6 @@ export async function getServerSideProps(
         let view: View
 
         if (chart_provider == 'datastore') {
-            console.log('ts')
             view = await getResourceView({ id: chart_id as string, session })
         } else {
             view = await getDatasetView({ id: chart_id as string })

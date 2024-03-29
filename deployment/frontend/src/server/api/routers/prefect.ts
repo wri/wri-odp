@@ -40,7 +40,6 @@ export const prefectRouter = createTRPCRouter({
     submitToDatapusher: protectedProcedure
         .input(z.object({ resourceId: z.string() }))
         .mutation(async ({ ctx, input }) => {
-            console.log(`Submitting ${input.resourceId} to Datapusher`)
             const user = ctx.session.user
             const submitToDatapusherRes = await fetch(
                 `${env.CKAN_URL}/api/action/prefect_datapusher_submit`,
@@ -58,7 +57,6 @@ export const prefectRouter = createTRPCRouter({
             )
             const submitToDatapusher: CkanResponse<boolean> =
                 await submitToDatapusherRes.json()
-            console.log('submitToDatapusher', submitToDatapusher)
             return submitToDatapusher
         }),
     getFlowState: protectedProcedure
@@ -112,7 +110,7 @@ export const prefectRouter = createTRPCRouter({
                 const logs: Log[] = await logsRes.json()
                 return { ...flowState.state, logs }
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 throw e
             }
         }),

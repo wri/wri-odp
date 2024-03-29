@@ -86,7 +86,7 @@ export const teamRouter = createTRPCRouter({
                         'team'
                     )
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                 }
                 input.users = newMembers
                 const body = JSON.stringify({
@@ -271,15 +271,14 @@ export const teamRouter = createTRPCRouter({
                 {} as Record<string, GroupsmDetails>
             )
 
-            for ( const group in teamDetails) {
+            for (const group in teamDetails) {
                 const team = teamDetails[group]!
                 const packagedetails = (await getAllDatasetFq({
                     apiKey: ctx?.session?.user.apikey ?? '',
                     fq: `organization:${team.name}+is_approved:true`,
-                    query: {search: '', page: {start: 0, rows: 10000}},
+                    query: { search: '', page: { start: 0, rows: 10000 } },
                 }))!
                 team.package_count = packagedetails.count
-                
             }
 
             if (input.search) {
@@ -333,7 +332,6 @@ export const teamRouter = createTRPCRouter({
     getPossibleMembers: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ ctx, input }) => {
-            console.log(input)
             const user = ctx.session.user
             const teamRes = await fetch(
                 `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,

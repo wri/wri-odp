@@ -44,9 +44,11 @@ export function BuildALayerRaw({
             const apiSpec = getApiSpecFromRawObj(
                 getValues(`resources.${index}.layerObjRaw`)
             )
-            console.log
             return getValues(`resources.${index}.layerObjRaw`)
-                ? { ...apiSpec, id: getValues(`resources.${index}.rw_id`) ?? uuidv4() }
+                ? {
+                      ...apiSpec,
+                      id: getValues(`resources.${index}.rw_id`) ?? uuidv4(),
+                  }
                 : null
         } catch (e) {
             return null
@@ -202,9 +204,13 @@ export function BuildALayerRaw({
                                                 <Image
                                                     src="/docs/legends/basic.png"
                                                     alt="Image of basic legend"
-                                                    layout="responsive"
                                                     width={300}
                                                     height={120}
+                                                    sizes="100vw"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: 'auto',
+                                                    }}
                                                 />
                                             </li>
                                             <li>
@@ -212,9 +218,13 @@ export function BuildALayerRaw({
                                                 <Image
                                                     src="/docs/legends/choropleth.png"
                                                     alt="Image of choropleth legend"
-                                                    layout="responsive"
                                                     width={300}
                                                     height={120}
+                                                    sizes="100vw"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: 'auto',
+                                                    }}
                                                 />
                                             </li>
                                             <li>
@@ -222,9 +232,13 @@ export function BuildALayerRaw({
                                                 <Image
                                                     src="/docs/legends/gradient.png"
                                                     alt="Image of gradient legend"
-                                                    layout="responsive"
                                                     width={300}
                                                     height={120}
+                                                    sizes="100vw"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: 'auto',
+                                                    }}
                                                 />
                                             </li>
                                         </ul>
@@ -357,7 +371,6 @@ export function PreviewMap({
             )
             const { interactionConfig } = layer
 
-            console.log('FOUND INTERACTION CONFIG', interactionConfig)
             const layerInfo = {
                 id: layer.id,
                 name: layer.name ?? 'sample-name',
