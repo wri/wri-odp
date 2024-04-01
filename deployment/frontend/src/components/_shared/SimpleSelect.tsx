@@ -79,7 +79,7 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                             selected && selected.label
                                                 ? ''
                                                 : 'text-zinc-500',
-                                            'block truncate'
+                                            'block'
                                         )}
                                     >
                                         {selected && selected.label
