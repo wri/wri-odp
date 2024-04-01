@@ -7,7 +7,10 @@ import type { SearchInput } from '@/schema/search.schema'
 import Pagination from '../_shared/Pagination'
 import type { WriDataset } from '@/schema/ckan.schema'
 import notify from '@/utils/notify'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic'
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+})
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'

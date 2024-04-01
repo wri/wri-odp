@@ -41,9 +41,7 @@ import { matchesAnyPattern } from '@/utils/general'
 
 import { Versioning } from '@/components/datasets/sections/Versioning'
 
-import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
-import { Resource, View } from '@/interfaces/dataset.interface'
-import { useLayersFromRW } from '@/utils/queryHooks'
+import { useActiveLayerGroups } from '@/utils/storeHooks'
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -69,11 +67,12 @@ export async function getServerSideProps(
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
     try {
-        let prevdataset = await getOneDataset(datasetName, session)
+        let prevdataset = await getOneDataset(datasetName, session, true)
 
         const pendingDataset = await getOnePendingDataset(
             prevdataset.id,
-            session
+            session,
+            true
         )
 
         let dataset = prevdataset
@@ -213,7 +212,6 @@ export default function DatasetPage(
     const [selectedIndex, setSelectedIndex] = useState(0)
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
         useActiveLayerGroups()
-    const { data: activeLayers } = useLayersFromRW()
     const datasetName = props.datasetName as string
     const datasetId = props.datasetId!
     const pendingExist = props.pendingExist!
@@ -228,7 +226,7 @@ export default function DatasetPage(
     const isApprovalRequest =
         query?.approval === 'true' ||
         (approvalAuth && pendingExist && isPendingState)
-    const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers()
+    const { isAddingLayers } = useIsAddingLayers()
     const session = useSession()
 
     const {
@@ -236,7 +234,7 @@ export default function DatasetPage(
         error: datasetError,
         isLoading,
     } = api.dataset.getOneActualOrPendingDataset.useQuery(
-        { id: datasetId, isPending: pendingExist },
+        { id: datasetId, isPending: pendingExist, noLayer: true },
         // @ts-ignore
         { retry: 0, initialData: dataset }
     )
@@ -246,7 +244,7 @@ export default function DatasetPage(
         error: prevDatasetError,
         isLoading: isLoadingPrev,
     } = api.dataset.getOneDataset.useQuery(
-        { id: datasetName },
+        { id: datasetName, noLayer: true },
         // @ts-ignore
         { retry: 0, initialData: prevdataset, enabled: !!pendingExist }
     )
@@ -275,7 +273,7 @@ export default function DatasetPage(
 
     const issues = api.dataset.getDatasetIssues.useQuery(
         { id: datasetName },
-        { enabled: !!session.data?.user.apikey, retry: false }
+        { enabled: !!session.data?.user.apikey && pendingExist, retry: false }
     )
 
     const teamsDetails = api.teams.getTeam.useQuery(
@@ -347,7 +345,7 @@ export default function DatasetPage(
         { label: 'Explore Data', url: '/search', current: false },
         {
             label: datasetData?.title ?? datasetData?.name ?? '',
-            url: `/datasets/${datasetData?.title ?? datasetData?.name ?? ''}`,
+            url: `/datasets/${datasetData?.name ?? '404'}`,
             current: true,
         },
     ]
@@ -406,21 +404,23 @@ export default function DatasetPage(
             highlighted:
                 !isCurrentVersion &&
                 diffFields &&
-                diffFields.some((f) =>
-                    [
-                        'extras',
-                        'tags',
-                        'notes',
-                        'technical_notes',
-                        'project',
-                        'license_id',
-                        'groups',
-                        'license_title',
-                        'citation',
-                        'reason_for_adding',
-                        'restrictions',
-                    ].some((x) => f.includes(x))
-                ),
+                // for some reason the extra field acts weird on he diff, so we are removing it from the diffFields, it will still match subpatterns such as extras[0]
+                diffFields
+                    .filter((f) => f !== 'extras')
+                    .some((f) =>
+                        [
+                            'extras',
+                            'tags',
+                            'notes',
+                            'technical_notes',
+                            'project',
+                            'license_id',
+                            'license_title',
+                            'citation',
+                            'reason_for_adding',
+                            'restrictions',
+                        ].some((x) => f.includes(x))
+                    ),
         },
         {
             name: 'Methodology',
@@ -454,7 +454,7 @@ export default function DatasetPage(
         {
             name: 'Issues',
             count: openIssueLength,
-            enabled: issues.data && issues.data.length > 0,
+            enabled: issues.data && issues.data.length > 0 && !isCurrentVersion,
         },
         {
             name: 'Release Notes',
@@ -483,6 +483,7 @@ export default function DatasetPage(
                 setTabularResource({
                     provider: dataset.provider as string,
                     id: dataset.rw_id as string,
+                    name: dataset.name as string,
                 })
             } else if (dataset?.resources.find((d) => d.datastore_active)) {
                 const resource = dataset?.resources.find(
@@ -493,6 +494,7 @@ export default function DatasetPage(
                     provider: 'datastore',
                     id: resource?.id as string,
                     apiKey: apikey,
+                    name: resource?.title ?? resource?.name as string,
                 })
             } else {
                 setTabularResource(null)
@@ -517,8 +519,6 @@ export default function DatasetPage(
             </>
         )
     }
-
-    console.log(diffFields)
 
     return (
         <>
@@ -691,7 +691,7 @@ export default function DatasetPage(
                                                     />
                                                 </Tab.Panel>
                                             )}
-                                            {issues.data &&
+                                            {issues.data && !isCurrentVersion &&
                                                 issues.data.length > 0 && (
                                                     <Tab.Panel as="div">
                                                         <Issues

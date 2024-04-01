@@ -1,6 +1,9 @@
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { ErrorDisplay } from '@/components/_shared/InputGroup'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic'
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+})
 import {
     Popover,
     PopoverContent,
@@ -41,8 +44,8 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
         (datafile.format == 'Layer' &&
             // @ts-ignore
             datafile?.layerObj?.provider !=
-            // @ts-ignore
-            'cartodb' &&
+                // @ts-ignore
+                'cartodb' &&
             sql) ||
         (!datafile.key && !datafile.url)
     ) {
@@ -62,14 +65,16 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
     const Component =
         isLoading && mode == 'SIGNED_URL' ? `span` : PopoverTrigger
 
-    const conversibleFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
+    const conversibleTabularFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
+    const conversibleSpatialFormats = ['GeoJSON', 'KML', 'SHP']
 
     const format = datafile.format ?? ''
-    const isConversible =
+    const isConversibleTabular =
         datafile.datastore_active &&
-        conversibleFormats.includes(format.toUpperCase())
+        conversibleTabularFormats.includes(format.toUpperCase())
+    const isConversibleVector = datafile.format == 'Layer'
 
-    const conversionOptions = conversibleFormats.filter(
+    const tabularConversionOptions = conversibleTabularFormats.filter(
         (f) => f != format.toUpperCase()
     )
 
@@ -78,7 +83,7 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
     return (
         <>
             <Popover>
-                <Component className="w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400">
+                <Component className="download-datafile w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400">
                     <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
                     <div className="font-acumin text-xs sm:text-sm font-normal text-black">
                         {isLoading && mode == 'SIGNED_URL'
@@ -97,6 +102,8 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                             <Button
                                 className="w-full"
                                 variant="ghost"
+                                id="download"
+                                data-resource={datafile.title ?? datafile.name!}
                                 onClick={() =>
                                     download(originalResourceDownloadUrl)
                                 }
@@ -106,8 +113,8 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                                     ? `(${datafile.format})`
                                     : ''}
                             </Button>
-                            {isConversible &&
-                                conversionOptions.map((f) => (
+                            {isConversibleTabular &&
+                                tabularConversionOptions.map((f) => (
                                     <Button
                                         variant="ghost"
                                         className="w-full"
@@ -123,7 +130,7 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                         </>
                     ) : (
                         <>
-                            {conversibleFormats.map((f) => (
+                            {conversibleTabularFormats.map((f) => (
                                 <Button
                                     variant="ghost"
                                     className="w-full"
@@ -136,6 +143,20 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                                     {f}
                                 </Button>
                             ))}
+                            {isConversibleVector &&
+                                conversibleSpatialFormats.map((f) => (
+                                    <Button
+                                        variant="ghost"
+                                        className="w-full"
+                                        onClick={() => {
+                                            // @ts-ignore
+                                            setConvertTo(f)
+                                            setOpen(true)
+                                        }}
+                                    >
+                                        {f}
+                                    </Button>
+                                ))}
                         </>
                     )}
                 </PopoverContent>
@@ -181,12 +202,14 @@ function DownloadModal({
 
     let isLoading = false
     let sql = `SELECT * FROM "${datafile.id}"`
+    let cartoAccount: string | undefined = ''
     if (datafile.format == 'Layer') {
         const layerObj = datafile.layerObj
         const layerCfg = layerObj?.layerConfig
         const layerSrc = layerCfg?.source
         const layerProvider = layerSrc?.provider
         sql = layerProvider?.layers?.at(0)?.options?.sql
+        cartoAccount = layerProvider?.account
     }
 
     return (
@@ -208,6 +231,8 @@ function DownloadModal({
                 )}
                 {!isLoading && (
                     <form
+                        id="download"
+                        data-resource={datafile.title ?? datafile.name!}
                         onSubmit={handleSubmit(
                             async (data) => {
                                 requestDatafileConversionMutation.mutate(
@@ -222,6 +247,7 @@ function DownloadModal({
                                             : 'datastore',
                                         sql: sql,
                                         resource_id: datafile.id,
+                                        carto_account: cartoAccount ?? '',
                                     },
                                     {
                                         onSuccess: () => {
@@ -233,7 +259,7 @@ function DownloadModal({
                                             setOpen(false)
                                         },
                                         onError: (err) => {
-                                            console.log(err)
+                                            console.error(err)
 
                                             toast('Failed to request file', {
                                                 type: 'error',
@@ -243,7 +269,7 @@ function DownloadModal({
                                 )
                             },
                             (err) => {
-                                console.log(err)
+                                console.error(err)
                                 toast('Failed to request file', {
                                     type: 'error',
                                 })

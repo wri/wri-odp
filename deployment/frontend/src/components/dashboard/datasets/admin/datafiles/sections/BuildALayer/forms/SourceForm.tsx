@@ -19,13 +19,18 @@ import { useColumns } from '../useColumns'
 import classNames from '@/utils/classnames'
 import { ChooseTemplates } from './ChooseTemplates'
 import { ScrollArea } from '@/components/_shared/ScrollArea'
+import { DatafileLocation } from '../../../DatafileLocation'
 
 export default function SourceForm({
     onNext,
     convertToRaw,
+    formObj: _formObj,
+    index: _index
 }: {
     onNext: () => void
     convertToRaw: () => void
+    formObj: any,
+    index: number
 }) {
     const formObj = useFormContext<LayerFormType>()
     const [columnsFetchEnabled, setColumnsFetchEnabled] = useState(false)
@@ -76,7 +81,7 @@ export default function SourceForm({
                     open={templateModalOpen}
                     setOpen={() => setTemplateModalOpen(!open)}
                 />
-                <div className="mt-10 flex gap-x-2 w-full justify-end">
+                <div className="mt-10 flex gap-x-2 w-full justify-end flex-wrap gap-y-5 mb-10 sm:mb-0">
                     <DefaultTooltip content="This will convert this guided form to a raw JSON object that can be edited directly, this is useful for advanced users that want to use features that are not yet supported by the guided form">
                         <Button onClick={() => convertToRaw()} type="button">
                             Convert to raw object
@@ -96,25 +101,26 @@ export default function SourceForm({
                             className="sm:grid-cols-1 gap-x-2"
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
-                            <Input {...register('name')} type="text" />
+                            <Input {...register('name')} type="text" aria-label='layer name'/>
                         </InputGroup>
                         <InputGroup
                             label="Slug of layer"
                             className="sm:grid-cols-1 gap-x-2"
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
-                            <Input {...register('slug')} type="text" />
+                            <Input {...register('slug')} type="text" aria-label='slug of layer'/>
                         </InputGroup>
                         <InputGroup
                             label="Description of Layer"
                             className="sm:grid-cols-1 gap-x-2"
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
-                            <Input {...register('description')} type="text" />
+                            <Input {...register('description')} type="text" aria-label='layer description'/>
                         </InputGroup>
                         <div className="relative flex justify-start">
                             <div className="flex h-6 items-center">
                                 <input
+                                    aria-label='featured dataset'
                                     id="featured_dataset"
                                     aria-describedby="comments-description"
                                     {...register(`default`)}
@@ -128,6 +134,67 @@ export default function SourceForm({
                                 </label>
                             </div>
                         </div>
+                        <div className="relative flex justify-start">
+                            <div className="flex h-6 items-center">
+                                <input
+                                    aria-label='timeline'
+                                    id="timeline"
+                                    aria-describedby="comments-description"
+                                    {...register(`layerConfig.timeline`)}
+                                    type="checkbox"
+                                    className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
+                                />
+                            </div>
+                            <div className="ml-3 text-sm leading-6">
+                                <label className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800">
+                                    Timeline
+                                    <DefaultTooltip content="Set this to true to allow to order the layers of this dataset in a timeline">
+                                        <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                    </DefaultTooltip>
+                                </label>
+                            </div>
+                        </div>
+                        {watch('layerConfig.timeline') === true && (
+                            <>
+                                <InputGroup
+                                    label="Timeline order"
+                                    className="sm:grid-cols-1 gap-x-2"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                >
+                                    <Input
+                                    aria-label='timeline order'
+                                        {...register('layerConfig.order', {
+                                            valueAsNumber: true,
+                                        })}
+                                        defaultValue={0}
+                                        type="number"
+                                        icon={
+                                            <DefaultTooltip content="Integer that is going to be used to order the layers in the timeline, usually set to the year that the layer describes">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
+                                    />
+                                </InputGroup>
+                                <InputGroup
+                                    label="Timeline label"
+                                    className="sm:grid-cols-1 gap-x-2"
+                                    labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
+                                >
+                                    <Input
+                                        {...register(
+                                            'layerConfig.timelineLabel'
+                                        )}
+                                        aria-label='timeline label'
+                                        type="text"
+                                        icon={
+                                            <DefaultTooltip content="Label that will popup when the user hovers over the layer little circle in the timeline">
+                                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                            </DefaultTooltip>
+                                        }
+                                    />
+                                </InputGroup>
+                            </>
+                        )}
                         <InputGroup
                             label="Layer Type"
                             className="sm:grid-cols-1 gap-x-2"
@@ -179,7 +246,7 @@ export default function SourceForm({
                         {watch('layerConfig.source.provider.type')?.value ===
                             'gee' && (
                             <InputGroup
-                                label="Layer ID"
+                                label="GEE ID"
                                 className="sm:grid-cols-1 gap-x-2"
                                 labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                             >
@@ -196,6 +263,7 @@ export default function SourceForm({
                                     labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                 >
                                     <Input
+                                    aria-label='account'
                                         {...register(
                                             'layerConfig.source.provider.account'
                                         )}
@@ -217,6 +285,7 @@ export default function SourceForm({
                                         {...register(
                                             'layerConfig.source.provider.layers.0.options.sql'
                                         )}
+                                        aria-label='sql query'
                                         type="text"
                                         defaultValue=""
                                     />
@@ -234,6 +303,7 @@ export default function SourceForm({
                                     <div className="flex gap-x-2 items-center">
                                         <Input
                                             {...register('connectorUrl')}
+                                            aria-label='columns url'
                                             type="text"
                                             defaultValue="https://wri-rw.carto.com:443/api/v2/sql?q="
                                             icon={
@@ -244,6 +314,7 @@ export default function SourceForm({
                                         />
                                         <DefaultTooltip content="Try to fetch columns (this will clear the interaction config)">
                                             <Button
+                                                aria-label='refetch'
                                                 onClick={() => {
                                                     formObj.setValue(
                                                         'interactionConfig.output',
@@ -274,6 +345,7 @@ export default function SourceForm({
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
                             <Input
+                            aria-label='min zoom'
                                 {...register('layerConfig.source.minzoom', {
                                     setValueAs: (v) =>
                                         v === '' ? undefined : parseInt(v),
@@ -297,6 +369,7 @@ export default function SourceForm({
                                     setValueAs: (v) =>
                                         v === '' ? undefined : parseInt(v),
                                 })}
+                                aria-label='max zoom'
                                 icon={
                                     <DefaultTooltip content="Max zoom in which content will appera">
                                         <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
@@ -306,6 +379,18 @@ export default function SourceForm({
                             />
                             <ErrorDisplay errors={errors} name="zoom" />
                         </InputGroup>
+                        <div>
+                            <h2 className="text-lg flex items-center gap-x-2">
+                                Location Coverage
+                                <DefaultTooltip content="This field defines whether a data file will show up on the results or not when doing a search by location">
+                                    <InformationCircleIcon
+                                        className="h-5 w-5 text-neutral-500"
+                                        aria-hidden="true"
+                                    />
+                                </DefaultTooltip>
+                            </h2>
+                        </div>
+                        <DatafileLocation formObj={_formObj} index={_index} />
                     </div>
                 </ScrollArea>
                 <Button

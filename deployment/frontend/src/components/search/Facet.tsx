@@ -50,6 +50,7 @@ export default function Facet({
         <Disclosure
             as="div"
             className="border-b border-r border-stone-200 shadow"
+            role="listitem"
         >
             {({ open }) => (
                 <>
@@ -135,7 +136,8 @@ export default function Facet({
                                                     htmlFor={`facet-${fqKey}-${option.value}`}
                                                     className="select-none font-medium text-gray-900"
                                                 >
-                                                    {option.label ?? option.value}
+                                                    {option.label ??
+                                                        option.value}
                                                 </label>
                                             </div>
                                         </div>

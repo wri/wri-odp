@@ -33,7 +33,10 @@ import { EditDataFilesSection } from './datafiles/EditDataFilesSection'
 import { useSession } from 'next-auth/react'
 import { match } from 'ts-pattern'
 import { Collaborators } from './metadata/Collaborators'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic'
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+})
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
@@ -119,7 +122,29 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         })
         .otherwise(() => false)
 
-    const resourceForm = dataset.resources as unknown as ResourceFormType[]
+    const resourceForm = dataset.resources.sort((a, b) => {
+        const isLayer = (r: any) =>
+            r.type === 'layer' ||
+            r.type === 'layer-raw' ||
+            r.type === 'empty-layer'
+
+        const isALayer = isLayer(a)
+        const isBLayer = isLayer(b)
+
+        if (isALayer && isBLayer) {
+            return 0
+        }
+
+        if (!isALayer && isBLayer) {
+            return -1
+        }
+
+        if (isALayer && !isBLayer) {
+            return 1
+        }
+
+        return 0
+    }) as unknown as ResourceFormType[]
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
@@ -216,7 +241,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             <Tab.Group>
                 <div>
                     <Tab.List
-                        className="max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
+                        className="max-w-screen sm:max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
                         aria-label="Tabs"
                     >
                         <div className="flex-col justify-start flex sm:flex-row gap-y-4 sm:gap-x-8 sm:border-b-2 border-gray-300 w-full">
@@ -253,7 +278,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         >
                             <form
                                 onSubmit={formObj.handleSubmit((data) => {
-                                    console.log('Data', data)
                                     editDataset.mutate(data)
                                 })}
                             >
@@ -314,9 +338,14 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 )}
             </div>
             <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-6 xxl:px-0">
-                <Button type="button" variant="outline">
-                    <Link href="/dashboard/datasets">Cancel</Link>
-                </Button>
+                {/* <Button type="button" variant="outline"> */}
+                <Link
+                    href="/dashboard/datasets"
+                    className="inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold h-11 px-6 py-4 rounded-[3px] text-base"
+                >
+                    Cancel
+                </Link>
+                {/* </Button> */}
                 <LoaderButton
                     loading={editDataset.isLoading}
                     type="submit"
@@ -430,7 +459,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             }
                         },
                         (err) => {
-                            console.log(err)
+                            console.error(err)
                         }
                     )}
                 >

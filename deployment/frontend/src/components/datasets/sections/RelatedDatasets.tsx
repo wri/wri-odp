@@ -1,5 +1,8 @@
 import { Button } from '@/components/_shared/Button'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import Map from '@/components/_shared/map/Map'
 import { APILayerSpec } from '@/interfaces/layer.interface'

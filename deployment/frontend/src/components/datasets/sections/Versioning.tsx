@@ -21,13 +21,17 @@ export function Versioning({
         { id: dataset.id },
         {
             select: (data) => {
-                return data || []
+                return (data || []).sort((a, b) => {
+                    return b.date.localeCompare(a.date)
+                })
             },
         }
     )
 
     const isReleaseNotesChanged =
         diffFields.includes('release_notes') && !isCurrentVersion
+
+    const isFirstReleaseNotes = !releaseNotes?.length && dataset.release_notes
 
     return (
         <div className="flex flex-col gap-y-4 py-2">
@@ -38,7 +42,7 @@ export function Versioning({
             )}
             {!isReleaseNotesLoading && (
                 <div className="flex flex-col gap-y-4">
-                    {isReleaseNotesChanged && (
+                    {(isReleaseNotesChanged || isFirstReleaseNotes) && (
                         <ReleaseNotesCard
                             releaseNotes={dataset.release_notes}
                             version={'Pending'}
@@ -46,18 +50,21 @@ export function Versioning({
                             defaultOpen={true}
                         />
                     )}
-                    {releaseNotes?.map((rn, i) => (
-                        <ReleaseNotesCard
-                            releaseNotes={rn.release_notes}
-                            date={rn.date}
-                            version={`Version ${releaseNotes?.length - i}`}
-                            key={`release-notes-${i}`}
-                            defaultOpen={!isReleaseNotesChanged && i == 0}
-                        />
-                    ))}
-                    {!isReleaseNotesChanged && !releaseNotes?.length && (
-                        <span>This dataset is at it's initial version</span>
-                    )}
+                    {!isFirstReleaseNotes &&
+                        releaseNotes?.map((rn, i) => (
+                            <ReleaseNotesCard
+                                releaseNotes={rn.release_notes}
+                                date={rn.date}
+                                version={`Version ${releaseNotes?.length - i}`}
+                                key={`release-notes-${i}`}
+                                defaultOpen={!isReleaseNotesChanged && i == 0}
+                            />
+                        ))}
+                    {!isReleaseNotesChanged &&
+                        !releaseNotes?.length &&
+                        !isFirstReleaseNotes && (
+                            <span>This dataset is at its initial version</span>
+                        )}
                 </div>
             )}
         </div>

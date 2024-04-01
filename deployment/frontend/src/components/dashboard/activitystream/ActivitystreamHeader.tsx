@@ -30,6 +30,7 @@ function LeftNode({
     const { data: activity, isLoading: isLoadingActivity } =
         api.dashboardActivity.listActivityStreamDashboard.useQuery({
             search: '',
+            fq: {},
             page: { start: 0, rows: 1000 },
         })
     const { data: organization, isLoading: isLoadingOrganization } =
@@ -79,7 +80,7 @@ function LeftNode({
         )
 
     return (
-        <div className="flex w-full gap-x-4 pl-6 pr-2 sm:pr-0 pt-2 sm:pt-0">
+        <div className="flex w-full gap-x-4 pl-6 pr-2 sm:pr-0 pt-2 sm:pt-0 flex-col gap-y-2 sm:flex-row sm:gap-y-0">
             <SelectFilter
                 options={[{ id: 'None', label: 'All activity' }].concat(
                     getKeyValues2(

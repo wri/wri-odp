@@ -4,10 +4,9 @@ import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import { v4 as uuidv4 } from 'uuid'
 import { AddDataFile } from './AddDataFile'
 import { EditDataFile } from './EditDataFile'
-import { MetadataAccordion } from '../metadata/MetadataAccordion'
 import { api } from '@/utils/api'
-import ViewsList from '@/components/views/ViewsList'
 import { WriDataset } from '@/schema/ckan.schema'
+import SortableList, { SortableItem } from 'react-easy-sort'
 
 export function EditDataFilesSection({
     formObj,
@@ -34,38 +33,55 @@ export function EditDataFilesSection({
         { enabled: !!rwId }
     )
 
+    const datafiles = fields.filter(
+        (r) =>
+            r.type !== 'layer' &&
+            r.type !== 'layer-raw' &&
+            r.type !== 'empty-layer'
+    )
+
     return (
         <>
-              {fields.map((field, index) => {
-                if (
-                    field.type === 'layer' ||
-                    field.type === 'layer-raw' ||
-                    field.type === 'empty-layer'
-                )
-                    return <></>
-                return field.new ? (
-                    <AddDataFile
-                        key={index}
-                        index={index}
-                        field={field}
-                        remove={() => remove(index)}
-                        formObj={formObj}
-                    />
-                ) : (
-                    <EditDataFile
-                        key={index}
-                        index={index}
-                        field={field}
-                        remove={() => remove(index)}
-                        formObj={formObj}
-                        dataset={dataset}
-                    />
-                )
-            })}
+            <SortableList
+                onSortEnd={(oldIdx, newIdx) => {
+                    swap(oldIdx, newIdx)
+                }}
+                className="list"
+                lockAxis="y"
+                draggedItemClassName="dragged"
+            >
+                {datafiles.map((field, index) => {
+                    return (
+                        <SortableItem key={field.id}>
+                            <div>
+
+                                {field.new ? (
+                                    <AddDataFile
+                                        key={index}
+                                        index={index}
+                                        field={field}
+                                        remove={() => remove(index)}
+                                        formObj={formObj}
+                                    />
+                                ) : (
+                                    <EditDataFile
+                                        key={index}
+                                        index={index}
+                                        field={field}
+                                        remove={() => remove(index)}
+                                        formObj={formObj}
+                                        dataset={dataset}
+                                    />
+                                )}
+                            </div>
+                        </SortableItem>
+                    )
+                })}
+            </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>
-                        append({
+                        insert(datafiles.length, {
                             resourceId: uuidv4(),
                             package_id: watch('id'),
                             title: '',

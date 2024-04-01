@@ -138,8 +138,6 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials, _req) {
                 try {
-                    console.log('Login credentials', credentials)
-                    console.log('Ckan URL', env.CKAN_URL)
                     if (!credentials) return null
                     const userRes = await fetch(
                         `${env.CKAN_URL}/api/3/action/user_login`,
@@ -164,36 +162,17 @@ export const authOptions: NextAuthOptions = {
                     }
 
                     if (user.result.id) {
-                        const orgListRes = await fetch(
-                            `${env.CKAN_URL}/api/3/action/organization_list_for_user`,
-                            {
-                                method: 'POST',
-                                body: JSON.stringify({ id: user.result.id }),
-                                headers: {
-                                    Authorization: user.result.frontend_token,
-                                    'Content-Type': 'application/json',
-                                },
-                            }
-                        )
-                        const orgList: CkanResponse<Organization[]> =
-                            await orgListRes.json()
-
-                        // console.log('Org list', orgList)
                         return {
                             ...user.result,
                             image: '',
                             apikey: user.result.frontend_token,
                             sysadmin: user.result?.sysadmin,
-                            /*teams: orgList.result.map((org) => ({
-                                name: org?.name ?? '',
-                                id: org?.id ?? '',
-                            })),*/
                         }
                     } else {
                         throw 'An unexpected error occurred while signing in. Please, try again.'
                     }
                 } catch (e) {
-                    console.log('Error', e)
+                    console.error(e)
                     throw e
                 }
             },

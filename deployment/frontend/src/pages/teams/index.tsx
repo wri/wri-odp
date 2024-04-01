@@ -1,7 +1,7 @@
 import Header from '@/components/_shared/Header'
 import Footer from '@/components/_shared/Footer'
 import TeamsSearch from '@/components/team/TeamsSearch'
-import TeamsSearchResults from '@/components/team/TeamsSearchResults'
+// import TeamsSearchResults from '@/components/team/TeamsSearchResults'
 import { NextSeo } from 'next-seo'
 import { api } from '@/utils/api'
 import { useState, useEffect } from 'react'
@@ -16,6 +16,12 @@ import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
 import { env } from '@/env.mjs'
+import dynamic from 'next/dynamic'
+import { Index } from 'flexsearch'
+
+const TeamsSearchResults = dynamic(
+    () => import('@/components/team/TeamsSearchResults')
+)
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
@@ -44,32 +50,40 @@ export default function TeamsPage(
         search: '',
         page: { start: 0, rows: 10 },
     })
-    const [query, setQuery] = useState<SearchInput>({
+
+    const [query, setQuery] = useState<string>('')
+
+    const { data, isLoading } = api.teams.getGeneralTeam.useQuery({
         search: '',
-        page: { start: 0, rows: 10000 },
+        page: { start: 0, rows: 1000 },
         allTree: true,
     })
-    const { data, isLoading } = api.teams.getGeneralTeam.useQuery(query)
+    const indexTeams = new Index({
+        tokenize: 'full',
+    })
+    if (data?.teams) {
+        data?.teams.forEach((team) => {
+            indexTeams.add(team.id, JSON.stringify(team))
+        })
+    }
 
-    const ProcessedTeam = useQuery(
-        ['teamspage', data, pagination],
-        () => {
-            if (!data) return { teams: [], teamsDetails: {}, count: 0 }
-            const teams = data?.teams.slice(
-                pagination.page.start,
-                pagination.page.start + pagination.page.rows
-            )
-            const teamsDetails = data?.teamsDetails
-            return { teams, teamsDetails, count: data?.count }
-        },
-        {
-            enabled: !!data,
-        }
-    )
+    function ProcessTeams() {
+        if (!data) return { teams: [], teamsDetails: {}, count: 0 }
+        const filteredTeams =
+            query !== ''
+                ? data.teams.filter((t) =>
+                      indexTeams.search(query).includes(t.id)
+                  )
+                : data.teams
+        const teams = filteredTeams.slice(
+            pagination.page.start,
+            pagination.page.start + pagination.page.rows
+        )
+        const teamsDetails = data?.teamsDetails
+        return { teams, teamsDetails, count: filteredTeams.length }
+    }
 
-    useEffect(() => {
-        setPagination({ search: '', page: { start: 0, rows: 10 } })
-    }, [query.search])
+    const filteredTeams = ProcessTeams()
 
     return (
         <>
@@ -90,25 +104,20 @@ export default function TeamsPage(
                 query={query}
             />
 
-            {isLoading || ProcessedTeam.isLoading ? (
+            {isLoading ? (
                 <Spinner className="mx-auto" />
             ) : (
                 <>
                     <TeamsSearchResults
-                        count={data?.count as number}
-                        teams={ProcessedTeam?.data?.teams as GroupTree[]}
-                        teamsDetails={
-                            ProcessedTeam?.data?.teamsDetails as Record<
-                                string,
-                                GroupsmDetails
-                            >
-                        }
+                        count={filteredTeams.count}
+                        teams={filteredTeams?.teams}
+                        teamsDetails={filteredTeams?.teamsDetails}
                     />
                     <div className="w-full px-8 xxl:px-0 max-w-8xl mx-auto">
                         <Pagination
                             setQuery={setPagination}
                             query={pagination}
-                            data={data}
+                            data={filteredTeams}
                         />
                     </div>
                 </>

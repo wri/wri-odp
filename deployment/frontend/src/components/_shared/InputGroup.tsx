@@ -22,21 +22,21 @@ export function InputGroup({
     return (
         <div
             className={classNames(
-                'grid sm:grid-cols-8 justify-between gap-x-14',
+                'grid sm:grid-cols-8 justify-between sm:gap-x-14',
                 className ?? ''
             )}
         >
             {typeof label === 'string' ? (
                 <span
                     className={classNames(
-                        'col-span-2 text-left sm:text-end font-acumin xxl:text-lg font-normal leading-tight text-black sm:max-w-[5rem] flex items-center',
+                        'col-span-2 text-left sm:text-end font-acumin xxl:text-lg font-normal leading-tight text-black sm:max-w-[5rem] flex ',
                         labelClassName ?? ''
                     )}
                 >
                     {label}{' '}
                     {required && <span className="text-red-500">*</span>}
                     {info && (
-                        <DefaultTooltip content={info} contentClassName=''>
+                        <DefaultTooltip content={info} contentClassName="">
                             <InformationCircleIcon
                                 className="h-5 w-5 text-neutral-500 ml-1 mb-1"
                                 aria-hidden="true"

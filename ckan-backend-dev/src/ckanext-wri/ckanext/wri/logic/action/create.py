@@ -56,7 +56,6 @@ def pending_dataset_create(context: Context, data_dict: DataDict):
     """Create a Pending Dataset"""
     package_id = data_dict.get("package_id")
     package_data = data_dict.get("package_data")
-    log.error(package_data)
 
     if not package_id:
         raise tk.ValidationError(_("package_id is required"))

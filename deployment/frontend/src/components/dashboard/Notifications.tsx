@@ -69,11 +69,12 @@ function Notification({ items }: { items: NotificationType }) {
     )
 }
 export default function Notifications({ drag }: { drag: boolean }) {
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery()
+    const { data, isLoading } = api.notification.getAllNotifications.useQuery({
+        returnLength: true,
+    })
 
     if (isLoading) return <Spinner className="mx-auto" />
 
-    console.log('data: ', data)
     return (
         <section
             id="favourites"
@@ -95,14 +96,20 @@ export default function Notifications({ drag }: { drag: boolean }) {
                     <p className="font-normal text-[20px]">Notifications </p>
                     {isLoading ? (
                         <Spinner className="w-2 h-2" />
-                    ) : data?.length ? (
+                    ) : (data as NotificationType[])?.length ? (
                         <DefaultTooltip
                             content={`${
-                                data.filter((item) => item.is_unread).length
+                                (data as NotificationType[]).filter(
+                                    (item) => item.is_unread
+                                ).length
                             } unread`}
                         >
                             <div className="rounded-full my-auto w-4 h-4 bg-wri-gold font-bold text-[11px] flex justify-center items-center">
-                                {data.filter((item) => item.is_unread).length}
+                                {
+                                    (data as NotificationType[]).filter(
+                                        (item) => item.is_unread
+                                    ).length
+                                }
                             </div>
                         </DefaultTooltip>
                     ) : (
@@ -117,8 +124,8 @@ export default function Notifications({ drag }: { drag: boolean }) {
                     <ArrowRightIcon className="w-4 h-4 mb-1" />
                 </Link>
             </div>
-            {data?.length
-                ? data?.slice(0, 6).map((items) => {
+            {(data as NotificationType[])?.length
+                ? (data as NotificationType[])?.slice(0, 6).map((items) => {
                       return <Notification key={items.id} items={items} />
                   })
                 : 'No notifications'}

@@ -32,13 +32,13 @@ export const activityStreamRouter = createTRPCRouter({
     listActivityStreamDashboard: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            let url = `${env.CKAN_URL}/api/3/action/dashboard_activity_list`
+            let url = `${env.CKAN_URL}/api/3/action/dashboard_activity_listv2`
 
             if (input.fq) {
                 if ('package_id' in input.fq) {
-                    url = `${env.CKAN_URL}/api/3/action/package_activity_list?id=${input.fq['package_id']}`
+                    url = `${env.CKAN_URL}/api/3/action/package_activity_list_wri?id=${input.fq['package_id']}`
                 } else if ('orgId' in input.fq) {
-                    url = `${env.CKAN_URL}/api/3/action/organization_activity_list?id=${input.fq['orgId']}`
+                    url = `${env.CKAN_URL}/api/3/action/organization_activity_list_wri?id=${input.fq['orgId']}`
                 }
             }
             const response = await fetch(url, {
@@ -48,18 +48,12 @@ export const activityStreamRouter = createTRPCRouter({
             })
 
             const data = (await response.json()) as CkanResponse<Activity[]>
-            const activities = await Promise.all(
-                data.result.map(async (activity: Activity) => {
-                    let user_data = await getUser({
-                        userId: activity.user_id,
-                        apiKey: ctx.session.user.apikey,
-                    })
-                    user_data = user_data === undefined ? null : user_data
-                    const actitvityDetails = activityDetails(activity)
-                    actitvityDetails.description = `${user_data?.name} ${actitvityDetails.description}`
-                    return actitvityDetails
-                })
-            )
+            const activities = data.result.map((activity: Activity) => {
+                let user_data = activity.user_data as User
+                const actitvityDetails = activityDetails(activity)
+                actitvityDetails.description = `${user_data?.name} ${actitvityDetails.description}`
+                return actitvityDetails
+            })
 
             let result = activities
             if (input.search) {

@@ -1,8 +1,12 @@
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { WriDataset } from '@/schema/ckan.schema'
+import { WriDataset, WriDatasetWithoutDetails } from '@/schema/ckan.schema'
 import { TableCellsIcon } from '@heroicons/react/20/solid'
 
-export default function TabularViewIcon({ dataset }: { dataset: WriDataset }) {
+export default function TabularViewIcon({
+    dataset,
+}: {
+    dataset: WriDatasetWithoutDetails
+}) {
     const hasTabularView =
         dataset?.rw_id || dataset?.resources?.some((r) => r.datastore_active)
 

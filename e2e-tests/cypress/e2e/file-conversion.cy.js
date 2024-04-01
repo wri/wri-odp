@@ -25,7 +25,7 @@ describe("Data files", () => {
     cy.get("input[name=maintainer]").type("Luccas");
     cy.get("input[name=maintainer_email]").type("luccasmmg@gmail.com");
     cy.contains("Next: Datafiles").click();
-    cy.get("input[type=file]").selectFile("cypress/fixtures/airtravel.csv", {
+    cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/airtravel.csv", {
       force: true,
     });
     cy.wait(5000);
@@ -67,10 +67,11 @@ describe("Data files", () => {
       },
     },
     () => {
+      cy.viewport(1440, 1440);
       cy.visit(`/datasets/${datasetName}`);
-
+      cy.wait(5000);
       cy.contains("Example title").click({ force: true });
-      cy.contains("Download").click({force: true})
+      cy.get(".download-datafile").click()
       cy.contains("Original Format")
     },
   );

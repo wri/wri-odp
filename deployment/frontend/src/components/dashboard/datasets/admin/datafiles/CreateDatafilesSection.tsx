@@ -12,7 +12,7 @@ import {
 import classNames from '@/utils/classnames'
 import { LinkExternalForm } from './sections/LinkExternalForm'
 import { UploadForm } from './sections/UploadForm'
-import { useMemo, useRef, useState } from 'react'
+import { Fragment, useMemo, useRef, useState } from 'react'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import { DataFileAccordion } from './DatafileAccordion'
@@ -27,6 +27,7 @@ import { convertBytes } from '@/utils/convertBytes'
 import { useDataDictionary } from '@/utils/getDataDictionary'
 import { Field } from 'tableschema'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
+import SortableList, { SortableItem } from 'react-easy-sort'
 
 export function CreateDataFilesSection({
     formObj,
@@ -39,29 +40,43 @@ export function CreateDataFilesSection({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
         })
+
+    const datafiles = fields.filter(
+        (r) =>
+            r.type !== 'layer' &&
+            r.type !== 'layer-raw' &&
+            r.type !== 'empty-layer'
+    )
+
     return (
         <>
-            {fields.map((field, index) => {
-                if (
-                    field.type === 'layer' ||
-                    field.type === 'layer-raw' ||
-                    field.type === 'empty-layer'
-                )
-                    return <></>
-                return (
-                    <AddDataFile
-                        key={index}
-                        index={index}
-                        field={field}
-                        remove={() => remove(index)}
-                        formObj={formObj}
-                    />
-                )
-            })}
+            <SortableList
+                onSortEnd={(oldIdx, newIdx) => {
+                    swap(oldIdx, newIdx)
+                }}
+                className="list"
+                lockAxis="y"
+                draggedItemClassName="dragged"
+            >
+                {datafiles.map((field, index) => {
+                    return (
+                        <SortableItem key={field.id}>
+                            <div>
+                                <AddDataFile
+                                    index={index}
+                                    field={field}
+                                    remove={() => remove(index)}
+                                    formObj={formObj}
+                                />
+                            </div>
+                        </SortableItem>
+                    )
+                })}
+            </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
                     onClick={() =>
-                        append({
+                        insert(datafiles.length, {
                             resourceId: uuidv4(),
                             title: '',
                             type: 'empty-file',
@@ -95,10 +110,10 @@ function AddDataFile({
 }) {
     const { setValue, watch } = formObj
     const datafile = watch(`resources.${index}`)
-    console.log(datafile)
     const uploadInputRef = useRef<HTMLInputElement>(null)
     const { isLoading: dataDictionaryLoading } = useDataDictionary(
         watch(`resources.${index}.fileBlob`),
+        watch(`resources.${index}.resourceId`),
         (data) => {
             if (data) {
                 const types = {

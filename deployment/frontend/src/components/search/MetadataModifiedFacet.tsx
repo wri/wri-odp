@@ -72,7 +72,7 @@ export default function MetadataModifiedFacet({
                 key,
                 title:
                     'Last Updated ' +
-                    (key.endsWith('_since') ? 'Since' : 'Before'),
+                    (key.endsWith('_since') ? 'After' : 'Before'),
                 value,
                 label: value,
             })
@@ -84,6 +84,7 @@ export default function MetadataModifiedFacet({
         <Disclosure
             as="div"
             className="border-b border-r border-stone-200 shadow"
+            role="listitem"
         >
             {({ open }) => (
                 <>

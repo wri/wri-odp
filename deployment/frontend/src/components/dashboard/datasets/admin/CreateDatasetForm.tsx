@@ -24,7 +24,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { OpenInForm } from './metadata/OpenIn'
 import Link from 'next/link'
 import { LocationForm } from './metadata/LocationForm'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { VersioningForm } from './metadata/VersioningForm'
@@ -105,7 +108,6 @@ export default function CreateDatasetForm() {
         formState: { dirtyFields, errors },
     } = formObj
 
-    console.log('Errors', errors)
     useEffect(() => {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])
@@ -183,10 +185,11 @@ export default function CreateDatasetForm() {
                 >
                     Save as Draft
                 </Button>
-                <div className="flex items-center gap-x-2">
-                    <Button type="button" variant="outline">
-                        <Link href="/dashboard/datasets">Cancel</Link>
-                    </Button>
+                <div className="flex items-center gap-x-2 flex-wrap gap-y-5">
+                    <Link href="/dashboard/datasets"
+                        className='inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold h-11 px-6 py-4 rounded-[3px] text-base'>
+                        Cancel
+                    </Link>
                     {selectedIndex !== 0 && (
                         <Button
                             type="button"

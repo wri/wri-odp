@@ -5,7 +5,13 @@ import {
     ResetPasswordSchema,
 } from '@/schema/auth.schema'
 import { CkanResponse } from '@/schema/ckan.schema'
-import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
+import {
+    createTRPCRouter,
+    protectedProcedure,
+    publicProcedure,
+} from '@/server/api/trpc'
+import { getTokenList } from '@/utils/apiUtils'
+import { z } from 'zod'
 
 export const authRouter = createTRPCRouter({
     requestPasswordReset: publicProcedure
@@ -25,7 +31,7 @@ export const authRouter = createTRPCRouter({
                 ).json()
                 return userUpdate
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 throw new Error(
                     'Failed to request password reset. Try again in a few seconds. If the error persists, please contact the system administrator.'
                 )
@@ -72,10 +78,15 @@ export const authRouter = createTRPCRouter({
 
                 return userUpdate
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 throw new Error(
                     'Failed to reset password. Try again in a few seconds. If the error persists, please contact the system administrator.'
                 )
             }
+        }),
+    getApiTokensList: protectedProcedure
+        .input(z.object({}))
+        .query(async ({ input, ctx }) => {
+            return getTokenList(ctx?.session)
         }),
 })

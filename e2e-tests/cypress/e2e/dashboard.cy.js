@@ -102,23 +102,23 @@ describe("Dashboard Test", () => {
 
   it("Should test activity stream", () => {
     cy.visit("/dashboard/activity-stream");
-    cy.contains(`${ckanUserName} created the package ${datasetName}`);
+    cy.contains(`${ckanUserName} created the dataset ${datasetName}`);
     cy.get('[id^="headlessui-listbox-button"]').first().click();
     cy.contains('[role="option"]', "new").click();
-    cy.contains(`${ckanUserName} created the package ${datasetName}`);
+    cy.contains(`${ckanUserName} created the dataset ${datasetName}`);
   });
   it("Should test activity stream select", () => {
     cy.visit("/dashboard/activity-stream");
-    cy.contains(`${ckanUserName} created the package ${datasetName}`);
+    cy.contains(`${ckanUserName} created the dataset ${datasetName}`);
     cy.get('[id^="headlessui-listbox-button"]').eq(1).click();
     cy.contains('[role="option"]', "teams").click();
     cy.get('[id^="headlessui-listbox-button"]').eq(2).click();
     cy.contains('[role="option"]', `${parentOrg}`).click();
-    cy.contains(`${ckanUserName} created the package ${datasetName}`);
+    cy.contains(`${ckanUserName} created the dataset ${datasetName}`);
   });
 
   it("Should test user form", () => {
-    cy.visit(`/dashboard/users/edit/${user}`);
+    cy.visit(`/dashboard/settings/edit/${user}`);
     cy.get('input[name="fullname"]').type(userfullname);
     cy.get('button[type="submit"]').click();
     cy.contains(`Successfully updated user: ${user}`);
@@ -245,7 +245,7 @@ describe("Dashboard Test", () => {
 
   it("Should view issues", () => {
     cy.visit("/datasets/" + datasetName);
-    cy.wait(15000)
+    cy.wait(18000)
     cy.contains("Issues").click({force: true});
     cy.contains("Test");
     cy.contains("Test").click();

@@ -52,6 +52,7 @@ import {
 import type { Dataset, Resource } from '@/interfaces/dataset.interface'
 import type { License } from '@/interfaces/licenses.interface'
 import { isValidUrl } from '@/utils/isValidUrl'
+import { cleanUrl } from '@/utils/cleanUrl'
 import {
     convertFormToLayerObj,
     convertLayerObjToForm,
@@ -100,7 +101,7 @@ export async function fetchDatasetCollaborators(
     sysAdminApiKey: string
 ) {
     const collaboratorsRes = await fetch(
-        `${env.CKAN_URL}/api/3/action/package_collaborator_list?id=${datasetId}`,
+        `${env.CKAN_URL}/api/3/action/package_collaborator_list_wri?id=${datasetId}`,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -108,8 +109,7 @@ export async function fetchDatasetCollaborators(
             },
         }
     )
-    const collaborators: CkanResponse<Collaborator[]> =
-        await collaboratorsRes.json()
+    const collaborators: CkanResponse<any[]> = await collaboratorsRes.json()
     if (!collaborators.success && collaborators.error) {
         if (collaboratorsRes.status === 403)
             throw new TRPCError({
@@ -127,27 +127,17 @@ export async function fetchDatasetCollaborators(
         })
     }
 
-    const collaboratorsWithDetails = await Promise.all(
-        collaborators.result.map(async (collaborator) => {
-            const userRes = await fetch(
-                `${env.CKAN_URL}/api/action/user_show?id=${collaborator.user_id}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: sysAdminApiKey,
-                    },
-                }
-            )
-            const user = await userRes.json()
-            if (!user.success && user.error) {
-                if (user.error.message) throw Error(user.error.message)
-                throw Error(JSON.stringify(user.error))
-            }
-            return { ...collaborator, ...user.result }
-        })
-    )
+    // const result = collaborators.result.map((collaborator) => {
+    //     const user = collaborator.user
+    //     delete collaborator.user
+    //     return {
+    //         ...collaborator,
+    //         ...user
+    //     }
+    //  })
 
-    return collaboratorsWithDetails
+    //@ts-ignore
+    return collaborators.result
 }
 
 export const DatasetRouter = createTRPCRouter({
@@ -177,7 +167,11 @@ export const DatasetRouter = createTRPCRouter({
                     update_frequency: input.update_frequency?.value ?? '',
                     featured_image:
                         input.featured_image && input.featured_dataset
-                            ? `${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`
+                            ? !isValidUrl(cleanUrl(input.featured_image))
+                                ? cleanUrl(
+                                      `${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`
+                                  )
+                                : input.featured_image
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
                     resources: input.resources
@@ -361,7 +355,7 @@ export const DatasetRouter = createTRPCRouter({
                         })
                     }
                 } catch (error) {
-                    console.log(error)
+                    console.error(error)
                     throw Error('Error in sending issue /comment notification')
                 }
 
@@ -370,11 +364,10 @@ export const DatasetRouter = createTRPCRouter({
                         dataset.result.visibility_type ?? ''
                     )
                 ) {
-                    console.log('APPRIVING DATASET')
                     try {
                         approvePendingDataset(dataset.result.id, ctx.session)
                     } catch (e) {
-                        console.log(e)
+                        console.error(e)
                     }
                 }
                 return dataset.result
@@ -419,7 +412,7 @@ export const DatasetRouter = createTRPCRouter({
                     )
                 }
             } catch (e) {
-                console.log(e)
+                console.error(e)
             }
 
             const inputKeys = Object.keys(input)
@@ -484,8 +477,6 @@ export const DatasetRouter = createTRPCRouter({
                 }
             }
 
-            //console.log('PREV DATASET', prevDataset)
-            //console.log('CURRENT DATASET', input)
             try {
                 if (isUpdate) {
                     const user = ctx.session.user
@@ -532,8 +523,10 @@ export const DatasetRouter = createTRPCRouter({
                         update_frequency: input.update_frequency?.value ?? '',
                         featured_image:
                             input.featured_image && input.featured_dataset
-                                ? !isValidUrl(input.featured_image)
-                                    ? `${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`
+                                ? !isValidUrl(cleanUrl(input.featured_image))
+                                    ? cleanUrl(
+                                          `${env.NEXT_PUBLIC_CKAN_URL}/uploads/group/${input.featured_image}`
+                                      )
                                     : input.featured_image
                                 : null,
                         visibility_type: input.visibility_type?.value ?? '',
@@ -565,8 +558,6 @@ export const DatasetRouter = createTRPCRouter({
                                         resource.title != ''
                                             ? resource.title
                                             : layerRaw.name
-                                    console.log('TITLE', title)
-                                    console.log('DESCRIPTION', description)
                                 }
                                 if (resource.layerObj || resource.layerObjRaw) {
                                     return {
@@ -762,7 +753,7 @@ export const DatasetRouter = createTRPCRouter({
                                     })
                                 }
                             } catch (error) {
-                                console.log(error)
+                                console.error(error)
                                 throw Error(
                                     'Error in sending approval status notification'
                                 )
@@ -808,7 +799,7 @@ export const DatasetRouter = createTRPCRouter({
                             )
                     )
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                 }
                 if (
                     ['draft', 'private'].includes(
@@ -818,7 +809,7 @@ export const DatasetRouter = createTRPCRouter({
                     try {
                         approvePendingDataset(input.id ?? '', ctx.session)
                     } catch (e) {
-                        console.log(e)
+                        console.error(e)
                     }
                 }
 
@@ -980,7 +971,7 @@ export const DatasetRouter = createTRPCRouter({
                             })
                         }
                     } catch (error) {
-                        console.log(error)
+                        console.error(error)
                         throw Error(
                             'Error in sending approval status notification'
                         )
@@ -1112,7 +1103,14 @@ export const DatasetRouter = createTRPCRouter({
             return view
         }),
     getAllDataset: publicProcedure
-        .input(searchSchema)
+        .input(
+            searchSchema.extend({
+                removeUnecessaryDataInResources: z
+                    .boolean()
+                    .optional()
+                    .default(false),
+            })
+        )
         .query(async ({ input, ctx }) => {
             let fq = `" "`
             let orgsFq = ''
@@ -1166,8 +1164,17 @@ export const DatasetRouter = createTRPCRouter({
                 extAddressQ: input.extAddressQ,
             }))!
 
+            const _datasets = input.removeUnecessaryDataInResources
+                ? dataset.datasets.map((d) => ({
+                      ...d,
+                      resources: d.resources.map((r) => ({
+                          datastore_active: r.datastore_active,
+                          format: r.format,
+                      })),
+                  }))
+                : dataset.datasets
             return {
-                datasets: dataset.datasets,
+                datasets: _datasets as unknown as WriDataset[],
                 count: dataset.count,
                 searchFacets: dataset.searchFacets,
             }
@@ -1187,7 +1194,7 @@ export const DatasetRouter = createTRPCRouter({
         .query(async ({ input, ctx }) => {
             const user = ctx.session?.user
             const issuesRes = await fetch(
-                `${env.CKAN_URL}/api/action/issue_search?dataset_id=${input.id}`,
+                `${env.CKAN_URL}/api/action/issue_search_wri?dataset_id=${input.id}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -1195,43 +1202,28 @@ export const DatasetRouter = createTRPCRouter({
                     },
                 }
             )
-            const issues: CkanResponse<{ count: number; results: Issue[] }> =
-                await issuesRes.json()
+            const issues: CkanResponse<Issue[]> = await issuesRes.json()
             if (!issues.success && issues.error) {
                 if (issues.error.message) throw Error(issues.error.message)
                 throw Error(JSON.stringify(issues.error))
             }
-            const issuesWithDetails = await Promise.all(
-                issues.result.results.map(async (issue) => {
-                    const detailsRes = await fetch(
-                        `${env.CKAN_URL}/api/action/issue_show?dataset_id=${input.id}&issue_number=${issue.number}`,
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `${user?.apikey ?? ''}`,
-                            },
-                        }
-                    )
-                    const details: CkanResponse<Issue> = await detailsRes.json()
-                    if (!details.success && details.error) {
-                        if (details.error.message)
-                            throw Error(details.error.message)
-                        throw Error(JSON.stringify(details.error))
-                    }
-                    return { ...issue, ...details.result }
-                })
-            )
-            return issuesWithDetails
+
+            return issues.result
         }),
     getOneDataset: publicProcedure
         .input(
             z.object({
                 id: z.string(),
                 includeViews: z.boolean().default(false).optional(),
+                noLayer: z.boolean().optional(),
             })
         )
         .query(async ({ input, ctx }) => {
-            const dataset = await getOneDataset(input.id, ctx.session)
+            const dataset = await getOneDataset(
+                input.id,
+                ctx.session,
+                input.noLayer
+            )
             return dataset
         }),
     getPossibleCollaborators: protectedProcedure.query(async () => {
@@ -1334,7 +1326,7 @@ export const DatasetRouter = createTRPCRouter({
         }),
     getFavoriteDataset: protectedProcedure.query(async ({ ctx }) => {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
+            `${env.CKAN_URL}/api/3/action/dataset_followee_list?id=${ctx.session.user.id}`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -1342,48 +1334,41 @@ export const DatasetRouter = createTRPCRouter({
                 },
             }
         )
-        const data = (await response.json()) as CkanResponse<FolloweeList[]>
+        const data = (await response.json()) as CkanResponse<WriDataset[]>
         if (!data.success && data.error) throw Error(data.error.message)
-        const result = data.result.reduce((acc, item) => {
-            if (item.type === 'dataset') {
-                const t = item.dict as WriDataset
-                acc.push(t)
-            }
-            return acc
-        }, [] as WriDataset[])
-
-        const dataDetails = await Promise.all(
-            result.map(async (item) => {
-                const response = await fetch(
-                    `${env.CKAN_URL}/api/3/action/package_show?id=${item.id}`,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `${ctx.session.user.apikey}`,
-                        },
-                    }
-                )
-                const data = (await response.json()) as CkanResponse<WriDataset>
-                if (!data.success && data.error) throw Error(data.error.message)
-                return data.result
-            })
-        )
 
         return {
-            datasets: dataDetails,
-            count: dataDetails?.length,
+            datasets: data.result,
+            count: data.result?.length,
         }
     }),
     getFeaturedDatasets: publicProcedure
-        .input(searchSchema)
+        .input(
+            searchSchema.extend({
+                removeUnecessaryDataInResources: z
+                    .boolean()
+                    .optional()
+                    .default(false),
+            })
+        )
         .query(async ({ input, ctx }) => {
             const dataset = (await getAllDatasetFq({
                 apiKey: '',
                 fq: `featured_dataset:true`,
                 query: input,
             }))!
+            //This allows us to send less data to the client
+            const _datasets = input.removeUnecessaryDataInResources
+                ? dataset.datasets.map((d) => ({
+                      ...d,
+                      resources: d.resources.map((r) => ({
+                          datastore_active: r.datastore_active,
+                          format: r.format,
+                      })),
+                  }))
+                : dataset.datasets
             return {
-                datasets: dataset.datasets,
+                datasets: _datasets,
                 count: dataset.count,
             }
         }),
@@ -1524,7 +1509,7 @@ export const DatasetRouter = createTRPCRouter({
                     action: 'commented',
                 })
             } catch (error) {
-                console.log(error)
+                console.error(error)
                 throw Error('Error in sending issue /comment notification')
             }
             return data
@@ -1580,7 +1565,7 @@ export const DatasetRouter = createTRPCRouter({
                     action: input.status!,
                 })
             } catch (error) {
-                console.log(error)
+                console.error(error)
                 throw Error('Error in sending issue /comment notification')
             }
             return input.status
@@ -1620,7 +1605,7 @@ export const DatasetRouter = createTRPCRouter({
                     action: 'deleted',
                 })
             } catch (error) {
-                console.log(error)
+                console.error(error)
                 throw Error('Error in sending issue /comment notification')
             }
             return input.issue_number
@@ -1723,7 +1708,7 @@ export const DatasetRouter = createTRPCRouter({
                     action: 'rejected_dataset',
                 })
             } catch (error) {
-                console.log(error)
+                console.error(error)
                 throw Error('Error in sending issue /approval notification')
             }
             return data
@@ -1755,42 +1740,11 @@ export const DatasetRouter = createTRPCRouter({
                 apiKey: ctx.session.user.apikey,
                 fq: fq, // TODO: Vverify if organization admin can only see this and sysadmin
                 query: input,
+                user: true,
             }))!
 
-            // using getUser function, get user details per dataset
-            const resultdata = await Promise.all(
-                dataset.datasets.map(async (dataset) => {
-                    const user = await getUser({
-                        userId: dataset.creator_user_id,
-                        apiKey: ctx.session.user.apikey,
-                    })
-                    const issuesRes = await fetch(
-                        `${env.CKAN_URL}/api/action/issue_search?dataset_id=${dataset.id}`,
-                        {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `${ctx.session.user.apikey}`,
-                            },
-                        }
-                    )
-                    const issues: CkanResponse<{
-                        count: number
-                        results: Issue[]
-                    }> = await issuesRes.json()
-                    if (!issues.success && issues.error) {
-                        if (issues.error.message)
-                            throw Error(issues.error.message)
-                        throw Error(JSON.stringify(issues.error))
-                    }
-                    return {
-                        ...dataset,
-                        user: user,
-                        issue_count: issues.result.count,
-                    }
-                })
-            )
             return {
-                datasets: resultdata as WriDataset[],
+                datasets: dataset.datasets,
                 count: dataset.count,
             }
         }),
@@ -1867,7 +1821,7 @@ export const DatasetRouter = createTRPCRouter({
                 try {
                     spatial = JSON.parse(dataset.spatial)
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                 }
             }
 
@@ -1883,7 +1837,13 @@ export const DatasetRouter = createTRPCRouter({
         }),
 
     getOneActualOrPendingDataset: publicProcedure
-        .input(z.object({ id: z.string(), isPending: z.boolean() }))
+        .input(
+            z.object({
+                id: z.string(),
+                isPending: z.boolean(),
+                noLayer: z.boolean().optional(),
+            })
+        )
         .query(async ({ input, ctx }) => {
             if (input.isPending) {
                 const dataset = await getOnePendingDataset(
@@ -1892,7 +1852,11 @@ export const DatasetRouter = createTRPCRouter({
                 )
                 return dataset
             }
-            const dataset = await getOneDataset(input.id, ctx.session)
+            const dataset = await getOneDataset(
+                input.id,
+                ctx.session,
+                input.noLayer
+            )
             return dataset
         }),
 
@@ -1934,10 +1898,20 @@ export const DatasetRouter = createTRPCRouter({
             z.object({
                 resource_id: z.string(),
                 provider: z.enum(['datastore', 'rw']),
-                format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON']),
+                format: z.enum([
+                    'CSV',
+                    'XLSX',
+                    'XML',
+                    'TSV',
+                    'JSON',
+                    'GeoJSON',
+                    'SHP',
+                    'KML',
+                ]),
                 sql: z.string(),
                 email: z.string(),
                 rw_id: z.string().optional(),
+                carto_account: z.string().optional(),
             })
         )
         .mutation(async ({ input, ctx }) => {
@@ -1961,7 +1935,77 @@ export const DatasetRouter = createTRPCRouter({
 
             const data = (await response.json()) as CkanResponse<boolean>
             if (response.ok) {
-                console.log(data)
+                return data
+            }
+            throw data
+        }),
+    downloadSubsetOfData: publicProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                provider: z.string(),
+                dataset_id: z.string().optional(),
+                numOfRows: z.number(),
+                connectorUrl: z.string().optional(),
+                format: z.enum(['CSV', 'XLSX', 'XML', 'TSV', 'JSON']),
+                sql: z.string(),
+                email: z.string(),
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            const headers: any = {
+                'Content-Type': 'application/json',
+            }
+
+            const user = ctx?.session?.user
+            if (user) {
+                headers['Authorization'] = user.apikey
+            }
+
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/prefect_download_subset_from_store`,
+                {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(input),
+                }
+            )
+
+            const data = (await response.json()) as CkanResponse<boolean>
+            if (response.ok) {
+                return data
+            }
+            throw data
+        }),
+    downloadZippedResources: publicProcedure
+        .input(
+            z.object({
+                dataset_id: z.string(),
+                keys: z.array(z.string()),
+                email: z.string(),
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            const headers: any = {
+                'Content-Type': 'application/json',
+            }
+
+            const user = ctx?.session?.user
+            if (user) {
+                headers['Authorization'] = user.apikey
+            }
+
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/prefect_download_zipped`,
+                {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(input),
+                }
+            )
+
+            const data = (await response.json()) as CkanResponse<boolean>
+            if (response.ok) {
                 return data
             }
             throw data
@@ -1970,5 +2014,39 @@ export const DatasetRouter = createTRPCRouter({
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
             return getDatasetReleaseNotes(input)
+        }),
+    resourceLocationSearch: publicProcedure
+        .input(
+            z.object({
+                bbox: z.array(z.array(z.number())).nullable(),
+                point: z.array(z.number()).nullable(),
+                location: z.string(),
+                package_id: z.string(),
+                is_pending: z.boolean(),
+            })
+        )
+        .query(async ({ input, ctx }) => {
+            if (!input.bbox && !input.point) {
+                return null
+            }
+            const bbox = input.bbox ? `&bbox=${input.bbox?.join(',')}` : ''
+            const point = input.point ? `&point=${input.point?.join(',')}` : ''
+            const spatial_address = input.location
+                ? `&spatial_address=${input.location}`
+                : ''
+            const is_pending = `&is_pending=${
+                input.is_pending ? 'True' : 'False'
+            }`
+            const url = `${env.CKAN_URL}/api/3/action/resource_location_search?package_id=${input.package_id}${bbox}${point}${spatial_address}${is_pending}`
+            const response = await fetch(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            const results: CkanResponse<{
+                count: number
+                results: Resource[]
+            }> = await response.json()
+            return results.result.results
         }),
 })

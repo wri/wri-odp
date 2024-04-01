@@ -75,7 +75,6 @@ export const useMapState = () => {
         }),
         shallow
     )
-
     return { viewState, setViewState }
 }
 

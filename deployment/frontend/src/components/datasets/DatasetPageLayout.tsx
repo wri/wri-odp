@@ -36,6 +36,7 @@ export default function DatasetPageLayout({
                 {({ open }) => (
                     <>
                         <Disclosure.Button
+                            aria-label='Toggle left hand side'
                             onClick={() => {
                                 setLhsOpen(!open)
                             }}
@@ -72,7 +73,7 @@ export default function DatasetPageLayout({
                         <Disclosure.Panel
                             as="div"
                             style={{ maxHeight: lhsMaxHeight }}
-                            className="overflow-y-auto overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col py-4 border-r border-gray-200 @container"
+                            className="md:overflow-y-auto overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col py-4 border-r border-gray-200 @container"
                         >
                             {lhs}
                         </Disclosure.Panel>
@@ -84,6 +85,7 @@ export default function DatasetPageLayout({
                 {({ open }) => (
                     <>
                         <Disclosure.Button
+                            aria-label='Toggle right hand side'
                             onClick={() => {
                                 setRhsOpen(!open)
                             }}

@@ -125,6 +125,10 @@ export interface WriDataset extends Dataset {
     release_notes: string
 }
 
+export type WriDatasetWithoutDetails = Omit<WriDataset, 'resources'> & {
+    resources: { datastore_active?: boolean | null; format?: string }[]
+}
+
 export interface Extra {
     key: string
     value: string
@@ -164,6 +168,7 @@ export interface WriOrganization extends Organization {
 export interface WriUser extends CkanUser {
     capacity?: string
     gravatar_url?: string
+    organizations?: WriOrganization[]
 }
 
 export interface GroupTree {
@@ -180,6 +185,7 @@ export interface Collaborator {
     user_id: string
     capacity: 'admin' | 'editor' | 'member'
     modified: string
+    user?: WriUser
 }
 
 export interface Issue {

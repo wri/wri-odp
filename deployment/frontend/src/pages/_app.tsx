@@ -3,7 +3,7 @@ import { SessionProvider } from 'next-auth/react'
 import { AppProps, type AppType } from 'next/app'
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { Provider, useCreateStore } from '@/utils/store'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import 'react-toastify/dist/ReactToastify.css'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -14,11 +14,13 @@ import localFont from 'next/font/local'
 import { api } from '@/utils/api'
 
 import '@/styles/globals.scss'
-import '@/styles/rte.css'
+import '@/styles/rte.scss'
 import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
 import { env } from '@/env.mjs'
+import NProgress from 'nprogress'
+import Router from 'next/router'
 
 const acumin = localFont({
     src: [
@@ -54,6 +56,21 @@ const MyApp: AppType<{ session: Session | null }> = ({
     const { initialZustandState } = pageProps
     let { dataset, prevdataset } = pageProps
 
+    useEffect(() => {
+        const handleRouteStart = () => NProgress.start()
+        const handleRouteDone = () => NProgress.done()
+
+        Router.events.on('routeChangeStart', handleRouteStart)
+        Router.events.on('routeChangeComplete', handleRouteDone)
+        Router.events.on('routeChangeError', handleRouteDone)
+
+        return () => {
+            Router.events.off('routeChangeStart', handleRouteStart)
+            Router.events.off('routeChangeComplete', handleRouteDone)
+            Router.events.off('routeChangeError', handleRouteDone)
+        }
+    }, [])
+
     if (typeof prevdataset == 'string') {
         prevdataset = JSON.parse(prevdataset)
     }
@@ -79,11 +96,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     const layerAsLayerObj = new Map()
     const tempLayerAsLayerobj = new Map()
 
-    if (!activeLayerGroups?.length && dataset) {
-        const layers = dataset?.resources
-            .filter((r: any) => r?.format == 'Layer')
-            .map((r: any) => r?.rw_id)
-
+    if (dataset) {
         for (const resource of dataset?.resources) {
             if (resource.format == 'Layer') {
                 if (
@@ -98,7 +111,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         }
     }
 
-    if (initialZustandState && initialZustandState?.relatedDatasets.length) {
+    if (initialZustandState && initialZustandState?.relatedDatasets?.length) {
         const datasets = initialZustandState?.relatedDatasets
         for (const dataset of datasets) {
             for (const resource of dataset?.resources) {
@@ -118,7 +131,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     if (
         initialZustandState &&
-        initialZustandState?.prevRelatedDatasets.length
+        initialZustandState?.prevRelatedDatasets?.length
     ) {
         const datasets = initialZustandState?.prevRelatedDatasets
         for (const dataset of datasets) {
@@ -138,10 +151,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
     }
 
     if (prevdataset) {
-        const layers = prevdataset?.resources
-            .filter((r: any) => r?.format == 'Layer')
-            .map((r: any) => r?.rw_id)
-
         for (const resource of prevdataset?.resources) {
             if (resource.format == 'Layer') {
                 if (
@@ -165,6 +174,14 @@ const MyApp: AppType<{ session: Session | null }> = ({
             basemap: initialZustandState?.mapView?.basemap ?? 'dark',
             layers: newLayersState,
             activeLayerGroups,
+            viewState: {
+                ...initialZustandState?.mapView?.viewState,
+                latitude:
+                    initialZustandState?.mapView?.viewState?.latitude ?? 0,
+                longitude:
+                    initialZustandState?.mapView?.viewState?.longitude ?? 0,
+                zoom: initialZustandState?.mapView?.viewState?.zoom ?? 3,
+            },
         },
     })
 

@@ -1,3 +1,4 @@
+from itertools import chain
 import json
 import os
 import tempfile
@@ -19,9 +20,10 @@ from tasks.sort_and_dedup import sort_and_dedup
 from tasks.validate_csv import validate_csv
 from tasks.data_to_file import data_to_file
 from tasks.s3_upload import s3_upload
+from tasks.zip_files import download_keys
 
 from tasks.send_callback import send_callback
-from tasks.query_datastore import query_datastore
+from tasks.query_datastore import query_datastore, query_rw, query_subset_datastore
 
 
 MINIMUM_QSV_VERSION = "0.108.0"
@@ -35,14 +37,12 @@ DATASTORE_URLS = {
 @flow(log_prints=True)
 def push_to_datastore(resource_id, api_key):
     logger = get_run_logger()
-    qsv_bin = config.get('QSV_BIN')
-    file_bin = config.get('FILE_BIN')
-    ckan_url = config.get('CKAN_URL')
+    qsv_bin = config.get("QSV_BIN")
+    file_bin = config.get("FILE_BIN")
+    ckan_url = config.get("CKAN_URL")
     check_qsv(qsv_bin, file_bin)
     get_resource = GetResource(
-        resource_id=resource_id,
-        ckan_url=ckan_url,
-        api_key=api_key
+        resource_id=resource_id, ckan_url=ckan_url, api_key=api_key
     )
     resource = get_resource_metadata(get_resource)
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -60,7 +60,11 @@ def push_to_datastore(resource_id, api_key):
         tmp_file, qsv_headers, original_header_dicts = get_headers(
             tmp_file, temp_dir, qsv_bin
         )
-        data_dictionary = resource.get('schema').get('value', None) if resource.get('schema') else None
+        data_dictionary = (
+            resource.get("schema").get("value", None)
+            if resource.get("schema")
+            else None
+        )
         (
             tmp_file,
             header_dicts,
@@ -112,36 +116,154 @@ def push_to_datastore(resource_id, api_key):
 
 
 @flow(log_prints=True)
-def convert_store_to_file(resource_id, api_key, task_id, provider, sql, rw_id,
-                          format, filename, download_filename):
+def convert_store_to_file(
+    resource_id,
+    api_key,
+    task_id,
+    provider,
+    sql,
+    rw_id,
+    carto_account,
+    format,
+    filename,
+    download_filename,
+):
     logger = get_run_logger()
-    ckan_url = config.get('CKAN_URL')
+    ckan_url = config.get("CKAN_URL")
 
     logger.info("Fetching data...")
-    data = query_datastore(api_key, ckan_url, sql, provider, rw_id)
+    data = query_datastore(
+        api_key, ckan_url, sql, provider, rw_id, carto_account, format
+    )
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.info("Converting data..." + " " + format)
         tmp_filepath = os.path.join(tmp_dir, filename)
         data_to_file(data, tmp_filepath, format)
 
         logger.info("Uploading data...")
-        url = s3_upload(tmp_filepath, "_downloads_cache/{}".format(filename), download_filename)
+        url = s3_upload(
+            tmp_filepath, "_downloads_cache/{}".format(filename), download_filename
+        )
 
     # TODO: send error/success (send status)
-    send_callback(api_key, ckan_url, "prefect_download_callback",
-                  {"task_id": task_id, "url": url, "state": "complete", "entity_id": resource_id, 
-                   "key": format})
+    send_callback(
+        api_key,
+        ckan_url,
+        "prefect_download_callback",
+        {
+            "task_id": task_id,
+            "url": url,
+            "state": "complete",
+            "entity_id": resource_id,
+            "key": format,
+        },
+    )
+
+
+@flow(log_prints=True)
+async def download_subset_of_data(
+    id,
+    api_key,
+    task_id,
+    provider,
+    sql,
+    format,
+    filename,
+    download_filename,
+    connector_url,
+    dataset_id,
+    num_of_rows,
+):
+    logger = get_run_logger()
+    ckan_url = config.get("CKAN_URL")
+
+    logger.info("Fetching data...")
+    data = []
+    if provider == "datastore":
+        tasks = await query_subset_datastore(id, sql, num_of_rows, ckan_url)
+        data = list(chain.from_iterable(tasks))
+    else:
+        tasks = await query_rw(id, sql, connector_url, provider, num_of_rows)
+        data = list(chain.from_iterable(tasks))
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        logger.info("Converting data..." + " " + format)
+        tmp_filepath = os.path.join(tmp_dir, filename)
+        data_to_file(data, tmp_filepath, format)
+        logger.info("Uploading data...")
+        url = s3_upload(
+            tmp_filepath, "_downloads_cache/{}".format(filename), download_filename
+        )
+
+    # TODO: send error/success (send status)
+    send_callback(
+        api_key,
+        ckan_url,
+        "prefect_download_subset_callback",
+        {
+            "task_id": task_id,
+            "url": url,
+            "state": "complete",
+            "entity_id": id if provider == "datastore" else dataset_id,
+            "key": filename,
+        },
+    )
+
+
+@flow(log_prints=True)
+async def download_resources_zipped(
+    dataset_id,
+    api_key,
+    task_id,
+    keys,
+    filename,
+    download_filename,
+):
+    logger = get_run_logger()
+    ckan_url = config.get("CKAN_URL")
+    with tempfile.TemporaryDirectory() as temp_dir:
+        zipped_file = download_keys(keys, filename, temp_dir)
+        tmp_filepath = os.path.join(temp_dir, zipped_file)
+        logger.info("Uploading data...")
+        url = s3_upload(
+            tmp_filepath, "_downloads_cache/{}".format(f"{filename}.zip"), f"{download_filename}.zip"
+        )
+    logger.info("Uploading data...")
+    send_callback(
+        api_key,
+        ckan_url,
+        "prefect_download_zipped_callback",
+        {
+            "task_id": task_id,
+            "url": url,
+            "state": "complete",
+            "entity_id": dataset_id,
+            "key": filename,
+        },
+    )
 
 
 if __name__ == "__main__":
     datastore_deployment = push_to_datastore.to_deployment(
-        name=config.get('DEPLOYMENT_NAME'),
+        name=config.get("DEPLOYMENT_NAME"),
         parameters={"resource_id": "test_id", "api_key": "api_key"},
         enforce_parameter_schema=False,
         is_schedule_active=False,
     )
+    download_zipped_deployment = download_resources_zipped.to_deployment(
+        name=config.get("DEPLOYMENT_NAME"),
+        parameters={
+            "dataset_id": "test_id",
+            "api_key": "api_key",
+            "task_id": "task_id",
+            "keys": ["key 1", "key 2"],
+            "filename": "filename",
+            "download_filename": "download_filename",
+        },
+        enforce_parameter_schema=False,
+        is_schedule_active=False,
+    )
     conversion_deployment = convert_store_to_file.to_deployment(
-        name=config.get('DEPLOYMENT_NAME'),
+        name=config.get("DEPLOYMENT_NAME"),
         parameters={
             "resource_id": "test_id",
             "api_key": "api_key",
@@ -149,11 +271,35 @@ if __name__ == "__main__":
             "provider": "provider",
             "sql": "sql",
             "rw_id": "rw_id",
+            "carto_account": "carto_account",
             "format": "format",
             "filename": "filename",
-            "download_filename": "download_filename"
-            },
+            "download_filename": "download_filename",
+        },
         enforce_parameter_schema=False,
         is_schedule_active=False,
     )
-    serve(datastore_deployment, conversion_deployment)
+    download_subset_deployment = download_subset_of_data.to_deployment(
+        name=config.get("DEPLOYMENT_NAME"),
+        parameters={
+            "id": "test_id",
+            "api_key": "api_key",
+            "task_id": "task_id",
+            "provider": "provider",
+            "sql": "sql",
+            "format": "format",
+            "num_of_rows": "count",
+            "filename": "filename",
+            "dataset_id": "dataset_id",
+            "connector_url": "https://wri-01.carto.com/tables/wdpa_protected_areas/table",
+            "download_filename": "download_filename",
+        },
+        enforce_parameter_schema=False,
+        is_schedule_active=False,
+    )
+    serve(
+        datastore_deployment,
+        conversion_deployment,
+        download_subset_deployment,
+        download_zipped_deployment,
+    )

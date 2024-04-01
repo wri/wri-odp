@@ -126,6 +126,22 @@ export function About({
                         </>
                     </div>
                 )}
+                {dataset.spatial_address && (
+                    <div className="flex items-center gap-x-1">
+                        <>
+                            <dt
+                                className={`font-acumin text-sm font-semibold text-neutral-700 ${highlighted(
+                                    'license_title'
+                                )}`}
+                            >
+                                Location:{' '}
+                            </dt>
+                            <dd className="mb-1 text-sm font-light text-stone-900">
+                                {dataset.spatial_address ?? ' - '}
+                            </dd>
+                        </>
+                    </div>
+                )}
                 {dataset.extras?.map((extra, index) => (
                     <div key={extra.key} className="flex items-center gap-x-1">
                         <>

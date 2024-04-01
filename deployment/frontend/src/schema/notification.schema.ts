@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { User, WriDataset, WriOrganization } from "./ckan.schema";
+import Team from "@/interfaces/team.interface";
+import Topic from "@/interfaces/topic.interface";
 
 export const NotificationSchema = z.object({
   id: z.string(),
@@ -21,7 +24,12 @@ export const NotificationSchema = z.object({
 
 })
 
-export type NotificationType = z.infer<typeof NotificationSchema>;
+export type Notification = z.infer<typeof NotificationSchema>;
+
+export interface NotificationType extends Notification {
+  sender_obj?: User;
+  object_data?: WriDataset | Topic | Team;
+}
 
 export const NotificationInput = z.object({
   notifications: z.array(NotificationSchema),

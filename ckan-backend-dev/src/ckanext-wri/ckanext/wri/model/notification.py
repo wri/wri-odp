@@ -13,6 +13,10 @@ from typing import Any, Iterable, Optional, Type, TypeVar
 import ckan.model as model
 from sqlalchemy import and_
 from sqlalchemy import update
+from sqlalchemy import bindparam
+from typing import Union
+import logging
+log = logging.getLogger(__name__)
 
 
 notification = sqlalchemy.Table('notification', meta.metadata,
@@ -113,6 +117,34 @@ class Notification(object):
         result = meta.Session.execute(stmt)
         meta.Session.commit()
         return result.fetchall()
+    
+    @classmethod
+    def bulk_update(
+        cls,
+        notifications: list[dict[str, Union[str, datetime.datetime, bool]]],
+    ) -> Optional['Notification']:
+        stmt = (
+            update(Notification)
+            .where(Notification.id == bindparam('_id'))
+            .values(
+                recipient_id=bindparam('_recipient_id'),
+                sender_id=bindparam('_sender_id'), 
+                activity_type=bindparam('_activity_type'), 
+                object_type=bindparam('_object_type'), 
+                object_id=bindparam('_object_id'),
+                time_sent=bindparam('_time_sent'),
+                is_unread=bindparam('_is_unread'),
+                state=bindparam('_state')
+            )
+        )
+
+        try:
+            result = meta.Session.execute(stmt, notifications)
+            meta.Session.commit()
+            return result.rowcount
+        except Exception as e:
+            meta.Session.rollback()  
+            raise e
 
 def notification_dictize(notification: Notification, context: Context) -> dict[str, Any]:
     return table_dictize(notification, context)

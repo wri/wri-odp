@@ -18,6 +18,7 @@ export function Accordion({
                 'border-b border-r border-stone-200 shadow',
                 className ?? ''
             )}
+            role="listitem"
         >
             {({ open }) => (
                 <>

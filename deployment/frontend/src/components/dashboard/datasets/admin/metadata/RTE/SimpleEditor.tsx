@@ -1,9 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react'
 // => Tiptap packages
 import Placeholder from '@tiptap/extension-placeholder'
-import { useEditor, EditorContent, Editor, BubbleMenu } from '@tiptap/react'
+import {
+    useEditor,
+    EditorContent,
+    Editor,
+    BubbleMenu,
+    ReactNodeViewRenderer,
+} from '@tiptap/react'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import Text from '@tiptap/extension-text'
 import Link from '@tiptap/extension-link'
 import Bold from '@tiptap/extension-bold'
@@ -26,6 +33,18 @@ import {
     UseFormReturn,
 } from 'react-hook-form'
 import { Button } from '@/components/_shared/Button'
+import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
+import { createLowlight } from 'lowlight'
+
+import python from 'highlight.js/lib/languages/python'
+import js from 'highlight.js/lib/languages/javascript'
+import r from 'highlight.js/lib/languages/r'
+
+const lowlight = createLowlight()
+
+lowlight.register('python', python)
+lowlight.register('r', r)
+lowlight.register('js', js)
 
 interface TEditorProps {
     value: string
@@ -96,6 +115,11 @@ function TipTapEditor({
             Italic,
             Strike,
             Code,
+            CodeBlockLowlight.extend({
+                addNodeView() {
+                    return ReactNodeViewRenderer(CodeBlockComponent)
+                },
+            }).configure({ lowlight }),
             Placeholder.configure({
                 // Use a placeholder:
                 placeholder: placeholder ?? '',
@@ -165,6 +189,10 @@ function TipTapEditor({
         editor.chain().focus().toggleBulletList().run()
     }, [editor])
 
+    const toggleCodeBlock = useCallback(() => {
+        editor.chain().focus().toggleCodeBlock().run()
+    }, [editor])
+
     if (!editor) {
         return null
     }
@@ -178,6 +206,7 @@ function TipTapEditor({
         >
             <div className="menu">
                 <button
+                    aria-label="Undo"
                     type="button"
                     className="menu-button hover:bg-neutral-50"
                     onClick={() => editor.chain().focus().undo().run()}
@@ -186,6 +215,7 @@ function TipTapEditor({
                     <Icons.RotateLeft />
                 </button>
                 <button
+                    aria-label="Redo"
                     type="button"
                     className="menu-button hover:bg-neutral-50"
                     onClick={() => editor.chain().focus().redo().run()}
@@ -194,6 +224,7 @@ function TipTapEditor({
                     <Icons.RotateRight />
                 </button>
                 <button
+                    aria-label="Link"
                     type="button"
                     className={classNames('menu-button hover:bg-neutral-50', {
                         'is-active': editor.isActive('link'),
@@ -203,6 +234,7 @@ function TipTapEditor({
                     <Icons.Link />
                 </button>
                 <button
+                    aria-label="Bold"
                     type="button"
                     className={classNames('menu-button hover:text-blue-800', {
                         'is-active': editor.isActive('bold'),
@@ -212,6 +244,7 @@ function TipTapEditor({
                     <Icons.Bold />
                 </button>
                 <button
+                    aria-label="Underline"
                     type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('underline'),
@@ -221,6 +254,7 @@ function TipTapEditor({
                     <Icons.Underline />
                 </button>
                 <button
+                    aria-label="Italic"
                     type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('intalic'),
@@ -230,6 +264,7 @@ function TipTapEditor({
                     <Icons.Italic />
                 </button>
                 <button
+                    aria-label="Strike"
                     type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('strike'),
@@ -239,6 +274,7 @@ function TipTapEditor({
                     <Icons.Strikethrough />
                 </button>
                 <button
+                    aria-label="Code"
                     type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('code'),
@@ -248,13 +284,24 @@ function TipTapEditor({
                     <Icons.Code />
                 </button>
                 <button
+                    aria-label="List"
                     type="button"
                     className={classNames('menu-button', {
                         'is-active': editor.isActive('bulletList'),
                     })}
                     onClick={toggleList}
                 >
-                    <Icons.ListItem className='w-5' />
+                    <Icons.ListItem className="w-5" />
+                </button>
+                <button
+                    aria-label="Code"
+                    type="button"
+                    className={classNames('menu-button', {
+                        'is-active': editor.isActive('code'),
+                    })}
+                    onClick={toggleCodeBlock}
+                >
+                    <Icons.HighlightedCode />
                 </button>
             </div>
 
@@ -268,6 +315,7 @@ function TipTapEditor({
                 }}
             >
                 <Button
+                    aria-label="Edit"
                     size="sm"
                     variant="outline"
                     type="button"
@@ -277,6 +325,7 @@ function TipTapEditor({
                     Edit
                 </Button>
                 <Button
+                    aria-label="Remove"
                     size="sm"
                     variant="destructive"
                     onClick={removeLink}
@@ -302,5 +351,32 @@ function TipTapEditor({
                 onRemoveLink={removeLink}
             />
         </div>
+    )
+}
+
+function CodeBlockComponent({ updateAttributes, extension }: any) {
+    return (
+        <NodeViewWrapper className="code-block">
+            <select
+                contentEditable={false}
+                defaultValue="js"
+                onChange={(event) =>
+                    updateAttributes({ language: event.target.value })
+                }
+            >
+                <option value="null">auto</option>
+                <option disabled>—</option>
+                {extension.options.lowlight
+                    .listLanguages()
+                    .map((lang: string, index: number) => (
+                        <option key={index} value={lang}>
+                            {lang}
+                        </option>
+                    ))}
+            </select>
+            <pre>
+                <NodeViewContent as="code" />
+            </pre>
+        </NodeViewWrapper>
     )
 }

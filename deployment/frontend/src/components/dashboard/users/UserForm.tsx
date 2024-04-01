@@ -19,7 +19,10 @@ import type { UserFormInput, UserSchema } from '@/schema/user.schema'
 import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { useRouter } from 'next/router'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 
@@ -108,7 +111,7 @@ export default function UserForm({ user }: { user: User }) {
                 className="max-w-8xl mx-auto w-full xl:w-[90%] py-12 px-4 sm:px-6 lg:px-12  rounded-lg shadow-wri flex flex-col gap-y-8"
             >
                 <InputGroup label="Username" labelClassName="sm:max-w-[10rem]">
-                    <Input {...register('name')} type="text" disabled />
+                    <Input {...register('name')} type="text" disabled aria-label='user name'/>
                 </InputGroup>
                 <InputGroup label="Full name" labelClassName="sm:max-w-[10rem]">
                     <Input
@@ -116,6 +119,7 @@ export default function UserForm({ user }: { user: User }) {
                         placeholder="Full Name"
                         name="fullname"
                         type="text"
+                        aria-label='full name'
                     />
                     <ErrorDisplay name="fullname" errors={errors} />
                 </InputGroup>
@@ -128,6 +132,7 @@ export default function UserForm({ user }: { user: User }) {
                         {...register('email')}
                         placeholder="Email address"
                         type="email"
+                        aria-label='email address'
                     />
                     <ErrorDisplay name="email" errors={errors} />
                 </InputGroup>
@@ -138,6 +143,7 @@ export default function UserForm({ user }: { user: User }) {
                     {upload.file === false && upload.url === false && (
                         <div className="flex gap-x-2.5">
                             <button
+                                aria-label='upload image'
                                 className="flex px-2.5 py-2 rounded-md text-black outline outline-1"
                                 onClick={() =>
                                     setUpload({ url: false, file: true })
@@ -147,6 +153,7 @@ export default function UserForm({ user }: { user: User }) {
                                 Upload
                             </button>
                             <button
+                                aria-label='link image'
                                 className="flex px-2.5 py-2  rounded-md text-black outline outline-1"
                                 onClick={() =>
                                     setUpload({ url: true, file: false })
@@ -174,6 +181,7 @@ export default function UserForm({ user }: { user: User }) {
                                 }}
                             />
                             <button
+                                aria-label='upload file'
                                 className="flex rounded-md text-black"
                                 onClick={() =>
                                     setUpload({ url: false, file: false })
@@ -185,8 +193,9 @@ export default function UserForm({ user }: { user: User }) {
                     )}
                     {upload.url && (
                         <div className="flex gap-x-2.5">
-                            <Input {...register('image_url')} type="text" />
+                            <Input {...register('image_url')} type="text"  aria-label='upload url'/>
                             <button
+                                aria-label='upload url'
                                 className="flex rounded-md text-black"
                                 onClick={() =>
                                     setUpload({ url: false, file: false })
@@ -201,23 +210,24 @@ export default function UserForm({ user }: { user: User }) {
                     label="Old Password"
                     labelClassName="sm:max-w-[10rem]"
                 >
-                    <Input {...register('oldpassword')} type="password" />
+                    <Input {...register('oldpassword')} type="password"  aria-label='old password'/>
                     <ErrorDisplay name="oldpassword" errors={errors} />
                 </InputGroup>
                 <InputGroup label="Password" labelClassName="sm:max-w-[10rem]">
-                    <Input {...register('password')} type="password" />
+                    <Input {...register('password')} type="password" aria-label='password'/>
                     <ErrorDisplay name="password" errors={errors} />
                 </InputGroup>
                 <InputGroup
                     label="Confirm Password"
                     labelClassName="sm:max-w-[10rem]"
                 >
-                    <Input {...register('confirm')} type="password" />
+                    <Input {...register('confirm')} type="password" aria-label='confirm password'/>
                     <ErrorDisplay name="confirm" errors={errors} />
                 </InputGroup>
 
                 <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-6 xxl:px-0">
                     <Button
+                        aria-label='delete user'
                         variant="destructive"
                         onClick={() => {
                             setIsDeleting(true)
@@ -228,6 +238,7 @@ export default function UserForm({ user }: { user: User }) {
                         Delete
                     </Button>
                     <LoaderButton
+                        aria-label='update user'
                         loading={userUpdateApi.isLoading}
                         type="submit"
                     >

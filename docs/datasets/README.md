@@ -24,10 +24,6 @@ If you select the `featured dataset` checkbox an image uploader will appear wher
 
 ![Featured dataset](./featured_dataset.png)
 
-If you want the data you define here to also live in the resource watch api, you will need to check the `RW Api` checkbox and provide the necessary values, this is necessary if you want to create layers
-
-![RW API Dataset](./rw_api_dataset.png)
-
 ### Location 
 
 Where you can select the location for your dataset which can then be queried in the search page
@@ -45,6 +41,27 @@ Or you can upload a GeoJSON file that will appear as a vector polygon on the map
 A short description to live in the header + a long rich text description that lives in the About tab in the dataset page, the long description field allow rich text elements such as bold/italic and links
 
 ![Description](./description.png)
+
+### UI For searching
+
+On the Datafile tab in the dataset individual page you will be able to see a map with markers and yellow vectors, if you setup a datafile with an address, a blue marker will show up in the map on the center of that particular address,
+while if you added a geojson location a yellow vector will show up on the map, these objects will appear and disappear as you search using the input above for the metadata in the datafiles.
+
+In that map you can search using a bbox by clicking on the square at the top left section of the map, and drawing an rectangle on it
+
+![](./bbox_search.png)
+
+- If that rectangle intersects or covers a geojson shape that is attached to a datafile, that datafile will then appear
+- If that rectangle covers the center coordinate of an address that is attached to a datafile, that datafile will also appear
+
+You can toggle that bbox by clicking on the rectangle icon
+
+Besides that we also have an autocomplete field for addresses, which will match in the following way
+
+- If the center of that address is inside the geojson attached to a datafile, then that datafile will appear
+- If the address typed matches or is contained by the address in a specific datafile, than that datafile will appear, for example, in the image below, we have a datafile that is attached to the state of Lagos in Nigeria, if we type Ikeja, Lagos, Nigeria, which is a city inside that particular state, the result will match, given that possibly data about the state of Lagos will also contain data about that particular city
+
+![](./location_search.png)
 ![Description adding a link](./description_adding_a_link.png)
 
 ### Point of contact 
@@ -98,6 +115,18 @@ If you want to just link some data that lives outside the system, you can just s
 You can add multiple datafiles by selecting the `Add another datafile button`
 
 ![Add another datafile](./add_another_datafile.png)
+
+### Map Visualizations
+
+If you want the data you define here to also live in the resource watch api, you will need to check the `RW Api` checkbox thats is contained in the `Map Visualizations` tab (The third one) and provide the necessary values, this is necessary if you want to create layers
+
+![RW API Dataset](./rw_api_dataset.png)
+
+The connectorUrl and tablename fields can be used to allow users to get the data in their original places, for example: if you setup the provider to be cartodb a `Open in Carto` such as below
+
+![Open in Carto](./open_in_carto.png)
+
+For `featureservice`, `cartodb` and `gfw` we are just linking the connectorUrl, for GEE we try to build a url using the tablename e.g: the tablename `JRC/GSW1_0/GlobalSurfaceWater` becomes the following URL [https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_0_GlobalSurfaceWater](https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_0_GlobalSurfaceWater)
 
 ## Edit Datasets
 

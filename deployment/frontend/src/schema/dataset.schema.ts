@@ -60,6 +60,10 @@ export const ResourceSchema = z
         layerObj: layerSchema.optional().nullable(),
         datastore_active: z.boolean().optional().nullable(),
         layerObjRaw: z.any().optional().nullable(),
+        spatial_address: z.string().optional(),
+        spatial_geom: z.any().optional(),
+        spatial_coordinates: z.any().optional(),
+        spatial_type: z.enum(['address', 'geom']).optional(),
     })
     .refine(
         (obj) => {
@@ -224,12 +228,23 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     .refine(
         (obj) => {
             if (!obj.rw_dataset) return true
-            if (obj.rw_dataset && !obj.connectorUrl) return false
+            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName) return false
             return true
         },
         {
-            message: 'ConnectorUrl is required for RW datasets',
+            message: 'ConnectorUrl is required for RW datasets, unless a table name is provided',
             path: ['connectorUrl'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (!obj.rw_dataset) return true
+            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName) return false
+            return true
+        },
+        {
+            message: 'Tablename is required for RW datasets, unless a connectorUrl is provided',
+            path: ['tableName'],
         }
     )
     .refine(

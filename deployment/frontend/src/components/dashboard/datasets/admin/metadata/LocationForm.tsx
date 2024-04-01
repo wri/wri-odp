@@ -79,7 +79,7 @@ export function LocationForm({
                 const json = JSON.parse(event?.target?.result as string)
                 setValue(`spatial`, json)
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 notify('Failed to parse GeoJSON file', 'error')
             }
         })

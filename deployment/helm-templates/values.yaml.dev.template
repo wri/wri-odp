@@ -29,7 +29,7 @@ ckan:
       CKAN__SITE_TITLE: WRI OpenData Platform Dev
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
-      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
+      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri wri_api_tracking auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
       CKAN__AUTH__CREATE_UNOWNED_DATASET: "True"
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_ADMIN_COLLABORATORS: "True"
@@ -40,6 +40,9 @@ ckan:
       CKAN___SCHEMING__PRESETS: ckanext.wri.schema:presets.json
       CKANEXT__AUTH__INCLUDE_FRONTEND_LOGIN_TOKEN: "True"
       CKAN__DATASTORE__SQLSEARCH__ENABLED: "True"
+      # GA4 credentials for testing only
+      CKANEXT__WRI__API_ANALYTICS__MEASUREMENT_ID: G-XKQWQ802E4
+      CKANEXT__WRI__API_ANALYTICS__API_SECRET: C9ctTsbZSXCS6jRBR5Mywg
     hpa:
       enable: true
       minReplicas: 2
@@ -47,15 +50,15 @@ ckan:
       targetMemoryUtilizationPercentage: 80
     resources:
       limits:
-        cpu: 400m
-        memory: 1.5G
+        cpu: 800m
+        memory: 3G
       requests:
-        cpu: 300m
-        memory: 1G
+        cpu: 400m
+        memory: 2.5G
     image:
       pullPolicy: Always
       repository: {{REGISTRY}}/{{CKAN_REPO}}
-      tag: {{GITHUB_SHA}}
+      tag: dev-{{GITHUB_SHA}}
     runInitContainers: false
     service:
       port: 80
@@ -66,18 +69,39 @@ ckan:
       DATAPUSHER_MAX_CONTENT_LENGTH: "5368709120"
     resources:
       limits:
-        cpu: 300m
-        memory: 1G
+        cpu: 800m
+        memory: 4.5G
       requests:
-        cpu: 200m
-        memory: 0.5G
+        cpu: 300m
+        memory: 4G
     hpa:
       enable: true
       minReplicas: 1
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: {{GITHUB_SHA}}
+      tag: dev-{{GITHUB_SHA}}
+      pullPolicy: Always
+      repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
+    replicaCount: 1
+  migrationApp:
+    enable: enable
+    env:
+      DATAPUSHER_MAX_CONTENT_LENGTH: "5368709120"
+    resources:
+      limits:
+        cpu: 300m
+        memory: 1.5G
+      requests:
+        cpu: 250m
+        memory: 1G
+    hpa:
+      enable: true
+      minReplicas: 1
+      maxReplicas: 2
+      targetMemoryUtilizationPercentage: 80
+    image:
+      tag: dev-{{GITHUB_SHA}}-migration
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
@@ -96,7 +120,7 @@ ckan:
     enable: true
     image:
       repository: {{REGISTRY}}/{{FRONTEND_REPO}}
-      tag: {{GITHUB_SHA}}
+      tag: dev-{{GITHUB_SHA}}
     env:
       SITE_TITLE: WRI ODP
     targetPort: 3000

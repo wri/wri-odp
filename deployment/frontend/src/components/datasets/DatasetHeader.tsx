@@ -23,7 +23,10 @@ import { DefaultTooltip } from '../_shared/Tooltip'
 import { PencilSquareIcon } from '@heroicons/react/24/solid'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic'
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+})
 import { LoaderButton } from '@/components/_shared/Button'
 import { Dialog } from '@headlessui/react'
 import { useState } from 'react'
@@ -38,6 +41,9 @@ import { useActiveCharts } from '@/utils/storeHooks'
 import { View } from '@/interfaces/dataset.interface'
 import ChartViewIcon from './view-icons/ChartViewIcon'
 import Highlights from '../Highlights'
+import { useQuery } from 'react-query'
+import { RwDatasetResp, RwResponse, isRwError } from '@/interfaces/rw.interface'
+import { match } from 'ts-pattern'
 
 function OpenInButton({
     open_in,
@@ -51,8 +57,13 @@ function OpenInButton({
     if (open_in.length === 1 && !session.data?.user) {
         return (
             <Button>
-                <a href={open_in[0]?.url} target="_blank" rel="noreferrer">
-                    Open in {open_in[0]?.title}
+                <a
+                    href={open_in[0]?.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    id="openin"
+                >
+                    Open in {open_in[0]?.title} steve
                     <ArrowUpRightIcon className="mb-1 h-6 w-6" />
                 </a>
             </Button>
@@ -64,6 +75,7 @@ function OpenInButton({
                 href={open_in[0]?.url}
                 target="_blank"
                 rel="noreferrer"
+                id="openin"
                 className="flex gap-x-2 items-center text-center text-stone-900 text-base font-bold font-acumin"
             >
                 Open in {open_in[0]?.title}
@@ -93,7 +105,6 @@ function OpenInButton({
                     )}
                 </Menu.Button>
             </div>
-
             <Transition
                 as={Fragment}
                 enter="transition ease-out duration-100"
@@ -114,6 +125,7 @@ function OpenInButton({
                             <Menu.Item key={item.url}>
                                 {({ active }) => (
                                     <a
+                                        id="openin"
                                         href={item.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -134,6 +146,128 @@ function OpenInButton({
                 </Menu.Items>
             </Transition>
         </Menu>
+    )
+}
+
+export function ExternalService({ rw_id }: { rw_id: string }) {
+    const { data } = useQuery([rw_id], async () => {
+        const datasetRes = await fetch(
+            `https://api.resourcewatch.org/v1/dataset/${rw_id}`
+        )
+        const dataset: RwDatasetResp = await datasetRes.json()
+        if (isRwError(dataset)) throw new Error(dataset.errors[0].detail)
+        return dataset.data.attributes
+    })
+    if (!data) return <></>
+    return (
+        <>
+            {match(data.provider)
+                .with('cartodb', 'featureservice', 'gfw', () => (
+                    <a
+                        className="text-wri-green
+flex items-center gap-x-1 mt-4 w-fit
+          "
+                        href={data.connectorUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <ArrowUpRightIcon className="h-4 w-4 text-wri-green" />
+                        <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
+                            Open table in{' '}
+                            {match(data.provider)
+                                .with('cartodb', () => 'Carto')
+                                .with('featureservice', () => 'ArcGIS')
+                                .with('gfw', () => 'GFW')
+                                .otherwise(() => '')}
+                        </div>
+                    </a>
+                ))
+                .with('gee', () => (
+                    <a
+                        className="text-wri-green
+flex items-center gap-x-1 mt-4 w-fit
+          "
+                        href={`https://developers.google.com/earth-engine/datasets/catalog/${data.tableName.replaceAll(
+                            '/',
+                            '_'
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <ArrowUpRightIcon className="h-4 w-4 text-wri-green" />
+                        <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
+                            Open table in GEE
+                        </div>
+                    </a>
+                ))
+                .with('csv', 'tsv', 'json', 'xml', () => {
+                    if (data.sources.length === 1) {
+                        return (
+                            <a
+                                className="text-wri-greenflex items-center gap-x-1 mt-4 w-fit"
+                                href={data.sources[0]}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <ArrowUpRightIcon className="h-4 w-4 text-wri-green" />
+                                <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
+                                    Open table {data.provider.toUpperCase()}
+                                </div>
+                            </a>
+                        )
+                    }
+                    return (
+                        <Menu
+                            as="div"
+                            className="relative inline-block text-left py-4"
+                        >
+                            <div>
+                                <Menu.Button>
+                                    <Button size="sm">
+                                        Open external sources for table
+                                    </Button>
+                                </Menu.Button>
+                            </div>
+                            <Transition
+                                as={Fragment}
+                                enter="transition ease-out duration-100"
+                                enterFrom="transform opacity-0 scale-95"
+                                enterTo="transform opacity-100 scale-100"
+                                leave="transition ease-in duration-75"
+                                leaveFrom="transform opacity-100 scale-100"
+                                leaveTo="transform opacity-0 scale-95"
+                            >
+                                <Menu.Items className="absolute left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                    <div className="py-1">
+                                        {data.sources.map((item, index) => (
+                                            <Menu.Item key={item}>
+                                                {({ active }) => (
+                                                    <a
+                                                        href={item}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className={classNames(
+                                                            active
+                                                                ? 'bg-gray-100 text-gray-900'
+                                                                : 'text-gray-700',
+                                                            'block px-4 py-2 text-sm'
+                                                        )}
+                                                    >
+                                                        Source {index + 1}
+                                                    </a>
+                                                )}
+                                            </Menu.Item>
+                                        ))}
+                                    </div>
+                                </Menu.Items>
+                            </Transition>
+                        </Menu>
+                    )
+                })
+                .otherwise(() => (
+                    <></>
+                ))}
+        </>
     )
 }
 
@@ -236,7 +370,7 @@ export function DatasetHeader({
                     />
                 </div>
             ) : (
-                <div className="mb-4 flex justify-between gap-x-3 bg-white shadow sm:px-6 px-4 pb-4">
+                <div className="mb-4 flex justify-between gap-x-3 bg-white shadow sm:px-6 px-4 pb-4 sm:pr-12">
                     <div className="flex items-center gap-x-3">
                         <Link
                             className="flex gap-x-2 items-center text-center text-stone-900 text-base font-bold font-acumin"
@@ -273,6 +407,7 @@ export function DatasetHeader({
                                 side="bottom"
                             >
                                 <button
+                                    aria-label="remove from favorites"
                                     className="p-0 m-0 "
                                     onClick={() => setFOpen(true)}
                                 >
@@ -285,6 +420,7 @@ export function DatasetHeader({
                                 side="bottom"
                             >
                                 <button
+                                    aria-label="add to favorite"
                                     className="p-0 m-0 "
                                     onClick={() => setOpen(true)}
                                 >
@@ -295,6 +431,7 @@ export function DatasetHeader({
 
                         <DefaultTooltip content="Edit" side="bottom">
                             <Link
+                                aria-label="edit dataset"
                                 href={`/dashboard/datasets/${dataset?.name}/edit`}
                             >
                                 <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
@@ -559,7 +696,7 @@ export function DatasetHeader({
                 )}
                 <div className="mt-4 flex justify-start gap-x-3">
                     {dataset?.wri_data ? (
-                        <div className="flex items-center rounded-[3px] border border-blue-400 bg-blue-400">
+                        <div className="flex items-center rounded-[3px] border border-blue-400 bg-blue-800">
                             <div className="px-2 font-acumin text-xs font-medium text-white">
                                 WRI Data
                             </div>
@@ -568,10 +705,10 @@ export function DatasetHeader({
                         ''
                     )}
                     {session.data?.user ? (
-                        dataset?.technical_notes ? (
+                        dataset?.technical_notes && (
                             <div
                                 className={classNames(
-                                    'flex items-center rounded-[3px] border border-green-500 bg-green-500',
+                                    'flex items-center rounded-[3px] border border-green-500 bg-green-800',
                                     highlighted('technical_notes'),
                                     highlighted('technical_notes') !== ''
                                         ? 'border-yellow-200'
@@ -580,20 +717,6 @@ export function DatasetHeader({
                             >
                                 <div className="px-2 font-acumin text-xs font-medium text-white">
                                     RDI approved
-                                </div>
-                            </div>
-                        ) : (
-                            <div
-                                className={classNames(
-                                    'flex items-center rounded-[3px] border border-orange-400 bg-orange-400',
-                                    highlighted('technical_notes'),
-                                    highlighted('technical_notes') !== ''
-                                        ? 'border-yellow-200'
-                                        : ''
-                                )}
-                            >
-                                <div className="px-2 font-acumin text-xs font-medium text-white">
-                                    Awaiting RDI approval
                                 </div>
                             </div>
                         )
@@ -651,37 +774,44 @@ export function DatasetHeader({
                 )}
 
                 <div className="flex space-x-2">
-                    {dataset?.provider && dataset?.rw_id && (
-                        <div className="py-4">
-                            {tabularResource &&
-                            tabularResource.id === dataset.rw_id ? (
-                                <Button
-                                    size="sm"
-                                    onClick={() => setTabularResource(null)}
-                                >
-                                    Remove Tabular View
-                                </Button>
-                            ) : (
-                                <Button
-                                    size="sm"
-                                    onClick={() =>
-                                        setTabularResource({
-                                            provider:
-                                                dataset.provider as string,
-                                            id: dataset.rw_id as string,
-                                        })
-                                    }
-                                >
-                                    View Table Preview
-                                </Button>
-                            )}
-                        </div>
-                    )}
+                    {dataset?.connectorUrl &&
+                        dataset?.provider &&
+                        dataset?.provider !== 'gee' &&
+                        dataset?.rw_id && (
+                            <div className="pt-4">
+                                {tabularResource &&
+                                tabularResource.id === dataset.rw_id ? (
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setTabularResource(null)}
+                                    >
+                                        Remove Tabular View
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            setTabularResource({
+                                                provider:
+                                                    dataset.provider as any,
+                                                datasetId: dataset.id,
+                                                id: dataset.rw_id as string,
+                                                connectorUrl:
+                                                    dataset.connectorUrl as string,
+                                                name: dataset.name,
+                                            })
+                                        }
+                                    >
+                                        View Table Preview
+                                    </Button>
+                                )}
+                            </div>
+                        )}
                     {dataset?.provider &&
                         dataset?.rw_id &&
                         !isDatasetViewsLoading &&
                         datasetViews?.some(
-                            (v: View) => v.config_obj.type == 'chart'
+                            (v: View) => v.config_obj?.type == 'chart'
                         ) && (
                             <div className="py-4">
                                 {activeCharts
@@ -716,6 +846,11 @@ export function DatasetHeader({
                             </div>
                         )}
                 </div>
+                {dataset?.rw_id && (
+                    <div>
+                        <ExternalService rw_id={dataset.rw_id} />
+                    </div>
+                )}
             </div>
         </div>
     )

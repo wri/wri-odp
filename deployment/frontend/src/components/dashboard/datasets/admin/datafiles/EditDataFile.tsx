@@ -27,6 +27,7 @@ import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import ViewsList from '@/components/views/ViewsList'
 import { WriDataset } from '@/schema/ckan.schema'
+import { DatafileLocation } from './DatafileLocation'
 
 export function EditDataFile({
     remove,
@@ -59,14 +60,32 @@ export function EditDataFile({
         },
     })
 
+    const allDataFiles = watch('resources')
+    const notLayers = allDataFiles.filter(
+        (datafile) =>
+            datafile.type === 'upload' ||
+            datafile.type === 'link' ||
+            datafile.type === 'empty-file'
+    )
+    const notLayersCount = notLayers.length ?? 0
+
     const datafile = watch(`resources.${index}`)
+
+    const isLayer =
+        datafile.type !== 'upload' &&
+        datafile.type !== 'link' &&
+        datafile.type !== 'empty-file'
+
+    const heading = isLayer
+        ? `Layer ${index + 1 - notLayersCount}`
+        : `Data File ${index + 1}`
 
     return (
         <>
             <DataFileAccordion
                 id={`datafile-accordion-${datafile.id}`}
                 icon={<></>}
-                title={`Data File ${index + 1}`}
+                title={`${heading}`}
                 className="py-0"
                 remove={remove}
                 preview={
@@ -79,13 +98,14 @@ export function EditDataFile({
                                         <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
                                             {datafile.name}
                                         </span>
-                                        <span className="font-['Acumin Pro SemiCondensed'] mt-0.5 text-right text-xs font-normal leading-tight text-neutral-500">
+                                        <span className="font-['Acumin Pro SemiCondensed'] mt-0.5 text-right text-xs font-normal leading-tight text-neutral-600">
                                             {datafile.size
                                                 ? convertBytes(datafile.size)
                                                 : 'N/A'}
                                         </span>
                                     </div>
                                     <button
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -102,6 +122,7 @@ export function EditDataFile({
                                         </span>
                                     </div>
                                     <button
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -118,6 +139,7 @@ export function EditDataFile({
                                         </span>
                                     </div>
                                     <button
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -129,6 +151,7 @@ export function EditDataFile({
                                 <>
                                     <div className="flex items-center gap-x-2"></div>
                                     <button
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -162,6 +185,7 @@ export function EditDataFile({
                         </span>
                     </div>
                     <button
+                        aria-label="remove"
                         type="button"
                         id={`remove_${index}_datafile`}
                         onClick={() => remove()}
@@ -254,30 +278,33 @@ export function EditDataFile({
                                         ].includes(
                                             datafile.format?.toLowerCase() ??
                                                 'none'
-                                        ) && datafile.url_type === 'upload' && (
-                                            <Tab as={Fragment}>
-                                                {({ selected }) => (
-                                                    <div
-                                                        className={classNames(
-                                                            'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
-                                                            selected
-                                                                ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
-                                                                : 'text-black'
-                                                        )}
-                                                        aria-current={
-                                                            selected
-                                                                ? 'page'
-                                                                : undefined
-                                                        }
-                                                    >
-                                                        Datapusher{' '}
-                                                        <DatapusherStatus
-                                                            datafile={datafile}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </Tab>
-                                        )}
+                                        ) &&
+                                            datafile.url_type === 'upload' && (
+                                                <Tab as={Fragment}>
+                                                    {({ selected }) => (
+                                                        <div
+                                                            className={classNames(
+                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
+                                                                selected
+                                                                    ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
+                                                                    : 'text-black'
+                                                            )}
+                                                            aria-current={
+                                                                selected
+                                                                    ? 'page'
+                                                                    : undefined
+                                                            }
+                                                        >
+                                                            Datapusher{' '}
+                                                            <DatapusherStatus
+                                                                datafile={
+                                                                    datafile
+                                                                }
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </Tab>
+                                            )}
                                     </div>
                                 </Tab.List>
                                 <Tab.Panels className="px-4 sm:px-6 xxl:px-0 py-4">
@@ -286,7 +313,7 @@ export function EditDataFile({
                                             <InputGroup
                                                 label="Title"
                                                 required
-                                                className="whitespace-nowrap"
+                                                className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <Input
                                                     placeholder="Some name"
@@ -303,7 +330,7 @@ export function EditDataFile({
                                             </InputGroup>
                                             <InputGroup
                                                 label="Description"
-                                                className="whitespace-nowrap"
+                                                className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <TextArea
                                                     placeholder="Add description"
@@ -316,7 +343,7 @@ export function EditDataFile({
                                             </InputGroup>
                                             <InputGroup
                                                 label="Format"
-                                                className="whitespace-nowrap"
+                                                className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <div className="max-w-[55rem] w-full">
                                                     <FormatInput
@@ -325,6 +352,10 @@ export function EditDataFile({
                                                     />
                                                 </div>
                                             </InputGroup>
+                                            <DatafileLocation
+                                                formObj={formObj}
+                                                index={index}
+                                            />
                                         </div>
                                     </Tab.Panel>
                                     <Tab.Panel>
@@ -354,11 +385,14 @@ export function EditDataFile({
                                         'tab',
                                     ].includes(
                                         datafile.format?.toLowerCase() ?? 'none'
-                                    ) && datafile.url_type === 'upload' && (
-                                        <Tab.Panel>
-                                            <Datapusher datafile={datafile} />
-                                        </Tab.Panel>
-                                    )}
+                                    ) &&
+                                        datafile.url_type === 'upload' && (
+                                            <Tab.Panel>
+                                                <Datapusher
+                                                    datafile={datafile}
+                                                />
+                                            </Tab.Panel>
+                                        )}
                                 </Tab.Panels>
                             </div>
                         </Tab.Group>
