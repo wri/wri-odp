@@ -6,6 +6,7 @@ import {
     ArrowDownCircleIcon,
     ArrowPathIcon,
     FingerPrintIcon,
+    GlobeAmericasIcon,
     MagnifyingGlassIcon,
     MapPinIcon,
     PaperAirplaneIcon,
@@ -16,7 +17,14 @@ import { OpenInButton } from './datafiles/OpenIn'
 import { Resource, View } from '@/interfaces/dataset.interface'
 import { getFormatColor } from '@/utils/formatColors'
 import { Index } from 'flexsearch'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import {
+    Fragment,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
@@ -40,12 +48,16 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/_shared/Popover'
+import { SearchIcon } from '@/components/_shared/icons/SearchIcon'
+import GlobalError from 'next/dist/client/components/error-boundary'
 
 export function LocationSearch({
     geojsons,
     formObj,
+    open,
 }: {
     geojsons: any[]
+    open: boolean
     formObj: UseFormReturn<LocationSearchFormType>
 }) {
     const { setValue } = formObj
@@ -87,13 +99,19 @@ export function LocationSearch({
         }
     }, [])
 
+    useEffect(() => {
+        if (mapRef.current && open) {
+            mapRef.current.resize()
+        }
+    }, [mapRef.current, open])
+
     return (
         <Map
             ref={(_map) => {
                 if (_map) mapRef.current = _map.getMap() as unknown as MapRef
             }}
             mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
-            style={{ height: 300, width: '100%' }}
+            style={{ height: 300 }}
             mapStyle="mapbox://styles/mapbox/streets-v9"
         >
             <GeocoderControl
@@ -132,7 +150,7 @@ export function LocationSearch({
                 controls={{
                     polygon: true,
                 }}
-                defaultMode="draw_polygon"
+                defaultMode="simple_select"
                 onCreate={onUpdate}
                 onUpdate={onUpdate}
                 onDelete={() => {
@@ -245,7 +263,28 @@ export function DataFiles({
                     placeholder="Search datafiles by title or description"
                 />
                 <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
-                <LocationSearch geojsons={geojsons} formObj={formObj} />
+                <Disclosure>
+                    {({ open }) => (
+                        <>
+                            <Disclosure.Button as={Fragment}>
+                                <Button className="my-2 ml-auto group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
+                                    Location Search
+                                    <GlobeAmericasIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
+                                </Button>
+                            </Disclosure.Button>
+                            <Disclosure.Panel
+                                unmount={false}
+                                className="py-3 w-full"
+                            >
+                                <LocationSearch
+                                    open={open}
+                                    geojsons={geojsons}
+                                    formObj={formObj}
+                                />
+                            </Disclosure.Panel>
+                        </>
+                    )}
+                </Disclosure>
             </div>
             <div className="flex justify-between pb-1 lg:flex-col xl:flex-row">
                 <span className="font-acumin text-base font-normal text-black">
