@@ -252,72 +252,91 @@ export function DataFiles({
                     {filteredDatafiles?.length ?? 0} Data Files
                 </span>
                 <div className="flex gap-x-4 lg:justify-end">
-                    {datafilesToDownload.length !==
-                        uploadedDatafiles.length && (
-                        <button
-                            onClick={() =>
-                                setDatafilesToDownload(uploadedDatafiles)
-                            }
-                            className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                        >
-                            Select all datafiles
-                        </button>
+                    {datafiles.some((r) => r.url_type === 'upload') && (
+                        <>
+                            {' '}
+                            {datafilesToDownload.length !==
+                                uploadedDatafiles.length && (
+                                <button
+                                    onClick={() =>
+                                        setDatafilesToDownload(
+                                            uploadedDatafiles
+                                        )
+                                    }
+                                    className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                                >
+                                    Select all datafiles
+                                </button>
+                            )}
+                            {!filteredDatafilesEqualToDownloadDatafiles() &&
+                                datafilesToDownload.length !==
+                                    uploadedDatafiles.length && (
+                                    <button
+                                        onClick={() =>
+                                            setDatafilesToDownload(
+                                                filteredUploadedDatafiles
+                                            )
+                                        }
+                                        className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                                    >
+                                        Select all filtered datafiles
+                                    </button>
+                                )}
+                            {datafilesToDownload.length > 0 && (
+                                <button
+                                    onClick={() => setDatafilesToDownload([])}
+                                    className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                                >
+                                    Unselect all datafiles
+                                </button>
+                            )}
+                        </>
                     )}
-                    {!filteredDatafilesEqualToDownloadDatafiles() &&
-                        datafilesToDownload.length !==
-                            uploadedDatafiles.length && (
+                    {datafiles.some(
+                        (r) =>
+                            r.url_type === 'layer' || r.url_type === 'layer-raw'
+                    ) && (
+                        <>
                             <button
-                                onClick={() =>
-                                    setDatafilesToDownload(
-                                        filteredUploadedDatafiles
-                                    )
-                                }
+                                onClick={() => {
+                                    dataset.resources.forEach((r) => {
+                                        if (
+                                            r.format == 'Layer' &&
+                                            r.rw_id &&
+                                            // @ts-ignore
+                                            !activeLayers.some(
+                                                (l) => l.id == r?.rw_id
+                                            )
+                                        ) {
+                                            addLayerToLayerGroup(
+                                                r.rw_id ?? '',
+                                                dataset.id
+                                            )
+                                        }
+                                    })
+                                }}
                                 className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                             >
-                                Select all filtered datafiles
+                                Show All Layers
                             </button>
-                        )}
-                    {datafilesToDownload.length > 0 && (
-                        <button
-                            onClick={() => setDatafilesToDownload([])}
-                            className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                        >
-                            Unselect all datafiles
-                        </button>
+                            <button
+                                className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                                onClick={() => {
+                                    dataset.resources.forEach((r) => {
+                                        if (r.format == 'Layer') {
+                                            removeLayerFromLayerGroup(
+                                                // @ts-ignore
+                                                r.rw_id,
+                                                dataset.id
+                                            )
+                                        }
+                                    })
+                                }}
+                            >
+                                Hide All
+                            </button>
+                        </>
                     )}
-                    <button
-                        onClick={() => {
-                            dataset.resources.forEach((r) => {
-                                if (
-                                    r.format == 'Layer' &&
-                                    // @ts-ignore
-                                    !activeLayers.some((l) => l.id == r?.rw_id)
-                                ) {
-                                    // @ts-ignore
-                                    addLayerToLayerGroup(r.rw_id, dataset.id)
-                                }
-                            })
-                        }}
-                        className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                    >
-                        Show All Layers
-                    </button>
-                    <button
-                        className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                        onClick={() => {
-                            dataset.resources.forEach((r) => {
-                                if (r.format == 'Layer') {
-                                    removeLayerFromLayerGroup(
-                                        // @ts-ignore
-                                        r.rw_id,
-                                        dataset.id
-                                    )
-                                }
-                            })
-                        }}
-                    >
-                        Hide All
-                    </button>
                 </div>
             </div>
             {datafilesToDownload.length > 0 && (
