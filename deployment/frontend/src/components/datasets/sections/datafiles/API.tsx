@@ -1,7 +1,7 @@
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { Tab } from '@headlessui/react'
 import { BookOpenIcon } from '@heroicons/react/24/outline'
 import { Fragment, useState } from 'react'
@@ -14,7 +14,35 @@ import {
     getJsSnippet,
     getPythonSnippet,
     getRSnippet,
+    RwMoreInfo,
 } from '../APIEndpoint'
+
+export function MoreInfo() {
+    return (
+        <div>
+            <div className="font-acumin text-base font-normal text-zinc-800">
+                For more information on the CKAN API, see the{' '}
+                <a
+                    href="https://docs.ckan.org/en/2.9/api/index.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    className=" text-blue-500 italic underline"
+                >
+                    CKAN API documentation
+                </a>{' '}
+                and for Datastore API see the{' '}
+                <a
+                    href="https://docs.ckan.org/en/2.9/maintaining/datastore.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    className=" text-blue-500 italic underline"
+                >
+                    Datastore API documentation
+                </a>
+            </div>
+        </div>
+    )
+}
 
 export function APIButton({ datafile }: { datafile: Resource }) {
     const [open, setOpen] = useState(false)
@@ -144,6 +172,22 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
                 description="Get this data file's metadata"
                 url={ckanResourcGetUrl}
             />
+
+            <QueryEndpoint
+                description="update this data file's metadata"
+                url={`${ckanBaseUrl}/resource_patch`}
+                method="POST"
+                headers={{
+                    Authorization: '<API_TOKEN>',
+                }}
+                body={`{
+    "id": "${datafile.id}",
+    "title": "${datafile.title ?? datafile.name} -Edited",
+    "description": "${datafile.description} Edited",
+}`}
+                lang={'json'}
+            />
+
             {ckanResourcGetFileUrl && (
                 <QueryEndpoint
                     description="Get raw file"
@@ -175,6 +219,8 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
                 />
             )}
 
+            <MoreInfo />
+
             {datafile.rw_id && (
                 <>
                     <h2 className="text-lg font-bold mb-5 mt-10">
@@ -185,6 +231,7 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
                         description="Get the layer object associated with this data file"
                         url={rwDatasetGetLayerUrl}
                     />
+                    <RwMoreInfo />
                 </>
             )}
         </>
@@ -253,6 +300,23 @@ const SnippetInstructions = ({
         <>
             <h2 className="text-lg font-bold mb-5">Data Files API</h2>
             <SnippetEndpoint
+                description="Edit this data file's metadata"
+                snippet={getSnippetFn(
+                    `${ckanBaseUrl}/resource_patch`,
+                    'POST',
+                    JSON.stringify(
+                        {
+                            id: datafile.id,
+                            title: datafile.title ?? datafile.name + 'Edited',
+                            description: datafile.description + ' Edited',
+                        },
+                        null,
+                        4
+                    ).replace(/\n/g, `\n${' '.repeat(8)}`)
+                )}
+                language={language}
+            />
+            <SnippetEndpoint
                 description="Get this data file's metadata"
                 snippet={ckanResourcGetSnippet}
                 language={language}
@@ -287,6 +351,8 @@ const SnippetInstructions = ({
                 />
             )}
 
+            <MoreInfo />
+
             {datafile.rw_id && (
                 <>
                     <h2 className="text-lg font-bold mb-5 mt-10">
@@ -298,6 +364,7 @@ const SnippetInstructions = ({
                         snippet={rwDatasetGetLayerSnippet}
                         language={language}
                     />
+                    <RwMoreInfo />
                 </>
             )}
         </>

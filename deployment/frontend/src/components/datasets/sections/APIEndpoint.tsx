@@ -178,3 +178,43 @@ data <- httr::content(response, "parsed")
 print(data)
 `
 }
+
+export const CkanApiMoreInfo = () => {
+    return (
+        <div>
+            <p>
+                For more information on how to use the CKAN API, please refer to
+                the{' '}
+                <a
+                    href="https://docs.ckan.org/en/2.9/api/index.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    className=" text-blue-500 italic underline"
+                >
+                    CKAN API documentation
+                </a>
+                .
+            </p>
+        </div>
+    )
+}
+
+export const RwMoreInfo = () => {
+    return (
+        <div>
+            <p>
+                For more information on how to use the Resource Watch API,
+                please refer to the{' '}
+                <a
+                    href="https://resource-watch.github.io/doc-api/reference.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    className=" text-blue-500 italic underline"
+                >
+                    Resource Watch API documentation
+                </a>
+                .
+            </p>
+        </div>
+    )
+}

@@ -9,6 +9,8 @@ import {
     getJsSnippet,
     getPythonSnippet,
     getRSnippet,
+    CkanApiMoreInfo,
+    RwMoreInfo,
 } from './APIEndpoint'
 import { useFields } from '@/components/data-explorer/queryHooks'
 
@@ -144,6 +146,9 @@ const QueryInstructions = () => {
     ]
 }`}
             />
+
+            <CkanApiMoreInfo />
+
             {dataset.rw_id && (
                 <>
                     <h2 className="text-lg font-bold mb-5 mt-10">
@@ -166,6 +171,7 @@ const QueryInstructions = () => {
                             />
                         </>
                     )}
+                    <RwMoreInfo />
                 </>
             )}
         </>
@@ -277,6 +283,7 @@ const SnippetInstructions = ({
                 )}
                 language={language}
             />
+            <CkanApiMoreInfo />
 
             {dataset.rw_id && (
                 <>
@@ -303,6 +310,7 @@ const SnippetInstructions = ({
                             />
                         </>
                     )}
+                    <RwMoreInfo />
                 </>
             )}
         </>
