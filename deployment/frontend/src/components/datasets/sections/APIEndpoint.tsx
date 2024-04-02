@@ -100,6 +100,7 @@ const CopyButton = ({ content }: { content: string }) => {
     return (
         <DefaultTooltip content="Copy to clipboard">
             <Button
+                aria-label="copy button"
                 className=" h-auto rounded-full p-2"
                 onClick={() => {
                     navigator.clipboard.writeText(content)
@@ -189,7 +190,7 @@ export const CkanApiMoreInfo = () => {
                     href="https://docs.ckan.org/en/2.9/api/index.html"
                     target="_blank"
                     rel="noreferrer"
-                    className=" text-blue-500 italic underline"
+                    className=" text-blue-700 italic underline"
                 >
                     CKAN API documentation
                 </a>
@@ -209,7 +210,7 @@ export const RwMoreInfo = () => {
                     href="https://resource-watch.github.io/doc-api/reference.html"
                     target="_blank"
                     rel="noreferrer"
-                    className=" text-blue-500 italic underline"
+                    className=" text-blue-700 italic underline"
                 >
                     Resource Watch API documentation
                 </a>

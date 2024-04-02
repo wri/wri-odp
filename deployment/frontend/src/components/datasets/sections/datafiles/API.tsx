@@ -26,7 +26,7 @@ export function MoreInfo() {
                     href="https://docs.ckan.org/en/2.9/api/index.html"
                     target="_blank"
                     rel="noreferrer"
-                    className=" text-blue-500 italic underline"
+                    className=" text-blue-700 italic underline"
                 >
                     CKAN API documentation
                 </a>{' '}
@@ -35,7 +35,7 @@ export function MoreInfo() {
                     href="https://docs.ckan.org/en/2.9/maintaining/datastore.html"
                     target="_blank"
                     rel="noreferrer"
-                    className=" text-blue-500 italic underline"
+                    className=" text-blue-700 italic underline"
                 >
                     Datastore API documentation
                 </a>

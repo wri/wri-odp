@@ -8,7 +8,7 @@ export const HttpMethodChip = ({
     return (
         <div className="w-16">
             <span
-                className={`bg-green-600 font-semibold text-white py-1 px-2 ${className}`}
+                className={`bg-green-700 font-semibold text-white py-1 px-2 ${className}`}
             >
                 {children}
             </span>
