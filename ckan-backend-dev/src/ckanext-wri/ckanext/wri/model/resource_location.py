@@ -86,7 +86,7 @@ class ResourceLocation(object):
         if result is not None:
             obj = {
                 "resource_id": result[0],
-                "spatial_addess": result[1],
+                "spatial_address": result[1],
                 "spatial_geom": result[2],
                 "spatial_coordinates": result[3],
             }
@@ -183,15 +183,21 @@ class ResourceLocation(object):
 
     @classmethod
     def get_geometry_from_geojson(self, spatial_geom):
+        log.error(type(spatial_geom))
         if spatial_geom:
             geometries = []
+
+            if isinstance(spatial_geom, str):
+                spatial_geom = json.loads(spatial_geom)
 
             if spatial_geom["type"] == "GeometryCollection":
                 geometries = spatial_geom["geometries"]
             elif spatial_geom["type"] == "FeatureCollection":
                 geometries = [x["geometry"] for x in spatial_geom["features"]]
-            else:
+            elif "geometry" in spatial_geom:
                 geometries = [spatial_geom["geometry"]]
+            else:
+                geometries = [spatial_geom]
 
             valid_geometries = []
             for geom in geometries:
@@ -220,6 +226,14 @@ class ResourceLocation(object):
         current_resource_location = ResourceLocation.get(
             resource_id, is_pending=is_pending
         )
+
+        if is_pending is False:
+            pending_resource_location = ResourceLocation.get(
+                resource_id, is_pending=True
+            )
+
+            if pending_resource_location:
+                spatial_geom = pending_resource_location.get("spatial_geom")
 
         resource_location = None
 
@@ -252,13 +266,14 @@ class ResourceLocation(object):
 
         resource_dict.pop("spatial_geom", None)
         resource_dict.pop("spatial_coordinates", None)
-        resource_dict.pop("spatial_address", None)
+        # resource_dict.pop("spatial_address", None)
 
         return resource_dict
 
     @classmethod
     def index_dataset_resources_by_location(self, dataset, is_pending):
         resources = dataset.get("resources", [])
+
 
         for i, resource in enumerate(resources):
             resources[i] = ResourceLocation.index_resource_by_location(

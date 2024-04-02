@@ -976,6 +976,9 @@ def resource_search(context: Context, data_dict: DataDict):
         model.Session.query(model.Resource)
         .join(ResourceLocation, ResourceLocation.resource_id == model.Resource.id, isouter=True)
         .join(Package, model.Package.id == model.Resource.package_id, isouter=True)
+        # TODO: could be that is_pending=True search is not working because
+        # of the join above (i.e. before being approved this join won't match
+        # any rows)
         .filter(ResourceLocation.is_pending == (is_pending == "true"))
         .filter(model.Package.state == "active")
         .filter(model.Package.private == False)
@@ -1012,7 +1015,7 @@ def resource_search(context: Context, data_dict: DataDict):
                 )
             )
         if len(segments) == 1:
-            country = f"{segments[1].strip()}"
+            country = f"{segments[0].strip()}"
             location_queries.append(
                 ResourceLocation.spatial_address.like(f"%{country}"),
             )
@@ -1156,3 +1159,37 @@ def resource_search(context: Context, data_dict: DataDict):
 
 # TODO:  customize package_show to include spatial_geom
 # conditionally (optimization of the data file geo indexing)
+@tk.chained_action
+@tk.side_effect_free
+def package_show(original_action, context, data_dict):
+    include_rsc_location = data_dict.get('include_rsc_location', True)
+
+    response = original_action(context, data_dict)
+    resources = response.get("resources")
+
+    if include_rsc_location:
+        log.error("getting rsc include location")
+        for i, res in enumerate(resources):
+            res_id = res.get("id")
+            resource_location = ResourceLocation.get(res_id, is_pending=False)
+
+
+            if resource_location is not None:
+                spatial_address = resource_location.get("spatial_address", None)
+                if spatial_address is not None:
+                    resources[i]["spatial_address"] = spatial_address
+
+                spatial_geom = resource_location.get("spatial_geom", None)
+                if spatial_geom is not None:
+                    if isinstance(spatial_geom, str):
+                        resources[i]["spatial_geom"] = json.loads(spatial_geom)
+                    else:
+                        resources[i]["spatial_geom"] = spatial_geom
+
+                spatial_coordinates = resource_location.get("spatial_coordinates", None)
+                if spatial_coordinates is not None:
+                    resources[i]["spatial_coordinates"] = spatial_coordinates
+
+    return response
+
+

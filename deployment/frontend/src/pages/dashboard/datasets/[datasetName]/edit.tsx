@@ -44,6 +44,8 @@ export async function getServerSideProps(
                 ? true
                 : false
 
+        console.log(pendingExist, pendingDataset)
+
         if (pendingExist && pendingDataset) {
             initialDataset = pendingDataset
         }
@@ -84,6 +86,7 @@ export default function EditDatasetPage(
     const { datasetName } = props
     const [deleteOpen, setDeleteOpen] = useState(false)
     const pendingExist = props.pendingExist!
+    console.log(pendingExist)
     const datasetId = props.datasetId!
     const router = useRouter()
     const utils = api.useContext()

@@ -44,6 +44,7 @@ from ckanext.wri.logic.action.get import (
     issue_search_wri,
     package_collaborator_list_wri,
     resource_search,
+    package_show
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -196,6 +197,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "issue_search_wri": issue_search_wri,
             "package_collaborator_list_wri": package_collaborator_list_wri,
             "resource_location_search": resource_search,
+            "package_show": package_show
         }
 
     # IPermissionLabels
@@ -300,7 +302,6 @@ class WriPlugin(plugins.SingletonPlugin):
     # IPackageController
 
     def after_dataset_create(self, context, pkg_dict):
-        log.error("!@#!@#!@#!")
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)
@@ -309,8 +310,6 @@ class WriPlugin(plugins.SingletonPlugin):
             ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
-        log.error("!@#!@#!@#!")
-        log.error(pkg_dict)
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment

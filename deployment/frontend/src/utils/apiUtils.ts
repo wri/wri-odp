@@ -660,7 +660,9 @@ export async function getOnePendingDataset(
             },
         }
     )
+
     const data = (await response.json()) as CkanResponse<PendingDataset>
+    console.log(data)
     if (!data.success && data.error) {
         const erroInfo = JSON.stringify(data.error).toLowerCase()
         if (erroInfo.includes('not found')) {

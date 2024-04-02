@@ -4,6 +4,7 @@ import sqlalchemy
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import JSONB
 from ckanext.wri.model.resource_location import ResourceLocation
+import json 
 
 import ckan.model.meta as meta
 from ckan.common import _
@@ -35,13 +36,37 @@ class PendingDatasets(object):
         self.last_modified = None
 
     @classmethod
-    def get(cls, package_id: str) -> Optional[dict]:
+    def get(cls, package_id: str, include_rsc_location: bool = True) -> Optional[dict]:
+
         try:
             pending_dataset = (
                 meta.Session.query(PendingDatasets)
                 .filter(PendingDatasets.package_id == package_id)
                 .one()
             )
+
+            if include_rsc_location:
+                resources = pending_dataset.package_data.get("resources", [])
+                for i, res in enumerate(resources):
+                    res_id = res.get("id")
+                    resource_location = ResourceLocation.get(res_id, is_pending=True)
+
+                    if resource_location is not None:
+                        spatial_address = resource_location.get("spatial_address", None)
+                        if spatial_address is not None:
+                            resources[i]["spatial_address"] = spatial_address
+
+                        spatial_geom = resource_location.get("spatial_geom", None)
+                        if spatial_geom is not None:
+                            if isinstance(spatial_geom, str):
+                                resources[i]["spatial_geom"] = json.loads(spatial_geom)
+                            else:
+                                resources[i]["spatial_geom"] = spatial_geom
+
+                        spatial_coordinates = resource_location.get("spatial_coordinates", None)
+                        if spatial_coordinates is not None:
+                            resources[i]["spatial_coordinates"] = spatial_coordinates
+
             return {
                 "package_id": pending_dataset.package_id,
                 "package_data": pending_dataset.package_data,
@@ -57,11 +82,10 @@ class PendingDatasets(object):
         package_data: dict,
     ) -> Optional[dict]:
         try:
+            package_data = ResourceLocation.index_dataset_resources_by_location(package_data, True)
             pending_dataset = PendingDatasets(package_id, package_data)
             meta.Session.add(pending_dataset)
             meta.Session.commit()
-
-            package_data = ResourceLocation.index_dataset_resources_by_location(package_data, True)
 
             return {
                 "package_id": pending_dataset.package_id,
@@ -87,10 +111,9 @@ class PendingDatasets(object):
             )
 
             if pending_dataset:
+                package_data = ResourceLocation.index_dataset_resources_by_location(package_data, True)
                 pending_dataset.package_data = package_data
                 meta.Session.commit()
-
-                package_data = ResourceLocation.index_dataset_resources_by_location(package_data, True)
 
                 return {
                     "package_id": pending_dataset.package_id,
