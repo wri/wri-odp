@@ -121,7 +121,7 @@ export const getJsSnippet = (
     { 
         method: "${method}",${
             body
-                ? `\n\t\tbody: JSON.stringify(${body}),\n\t\theaders: {\n\t\t\t"Content-Type": "application/json"\n\t\t}`
+                ? `\n\t\tbody: JSON.stringify(${body}),\n\t\theaders: {\n\t\t\t"Content-Type": "application/json",\n\t\t\t"Authorization": "<API_TOKEN>"\n\t\t}`
                 : ''
         }
     }
@@ -143,7 +143,11 @@ export const getPythonSnippet = (
 response = requests.request(
     "${method}",
     "${url}",
-    ${body ? `data=${body}, headers={"Content-Type": "application/json"}` : ''}
+    ${
+        body
+            ? `data=${body}, headers={\n\t\t\t"Content-Type": "application/json",\n\t\t\t"Authorization": "<API_TOKEN>"\n\t\t}`
+            : ''
+    }
 )
 
 data = response.json()
@@ -164,7 +168,7 @@ response <- httr::VERB(
     "${url}",
     ${
         body
-            ? `body = toJSON(${body}), add_headers("Content-Type" = "application/json")`
+            ? `body = toJSON(${body}), add_headers(\n\t\t\t"Content-Type" = "application/json",\n\t\t\t"Authorization" = "<API_TOKEN>"\n\t\t)`
             : ''
     }
 )
