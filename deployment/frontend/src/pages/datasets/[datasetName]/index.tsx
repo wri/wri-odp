@@ -446,7 +446,14 @@ export default function DatasetPage(
                     ].some((x) => f.includes(x))
                 ),
         },
-        { name: 'API', enabled: true },
+        {
+            name: 'API',
+            enabled: true,
+            highlighted:
+                !isCurrentVersion &&
+                diffFields &&
+                diffFields.some((f) => f.includes('usecases')),
+        },
         {
             name: 'Collaborators',
             enabled: collaborators.data,
@@ -494,7 +501,7 @@ export default function DatasetPage(
                     provider: 'datastore',
                     id: resource?.id as string,
                     apiKey: apikey,
-                    name: resource?.title ?? resource?.name as string,
+                    name: resource?.title ?? (resource?.name as string),
                 })
             } else {
                 setTabularResource(null)
@@ -680,7 +687,13 @@ export default function DatasetPage(
                                                 />
                                             </Tab.Panel>
                                             <Tab.Panel as="div">
-                                                <API />
+                                                <API
+                                                    usecases={
+                                                        isCurrentVersion
+                                                            ? prevDatasetData.usecases
+                                                            : datasetData.usecases
+                                                    }
+                                                />
                                             </Tab.Panel>
                                             {collaborators.data && (
                                                 <Tab.Panel as="div">
@@ -691,7 +704,8 @@ export default function DatasetPage(
                                                     />
                                                 </Tab.Panel>
                                             )}
-                                            {issues.data && !isCurrentVersion &&
+                                            {issues.data &&
+                                                !isCurrentVersion &&
                                                 issues.data.length > 0 && (
                                                     <Tab.Panel as="div">
                                                         <Issues

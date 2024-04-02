@@ -99,6 +99,24 @@ export function MoreDetailsForm({
                             defaultValue=""
                         />
                     </InputGroup>
+                    <InputGroup
+                        label={
+                            <span className="flex items-center gap-x-1">
+                                Advanced API Usage
+                                <DefaultTooltip content="This field will end up next to the API tab in the dataset page, you can use it to provide code samples that are useful for this particular data">
+                                    <InformationCircleIcon className="h-5 w-5" />
+                                </DefaultTooltip>
+                            </span>
+                        }
+                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                    >
+                        <SimpleEditor
+                            formObj={formObj}
+                            name="usecases"
+                            className="min-h-[320px]"
+                            defaultValue=""
+                        />
+                    </InputGroup>
                 </div>
             </Disclosure.Panel>
         </MetadataAccordion>

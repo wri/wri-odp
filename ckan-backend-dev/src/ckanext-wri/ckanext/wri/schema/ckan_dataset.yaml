@@ -202,6 +202,11 @@ dataset_fields:
   display_snippet: email.html
   display_email_name_field: maintainer
 
+- field_name: usecases
+  label: Use cases
+  form_snippet: markdown.html
+  form_placeholder: eg. This is an example of how this data can be used...
+
 - field_name: function
   label: Function
   form_snippet: markdown.html

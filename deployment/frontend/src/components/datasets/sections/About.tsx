@@ -197,7 +197,7 @@ export function About({
                             className="text-justify font-acumin text-sm font-light text-stone-900 max-h-[180px]"
                         >
                             <div
-                                className="prose max-w-none prose-sm prose-a:text-wri-green"
+                                className="prose max-w-none prose-sm prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base"
                                 dangerouslySetInnerHTML={{
                                     __html: dataset?.notes ?? '',
                                 }}
