@@ -9,6 +9,8 @@ import {
     getJsSnippet,
     getPythonSnippet,
     getRSnippet,
+    CkanApiMoreInfo,
+    RwMoreInfo,
 } from './APIEndpoint'
 import { useFields } from '@/components/data-explorer/queryHooks'
 
@@ -87,6 +89,65 @@ const QueryInstructions = () => {
                 description="Get this dataset's metadata"
                 url={ckanDatasetGetUrl}
             />
+            <QueryEndpoint
+                description="Example on how to create a new Dataset"
+                method="POST"
+                url={`${publicCkanUrl}/api/3/action/package_create`}
+                headers={{
+                    Authorization: '<API_TOKEN>',
+                }}
+                body={`{
+    "name": ${dataset.name},
+    "title": ${dataset.title},
+    "visibility_type": "public",
+    "short_description": ${dataset.short_description},
+    "technical_notes": ${dataset.technical_notes},
+    "maintainer": ${dataset.maintainer},
+    "maintainer_email": ${dataset.maintainer_email},
+    "author": ${dataset.author},
+    "resources": [
+        {
+            "format": "CSV",
+            "name": "Test.csv",
+            "description": "Test description",
+            "type": "link",
+            "url": "https://test.com/a_link_to_csv_file.csv",
+
+        }
+    ]
+}`}
+            />
+            <QueryEndpoint
+                description="example on how to edit a Dataset"
+                method="POST"
+                url={`${publicCkanUrl}/api/3/action/package_patch`}
+                headers={{
+                    Authorization: '<API_TOKEN>',
+                }}
+                body={`{
+    "id": "${dataset.id}",
+    "name": "${dataset.name}",
+    "title": "${dataset.title}+ - Edited",
+    "visibility_type": "public",
+    "short_description": "${dataset.short_description}",
+    "technical_notes": "${dataset.technical_notes}",
+    "maintainer": "${dataset.maintainer}",
+    "maintainer_email": "${dataset.maintainer_email}",
+    "author": "${dataset.author}",
+    "resources": [
+        {
+            "format": "CSV",
+            "name": "Test_Edited.csv",
+            "description": "Test description Edited",
+            "type": "link",
+            "url": "https://test.com/a_link_to_csv_file_edited.csv",
+
+        }
+    ]
+}`}
+            />
+
+            <CkanApiMoreInfo />
 
             {dataset.rw_id && (
                 <>
@@ -110,6 +171,7 @@ const QueryInstructions = () => {
                             />
                         </>
                     )}
+                    <RwMoreInfo />
                 </>
             )}
         </>
@@ -157,6 +219,71 @@ const SnippetInstructions = ({
                 snippet={ckanPackageShowSnippet}
                 language={language}
             />
+            <SnippetEndpoint
+                description="Example on how to create a new Dataset"
+                snippet={getSnippetFn(
+                    `${ckanBaseUrl}/package_create`,
+                    'POST',
+                    JSON.stringify(
+                        {
+                            name: dataset.name,
+                            title: dataset.title,
+                            visibility_type: 'public',
+                            short_description: dataset.short_description,
+                            technical_notes: dataset.technical_notes,
+                            maintainer: dataset.maintainer,
+                            maintainer_email: dataset.maintainer_email,
+                            author: dataset.author,
+                            resources: [
+                                {
+                                    format: 'CSV',
+                                    name: 'Test.csv',
+                                    description: 'Test description',
+                                    type: 'link',
+                                    url: 'https://test.com/a_link_to_csv_file.csv',
+                                },
+                            ],
+                        },
+                        null,
+                        4
+                    ).replace(/\n/g, `\n${' '.repeat(8)}`)
+                )}
+                language={language}
+            />
+
+            <SnippetEndpoint
+                description="Example on how to edit a Dataset"
+                snippet={getSnippetFn(
+                    `${ckanBaseUrl}/package_patch`,
+                    'POST',
+                    JSON.stringify(
+                        {
+                            name: dataset.name,
+                            title: dataset.title,
+                            visibility_type: 'public',
+                            short_description:
+                                dataset.short_description + ' - Edited',
+                            technical_notes: dataset.technical_notes,
+                            maintainer: dataset.maintainer,
+                            maintainer_email: dataset.maintainer_email,
+                            author: dataset.author,
+                            resources: [
+                                {
+                                    format: 'CSV',
+                                    name: 'Test_Edited.csv',
+                                    description: 'Test description -Edited',
+                                    type: 'link',
+                                    url: 'https://test.com/a_link_to_csv_file_edited.csv',
+                                },
+                            ],
+                        },
+                        null,
+                        4
+                    ).replace(/\n/g, `\n${' '.repeat(8)}`)
+                )}
+                language={language}
+            />
+            <CkanApiMoreInfo />
 
             {dataset.rw_id && (
                 <>
@@ -183,6 +310,7 @@ const SnippetInstructions = ({
                             />
                         </>
                     )}
+                    <RwMoreInfo />
                 </>
             )}
         </>

@@ -56,17 +56,17 @@ function OpenInButton({
     if (open_in.length === 0) return <></>
     if (open_in.length === 1 && !session.data?.user) {
         return (
-            <Button>
-                <a
-                    href={open_in[0]?.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    id="openin"
-                >
-                    Open in {open_in[0]?.title} steve
-                    <ArrowUpRightIcon className="mb-1 h-6 w-6" />
-                </a>
-            </Button>
+            <a
+                href={open_in[0]?.url}
+                target="_blank"
+                rel="noreferrer"
+                id="openin"
+                className="inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 max-w-[800px]
+                bg-amber-400 text-stone-900 font-bold font-acumin hover:bg-yellow-500 h-11 px-6 py-4 rounded-[3px] text-base"
+            >
+                Open in {open_in[0]?.title}
+                <ArrowUpRightIcon className="mb-1 h-6 w-6" />
+            </a>
         )
     }
     if (open_in.length === 1 && session.data?.user) {
