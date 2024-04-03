@@ -275,6 +275,14 @@ export function Preview({
                                             }}
                                         ></div>
                                     </FullDescription>
+                                    <FullDescription label="Use cases">
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html:
+                                                    watch('usecases') ?? '_',
+                                            }}
+                                        ></div>
+                                    </FullDescription>
                                 </dl>
                             </div>
                         </div>

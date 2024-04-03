@@ -54,8 +54,25 @@ export const ResourceSchema = z
         size: z.number().optional().nullable(),
         title: z.string().optional(),
         fileBlob: z.any(),
-        type: z.enum(['link', 'upload', 'layer', 'empty-file', 'empty-layer', 'layer-raw']),
-        url_type: z.enum(['link', 'upload', 'layer', 'empty-file', 'empty-layer', 'layer-raw']).optional().nullable(),
+        type: z.enum([
+            'link',
+            'upload',
+            'layer',
+            'empty-file',
+            'empty-layer',
+            'layer-raw',
+        ]),
+        url_type: z
+            .enum([
+                'link',
+                'upload',
+                'layer',
+                'empty-file',
+                'empty-layer',
+                'layer-raw',
+            ])
+            .optional()
+            .nullable(),
         schema: DataDictionarySchema.optional().nullable(),
         layerObj: layerSchema.optional().nullable(),
         datastore_active: z.boolean().optional().nullable(),
@@ -152,7 +169,12 @@ export const DatasetSchemaObject = z.object({
         .nullable()
         .or(emptyStringToUndefined),
     author: z.string(),
-    author_email: z.string().email().optional().nullable().or(emptyStringToUndefined),
+    author_email: z
+        .string()
+        .email()
+        .optional()
+        .nullable()
+        .or(emptyStringToUndefined),
     maintainer: z.string(),
     maintainer_email: z.string().email(),
     function: z.string().optional().nullable(),
@@ -168,6 +190,7 @@ export const DatasetSchemaObject = z.object({
         .or(emptyStringToUndefined),
     cautions: z.string().optional().nullable(),
     methodology: z.string().optional().nullable(),
+    usecases: z.string().optional().nullable(),
     extras: z.array(
         z.object({
             key: z.string(),
@@ -187,9 +210,7 @@ export const DatasetSchemaObject = z.object({
     spatial_address: z.string().optional(),
     spatial: z.any().optional(),
     spatial_type: z.enum(['address', 'geom']).optional(),
-    release_notes: z
-        .string()
-        .optional(),
+    release_notes: z.string().optional(),
 })
 
 export const DatasetSchema = DatasetSchemaObject.refine(
@@ -228,22 +249,26 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     .refine(
         (obj) => {
             if (!obj.rw_dataset) return true
-            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName) return false
+            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName)
+                return false
             return true
         },
         {
-            message: 'ConnectorUrl is required for RW datasets, unless a table name is provided',
+            message:
+                'ConnectorUrl is required for RW datasets, unless a table name is provided',
             path: ['connectorUrl'],
         }
     )
     .refine(
         (obj) => {
             if (!obj.rw_dataset) return true
-            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName) return false
+            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName)
+                return false
             return true
         },
         {
-            message: 'Tablename is required for RW datasets, unless a connectorUrl is provided',
+            message:
+                'Tablename is required for RW datasets, unless a connectorUrl is provided',
             path: ['tableName'],
         }
     )
