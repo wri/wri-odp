@@ -23,7 +23,7 @@ export function MoreInfo() {
             <div className="font-acumin text-base font-normal text-zinc-800">
                 For more information on the CKAN API, see the{' '}
                 <a
-                    href="https://docs.ckan.org/en/2.9/api/index.html"
+                    href="https://docs.ckan.org/en/2.10/api/index.html"
                     target="_blank"
                     rel="noreferrer"
                     className=" text-blue-700 italic underline"
@@ -32,7 +32,7 @@ export function MoreInfo() {
                 </a>{' '}
                 and for Datastore API see the{' '}
                 <a
-                    href="https://docs.ckan.org/en/2.9/maintaining/datastore.html"
+                    href="https://docs.ckan.org/en/2.10/maintaining/datastore.html"
                     target="_blank"
                     rel="noreferrer"
                     className=" text-blue-700 italic underline"
