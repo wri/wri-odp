@@ -187,7 +187,7 @@ export const CkanApiMoreInfo = () => {
                 For more information on how to use the CKAN API, please refer to
                 the{' '}
                 <a
-                    href="https://docs.ckan.org/en/2.9/api/index.html"
+                    href="https://docs.ckan.org/en/2.10/api/index.html"
                     target="_blank"
                     rel="noreferrer"
                     className=" text-blue-700 italic underline"
