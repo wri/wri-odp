@@ -205,6 +205,8 @@ jobs:
           category: frontend_container_trivy_results
           sarif_file: frontend-trivy-results.sarif
       - name: Tear down containers
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         if: failure() || success()
         run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
         working-directory: ./ckan-backend-dev
