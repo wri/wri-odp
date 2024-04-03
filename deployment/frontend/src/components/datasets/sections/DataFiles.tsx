@@ -268,7 +268,7 @@ export function DataFiles({
                         <>
                             <Disclosure.Button as={Fragment}>
                                 <Button className="my-2 ml-auto group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
-                                    Location Search
+                                    {open ? 'Hide' : 'Show'} Location Search
                                     <GlobeAmericasIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
                                 </Button>
                             </Disclosure.Button>
@@ -286,10 +286,10 @@ export function DataFiles({
                     )}
                 </Disclosure>
             </div>
-            <div className="flex justify-between pb-1 lg:flex-col xl:flex-row">
-                <span className="font-acumin text-base font-normal text-black">
-                    {filteredDatafiles?.length ?? 0} Data Files
-                </span>
+            <span className="font-acumin text-base font-normal text-black">
+                {filteredDatafiles?.length ?? 0} Data Files
+            </span>
+            <div className="flex justify-end pb-1 lg:flex-col xl:flex-row">
                 <div className="flex gap-x-4 lg:justify-end">
                     {datafiles.some((r) => r.url_type === 'upload') && (
                         <>
@@ -372,7 +372,7 @@ export function DataFiles({
                                     })
                                 }}
                             >
-                                Hide All
+                                Hide All Layers
                             </button>
                         </>
                     )}
