@@ -2,19 +2,30 @@ import { env } from '@/env.mjs'
 import classNames from '@/utils/classnames'
 import { useDataset } from '@/utils/storeHooks'
 import { Tab } from '@headlessui/react'
-import { Fragment } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import {
     SnippetEndpoint,
     QueryEndpoint,
     getJsSnippet,
     getPythonSnippet,
     getRSnippet,
+    CkanApiMoreInfo,
+    RwMoreInfo,
 } from './APIEndpoint'
 import { useFields } from '@/components/data-explorer/queryHooks'
+import hljs from 'highlight.js/lib/core'
+
+import python from 'highlight.js/lib/languages/python'
+import js from 'highlight.js/lib/languages/javascript'
+import r from 'highlight.js/lib/languages/r'
+
+hljs.registerLanguage('python', python)
+hljs.registerLanguage('javascript', js)
+hljs.registerLanguage('r', r)
 
 const tabs = ['Query', 'Javascript', 'Python', 'R']
 
-export function API() {
+export function API({ usecases }: { usecases?: string }) {
     return (
         <Tab.Group as="div">
             <Tab.List
@@ -37,6 +48,22 @@ export function API() {
                         )}
                     </Tab>
                 ))}
+                {usecases && (
+                    <Tab key="Usecases" as={Fragment}>
+                        {({ selected }: { selected: boolean }) => (
+                            <button
+                                className={classNames(
+                                    selected
+                                        ? 'rounded-sm border-b border-wri-green bg-white'
+                                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                                    'h-full whitespace-nowrap px-8 text-center text-base font-normal capitalize text-neutral-800'
+                                )}
+                            >
+                                Advanced API Usage
+                            </button>
+                        )}
+                    </Tab>
+                )}
             </Tab.List>
             <Tab.Panel as="div" className="py-6 overflow-clip">
                 <QueryInstructions />
@@ -56,6 +83,11 @@ export function API() {
             <Tab.Panel as="div" className="py-6 overflow-clip">
                 <SnippetInstructions language="r" getSnippetFn={getRSnippet} />
             </Tab.Panel>
+            {usecases && (
+                <Tab.Panel as="div" className="py-6 overflow-clip">
+                    <UseCases usecases={usecases} />
+                </Tab.Panel>
+            )}
         </Tab.Group>
     )
 }
@@ -87,6 +119,65 @@ const QueryInstructions = () => {
                 description="Get this dataset's metadata"
                 url={ckanDatasetGetUrl}
             />
+            <QueryEndpoint
+                description="Example on how to create a new Dataset"
+                method="POST"
+                url={`${publicCkanUrl}/api/3/action/package_create`}
+                headers={{
+                    Authorization: '<API_TOKEN>',
+                }}
+                body={`{
+    "name": ${dataset.name},
+    "title": ${dataset.title},
+    "visibility_type": "public",
+    "short_description": ${dataset.short_description},
+    "technical_notes": ${dataset.technical_notes},
+    "maintainer": ${dataset.maintainer},
+    "maintainer_email": ${dataset.maintainer_email},
+    "author": ${dataset.author},
+    "resources": [
+        {
+            "format": "CSV",
+            "name": "Test.csv",
+            "description": "Test description",
+            "type": "link",
+            "url": "https://test.com/a_link_to_csv_file.csv",
+
+        }
+    ]
+}`}
+            />
+            <QueryEndpoint
+                description="example on how to edit a Dataset"
+                method="POST"
+                url={`${publicCkanUrl}/api/3/action/package_patch`}
+                headers={{
+                    Authorization: '<API_TOKEN>',
+                }}
+                body={`{
+    "id": "${dataset.id}",
+    "name": "${dataset.name}",
+    "title": "${dataset.title}+ - Edited",
+    "visibility_type": "public",
+    "short_description": "${dataset.short_description}",
+    "technical_notes": "${dataset.technical_notes}",
+    "maintainer": "${dataset.maintainer}",
+    "maintainer_email": "${dataset.maintainer_email}",
+    "author": "${dataset.author}",
+    "resources": [
+        {
+            "format": "CSV",
+            "name": "Test_Edited.csv",
+            "description": "Test description Edited",
+            "type": "link",
+            "url": "https://test.com/a_link_to_csv_file_edited.csv",
+
+        }
+    ]
+}`}
+            />
+
+            <CkanApiMoreInfo />
 
             {dataset.rw_id && (
                 <>
@@ -110,9 +201,49 @@ const QueryInstructions = () => {
                             />
                         </>
                     )}
+                    <RwMoreInfo />
                 </>
             )}
         </>
+    )
+}
+
+hljs.registerLanguage('python', python)
+hljs.registerLanguage('javascript', js)
+hljs.registerLanguage('r', r)
+
+const UseCases = ({ usecases }: { usecases: string }) => {
+    const { dataset } = useDataset()
+    const [highlighted, setHighlighted] = useState(false)
+    const divRef = useRef<HTMLDivElement | null>(null)
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    publicCkanUrl = publicCkanUrl.endsWith('/')
+        ? publicCkanUrl.slice(0, -1)
+        : publicCkanUrl
+
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
+    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.id}`
+
+    useEffect(() => {
+        if (!highlighted && divRef.current) {
+            setHighlighted(true)
+            hljs.highlightAll()
+        }
+    }, [highlighted])
+    return (
+        <div>
+            <h2 className="text-lg font-bold mb-5">Usecases</h2>
+            <div
+                ref={divRef}
+                className="prose w-full max-w-7xl prose-sm prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base"
+                dangerouslySetInnerHTML={{
+                    __html: usecases.replaceAll(
+                        '{% DATASET_URL %}',
+                        ckanDatasetGetUrl
+                    ),
+                }}
+            ></div>
+        </div>
     )
 }
 
@@ -157,6 +288,71 @@ const SnippetInstructions = ({
                 snippet={ckanPackageShowSnippet}
                 language={language}
             />
+            <SnippetEndpoint
+                description="Example on how to create a new Dataset"
+                snippet={getSnippetFn(
+                    `${ckanBaseUrl}/package_create`,
+                    'POST',
+                    JSON.stringify(
+                        {
+                            name: dataset.name,
+                            title: dataset.title,
+                            visibility_type: 'public',
+                            short_description: dataset.short_description,
+                            technical_notes: dataset.technical_notes,
+                            maintainer: dataset.maintainer,
+                            maintainer_email: dataset.maintainer_email,
+                            author: dataset.author,
+                            resources: [
+                                {
+                                    format: 'CSV',
+                                    name: 'Test.csv',
+                                    description: 'Test description',
+                                    type: 'link',
+                                    url: 'https://test.com/a_link_to_csv_file.csv',
+                                },
+                            ],
+                        },
+                        null,
+                        4
+                    ).replace(/\n/g, `\n${' '.repeat(8)}`)
+                )}
+                language={language}
+            />
+
+            <SnippetEndpoint
+                description="Example on how to edit a Dataset"
+                snippet={getSnippetFn(
+                    `${ckanBaseUrl}/package_patch`,
+                    'POST',
+                    JSON.stringify(
+                        {
+                            name: dataset.name,
+                            title: dataset.title,
+                            visibility_type: 'public',
+                            short_description:
+                                dataset.short_description + ' - Edited',
+                            technical_notes: dataset.technical_notes,
+                            maintainer: dataset.maintainer,
+                            maintainer_email: dataset.maintainer_email,
+                            author: dataset.author,
+                            resources: [
+                                {
+                                    format: 'CSV',
+                                    name: 'Test_Edited.csv',
+                                    description: 'Test description -Edited',
+                                    type: 'link',
+                                    url: 'https://test.com/a_link_to_csv_file_edited.csv',
+                                },
+                            ],
+                        },
+                        null,
+                        4
+                    ).replace(/\n/g, `\n${' '.repeat(8)}`)
+                )}
+                language={language}
+            />
+            <CkanApiMoreInfo />
 
             {dataset.rw_id && (
                 <>
@@ -183,6 +379,7 @@ const SnippetInstructions = ({
                             />
                         </>
                     )}
+                    <RwMoreInfo />
                 </>
             )}
         </>

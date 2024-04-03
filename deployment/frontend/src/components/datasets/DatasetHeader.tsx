@@ -40,10 +40,10 @@ import { useToggleLayergroups } from '@/utils/storeHooks'
 import { useActiveCharts } from '@/utils/storeHooks'
 import { View } from '@/interfaces/dataset.interface'
 import ChartViewIcon from './view-icons/ChartViewIcon'
-import Highlights from '../Highlights'
 import { useQuery } from 'react-query'
-import { RwDatasetResp, RwResponse, isRwError } from '@/interfaces/rw.interface'
+import { RwDatasetResp, isRwError } from '@/interfaces/rw.interface'
 import { match } from 'ts-pattern'
+import Image from 'next/image'
 
 function OpenInButton({
     open_in,
@@ -56,17 +56,17 @@ function OpenInButton({
     if (open_in.length === 0) return <></>
     if (open_in.length === 1 && !session.data?.user) {
         return (
-            <Button>
-                <a
-                    href={open_in[0]?.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    id="openin"
-                >
-                    Open in {open_in[0]?.title} steve
-                    <ArrowUpRightIcon className="mb-1 h-6 w-6" />
-                </a>
-            </Button>
+            <a
+                href={open_in[0]?.url}
+                target="_blank"
+                rel="noreferrer"
+                id="openin"
+                className="inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 max-w-[800px]
+                bg-amber-400 text-stone-900 font-bold font-acumin hover:bg-yellow-500 h-11 px-6 py-4 rounded-[3px] text-base"
+            >
+                Open in {open_in[0]?.title}
+                <ArrowUpRightIcon className="mb-1 h-6 w-6" />
+            </a>
         )
     }
     if (open_in.length === 1 && session.data?.user) {
@@ -636,6 +636,46 @@ export function DatasetHeader({
                                 </div>
                             </div>
                         </div>
+                        {session.data?.user &&
+                            dataset?.featured_image &&
+                            dataset?.featured_image !== '' &&
+                            dataset?.featured_dataset && (
+                                <div className="flex gap-x-1">
+                                    <LinkIcon className="h-5 w-5 text-blue-800" />
+                                    <div>
+                                        <div
+                                            className={`whitespace-nowrap text-sm font-semibold text-neutral-700 ${highlighted(
+                                                'featured_image'
+                                            )}`}
+                                        >
+                                            Requested to be featured
+                                        </div>
+                                        <div className="text-sm font-light text-stone-900">
+                                            <DefaultTooltip
+                                                side="bottom"
+                                                content={
+                                                    <Image
+                                                        src={
+                                                            dataset?.featured_image
+                                                        }
+                                                        width={640}
+                                                        height={640}
+                                                        alt="featured image"
+                                                        className="w-64 h-64"
+                                                    />
+                                                }
+                                            >
+                                                <span className="flex items-center gap-x-1">
+                                                    <InformationCircleIcon className="h-5 w-5 text-blue-800" />
+                                                    <span className="mt-1.5">
+                                                        Preview image here
+                                                    </span>
+                                                </span>
+                                            </DefaultTooltip>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         {dataset?.temporal_coverage_start ||
                         dataset?.temporal_coverage_end ? (
                             <div className="flex gap-x-1">

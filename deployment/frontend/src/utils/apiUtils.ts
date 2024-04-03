@@ -2457,6 +2457,7 @@ export const datasetFields = [
     'spatial_address',
     'spatial_type',
     'methodology',
+    'usecases',
     'cautions',
     'function',
     'release_notes',
