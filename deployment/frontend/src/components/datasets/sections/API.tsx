@@ -232,7 +232,6 @@ const UseCases = ({ usecases }: { usecases: string }) => {
     }, [highlighted])
     return (
         <div>
-            <h2 className="text-lg font-bold mb-5">Usecases</h2>
             <div
                 ref={divRef}
                 className="prose w-full max-w-7xl prose-sm prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base"

@@ -53,6 +53,7 @@ export const ResourceSchema = z
         format: z.string().optional().nullable(),
         size: z.number().optional().nullable(),
         title: z.string().optional(),
+        advanced_api_usage: z.string().optional().nullable(),
         fileBlob: z.any(),
         type: z.enum([
             'link',

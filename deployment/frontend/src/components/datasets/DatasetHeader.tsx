@@ -11,6 +11,7 @@ import {
     FingerPrintIcon,
     LinkIcon,
     StarIcon,
+    TrophyIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { OpenIn, WriDataset } from '@/schema/ckan.schema'
@@ -642,7 +643,7 @@ export function DatasetHeader({
                             dataset?.featured_image !== '' &&
                             dataset?.featured_dataset && (
                                 <div className="flex gap-x-1">
-                                    <LinkIcon className="h-5 w-5 text-blue-800" />
+                                    <TrophyIcon className="h-5 w-5 text-blue-800" />
                                     <div>
                                         <div
                                             className={`whitespace-nowrap text-sm font-semibold text-neutral-700 ${highlighted(
