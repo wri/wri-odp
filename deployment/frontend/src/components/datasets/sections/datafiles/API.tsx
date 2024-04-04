@@ -207,7 +207,7 @@ const AdvancedApiUsage = ({
                 className="prose w-full max-w-7xl prose-sm prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base"
                 dangerouslySetInnerHTML={{
                     __html: advancedApiUsage.replaceAll(
-                        '{% DATASET_URL %}',
+                        '{% DATAFILE_URL %}',
                         ckanResourcGetUrl
                     ),
                 }}

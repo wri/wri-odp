@@ -74,7 +74,7 @@ A list of rich text fields where you can put extra information about the dataset
 
 ![Extra information](./extra_information.png)
 
-These will live in the dataset metadata page, both in the header and in the about/methodology tabs
+These will live in the dataset metadata page, both in the header and in the about/methodology/api tabs
 
 ![Extra information public page](./where_extrainfo_lives.png)
 
@@ -87,6 +87,20 @@ A list of name/url pairs that allow you to show the same dataset in different pl
 These links will live at the top of the dataset metadata page either as a single link or a dropdown with a list of links
 
 ![Where open in lives](./where_open_in_lives.png)
+
+### Advanced API Usage
+
+You can show code examples of how to use some specific dataset by going in the more details section of the dataset and then in the `Advanced API Usage`, there you have a rich text field with support for code, you can either do that by
+using standard markdown with triple \` for example, or by clicking on the last icon, the same thing can be accomplished to datafiles in the datafile form. You can use either `{% DATASET_URL %}` or `{% DATAFILE_URL %`} to get the datafile and dataset url respectively
+
+![](./advanced_api_usage_dataset.png)
+![](./advanced_api_usage_datafile.png)
+
+These will show up in the API Tab for both dataset and datafile like so
+
+![](./advanced_api_usage_dataset_public.png)
+![](./advanced_api_usage_datafile_public.png)
+
 
 ### Extra fields 
 
