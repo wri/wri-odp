@@ -120,7 +120,7 @@ const QueryInstructions = () => {
                 url={ckanDatasetGetUrl}
             />
             <QueryEndpoint
-                description="Example on how to create a new Dataset"
+                description="Create a new Dataset"
                 method="POST"
                 url={`${publicCkanUrl}/api/3/action/package_create`}
                 headers={{
@@ -148,7 +148,7 @@ const QueryInstructions = () => {
 }`}
             />
             <QueryEndpoint
-                description="example on how to edit a Dataset"
+                description="Edit a Dataset"
                 method="POST"
                 url={`${publicCkanUrl}/api/3/action/package_patch`}
                 headers={{
@@ -289,7 +289,7 @@ const SnippetInstructions = ({
                 language={language}
             />
             <SnippetEndpoint
-                description="Example on how to create a new Dataset"
+                description="Create a new Dataset"
                 snippet={getSnippetFn(
                     `${ckanBaseUrl}/package_create`,
                     'POST',
@@ -321,7 +321,7 @@ const SnippetInstructions = ({
             />
 
             <SnippetEndpoint
-                description="Example on how to edit a Dataset"
+                description="Edit a Dataset"
                 snippet={getSnippetFn(
                     `${ckanBaseUrl}/package_patch`,
                     'POST',
