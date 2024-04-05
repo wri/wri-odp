@@ -29,7 +29,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          mask-password: 'true'
+          mask-password: "true"
       - name: Add CKAN url to hosts
         run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
       - name: Add Minio url to hosts
@@ -59,8 +59,8 @@ jobs:
           --build-arg CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
           --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
           --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
-          --build-arg NEXT_PUBLIC_GTM_ID='GTM-NPWKXNB5' \
-          --build-arg NEXT_PUBLIC_HOTJAR_ID='3904211' \
+          --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
+          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Build and push Datapusher image to ECR
@@ -83,7 +83,7 @@ jobs:
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
       - name: Set up Docker Containers
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          CKAN_IMAGE: "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}"
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
@@ -92,7 +92,7 @@ jobs:
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
-          wait-on: 'http://localhost:5000'
+          wait-on: "http://localhost:5000"
           wait-on-timeout: 120
           node-version: 18
           runTests: false
@@ -101,20 +101,20 @@ jobs:
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Set up Frontend Docker Container
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          CKAN_IMAGE: "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}"
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
       - name: Initialize the Extensions
         run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Print Logs
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          CKAN_IMAGE: "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}"
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and Frontend setup
         uses: cypress-io/github-action@v6
         with:
-          wait-on: 'http://localhost:3000'
+          wait-on: "http://localhost:3000"
           wait-on-timeout: 60
           node-version: 18
           runTests: false
@@ -147,7 +147,7 @@ jobs:
       - name: Print Error Logs
         if: failure()
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          CKAN_IMAGE: "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}"
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Copy run_unit_tests.sh
@@ -159,14 +159,14 @@ jobs:
         working-directory: ./ckan-backend-dev
       - name: Fix s3filestore test.ini for minio
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+          CKAN_IMAGE: "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}"
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
         working-directory: ./ckan-backend-dev
       - name: Initialize the pending datasets table
         run: docker exec ckan-wri sh -c "ckan -c production.ini pendingdatasetsdb"
       - name: Run Unit Tests 🧪
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+          CKAN_IMAGE: "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}"
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/run_unit_tests.sh"
         working-directory: ./ckan-backend-dev
       - name: Run Trivy Vulnerability Scanner for CKAN Container 🧪
@@ -175,26 +175,26 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_CKAN_REPO }}
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:dev-${{ github.sha }}'
-          format: 'sarif'
+          image-ref: "${{ env.REGISTRY }}/${{ env.REPOSITORY }}:dev-${{ github.sha }}"
+          format: "sarif"
           output: ckan-trivy-results.sarif
-          exit-code: '0'
+          exit-code: "0"
           ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
       - name: Run Trivy Vulnerability Scanner for Frontend Container 🧪
         uses: aquasecurity/trivy-action@master
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_FRONTEND_REPO }}
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:dev-${{ github.sha }}'
-          format: 'sarif'
+          image-ref: "${{ env.REGISTRY }}/${{ env.REPOSITORY }}:dev-${{ github.sha }}"
+          format: "sarif"
           output: frontend-trivy-results.sarif
-          exit-code: '0'
+          exit-code: "0"
           ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
       - name: Upload CKAN container Trivy scan results to GitHub Code scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
@@ -206,7 +206,7 @@ jobs:
           sarif_file: frontend-trivy-results.sarif
       - name: Tear down containers
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+          CKAN_IMAGE: "${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}"
         if: failure() || success()
         run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
         working-directory: ./ckan-backend-dev
@@ -229,7 +229,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          mask-password: 'true'
+          mask-password: "true"
       - name: Run Templater and update values.yaml
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -248,13 +248,13 @@ jobs:
           aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --role-arn ${{ secrets.KUBEROLE }}
           chmod 600 ~/.kube/config
         env:
-          GITHUB_SHA: '${{ github.sha }}'
+          GITHUB_SHA: "${{ github.sha }}"
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: install
-      - name: 'Deploy using Helm Upgrade'
+      - name: "Deploy using Helm Upgrade"
         run: |
           set -e
           helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./deployment/helm-templates -f ./deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait
