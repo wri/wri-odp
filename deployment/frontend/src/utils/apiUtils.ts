@@ -514,7 +514,7 @@ export async function getOneDataset(
         {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: env.SYS_ADMIN_API_KEY,
+                Authorization: session?.user.apikey ?? '',
             },
         }
     )
@@ -655,7 +655,7 @@ export async function getOnePendingDataset(
         `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
         {
             headers: {
-                Authorization: env.SYS_ADMIN_API_KEY,
+                Authorization: session?.user.apikey ?? '',
                 'Content-Type': 'application/json',
             },
         }
