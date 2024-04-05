@@ -58,6 +58,7 @@ export interface Resource {
     url?: string
     url_type?: string
     key?: string
+    advanced_api_usage?: string
     schema?: { value: DataDictionaryFormType }
     rw_id?: string
     layerObjRaw: APILayerSpec | null

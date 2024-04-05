@@ -11,6 +11,7 @@ import {
     FingerPrintIcon,
     LinkIcon,
     StarIcon,
+    TrophyIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { OpenIn, WriDataset } from '@/schema/ckan.schema'
@@ -44,6 +45,7 @@ import { useQuery } from 'react-query'
 import { RwDatasetResp, isRwError } from '@/interfaces/rw.interface'
 import { match } from 'ts-pattern'
 import Image from 'next/image'
+import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover'
 
 function OpenInButton({
     open_in,
@@ -641,7 +643,7 @@ export function DatasetHeader({
                             dataset?.featured_image !== '' &&
                             dataset?.featured_dataset && (
                                 <div className="flex gap-x-1">
-                                    <LinkIcon className="h-5 w-5 text-blue-800" />
+                                    <TrophyIcon className="h-5 w-5 text-blue-800" />
                                     <div>
                                         <div
                                             className={`whitespace-nowrap text-sm font-semibold text-neutral-700 ${highlighted(
@@ -650,7 +652,30 @@ export function DatasetHeader({
                                         >
                                             Requested to be featured
                                         </div>
-                                        <div className="text-sm font-light text-stone-900">
+                                        <div className="block lg:hidden text-sm font-light text-stone-900">
+                                            <Popover>
+                                                <PopoverTrigger>
+                                                    <span className="flex items-center gap-x-1">
+                                                        <span className="mt-1.5">
+                                                            Click here to
+                                                            preview
+                                                        </span>
+                                                    </span>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="p-1 w-64">
+                                                    <Image
+                                                        src={
+                                                            dataset?.featured_image
+                                                        }
+                                                        width={640}
+                                                        height={640}
+                                                        alt="featured image"
+                                                        className="w-64 h-64"
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+                                        <div className="hidden lg:block text-sm font-light text-stone-900">
                                             <DefaultTooltip
                                                 side="bottom"
                                                 content={

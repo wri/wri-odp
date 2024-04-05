@@ -120,7 +120,7 @@ const QueryInstructions = () => {
                 url={ckanDatasetGetUrl}
             />
             <QueryEndpoint
-                description="Example on how to create a new Dataset"
+                description="Create a new Dataset"
                 method="POST"
                 url={`${publicCkanUrl}/api/3/action/package_create`}
                 headers={{
@@ -148,7 +148,7 @@ const QueryInstructions = () => {
 }`}
             />
             <QueryEndpoint
-                description="example on how to edit a Dataset"
+                description="Edit a Dataset"
                 method="POST"
                 url={`${publicCkanUrl}/api/3/action/package_patch`}
                 headers={{
@@ -232,7 +232,6 @@ const UseCases = ({ usecases }: { usecases: string }) => {
     }, [highlighted])
     return (
         <div>
-            <h2 className="text-lg font-bold mb-5">Usecases</h2>
             <div
                 ref={divRef}
                 className="prose w-full max-w-7xl prose-sm prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base"
@@ -289,7 +288,7 @@ const SnippetInstructions = ({
                 language={language}
             />
             <SnippetEndpoint
-                description="Example on how to create a new Dataset"
+                description="Create a new Dataset"
                 snippet={getSnippetFn(
                     `${ckanBaseUrl}/package_create`,
                     'POST',
@@ -321,7 +320,7 @@ const SnippetInstructions = ({
             />
 
             <SnippetEndpoint
-                description="Example on how to edit a Dataset"
+                description="Edit a Dataset"
                 snippet={getSnippetFn(
                     `${ckanBaseUrl}/package_patch`,
                     'POST',

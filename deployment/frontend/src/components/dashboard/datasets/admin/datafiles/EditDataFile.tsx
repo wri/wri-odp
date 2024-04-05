@@ -3,6 +3,7 @@ import {
     GlobeAsiaAustraliaIcon,
     PaperClipIcon,
     MinusCircleIcon,
+    InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 import { UseFormReturn } from 'react-hook-form'
 import { DataFileAccordion } from './DatafileAccordion'
@@ -13,8 +14,7 @@ import { Tab } from '@headlessui/react'
 import { Fragment, useState } from 'react'
 import classNames from '@/utils/classnames'
 import { DataDictionaryTable } from './DataDictionaryTable'
-import { InputGroup } from '../metadata/InputGroup'
-import { ErrorDisplay } from '@/components/_shared/InputGroup'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { Input } from '@/components/_shared/SimpleInput'
 import FormatInput from './FormatInput'
@@ -28,6 +28,8 @@ import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import ViewsList from '@/components/views/ViewsList'
 import { WriDataset } from '@/schema/ckan.schema'
 import { DatafileLocation } from './DatafileLocation'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
 
 export function EditDataFile({
     remove,
@@ -351,6 +353,24 @@ export function EditDataFile({
                                                         name={`resources.${index}.format`}
                                                     />
                                                 </div>
+                                            </InputGroup>
+                                            <InputGroup
+                                                label={
+                                                    <span className="flex items-center gap-x-1">
+                                                        Advanced API Usage
+                                                        <DefaultTooltip content="This field will end up in the Datafile API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
+                                                            <InformationCircleIcon className="h-5 w-5" />
+                                                        </DefaultTooltip>
+                                                    </span>
+                                                }
+                                                className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                                            >
+                                                <SimpleEditor
+                                                    formObj={formObj}
+                                                    name={`resources.${index}.advanced_api_usage`}
+                                                    className="min-h-[320px]"
+                                                    defaultValue=""
+                                                />
                                             </InputGroup>
                                             <DatafileLocation
                                                 formObj={formObj}

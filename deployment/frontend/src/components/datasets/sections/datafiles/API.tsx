@@ -4,7 +4,7 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 })
 import { Tab } from '@headlessui/react'
 import { BookOpenIcon } from '@heroicons/react/24/outline'
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import classNames from '@/utils/classnames'
 import { env } from '@/env.mjs'
 import { Resource } from '@/interfaces/dataset.interface'
@@ -16,6 +16,16 @@ import {
     getRSnippet,
     RwMoreInfo,
 } from '../APIEndpoint'
+import hljs from 'highlight.js/lib/core'
+
+import python from 'highlight.js/lib/languages/python'
+import js from 'highlight.js/lib/languages/javascript'
+import r from 'highlight.js/lib/languages/r'
+
+hljs.registerLanguage('python', python)
+hljs.registerLanguage('javascript', js)
+hljs.registerLanguage('r', r)
+
 
 export function MoreInfo() {
     return (
@@ -23,7 +33,7 @@ export function MoreInfo() {
             <div className="font-acumin text-base font-normal text-zinc-800">
                 For more information on the CKAN API, see the{' '}
                 <a
-                    href="https://docs.ckan.org/en/2.9/api/index.html"
+                    href="https://docs.ckan.org/en/2.10/api/index.html"
                     target="_blank"
                     rel="noreferrer"
                     className=" text-blue-700 italic underline"
@@ -32,7 +42,7 @@ export function MoreInfo() {
                 </a>{' '}
                 and for Datastore API see the{' '}
                 <a
-                    href="https://docs.ckan.org/en/2.9/maintaining/datastore.html"
+                    href="https://docs.ckan.org/en/2.10/maintaining/datastore.html"
                     target="_blank"
                     rel="noreferrer"
                     className=" text-blue-700 italic underline"
@@ -105,6 +115,22 @@ function OpenInModal({
                                 )}
                             </Tab>
                         ))}
+                        {datafile.advanced_api_usage && (
+                            <Tab key="Usecases" as={Fragment}>
+                                {({ selected }: { selected: boolean }) => (
+                                    <button
+                                        className={classNames(
+                                            selected
+                                                ? 'rounded-sm border-b border-wri-green bg-white'
+                                                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                                            'h-full whitespace-nowrap px-8 text-center text-base font-normal capitalize text-neutral-800'
+                                        )}
+                                    >
+                                        Advanced API Usage
+                                    </button>
+                                )}
+                            </Tab>
+                        )}
                     </Tab.List>
                     <Tab.Panels
                         as="div"
@@ -134,6 +160,16 @@ function OpenInModal({
                                 getSnippetFn={getRSnippet}
                             />
                         </Tab.Panel>
+                        {datafile.advanced_api_usage && (
+                            <Tab.Panel as="div" className="py-6 overflow-clip">
+                                <AdvancedApiUsage
+                                    advancedApiUsage={
+                                        datafile.advanced_api_usage
+                                    }
+                                    datafileId={datafile.id}
+                                />
+                            </Tab.Panel>
+                        )}
                     </Tab.Panels>
                 </Tab.Group>
             </div>
@@ -141,6 +177,44 @@ function OpenInModal({
     )
 }
 
+const AdvancedApiUsage = ({
+    advancedApiUsage,
+    datafileId,
+}: {
+    advancedApiUsage: string
+    datafileId: string
+}) => {
+    const [highlighted, setHighlighted] = useState(false)
+    const divRef = useRef<HTMLDivElement | null>(null)
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    publicCkanUrl = publicCkanUrl.endsWith('/')
+        ? publicCkanUrl.slice(0, -1)
+        : publicCkanUrl
+
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
+    const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafileId}`
+
+    useEffect(() => {
+        if (!highlighted && divRef.current) {
+            setHighlighted(true)
+            hljs.highlightAll()
+        }
+    }, [highlighted])
+    return (
+        <div>
+            <div
+                ref={divRef}
+                className="prose w-full max-w-7xl prose-sm prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base"
+                dangerouslySetInnerHTML={{
+                    __html: advancedApiUsage.replaceAll(
+                        '{% DATAFILE_URL %}',
+                        ckanResourcGetUrl
+                    ),
+                }}
+            ></div>
+        </div>
+    )
+}
 const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
     let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
     publicCkanUrl = publicCkanUrl.endsWith('/')
