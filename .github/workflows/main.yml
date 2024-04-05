@@ -68,8 +68,8 @@ jobs:
           --build-arg CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
           --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
           --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.STAGING_FRONTEND_NEXTAUTH_URL }} \
-          --build-arg NEXT_PUBLIC_GTM_ID='GTM-NPWKXNB5' \
-          --build-arg NEXT_PUBLIC_HOTJAR_ID='3904211' \
+          --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.STAGING_NEXT_PUBLIC_GTM_ID }} \
+          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.STAGING_NEXT_PUBLIC_HOTJAR_ID }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Build and push Datapusher image to ECR
