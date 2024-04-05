@@ -42,7 +42,6 @@ describe("Chart view", () => {
       },
     },
     () => {
-      cy.logout();
       cy.visit(`/datasets/${datasetName}`);
       cy.contains("Dataset not found")
     },
