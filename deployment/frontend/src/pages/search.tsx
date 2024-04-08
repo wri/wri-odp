@@ -11,15 +11,19 @@ import superjson from 'superjson'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import { appRouter } from '@/server/api/root'
 import { getServerAuthSession } from '@/server/auth'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 
-const ErrorAlert = dynamic<{ text: string; title?: string; }>(
-    () => import('@/components/_shared/Alerts').then(module => module.ErrorAlert), {
+const ErrorAlert = dynamic<{ text: string; title?: string }>(
+    () =>
+        import('@/components/_shared/Alerts').then(
+            (module) => module.ErrorAlert
+        ),
+    {
         ssr: false,
-});
+    }
+)
 
-const Recent = dynamic(()=> import('@/components/Recent'))
-    
+const Recent = dynamic(() => import('@/components/Recent'))
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
@@ -28,35 +32,29 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-
-    await helpers.dataset.getAllDataset.prefetch({
-        search: '',
-        page: { rows: 8, start: 0 },
-        sortBy: 'metadata_created desc',
-    })
-
-    await helpers.dataset.getAllDataset.prefetch({
-        search: '',
-        page: { rows: 8, start: 0 },
-        sortBy: 'metadata_modified desc',
-    })
-
     await helpers.dataset.getFeaturedDatasets.prefetch({
         search: '',
-        page: { start: 0, rows: 100 },
+        page: { start: 0, rows: 8 },
         sortBy: 'metadata_modified desc',
         _isUserSearch: false,
+        removeUnecessaryDataInResources: true,
     })
-
-
+    await helpers.dataset.getAllDataset.prefetch({
+        search: '',
+        page: { start: 0, rows: 8 },
+        sortBy: 'metadata_created desc',
+        removeUnecessaryDataInResources: true,
+    })
     return {
         props: {
-             trpcState: helpers.dehydrate(),
+            trpcState: helpers.dehydrate(),
         },
     }
 }
 
-export default function SearchPage( props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function SearchPage(
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
     const {
         data: recentlyAdded,
         isLoading: isLoadingRecentlyAdded,
@@ -65,6 +63,7 @@ export default function SearchPage( props: InferGetServerSidePropsType<typeof ge
         search: '',
         page: { rows: 8, start: 0 },
         sortBy: 'metadata_created desc',
+        removeUnecessaryDataInResources: true,
     })
 
     const {
@@ -75,6 +74,7 @@ export default function SearchPage( props: InferGetServerSidePropsType<typeof ge
         search: '',
         page: { rows: 8, start: 0 },
         sortBy: 'metadata_modified desc',
+        removeUnecessaryDataInResources: true,
     })
 
     return (

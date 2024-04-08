@@ -56,11 +56,23 @@ function TeamMember({ name, img, title, email, highlighted }: TeamMemberProps) {
                 </div>
             </div>
             <div className="col-span-2 flex flex-col justify-center font-acumin sm:ml-2">
-                <div className='text-sm font-semibold text-black'>
-                    {title}
+                <div className="text-sm font-semibold text-black">{title}</div>
+                <div
+                    className={classNames(
+                        'text-sm font-normal text-black',
+                        highlighted('')
+                    )}
+                >
+                    {name}
                 </div>
-                <div className={classNames("text-sm font-normal text-black", highlighted(''))}>{name}</div>
-                <div className={classNames("text-sm font-normal text-black", highlighted('_email'))}>{email}</div>
+                <div
+                    className={classNames(
+                        'text-sm font-normal text-black',
+                        highlighted('_email')
+                    )}
+                >
+                    {email}
+                </div>
             </div>
         </div>
     )

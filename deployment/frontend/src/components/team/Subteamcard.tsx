@@ -33,7 +33,9 @@ export default function Subteamcard({
                     className="object-contain"
                 />
             </div>
-            <div className="text-black text-lg font-normal line-clamp-1">{team.title}</div>
+            <div className="text-black text-lg font-normal line-clamp-1">
+                {team.title}
+            </div>
             <div className="text-black text-sm font-normal">
                 {teamsDetails[team.id]?.package_count} Datasets
             </div>

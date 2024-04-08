@@ -38,9 +38,11 @@ export function BuildALayer({
                       formObj.getValues(`resources.${index}.layerObj`)
                   ).success
                       ? formObj.getValues(`resources.${index}.layerObj`)
-                      : (layerSchema.safeParse(
-                            formObj.getValues(`resources.${index}.layerObj`)
-                        ) as SafeParseSuccess<any>).data
+                      : (
+                            layerSchema.safeParse(
+                                formObj.getValues(`resources.${index}.layerObj`)
+                            ) as SafeParseSuccess<any>
+                        ).data
               )
             : null
     )
@@ -236,7 +238,6 @@ export function PreviewMap({
     }) => {
         setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat })
         const layersInfo = []
-        console.log('LAYERS INSIDE ON CLICK', layers)
         for (let layer of layers) {
             const feature = features?.find(
                 //  @ts-ignore
@@ -244,7 +245,6 @@ export function PreviewMap({
             )
             const { interactionConfig } = layer
 
-            console.log('FOUND INTERACTION CONFIG', interactionConfig)
             const layerInfo = {
                 id: layer.id,
                 name: layer.name ?? 'sample-name',

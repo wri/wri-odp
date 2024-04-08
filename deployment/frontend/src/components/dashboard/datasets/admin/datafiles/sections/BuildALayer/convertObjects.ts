@@ -375,7 +375,7 @@ export const getApiSpecFromRawObj = (rawLayerFormObj: RawLayerFormType) => {
         }
         return apiSpec
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw new Error('Could not convert to layer object')
     }
 }

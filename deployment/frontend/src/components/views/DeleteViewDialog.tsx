@@ -1,8 +1,8 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { Dialog } from '@headlessui/react'
 import { Dispatch, SetStateAction } from 'react'
 import { Button, LoaderButton } from '@/components/_shared/Button'
@@ -40,7 +40,7 @@ export default function DeleteViewDialog({
                         onDelete()
                     },
                     onError: (e) => {
-                        console.log(e)
+                        console.error(e)
                         toast('Failed to delete view', {
                             type: 'error',
                         })
@@ -62,7 +62,6 @@ export default function DeleteViewDialog({
                         onDelete()
                     },
                     onError: (e) => {
-                        console.log(e)
                         toast('Failed to delete view', {
                             type: 'error',
                         })

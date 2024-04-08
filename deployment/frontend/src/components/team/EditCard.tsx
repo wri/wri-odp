@@ -17,7 +17,6 @@ export default function EditCard({
     teamName: string
 }) {
     if (isLoading) return <Spinner className="mx-auto" />
-    console.log('get here')
     let user = orgDetails?.users?.find((user) => user.name === userName)
 
     if (user) {

@@ -154,6 +154,7 @@ export const datasetFormFieldmap: Record<string, string> = {
     function: 'Function',
     cautions: 'Cautions',
     methodology: 'Methodology',
+    usecases: 'Advanced API Usage',
     restrictions: 'Restrictions',
     reason_for_adding: 'Reason for adding',
     owner_org: 'Team',

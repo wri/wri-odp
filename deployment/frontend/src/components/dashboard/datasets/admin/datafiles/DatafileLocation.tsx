@@ -13,7 +13,7 @@ import { Layer, Map, Source } from 'react-map-gl'
 import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner'
 import { UseFormReturn } from 'react-hook-form'
-import * as turf from "@turf/turf"
+import * as turf from '@turf/turf'
 
 export function DatafileLocation({
     formObj,
@@ -73,7 +73,6 @@ export function DatafileLocation({
         reader.addEventListener('load', (event) => {
             setIsLoadingGeoJSON(false)
             try {
-
                 const json = JSON.parse(event?.target?.result as string)
                 const geojsonType = json?.type
 
@@ -89,9 +88,9 @@ export function DatafileLocation({
                     geometries.push(json)
                 }
 
-                let union = geometries[0];
+                let union = geometries[0]
                 let i
-                for(i = 1; i < geometries.length; i++) {
+                for (i = 1; i < geometries.length; i++) {
                     union = turf.union(union, geometries[i])
                 }
 
@@ -99,7 +98,7 @@ export function DatafileLocation({
 
                 setValue(`resources.${index}.spatial_geom`, union)
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 notify('Failed to parse GeoJSON file', 'error')
             }
         })

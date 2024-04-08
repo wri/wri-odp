@@ -106,7 +106,7 @@ export async function searchHierarchy({
 
         return groups
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw new Error(e as string)
     }
 }
@@ -514,7 +514,7 @@ export async function getOneDataset(
         {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: env.SYS_ADMIN_API_KEY,
+                Authorization: session?.user.apikey ?? '',
             },
         }
     )
@@ -564,7 +564,7 @@ export async function getOneDataset(
         try {
             spatial = JSON.parse(dataset.result.spatial)
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }
    
@@ -655,7 +655,7 @@ export async function getOnePendingDataset(
         `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
         {
             headers: {
-                Authorization: env.SYS_ADMIN_API_KEY,
+                Authorization: session?.user.apikey ?? '',
                 'Content-Type': 'application/json',
             },
         }
@@ -736,7 +736,7 @@ export async function getOnePendingDataset(
         try {
             spatial = JSON.parse(dataset.spatial)
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }
 
@@ -2373,7 +2373,7 @@ export async function approvePendingDataset(
                 action: 'approved_dataset',
             })
         } catch (error) {
-            console.log(error)
+            console.error(error)
             throw Error('Error in sending issue /comment notification')
         }
     }
@@ -2457,6 +2457,7 @@ export const datasetFields = [
     'spatial_address',
     'spatial_type',
     'methodology',
+    'usecases',
     'cautions',
     'function',
     'release_notes',

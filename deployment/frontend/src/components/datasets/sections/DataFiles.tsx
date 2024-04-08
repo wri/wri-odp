@@ -6,6 +6,7 @@ import {
     ArrowDownCircleIcon,
     ArrowPathIcon,
     FingerPrintIcon,
+    GlobeAmericasIcon,
     MagnifyingGlassIcon,
     MapPinIcon,
     PaperAirplaneIcon,
@@ -16,7 +17,14 @@ import { OpenInButton } from './datafiles/OpenIn'
 import { Resource, View } from '@/interfaces/dataset.interface'
 import { getFormatColor } from '@/utils/formatColors'
 import { Index } from 'flexsearch'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import {
+    Fragment,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react'
 import { WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
@@ -40,12 +48,16 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/_shared/Popover'
+import { SearchIcon } from '@/components/_shared/icons/SearchIcon'
+import GlobalError from 'next/dist/client/components/error-boundary'
 
 export function LocationSearch({
     geojsons,
     formObj,
+    open,
 }: {
     geojsons: any[]
+    open: boolean
     formObj: UseFormReturn<LocationSearchFormType>
 }) {
     const { setValue } = formObj
@@ -87,13 +99,19 @@ export function LocationSearch({
         }
     }, [])
 
+    useEffect(() => {
+        if (mapRef.current && open) {
+            mapRef.current.resize()
+        }
+    }, [mapRef.current, open])
+
     return (
         <Map
             ref={(_map) => {
                 if (_map) mapRef.current = _map.getMap() as unknown as MapRef
             }}
             mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
-            style={{ height: 300, width: '100%' }}
+            style={{ height: 300 }}
             mapStyle="mapbox://styles/mapbox/streets-v9"
         >
             <GeocoderControl
@@ -132,7 +150,7 @@ export function LocationSearch({
                 controls={{
                     polygon: true,
                 }}
-                defaultMode="draw_polygon"
+                defaultMode="simple_select"
                 onCreate={onUpdate}
                 onUpdate={onUpdate}
                 onDelete={() => {
@@ -170,7 +188,6 @@ export function DataFiles({
     isCurrentVersion?: boolean
     diffFields: Array<Record<string, { old_value: string; new_value: string }>>
 }) {
-    console.log(diffFields)
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
         useActiveLayerGroups()
     const { data: activeLayers } = useLayersFromRW()
@@ -195,8 +212,8 @@ export function DataFiles({
     const filteredDatafilesByName =
         q !== ''
             ? datafiles?.filter((datafile) =>
-                index.search(q).includes(datafile.id)
-            )
+                  index.search(q).includes(datafile.id)
+              )
             : datafiles
     const filteredDatafilesIds = filteredDatafilesByName?.map((df) => df.id)
     const filteredDatafiles = searchedResources
@@ -246,79 +263,119 @@ export function DataFiles({
                     placeholder="Search datafiles by title or description"
                 />
                 <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
-                <LocationSearch geojsons={geojsons} formObj={formObj} />
-            </div>
-            <div className="flex justify-between pb-1 lg:flex-col xl:flex-row">
-                <span className="font-acumin text-base font-normal text-black">
-                    {filteredDatafiles?.length ?? 0} Data Files
-                </span>
-                <div className="flex gap-x-4 lg:justify-end">
-                    {datafilesToDownload.length !==
-                        uploadedDatafiles.length && (
-                            <button
-                                onClick={() =>
-                                    setDatafilesToDownload(uploadedDatafiles)
-                                }
-                                className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                <Disclosure>
+                    {({ open }) => (
+                        <>
+                            <Disclosure.Button as={Fragment}>
+                                <Button className="my-2 ml-auto group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
+                                    {open ? 'Hide' : 'Show'} Location Search
+                                    <GlobeAmericasIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
+                                </Button>
+                            </Disclosure.Button>
+                            <Disclosure.Panel
+                                unmount={false}
+                                className="py-3 w-full"
                             >
-                                Select all datafiles
-                            </button>
-                        )}
-                    {!filteredDatafilesEqualToDownloadDatafiles() &&
-                        datafilesToDownload.length !==
-                        uploadedDatafiles.length && (
-                            <button
-                                onClick={() =>
-                                    setDatafilesToDownload(
-                                        filteredUploadedDatafiles
-                                    )
-                                }
-                                className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                            >
-                                Select all filtered datafiles
-                            </button>
-                        )}
-                    {datafilesToDownload.length > 0 && (
-                        <button
-                            onClick={() => setDatafilesToDownload([])}
-                            className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                        >
-                            Unselect all datafiles
-                        </button>
+                                <LocationSearch
+                                    open={open}
+                                    geojsons={geojsons}
+                                    formObj={formObj}
+                                />
+                            </Disclosure.Panel>
+                        </>
                     )}
-                    <button
-                        onClick={() => {
-                            dataset.resources.forEach((r) => {
-                                if (
-                                    r.format == 'Layer' &&
-                                    // @ts-ignore
-                                    !activeLayers.some((l) => l.id == r?.rw_id)
-                                ) {
-                                    // @ts-ignore
-                                    addLayerToLayerGroup(r.rw_id, dataset.id)
-                                }
-                            })
-                        }}
-                        className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                    >
-                        Show All Layers
-                    </button>
-                    <button
-                        className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                        onClick={() => {
-                            dataset.resources.forEach((r) => {
-                                if (r.format == 'Layer') {
-                                    removeLayerFromLayerGroup(
-                                        // @ts-ignore
-                                        r.rw_id,
-                                        dataset.id
-                                    )
-                                }
-                            })
-                        }}
-                    >
-                        Hide All
-                    </button>
+                </Disclosure>
+            </div>
+            <span className="font-acumin text-base font-normal text-black">
+                {filteredDatafiles?.length ?? 0} Data Files
+            </span>
+            <div className="flex justify-end pb-1 lg:flex-col xl:flex-row">
+                <div className="flex gap-x-4 lg:justify-end">
+                    {datafiles.some((r) => r.url_type === 'upload') && (
+                        <>
+                            {' '}
+                            {datafilesToDownload.length !==
+                                uploadedDatafiles.length && (
+                                <button
+                                    onClick={() =>
+                                        setDatafilesToDownload(
+                                            uploadedDatafiles
+                                        )
+                                    }
+                                    className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                                >
+                                    Select all datafiles
+                                </button>
+                            )}
+                            {!filteredDatafilesEqualToDownloadDatafiles() &&
+                                datafilesToDownload.length !==
+                                    uploadedDatafiles.length && (
+                                    <button
+                                        onClick={() =>
+                                            setDatafilesToDownload(
+                                                filteredUploadedDatafiles
+                                            )
+                                        }
+                                        className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                                    >
+                                        Select all filtered datafiles
+                                    </button>
+                                )}
+                            {datafilesToDownload.length > 0 && (
+                                <button
+                                    onClick={() => setDatafilesToDownload([])}
+                                    className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                                >
+                                    Unselect all datafiles
+                                </button>
+                            )}
+                        </>
+                    )}
+                    {datafiles.some(
+                        (r) =>
+                            r.url_type === 'layer' || r.url_type === 'layer-raw'
+                    ) && (
+                        <>
+                            <button
+                                onClick={() => {
+                                    dataset.resources.forEach((r) => {
+                                        if (
+                                            r.format == 'Layer' &&
+                                            r.rw_id &&
+                                            // @ts-ignore
+                                            !activeLayers.some(
+                                                (l) => l.id == r?.rw_id
+                                            )
+                                        ) {
+                                            addLayerToLayerGroup(
+                                                r.rw_id ?? '',
+                                                dataset.id
+                                            )
+                                        }
+                                    })
+                                }}
+                                className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                            >
+                                Show All Layers
+                            </button>
+                            <button
+                                className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                                onClick={() => {
+                                    dataset.resources.forEach((r) => {
+                                        if (r.format == 'Layer') {
+                                            removeLayerFromLayerGroup(
+                                                // @ts-ignore
+                                                r.rw_id,
+                                                dataset.id
+                                            )
+                                        }
+                                    })
+                                }}
+                            >
+                                Hide All Layers
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
             {datafilesToDownload.length > 0 && (
@@ -332,8 +389,8 @@ export function DataFiles({
             )}
             <div className="flex flex-col gap-y-4">
                 {isLoadingLocationSearch &&
-                    (formObj.watch('bbox') !== null ||
-                        formObj.watch('point') !== null) ? (
+                (formObj.watch('bbox') !== null ||
+                    formObj.watch('point') !== null) ? (
                     <div className="flex h-20">
                         <svg
                             className={classNames('h-5 w-5 animate-spin mr-2')}
@@ -396,7 +453,9 @@ export function DataFiles({
                         .filter(Boolean) as string[]
                 }
                 dataset_id={dataset.id}
-                resource_name={datafilesToDownload.map((r) => r.title || r.name).join(",")}
+                resource_name={datafilesToDownload
+                    .map((r) => r.title || r.name)
+                    .join(',')}
                 open={open}
                 setOpen={setOpen}
             />
@@ -520,13 +579,14 @@ function DatafileCard({
                             )}
                             <Disclosure.Button>
                                 <h3
-                                    className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${datafile.title
+                                    className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${
+                                        datafile.title
                                             ? higlighted(
-                                                'title',
-                                                datafile.title
-                                            )
+                                                  'title',
+                                                  datafile.title
+                                              )
                                             : higlighted('name', datafile.name!)
-                                        }`}
+                                    }`}
                                 >
                                     {datafile.title ?? datafile.name}
                                 </h3>
@@ -604,7 +664,7 @@ function DatafileCard({
                             {datafile.datastore_active && (
                                 <>
                                     {tabularResource &&
-                                        tabularResource.id === datafile.id ? (
+                                    tabularResource.id === datafile.id ? (
                                         <Button
                                             variant="outline"
                                             size="sm"
@@ -684,18 +744,19 @@ function DatafileCard({
                                 aria-label="expand"
                             >
                                 <ChevronDownIcon
-                                    className={`${open
+                                    className={`${
+                                        open
                                             ? 'rotate-180 transform  transition'
                                             : ''
-                                        } h-5 w-5 text-stone-900`}
+                                    } h-5 w-5 text-stone-900`}
                                 />
                             </Disclosure.Button>
                         </div>
-                        <Popover >
+                        <Popover>
                             <PopoverTrigger className="sm:hidden">
                                 <PlusCircleIcon className="h-5 w-5 sm:h-9 sm:w-9" />
                             </PopoverTrigger>
-                            <PopoverContent className='w-fit flex flex-col'>
+                            <PopoverContent className="w-fit flex flex-col">
                                 {datafile?.rw_id && (
                                     <>
                                         {activeLayers.some(
@@ -755,7 +816,7 @@ function DatafileCard({
                                 {datafile.datastore_active && (
                                     <>
                                         {tabularResource &&
-                                            tabularResource.id === datafile.id ? (
+                                        tabularResource.id === datafile.id ? (
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -846,13 +907,14 @@ function DatafileCard({
                     >
                         <Disclosure.Panel className="py-3">
                             <p
-                                className={`font-acumin text-base font-light text-stone-900 ${datafile.description
+                                className={`font-acumin text-base font-light text-stone-900 ${
+                                    datafile.description
                                         ? higlighted(
-                                            'description',
-                                            datafile.description
-                                        )
+                                              'description',
+                                              datafile.description
+                                          )
                                         : ''
-                                    }`}
+                                }`}
                             >
                                 {datafile.description ?? 'No Description'}
                             </p>
@@ -895,7 +957,7 @@ function DownloadModal({
     setOpen,
     dataset_id,
     keys,
-    resource_name
+    resource_name,
 }: {
     open: boolean
     setOpen: (open: boolean) => void
@@ -958,7 +1020,7 @@ function DownloadModal({
                                             setOpen(false)
                                         },
                                         onError: (err) => {
-                                            console.log(err)
+                                            console.error(err)
 
                                             toast('Failed to request file', {
                                                 type: 'error',
@@ -968,7 +1030,7 @@ function DownloadModal({
                                 )
                             },
                             (err) => {
-                                console.log(err)
+                                console.error(err)
                                 toast('Failed to request file', {
                                     type: 'error',
                                 })

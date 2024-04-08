@@ -11,6 +11,7 @@ import {
     FingerPrintIcon,
     LinkIcon,
     StarIcon,
+    TrophyIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { OpenIn, WriDataset } from '@/schema/ckan.schema'
@@ -23,10 +24,10 @@ import { DefaultTooltip } from '../_shared/Tooltip'
 import { PencilSquareIcon } from '@heroicons/react/24/solid'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { LoaderButton } from '@/components/_shared/Button'
 import { Dialog } from '@headlessui/react'
 import { useState } from 'react'
@@ -40,10 +41,11 @@ import { useToggleLayergroups } from '@/utils/storeHooks'
 import { useActiveCharts } from '@/utils/storeHooks'
 import { View } from '@/interfaces/dataset.interface'
 import ChartViewIcon from './view-icons/ChartViewIcon'
-import Highlights from '../Highlights'
 import { useQuery } from 'react-query'
-import { RwDatasetResp, RwResponse, isRwError } from '@/interfaces/rw.interface'
+import { RwDatasetResp, isRwError } from '@/interfaces/rw.interface'
 import { match } from 'ts-pattern'
+import Image from 'next/image'
+import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover'
 
 function OpenInButton({
     open_in,
@@ -56,12 +58,17 @@ function OpenInButton({
     if (open_in.length === 0) return <></>
     if (open_in.length === 1 && !session.data?.user) {
         return (
-            <Button>
-                <a href={open_in[0]?.url} target="_blank" rel="noreferrer">
-                    Open in {open_in[0]?.title}
-                    <ArrowUpRightIcon className="mb-1 h-6 w-6" />
-                </a>
-            </Button>
+            <a
+                href={open_in[0]?.url}
+                target="_blank"
+                rel="noreferrer"
+                id="openin"
+                className="inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 max-w-[800px]
+                bg-amber-400 text-stone-900 font-bold font-acumin hover:bg-yellow-500 h-11 px-6 py-4 rounded-[3px] text-base"
+            >
+                Open in {open_in[0]?.title}
+                <ArrowUpRightIcon className="mb-1 h-6 w-6" />
+            </a>
         )
     }
     if (open_in.length === 1 && session.data?.user) {
@@ -70,6 +77,7 @@ function OpenInButton({
                 href={open_in[0]?.url}
                 target="_blank"
                 rel="noreferrer"
+                id="openin"
                 className="flex gap-x-2 items-center text-center text-stone-900 text-base font-bold font-acumin"
             >
                 Open in {open_in[0]?.title}
@@ -119,6 +127,7 @@ function OpenInButton({
                             <Menu.Item key={item.url}>
                                 {({ active }) => (
                                     <a
+                                        id="openin"
                                         href={item.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -400,7 +409,7 @@ export function DatasetHeader({
                                 side="bottom"
                             >
                                 <button
-                                    aria-label='remove from favorites'     
+                                    aria-label="remove from favorites"
                                     className="p-0 m-0 "
                                     onClick={() => setFOpen(true)}
                                 >
@@ -413,7 +422,7 @@ export function DatasetHeader({
                                 side="bottom"
                             >
                                 <button
-                                    aria-label='add to favorite'
+                                    aria-label="add to favorite"
                                     className="p-0 m-0 "
                                     onClick={() => setOpen(true)}
                                 >
@@ -423,9 +432,9 @@ export function DatasetHeader({
                         )}
 
                         <DefaultTooltip content="Edit" side="bottom">
-                                <Link
-                                    aria-label='edit dataset'
-                                    href={`/dashboard/datasets/${dataset?.name}/edit`}
+                            <Link
+                                aria-label="edit dataset"
+                                href={`/dashboard/datasets/${dataset?.name}/edit`}
                             >
                                 <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
                             </Link>
@@ -629,6 +638,69 @@ export function DatasetHeader({
                                 </div>
                             </div>
                         </div>
+                        {session.data?.user &&
+                            dataset?.featured_image &&
+                            dataset?.featured_image !== '' &&
+                            dataset?.featured_dataset && (
+                                <div className="flex gap-x-1">
+                                    <TrophyIcon className="h-5 w-5 text-blue-800" />
+                                    <div>
+                                        <div
+                                            className={`whitespace-nowrap text-sm font-semibold text-neutral-700 ${highlighted(
+                                                'featured_image'
+                                            )}`}
+                                        >
+                                            Requested to be featured
+                                        </div>
+                                        <div className="block lg:hidden text-sm font-light text-stone-900">
+                                            <Popover>
+                                                <PopoverTrigger>
+                                                    <span className="flex items-center gap-x-1">
+                                                        <span className="mt-1.5">
+                                                            Click here to
+                                                            preview
+                                                        </span>
+                                                    </span>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="p-1 w-64">
+                                                    <Image
+                                                        src={
+                                                            dataset?.featured_image
+                                                        }
+                                                        width={640}
+                                                        height={640}
+                                                        alt="featured image"
+                                                        className="w-64 h-64"
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+                                        <div className="hidden lg:block text-sm font-light text-stone-900">
+                                            <DefaultTooltip
+                                                side="bottom"
+                                                content={
+                                                    <Image
+                                                        src={
+                                                            dataset?.featured_image
+                                                        }
+                                                        width={640}
+                                                        height={640}
+                                                        alt="featured image"
+                                                        className="w-64 h-64"
+                                                    />
+                                                }
+                                            >
+                                                <span className="flex items-center gap-x-1">
+                                                    <InformationCircleIcon className="h-5 w-5 text-blue-800" />
+                                                    <span className="mt-1.5">
+                                                        Preview image here
+                                                    </span>
+                                                </span>
+                                            </DefaultTooltip>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         {dataset?.temporal_coverage_start ||
                         dataset?.temporal_coverage_end ? (
                             <div className="flex gap-x-1">
@@ -698,7 +770,7 @@ export function DatasetHeader({
                         ''
                     )}
                     {session.data?.user ? (
-                        dataset?.technical_notes ? (
+                        dataset?.technical_notes && (
                             <div
                                 className={classNames(
                                     'flex items-center rounded-[3px] border border-green-500 bg-green-800',
@@ -710,20 +782,6 @@ export function DatasetHeader({
                             >
                                 <div className="px-2 font-acumin text-xs font-medium text-white">
                                     RDI approved
-                                </div>
-                            </div>
-                        ) : (
-                            <div
-                                className={classNames(
-                                    'flex items-center rounded-[3px] border border-orange-400 bg-orange-800',
-                                    highlighted('technical_notes'),
-                                    highlighted('technical_notes') !== ''
-                                        ? 'border-yellow-200'
-                                        : ''
-                                )}
-                            >
-                                <div className="px-2 font-acumin text-xs font-medium text-white">
-                                    Awaiting RDI approval
                                 </div>
                             </div>
                         )
