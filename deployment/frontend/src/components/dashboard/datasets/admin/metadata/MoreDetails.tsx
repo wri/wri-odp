@@ -101,11 +101,15 @@ export function MoreDetailsForm({
                     </InputGroup>
                     <InputGroup
                         label={
-                            <span className="flex items-center gap-x-1">
+                            <span className="relative flex items-center gap-x-1">
                                 Advanced API Usage
-                                <DefaultTooltip content="This field will end up next to the API tab in the dataset page, you can use it to provide code samples that are useful for this particular data">
-                                    <InformationCircleIcon className="h-5 w-5" />
-                                </DefaultTooltip>
+                                    <DefaultTooltip
+                                        contentClassName="max-w-sm whitespace-normal lg:max-w-xl"
+                                        side="right"
+                                        content="This field will end up next to the API tab in the dataset page, you can use it to provide code samples that are useful for this particular data, the string {% DATASET_URL %} will get replaced with the actual url for this particular dataset"
+                                    >
+                                        <InformationCircleIcon className="h-5 w-5" />
+                                    </DefaultTooltip>
                             </span>
                         }
                         className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
