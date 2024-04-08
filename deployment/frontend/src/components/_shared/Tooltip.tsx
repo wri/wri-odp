@@ -43,10 +43,10 @@ const DefaultTooltip = ({
             <Tooltip>
                 <TooltipTrigger asChild>{children}</TooltipTrigger>
                 <TooltipContent
-                    className={`bg-white z-[10000] ${contentClassName}`}
+                    className={`bg-white whitespace-normal z-[10000] ${contentClassName}`}
                     side={side}
                 >
-                    <p>{content}</p>
+                    <p className='text-wrap max-w-sm'>{content}</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
