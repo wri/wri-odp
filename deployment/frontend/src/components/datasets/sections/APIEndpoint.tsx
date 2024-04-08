@@ -11,12 +11,14 @@ export const QueryEndpoint = ({
     method = 'GET',
     body = '',
     lang = '',
+    headers = {},
 }: {
     description: string
     url: string
     method?: string
     body?: string
     lang?: string
+    headers?: Record<string, string>
 }) => {
     return (
         <div className="mb-10 pr-5">
@@ -42,6 +44,16 @@ export const QueryEndpoint = ({
                     </div>
                 </div>
             </div>
+            {Object.keys(headers).length > 0 && (
+                <div className="mb-4 bg-slate-50 p-4">
+                    {Object.entries(headers).map(([key, value]) => (
+                        <div key={key} className="flex items-center mt-2">
+                            <div className="font-medium mr-2">{key}:</div>
+                            <div>{value}</div>
+                        </div>
+                    ))}
+                </div>
+            )}
             {body && body != '' && (
                 <div className="relative">
                     <div className="absolute right-5 top-5">
@@ -59,11 +71,11 @@ export const QueryEndpoint = ({
 export const SnippetEndpoint = ({
     description,
     snippet,
-    language
+    language,
 }: {
     description: string
     snippet: string
-    language: "javascript" | "python" | "r"
+    language: 'javascript' | 'python' | 'r'
 }) => {
     return (
         <div className="mb-10 pr-5">
@@ -88,6 +100,7 @@ const CopyButton = ({ content }: { content: string }) => {
     return (
         <DefaultTooltip content="Copy to clipboard">
             <Button
+                aria-label="copy button"
                 className=" h-auto rounded-full p-2"
                 onClick={() => {
                     navigator.clipboard.writeText(content)
@@ -107,7 +120,11 @@ export const getJsSnippet = (
     return `const response = await fetch(
     \`${url}\`, 
     { 
-        method: "${method}",${body ? `\n\t\tbody: JSON.stringify(${body}),\n\t\theaders: {\n\t\t\t"Content-Type": "application/json"\n\t\t}` : ''}
+        method: "${method}",${
+            body
+                ? `\n\t\tbody: JSON.stringify(${body}),\n\t\theaders: {\n\t\t\t"Content-Type": "application/json",\n\t\t\t"Authorization": "<API_TOKEN>"\n\t\t}`
+                : ''
+        }
     }
 );
 
@@ -127,13 +144,17 @@ export const getPythonSnippet = (
 response = requests.request(
     "${method}",
     "${url}",
-    ${body ? `data=${body}, headers={"Content-Type": "application/json"}` : ''}
+    ${
+        body
+            ? `data=${body}, headers={\n\t\t\t"Content-Type": "application/json",\n\t\t\t"Authorization": "<API_TOKEN>"\n\t\t}`
+            : ''
+    }
 )
 
 data = response.json()
 
 print(data)
-`;
+`
 }
 
 export const getRSnippet = (
@@ -146,11 +167,55 @@ export const getRSnippet = (
 response <- httr::VERB(
     "${method}",
     "${url}",
-    ${body ? `body = toJSON(${body}), add_headers("Content-Type" = "application/json")` : ''}
+    ${
+        body
+            ? `body = toJSON(${body}), add_headers(\n\t\t\t"Content-Type" = "application/json",\n\t\t\t"Authorization" = "<API_TOKEN>"\n\t\t)`
+            : ''
+    }
 )
 
 data <- httr::content(response, "parsed")
 
 print(data)
-`;
+`
+}
+
+export const CkanApiMoreInfo = () => {
+    return (
+        <div>
+            <p>
+                For more information on how to use the CKAN API, please refer to
+                the{' '}
+                <a
+                    href="https://docs.ckan.org/en/2.10/api/index.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    className=" text-blue-700 italic underline"
+                >
+                    CKAN API documentation
+                </a>
+                .
+            </p>
+        </div>
+    )
+}
+
+export const RwMoreInfo = () => {
+    return (
+        <div>
+            <p>
+                For more information on how to use the Resource Watch API,
+                please refer to the{' '}
+                <a
+                    href="https://resource-watch.github.io/doc-api/reference.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    className=" text-blue-700 italic underline"
+                >
+                    Resource Watch API documentation
+                </a>
+                .
+            </p>
+        </div>
+    )
 }

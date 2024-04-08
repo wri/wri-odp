@@ -13,9 +13,10 @@ export default function Highlights() {
         error: errorFeaturedDatasets,
     } = api.dataset.getFeaturedDatasets.useQuery({
         search: '',
-        page: { start: 0, rows: 100 },
+        page: { start: 0, rows: 8 },
         sortBy: 'metadata_modified desc',
         _isUserSearch: false,
+        removeUnecessaryDataInResources: true,
     })
 
     return (

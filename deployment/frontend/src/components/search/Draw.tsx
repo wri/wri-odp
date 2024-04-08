@@ -16,7 +16,10 @@ type DrawControlProps = ConstructorParameters<typeof MapboxDraw>[0] & {
 
 export default function DrawControl(props: DrawControlProps) {
     const [draw, setDraw] = useState(null)
-    function deleteAllFeatures() {
+    function getAction(e) {
+        console.log(e)
+    }
+    function deleteAllFeatures(e) {
         if (draw) {
             const data = draw.getAll()
             if (draw.getMode() == 'draw_polygon') {
@@ -40,7 +43,7 @@ export default function DrawControl(props: DrawControlProps) {
     }
     const _props = {
         ...props,
-        defaultMode: 'draw_polygon',
+        defaultMode: 'simple_select',
         modes: { ...MapboxDraw.modes, draw_polygon: DrawRectangle },
     }
     useControl<MapboxDraw>(
@@ -53,12 +56,16 @@ export default function DrawControl(props: DrawControlProps) {
             map.on('draw.create', props.onCreate)
             map.on('draw.update', props.onUpdate)
             map.on('draw.modechange', deleteAllFeatures)
+            map.on('draw.trash', deleteAllFeatures)
+            map.on('draw.actionable', getAction)
         },
         ({ map }: { map: MapRef }) => {
             map.off('draw.create', props.onCreate)
             map.off('draw.update', props.onUpdate)
             map.off('draw.delete', props.onDelete)
             map.off('draw.modechange', deleteAllFeatures)
+            map.off('draw.trash', deleteAllFeatures)
+            map.off('draw.actionable', getAction)
         },
         {
             position: props.position,

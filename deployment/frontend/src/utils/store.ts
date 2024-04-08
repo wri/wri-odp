@@ -10,8 +10,8 @@ import {
 import { template } from 'lodash'
 import { useLayoutEffect } from 'react'
 import { ViewState } from 'react-map-gl'
-import create, { UseBoundStore } from 'zustand'
-import createContext from 'zustand/context'
+import { create, UseBoundStore } from 'zustand'
+import { createContext } from 'zustand-utils'
 import { combine } from 'zustand/middleware'
 
 let store: any
@@ -45,7 +45,7 @@ const getDefaultInitialState = () => {
             viewState: {
                 latitude: 0,
                 longitude: 0,
-                zoom: 3,
+                zoom: 6,
                 bearing: 0,
                 pitch: 0,
                 padding: {
@@ -80,6 +80,10 @@ export const initializeStore = (preloadedState: any = {}) => {
                 mapView: {
                     ...getDefaultInitialState().mapView,
                     ...preloadedState?.mapView,
+                    viewState: {
+                        ...getDefaultInitialState().mapView.viewState,
+                        ...preloadedState?.mapView?.viewState,
+                    },
                 },
             },
             (set, get) => ({
@@ -351,7 +355,6 @@ export const initializeStore = (preloadedState: any = {}) => {
                             layers: layerIds,
                         })
                     } else {
-                        console.log(newActiveLayerGroups)
                         newActiveLayerGroups = newActiveLayerGroups.filter(
                             (lg: ActiveLayerGroup) => lg.datasetId != datasetId
                         )
@@ -423,6 +426,7 @@ export const useCreateStore = (serverInitialState: Partial<InitialState>) => {
     const isReusingStore = Boolean(store)
     // For CSR, always re-use same store.
     store = store ?? initializeStore(serverInitialState)
+    console.log('STORE', store)
     // And if initialState changes, then merge states in the next render cycle.
     //
     // eslint complaining "React Hooks must be called in the exact same order in every component render"

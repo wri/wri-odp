@@ -3,9 +3,7 @@ import defaultTheme from 'tailwindcss/defaultTheme'
 
 export default {
     content: ['./src/**/*.{js,ts,jsx,tsx}'],
-    safelist: [
-        'text-nowrap'
-    ],
+    safelist: ['text-nowrap'],
     theme: {
         extend: {
             fontFamily: {
@@ -23,6 +21,7 @@ export default {
                 'accordion-up': 'accordion-up 0.2s ease-out',
             },
             colors: {
+                'pre-code': 'rgb(245, 242, 240)',
                 border: 'hsl(var(--border))',
                 input: 'hsl(var(--input))',
                 ring: 'hsl(var(--ring))',

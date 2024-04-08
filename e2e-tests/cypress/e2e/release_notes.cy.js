@@ -56,7 +56,7 @@ describe("Release notes", () => {
 
       cy.visit(`/datasets/${dataset}`);
       cy.contains("Release Notes", { timeout: 60000 }).click({ force: true });
-      cy.contains("This dataset is at it's initial version");
+      cy.contains("This dataset is at its initial version");
     },
   );
 

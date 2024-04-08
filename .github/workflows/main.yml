@@ -116,7 +116,9 @@ jobs:
       - name: Initialize the Extensions
         run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Print Logs
-        run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and Frontend setup
         uses: cypress-io/github-action@v6
@@ -153,7 +155,9 @@ jobs:
           if-no-files-found: ignore
       - name: Print Error Logs
         if: failure()
-        run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
@@ -210,8 +214,10 @@ jobs:
           category: frontend_container_trivy_results
           sarif_file: frontend-trivy-results.sarif
       - name: Tear down containers
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         if: failure() || success()
-        run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
+        run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
         working-directory: ./ckan-backend-dev
 
   deploy:

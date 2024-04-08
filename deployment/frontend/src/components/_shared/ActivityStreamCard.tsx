@@ -1,5 +1,5 @@
 import React from 'react'
-import Image from 'next/image'
+import Image from "next/image"
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 import { TrashIcon, PencilIcon, PlusCircleIcon, UserGroupIcon, BuildingLibraryIcon, UserIcon } from '@heroicons/react/24/outline';

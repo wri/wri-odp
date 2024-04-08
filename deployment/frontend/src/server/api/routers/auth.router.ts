@@ -31,7 +31,7 @@ export const authRouter = createTRPCRouter({
                 ).json()
                 return userUpdate
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 throw new Error(
                     'Failed to request password reset. Try again in a few seconds. If the error persists, please contact the system administrator.'
                 )
@@ -78,7 +78,7 @@ export const authRouter = createTRPCRouter({
 
                 return userUpdate
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 throw new Error(
                     'Failed to reset password. Try again in a few seconds. If the error persists, please contact the system administrator.'
                 )

@@ -42,28 +42,28 @@ export function Versioning({
             )}
             {!isReleaseNotesLoading && (
                 <div className="flex flex-col gap-y-4">
-                    {(isReleaseNotesChanged ||
-                        isFirstReleaseNotes) && (
-                            <ReleaseNotesCard
-                                releaseNotes={dataset.release_notes}
-                                version={'Pending'}
-                                isPending={true}
-                                defaultOpen={true}
-                            />
-                        )}
-                    {!isFirstReleaseNotes && releaseNotes?.map((rn, i) => (
+                    {(isReleaseNotesChanged || isFirstReleaseNotes) && (
                         <ReleaseNotesCard
-                            releaseNotes={rn.release_notes}
-                            date={rn.date}
-                            version={`Version ${releaseNotes?.length - i}`}
-                            key={`release-notes-${i}`}
-                            defaultOpen={!isReleaseNotesChanged && i == 0}
+                            releaseNotes={dataset.release_notes}
+                            version={'Pending'}
+                            isPending={true}
+                            defaultOpen={true}
                         />
-                    ))}
+                    )}
+                    {!isFirstReleaseNotes &&
+                        releaseNotes?.map((rn, i) => (
+                            <ReleaseNotesCard
+                                releaseNotes={rn.release_notes}
+                                date={rn.date}
+                                version={`Version ${releaseNotes?.length - i}`}
+                                key={`release-notes-${i}`}
+                                defaultOpen={!isReleaseNotesChanged && i == 0}
+                            />
+                        ))}
                     {!isReleaseNotesChanged &&
                         !releaseNotes?.length &&
                         !isFirstReleaseNotes && (
-                            <span>This dataset is at it's initial version</span>
+                            <span>This dataset is at its initial version</span>
                         )}
                 </div>
             )}

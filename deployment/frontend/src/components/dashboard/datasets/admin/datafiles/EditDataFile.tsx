@@ -3,6 +3,7 @@ import {
     GlobeAsiaAustraliaIcon,
     PaperClipIcon,
     MinusCircleIcon,
+    InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 import { UseFormReturn } from 'react-hook-form'
 import { DataFileAccordion } from './DatafileAccordion'
@@ -13,8 +14,7 @@ import { Tab } from '@headlessui/react'
 import { Fragment, useState } from 'react'
 import classNames from '@/utils/classnames'
 import { DataDictionaryTable } from './DataDictionaryTable'
-import { InputGroup } from '../metadata/InputGroup'
-import { ErrorDisplay } from '@/components/_shared/InputGroup'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { Input } from '@/components/_shared/SimpleInput'
 import FormatInput from './FormatInput'
@@ -28,6 +28,8 @@ import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import ViewsList from '@/components/views/ViewsList'
 import { WriDataset } from '@/schema/ckan.schema'
 import { DatafileLocation } from './DatafileLocation'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
 
 export function EditDataFile({
     remove,
@@ -60,14 +62,32 @@ export function EditDataFile({
         },
     })
 
+    const allDataFiles = watch('resources')
+    const notLayers = allDataFiles.filter(
+        (datafile) =>
+            datafile.type === 'upload' ||
+            datafile.type === 'link' ||
+            datafile.type === 'empty-file'
+    )
+    const notLayersCount = notLayers.length ?? 0
+
     const datafile = watch(`resources.${index}`)
+
+    const isLayer =
+        datafile.type !== 'upload' &&
+        datafile.type !== 'link' &&
+        datafile.type !== 'empty-file'
+
+    const heading = isLayer
+        ? `Layer ${index + 1 - notLayersCount}`
+        : `Data File ${index + 1}`
 
     return (
         <>
             <DataFileAccordion
                 id={`datafile-accordion-${datafile.id}`}
                 icon={<></>}
-                title={`Data File ${index + 1}`}
+                title={`${heading}`}
                 className="py-0"
                 remove={remove}
                 preview={
@@ -87,7 +107,7 @@ export function EditDataFile({
                                         </span>
                                     </div>
                                     <button
-                                        aria-label='remove'
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -104,7 +124,7 @@ export function EditDataFile({
                                         </span>
                                     </div>
                                     <button
-                                        aria-label='remove'
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -121,7 +141,7 @@ export function EditDataFile({
                                         </span>
                                     </div>
                                     <button
-                                        aria-label='remove'
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -133,7 +153,7 @@ export function EditDataFile({
                                 <>
                                     <div className="flex items-center gap-x-2"></div>
                                     <button
-                                        aria-label='remove'
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -167,7 +187,7 @@ export function EditDataFile({
                         </span>
                     </div>
                     <button
-                        aria-label='remove'
+                        aria-label="remove"
                         type="button"
                         id={`remove_${index}_datafile`}
                         onClick={() => remove()}
@@ -260,30 +280,33 @@ export function EditDataFile({
                                         ].includes(
                                             datafile.format?.toLowerCase() ??
                                                 'none'
-                                        ) && datafile.url_type === 'upload' && (
-                                            <Tab as={Fragment}>
-                                                {({ selected }) => (
-                                                    <div
-                                                        className={classNames(
-                                                            'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
-                                                            selected
-                                                                ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
-                                                                : 'text-black'
-                                                        )}
-                                                        aria-current={
-                                                            selected
-                                                                ? 'page'
-                                                                : undefined
-                                                        }
-                                                    >
-                                                        Datapusher{' '}
-                                                        <DatapusherStatus
-                                                            datafile={datafile}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </Tab>
-                                        )}
+                                        ) &&
+                                            datafile.url_type === 'upload' && (
+                                                <Tab as={Fragment}>
+                                                    {({ selected }) => (
+                                                        <div
+                                                            className={classNames(
+                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
+                                                                selected
+                                                                    ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
+                                                                    : 'text-black'
+                                                            )}
+                                                            aria-current={
+                                                                selected
+                                                                    ? 'page'
+                                                                    : undefined
+                                                            }
+                                                        >
+                                                            Datapusher{' '}
+                                                            <DatapusherStatus
+                                                                datafile={
+                                                                    datafile
+                                                                }
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </Tab>
+                                            )}
                                     </div>
                                 </Tab.List>
                                 <Tab.Panels className="px-4 sm:px-6 xxl:px-0 py-4">
@@ -331,7 +354,28 @@ export function EditDataFile({
                                                     />
                                                 </div>
                                             </InputGroup>
-                                            <DatafileLocation formObj={formObj} index={index} />
+                                            <InputGroup
+                                                label={
+                                                    <span className="flex items-center gap-x-1">
+                                                        Advanced API Usage
+                                                        <DefaultTooltip content="This field will end up in the Datafile API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
+                                                            <InformationCircleIcon className="h-5 w-5" />
+                                                        </DefaultTooltip>
+                                                    </span>
+                                                }
+                                                className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                                            >
+                                                <SimpleEditor
+                                                    formObj={formObj}
+                                                    name={`resources.${index}.advanced_api_usage`}
+                                                    className="min-h-[320px]"
+                                                    defaultValue=""
+                                                />
+                                            </InputGroup>
+                                            <DatafileLocation
+                                                formObj={formObj}
+                                                index={index}
+                                            />
                                         </div>
                                     </Tab.Panel>
                                     <Tab.Panel>
@@ -361,11 +405,14 @@ export function EditDataFile({
                                         'tab',
                                     ].includes(
                                         datafile.format?.toLowerCase() ?? 'none'
-                                    ) && datafile.url_type === 'upload' && (
-                                        <Tab.Panel>
-                                            <Datapusher datafile={datafile} />
-                                        </Tab.Panel>
-                                    )}
+                                    ) &&
+                                        datafile.url_type === 'upload' && (
+                                            <Tab.Panel>
+                                                <Datapusher
+                                                    datafile={datafile}
+                                                />
+                                            </Tab.Panel>
+                                        )}
                                 </Tab.Panels>
                             </div>
                         </Tab.Group>

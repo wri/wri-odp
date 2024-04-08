@@ -17,10 +17,10 @@ import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import {
     ExclamationTriangleIcon,
     InformationCircleIcon,
@@ -253,7 +253,7 @@ function IssueCard({
                     </p>
                     {issue.comments.map((comment) => (
                         <li key={comment.id} className="flex gap-x-4 pt-2">
-                            <div className='relative h-12 w-12 '>
+                            <div className="relative h-12 w-12 ">
                                 <Image
                                     fill
                                     className="flex-none rounded-full bg-gray-50"

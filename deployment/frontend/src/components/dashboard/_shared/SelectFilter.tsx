@@ -53,41 +53,37 @@ export default function SelectFilter({
                 })
             }
         } else {
-          let updateQuery: SearchInput;
-          if (["orgId", "packageId"].includes(filtername)) {
-            const action = query.fq?.action
-            const timestamp = query.fq?.timestamp
-            const prev: Record<string, string> = {}
-            if (action) {
-              prev["action"] = action
-            }
-            if (timestamp) {
-              prev["timestamp"] = timestamp
+            let updateQuery: SearchInput
+            if (['orgId', 'packageId'].includes(filtername)) {
+                const action = query.fq?.action
+                const timestamp = query.fq?.timestamp
+                const prev: Record<string, string> = {}
+                if (action) {
+                    prev['action'] = action
+                }
+                if (timestamp) {
+                    prev['timestamp'] = timestamp
+                }
+
+                updateQuery = {
+                    page: { ...query?.page, start: 0 },
+                    search: query.search,
+                    fq: {
+                        ...prev,
+                        [filtername]: option.label === 'All' ? '' : option.id,
+                    },
+                }
+            } else {
+                updateQuery = {
+                    page: { ...query?.page, start: 0 },
+                    search: query.search,
+                    fq: {
+                        ...query.fq,
+                        [filtername]: option.label === 'All' ? '' : option.id,
+                    },
+                }
             }
 
-
-            console.log("action", action)
-            console.log("timestamp", query.fq)
-            updateQuery = {
-                page: { ...query?.page, start: 0 },
-                search: query.search,
-                fq: {
-                  ...prev,
-                    [filtername]: option.label === 'All' ? '' : option.id,
-                },
-            }
-          }
-          else {
-               updateQuery= {
-                   page: { ...query?.page, start: 0 },
-                   search: query.search,
-                   fq: {
-                       ...query.fq,
-                       [filtername]: option.label === 'All' ? '' : option.id,
-                   },
-               }
-          }
-           
             setQuery && setQuery(updateQuery)
         }
     }

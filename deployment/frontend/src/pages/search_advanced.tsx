@@ -21,9 +21,12 @@ import superjson from 'superjson'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerAuthSession } from '@/server/auth'
 import { advance_search_query } from '@/utils/apiUtils'
+import { log } from 'console'
 
-export async function getServerSideProps(context: GetServerSidePropsContext<{ query: any }>) {
-   const { query } = context;
+export async function getServerSideProps(
+    context: GetServerSidePropsContext<{ query: any }>
+) {
+    const { query } = context
     const initialFilters = query.search
         ? JSON.parse(query.search as string)
         : []
@@ -33,7 +36,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext<{ qu
     const initialSortBy = query.sort_by
         ? JSON.parse(query.sort_by as string)
         : 'relevance asc'
-    
+
     const session = await getServerAuthSession(context)
     const helpers = createServerSideHelpers({
         router: appRouter,
@@ -41,20 +44,28 @@ export async function getServerSideProps(context: GetServerSidePropsContext<{ qu
         transformer: superjson,
     })
 
-    
     const searchQuery = advance_search_query(initialFilters as Filter[])
 
     await helpers.dataset.getAllDataset.prefetch({
         ...searchQuery,
         page: initialPage,
         sortBy: initialSortBy,
+        removeUnecessaryDataInResources: true,
     })
-    
 
-    return { props: {trpcState: helpers.dehydrate(), initialFilters, initialPage, initialSortBy } }
+    return {
+        props: {
+            trpcState: helpers.dehydrate(),
+            initialFilters,
+            initialPage,
+            initialSortBy,
+        },
+    }
 }
 
-export default function SearchPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function SearchPage(
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
     const { initialFilters, initialPage, initialSortBy } = props
     const router = useRouter()
     const session = useSession()
@@ -65,10 +76,13 @@ export default function SearchPage(props: InferGetServerSidePropsType<typeof get
      */
     const [query, setQuery] = useState<SearchInput>({
         search: '',
+        extLocationQ: '',
+        extAddressQ: '',
+        fq: {},
         page: initialPage,
         sortBy: initialSortBy,
+        removeUnecessaryDataInResources: true,
     })
-
     const [filters, setFilters] = useState<Filter[]>(initialFilters)
 
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
