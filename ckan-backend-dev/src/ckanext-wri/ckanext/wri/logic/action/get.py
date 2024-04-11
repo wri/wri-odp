@@ -710,6 +710,23 @@ def organization_activity_list_wri(context: Context, data_dict: DataDict):
             user_data[user_id] = temp
     return results
 
+@logic.side_effect_free
+def group_activity_list_wri(context: Context, data_dict: DataDict):
+    model = context["model"]
+    results = get_action("group_activity_list")(context, data_dict)
+    user_data = {}
+    for result in results:
+        user_id = result["user_id"]
+        if user_id in user_data:
+            result["user_data"] = user_data[user_id]
+        else:
+            temp = model_dictize.user_dictize(
+                model.User.get(result["user_id"]), context
+            )
+            result["user_data"] = temp
+            user_data[user_id] = temp
+    return results
+
 
 @logic.side_effect_free
 def user_list_wri(context: Context, data_dict: DataDict):

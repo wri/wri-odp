@@ -3,7 +3,6 @@ import { Listbox, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import classNames from '@/utils/classnames'
 import type { SearchInput } from '@/schema/search.schema'
-import { filter } from 'lodash'
 
 interface Option {
     id: string
@@ -54,7 +53,8 @@ export default function SelectFilter({
             }
         } else {
             let updateQuery: SearchInput
-            if (['orgId', 'packageId'].includes(filtername)) {
+
+            if (['orgId', 'packageId', 'groupId'].includes(filtername)) {
                 const action = query.fq?.action
                 const timestamp = query.fq?.timestamp
                 const prev: Record<string, string> = {}
