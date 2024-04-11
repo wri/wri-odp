@@ -63,14 +63,14 @@ function Card({
                                     src={`${rowProfile.sender_image}`}
                                     fill
                                     alt=""
-                                    className="rounded-md"
+                                    className="rounded-md object-cover"
                                 />
                             ) : (
                                 <Image
                                     src={`https://gravatar.com/avatar/${rowProfile?.sender_emailHash}?s=270&d=identicon`}
                                     alt="Gravatar"
                                     fill
-                                    className="rounded-md"
+                                    className="rounded-md object-cover"
                                 />
                             )}
                         </div>
