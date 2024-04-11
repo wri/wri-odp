@@ -543,8 +543,9 @@ def pending_diff_show(context: Context, data_dict: DataDict):
     tk.check_access("package_show", context, {"id": package_id})
 
     dataset_diff = None
-
     pending_dataset = None
+    existing_dataset = None
+
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
         if pending_dataset is not None:
@@ -560,6 +561,9 @@ def pending_diff_show(context: Context, data_dict: DataDict):
         # raise logic.NotFound(
         #     _("Diff not found for Pending Dataset: {}".format(package_id))
         # )
+
+    if not existing_dataset:
+        existing_dataset = {}
 
     return {
         "diff": dataset_diff,
