@@ -366,6 +366,11 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             const changedFields: string[] = []
 
                             getDiff(newDirtyFields, changedFields)
+                            if (
+                                data.featured_image !==
+                                dataset.featured_image
+                            )
+                                changedFields.push('featured_dataset')
 
                             const toBeSavedData: Partial<DatasetFormType> = data
 
