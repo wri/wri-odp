@@ -144,7 +144,7 @@ function LeftNode({
             {selectEntity.search === 'topics' ? (
                 <SelectFilter
                     options={[{ id: 'None', label: 'All topics' }].concat(
-                        getKeyValues(group as Topic[], 'title', 'id')
+                        getKeyValues(group as Group[], 'title', 'id')
                     )}
                     filtername="groupId"
                     setQuery={setServerQuery}
