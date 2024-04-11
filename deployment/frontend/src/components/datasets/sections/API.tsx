@@ -1,7 +1,5 @@
 import { env } from '@/env.mjs'
-import classNames from '@/utils/classnames'
 import { useDataset } from '@/utils/storeHooks'
-import { Tab } from '@headlessui/react'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import {
     SnippetEndpoint,
@@ -13,57 +11,59 @@ import {
     RwMoreInfo,
 } from './APIEndpoint'
 import { useFields } from '@/components/data-explorer/queryHooks'
+import { DatasetTabs } from '@/components/datasets/DatasetTabs'
 import hljs from 'highlight.js/lib/core'
 
 import python from 'highlight.js/lib/languages/python'
 import js from 'highlight.js/lib/languages/javascript'
 import r from 'highlight.js/lib/languages/r'
+import { addCopyButton } from '@/utils/highlight'
+import classNames from '@/utils/classnames'
+import { Tab } from '@headlessui/react'
+import {
+    ChevronDoubleLeftIcon,
+    ChevronDoubleRightIcon,
+} from '@heroicons/react/20/solid'
+import { Navigation } from 'swiper/modules'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
 
 hljs.registerLanguage('python', python)
 hljs.registerLanguage('javascript', js)
 hljs.registerLanguage('r', r)
 
-const tabs = ['Query', 'Javascript', 'Python', 'R']
-
 export function API({ usecases }: { usecases?: string }) {
+    const tabs = [
+        {
+            name: 'Query',
+            enabled: true,
+        },
+        {
+            name: 'Javascript',
+            enabled: true,
+        },
+        {
+            name: 'Python',
+            enabled: true,
+        },
+        {
+            name: 'R',
+            enabled: true,
+        },
+        {
+            name: 'Advanced API Usage',
+            enabled: usecases,
+        },
+    ]
     return (
         <Tab.Group as="div">
             <Tab.List
                 as="nav"
-                className="-mt-4 flex h-12 w-full items-center bg-neutral-100 font-acumin overflow-x-auto"
+                className="-mt-4 flex w-full justify-start items-start bg-neutral-100 font-acumin"
             >
-                {tabs.map((tab) => (
-                    <Tab key={tab} as={Fragment}>
-                        {({ selected }: { selected: boolean }) => (
-                            <button
-                                className={classNames(
-                                    selected
-                                        ? 'rounded-sm border-b border-wri-green bg-white'
-                                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                                    'h-full whitespace-nowrap px-10 text-center text-base font-normal capitalize text-neutral-800'
-                                )}
-                            >
-                                {tab}
-                            </button>
-                        )}
-                    </Tab>
-                ))}
-                {usecases && (
-                    <Tab key="Usecases" as={Fragment}>
-                        {({ selected }: { selected: boolean }) => (
-                            <button
-                                className={classNames(
-                                    selected
-                                        ? 'rounded-sm border-b border-wri-green bg-white'
-                                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                                    'h-full whitespace-nowrap px-8 text-center text-base font-normal capitalize text-neutral-800'
-                                )}
-                            >
-                                Advanced API Usage
-                            </button>
-                        )}
-                    </Tab>
-                )}
+                <APITabs tabs={tabs.filter((tab) => tab.enabled)} />
             </Tab.List>
             <Tab.Panel as="div" className="py-6 overflow-clip">
                 <QueryInstructions />
@@ -226,6 +226,7 @@ const UseCases = ({ usecases }: { usecases: string }) => {
 
     useEffect(() => {
         if (!highlighted && divRef.current) {
+            addCopyButton(`code-block-${dataset.id}`)
             setHighlighted(true)
             hljs.highlightAll()
         }
@@ -234,6 +235,7 @@ const UseCases = ({ usecases }: { usecases: string }) => {
         <div>
             <div
                 ref={divRef}
+                id={`code-block-${dataset.id}`}
                 className="prose w-full max-w-7xl prose-sm prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base"
                 dangerouslySetInnerHTML={{
                     __html: usecases.replaceAll(
@@ -381,6 +383,63 @@ const SnippetInstructions = ({
                     <RwMoreInfo />
                 </>
             )}
+        </>
+    )
+}
+
+export function APITabs({
+    tabs,
+}: {
+    tabs: { name: string; count?: number; highlighted?: boolean }[]
+}) {
+    const prevEl = `.nav-prev-button--tabs`
+    const nextEl = `.nav-next-button--tabs`
+    return (
+        <>
+            <Swiper
+                className="flex dataset-tabs"
+                modules={[Navigation]}
+                spaceBetween={0}
+                slidesPerView="auto"
+                navigation={{
+                    prevEl: prevEl,
+                    nextEl: nextEl,
+                }}
+            >
+                {tabs.map((tab) => (
+                    <SwiperSlide key={tab.name} className="">
+                        <Tab as="div">
+                            {({ selected }: { selected: boolean }) => (
+                                <div
+                                    aria-label={tab.name}
+                                    className={classNames(
+                                        selected
+                                            ? 'rounded-sm border-b border-wri-green bg-white'
+                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                                        'h-full py-2 whitespace-nowrap px-10 text-center text-base font-normal capitalize text-neutral-800'
+                                    )}
+                                >
+                                    {tab.name}
+                                </div>
+                            )}
+                        </Tab>
+                    </SwiperSlide>
+                ))}
+            </Swiper>
+            <button
+                className="nav-prev-button--tabs py-2"
+                aria-label="previous button"
+                role="tab"
+            >
+                <ChevronDoubleLeftIcon className="h-6 w-6 text-black" />
+            </button>
+            <button
+                className="nav-next-button--tabs py-2"
+                aria-label="next button"
+                role="tab"
+            >
+                <ChevronDoubleRightIcon className="h-6 w-6 text-black" />
+            </button>
         </>
     )
 }
