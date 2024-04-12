@@ -23,6 +23,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { z } from 'zod'
+import { useQuery } from 'react-query'
 
 export function DownloadButton({ datafile }: { datafile: Resource }) {
     const { dataset } = useDataset()
@@ -187,6 +188,19 @@ function DownloadModal({
     const formSchema = z.object({
         email: z.string().email(),
     })
+    const { data: layerObj, isLoading: layerObjLoading } = useQuery(
+        [datafile.rw_id],
+        async () => {
+            const res = await fetch(
+                `https://api.resourcewatch.org/v1/layer/${datafile.rw_id}`
+            )
+            const obj = await res.json()
+            return obj.data.attributes
+        },
+        {
+            enabled: datafile.format == 'Layer',
+        }
+    )
 
     type FormSchema = z.infer<typeof formSchema>
 
@@ -200,18 +214,16 @@ function DownloadModal({
         register,
     } = formObj
 
-    let isLoading = false
+    let isLoading = requestDatafileConversionMutation.isLoading
     let sql = `SELECT * FROM "${datafile.id}"`
     let cartoAccount: string | undefined = ''
     if (datafile.format == 'Layer') {
-        const layerObj = datafile.layerObj
         const layerCfg = layerObj?.layerConfig
         const layerSrc = layerCfg?.source
         const layerProvider = layerSrc?.provider
         sql = layerProvider?.layers?.at(0)?.options?.sql
         cartoAccount = layerProvider?.account
     }
-
     return (
         <Modal open={open} setOpen={setOpen} className="max-w-[48rem]">
             <div className="p-6">
@@ -224,12 +236,12 @@ function DownloadModal({
                         download link via email when it's ready.
                     </div>
                 </div>
-                {isLoading && (
+                {(layerObjLoading) && (
                     <div className="w-full flex items-center my-10 justify-center">
                         <Spinner />
                     </div>
                 )}
-                {!isLoading && (
+                {!isLoading && !layerObjLoading && (
                     <form
                         id="download"
                         data-resource={datafile.title ?? datafile.name!}
