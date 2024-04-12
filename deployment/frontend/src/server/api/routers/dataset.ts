@@ -1109,6 +1109,7 @@ export const DatasetRouter = createTRPCRouter({
                     .boolean()
                     .optional()
                     .default(false),
+                showPendingDataset: z.boolean().optional().default(false),
             })
         )
         .query(async ({ input, ctx }) => {
@@ -1150,7 +1151,7 @@ export const DatasetRouter = createTRPCRouter({
                         .join(' AND ')})`
             }
 
-            if (!fq.includes('is_approved')) {
+            if (!fq.includes('is_approved') && !input.showPendingDataset) {
                 fq += '+is_approved:true'
             }
 
