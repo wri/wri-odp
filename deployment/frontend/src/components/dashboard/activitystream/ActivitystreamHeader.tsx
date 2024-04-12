@@ -102,15 +102,17 @@ function LeftNode({
                     { id: 'dataset', label: 'dataset' },
                     { id: 'teams', label: 'teams' },
                     { id: 'topics', label: 'topics' },
+                    { id: 'reset', label: 'reset' },
                 ]}
                 filtername="selectEntity"
                 setQuery={setSelectEntity}
                 query={selectEntity}
+                reset={setServerQuery}
             />
 
             {selectEntity.search === 'dataset' ? (
                 <SelectFilter
-                    options={[{ id: 'None', label: 'All dataset' }].concat(
+                    options={[{ id: 'all', label: 'All dataset' }].concat(
                         getKeyValues(
                             dataset?.datasets as WriDataset[],
                             'title',
@@ -126,7 +128,7 @@ function LeftNode({
             )}
             {selectEntity.search === 'teams' ? (
                 <SelectFilter
-                    options={[{ id: 'None', label: 'All teams' }].concat(
+                    options={[{ id: 'all', label: 'All teams' }].concat(
                         getKeyValues(
                             organization as WriOrganization[],
                             'title',
@@ -143,7 +145,7 @@ function LeftNode({
 
             {selectEntity.search === 'topics' ? (
                 <SelectFilter
-                    options={[{ id: 'None', label: 'All topics' }].concat(
+                    options={[{ id: 'all', label: 'All topics' }].concat(
                         getKeyValues(group as Group[], 'title', 'id')
                     )}
                     filtername="groupId"

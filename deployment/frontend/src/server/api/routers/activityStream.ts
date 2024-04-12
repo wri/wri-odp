@@ -38,14 +38,27 @@ export const activityStreamRouter = createTRPCRouter({
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             let url = `${env.CKAN_URL}/api/3/action/dashboard_activity_listv2`
+            let search = ''
 
             if (input.fq) {
-                if ('package_id' in input.fq) {
-                    url = `${env.CKAN_URL}/api/3/action/package_activity_list_wri?id=${input.fq['package_id']}`
+                if ('packageId' in input.fq) {
+                    if (input.fq['packageId'] === 'all') {
+                        search = 'packageId'
+                    } else {
+                        url = `${env.CKAN_URL}/api/3/action/package_activity_list_wri?id=${input.fq['packageId']}`
+                    }
                 } else if ('orgId' in input.fq) {
-                    url = `${env.CKAN_URL}/api/3/action/organization_activity_list_wri?id=${input.fq['orgId']}`
+                    if (input.fq['orgId'] === 'all') {
+                        search = 'orgId'
+                    } else {
+                        url = `${env.CKAN_URL}/api/3/action/organization_activity_list_wri?id=${input.fq['orgId']}`
+                    }
                 } else if ('groupId' in input.fq) {
-                    url = `${env.CKAN_URL}/api/3/action/group_activity_list_wri?id=${input.fq['groupId']}`
+                    if (input.fq['groupId'] === 'all') {
+                        search = 'groupId'
+                    } else {
+                        url = `${env.CKAN_URL}/api/3/action/group_activity_list_wri?id=${input.fq['groupId']}`
+                    }
                 }
             }
             const response = await fetch(url, {
@@ -63,15 +76,17 @@ export const activityStreamRouter = createTRPCRouter({
             })
 
             let result = activities
-            if (input.search) {
-                result = searchArrayForKeyword<ActivityDisplay>(
-                    activities,
-                    input.search
-                )
-            }
-
-            if (input.fq && activities) {
-                result = filterObjects(activities, input.fq)
+            if (search) {
+                result = activities.filter((activity) => {
+                    if (search === 'packageId') {
+                        return activity.packageId
+                    } else if (search === 'orgId') {
+                        console.log('ORGID', activity.orgId, activity.packageId)
+                        return activity.orgId
+                    } else if (search === 'groupId') {
+                        return activity.groupId
+                    }
+                })
             }
 
             return {

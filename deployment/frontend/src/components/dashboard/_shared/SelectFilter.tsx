@@ -14,11 +14,13 @@ export default function SelectFilter({
     setQuery,
     query,
     filtername,
+    reset,
 }: {
     options: { id: string; label: string | undefined }[]
     filtername: string
     setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
     query: SearchInput
+    reset?: React.Dispatch<React.SetStateAction<SearchInput>>
 }) {
     const [selected, setSelected] = useState(
         options[0] ? options[0] : { id: '0', label: '' }
@@ -26,15 +28,19 @@ export default function SelectFilter({
 
     const handleSelect = (option: Option) => {
         setSelected(option)
-        if (option.id === 'None' && filtername !== 'selectEntity') {
-            const { [filtername]: filterdata, ...remainingFilters } =
-                query.fq || {}
+        if (option.id === 'reset' && filtername == 'selectEntity') {
             const updateQuery: SearchInput = {
-                page: { ...query?.page, start: 0 },
-                search: query.search,
-                fq: remainingFilters,
+                search: '',
+                page: { start: 0, rows: 1000 },
+                fq: {},
             }
-            setQuery && setQuery(updateQuery)
+            reset && reset(updateQuery)
+            setQuery((prev) => {
+                return {
+                    ...prev,
+                    search: 'None',
+                }
+            })
         } else if (filtername === 'selectEntity') {
             if (option.id === 'None') {
                 setQuery((prev) => {
