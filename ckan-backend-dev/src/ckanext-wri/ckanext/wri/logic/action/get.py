@@ -495,12 +495,17 @@ def notification_get_all(
         if object_id in object_data:
             notification["object_data"] = object_data[object_id]
         else:
-            if notification["object_type"] == "dataset":
-                temp = dict(model.Package.get(notification["object_id"]).as_dict())
-            elif notification["object_type"] == "topic":
-                temp = dict(model.Group.get(notification["object_id"]).as_dict())
-            elif notification["object_type"] == "team":
-                temp = dict(model.Group.get(notification["object_id"]).as_dict())
+            temp = {}
+
+            try:
+                if notification["object_type"] == "dataset":
+                    temp = dict(model.Package.get(notification["object_id"]).as_dict())
+                elif notification["object_type"] == "topic":
+                    temp = dict(model.Group.get(notification["object_id"]).as_dict())
+                elif notification["object_type"] == "team":
+                    temp = dict(model.Group.get(notification["object_id"]).as_dict())
+            except AttributeError:
+                log.error(f"Object not found: {json.dumps(notification, indent=2)}")
 
             notification["object_data"] = temp
             object_data[object_id] = temp
@@ -543,8 +548,9 @@ def pending_diff_show(context: Context, data_dict: DataDict):
     tk.check_access("package_show", context, {"id": package_id})
 
     dataset_diff = None
-
     pending_dataset = None
+    existing_dataset = None
+
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
         if pending_dataset is not None:
@@ -560,6 +566,9 @@ def pending_diff_show(context: Context, data_dict: DataDict):
         # raise logic.NotFound(
         #     _("Diff not found for Pending Dataset: {}".format(package_id))
         # )
+
+    if not existing_dataset:
+        existing_dataset = {}
 
     return {
         "diff": dataset_diff,
