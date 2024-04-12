@@ -20,13 +20,9 @@ export default function DatasetLCardList() {
         search: '',
         page: { start: 0, rows: 10 },
         _isUserSearch: true,
-        fq: {
-            is_approved: 'true',
-            draft: 'false',
-        },
     })
     const { data, isLoading, refetch } =
-        api.dataset.getAllDataset.useQuery(query)
+        api.dataset.getAllDataset.useQuery({ ...query, showPendingDataset: true })
     const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
     const [open, setOpen] = useState(false)
     const datasetDelete = api.dataset.deleteDataset.useMutation({

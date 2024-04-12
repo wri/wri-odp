@@ -25,7 +25,9 @@ export default function RowProfile({
         <div className="flex flex-row gap-x-4 hover:bg-slate-100  rounded-md">
             <div className="flex gap-x-4">
                 <div
-                    className={`relative ${imgStyle ? imgStyle : 'w-10 h-10'} `}
+                    className={`relative rounded-md ${
+                        imgStyle ? imgStyle : 'w-10 h-10'
+                    } `}
                 >
                     <Image
                         src={
@@ -35,7 +37,7 @@ export default function RowProfile({
                                   '/images/placeholders/user/userdefault.png'
                         }
                         alt=""
-                        className="rounded-md"
+                        className="rounded-md object-cover"
                         fill
                     />
                 </div>

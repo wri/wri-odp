@@ -10,6 +10,7 @@ import type {
     WriOrganization,
 } from '@/schema/ckan.schema'
 import { Group } from '@portaljs/ckan'
+import Topic from '@/interfaces/topic.interface'
 
 function LeftNode({
     setQuery,
@@ -37,8 +38,10 @@ function LeftNode({
         api.organization.getAllOrganizations.useQuery()
     const { data: dataset, isLoading: isLoadingDataset } =
         api.dataset.getFavoriteDataset.useQuery()
+    const { data: group, isLoading: isLoadingGroup } =
+        api.topics.getAllTopics.useQuery()
 
-    if (isLoadingActivity || isLoadingOrganization)
+    if (isLoadingActivity || isLoadingOrganization || isLoadingGroup)
         return (
             <div className="flex  gap-x-3">
                 <SelectFilter
@@ -82,13 +85,12 @@ function LeftNode({
     return (
         <div className="flex w-full gap-x-4 pl-6 pr-2 sm:pr-0 pt-2 sm:pt-0 flex-col gap-y-2 sm:flex-row sm:gap-y-0">
             <SelectFilter
-                options={[{ id: 'None', label: 'All activity' }].concat(
-                    getKeyValues2(
-                        (activity?.activity as ActivityDisplay[]) ?? [],
-                        'action',
-                        'action'
-                    )
-                )}
+                options={[
+                    { id: 'None', label: 'All activity' },
+                    { id: 'new', label: 'new' },
+                    { id: 'changed', label: 'changed' },
+                    { id: 'deleted', label: 'deleted' },
+                ]}
                 filtername="action"
                 setQuery={setQuery}
                 query={query}
@@ -99,15 +101,18 @@ function LeftNode({
                     { id: 'None', label: 'Filter by' },
                     { id: 'dataset', label: 'dataset' },
                     { id: 'teams', label: 'teams' },
+                    { id: 'topics', label: 'topics' },
+                    { id: 'reset', label: 'reset' },
                 ]}
                 filtername="selectEntity"
                 setQuery={setSelectEntity}
                 query={selectEntity}
+                reset={setServerQuery}
             />
 
             {selectEntity.search === 'dataset' ? (
                 <SelectFilter
-                    options={[{ id: 'None', label: 'All dataset' }].concat(
+                    options={[{ id: 'all', label: 'All dataset' }].concat(
                         getKeyValues(
                             dataset?.datasets as WriDataset[],
                             'title',
@@ -123,7 +128,7 @@ function LeftNode({
             )}
             {selectEntity.search === 'teams' ? (
                 <SelectFilter
-                    options={[{ id: 'None', label: 'All teams' }].concat(
+                    options={[{ id: 'all', label: 'All teams' }].concat(
                         getKeyValues(
                             organization as WriOrganization[],
                             'title',
@@ -131,6 +136,19 @@ function LeftNode({
                         )
                     )}
                     filtername="orgId"
+                    setQuery={setServerQuery}
+                    query={serverQuery}
+                />
+            ) : (
+                ''
+            )}
+
+            {selectEntity.search === 'topics' ? (
+                <SelectFilter
+                    options={[{ id: 'all', label: 'All topics' }].concat(
+                        getKeyValues(group as Group[], 'title', 'id')
+                    )}
+                    filtername="groupId"
                     setQuery={setServerQuery}
                     query={serverQuery}
                 />

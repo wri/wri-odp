@@ -23,6 +23,7 @@ export default function UserProfile() {
                                 : '/images/placeholders/user/userdefault.png'
                         }`}
                         fill
+                        className=" object-cover"
                         alt=""
                     />
                 ) : (
