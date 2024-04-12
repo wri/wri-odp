@@ -81,7 +81,6 @@ export const activityStreamRouter = createTRPCRouter({
                     if (search === 'packageId') {
                         return activity.packageId
                     } else if (search === 'orgId') {
-                        console.log('ORGID', activity.orgId, activity.packageId)
                         return activity.orgId
                     } else if (search === 'groupId') {
                         return activity.groupId
