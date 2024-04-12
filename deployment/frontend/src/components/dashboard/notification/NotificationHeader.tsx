@@ -1,6 +1,11 @@
 import React, { Fragment, useState } from 'react'
 import TableHeader from '../_shared/TableHeader'
-import { TrashIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline'
+import {
+    TrashIcon,
+    EllipsisVerticalIcon,
+    EnvelopeOpenIcon,
+    EnvelopeIcon,
+} from '@heroicons/react/24/outline'
 import { Menu, Transition } from '@headlessui/react'
 import { NotificationType } from '@/schema/notification.schema'
 import { LoaderButton, Button } from '@/components/_shared/Button'
@@ -72,7 +77,7 @@ function LeftNode({
             <div className="flex h-6 items-center">
                 <DefaultTooltip content="Select all">
                     <input
-                        aria-label='select all notifications'
+                        aria-label="select all notifications"
                         id="select_all_notifications"
                         aria-describedby="notifications-checkbox"
                         name="notifications"
@@ -91,7 +96,7 @@ function LeftNode({
             <div>
                 <DefaultTooltip content="delete">
                     <button
-                        aria-label='delete notification'
+                        aria-label="delete notification"
                         className="p-0 m-0 mt-2"
                         id="deletenotification"
                         onClick={() => setOpenDelete(true)}
@@ -100,64 +105,37 @@ function LeftNode({
                     </button>
                 </DefaultTooltip>
             </div>
-            <button
-                className="hidden"
+            <div>
+                <DefaultTooltip content="mark as read">
+                    <button
+                        aria-label="mark as read"
+                        className="p-0 m-0 mt-2"
+                        id="markasread_hidden"
+                        onClick={() => setOpenMarkAsRead(true)}
+                    >
+                        <EnvelopeOpenIcon className="w-4 h-4 " />
+                    </button>
+                </DefaultTooltip>
+            </div>
+            <div>
+                <DefaultTooltip content="mark as unread">
+                    <button
+                        aria-label="mark as read"
+                        className="p-0 m-0 mt-2.5"
+                        id="markasunread"
+                        onClick={() => setOpenMarkAsUnread(true)}
+                    >
+                        <EnvelopeIcon className="w-4 h-4 " />
+                    </button>
+                </DefaultTooltip>
+            </div>
+            {/* <button
+                className=""
                 id="markasread_hidden"
                 onClick={() => setOpenMarkAsRead(true)}
             >
                 Mark as read
-            </button>
-            <div className="">
-                <Menu
-                    as="div"
-                    className="relative inline-block text-left  pr-1 z-50"
-                >
-                    <div>
-                        <Menu.Button id="markedaction" aria-label='actions'>
-                            <div className="h-full mt-2">
-                                <DefaultTooltip content="read actions">
-                                    <EllipsisVerticalIcon className="w-4 h-4 text-black" />
-                                </DefaultTooltip>
-                            </div>
-                        </Menu.Button>
-                    </div>
-                    <Transition
-                        as={Fragment}
-                        enter="transition ease-out duration-100"
-                        enterFrom="transform opacity-0 scale-95"
-                        enterTo="transform opacity-100 scale-100"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95"
-                    >
-                        <Menu.Items className="absolute left-0 w-32 whitespace-nowrap  origin-top-left divide-y divide-gray-100 rounded-md bg-white shadow-md text-[14px] font-normal focus:outline-none">
-                            <div className="hover:bg-slate-100">
-                                <div className="px-2 pr-2 py-3 ">
-                                    <Menu.Item
-                                        as={'button'}
-                                        onClick={() => setOpenMarkAsRead(true)}
-                                    >
-                                        <div id="markasread">Mark as read</div>
-                                    </Menu.Item>
-                                </div>
-                            </div>
-                            <div className="hover:bg-slate-100">
-                                <div className="px-2 pr-4 py-3 ">
-                                    <Menu.Item
-                                        as={'button'}
-                                        id="markasunread"
-                                        onClick={() =>
-                                            setOpenMarkAsUnread(true)
-                                        }
-                                    >
-                                        <div>Mark as unread</div>
-                                    </Menu.Item>
-                                </div>
-                            </div>
-                        </Menu.Items>
-                    </Transition>
-                </Menu>
-            </div>
+            </button> */}
             {errorMessage && (
                 <div className="py-4">
                     <ErrorAlert text={errorMessage} />
@@ -197,7 +175,7 @@ function LeftNode({
                             variant="destructive"
                             loading={UpdateNotfication.isLoading}
                             onClick={() => {
-                               let filteredData = data.filter((item) =>
+                                let filteredData = data.filter((item) =>
                                     selected.includes(item.id)
                                 )
 

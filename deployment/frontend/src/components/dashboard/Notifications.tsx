@@ -29,14 +29,14 @@ function Notification({ items }: { items: NotificationType }) {
                             src={`${items.sender_image}`}
                             fill
                             alt=""
-                            className="rounded-md"
+                            className="rounded-md object-cover"
                         />
                     ) : (
                         <Image
                             src={`https://gravatar.com/avatar/${items?.sender_emailHash}?s=270&d=identicon`}
                             alt="Gravatar"
                             fill
-                            className="rounded-md"
+                            className="rounded-md object-cover"
                         />
                     )}
                 </div>

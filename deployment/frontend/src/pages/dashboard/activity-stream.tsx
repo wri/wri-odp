@@ -32,6 +32,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     })
     await helpers.dataset.getFavoriteDataset.prefetch()
     await helpers.organization.getAllOrganizations.prefetch()
+    await helpers.topics.getAllTopics.prefetch()
 
     return {
         props: {
@@ -40,7 +41,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
 }
 
-export default function activityStream(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function activityStream(
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
     return (
         <>
             <NextSeo
