@@ -105,7 +105,7 @@ export async function fetchDatasetCollaborators(
         {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `${userApiKey ?? ''}`,
+                Authorization: `${sysAdminApiKey}`,
             },
         }
     )
