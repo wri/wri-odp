@@ -303,6 +303,48 @@ export function DatasetHeader({
         dataset?.id as string,
         { retry: false, enabled: !!session.data?.user }
     )
+    const { data: adminUsers } = api.teams.getTeamUsers.useQuery(
+        {
+            id: dataset?.organization?.id ?? dataset?.owner_org ?? '',
+            capacity: 'admin',
+        },
+        { enabled: !!dataset?.organization?.id }
+    )
+    const { data: editorUsers } = api.teams.getTeamUsers.useQuery(
+        {
+            id: dataset?.organization?.id ?? dataset?.owner_org ?? '',
+            capacity: 'editor',
+        },
+        { enabled: !!dataset?.organization?.id }
+    )
+    const teamUsers = (adminUsers ?? []).concat(editorUsers ?? [])
+    const { data: collaborators } =
+        api.dataset.getDatasetCollaborators.useQuery(
+            {
+                id: dataset?.name ?? '',
+            },
+            { enabled: !!dataset?.name }
+        )
+    console.log('collaborators', collaborators)
+    const canEditDataset = match(session.data?.user.sysadmin ?? false)
+        .with(true, () => true)
+        .with(false, () => {
+            if (dataset?.creator_user_id === session.data?.user.id) return true
+            if (teamUsers && teamUsers.length > 0) {
+                return teamUsers.some(
+                    (user: string[]) => user[0] === session.data?.user.id
+                )
+            }
+            return collaborators
+                ? collaborators.some(
+                      (collaborator) =>
+                          collaborator.id === session.data?.user.id &&
+                          (collaborator.capacity === 'admin' ||
+                              collaborator.capacity === 'editor')
+                  )
+                : false
+        })
+        .otherwise(() => false)
 
     const {
         data: datasetViews,
@@ -431,14 +473,16 @@ export function DatasetHeader({
                             </DefaultTooltip>
                         )}
 
-                        <DefaultTooltip content="Edit" side="bottom">
-                            <Link
-                                aria-label="edit dataset"
-                                href={`/dashboard/datasets/${dataset?.name}/edit`}
-                            >
-                                <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
-                            </Link>
-                        </DefaultTooltip>
+                        {canEditDataset && (
+                            <DefaultTooltip content="Edit" side="bottom">
+                                <Link
+                                    aria-label="edit dataset"
+                                    href={`/dashboard/datasets/${dataset?.name}/edit`}
+                                >
+                                    <PencilSquareIcon className="cursor-pointer h-6 w-6 text-yellow-800" />
+                                </Link>
+                            </DefaultTooltip>
+                        )}
                     </div>
                     {open && (
                         <Modal
