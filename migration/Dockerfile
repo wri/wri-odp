@@ -14,8 +14,6 @@ RUN apt-get install -y \
     uchardet \
     libuchardet-dev
 
-RUN mkdir /app/files
-
 RUN mkdir /app/flow_logs
 
 COPY files/datasets.csv /app/files/datasets.csv
