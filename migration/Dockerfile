@@ -16,6 +16,8 @@ RUN apt-get install -y \
 
 RUN mkdir /app/files
 
+RUN mkdir /app/flow_logs
+
 COPY files/datasets.csv /app/files/datasets.csv
 
 CMD [ "python", "main.py" ]

@@ -21,18 +21,27 @@ def trigger_migration(data_dict):
             migration, rw_url, ckan_url, dataset_id = send_migration_dataset(data)
 
             if rw_url and ckan_url:
-                dataset_csv.append(
-                    [dataset_id, rw_url, ckan_url]
-                )
+                dataset_csv.append([dataset_id, rw_url, ckan_url])
 
-        with open(f'dataset_migration_{start_time}.csv', 'w') as f:
+        with open(f'/app/flow_logs/bulk_migration_{start_time}.csv', 'w') as f:
             writer = csv.writer(f)
             writer.writerows(dataset_csv)
 
         msg = 'Full migration task'
 
     else:
-        send_migration_dataset(data_dict)
+        start_time = datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+        migration, rw_url, ckan_url, dataset_id = send_migration_dataset(data_dict)
+
+        if rw_url and ckan_url:
+            with open(f'/app/flow_logs/dataset_migration_{start_time}.csv', 'w') as f:
+                writer = csv.writer(f)
+                writer.writerows(
+                    [
+                        ['dataset_id', 'rw_url', 'ckan_url'],
+                        [dataset_id, rw_url, ckan_url],
+                    ]
+                )
 
         msg = 'Migration task'
 
