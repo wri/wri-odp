@@ -1,17 +1,72 @@
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, Any
 import logging
+import requests
+from urllib.parse import urljoin
+import json
 
 from ckanext.wri.model.notification import Notification, notification_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
 from ckanext.wri.logic.auth import schema
 import ckan.logic as logic
 
-from ckan.common import _,config
+from ckan.common import _, config
 import ckan.plugins.toolkit as tk
 from ckan.types import Context, DataDict
+import ckan.plugins as p
+import ckan.lib.helpers as h
+
 
 NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
+
+
+def _trigger_prefect_flow(data_dict: DataDict) -> dict[str, Any]:
+    prefect_url = config.get("ckanext.wri.prefect_url")
+    migration_flow_name = config.get("ckanext.wri.migration_flow_name")
+    deployment_name = config.get("ckanext.wri.migration_deployment_name")
+
+    if any(
+        [
+            not prefect_url,
+            not migration_flow_name,
+            not deployment_name,
+        ]
+    ):
+        error: dict[str, Any] = {
+            "message": "Prefect Configuration Error",
+            "details": "Prefect URL, Migration Flow Name and Deployment Name are required",
+        }
+        raise p.toolkit.ValidationError(error)
+
+    try:
+        deployment = requests.get(
+            urljoin(
+                prefect_url,
+                f"/api/deployments/name/{migration_flow_name}/{deployment_name}",
+            )
+        )
+        deployment = deployment.json()
+        deployment_id = deployment["id"]
+
+        r = requests.post(
+            urljoin(prefect_url, f"api/deployments/{deployment_id}/create_flow_run"),
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(
+                {
+                    "parameters": {
+                        "data_dict": data_dict,
+                    },
+                    "state": {"type": "SCHEDULED", "state_details": {}},
+                }
+            ),
+        )
+        return r.json()
+    except requests.exceptions.ConnectionError as e:
+        error: dict[str, Any] = {
+            "message": "Request Failed",
+            "details": str(e),
+        }
+        raise p.toolkit.ValidationError(error)
 
 
 def notification_create(
@@ -78,40 +133,80 @@ def pending_dataset_create(context: Context, data_dict: DataDict):
 
     return pending_dataset
 
-import requests
-from urllib.parse import urljoin
-import json
 
 @logic.side_effect_free
 def trigger_migration(context: Context, data_dict: DataDict):
+    if not logic.check_access("sysadmin", context=context):
+        raise tk.NotAuthorized(_("Only sysadmins can trigger migrations"))
 
-    prefect_url: str = config.get("ckanext.wri.prefect_url")
-    deployment_name: str = config.get("ckanext.wri.migration_deployment_name")
-    flow_name: str = config.get("ckanext.wri.migration_flow_name")
+    data_dict['is_bulk'] = True
+    return _trigger_prefect_flow(data_dict)
+
+
+@logic.side_effect_free
+def migrate_dataset(context: Context, data_dict: DataDict):
+    dataset_id = data_dict.get("id")
+
+    if not dataset_id:
+        raise tk.ValidationError(_("Dataset 'id' is required"))
+
+    team = data_dict.get("team")
+    topics = data_dict.get("topics")
+
+    tk.check_access("package_create", context, data_dict)
+
+    if team:
+        try:
+            team_dict = tk.get_action("organization_show")(
+                context, {"id": team, "include_users": True}
+            )
+            tk.check_access("organization_update", context, team_dict)
+        except logic.NotFound:
+            raise tk.ValidationError(_(f"Team '{team}' not found"))
+
+    if topics:
+        if isinstance(topics, str):
+            topics = topics.split(",")
+
+            for topic in topics:
+                try:
+                    topic_dict = tk.get_action("group_show")(
+                        context, {"id": topic, "include_users": True}
+                    )
+                    tk.check_access("group_update", context, topic_dict)
+                except logic.NotFound:
+                    raise tk.ValidationError(_(f"Topic '{topic}' not found"))
+
+        else:
+            raise tk.ValidationError(
+                _(
+                    "Topics must be a string (comma separated if it contains multiple topics)"
+                )
+            )
+
+    return _trigger_prefect_flow(data_dict)
+
+
+@logic.side_effect_free
+def migration_status(context: Context, data_dict: DataDict):
+    prefect_url = config.get("ckanext.wri.prefect_url")
+    flow_run_id = data_dict.get("id")
+
+    if not flow_run_id:
+        raise tk.ValidationError(_("'id' is required"))
+
+    if not prefect_url:
+        error: dict[str, Any] = {
+            "message": "Prefect Configuration Error",
+            "details": "Prefect URL is required",
+        }
+        raise p.toolkit.ValidationError(error)
 
     try:
-        deployment = requests.get(
-            urljoin(prefect_url, f"/api/deployments/name/{flow_name}/{deployment_name}")
+        flow_run = requests.get(
+            urljoin(prefect_url, f"/api/flow_runs/{flow_run_id}")
         )
-        deployment = deployment.json()
-        deployment_id = deployment["id"]
-        res_id = None
-        if data_dict.get('id'):
-            res_id = data_dict.get('id')
-        r = requests.post(
-            urljoin(prefect_url, f"api/deployments/{deployment_id}/create_flow_run"),
-            headers={"Content-Type": "application/json"},
-            data=json.dumps(
-
-                {
-                    "parameters": {
-                        "resource_id": res_id
-                    },
-                    "state": {"type": "SCHEDULED", "state_details": {}},
-                }
-            ),
-        )
-        return r.json()
+        return flow_run.json()
     except requests.exceptions.ConnectionError as e:
         error: dict[str, Any] = {
             "message": "Request Failed",

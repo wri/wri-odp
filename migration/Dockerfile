@@ -16,4 +16,6 @@ RUN apt-get install -y \
 
 RUN mkdir /app/files
 
+COPY files/datasets.csv /app/files/datasets.csv
+
 CMD [ "python", "main.py" ]
