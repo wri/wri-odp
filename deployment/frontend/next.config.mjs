@@ -24,7 +24,11 @@ const config = {
                 headers: [
                     {
                         key: 'X-Frame-Options',
-                        value: '', // Matched parameters can be used in the value
+                        value: 'ALLOW-FROM *', // Matched parameters can be used in the value
+                    },
+                    {
+                        key: 'Content-Security-Policy',
+                        value: cspHeader.replace(/\n/g, ''),
                     },
                 ],
             },
@@ -33,7 +37,11 @@ const config = {
                 headers: [
                     {
                         key: 'X-Frame-Options',
-                        value: '', // Matched parameters can be used in the value
+                        value: 'ALLOW-FROM *', // Matched parameters can be used in the value
+                    },
+                    {
+                        key: 'Content-Security-Policy',
+                        value: cspHeader.replace(/\n/g, ''),
                     },
                 ],
             },
