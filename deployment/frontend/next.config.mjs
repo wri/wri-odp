@@ -11,8 +11,34 @@ const bundleAnalyzer = withBundleAnalyzer({
     enabled: process.env.ANALYZE === 'true',
 })
 
+const cspHeader = `
+    frame-ancestors '*';
+`
+
 /** @type {import("next").NextConfig} */
 const config = {
+    async headers() {
+        return [
+            {
+                source: '/datasets/:datasetName/embed*',
+                headers: [
+                    {
+                        key: 'X-Frame-Options',
+                        value: '', // Matched parameters can be used in the value
+                    },
+                ],
+            },
+            {
+                source: '/(.*)',
+                headers: [
+                    {
+                        key: 'Content-Security-Policy',
+                        value: cspHeader.replace(/\n/g, ''),
+                    },
+                ],
+            },
+        ]
+    },
     eslint: {
         // Warning: This allows production builds to successfully complete even if
         // your project has ESLint errors.
