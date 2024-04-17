@@ -12,7 +12,7 @@ import ckanapi
 
 DATASETS_FILE = 'files/datasets.csv'
 RW_API = 'https://api.resourcewatch.org/v1/dataset'
-CKAN_API_KEY = Secret.load("ckan-api-key")
+CKAN_API_KEY = Secret.load("ckan-api-key").get()
 CKAN_URL = variables.get("ckan_url")
 FRONTEND_CKAN_URL = variables.get("ckan_frontend_url")
 
@@ -269,6 +269,8 @@ def send_migration_dataset(data_dict):
     team = data_dict.get('team')
     topics = data_dict.get('topics')
     dataset = get_dataset_from_api(dataset_id, application)
+    whitelist = data_dict.get('whitelist')
+    blacklist = data_dict.get('blacklist')
 
     dataset_slug = dataset.get('dataset', {}).get('slug')
 
@@ -277,7 +279,7 @@ def send_migration_dataset(data_dict):
     if dataset_slug:
         rw_dataset_url = f'https://resourcewatch.org/data/explore/{dataset_slug}'
 
-    dataset = prepare_dataset(dataset, application, team, topics)
+    dataset = prepare_dataset(dataset, application, team, topics, whitelist, blacklist)
 
     dataset_name = dataset.get('name')
 
@@ -558,7 +560,7 @@ def get_dataset_from_api(dataset_id, application):
     return output_object
 
 
-def prepare_dataset(data_dict, application, team=None, topics=None):
+def prepare_dataset(data_dict, application, team=None, topics=None, whitelist=None, blacklist=None):
     log = get_run_logger()
 
     def get_value(key, default='', data_object=None):
@@ -643,24 +645,27 @@ def prepare_dataset(data_dict, application, team=None, topics=None):
         {'key': p[0], 'value': normalize_value(p[1])} for p in set(get_paths(data_dict))
     ]
 
-    dataset_values = {
+    required_dataset_values = {
         'name': name,
-        'title': title,
-        'notes': description,
         'private': False,
-        'extras': extras,
         'approval_status': 'approved',
         'is_approved': True,
         'draft': False,
         'private': False,
         'application': application,
+        'visibility_type': 'public',
+    }
+
+    dataset_values = {
+        'title': title,
+        'notes': description,
+        'extras': extras,
         'cautions': cautions,
         'language': language,
         'citation': citation,
         'function': function,
         'url': data_download_link,
         'learn_more': learn_more_link,
-        'visibility_type': 'public',
         'update_frequency': '',
     }
 
@@ -709,6 +714,22 @@ def prepare_dataset(data_dict, application, team=None, topics=None):
 
         if resources:
             dataset_dict['resources'] = resources
+
+    if whitelist:
+        dataset_dict = {
+            key: value
+            for key, value in dataset_dict.items()
+            if key in whitelist
+        }
+
+    if blacklist:
+        dataset_dict = {
+            key: value
+            for key, value in dataset_dict.items()
+            if key not in blacklist
+        }
+
+    dataset_dict = {**required_dataset_values, **dataset_dict}
 
     log.info(
         f'{log_name} Finished preparing dataset: \n{json.dumps(dataset_dict, indent=2)}'
