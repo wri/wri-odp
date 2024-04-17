@@ -12,3 +12,4 @@ pandas==2.2.0
 openpyxl==3.1.2
 lxml==5.1.0
 pycountry==22.3.5
+ckanapi==4.8.0
