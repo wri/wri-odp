@@ -20,6 +20,61 @@ NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
 
 
+SCHEMA_FIELDS = [
+    "author",
+    "author_email",
+    "isopen",
+    "license_id",
+    "license_title",
+    "maintainer",
+    "maintainer_email",
+    "notes",
+    "organization",
+    "title",
+    "url",
+    "resources",
+    "extras",
+    "language",
+    "citation",
+    "cautions",
+    "spatial",
+    "spatial_address",
+    "update_frequency",
+    "temporal_coverage_start",
+    "temporal_coverage_end",
+    "featured_dataset",
+    "groups",
+    "project",
+    "function",
+    "methodology",
+    "open_in",
+    "release_notes",
+    "restrictions",
+    "reason_for_adding",
+    "short_description",
+    "learn_more",
+    "wri_data",
+    "technical_notes",
+    "visibility_type",
+    "approval_status",
+    "is_approved"
+]
+
+SCHEMA_SYNONYMS = {
+    'organization': 'owner_org',
+    'team': 'owner_org',
+    'owner_org': 'owner_org',
+    'groups': 'groups',
+    'group': 'groups',
+    'topics': 'groups',
+    'topic': 'groups',
+    'resources': 'resources',
+    'resource': 'resources',
+    'layers': 'resources',
+    'layer': 'resources',
+}
+
+
 def _trigger_prefect_flow(data_dict: DataDict) -> dict[str, Any]:
     prefect_url = config.get("ckanext.wri.prefect_url")
     migration_flow_name = config.get("ckanext.wri.migration_flow_name")
@@ -140,15 +195,31 @@ def trigger_migration(context: Context, data_dict: DataDict):
         raise tk.NotAuthorized(_("Only sysadmins can trigger migrations"))
 
     data_dict['is_bulk'] = True
+
+    data_dict = _black_white_list("whitelist", data_dict)
+    data_dict = _black_white_list("blacklist", data_dict)
+
+    if data_dict.get("whitelist") and data_dict.get("blacklist"):
+        raise tk.ValidationError(_("Whitelist and blacklist cannot be used together"))
+
     return _trigger_prefect_flow(data_dict)
 
 
 @logic.side_effect_free
 def migrate_dataset(context: Context, data_dict: DataDict):
     dataset_id = data_dict.get("id")
+    application = data_dict.get("application")
+    data_dict = _black_white_list("whitelist", data_dict)
+    data_dict = _black_white_list("blacklist", data_dict)
+
+    if data_dict.get("whitelist") and data_dict.get("blacklist"):
+        raise tk.ValidationError(_("Whitelist and blacklist cannot be used together"))
 
     if not dataset_id:
         raise tk.ValidationError(_("Dataset 'id' is required"))
+
+    if not application:
+        raise tk.ValidationError(_("Application is required"))
 
     team = data_dict.get("team")
     topics = data_dict.get("topics")
@@ -174,6 +245,8 @@ def migrate_dataset(context: Context, data_dict: DataDict):
                         context, {"id": topic, "include_users": True}
                     )
                     tk.check_access("group_update", context, topic_dict)
+
+                    data_dict["topics"] = topics
                 except logic.NotFound:
                     raise tk.ValidationError(_(f"Topic '{topic}' not found"))
 
@@ -185,6 +258,32 @@ def migrate_dataset(context: Context, data_dict: DataDict):
             )
 
     return _trigger_prefect_flow(data_dict)
+
+
+def _black_white_list(list_type: str, data_dict: DataDict):
+    list_fields = data_dict.get(list_type)
+
+    if list_fields:
+        if isinstance(list_fields, str):
+            list_fields = list_fields.split(",")
+
+            for field in list_fields:
+                if field not in SCHEMA_FIELDS:
+                    raise tk.ValidationError(
+                        _(
+                            f"{list_type.capitalize()} field '{field}' is not a valid field"
+                        )
+                    )
+
+            data_dict[list_type] = [
+                SCHEMA_SYNONYMS.get(field, field) for field in list_fields
+            ]
+        else:
+            raise tk.ValidationError(
+                _(f"{list_type.capitalize()} fields must be a comma-separated string")
+            )
+
+    return data_dict
 
 
 @logic.side_effect_free
@@ -203,9 +302,7 @@ def migration_status(context: Context, data_dict: DataDict):
         raise p.toolkit.ValidationError(error)
 
     try:
-        flow_run = requests.get(
-            urljoin(prefect_url, f"/api/flow_runs/{flow_run_id}")
-        )
+        flow_run = requests.get(urljoin(prefect_url, f"/api/flow_runs/{flow_run_id}"))
         return flow_run.json()
     except requests.exceptions.ConnectionError as e:
         error: dict[str, Any] = {
