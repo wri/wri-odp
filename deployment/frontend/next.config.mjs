@@ -17,45 +17,6 @@ const cspHeader = `
 
 /** @type {import("next").NextConfig} */
 const config = {
-    async headers() {
-        return [
-            {
-                source: '/datasets/:datasetName/embed/map',
-                headers: [
-                    {
-                        key: 'X-Frame-Options',
-                        value: 'ALLOW-FROM *', // Matched parameters can be used in the value
-                    },
-                    {
-                        key: 'Content-Security-Policy',
-                        value: cspHeader.replace(/\n/g, ''),
-                    },
-                ],
-            },
-            {
-                source: '/datasets/:datasetName/embed/chart',
-                headers: [
-                    {
-                        key: 'X-Frame-Options',
-                        value: 'ALLOW-FROM *', // Matched parameters can be used in the value
-                    },
-                    {
-                        key: 'Content-Security-Policy',
-                        value: cspHeader.replace(/\n/g, ''),
-                    },
-                ],
-            },
-            {
-                source: '/(.*)',
-                headers: [
-                    {
-                        key: 'Content-Security-Policy',
-                        value: cspHeader.replace(/\n/g, ''),
-                    },
-                ],
-            },
-        ]
-    },
     eslint: {
         // Warning: This allows production builds to successfully complete even if
         // your project has ESLint errors.
