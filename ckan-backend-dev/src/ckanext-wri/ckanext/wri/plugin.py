@@ -20,7 +20,7 @@ from ckanext.wri.logic.action.datapusher import (
     datapusher_latest_task,
     datapusher_submit,
 )
-from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
+from ckanext.wri.logic.action.create import notification_create, pending_dataset_create, trigger_migration, migrate_dataset, migration_status
 from ckanext.wri.logic.action.update import (
     notification_update,
     pending_dataset_update,
@@ -166,6 +166,9 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def get_actions(self):
         return {
+            "trigger_migration": trigger_migration,
+            "migrate_dataset": migrate_dataset,
+            "migration_status": migration_status,
             "package_search": package_search,
             "password_reset": action.password_reset,
             "notification_get_all": notification_get_all,
