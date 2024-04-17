@@ -130,6 +130,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "pending_dataset_show": auth.pending_dataset_show,
             "pending_dataset_update": auth.pending_dataset_update,
             "pending_dataset_delete": auth.pending_dataset_delete,
+            "package_update": auth.package_update,
         }
 
     # IValidators
