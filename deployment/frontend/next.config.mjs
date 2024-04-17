@@ -20,7 +20,16 @@ const config = {
     async headers() {
         return [
             {
-                source: '/datasets/:datasetName/embed*',
+                source: '/datasets/:datasetName/embed/map',
+                headers: [
+                    {
+                        key: 'X-Frame-Options',
+                        value: '', // Matched parameters can be used in the value
+                    },
+                ],
+            },
+            {
+                source: '/datasets/:datasetName/embed/chart',
                 headers: [
                     {
                         key: 'X-Frame-Options',
