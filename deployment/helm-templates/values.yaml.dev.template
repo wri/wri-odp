@@ -43,6 +43,8 @@ ckan:
       # GA4 credentials for testing only
       CKANEXT__WRI__API_ANALYTICS__MEASUREMENT_ID: G-XKQWQ802E4
       CKANEXT__WRI__API_ANALYTICS__API_SECRET: C9ctTsbZSXCS6jRBR5Mywg
+      CKANEXT__WRI__MIGRATION_DEPLOYMENT_NAME: migration_deployment
+      CKANEXT__WRI__MIGRATION_FLOW_NAME: trigger-migration
     hpa:
       enable: true
       minReplicas: 2
