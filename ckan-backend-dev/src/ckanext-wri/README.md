@@ -492,7 +492,7 @@ The most important part of the response is the `state` object, which contains th
 
 #### Blacklist/Whitelist Supported Fields
 
-The following fields are supported for the `blacklist` and `whitelist` parameters:
+The following fields are supported for the `blacklist` and `whitelist` parameters (all other fields do not currently have a direct mapping):
 
 - `cautions` - Maps to `cautions` in the RW dataset.
 - `citation` - Maps to `citation` in the RW dataset.
