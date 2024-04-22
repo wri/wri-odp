@@ -190,6 +190,323 @@ Here's an example:
 }
 ```
 
+## Migration API
+
+This extension includes a migration API that allows users to migrate datasets from RW to CKAN.
+
+### API Endpoints
+
+#### POST /api/3/action/migrate_dataset
+
+**Note**: The functionality of this endpoint is limited to the user's permissions in CKAN. For example, if a user has the correct permissions to create a dataset but doesn't have permissions to add it to the Team or Topic specified, the request will return an authorization error.
+
+Migrates an RW dataset/metadata to CKAN. It maps all supported RW fields to CKAN fields. All additional RW fields (except objects) are stored in the `extras` field of the CKAN dataset. This endpoint handles both the creation and updating of datasets (this is determined automatically—no need to specify).
+
+**Parameters:**
+- **id** (string) – The RW UUID of the dataset to migrate (required). Example: `c0b5f4b1-4f3b-4f1e-8f1e-3f4b1f3b4f1e`.
+- **application** (string) – The RW application of the dataset to migrate (required). Example: `rw`.
+- **team** (string) – The `name` (`slug`) of the Team to associate the dataset with (optional). Example: `land-carbon-lab`.
+- **topics** (string) – A comma-separated list of Topic `slug`s to associate the dataset with (optional). Example: `atmosphere,biodiversity`.
+- **blacklist** (string) – A comma-separated list of CKAN fields to exclude from the migration mapping (optional—cannot be used with `whitelist`). Example: `resources,extras` will exclude the `resources` (Layers) and `extras` (additional unsupported fields) fields from the migration mapping.
+- **whitelist** (string) – A comma-separated list of CKAN fields to include in the migration mapping (optional—cannot be used with `blacklist`). Example: `title,notes` will only include the `title` (Title) and `notes` (Description) fields in the migration mapping.
+
+A successful request will return the Prefect status of the new migration job.
+
+##### Usage Example
+
+```
+% curl -H "Authorization: YOUR_API_TOKEN" "https://wri.dev.ckan.datopian.com/api/3/action/migrate_dataset?id=c12446ce-174f-4ffb-b2f7-77ecb0116aba&application=rw&team=migration-test&topics=lucas-topic,nov-16-topic"
+{
+  "help": "https://wri.dev.ckan.datopian.com/api/3/action/help_show?name=migration_status",
+  "success": true,
+  "result": {
+    "id": "2b3d8bf5-80a1-4816-a2f0-55a97f720471",
+    "created": "2024-04-19T16:25:50.064208+00:00",
+    "updated": "2024-04-19T16:26:09.039985+00:00",
+    "name": "masked-penguin",
+    "flow_id": "0c5a71cd-ce9f-448e-8453-366cbb6944c0",
+    "state_id": "142982aa-2c10-4859-b2fd-68beb2be7bdf",
+    "deployment_id": "7191012a-0572-4dfe-8e0d-be5de4acc39c",
+    "work_queue_id": null,
+    "work_queue_name": null,
+    "flow_version": "659bece7fac5af816d61217219193235",
+    "parameters": {
+      "data_dict": {
+        "id": "c12446ce-174f-4ffb-b2f7-77ecb0116aba",
+        "team": "migration-test",
+        "topics": [
+          "lucas-topic",
+          "nov-16-topic"
+        ],
+        "application": "rw"
+      }
+    },
+    "idempotency_key": null,
+    "context": {},
+    "empirical_policy": {
+      "max_retries": 0,
+      "retry_delay_seconds": 0,
+      "retries": 0,
+      "retry_delay": 0,
+      "pause_keys": [],
+      "resuming": false
+    },
+    "tags": [],
+    "parent_task_run_id": null,
+    "state_type": "COMPLETED",
+    "state_name": "Completed",
+    "run_count": 1,
+    "expected_start_time": "2024-04-19T16:25:50.064030+00:00",
+    "next_scheduled_start_time": null,
+    "start_time": "2024-04-19T16:26:03.090073+00:00",
+    "end_time": "2024-04-19T16:26:09.038686+00:00",
+    "total_run_time": 5.948613,
+    "estimated_run_time": 5.948613,
+    "estimated_start_time_delta": 13.026043,
+    "auto_scheduled": false,
+    "infrastructure_document_id": null,
+    "infrastructure_pid": null,
+    "created_by": null,
+    "work_pool_id": null,
+    "work_pool_name": null,
+    "state": {
+      "id": "142982aa-2c10-4859-b2fd-68beb2be7bdf",
+      "type": "COMPLETED",
+      "name": "Completed",
+      "timestamp": "2024-04-19T16:26:09.038686+00:00",
+      "message": null,
+      "data": {
+        "type": "unpersisted"
+      },
+      "state_details": {
+        "flow_run_id": "2b3d8bf5-80a1-4816-a2f0-55a97f720471",
+        "task_run_id": null,
+        "child_flow_run_id": null,
+        "scheduled_time": null,
+        "cache_key": null,
+        "cache_expiration": null,
+        "untrackable_result": false,
+        "pause_timeout": null,
+        "pause_reschedule": false,
+        "pause_key": null,
+        "run_input_keyset": null,
+        "refresh_cache": null
+      }
+    }
+  }
+}
+```
+
+You'll need this ID: `"id": "2b3d8bf5-80a1-4816-a2f0-55a97f720471"` (`result.id`) to check the status of the migration job at a later time.
+
+#### POST /api/3/action/trigger_migration
+
+**Note**: This endpoint is currently only available to system admins.
+
+Triggers a full migration of RW datasets/metadata using the pre-defined [`datasets.csv` file](../../../migration/files/datasets.csv). There's currently no way to change the dataset list without modifying the CSV file, and only `blacklist` and `whitelist` parameters are supported. This endpoint handles both the creation and updating of datasets (this is determined automatically—no need to specify).
+
+**Parameters:**
+- **blacklist** (string) – A comma-separated list of CKAN fields to exclude from the migration mapping (optional—cannot be used with `whitelist`). Example: `resources,extras` will exclude the `resources` (Layers) and `extras` (additional unsupported fields) fields from the migration mapping.
+- **whitelist** (string) – A comma-separated list of CKAN fields to include in the migration mapping (optional—cannot be used with `blacklist`). Example: `title,notes` will only include the `title` (Title) and `notes` (Description) fields in the migration mapping.
+
+A successful request will return the Prefect status of the new migration job.
+
+##### Usage Example
+
+Same as above, but with the `/trigger_migration` endpoint.
+
+```
+% curl -H "Authorization: YOUR_API_TOKEN" "https://wri.dev.ckan.datopian.com/api/3/action/trigger_migration"
+{
+  "help": "https://wri.dev.ckan.datopian.com/api/3/action/help_show?name=trigger_migration",
+  "success": true,
+  "result": {
+    "id": "7cd8a09e-1834-4ab5-8b72-bd638e9392ae",
+    "created": "2024-04-19T13:35:02.161350+00:00",
+    "updated": "2024-04-19T13:35:02.158656+00:00",
+    "name": "hospitable-barracuda",
+    "flow_id": "0c5a71cd-ce9f-448e-8453-366cbb6944c0",
+    "state_id": "ecfa19b2-dd38-4434-a167-974fd8149b68",
+    "deployment_id": "7191012a-0572-4dfe-8e0d-be5de4acc39c",
+    "work_queue_id": null,
+    "work_queue_name": null,
+    "flow_version": null,
+    "parameters": {
+      "data_dict": {
+        "is_bulk": true
+      }
+    },
+    "idempotency_key": null,
+    "context": {},
+    "empirical_policy": {
+      "max_retries": 0,
+      "retry_delay_seconds": 0,
+      "retries": null,
+      "retry_delay": null,
+      "pause_keys": [],
+      "resuming": false
+    },
+    "tags": [],
+    "parent_task_run_id": null,
+    "state_type": "SCHEDULED",
+    "state_name": "Scheduled",
+    "run_count": 0,
+    "expected_start_time": "2024-04-19T13:35:02.161117+00:00",
+    "next_scheduled_start_time": "2024-04-19T13:35:02.161117+00:00",
+    "start_time": null,
+    "end_time": null,
+    "total_run_time": 0,
+    "estimated_run_time": 0,
+    "estimated_start_time_delta": 0.035684,
+    "auto_scheduled": false,
+    "infrastructure_document_id": null,
+    "infrastructure_pid": null,
+    "created_by": null,
+    "work_pool_id": null,
+    "work_pool_name": null,
+    "state": {
+      "id": "ecfa19b2-dd38-4434-a167-974fd8149b68",
+      "type": "SCHEDULED",
+      "name": "Scheduled",
+      "timestamp": "2024-04-19T13:35:02.161053+00:00",
+      "message": null,
+      "data": null,
+      "state_details": {
+        "flow_run_id": "7cd8a09e-1834-4ab5-8b72-bd638e9392ae",
+        "task_run_id": null,
+        "child_flow_run_id": null,
+        "scheduled_time": "2024-04-19T13:35:02.161117+00:00",
+        "cache_key": null,
+        "cache_expiration": null,
+        "untrackable_result": false,
+        "pause_timeout": null,
+        "pause_reschedule": false,
+        "pause_key": null,
+        "run_input_keyset": null,
+        "refresh_cache": null
+      }
+    }
+  }
+}
+```
+
+You'll need this ID: `"id": "7cd8a09e-1834-4ab5-8b72-bd638e9392ae"` (`result.id`) to check the status of the migration job at a later time.
+
+#### POST /api/3/action/migration_status
+
+Returns the status of the specified migration job in Prefect.
+
+**Parameters:**
+- **id** (string) – The Prefect flow run ID (required). This is found at `result.id` in the response from the `/migrate_dataset` or `/trigger_migration` endpoints.
+
+A successful request will return the current status of the migration job.
+
+##### Usage Example
+
+The following uses the flow run ID from the `/migrate_dataset` endpoint example above:
+
+```
+% curl -H "Authorization: YOUR_API_TOKEN" "https://wri.dev.ckan.datopian.com/api/3/action/migration_status?id=2b3d8bf5-80a1-4816-a2f0-55a97f720471"
+{
+  "help": "https://wri.dev.ckan.datopian.com/api/3/action/help_show?name=migration_status",
+  "success": true,
+  "result": {
+    "id": "2b3d8bf5-80a1-4816-a2f0-55a97f720471",
+    "created": "2024-04-19T16:25:50.064208+00:00",
+    "updated": "2024-04-19T16:26:09.039985+00:00",
+    "name": "masked-penguin",
+    "flow_id": "0c5a71cd-ce9f-448e-8453-366cbb6944c0",
+    "state_id": "142982aa-2c10-4859-b2fd-68beb2be7bdf",
+    "deployment_id": "7191012a-0572-4dfe-8e0d-be5de4acc39c",
+    "work_queue_id": null,
+    "work_queue_name": null,
+    "flow_version": "659bece7fac5af816d61217219193235",
+    "parameters": {
+      "data_dict": {
+        "id": "c12446ce-174f-4ffb-b2f7-77ecb0116aba",
+        "team": "migration-test",
+        "topics": [
+          "lucas-topic",
+          "nov-16-topic"
+        ],
+        "application": "rw"
+      }
+    },
+    "idempotency_key": null,
+    "context": {},
+    "empirical_policy": {
+      "max_retries": 0,
+      "retry_delay_seconds": 0,
+      "retries": 0,
+      "retry_delay": 0,
+      "pause_keys": [],
+      "resuming": false
+    },
+    "tags": [],
+    "parent_task_run_id": null,
+    "state_type": "COMPLETED",
+    "state_name": "Completed",
+    "run_count": 1,
+    "expected_start_time": "2024-04-19T16:25:50.064030+00:00",
+    "next_scheduled_start_time": null,
+    "start_time": "2024-04-19T16:26:03.090073+00:00",
+    "end_time": "2024-04-19T16:26:09.038686+00:00",
+    "total_run_time": 5.948613,
+    "estimated_run_time": 5.948613,
+    "estimated_start_time_delta": 13.026043,
+    "auto_scheduled": false,
+    "infrastructure_document_id": null,
+    "infrastructure_pid": null,
+    "created_by": null,
+    "work_pool_id": null,
+    "work_pool_name": null,
+    "state": {
+      "id": "142982aa-2c10-4859-b2fd-68beb2be7bdf",
+      "type": "COMPLETED",
+      "name": "Completed",
+      "timestamp": "2024-04-19T16:26:09.038686+00:00",
+      "message": null,
+      "data": {
+        "type": "unpersisted"
+      },
+      "state_details": {
+        "flow_run_id": "2b3d8bf5-80a1-4816-a2f0-55a97f720471",
+        "task_run_id": null,
+        "child_flow_run_id": null,
+        "scheduled_time": null,
+        "cache_key": null,
+        "cache_expiration": null,
+        "untrackable_result": false,
+        "pause_timeout": null,
+        "pause_reschedule": false,
+        "pause_key": null,
+        "run_input_keyset": null,
+        "refresh_cache": null
+      }
+    }
+  }
+}
+```
+
+The most important part of the response is the `state` object, which contains the current state of the migration job. The actual status can be found at `result.state.name` or `result.state.type`.
+
+#### Blacklist/Whitelist Supported Fields
+
+The following fields are supported for the `blacklist` and `whitelist` parameters (all other fields do not currently have a direct mapping):
+
+- `cautions` - Maps to `cautions` in the RW dataset.
+- `citation` - Maps to `citation` in the RW dataset.
+- `extras` - Maps all unsupported RW fields to the `extras` field in the CKAN dataset (except objects).
+- `function` - Maps to `function` or `functions` in the RW dataset.
+- `language` - Maps to `language` in the RW dataset. **Note**: This field in CKAN requires an ISO 639-1 language code. If the incoming language is not an ISO 639-1 code, it will be ignored.
+- `learn_more` - Maps to the `learn_more_link` in the RW dataset.
+- `notes` - Maps to `description` in the RW dataset.
+- `resources` - Maps to the Layers in the RW dataset. Each Layer is mapped to a CKAN resource.
+- `title` - Maps to `name` in the RW dataset if exists, otherwise, uses the same slugified name.
+- `url` - Maps to the `data_download_original_link` if exists, otherwise, uses `data_download_link`. **Note**: This field in CKAN requires a valid URL. If the incoming URL is not valid, it will be ignored.
+
+In all cases above, both the RW metadata and dataset are checked for a value, defaulting to the RW metadata value if it exists. In most cases, there's no comparable key/value in the RW dataset, but there are a few cases where the RW dataset has a key that's not in the RW metadata.
+
 ## API Analytics Tracking
 
 **Note**: This plugin requires a Google Analytics account with a Measurement ID and API Secret to work. For more information on how to set up Google Analytics, see the [Google Analytics documentation](https://support.google.com/analytics/answer/9304153?hl=en). Steps to set up reports can be found in the main `docs` directory in this repo (see [`wri-odp/docs/ga-api/README.md`](../docs/ga-api/README.md)).

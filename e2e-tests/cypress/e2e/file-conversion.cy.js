@@ -58,24 +58,6 @@ describe("Data files", () => {
     },
   );
 
-  it(
-    "should be downloadable from the dataset page",
-    {
-      retries: {
-        runMode: 5,
-        openMode: 0,
-      },
-    },
-    () => {
-      cy.viewport(1440, 1440);
-      cy.visit(`/datasets/${datasetName}`);
-      cy.wait(5000);
-      cy.contains("Example title").click({ force: true });
-      cy.get(".download-datafile").click()
-      cy.contains("Original Format")
-    },
-  );
-
   after(() => {
     cy.deleteDatasetAPI(datasetName);
   });

@@ -939,9 +939,13 @@ function DatafileCard({
                                 </div>
                             </div>
                             <div className="grid max-w-[30rem] grid-cols-3 gap-x-3 py-4 ">
-                                <DownloadButton datafile={datafile} />
+                                {!datafile.rw_id || datafile.rw_id === '' && (
+                                    <>
+                                        <DownloadButton datafile={datafile} />
+                                        <OpenInButton />
+                                    </>
+                                )}
                                 {/*<LearnMoreButton datafile={datafile} dataset={dataset} />*/}
-                                <OpenInButton />
                                 <APIButton datafile={datafile} />
                             </div>
                         </Disclosure.Panel>
