@@ -11,6 +11,10 @@ const bundleAnalyzer = withBundleAnalyzer({
     enabled: process.env.ANALYZE === 'true',
 })
 
+const cspHeader = `
+    frame-ancestors '*';
+`
+
 /** @type {import("next").NextConfig} */
 const config = {
     eslint: {
