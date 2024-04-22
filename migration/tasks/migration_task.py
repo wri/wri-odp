@@ -6,15 +6,17 @@ import requests
 import re
 import json
 import pycountry
+import os
 
 import ckanapi
 
 
 DATASETS_FILE = 'files/datasets.csv'
 RW_API = 'https://api.resourcewatch.org/v1/dataset'
-CKAN_API_KEY = Secret.load("ckan-api-key").get()
-CKAN_URL = variables.get("ckan_url")
-FRONTEND_CKAN_URL = variables.get("ckan_frontend_url")
+DEPLOYMENT_ENV = os.environ['FLOW_DEPLOYMENT_ENV']
+CKAN_API_KEY = Secret.load(f'ckan-api-key-{DEPLOYMENT_ENV}').get()
+CKAN_URL = variables.get(f'ckan_url_{DEPLOYMENT_ENV}')
+FRONTEND_CKAN_URL = variables.get(f'ckan_frontend_url_{DEPLOYMENT_ENV}')
 
 
 ckan = ckanapi.RemoteCKAN(CKAN_URL, apikey=CKAN_API_KEY)
@@ -560,7 +562,9 @@ def get_dataset_from_api(dataset_id, application):
     return output_object
 
 
-def prepare_dataset(data_dict, application, team=None, topics=None, whitelist=None, blacklist=None):
+def prepare_dataset(
+    data_dict, application, team=None, topics=None, whitelist=None, blacklist=None
+):
     log = get_run_logger()
 
     def get_value(key, default='', data_object=None):
@@ -674,8 +678,8 @@ def prepare_dataset(data_dict, application, team=None, topics=None, whitelist=No
     if team:
         try:
             owner_org = ckan.action.organization_show(id=team)
-            dataset_dict['owner_org'] = owner_org['id']
-            dataset_dict['owner_org_name'] = owner_org['name']
+            required_dataset_values['owner_org'] = owner_org['id']
+            required_dataset_values['owner_org_name'] = owner_org['name']
         except ckanapi.errors.NotFound:
             log.error(f'{log_name} Team not found: {team}')
 
@@ -690,11 +694,11 @@ def prepare_dataset(data_dict, application, team=None, topics=None, whitelist=No
                 log.error(f'{log_name} Topic not found: {topic}')
 
         if valid_topics:
-            dataset_dict['groups'] = valid_topics
+            required_dataset_values['groups'] = valid_topics
 
     resources = []
 
-    dataset_dict['rw_id'] = resource['dataset_id']
+    required_dataset_values['rw_id'] = resource['dataset_id']
 
     if application not in ['aqueduct', 'aqueduct-water-risk']:
         for layer in layers:
@@ -717,16 +721,12 @@ def prepare_dataset(data_dict, application, team=None, topics=None, whitelist=No
 
     if whitelist:
         dataset_dict = {
-            key: value
-            for key, value in dataset_dict.items()
-            if key in whitelist
+            key: value for key, value in dataset_dict.items() if key in whitelist
         }
 
     if blacklist:
         dataset_dict = {
-            key: value
-            for key, value in dataset_dict.items()
-            if key not in blacklist
+            key: value for key, value in dataset_dict.items() if key not in blacklist
         }
 
     dataset_dict = {**required_dataset_values, **dataset_dict}

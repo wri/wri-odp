@@ -20,6 +20,8 @@ NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
 
 
+# Most of SCHEMA_FIELDS and SCHEMA_SYNONYMS are not currently
+# supported in Whitelist and Blacklist, but they might be later.
 SCHEMA_FIELDS = [
     "author",
     "author_email",
@@ -89,7 +91,7 @@ def _trigger_prefect_flow(data_dict: DataDict) -> dict[str, Any]:
     ):
         error: dict[str, Any] = {
             "message": "Prefect Configuration Error",
-            "details": "Prefect URL, Migration Flow Name and Deployment Name are required",
+            "details": "prefect_url, migration_flow_name, and migration_deployment_name are required",
         }
         raise p.toolkit.ValidationError(error)
 
@@ -268,6 +270,22 @@ def _black_white_list(list_type: str, data_dict: DataDict):
             list_fields = list_fields.split(",")
 
             for field in list_fields:
+                if field in [
+                    "owner_org",
+                    "organization",
+                    "orgainzations",
+                    "team",
+                    "teams",
+                    "groups",
+                    "group",
+                    "topics",
+                    "topic",
+                ]:
+                    raise tk.ValidationError(
+                        _(
+                            f"{list_type.capitalize()} field '{field}' is not supported in {list_type.capitalize()} list"
+                        )
+                    )
                 if field not in SCHEMA_FIELDS:
                     raise tk.ValidationError(
                         _(
