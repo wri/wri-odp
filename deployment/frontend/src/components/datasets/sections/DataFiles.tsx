@@ -638,6 +638,8 @@ function DatafileCard({
                                         <Button
                                             variant="outline"
                                             size="sm"
+                                            id={`tableviews-${dataset.id}`}
+                                            className="text-xs 2xl:text-sm whitespace-nowrap"
                                             onClick={() => {
                                                 // @ts-ignore
                                                 if (datafile.rw_id) {
@@ -652,11 +654,15 @@ function DatafileCard({
                                                         dataset.id
                                                     )
                                                 }
+                                                //@ts-ignore
+                                                dataLayer.push({
+                                                    event: 'gtm.click',
+                                                    resource_name:
+                                                        datafile.title,
+                                                })
                                             }}
                                         >
-                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                Show Layer
-                                            </span>
+                                            Show Layer
                                         </Button>
                                     )}
                                 </>
@@ -679,7 +685,9 @@ function DatafileCard({
                                     ) : (
                                         <Button
                                             size="sm"
-                                            onClick={() =>
+                                            id={`tableviews-${dataset.id}`}
+                                            className="text-xs 2xl:text-sm whitespace-nowrap"
+                                            onClick={() => {
                                                 setTabularResource({
                                                     provider: 'datastore',
                                                     id: datafile.id as string,
@@ -687,11 +695,15 @@ function DatafileCard({
                                                         datafile?.title ??
                                                         (datafile.name as string),
                                                 })
-                                            }
+                                                //@ts-ignore
+                                                dataLayer.push({
+                                                    event: 'gtm.click',
+                                                    resource_name:
+                                                        datafile.title,
+                                                })
+                                            }}
                                         >
-                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                View Table Preview
-                                            </span>
+                                            View Table Preview
                                         </Button>
                                     )}
                                 </>
@@ -726,14 +738,24 @@ function DatafileCard({
                                     ) : (
                                         <Button
                                             size="sm"
+                                            id={`tableviews-${dataset.id}`}
+                                            className="text-xs 2xl:text-sm whitespace-nowrap"
+                                            data-resource={
+                                                datafile.title ?? datafile.name!
+                                            }
                                             onClick={() => {
                                                 if (datafile._views)
                                                     addCharts(datafile._views)
+
+                                                //@ts-ignore
+                                                dataLayer.push({
+                                                    event: 'gtm.click',
+                                                    resource_name:
+                                                        datafile.title,
+                                                })
                                             }}
                                         >
-                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                View Chart Preview
-                                            </span>
+                                            View Chart Preview
                                         </Button>
                                     )}
                                 </>
@@ -788,6 +810,8 @@ function DatafileCard({
                                             <Button
                                                 variant="outline"
                                                 size="sm"
+                                                id={`tableviews-${dataset.id}`}
+                                                className="text-xs 2xl:text-sm whitespace-nowrap"
                                                 onClick={() => {
                                                     // @ts-ignore
                                                     if (datafile.rw_id) {
@@ -804,11 +828,15 @@ function DatafileCard({
                                                             dataset.id
                                                         )
                                                     }
+                                                    //@ts-ignore
+                                                    dataLayer.push({
+                                                        event: 'gtm.click',
+                                                        resource_name:
+                                                            datafile.title,
+                                                    })
                                                 }}
                                             >
-                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                    Show Layer
-                                                </span>
+                                                Show Layer
                                             </Button>
                                         )}
                                     </>
@@ -832,7 +860,9 @@ function DatafileCard({
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() =>
+                                                id={`tableviews-${dataset.id}`}
+                                                className="text-xs 2xl:text-sm whitespace-nowrap"
+                                                onClick={() => {
                                                     setTabularResource({
                                                         provider: 'datastore',
                                                         id: datafile.id as string,
@@ -840,11 +870,15 @@ function DatafileCard({
                                                             datafile?.title ??
                                                             (datafile.name as string),
                                                     })
-                                                }
+                                                    //@ts-ignore
+                                                    dataLayer.push({
+                                                        event: 'gtm.click',
+                                                        resource_name:
+                                                            datafile.title,
+                                                    })
+                                                }}
                                             >
-                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                    View Table Preview
-                                                </span>
+                                                View Table Preview
                                             </Button>
                                         )}
                                     </>
@@ -880,16 +914,23 @@ function DatafileCard({
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
+                                                id={`tableviews-${dataset.id}`}
+                                                className="text-xs 2xl:text-sm whitespace-nowrap"
                                                 onClick={() => {
                                                     if (datafile._views)
                                                         addCharts(
                                                             datafile._views
                                                         )
+
+                                                    //@ts-ignore
+                                                    dataLayer.push({
+                                                        event: 'gtm.click',
+                                                        resource_name:
+                                                            datafile.title,
+                                                    })
                                                 }}
                                             >
-                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                    View Chart Preview
-                                                </span>
+                                                View Chart Preview
                                             </Button>
                                         )}
                                     </>
@@ -939,12 +980,15 @@ function DatafileCard({
                                 </div>
                             </div>
                             <div className="grid max-w-[30rem] grid-cols-3 gap-x-3 py-4 ">
-                                {!datafile.rw_id || datafile.rw_id === '' && (
-                                    <>
-                                        <DownloadButton datafile={datafile} />
-                                        <OpenInButton />
-                                    </>
-                                )}
+                                {!datafile.rw_id ||
+                                    (datafile.rw_id === '' && (
+                                        <>
+                                            <DownloadButton
+                                                datafile={datafile}
+                                            />
+                                            <OpenInButton />
+                                        </>
+                                    ))}
                                 {/*<LearnMoreButton datafile={datafile} dataset={dataset} />*/}
                                 <APIButton datafile={datafile} />
                             </div>

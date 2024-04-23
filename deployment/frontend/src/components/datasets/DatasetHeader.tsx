@@ -899,7 +899,8 @@ export function DatasetHeader({
                                 ) : (
                                     <Button
                                         size="sm"
-                                        onClick={() =>
+                                        id="tableviews"
+                                        onClick={() => {
                                             setTabularResource({
                                                 provider:
                                                     dataset.provider as any,
@@ -909,7 +910,12 @@ export function DatasetHeader({
                                                     dataset.connectorUrl as string,
                                                 name: dataset.name,
                                             })
-                                        }
+                                            //@ts-ignore
+                                            dataLayer.push({
+                                                event: 'gtm.click',
+                                                resource_name: dataset.title,
+                                            })
+                                        }}
                                     >
                                         View Table Preview
                                     </Button>
@@ -945,6 +951,8 @@ export function DatasetHeader({
                                 ) : (
                                     <Button
                                         size="sm"
+                                        id="views"
+                                        data-resource={dataset.title}
                                         onClick={() => {
                                             addCharts(datasetViews)
                                         }}
