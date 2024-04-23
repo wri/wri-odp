@@ -360,7 +360,11 @@ def migrate_dataset(data_dict):
                 owner_org = ckan.action.organization_show(id=new_organization)
                 updated_dataset['owner_org'] = owner_org['id']
             except (ckanapi.errors.NotFound, ckanapi.errors.ValidationError):
-                log.error(f'{log_name} Team not found: {new_organization}')
+                if not new_organization:
+                    log.error(f'{log_name} Team not found: {new_organization}')
+                else:
+                    log.info('Removing team...')
+                    updated_dataset['owner_org'] = ''
 
         existing_extras = dataset.get('extras', [])
         new_extras = data_dict.get('extras', [])
@@ -681,7 +685,7 @@ def prepare_dataset(
             required_dataset_values['owner_org'] = owner_org['id']
             required_dataset_values['owner_org_name'] = owner_org['name']
         except ckanapi.errors.NotFound:
-            log.error(f'{log_name} Team not found: {team}')
+            log.info(f'{log_name} Topic not found: {topic}')
 
     if topics:
         valid_topics = []
