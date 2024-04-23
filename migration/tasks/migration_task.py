@@ -693,7 +693,7 @@ def prepare_dataset(
             required_dataset_values['owner_org'] = owner_org['id']
             required_dataset_values['owner_org_name'] = owner_org['name']
         except ckanapi.errors.NotFound:
-            log.info(f'{log_name} Team not found: {team}')
+            log.error(f'{log_name} Team not found: {team}')
 
     if topics:
         valid_topics = []
