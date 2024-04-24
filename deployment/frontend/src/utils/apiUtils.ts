@@ -2466,7 +2466,7 @@ export const datasetFields = [
 export function filterDatasetFields(dataset: any) {
     const filteredDataset: any = {}
     for (const field of datasetFields) {
-        if (dataset[field]) {
+        if (field in dataset) {
             filteredDataset[field] = dataset[field]
         }
     }

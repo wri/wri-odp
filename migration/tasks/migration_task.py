@@ -338,6 +338,8 @@ def migrate_dataset(data_dict):
             for group in existing_groups
         ):
             log.info(f'{log_name} Topics changed...')
+            log.info(f'{log_name} Existing topics: {json.dumps(existing_groups, indent=2)}')
+            log.info(f'{log_name} New topics: {json.dumps(new_groups, indent=2)}')
             updated_dataset['groups'] = new_groups
         else:
             log.info(f'{log_name} No topic changes')
@@ -355,12 +357,18 @@ def migrate_dataset(data_dict):
 
         if existing_organization != new_organization:
             log.info(f'{log_name} Team changed...')
+            log.info(f'{log_name} Existing team: {existing_organization}')
+            log.info(f'{log_name} New team: {new_organization}')
 
-            try:
-                owner_org = ckan.action.organization_show(id=new_organization)
-                updated_dataset['owner_org'] = owner_org['id']
-            except (ckanapi.errors.NotFound, ckanapi.errors.ValidationError):
-                log.error(f'{log_name} Team not found: {new_organization}')
+            if new_organization:
+                try:
+                    owner_org = ckan.action.organization_show(id=new_organization)
+                    updated_dataset['owner_org'] = owner_org['id']
+                except (ckanapi.errors.NotFound, ckanapi.errors.ValidationError):
+                    log.error(f'{log_name} Team not found: {new_organization}')
+            else:
+                log.info('Team removed')
+                updated_dataset['owner_org'] = ''
 
         existing_extras = dataset.get('extras', [])
         new_extras = data_dict.get('extras', [])
@@ -381,6 +389,8 @@ def migrate_dataset(data_dict):
             )
         ):
             log.info(f'{log_name} Extras changed...')
+            log.info(f'{log_name} Existing extras: {json.dumps(existing_extras, indent=2)}')
+            log.info(f'{log_name} New extras: {json.dumps(new_extras, indent=2)}')
             updated_dataset['extras'] = [
                 {'key': key, 'value': value}
                 for key, value in normalized_new_extras_by_key.items()
@@ -429,6 +439,8 @@ def migrate_dataset(data_dict):
 
         if resource_changes:
             log.info(f'{log_name} Resources/layers changed...')
+            log.info(f'{log_name} Existing resources: {json.dumps(existing_resources, indent=2)}')
+            log.info(f'{log_name} New resources: {json.dumps(new_resources, indent=2)}')
 
             if updated_resources:
                 updated_dataset['resources'] = updated_resources
