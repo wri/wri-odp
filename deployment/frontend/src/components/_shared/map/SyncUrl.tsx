@@ -45,7 +45,15 @@ export default function SyncUrl() {
                     currentLayers ? currentLayers.entries() : []
                 ),
             })
+
             updateURLParameter(window.location.href, 'map', map)
+            //@ts-ignore
+            dataLayer.push({
+                event: 'map_events',
+                lat_coord: debouncedValue.viewState.latitude + '',
+                long_coord: debouncedValue.viewState.longitude + '',
+                zoom_level: debouncedValue.viewState.zoom + '',
+            })
         }
     }, [
         debouncedValue,
