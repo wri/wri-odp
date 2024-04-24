@@ -429,12 +429,13 @@ def migrate_dataset(data_dict):
             updated_resources.append(new_resource)
 
         resource_changes = True
+        remove_resources = existing_resources and not new_resources
 
         if all(
             len(updated_resource) == 2
             and all(k in updated_resource for k in ['id', 'package_id'])
             for updated_resource in updated_resources
-        ):
+        ) and not remove_resources:
             resource_changes = False
 
         if resource_changes:
@@ -444,7 +445,7 @@ def migrate_dataset(data_dict):
 
             if updated_resources:
                 updated_dataset['resources'] = updated_resources
-            elif existing_resources and not new_resources:
+            elif remove_resources:
                 updated_dataset['resources'] = []
         else:
             log.info(f'{log_name} No resource/layer changes')

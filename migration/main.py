@@ -4,6 +4,10 @@ from tasks.migration_task import get_datasets_from_csv, send_migration_dataset
 
 import csv
 import datetime
+import os
+
+
+DEPLOYMENT_ENV = os.environ['FLOW_DEPLOYMENT_ENV']
 
 
 @flow
@@ -51,7 +55,7 @@ def trigger_migration(data_dict):
 
 if __name__ == "__main__":
     migration_deployment = trigger_migration.to_deployment(
-        name='migration_deployment',
+        name=f'migration_deployment_{DEPLOYMENT_ENV}',
         enforce_parameter_schema=False,
         is_schedule_active=False,
     )
