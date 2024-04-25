@@ -951,7 +951,7 @@ export function DatasetHeader({
                                 ) : (
                                     <Button
                                         size="sm"
-                                        id={`tableviews-${dataset.id}-chart`}
+                                        id={`chartviews-${dataset.id}`}
                                         onClick={() => {
                                             addCharts(datasetViews)
                                             //@ts-ignore

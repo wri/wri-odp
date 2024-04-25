@@ -638,7 +638,7 @@ function DatafileCard({
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            id={`tableviews-${datafile.id}`}
+                                            id={`layerviews-${datafile.id}`}
                                             className="text-xs 2xl:text-sm whitespace-nowrap"
                                             onClick={() => {
                                                 // @ts-ignore
@@ -738,7 +738,7 @@ function DatafileCard({
                                     ) : (
                                         <Button
                                             size="sm"
-                                            id={`tableviews-${datafile.id}-chart`}
+                                            id={`chartviews-${datafile.id}`}
                                             className="text-xs 2xl:text-sm whitespace-nowrap"
                                             data-resource={
                                                 datafile.title ?? datafile.name!
@@ -810,7 +810,7 @@ function DatafileCard({
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                id={`tableviews-${datafile.id}`}
+                                                id={`layerviews-${datafile.id}`}
                                                 className="text-xs 2xl:text-sm whitespace-nowrap"
                                                 onClick={() => {
                                                     // @ts-ignore
@@ -914,7 +914,7 @@ function DatafileCard({
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                id={`tableviews-${datafile.id}-chart`}
+                                                id={`chartviews-${datafile.id}`}
                                                 className="text-xs 2xl:text-sm whitespace-nowrap"
                                                 onClick={() => {
                                                     if (datafile._views)
