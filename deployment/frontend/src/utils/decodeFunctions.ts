@@ -217,6 +217,7 @@ export function createDeckLayer(
             ...layer.source,
             tiles: [tileUrl],
         },
+        visibility: true,
         decodeFunction: decodes[layer.decode_function as keyof typeof decodes],
         decodeParams: layer.decodeParams ?? {},
     }
@@ -224,7 +225,7 @@ export function createDeckLayer(
         obj = {
             ...obj,
             ...layerState,
-            visible: layerState.active
+            visibility: layerState.active
                 ? typeof layerState.visibility !== 'undefined'
                     ? layerState.visibility
                     : true
