@@ -17,7 +17,6 @@ export default function Controls({
     return (
         <div className="absolute top-5 right-6 flex flex-col gap-y-1.5 rounded">
             <Zoom mapRef={mapRef} />
-            <Search mapContainerRef={mapContainerRef} />
             <Settings mapRef={mapRef} />
             <Export />
         </div>

@@ -1,10 +1,4 @@
 // https://www.khronos.org/files/opengles_shading_language.pdf
-import GL from '@luma.gl/constants'
-//@ts-ignore
-import { MapboxLayer } from '@deck.gl/mapbox'
-//@ts-ignore
-import { TileLayer } from '@deck.gl/geo-layers'
-import { DecodedLayer } from '@vizzuality/layer-manager-layers-deckgl'
 import { LayerState } from '@/interfaces/state.interface'
 import { layerConfigSpec } from '@/interfaces/layer.interface'
 import { differenceInDays } from 'date-fns'
@@ -214,19 +208,21 @@ export function createDeckLayer(
 ) {
     // @ts-ignore
     let tileUrl = layer.source.tiles[0] ?? ''
-    let layerConfig = {
-        id,
-        type: TileLayer,
-        data: tileUrl
-            .replace('{thresh}', layerState?.threshold ?? 20)
-            .replace('{threshold}', layerState?.threshold ?? 20),
-        tileSize: 256,
-        refinementStrategy: 'no-overlap',
-        visible: true,
+    tileUrl = tileUrl
+        .replace('{thresh}', layerState?.threshold ?? 20)
+        .replace('{threshold}', layerState?.threshold ?? 20)
+    let obj = {
+        ...layer,
+        source: {
+            ...layer.source,
+            tiles: [tileUrl],
+        },
+        decodeFunction: decodes[layer.decode_function as keyof typeof decodes],
+        decodeParams: layer.decodeParams ?? {},
     }
     if (layerState) {
-        layerConfig = {
-            ...layerConfig,
+        obj = {
+            ...obj,
             ...layerState,
             visible: layerState.active
                 ? typeof layerState.visibility !== 'undefined'
@@ -235,60 +231,7 @@ export function createDeckLayer(
                 : false,
         }
     }
-    return {
-        type: 'deck' as const,
-        id,
-        deck: [
-            new MapboxLayer({
-                decodeFunction:
-                    decodes[layer.decode_function as keyof typeof decodes],
-                decodeParams: layer.decodeParams ?? {},
-                ...layerConfig,
-                renderSubLayers: (sl: any) => {
-                    const {
-                        id: subLayerId,
-                        data,
-                        tile,
-                        visible,
-                        opacity: _opacity,
-                        decodeFunction: dFunction,
-                        decodeParams: dParams,
-                    } = sl
-
-                    const {
-                        z,
-                        bbox: { west, south, east, north },
-                    } = tile
-
-                    if (data) {
-                        return new DecodedLayer({
-                            id: subLayerId,
-                            image: data,
-                            bounds: [west, south, east, north],
-                            textureParameters: {
-                                [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
-                                [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
-                                [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-                                [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
-                            },
-                            zoom: z,
-                            visible,
-                            opacity: _opacity,
-                            decodeParams: dParams,
-                            decodeFunction: dFunction,
-                            updateTriggers: {
-                                decodeParams: dParams,
-                                decodeFunction: dFunction,
-                            },
-                        })
-                    }
-                    return null
-                },
-                minZoom: layer.source.minzoom ?? 0,
-                maxZoom: layer.source.maxzoom ?? 0,
-            } as any),
-        ],
-    }
+    return obj
 }
 
 const decodes = {

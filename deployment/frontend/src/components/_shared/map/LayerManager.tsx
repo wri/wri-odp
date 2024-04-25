@@ -1,10 +1,12 @@
 //import VizzLayerManager from './VizzLayerManager'
-import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl'
+//@ts-ignore
+import { PluginMapboxGl } from 'layer-manager'
 import { useMap } from 'react-map-gl'
 import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
-import { Layer, LayerManager as VizzLayerManager } from '@vizzuality/layer-manager-react'
+//@ts-ignore
+import { Layer, LayerManager as VizzLayerManager } from 'layer-manager/dist/components'
 import pick from 'lodash/pick'
-import CartoProvider from '@vizzuality/layer-manager-provider-carto'
+import { CartoProvider } from '@/utils/providers/cartoProvider'
 import { TileProvider } from '@/utils/providers/tileProvider'
 import { GeeProvider } from '@/utils/providers/geeProvider'
 import { APILayerSpec, DeckLayerSpec } from '@/interfaces/layer.interface'
