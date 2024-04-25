@@ -81,6 +81,7 @@ def _trigger_prefect_flow(data_dict: DataDict) -> dict[str, Any]:
     prefect_url = config.get("ckanext.wri.prefect_url")
     migration_flow_name = config.get("ckanext.wri.migration_flow_name")
     deployment_name = config.get("ckanext.wri.migration_deployment_name")
+    deployment_env = config.get("ckanext.wri.migration_deployment_env")
 
     if any(
         [
@@ -99,7 +100,7 @@ def _trigger_prefect_flow(data_dict: DataDict) -> dict[str, Any]:
         deployment = requests.get(
             urljoin(
                 prefect_url,
-                f"/api/deployments/name/{migration_flow_name}/{deployment_name}",
+                f"/api/deployments/name/{migration_flow_name}/{deployment_name}_{deployment_env}",
             )
         )
         deployment = deployment.json()
