@@ -26,22 +26,15 @@ import {
 } from './formOptions'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import { Button, LoaderButton } from '@/components/_shared/Button'
+import { LoaderButton } from '@/components/_shared/Button'
 import Link from 'next/link'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { EditDataFilesSection } from './datafiles/EditDataFilesSection'
 import { useSession } from 'next-auth/react'
 import { match } from 'ts-pattern'
 import { Collaborators } from './metadata/Collaborators'
-import dynamic from 'next/dynamic'
-const Modal = dynamic(() => import('@/components/_shared/Modal'), {
-    ssr: false,
-})
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
 import { EditRwSection } from './datafiles/EditRwSection'
-import form from '@/components/vizzuality/1.3-components/form'
 import { VersioningForm } from './metadata/VersioningForm'
 
 function getDiff<T>(dirtyObject: T, changedFields: string[]) {
