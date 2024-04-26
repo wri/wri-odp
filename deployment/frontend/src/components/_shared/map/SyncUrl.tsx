@@ -10,6 +10,7 @@ import {
 import { encodeMapParam } from '@/utils/urlEncoding'
 import { useEffect } from 'react'
 import { useDebounce } from 'usehooks-ts'
+import { env } from '@/env.mjs'
 
 export default function SyncUrl() {
     const { viewState } = useMapState()
@@ -45,15 +46,16 @@ export default function SyncUrl() {
 
     useEffect(() => {
         if (debouneMapTrackValue && typeof window !== 'undefined') {
-            console.log('debouneMapTrackValue', debouneMapTrackValue)
-            //@ts-ignore
-            dataLayer.push({
-                event: 'map_events',
-                lat_coord: debouneMapTrackValue.latitude + '',
-                long_coord: debouneMapTrackValue.longitude + '',
-                zoom_level: debouneMapTrackValue.zoom + '',
-                layer: debouneMapTrackValue.layer.join(','),
-            })
+            if (env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
+                //@ts-ignore
+                dataLayer.push({
+                    event: 'map_events',
+                    lat_coord: debouneMapTrackValue.latitude + '',
+                    long_coord: debouneMapTrackValue.longitude + '',
+                    zoom_level: debouneMapTrackValue.zoom + '',
+                    layer: debouneMapTrackValue.layer.join(','),
+                })
+            }
         }
     }, [debouneMapTrackValue])
 

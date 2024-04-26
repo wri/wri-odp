@@ -46,6 +46,7 @@ import { RwDatasetResp, isRwError } from '@/interfaces/rw.interface'
 import { match } from 'ts-pattern'
 import Image from 'next/image'
 import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover'
+import { env } from '@/env.mjs'
 
 function OpenInButton({
     open_in,
@@ -910,11 +911,17 @@ export function DatasetHeader({
                                                     dataset.connectorUrl as string,
                                                 name: dataset.name,
                                             })
-                                            //@ts-ignore
-                                            dataLayer.push({
-                                                event: 'gtm.click',
-                                                resource_name: dataset.title,
-                                            })
+                                            if (
+                                                env.NEXT_PUBLIC_DISABLE_HOTJAR !==
+                                                'disabled'
+                                            ) {
+                                                //@ts-ignore
+                                                dataLayer.push({
+                                                    event: 'gtm.click',
+                                                    resource_name:
+                                                        dataset.title,
+                                                })
+                                            }
                                         }}
                                     >
                                         View Table Preview
@@ -954,11 +961,17 @@ export function DatasetHeader({
                                         id={`chartviews-${dataset.id}`}
                                         onClick={() => {
                                             addCharts(datasetViews)
-                                            //@ts-ignore
-                                            dataLayer.push({
-                                                event: 'gtm.click',
-                                                resource_name: dataset.title,
-                                            })
+                                            if (
+                                                env.NEXT_PUBLIC_DISABLE_HOTJAR !==
+                                                'disabled'
+                                            ) {
+                                                //@ts-ignore
+                                                dataLayer.push({
+                                                    event: 'gtm.click',
+                                                    resource_name:
+                                                        dataset.title,
+                                                })
+                                            }
                                         }}
                                     >
                                         View Chart Preview

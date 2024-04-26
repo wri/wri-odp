@@ -50,6 +50,17 @@ import {
 } from '@/components/_shared/Popover'
 import { SearchIcon } from '@/components/_shared/icons/SearchIcon'
 import GlobalError from 'next/dist/client/components/error-boundary'
+import { env } from '@/env.mjs'
+
+function customDataLayer(data: { event: string; resource_name: string }) {
+    if (env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
+        //@ts-ignore
+        dataLayer.push({
+            event: data.event,
+            resource_name: data.resource_name,
+        })
+    }
+}
 
 export function LocationSearch({
     geojsons,
@@ -654,8 +665,8 @@ function DatafileCard({
                                                         dataset.id
                                                     )
                                                 }
-                                                //@ts-ignore
-                                                dataLayer.push({
+
+                                                customDataLayer({
                                                     event: 'gtm.click',
                                                     resource_name:
                                                         datafile.title,
@@ -695,8 +706,8 @@ function DatafileCard({
                                                         datafile?.title ??
                                                         (datafile.name as string),
                                                 })
-                                                //@ts-ignore
-                                                dataLayer.push({
+
+                                                customDataLayer({
                                                     event: 'gtm.click',
                                                     resource_name:
                                                         datafile.title,
@@ -748,7 +759,7 @@ function DatafileCard({
                                                     addCharts(datafile._views)
 
                                                 //@ts-ignore
-                                                dataLayer.push({
+                                                customDataLayer({
                                                     event: 'gtm.click',
                                                     resource_name:
                                                         datafile.title,
@@ -828,8 +839,8 @@ function DatafileCard({
                                                             dataset.id
                                                         )
                                                     }
-                                                    //@ts-ignore
-                                                    dataLayer.push({
+
+                                                    customDataLayer({
                                                         event: 'gtm.click',
                                                         resource_name:
                                                             datafile.title,
@@ -870,8 +881,8 @@ function DatafileCard({
                                                             datafile?.title ??
                                                             (datafile.name as string),
                                                     })
-                                                    //@ts-ignore
-                                                    dataLayer.push({
+
+                                                    customDataLayer({
                                                         event: 'gtm.click',
                                                         resource_name:
                                                             datafile.title,
@@ -922,8 +933,7 @@ function DatafileCard({
                                                             datafile._views
                                                         )
 
-                                                    //@ts-ignore
-                                                    dataLayer.push({
+                                                    customDataLayer({
                                                         event: 'gtm.click',
                                                         resource_name:
                                                             datafile.title,

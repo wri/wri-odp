@@ -43,6 +43,16 @@ import { Versioning } from '@/components/datasets/sections/Versioning'
 
 import { useActiveLayerGroups } from '@/utils/storeHooks'
 
+function customDataLayer(data: { event: string; resource_name: string }) {
+    if (env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
+        //@ts-ignore
+        dataLayer.push({
+            event: data.event,
+            resource_name: data.resource_name,
+        })
+    }
+}
+
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
     {
@@ -485,8 +495,7 @@ export default function DatasetPage(
                 removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id!)
                 setMapDisplayPreview(true)
                 addLayerToLayerGroup(LayerResource.rw_id!, dataset.id)
-                //@ts-ignore
-                dataLayer.push({
+                customDataLayer({
                     event: 'layer_view_event',
                     resource_name: LayerResource.title,
                 })
@@ -497,8 +506,7 @@ export default function DatasetPage(
                     id: dataset.rw_id as string,
                     name: dataset.name as string,
                 })
-                //@ts-ignore
-                dataLayer.push({
+                customDataLayer({
                     event: 'table_view_event',
                     resource_name: dataset.provider,
                 })
@@ -513,8 +521,7 @@ export default function DatasetPage(
                     apiKey: apikey,
                     name: resource?.title ?? (resource?.name as string),
                 })
-                //@ts-ignore
-                dataLayer.push({
+                customDataLayer({
                     event: 'table_view_event',
                     resource_name:
                         resource?.title ?? (resource?.name as string),
