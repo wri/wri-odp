@@ -31,6 +31,32 @@ export default function SyncUrl() {
         },
         500
     )
+
+    const debouneMapTrackValue = useDebounce(
+        {
+            zoom: debouncedValue.viewState.zoom,
+            latitude: debouncedValue.viewState.latitude,
+            longitude: debouncedValue.viewState.longitude,
+            layer:
+                activeLayerGroups.length > 0 ? activeLayerGroups[0].layers : [],
+        },
+        1500
+    )
+
+    useEffect(() => {
+        if (debouneMapTrackValue && typeof window !== 'undefined') {
+            console.log('debouneMapTrackValue', debouneMapTrackValue)
+            //@ts-ignore
+            dataLayer.push({
+                event: 'map_events',
+                lat_coord: debouneMapTrackValue.latitude + '',
+                long_coord: debouneMapTrackValue.longitude + '',
+                zoom_level: debouneMapTrackValue.zoom + '',
+                layer: debouneMapTrackValue.layer.join(','),
+            })
+        }
+    }, [debouneMapTrackValue])
+
     useEffect(() => {
         if (debouncedValue && typeof window !== 'undefined') {
             const map = encodeMapParam({
