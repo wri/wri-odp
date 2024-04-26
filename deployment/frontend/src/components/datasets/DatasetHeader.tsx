@@ -325,7 +325,6 @@ export function DatasetHeader({
             },
             { enabled: !!dataset?.name }
         )
-    console.log('collaborators', collaborators)
     const canEditDataset = match(session.data?.user.sysadmin ?? false)
         .with(true, () => true)
         .with(false, () => {
