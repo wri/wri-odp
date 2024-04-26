@@ -3,8 +3,11 @@
 import { PluginMapboxGl } from 'layer-manager'
 import { useMap } from 'react-map-gl'
 import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
+import {
+    Layer,
+    LayerManager as VizzLayerManager,
 //@ts-ignore
-import { Layer, LayerManager as VizzLayerManager } from 'layer-manager/dist/components'
+} from 'layer-manager/dist/components'
 import pick from 'lodash/pick'
 import { CartoProvider } from '@/utils/providers/cartoProvider'
 import { TileProvider } from '@/utils/providers/tileProvider'
@@ -22,7 +25,8 @@ export const parseLayers = (
     return layers.map((layer: APILayerSpec) => {
         const { id, layerConfig } = layer
         const layerState = layerStates.get(id)
-        if (layerConfig.decode_function) return createDeckLayer(layerConfig, id, layerState)
+        if (layerConfig.decode_function)
+            return createDeckLayer(layerConfig, id, layerState)
         let layerProps: any = pick(layerConfig, [
             'deck',
             'images',
@@ -72,6 +76,7 @@ const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
         return parsedLayers
     }, [layers, currentLayers])
 
+    console.log('PARSED LEYS', parsedLayers)
     return map && map.getMap() ? (
         <VizzLayerManager
             map={map.getMap()}
@@ -79,8 +84,8 @@ const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
             providers={providers}
         >
             {parsedLayers &&
-                parsedLayers.map((_layer: any) => {
-                    return <Layer key={JSON.stringify(_layer)} {..._layer} />
+                parsedLayers.filter(l => l.visibility).map((_layer: any) => {
+                    return <Layer key={_layer.id} {..._layer} />
                 })}
         </VizzLayerManager>
     ) : (
