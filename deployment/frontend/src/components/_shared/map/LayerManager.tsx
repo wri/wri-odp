@@ -3,10 +3,10 @@
 import { PluginMapboxGl } from 'layer-manager'
 import { useMap } from 'react-map-gl'
 import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
-//@ts-ignore
 import {
     Layer,
     LayerManager as VizzLayerManager,
+//@ts-ignore
 } from 'layer-manager/dist/components'
 import pick from 'lodash/pick'
 import { CartoProvider } from '@/utils/providers/cartoProvider'
