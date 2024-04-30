@@ -15,12 +15,9 @@ import Basemap from './Basemap'
 import Labels from './Labels'
 import dynamic from 'next/dynamic'
 
-const DynamicLayerManger = dynamic(
-  () => import("./LayerManager"),
-  {
+const DynamicLayerManger = dynamic(() => import('./LayerManager'), {
     ssr: false,
-  }
-);
+})
 
 export default function Map({
     layers,
@@ -65,7 +62,7 @@ export default function Map({
                 }}
                 {...viewState}
                 mapStyle="mapbox://styles/resourcewatch/cjzmw480d00z41cp2x81gm90h"
-                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                 style={{
                     height: mapHeight ?? 'calc(100vh - 63px)',
                     minHeight: '800px',
