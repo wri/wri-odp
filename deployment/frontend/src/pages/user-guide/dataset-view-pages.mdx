@@ -1,0 +1,249 @@
+import MdxLayout from '@/components/_shared/mdx-layout'
+ 
+# Dataset View Pages
+
+1.  Dataset Metadata
+
+2.  Dataset Tabs
+
+    a. Data Files
+
+        1. Location search
+
+        2. Data File list section
+
+            a. Data file download
+
+            b. Tabular Previews
+
+            c. Chart Preview
+
+            d. Map preview
+
+    b. About Tab
+
+    c. Related Datasets
+
+    d. Contact Tab
+
+    e. Api Tab
+
+    f. Collaborators Tab
+
+    g. Release Note tab
+
+Assuming you’ve gone through the Basic and Advanced search page and you’ve identified the dataset you would like to view or you have a direct link to a dataset, here is the description of what the dataset page should look like:
+
+On visiting a dataset, the layout should look like the following
+
+<img src="/images/user-guide/dataset1.png" />
+
+The layout is divided into sections, The left side contains the dataset’s detailed information, ranging from metadata to datafiles and a list of all other entities, and the right-hand side contains Preview sections.
+
+For the preview section, the image display above shows Map preview, and that's because the dataset contains a layer data file, and in cases where no layer datafile is available, but tabular datafiles are present, the preview section will contain a tabular preview and if no datafiles at all, the preview section will be empty
+
+<img src="/images/user-guide/dataset2.png" />
+
+Starting from the <mark>Open in GFW</mark> button, the button enables us to open the same dataset layer in Global Forest Watch which is one of WRI’s products.
+
+The top part of the metadata contains 3 sets of icons from left to right, showing that chart view, map view, and Tabular view are present for this dataset
+
+The <mark>COST SPLITTING ORG</mark> signifies the title of the organization this dataset belongs.
+
+PM <mark>DATA PUSHER QA Jan 26</mark> signifies the title of the dataset. <mark>this is a short description</mark> trigger this represents the text added to the short description field when creating or editing the dataset.
+
+Below the short description, contains 4 metadata which are self-explanatory, show when the dataset was created and updated, and show the temporal coverage, it also indicates that the dataset
+
+The <mark>WRI DATA</mark> tag shows that WRI developed this dataset. this will be present in the view of this field (This dataset was developed by WRI ) while creating or editing the dataset
+
+The <mark>RDI approved</mark> tags show when a Technical note is added. The csv , XLSX , LAYER show that this dataset contains three types of datafiles.
+
+Sometimes a dataset can have global tabular data associated with it, such tabular can be previewed in other external platforms such as <mark>cartodb</mark> hence, if you click on <mark>Open table in Carto</mark> it opens the tabular data in Cartodb portal. Also if you click on <mark>View Table Preview</mark>instead of opening the tabular data in Cartodb, the Preview section will display a tabular preview of data fetched from Cartodb as shown below
+
+<img src="/images/user-guide/dataset3.png" />
+
+once you are done previewing the table you can click on Remove Tabular preview , We will not be bothered about the tabular preview for now, it will be discussed in some sections from now.
+
+## Dataset Tabs
+
+After the dataset header and metadata we have a list of tabs,
+
+<img src="/images/user-guide/dataset4.png" />
+
+The <mark>>></mark> is used to see the remaining collapsed tabs, and if the left section is expanded we can see the full tabs.
+
+### Data files
+
+This tab contains the list of data files belonging to the dataset
+
+<img src="/images/user-guide/dataset5.png" />
+
+First, we have the search section, which enables us to search datafiles based on title and description. To search by location, click on the <mark>Location Search</mark> to enable the map view and map search
+
+### Location Search
+
+<img src="/images/user-guide/dataset6.png" />
+
+In that map, you can search using a bbox by clicking on the square at the top left section of the map, and drawing a rectangle on it
+
+<img src="/images/user-guide/dataset7.png" />
+
+-   If that rectangle intersects or covers a geojson shape that is attached to a datafile, that datafile will then appear
+
+-   If that rectangle covers the center coordinate of an address that is attached to a datafile, that datafile will also appear
+
+Besides that, we also have an autocomplete field for addresses, which will match in the following way
+
+-   If the center of that address is inside the geojson attached to a datafile, then that datafile will appear
+
+-   If the address typed matches or is contained by the address in a specific datafile, then that datafile will appear, for example, in the image below, we have a datafile that is attached to the state of Lagos in Nigeria, if we type Ikeja, Lagos, Nigeria, which is a city inside that particular state, the result will match, given that possibly data about the state of Lagos will also contain data about that particular city
+
+<img src="/images/user-guide/dataset8.png" />
+
+### Data file list section
+
+contains all the default or filtered datafiles
+
+<img src="/images/user-guide/dataset10.png" />
+
+#### Data file download
+
+As shown in the image above, we have different control buttons e.g Select all datafiles this selects all the tabular data files and then displays the Download selected datafiles to download all selected files as a zipped file
+
+<img src="/images/user-guide/dataset11.png" />
+
+Once you filled the form, the zipped file will be sent to your email once its ready. and to download a single file, click on the dropdown icon for the datafile you want to download and then click download
+
+<img src="/images/user-guide/dataset12.png" />
+
+the file can be downloaded in different formats
+
+<img src="/images/user-guide/dataset13.png" />
+
+If the original format is clicked, the download is an instance if, for any other format, it has to undergo some processing, hence you will need to add your email to the popped-up modal
+
+<img src="/images/user-guide/dataset14.png" />
+
+Also, we have the Show all layers and Hide All this to display and hide the combined map view of all layer datafiles.
+
+### Tabular Previews
+
+The first datafile in the image above is a tabular data files and it has view table preview button, if the button is clicked, the preview section shows the table preview
+
+<img src="/images/user-guide/dataset15.png" />
+
+The table contains pagination and also Download data button which allows us to download filtered data.
+
+The table also allows us to sort by clicking the arrows in the column both asc and desc
+
+<img src="/images/user-guide/dataset16.png" />
+
+Pin specific column to the left
+
+<img src="/images/user-guide/dataset17.png" />
+
+Hide columns that you do not want to see at that specific moment, click on <mark>show Columns</mark> and then filter
+
+<img src="/images/user-guide/dataset18.png" />
+
+Filter data whereaver you like, by clicking in the funnel icon in the column, filters can be removed easily in the top bar
+
+<img src="/images/user-guide/dataset19.png" />
+
+If the column is inferred as a timestamp, then instead of a normal input a date picker will be shown in the filter
+
+<img src="/images/user-guide/dataset20.png" />
+
+### Chart Preview
+
+some of the datafile in the list contain View chart Preview , if clicked it displays the chart preview
+
+<img src="/images/user-guide/dataset21.png" />
+
+The preview contains a drop-down button has shown below containing list of Predefined chart views.
+
+<img src="/images/user-guide/dataset22.png" />
+
+The embed the chart view in a webpage click on the icon in the top right <img src="/images/user-guide/dataset23.png" width="60" height="60"  /> and then this should pop-up
+
+<img src="/images/user-guide/dataset24.png" />
+
+The chart is interactive on hover and you can also take a snapshot of the chart, by clicking on the camera icon in the image below
+
+<img src="/images/user-guide/dataset25.png" />
+
+### Map Preview
+
+Datasets with geospatial data can be visualized in a feature-rich map on the dataset page.
+
+<img src="/images/user-guide/dataset26.png" />
+
+### controls
+
+The map has a few controls in the top-right corner.
+
+<img src="/images/user-guide/dataset27.png" width="90" height="90" />
+
+1. Zoom in
+
+2. Zoom out
+
+3. Geolocation search
+
+4. Map settings
+
+5. Export as
+
+### Geolocation search
+
+Geolocation search allows users to provide the name of a city, state or country and make the map navigate to it.
+
+<img src="/images/user-guide/dataset28.png" width="500" height="500" />
+
+### Map settings
+
+The map settings control allows users to change some visualization settings of the map, including the style of the basemap and labels and whether boundaries should be shown or hidden.
+
+<img src="/images/user-guide/dataset29.png" />
+
+### Export as
+
+The export as control allows users to export the map as an embedding.
+
+<img src="/images/user-guide/dataset30.png" />
+
+### Legends
+
+It provides some extra functionality to the maps. Some of the features are:
+
+-   Display layer metadata such as the title
+
+-   Render legends, that could be "choropleth", "gradient", "basic", "proportial" or "multiple" (for multiple legends)
+
+-   Reorder layers
+
+-   Hide layers
+
+-   Change layer opacity
+
+<img src="/images/user-guide/dataset31.png" />
+
+### Thresholds
+
+Some layers may contain different threshold. In this case, a new select will be shown on the legends allowing the threshold value to be changed:
+
+<img src="/images/user-guide/dataset32.png" width="600" height="600" />
+
+### Add layers from other datasets
+
+The ma view has Add layers to add layer from other datasets
+
+<img src="/images/user-guide/dataset33.png" />
+
+on clicked it displays list of some associated datasets,
+
+<img src="/images/user-guide/dataset34.png" />
+
+export default function MDXPage({ children }) {
+    return <MdxLayout>{children}</MdxLayout>
+}

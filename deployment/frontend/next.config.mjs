@@ -4,11 +4,16 @@
  */
 
 import withBundleAnalyzer from '@next/bundle-analyzer'
+import createMDX from '@next/mdx'
 
 await import('./src/env.mjs')
 
 const bundleAnalyzer = withBundleAnalyzer({
     enabled: process.env.ANALYZE === 'true',
+})
+
+const withMDX = createMDX({
+    // Add markdown plugins if needed
 })
 
 const cspHeader = `
@@ -47,6 +52,7 @@ const config = {
             's3.amazonaws.com',
         ],
     },
+    pageExtensions: ['tsx', 'mdx', 'ts', 'md'],
 }
 
-export default bundleAnalyzer(config)
+export default bundleAnalyzer(withMDX(config))

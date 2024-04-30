@@ -1,0 +1,62 @@
+import MdxLayout from '@/components/_shared/mdx-layout'
+ 
+# Basic Definition
+
+### Datasets
+
+Are entities containing metadata (top-level information about the dataset as a whole, such as Title, description, Teams, and topics it belongs to) and Data Files
+
+### Data Files
+
+Data file can either be a tabular file (CSV, Excel, JSON, TSV, or XML file) or  a Layer
+
+
+### Datasets
+
+Are entities containing metadata (top-level information about the dataset as a whole, such as Title, description, Teams, and topics it belongs to) and Data Files
+
+### Data Files
+
+Data file can either be a tabular file (CSV, Excel, JSON, TSV, or XML file) or  a Layer
+
+### Layer(s)
+
+A data file that contains map definition; contains metadata describing a map, map configuration, and how it should be rendered or displayed.
+
+### Teams
+
+Teams is an owned entity with a collection of Datasets. By owned entity, a Team has an admin user, Editor, and members. Based on which users on the platform have privileges to access, update a Dataset belonging to the Team
+
+### Topics
+
+Topics provide the means to group individually or collectively owned Datasets as a single collection. A topic is also an entity with sub-topics, unlike a team, it has no user entity or user hierarchy.
+
+### Tags
+
+Tags are keywords used to identify a collection of Datasets.
+
+### System Admin
+
+A power user, who has admin access to all entities on the platform.
+
+### Organization Admin
+
+A user, who is in charge of a Team, has the power to add new and delete users and can view all private dataset
+
+### Editor
+
+A user under a Team, have access to edit and view Dataset (including private ones). But does not have the power to Add or delete another user
+
+### Member
+
+A user belonging to a specific Team
+
+### Collaborator
+
+A user belonging to a team or not, but added to work on or supervise a Dataset belonging to a specific team.
+
+
+
+export default function MDXPage({ children }) {
+    return <MdxLayout>{children}</MdxLayout>
+}
