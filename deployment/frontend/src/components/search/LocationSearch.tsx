@@ -13,8 +13,7 @@ export default function LocationSearch({
     setFilters: Dispatch<SetStateAction<Filter[]>>
     filters: Filter[]
 }) {
-  
-    const initialValue = filters?.find(f => f.key == "spatial")?.label ?? ""
+    const initialValue = filters?.find((f) => f.key == 'spatial')?.label ?? ''
     return (
         <Disclosure
             as="div"
@@ -45,12 +44,12 @@ export default function LocationSearch({
                     >
                         <Disclosure.Panel className="h-[300px] border-t-2 border-amber-400 ">
                             <Map
-                                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                 style={{ height: 300 }}
                                 mapStyle="mapbox://styles/mapbox/streets-v9"
                             >
                                 <GeocoderControl
-                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     position="bottom-right"
                                     onResult={(e) => {
                                         setFilters((prev) => {
