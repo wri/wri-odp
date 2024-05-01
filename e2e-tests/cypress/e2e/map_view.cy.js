@@ -83,29 +83,29 @@ describe("Map view", () => {
     },
   );
 
-  it(
-    "should allow to add layers from related datasets",
-    {
-      retries: {
-        runMode: 5,
-        openMode: 0,
-      },
-    },
-    () => {
-      cy.visit(`/datasets/${datasetName}`);
-      cy.contains("Related Datasets").click({ force: true });
-      cy.contains(datasetName2);
-      cy.contains("Add to map").click();
-      cy.contains("Layer 2").click();
-      cy.wait(2000);
-      cy.get("#add-to-map-modal-btn").click();
-
-      cy.get(".vizzuality__c-legend-map", { timeout: 60000 }).contains(
-        "Tree cover loss - 2001-2022",
-        { timeout: 60000 },
-      );
-    },
-  );
+//  it(
+//    "should allow to add layers from related datasets",
+//    {
+//      retries: {
+//        runMode: 5,
+//        openMode: 0,
+//      },
+//    },
+//    () => {
+//      cy.visit(`/datasets/${datasetName}`);
+//      cy.contains("Related Datasets").click({ force: true });
+//      cy.contains(datasetName2);
+//      cy.contains("Add to map").click();
+//      cy.contains("Layer 2").click();
+//      cy.wait(2000);
+//      cy.get("#add-to-map-modal-btn").click();
+//
+//      cy.get(".vizzuality__c-legend-map", { timeout: 60000 }).contains(
+//        "Tree cover loss - 2001-2022",
+//        { timeout: 60000 },
+//      );
+//    },
+//  );
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);

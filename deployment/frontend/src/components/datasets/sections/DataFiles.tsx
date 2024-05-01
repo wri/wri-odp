@@ -50,6 +50,17 @@ import {
 } from '@/components/_shared/Popover'
 import { SearchIcon } from '@/components/_shared/icons/SearchIcon'
 import GlobalError from 'next/dist/client/components/error-boundary'
+import { env } from '@/env.mjs'
+
+function customDataLayer(data: { event: string; resource_name: string }) {
+    if (env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
+        //@ts-ignore
+        dataLayer.push({
+            event: data.event,
+            resource_name: data.resource_name,
+        })
+    }
+}
 
 export function LocationSearch({
     geojsons,
@@ -63,7 +74,7 @@ export function LocationSearch({
     const { setValue } = formObj
     const mapRef = useRef<MapRef | null>(null)
     const accessToken =
-        'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w'
+        'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA'
     const { data: markers } = useQuery(
         ['markers', geojsons.length],
         async () => {
@@ -110,12 +121,12 @@ export function LocationSearch({
             ref={(_map) => {
                 if (_map) mapRef.current = _map.getMap() as unknown as MapRef
             }}
-            mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+            mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
             style={{ height: 300 }}
             mapStyle="mapbox://styles/mapbox/streets-v9"
         >
             <GeocoderControl
-                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                 position="bottom-right"
                 placeholder="Search datafiles by location"
                 initialValue={formObj.getValues('location')}
@@ -638,6 +649,8 @@ function DatafileCard({
                                         <Button
                                             variant="outline"
                                             size="sm"
+                                            id={`layerviews-${datafile.id}`}
+                                            className="text-xs 2xl:text-sm whitespace-nowrap"
                                             onClick={() => {
                                                 // @ts-ignore
                                                 if (datafile.rw_id) {
@@ -652,11 +665,15 @@ function DatafileCard({
                                                         dataset.id
                                                     )
                                                 }
+
+                                                customDataLayer({
+                                                    event: 'gtm.click',
+                                                    resource_name:
+                                                        datafile.title,
+                                                })
                                             }}
                                         >
-                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                Show Layer
-                                            </span>
+                                            Show Layer
                                         </Button>
                                     )}
                                 </>
@@ -679,7 +696,9 @@ function DatafileCard({
                                     ) : (
                                         <Button
                                             size="sm"
-                                            onClick={() =>
+                                            id={`tableviews-${datafile.id}`}
+                                            className="text-xs 2xl:text-sm whitespace-nowrap"
+                                            onClick={() => {
                                                 setTabularResource({
                                                     provider: 'datastore',
                                                     id: datafile.id as string,
@@ -687,11 +706,15 @@ function DatafileCard({
                                                         datafile?.title ??
                                                         (datafile.name as string),
                                                 })
-                                            }
+
+                                                customDataLayer({
+                                                    event: 'gtm.click',
+                                                    resource_name:
+                                                        datafile.title,
+                                                })
+                                            }}
                                         >
-                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                View Table Preview
-                                            </span>
+                                            View Table Preview
                                         </Button>
                                     )}
                                 </>
@@ -726,14 +749,24 @@ function DatafileCard({
                                     ) : (
                                         <Button
                                             size="sm"
+                                            id={`chartviews-${datafile.id}`}
+                                            className="text-xs 2xl:text-sm whitespace-nowrap"
+                                            data-resource={
+                                                datafile.title ?? datafile.name!
+                                            }
                                             onClick={() => {
                                                 if (datafile._views)
                                                     addCharts(datafile._views)
+
+                                                //@ts-ignore
+                                                customDataLayer({
+                                                    event: 'gtm.click',
+                                                    resource_name:
+                                                        datafile.title,
+                                                })
                                             }}
                                         >
-                                            <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                View Chart Preview
-                                            </span>
+                                            View Chart Preview
                                         </Button>
                                     )}
                                 </>
@@ -788,6 +821,8 @@ function DatafileCard({
                                             <Button
                                                 variant="outline"
                                                 size="sm"
+                                                id={`layerviews-${datafile.id}`}
+                                                className="text-xs 2xl:text-sm whitespace-nowrap"
                                                 onClick={() => {
                                                     // @ts-ignore
                                                     if (datafile.rw_id) {
@@ -804,11 +839,15 @@ function DatafileCard({
                                                             dataset.id
                                                         )
                                                     }
+
+                                                    customDataLayer({
+                                                        event: 'gtm.click',
+                                                        resource_name:
+                                                            datafile.title,
+                                                    })
                                                 }}
                                             >
-                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                    Show Layer
-                                                </span>
+                                                Show Layer
                                             </Button>
                                         )}
                                     </>
@@ -832,7 +871,9 @@ function DatafileCard({
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() =>
+                                                id={`tableviews-${datafile.id}`}
+                                                className="text-xs 2xl:text-sm whitespace-nowrap"
+                                                onClick={() => {
                                                     setTabularResource({
                                                         provider: 'datastore',
                                                         id: datafile.id as string,
@@ -840,11 +881,15 @@ function DatafileCard({
                                                             datafile?.title ??
                                                             (datafile.name as string),
                                                     })
-                                                }
+
+                                                    customDataLayer({
+                                                        event: 'gtm.click',
+                                                        resource_name:
+                                                            datafile.title,
+                                                    })
+                                                }}
                                             >
-                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                    View Table Preview
-                                                </span>
+                                                View Table Preview
                                             </Button>
                                         )}
                                     </>
@@ -880,16 +925,22 @@ function DatafileCard({
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
+                                                id={`chartviews-${datafile.id}`}
+                                                className="text-xs 2xl:text-sm whitespace-nowrap"
                                                 onClick={() => {
                                                     if (datafile._views)
                                                         addCharts(
                                                             datafile._views
                                                         )
+
+                                                    customDataLayer({
+                                                        event: 'gtm.click',
+                                                        resource_name:
+                                                            datafile.title,
+                                                    })
                                                 }}
                                             >
-                                                <span className="text-xs 2xl:text-sm whitespace-nowrap">
-                                                    View Chart Preview
-                                                </span>
+                                                View Chart Preview
                                             </Button>
                                         )}
                                     </>
@@ -939,12 +990,15 @@ function DatafileCard({
                                 </div>
                             </div>
                             <div className="grid max-w-[30rem] grid-cols-3 gap-x-3 py-4 ">
-                                {!datafile.rw_id || datafile.rw_id === '' && (
-                                    <>
-                                        <DownloadButton datafile={datafile} />
-                                        <OpenInButton />
-                                    </>
-                                )}
+                                {!datafile.rw_id ||
+                                    (datafile.rw_id === '' && (
+                                        <>
+                                            <DownloadButton
+                                                datafile={datafile}
+                                            />
+                                            <OpenInButton />
+                                        </>
+                                    ))}
                                 {/*<LearnMoreButton datafile={datafile} dataset={dataset} />*/}
                                 <APIButton datafile={datafile} />
                             </div>

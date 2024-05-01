@@ -65,7 +65,7 @@ function TokenCard({ token }: { token: ApiToken }) {
                 )}
             </div>
             <Button
-                aria-label='delete token'
+                aria-label="delete token"
                 variant="destructive"
                 size="sm"
                 className="rounded-full px-1.5 delete-token"
@@ -166,7 +166,7 @@ export function ApiKeys({ apiTokens }: { apiTokens: ApiToken[] }) {
                             title="Make sure to copy it now, you won't be able to see it again!"
                             text={token}
                             copy={true}
-              close={true}
+                            close={true}
                         />
                     </div>
                 )}
@@ -195,6 +195,8 @@ export function ApiKeys({ apiTokens }: { apiTokens: ApiToken[] }) {
                         </div>
                     </div>
                     <form
+                        id="token"
+                        data-userid={session?.user?.id}
                         onSubmit={handleSubmit((data) => {
                             createToken.mutate(data)
                         })}
