@@ -257,59 +257,71 @@ you need to split the geometry in order to fit the parts. Not indexing"""
 
         if address:
             cwd = os.path.abspath(os.path.dirname(__file__))
-
             queries.append("spatial_address:/.*{}/".format(address))
 
-            segments = address.split(",")
-
-            if len(segments) == 1:
-                # It's a country
-                try:
-                    path = os.path.join(
-                        cwd,
-                        "../world_geojsons/countries/{}.geojson".format(
-                            segments[0].strip()
-                        ),
-                    )
-                    with open(path, "r") as f:
-                        content = f.read()
-                        wkt = self.get_wkt_for_geojson(content)
-
-                        if wkt:
-                            queries.append(self.get_wkt_query(wkt))
-                        elif point:
-                            queries.append(self.get_point_query(point))
-
-                except Exception:
-                    if point:
-                        queries.append(self.get_point_query(point))
-
-            elif len(segments) == 2:
-                # It's a state
-                try:
-                    path = os.path.join(
-                        cwd,
-                        "../world_geojsons/states/{}/{}.geojson".format(
-                            segments[0].strip(), segments[1].strip()
-                        ),
-                    )
-                    with open(path, "r") as f:
-                        content = f.read()
-                        wkt = self.get_wkt_for_geojson(content)
-
-                        if wkt:
-                            queries.append(self.get_wkt_query(wkt))
-                        elif point:
-                            queries.append(self.get_point_query(point))
-
-                except Exception:
-                    if point:
-                        queries.append(self.get_point_query(point))
-            elif len(segments) == 3:
-                # It's a city
-                if point:
-                    queries.append(self.get_point_query(point))
-
+        if isinstance(address, list):
+            list_of_queries = [self.get_address_query(a, point) for a in address]
+            queries += [
+                i for g in list_of_queries for i in g
+            ]
+        else:
+            queries += self.get_address_query(address, point)
+            
         search_params["fq_list"].append(" OR ".join(queries))
 
         return search_params
+
+    def get_address_query(self, address: str, point):
+        cwd = os.path.abspath(os.path.dirname(__file__))
+        segments = address.split(",")
+        _queries = [] 
+        if len(segments) == 1:
+            # It's a country
+            try:
+                path = os.path.join(
+                    cwd,
+                    "../world_geojsons/countries/{}.geojson".format(
+                        segments[0].strip()
+                    ),
+                )
+                with open(path, "r") as f:
+                    content = f.read()
+                    wkt = self.get_wkt_for_geojson(content)
+
+                    if wkt:
+                        _queries.append(self.get_wkt_query(wkt))
+                    elif point:
+                        _queries.append(self.get_point_query(point))
+
+            except Exception:
+                if point:
+                    _queries.append(self.get_point_query(point))
+
+        elif len(segments) == 2:
+            # It's a state
+            try:
+                path = os.path.join(
+                    cwd,
+                    "../world_geojsons/states/{}/{}.geojson".format(
+                        segments[0].strip(), segments[1].strip()
+                    ),
+                )
+                with open(path, "r") as f:
+                    content = f.read()
+                    wkt = self.get_wkt_for_geojson(content)
+
+                    if wkt:
+                        _queries.append(self.get_wkt_query(wkt))
+                    elif point:
+                        _queries.append(self.get_point_query(point))
+
+            except Exception:
+                if point:
+                    _queries.append(self.get_point_query(point))
+        elif len(segments) == 3:
+            # It's a city
+            if point:
+                _queries.append(self.get_point_query(point))
+        return _queries
+
+
