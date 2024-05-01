@@ -325,6 +325,15 @@ export const initializeStore = (preloadedState: any = {}) => {
                             layers: [layerId],
                         })
                     }
+                    //set default view state
+                    const currentLayers = get().mapView.layers
+                    currentLayers.set(layerId, {
+                        visibility: true,
+                        active: true,
+                        opacity: 1,
+                        threshold: 20,
+                        zIndex: Object.keys(currentLayers).length + 11,
+                    })
 
                     set({
                         ...prev,
@@ -359,6 +368,18 @@ export const initializeStore = (preloadedState: any = {}) => {
                             (lg: ActiveLayerGroup) => lg.datasetId != datasetId
                         )
                     }
+                    //set default view state
+                    const currentLayers = get().mapView.layers
+                    layerIds.forEach((_id: string, index: number) => {
+                        currentLayers.set(_id, {
+                            visibility: index === 0,
+                            active: index === 0,
+                            opacity: 1,
+                            threshold: 20,
+                            zIndex:
+                                Object.keys(currentLayers).length + 11 + index,
+                        })
+                    })
 
                     set({
                         ...prev,
@@ -426,7 +447,6 @@ export const useCreateStore = (serverInitialState: Partial<InitialState>) => {
     const isReusingStore = Boolean(store)
     // For CSR, always re-use same store.
     store = store ?? initializeStore(serverInitialState)
-    console.log('STORE', store)
     // And if initialState changes, then merge states in the next render cycle.
     //
     // eslint complaining "React Hooks must be called in the exact same order in every component render"

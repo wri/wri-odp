@@ -46,6 +46,7 @@ import { RwDatasetResp, isRwError } from '@/interfaces/rw.interface'
 import { match } from 'ts-pattern'
 import Image from 'next/image'
 import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover'
+import { env } from '@/env.mjs'
 
 function OpenInButton({
     open_in,
@@ -325,7 +326,6 @@ export function DatasetHeader({
             },
             { enabled: !!dataset?.name }
         )
-    console.log('collaborators', collaborators)
     const canEditDataset = match(session.data?.user.sysadmin ?? false)
         .with(true, () => true)
         .with(false, () => {
@@ -899,7 +899,8 @@ export function DatasetHeader({
                                 ) : (
                                     <Button
                                         size="sm"
-                                        onClick={() =>
+                                        id={`tableviews-${dataset.id}`}
+                                        onClick={() => {
                                             setTabularResource({
                                                 provider:
                                                     dataset.provider as any,
@@ -909,7 +910,18 @@ export function DatasetHeader({
                                                     dataset.connectorUrl as string,
                                                 name: dataset.name,
                                             })
-                                        }
+                                            if (
+                                                env.NEXT_PUBLIC_DISABLE_HOTJAR !==
+                                                'disabled'
+                                            ) {
+                                                //@ts-ignore
+                                                dataLayer.push({
+                                                    event: 'gtm.click',
+                                                    resource_name:
+                                                        dataset.title,
+                                                })
+                                            }
+                                        }}
                                     >
                                         View Table Preview
                                     </Button>
@@ -945,8 +957,20 @@ export function DatasetHeader({
                                 ) : (
                                     <Button
                                         size="sm"
+                                        id={`chartviews-${dataset.id}`}
                                         onClick={() => {
                                             addCharts(datasetViews)
+                                            if (
+                                                env.NEXT_PUBLIC_DISABLE_HOTJAR !==
+                                                'disabled'
+                                            ) {
+                                                //@ts-ignore
+                                                dataLayer.push({
+                                                    event: 'gtm.click',
+                                                    resource_name:
+                                                        dataset.title,
+                                                })
+                                            }
                                         }}
                                     >
                                         View Chart Preview
