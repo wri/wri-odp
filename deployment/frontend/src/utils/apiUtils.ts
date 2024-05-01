@@ -289,6 +289,7 @@ export async function getAllDatasetFq({
     sortBy = '',
     extLocationQ = '',
     extAddressQ = '',
+    extGlobalQ = 'include',
     user = null,
 }: {
     apiKey: string
@@ -298,6 +299,7 @@ export async function getAllDatasetFq({
     sortBy?: string
     extLocationQ?: string
     extAddressQ?: string
+    extGlobalQ?: string
     user?: boolean | null
 }): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets }> {
     try {
@@ -315,12 +317,21 @@ export async function getAllDatasetFq({
             url += `&sort=${sortBy}`
         }
 
-        if (extLocationQ) {
+        if (extLocationQ && extGlobalQ !== 'only') {
             url += `&ext_location_q=${extLocationQ}`
         }
 
-        if (extAddressQ) {
-            url += `&ext_address_q=${extAddressQ}`
+        if (extAddressQ && extGlobalQ !== 'only') {
+            if (extGlobalQ === 'exclude') {
+              url += `&ext_address_q=${extAddressQ}`
+            }
+            if (extGlobalQ === 'include') {
+              url += `&ext_address_q=${extAddressQ}&ext_address_q=Global`
+            }
+        }
+
+        if (extGlobalQ === 'only') {
+            url += '&ext_address_q=Global'
         }
 
         if (user) {

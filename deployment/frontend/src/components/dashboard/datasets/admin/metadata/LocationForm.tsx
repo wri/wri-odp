@@ -1,6 +1,7 @@
 import {
     ArrowUpTrayIcon,
     Bars4Icon,
+    GlobeEuropeAfricaIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
@@ -115,6 +116,7 @@ export function LocationForm({
                     selectedIndex={match(watch('spatial_type'))
                         .with('geom', () => 0)
                         .with('address', () => 1)
+                        .with('global', () => 2)
                         .otherwise(() => undefined)}
                 >
                     <Tab.List
@@ -172,6 +174,33 @@ export function LocationForm({
                                 </span>
                             )}
                         </Tab>
+                        <Tab
+                            id="tabLink"
+                            onClick={() => {
+                                setValue(`spatial_type`, 'global')
+                                setValue(`spatial`, undefined)
+                                setValue(`spatial_address`, 'Global')
+                            }}
+                        >
+                            {({ selected }) => (
+                                <span
+                                    className={classNames(
+                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                        selected ? 'bg-amber-400' : ''
+                                    )}
+                                >
+                                    <GlobeEuropeAfricaIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                    <div
+                                        className={classNames(
+                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                            selected ? 'font-bold' : ''
+                                        )}
+                                    >
+                                        Global Dataset
+                                    </div>
+                                </span>
+                            )}
+                        </Tab>
                     </Tab.List>
                     <Tab.Panels as="div" className="mt-2">
                         <Tab.Panel>
@@ -221,6 +250,7 @@ export function LocationForm({
                                 />
                             </Map>
                         </Tab.Panel>
+                        <Tab.Panel></Tab.Panel>
                     </Tab.Panels>
                 </Tab.Group>
             </Disclosure.Panel>

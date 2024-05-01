@@ -198,11 +198,14 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     schema: resource.schema ? schema.value : undefined,
                 }
             }),
-            spatial_type: dataset.spatial_address
-                ? 'address'
-                : dataset.spatial
-                ? 'geom'
-                : undefined,
+            spatial_type:
+                dataset.spatial_address === 'Global'
+                    ? 'global'
+                    : dataset.spatial_address
+                    ? 'address'
+                    : dataset.spatial
+                    ? 'geom'
+                    : undefined,
         },
     })
 

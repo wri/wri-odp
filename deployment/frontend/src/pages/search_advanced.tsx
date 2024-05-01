@@ -78,6 +78,7 @@ export default function SearchPage(
         search: '',
         extLocationQ: '',
         extAddressQ: '',
+        extGlobalQ: 'include',
         fq: {},
         page: initialPage,
         sortBy: initialSortBy,
@@ -99,6 +100,7 @@ export default function SearchPage(
         const fq: any = {}
         let extLocationQ = ''
         let extAddressQ = ''
+        let extGlobalQ = 'include'
 
         keys.forEach((key) => {
             let keyFq
@@ -158,6 +160,16 @@ export default function SearchPage(
                 // @ts-ignore
                 if (coordinates) extLocationQ = coordinates.reverse().join(',')
                 if (address) extAddressQ = address
+            } else if (key == 'extGlobalQ') {
+                const extGlobalQFilter = filters.find(
+                    (f) => f.key == 'extGlobalQ'
+                )
+                if (extGlobalQFilter && extGlobalQFilter.value === 'exclude') {
+                    fq['!spatial_address'] = 'Global'
+                }
+                if (extGlobalQFilter && extGlobalQFilter.value === 'only') {
+                    fq['spatial_address'] = 'Global'
+                }
             } else {
                 keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             }
@@ -168,6 +180,7 @@ export default function SearchPage(
         delete fq.metadata_modified_since
         delete fq.metadata_modified_before
         delete fq.spatial
+        delete fq.extGlobalQ
 
         setQuery((prev) => {
             return {
@@ -176,6 +189,9 @@ export default function SearchPage(
                 search: filters.find((e) => e?.key == 'search')?.value ?? '',
                 extLocationQ,
                 extAddressQ,
+                extGlobalQ:
+                    filters.find((e) => e?.key == 'extGlobalQ')?.value as 'only' | 'exclude' | 'include' ??
+                    'include',
             }
         })
     }, [filters])
