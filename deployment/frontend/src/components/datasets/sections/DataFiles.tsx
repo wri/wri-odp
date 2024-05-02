@@ -669,7 +669,8 @@ function DatafileCard({
                                                 customDataLayer({
                                                     event: 'gtm.click',
                                                     resource_name:
-                                                        datafile.title,
+                                                        datafile.title ??
+                                                        datafile.name!,
                                                 })
                                             }}
                                         >
@@ -710,7 +711,8 @@ function DatafileCard({
                                                 customDataLayer({
                                                     event: 'gtm.click',
                                                     resource_name:
-                                                        datafile.title,
+                                                        datafile.title ??
+                                                        datafile.name!,
                                                 })
                                             }}
                                         >
@@ -762,7 +764,8 @@ function DatafileCard({
                                                 customDataLayer({
                                                     event: 'gtm.click',
                                                     resource_name:
-                                                        datafile.title,
+                                                        datafile.title ??
+                                                        datafile.name!,
                                                 })
                                             }}
                                         >
@@ -843,7 +846,8 @@ function DatafileCard({
                                                     customDataLayer({
                                                         event: 'gtm.click',
                                                         resource_name:
-                                                            datafile.title,
+                                                            datafile.title ??
+                                                            datafile.name!,
                                                     })
                                                 }}
                                             >
@@ -885,7 +889,8 @@ function DatafileCard({
                                                     customDataLayer({
                                                         event: 'gtm.click',
                                                         resource_name:
-                                                            datafile.title,
+                                                            datafile.title ??
+                                                            datafile.name!,
                                                     })
                                                 }}
                                             >
@@ -936,7 +941,8 @@ function DatafileCard({
                                                     customDataLayer({
                                                         event: 'gtm.click',
                                                         resource_name:
-                                                            datafile.title,
+                                                            datafile.title ??
+                                                            datafile.name!,
                                                     })
                                                 }}
                                             >
