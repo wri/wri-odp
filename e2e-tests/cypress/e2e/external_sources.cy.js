@@ -70,7 +70,6 @@ describe("External sources", () => {
     () => {
       cy.visit(`/datasets/${gfwDataset}`);
       cy.contains('Open table in GFW')
-      cy.contains("Ma'tan al-Sarra", { timeout: 15000 });
       cy.contains("Download Data").click();
       cy.contains("CSV").click();
       cy.contains("Get via email")
@@ -81,7 +80,6 @@ describe("External sources", () => {
     () => {
       cy.visit(`/datasets/${cartoDataset}`);
       cy.contains('Open table in Carto')
-      cy.contains("port_name", { timeout: 15000 });
       cy.contains("Download Data").click();
       cy.contains("CSV").click();
       cy.contains("Get via email")

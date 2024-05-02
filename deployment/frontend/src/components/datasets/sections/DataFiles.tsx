@@ -176,6 +176,7 @@ interface LocationSearchFormType {
     bbox: Array<Array<number>> | null
     point: Array<number> | null
     location: string
+    global: 'include' | 'exclude' | 'only'
 }
 
 export function DataFiles({
@@ -211,11 +212,14 @@ export function DataFiles({
             bbox: null,
             point: null,
             location: '',
+            global: 'include',
         },
     })
     const { data: searchedResources, isLoading: isLoadingLocationSearch } =
         api.dataset.resourceLocationSearch.useQuery({
-            ...formObj.watch(),
+            bbox: formObj.watch('bbox'),
+            point: formObj.watch('point'),
+            location: formObj.watch('location'),
             package_id: dataset.name,
             is_pending: false,
         })
@@ -226,13 +230,28 @@ export function DataFiles({
                   index.search(q).includes(datafile.id)
               )
             : datafiles
-    const filteredDatafilesIds = filteredDatafilesByName?.map((df) => df.id)
-    const filteredDatafiles = searchedResources
-        ? searchedResources?.filter((r) => filteredDatafilesIds.includes(r.id))
+    const searchedDatafilesIds = searchedResources?.map((df) => df.id) ?? []
+    let filteredDatafiles = searchedResources
+        ? filteredDatafilesByName?.filter(
+              (r) =>
+                  searchedDatafilesIds.includes(r.id) ||
+                  (formObj.watch('global') === 'include' &&
+                      r.spatial_address === 'Global')
+          )
         : filteredDatafilesByName
+    if (formObj.watch('global') === 'exclude') {
+        filteredDatafiles = filteredDatafiles.filter(
+            (r) => r.spatial_address !== 'Global'
+        )
+    }
+    if (formObj.watch('global') === 'only') {
+        filteredDatafiles = filteredDatafilesByName.filter(
+            (r) => r.spatial_address === 'Global'
+        )
+    }
 
     const geojsons = useMemo(() => {
-        return filteredDatafilesByName.map((df) => ({
+        return filteredDatafilesByName.filter(r => r.spatial_type !== 'global').map((df) => ({
             ...df.spatial_geom,
             address: df.spatial_address,
             id: df.id,
@@ -285,13 +304,67 @@ export function DataFiles({
                             </Disclosure.Button>
                             <Disclosure.Panel
                                 unmount={false}
-                                className="py-3 w-full"
+                                className="pb-3 w-full"
                             >
-                                <LocationSearch
-                                    open={open}
-                                    geojsons={geojsons}
-                                    formObj={formObj}
-                                />
+                                <div className="pb-3 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            onChange={() =>
+                                                formObj.setValue(
+                                                    'global',
+                                                    formObj.watch('global') ===
+                                                        'only'
+                                                        ? 'include'
+                                                        : 'only'
+                                                )
+                                            }
+                                            checked={
+                                                formObj.watch('global') ===
+                                                'only'
+                                            }
+                                            className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
+                                        />
+                                        <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                            Only global
+                                        </label>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            onChange={() =>
+                                                formObj.setValue(
+                                                    'global',
+                                                    formObj.watch('global') ===
+                                                        'exclude'
+                                                        ? 'include'
+                                                        : 'exclude'
+                                                )
+                                            }
+                                            checked={
+                                                formObj.watch('global') ===
+                                                'exclude'
+                                            }
+                                            className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
+                                        />
+                                        <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                            Exclude global
+                                        </label>
+                                    </div>
+                                </div>
+                                <div
+                                    className={classNames(
+                                        formObj.watch('global') === 'only'
+                                            ? 'hidden'
+                                            : 'block'
+                                    )}
+                                >
+                                    <LocationSearch
+                                        open={open}
+                                        geojsons={geojsons}
+                                        formObj={formObj}
+                                    />
+                                </div>
                             </Disclosure.Panel>
                         </>
                     )}
