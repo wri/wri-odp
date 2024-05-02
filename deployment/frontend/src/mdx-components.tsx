@@ -1,14 +1,7 @@
 import type { MDXComponents } from 'mdx/types'
 import Image, { ImageProps } from 'next/image'
 
-// function Hs(props) {
-//     return (
-//         <>
-//             <a id={props.children?.toString().replaceAll(' ', '-')} />
-//             <h1>{props.children}</h1>
-//         </>
-//     )
-// }
+
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
     return {
