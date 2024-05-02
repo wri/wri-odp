@@ -497,7 +497,7 @@ export default function DatasetPage(
                 addLayerToLayerGroup(LayerResource.rw_id!, dataset.id)
                 customDataLayer({
                     event: 'layer_view_event',
-                    resource_name: LayerResource.title,
+                    resource_name: LayerResource.title ?? LayerResource.name!,
                 })
             } else if (dataset?.provider && dataset?.rw_id) {
                 setDisplayNoPreview(false)
