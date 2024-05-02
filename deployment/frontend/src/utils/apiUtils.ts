@@ -330,10 +330,6 @@ export async function getAllDatasetFq({
             }
         }
 
-        if (extGlobalQ === 'only') {
-            url += '&ext_address_q=Global'
-        }
-
         if (user) {
             url += `&user=true`
         }

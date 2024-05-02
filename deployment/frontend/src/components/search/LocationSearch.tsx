@@ -17,9 +17,7 @@ export default function LocationSearch({
     const initialValue = filters?.find((f) => f.key == 'spatial')?.label ?? ''
     const locationFilterIndex = filters.findIndex((f) => f.key == 'spatial')
     const globalQValue = filters.find((f) => f.key == 'extGlobalQ')?.value
-    console.log('GLOBAL Q VALUE', globalQValue)
     function updateGlobalQ(value: string) {
-        console.log('VALUE', value)
         setFilters((prev) => {
             const newFilters = prev.length ? [...prev] : []
 
@@ -35,7 +33,7 @@ export default function LocationSearch({
                     newFilters[filterIndex] = {
                         title: 'Global',
                         key: 'extGlobalQ',
-                        label: value,
+                        label: value === 'only' ? 'Only global' : 'Excluded',
                         value: value,
                     }
                 } else {
@@ -46,7 +44,7 @@ export default function LocationSearch({
                     newFilters.push({
                         key: 'extGlobalQ',
                         title: 'Global',
-                        label: value,
+                        label: value === 'only' ? 'Only global' : 'Excluded',
                         value: value,
                     })
                 } else {
