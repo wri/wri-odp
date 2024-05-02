@@ -1,5 +1,6 @@
 import {
     ArrowUpTrayIcon,
+    GlobeEuropeAfricaIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 import { Disclosure, Tab } from '@headlessui/react'
@@ -198,6 +199,42 @@ export function DatafileLocation({
                                 </span>
                             )}
                         </Tab>
+                        <Tab
+                            id="tabLink"
+                            onClick={() => {
+                                setValue(
+                                    `resources.${index}.spatial_type`,
+                                    'global'
+                                )
+                                setValue(
+                                    `resources.${index}.spatial_geom`,
+                                    undefined
+                                )
+                                setValue(
+                                    `resources.${index}.spatial_address`,
+                                    'Global'
+                                )
+                            }}
+                        >
+                            {({ selected }) => (
+                                <span
+                                    className={classNames(
+                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                        selected ? 'bg-amber-400' : ''
+                                    )}
+                                >
+                                    <GlobeEuropeAfricaIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                    <div
+                                        className={classNames(
+                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                            selected ? 'font-bold' : ''
+                                        )}
+                                    >
+                                        Global Datafile
+                                    </div>
+                                </span>
+                            )}
+                        </Tab>
                     </Tab.List>
                     <Tab.Panels as="div" className="mt-2">
                         <Tab.Panel>
@@ -262,6 +299,7 @@ export function DatafileLocation({
                                 />
                             </Map>
                         </Tab.Panel>
+                        <Tab.Panel></Tab.Panel>
                     </Tab.Panels>
                 </Tab.Group>
             </Disclosure.Panel>
