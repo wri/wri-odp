@@ -44,11 +44,15 @@ class PendingDatasets(object):
                 .filter(PendingDatasets.package_id == package_id)
                 .one()
             )
-            return {
-                "package_id": str(pending_dataset.package_id),
-                "package_data": str(pending_dataset.package_data),
-                "last_modified": pending_dataset.last_modified.isoformat(),
-            }
+            if pending_dataset:
+                return {
+                    "package_id": str(pending_dataset.package_id),
+                    "package_data": str(pending_dataset.package_data),
+                    "last_modified": pending_dataset.last_modified.isoformat(),
+                }
+            else:
+                log.error(_(f"Pending Dataset not found: {package_id}"))
+                return
 
     @classmethod
     def create(
