@@ -2,6 +2,8 @@ import { Hero } from '../home/Hero'
 import { HomeFooter } from '../home/HomeFooter'
 import Header from './Header'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
+import { NextSeo } from 'next-seo'
+import { env } from '@/env.mjs'
 export default function MdxLayout({
     children,
     label,
@@ -38,15 +40,25 @@ export default function MdxLayout({
 
     return (
         <>
+            <NextSeo
+                title={`${label !== "User Guide" ? label+" (user guide)" : label}`}
+                description={`${label}`}
+                openGraph={{
+                    title: `${label !== "User Guide" ? label+" (user guide)" : label} `,
+                    description: `${label}`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}${url}`,
+                }}
+            />
             <Header />
-            <Breadcrumbs links={links} />
+            
             <section
                 id="search"
-                className="flex h-[200px] w-full flex-col bg-cover bg-center bg-no-repeat font-acumin"
+                className="flex h-[245px] w-full flex-col bg-cover bg-center bg-no-repeat font-acumin"
                 style={{
                     backgroundImage: 'url(/images/bg.png)',
                 }}
             >
+                <Breadcrumbs links={links} />
                 <div className="mx-auto my-auto flex w-full max-w-4xl space-x-4 px-4 font-acumin sm:px-6 xxl:px-0">
                     <h1 className=" text-4xl text-white font-extrabold ">
                         {title}
