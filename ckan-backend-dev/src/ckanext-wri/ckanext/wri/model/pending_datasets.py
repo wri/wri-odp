@@ -46,9 +46,9 @@ class PendingDatasets(object):
             )
             if pending_dataset:
                 return {
-                    "package_id": str(pending_dataset.package_id),
-                    "package_data": str(pending_dataset.package_data),
-                    "last_modified": pending_dataset.last_modified.isoformat(),
+                    "package_id": pending_dataset.package_id,
+                    "package_data": pending_dataset.package_data,
+                    "last_modified": pending_dataset.last_modified,
                 }
             else:
                 log.error(_(f"Pending Dataset not found: {package_id}"))
@@ -63,15 +63,17 @@ class PendingDatasets(object):
         with sql_session_scope() as session:
             pending_dataset = PendingDatasets(package_id, package_data)
             session.add(pending_dataset)
+            session.commit()
+            session.refresh(pending_dataset)
 
             package_data = ResourceLocation.index_dataset_resources_by_location(
                 package_data, True
             )
 
             return {
-                "package_id": str(pending_dataset.package_id),
-                "package_data": str(package_data),
-                "last_modified": pending_dataset.last_modified.isoformat(),
+                "package_id": pending_dataset.package_id,
+                "package_data": package_data,
+                "last_modified": pending_dataset.last_modified,
             }
 
     @classmethod
@@ -89,15 +91,17 @@ class PendingDatasets(object):
 
             if pending_dataset:
                 pending_dataset.package_data = package_data
+                session.commit()
+                session.refresh(pending_dataset)
 
                 package_data = ResourceLocation.index_dataset_resources_by_location(
                     package_data, True
                 )
 
                 return {
-                    "package_id": str(pending_dataset.package_id),
-                    "package_data": str(package_data),
-                    "last_modified": pending_dataset.last_modified.isoformat(),
+                    "package_id": pending_dataset.package_id,
+                    "package_data": package_data,
+                    "last_modified": pending_dataset.last_modified,
                 }
             else:
                 log.error(_(f"Pending Dataset not found: {package_id}"))
