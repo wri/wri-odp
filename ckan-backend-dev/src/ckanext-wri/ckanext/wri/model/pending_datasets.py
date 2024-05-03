@@ -42,7 +42,7 @@ class PendingDatasets(object):
             pending_dataset = (
                 session.query(PendingDatasets)
                 .filter(PendingDatasets.package_id == package_id)
-                .one()
+                .one_or_none()
             )
             if pending_dataset:
                 return {
@@ -86,7 +86,7 @@ class PendingDatasets(object):
             pending_dataset = (
                 session.query(PendingDatasets)
                 .filter(PendingDatasets.package_id == package_id)
-                .one()
+                .one_or_none()
             )
 
             if pending_dataset:
@@ -113,11 +113,16 @@ class PendingDatasets(object):
             pending_dataset = (
                 session.query(PendingDatasets)
                 .filter(PendingDatasets.package_id == package_id)
-                .one()
+                .one_or_none()
             )
-            session.delete(pending_dataset)
+            if pending_dataset:
+                session.delete(pending_dataset)
+                session.refresh(pending_dataset)
 
-            return pending_dataset
+                return pending_dataset
+            else:
+                log.error(_(f"Pending Dataset not found: {package_id}"))
+                return
 
 
 meta.mapper(PendingDatasets, pending_datasets)
