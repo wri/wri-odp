@@ -123,6 +123,7 @@ export function DatafileLocation({
                     )
                         .with('geom', () => 0)
                         .with('address', () => 1)
+                        .with('global', () => 2)
                         .otherwise(() => undefined)}
                 >
                     <Tab.List
