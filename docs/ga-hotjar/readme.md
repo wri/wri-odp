@@ -125,6 +125,14 @@ and here is the current list of Tags
 
    ![](./gtm26.png)
 
+   `map interactions` to track `layer id` , `lattitude` , `longitude` and `zoom level`
+
+   ![](./gtm35.png)
+
+   `Table views` contains data on `View table preview` and the default table preview
+
+   ![](./gtm36.png)
+
 ## Adding Hotjar
 
 Go to https://insights.hotjar.com/site/list and create a new site or update a site
