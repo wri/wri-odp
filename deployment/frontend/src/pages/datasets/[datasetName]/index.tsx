@@ -433,6 +433,14 @@ export default function DatasetPage(
                     ),
         },
         {
+            name: 'API',
+            enabled: true,
+            highlighted:
+                !isCurrentVersion &&
+                diffFields &&
+                diffFields.some((f) => f.includes('usecases')),
+        },
+        {
             name: 'Methodology',
             enabled: !!datasetData?.methodology,
             highlighted:
@@ -440,7 +448,6 @@ export default function DatasetPage(
                 diffFields &&
                 diffFields.some((f) => f.includes('methodology')),
         },
-        { name: 'Related Datasets', enabled: true },
         {
             name: 'Contact',
             enabled: true,
@@ -456,14 +463,7 @@ export default function DatasetPage(
                     ].some((x) => f.includes(x))
                 ),
         },
-        {
-            name: 'API',
-            enabled: true,
-            highlighted:
-                !isCurrentVersion &&
-                diffFields &&
-                diffFields.some((f) => f.includes('usecases')),
-        },
+        { name: 'Related Datasets', enabled: true },
         {
             name: 'Collaborators',
             enabled: collaborators.data,
