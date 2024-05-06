@@ -54,8 +54,8 @@ export function HomeFooter() {
                         <a href="/publish-data" className=" font-normal">
                             Publish Data
                         </a>
-                        <a href="/get-help" className=" font-normal">
-                            Get Help
+                        <a href="/user-guide" className=" font-normal">
+                            User Guide
                         </a>
                     </div>
                     <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start xl:min-w-[420px]">
