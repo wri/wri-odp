@@ -24,7 +24,7 @@ UWSGI_OPTS="--socket /tmp/uwsgi.sock \
             --http 0.0.0.0:5000 \
             --master --enable-threads \
             --lazy-apps \
-            -p 6 -L -b 32768 --vacuum \
+            -p 8 -L -b 32768 --vacuum \
             --harakiri $UWSGI_HARAKIRI"
 
 if [ $? -eq 0 ]
