@@ -681,6 +681,15 @@ export default function DatasetPage(
                                                     diffFields={diffFields}
                                                 />
                                             </Tab.Panel>
+                                            <Tab.Panel as="div">
+                                                <API
+                                                    usecases={
+                                                        isCurrentVersion
+                                                            ? prevDatasetData.usecases
+                                                            : datasetData.usecases
+                                                    }
+                                                />
+                                            </Tab.Panel>
                                             {datasetData.methodology && (
                                                 <Tab.Panel as="div">
                                                     <Methodology
@@ -692,9 +701,6 @@ export default function DatasetPage(
                                                     />
                                                 </Tab.Panel>
                                             )}
-                                            <Tab.Panel as="div">
-                                                <RelatedDatasets />
-                                            </Tab.Panel>
                                             <Tab.Panel as="div">
                                                 <Contact
                                                     //@ts-ignore
@@ -710,13 +716,7 @@ export default function DatasetPage(
                                                 />
                                             </Tab.Panel>
                                             <Tab.Panel as="div">
-                                                <API
-                                                    usecases={
-                                                        isCurrentVersion
-                                                            ? prevDatasetData.usecases
-                                                            : datasetData.usecases
-                                                    }
-                                                />
+                                                <RelatedDatasets />
                                             </Tab.Panel>
                                             {collaborators.data && (
                                                 <Tab.Panel as="div">
