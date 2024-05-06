@@ -92,7 +92,7 @@ export default function LocationSearch({
                             <div className="px-7 py-3 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
                                 <div className="flex items-center">
                                     <input
-                                        name="notification-method"
+                                        name="only-global"
                                         type="checkbox"
                                         onChange={() =>
                                             updateGlobalQ(
@@ -104,13 +104,13 @@ export default function LocationSearch({
                                         checked={globalQValue == 'only'}
                                         className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
                                     />
-                                    <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                    <label htmlFor="only-global" className="ml-3 block text-sm font-medium leading-6 text-gray-900">
                                         Only global
                                     </label>
                                 </div>
                                 <div className="flex items-center">
                                     <input
-                                        name="notification-method"
+                                        name="exclude-global"
                                         type="checkbox"
                                         onChange={() =>
                                             updateGlobalQ(
@@ -122,7 +122,7 @@ export default function LocationSearch({
                                         checked={globalQValue == 'exclude'}
                                         className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
                                     />
-                                    <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                    <label htmlFor="exclude-global" className="ml-3 block text-sm font-medium leading-6 text-gray-900">
                                         Exclude global
                                     </label>
                                 </div>
