@@ -1,0 +1,150 @@
+import MdxLayout from '@/components/_shared/mdx-layout'
+
+1. [Explore Data (Basic search)](#Explore-Data)
+2. [Advanced Search Page](#Advanced-Search-Page)
+
+    a. [Facets](#Facets)
+
+    b. [Full text search](#Full-text-search)
+
+    c. [Share search Url](#Share-search-Url)
+
+    d. [Dataset metadata](#Dataset-metadata)
+
+    e. [Sorting](#Sorting)
+
+## Explore Data
+
+If you visit Search page <mark>/search</mark> you will see the following two tabs Explore data and <mark>Advance search</mark>
+
+<img src="/images/user-guide/explore1.png" />
+
+The Explore Data is the default search page, and it contains the search box input, Three different sections
+
+1. Highlighted Dataset: Display datasets that are marked as featured datasets and sorted by last modified and display an image chosen by the author
+
+<img src="/images/user-guide/explore2.png" />
+
+2. Recently added datasets: Display recently added datasets. As the name suggests, this section shows the last 8 created datasets.
+
+<img src="/images/user-guide/explore3.png" />
+
+3. Recently updated Datasets: Display recently updated datasets. Also as the name suggests, this section shows the last 8 updated datasets.
+
+<img src="/images/user-guide/explore4.png" />
+
+Note that by entering some text in the search input and hitting enter, users will be redirected to the Advanced search page, in which it is possible to see and filter the results.
+
+## Advanced Search page
+
+Users can move to the Advance search page by hitting enter in the basic search or by clicking the Advanced search tab
+
+<img src="/images/user-guide/explore5.png" />
+
+## Facets
+
+The page contains various facets by which you can filter datasets, and here are the facets:
+
+-   Location
+
+-   Featured (Yes or No)
+
+-   Application
+
+-   Project
+
+-   Team
+
+-   Topics
+
+-   Tags
+
+-   Temporal Coverage (start and end)
+
+-   Update Frequency
+
+-   Format (of the data files)
+
+-   License
+
+-   Language
+
+-   WRI Data (Yes or no)
+
+-   Visibility
+
+<img src="/images/user-guide/explore6.png" />
+
+For example to search by location, take your mouse pointer to the location facet and click on the expansion icon and then search by your desired location
+
+<img src="/images/user-guide/explore7.png" />
+
+### Full text search
+
+The search functionality also searches through all the metadata of each dataset to get datasets that match the text, e.g we can search for Dataset having this description shown below
+
+<img src="/images/user-guide/explore8.png" />
+
+If you’ve use different filters and you want to reset the search page to default, click on `Clear all filters`.
+
+### Share search Url
+
+When a user searches on the advanced search page, the URL gets updated containing the state of the current page. This URL can be shared with other users, which will be able to see the same results.
+
+### Dataset metadata
+
+Results are displayed using the following card:
+
+<img src="/images/user-guide/explore9.png" />
+
+1. Team
+
+2. Title
+
+3. Short description
+
+4. Last updated
+
+5. Temporal coverage
+
+6. Location
+
+7. Has chart view
+
+8. Has map view
+
+9. Has tabular view
+
+10. Has cautions
+
+11. Formats of the data files
+
+### Sorting
+
+Available sorting options are:
+
+-   Relevance
+
+-   Name Ascending
+
+-   Name Descending
+
+-   Last Modified
+
+-   Featured
+
+-   WRI Data
+
+<img src="/images/user-guide/explore10.png" />
+
+export default function MDXPage({ children }) {
+    return (
+        <MdxLayout
+            label="Explore data/Advance search"
+            url="/user-guide/explore-data-and-advance-search"
+            title="Explore Data and Advanced Search"
+        >
+            {children}
+        </MdxLayout>
+    )
+}

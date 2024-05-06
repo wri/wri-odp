@@ -1163,6 +1163,7 @@ export const DatasetRouter = createTRPCRouter({
                 sortBy: input.sortBy,
                 extLocationQ: input.extLocationQ,
                 extAddressQ: input.extAddressQ,
+                extGlobalQ: input.extGlobalQ,
             }))!
 
             const _datasets = input.removeUnecessaryDataInResources
@@ -1397,7 +1398,7 @@ export const DatasetRouter = createTRPCRouter({
                     method: 'POST',
                     body: JSON.stringify({ package_id: input }),
                     headers: {
-                       Authorization: ctx.session.user.apikey,
+                        Authorization: ctx.session.user.apikey,
                         'Content-Type': 'application/json',
                     },
                 }
