@@ -61,6 +61,8 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
           IMAGE_TAG: prod-${{ github.sha }}
+        # Using staging secrets for now until we have prod secrets for the
+        # last two variables given below
         run: |
           docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
           --build-arg NEXTAUTH_SECRET=${{ secrets.PROD_FRONTEND_NEXTAUTH_SECRET }} \
@@ -68,8 +70,8 @@ jobs:
           --build-arg CKAN_URL=${{ secrets.PROD_FRONTEND_CKAN_URL }} \
           --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.PROD_FRONTEND_CKAN_URL }} \
           --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.PROD_FRONTEND_NEXTAUTH_URL }} \
-          --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.PROD_NEXT_PUBLIC_GTM_ID }} \
-          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.PROD_NEXT_PUBLIC_HOTJAR_ID }} \
+          --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.STAGING_NEXT_PUBLIC_GTM_ID }} \
+          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.STAGING_NEXT_PUBLIC_HOTJAR_ID }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Build and push Datapusher image to ECR
