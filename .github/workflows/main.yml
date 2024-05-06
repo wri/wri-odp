@@ -42,7 +42,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: prod-${{ github.sha }}
         run: |
           mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
           docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
@@ -60,7 +60,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: prod-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
           --build-arg NEXTAUTH_SECRET=${{ secrets.PROD_FRONTEND_NEXTAUTH_SECRET }} \
@@ -76,7 +76,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: prod-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
           datapusher
@@ -85,14 +85,14 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: prod-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration \
           migration
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
       - name: Set up Docker Containers
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:prod-${{ github.sha }}'
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
@@ -110,7 +110,7 @@ jobs:
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Set up Frontend Docker Container
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:prod-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
       - name: Initialize the Extensions
@@ -184,7 +184,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_CKAN_REPO }}
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:staging-${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:prod-${{ github.sha }}'
           format: 'sarif'
           output: ckan-trivy-results.sarif
           exit-code: '0'
@@ -197,7 +197,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_FRONTEND_REPO }}
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:staging-${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:prod-${{ github.sha }}'
           format: 'sarif'
           output: frontend-trivy-results.sarif
           exit-code: '0'
