@@ -1,5 +1,8 @@
 import { Button } from '@/components/_shared/Button'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import Map from '@/components/_shared/map/Map'
 import { APILayerSpec } from '@/interfaces/layer.interface'
@@ -9,7 +12,6 @@ import classNames from '@/utils/classnames'
 import { getFormatColor } from '@/utils/formatColors'
 import { useActiveLayerGroups, useRelatedDatasets } from '@/utils/storeHooks'
 import {
-    ChartBarIcon,
     ExclamationTriangleIcon,
     MagnifyingGlassIcon,
 } from '@heroicons/react/20/solid'
@@ -19,6 +21,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import MapViewIcon from '../view-icons/MapViewIcon'
 import TabularViewIcon from '../view-icons/TabularViewIcon'
+import ChartViewIcon from '../view-icons/ChartViewIcon'
 
 export function RelatedDatasets() {
     const { relatedDatasets: datasets } = useRelatedDatasets()
@@ -32,7 +35,10 @@ export function RelatedDatasets() {
     return (
         <div className="flex flex-col gap-y-4 py-2">
             {datasets.map((dataset: WriDataset) => (
-                <DatasetCard key={`related-dataset-card-${dataset.name}`} dataset={dataset} />
+                <DatasetCard
+                    key={`related-dataset-card-${dataset.name}`}
+                    dataset={dataset}
+                />
             ))}
         </div>
     )
@@ -153,11 +159,7 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                         dataset.cautions ? 'border-r border-black' : ''
                     )}
                 >
-                    {false && (
-                        <div className="rounded-full bg-stone-100 p-1">
-                            <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                        </div>
-                    )}
+                    <ChartViewIcon dataset={dataset} />
                     <MapViewIcon dataset={dataset} />
                     <TabularViewIcon dataset={dataset} />
                 </div>
@@ -314,9 +316,9 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                                 id="add-to-map-modal-btn"
                                 onClick={() => {
                                     const layerIds = dataFiles
-                                        .filter((df) =>
-                                            selectedDataFileIds.includes(df.id)
-                                        )
+                                        // .filter((df) =>
+                                        //     selectedDataFileIds.includes(df.id)
+                                        // ) //ask Lucas what this line is doing
                                         .map((df) => df?.url?.split('/').at(-1))
                                         .filter((l) => l != undefined)
 

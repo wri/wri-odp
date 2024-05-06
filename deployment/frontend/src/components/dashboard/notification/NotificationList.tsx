@@ -9,7 +9,9 @@ import type { SearchInput } from '@/schema/search.schema'
 import { NotificationType } from '@/schema/notification.schema'
 
 export default function NotificationList() {
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery()
+    const { data, isLoading } = api.notification.getAllNotifications.useQuery({
+        returnLength: true,
+    })
     const [selected, setSelected] = useState<string[]>([])
     const [query, setQuery] = useState<SearchInput>({
         search: '',
@@ -25,12 +27,16 @@ export default function NotificationList() {
 
             const start = query.page.start
             const rows = query.page.rows
-            const slicedData = data.slice(start, start + rows)
-            slicedData.sort(
-                (a, b) =>
-                    new Date(a.time_sent!).getTime() -
-                    new Date(b.time_sent!).getTime()
-            )
+
+            let slicedData = (data as NotificationType[]).sort((a, b) => {
+                const dateA =
+                    Number(new Date()) - Number(new Date(a.time_sent!))
+                const dateB =
+                    Number(new Date()) - Number(new Date(b.time_sent!))
+                return dateA - dateB
+            })
+
+            slicedData = (data as NotificationType[]).slice(start, start + rows)
             return slicedData
         },
         {
@@ -53,7 +59,7 @@ export default function NotificationList() {
                         setQuery={setQuery}
                         query={query}
                         isLoading={paginatedData.isLoading}
-                        count={data?.length}
+                        count={(data as NotificationType[])?.length}
                     />
                 }
             />

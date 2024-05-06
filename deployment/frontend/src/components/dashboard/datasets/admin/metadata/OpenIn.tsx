@@ -80,7 +80,7 @@ export function OpenInForm({
             label={
                 <>
                     <ArrowUpRightIcon className="h-7 w-7" />
-                    Open In
+                    Link to Another WRI Product
                 </>
             }
         >
@@ -108,7 +108,7 @@ export function OpenInForm({
                         >
                             <PlusCircleIcon className="h-5 w-5 text-amber-400" />
                             <div className="font-['Acumin Pro SemiCondensed'] text-xl font-normal leading-tight text-black">
-                                Add a open-in field
+                                Add a link to another wri product
                             </div>
                         </button>
                     </DefaultTooltip>

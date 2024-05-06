@@ -1,7 +1,7 @@
 import { Button } from '@/components/_shared/Button'
 import { TextWithReadMore } from '@/components/_shared/TextWithReadMore'
 
-export function Methodology({ methodology }: { methodology: string }) {
+export function Methodology({ methodology = '' }: { methodology?: string }) {
     return (
         <div className="font-acumin text-sm font-light text-stone-900 flex flex-col gap-y-4 py-2">
             <TextWithReadMore

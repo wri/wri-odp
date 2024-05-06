@@ -16,7 +16,6 @@ export default function SubtopicCard({
     topic: GroupTree
     topicsDetails: Record<string, GroupsmDetails>
 }) {
-    console.log('img_url: ', topicsDetails[topic.id]?.img_url)
     return (
         <Link
             href={`/topics/${topic.name}`}

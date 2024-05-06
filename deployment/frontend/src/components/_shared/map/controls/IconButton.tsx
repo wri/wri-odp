@@ -14,6 +14,7 @@ export default function IconButton({
     return (
         <DefaultTooltip side="left" content={tooltip}>
             <button
+                aria-label={tooltip}
                 {...props}
                 className={`${
                     props?.className ?? ''

@@ -203,3 +203,63 @@ and once the user is created the user should recieve a notification.
 Also you can visit the users page to view newly added user
 
 ![](./adduser3.png)
+
+## Approval workflow
+
+Visit `dashboard/approval-request`
+
+![](./approv1.png)
+
+The page contain the list of dataset in approval workflow. The yellow indication ebhnd the dataset shows the dataset is still pending (not yet rejected, and if approved, it won't be on the list). Also the side par contains the count of pending dataset
+
+Quick review of dataset
+
+![](./approv2.png)
+
+If dataset have no diff (i.e no new version) current metadata are displayed
+
+Dataset can be rejected with a reason
+
+![](./approv3.png)
+
+add reason for rejection
+
+![](./approv9.png)
+
+Click on review to go to dataset page for review
+
+![](./approv4.png)
+
+The toggle button is used to toglle between new version and old version. if there is no new version, toggle won't appear
+
+version review:
+
+![](./approv5.png)
+
+Click on the issue tab to see list of issues, it has dropdown for open and close issues
+
+![](./approv10.png)
+
+let comment and re-open an issue
+
+![](./approv11.png)
+
+Delete a dataset
+
+![](./approv13.png)
+
+result after delete
+
+![](./approv14.png)
+
+User can go do `dashboard/datasets` and click Awaiting approval to see list of awaiting approval dataset
+
+![](./approv6.png)
+
+you can filter base on pending and rejected
+
+![](./approv15.png)
+
+click on `view issues` to go to dataset page to see if any issues
+
+![](./approv8.png)

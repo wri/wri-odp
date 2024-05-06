@@ -38,6 +38,7 @@ import { FilterFormType, FilterObjType, filterSchema } from './search.schema'
 import { Button } from '../_shared/Button'
 import SimpleSelect from '../_shared/SimpleSelect'
 import { DataExplorerColumnFilter } from './DataExplorer'
+import { DatePicker } from '../_shared/DatePicker'
 
 type TableProps = {
     table: TableType<any>
@@ -70,6 +71,7 @@ export function TopBar({
                         {(pageIndex + 1) * pageSize} of {numOfRows}
                     </span>
                     <button
+                        aria-label='left-icon'
                         className={`w-4 h-4 ${
                             !table.getCanPreviousPage()
                                 ? 'opacity-25'
@@ -81,6 +83,7 @@ export function TopBar({
                         <ChevronLeftIcon />
                     </button>
                     <button
+                        aria-label='right-icon'
                         className={`w-4 h-4 ${
                             !table.getCanNextPage()
                                 ? 'opacity-25'
@@ -104,14 +107,14 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
         q === ''
             ? table.getAllLeafColumns()
             : table.getAllLeafColumns().filter((column) => {
-                  return column.id.toLowerCase().includes(q.toLowerCase())
+                  return column.id.toLowerCase().includes(q.toLowerCase()) || typeof column.columnDef.header === 'string' && column.columnDef.header.toLowerCase().includes(q.toLowerCase())
               })
     return (
         <Popover as="div" className="relative inline-block text-left">
-            <Popover.Button>
-                <Button className="flex items-center justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs ">
+            <Popover.Button className=" p-4 flex items-center justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs ">
+               
                     Show Columns
-                </Button>
+               
             </Popover.Button>
             <Transition
                 as={Fragment}
@@ -188,7 +191,7 @@ export function ToggleColumns({ table }: { table: TableType<any> }) {
                                     htmlFor={column.id}
                                     className="font-medium text-gray-900 truncate"
                                 >
-                                    {column.id}
+                                    {typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id}
                                 </label>
                             </div>
                         </div>
@@ -271,17 +274,31 @@ export function Table({ table, isLoading }: TableProps) {
                 <tbody>
                     {table.getRowModel().rows.map((r) => (
                         <tr key={r.id} className="border-b border-b-slate-200">
-                            {r.getCenterVisibleCells().map((c) => (
-                                <td key={c.id} className="py-2 pl-12">
-                                    <div className="min-h-[65px] flex items-center text-base">
-                                        {' '}
-                                        {flexRender(
-                                            c.column.columnDef.cell,
-                                            c.getContext()
-                                        )}
-                                    </div>
-                                </td>
-                            ))}
+                            {r.getCenterVisibleCells().map((c) => {
+                                if (
+                                    c.getValue() === '' ||
+                                    c.getValue() === ' '
+                                ) {
+                                    return (
+                                        <td key={c.id} className="py-2 pl-12">
+                                            <div className="min-h-[65px] flex items-center text-base">
+                                                {c.column.columnDef.meta
+                                                    ?.default ?? ''}
+                                            </div>
+                                        </td>
+                                    )
+                                }
+                                return (
+                                    <td key={c.id} className="py-2 pl-12">
+                                        <div className="min-h-[65px] flex items-center text-base">
+                                            {flexRender(
+                                                c.column.columnDef.cell,
+                                                c.getContext()
+                                            )}
+                                        </div>
+                                    </td>
+                                )
+                            })}
                         </tr>
                     ))}
                 </tbody>
@@ -298,6 +315,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 .with(false, () => (
                     <DefaultTooltip content="Sort by this column">
                         <button
+                            aria-label='sort'
                             onClick={() => h.column.toggleSorting(false, true)}
                         >
                             <ArrowsUpDownIcon className="w-4 h-4 opacity-75" />
@@ -307,6 +325,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 .with('asc', () => (
                     <DefaultTooltip content="Sorting asc">
                         <button
+                            aria-label='asc sorting'
                             onClick={() => h.column.toggleSorting(true, true)}
                         >
                             <ArrowUpIcon className="w-4 h-4" />
@@ -315,7 +334,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 ))
                 .with('desc', () => (
                     <DefaultTooltip content="Sorting desc">
-                        <button onClick={() => h.column.clearSorting()}>
+                        <button aria-label='desc sorting' onClick={() => h.column.clearSorting()}>
                             <ArrowDownIcon className="w-4 h-4" />
                         </button>
                     </DefaultTooltip>
@@ -329,6 +348,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                     {h.column.getIsPinned() !== 'left' ? (
                         <DefaultTooltip content="Pin to left">
                             <button
+                                aria-label="pin to left"
                                 onClick={() => {
                                     h.column.pin('left')
                                 }}
@@ -338,7 +358,8 @@ function Column({ h }: { h: Header<any, unknown> }) {
                         </DefaultTooltip>
                     ) : (
                         <DefaultTooltip content="Unpin">
-                            <button
+                                <button
+                                aria-label="unpin"
                                 onClick={() => {
                                     h.column.pin(false)
                                 }}
@@ -358,8 +379,8 @@ function FilterColumn({ column }: { column: Column<any, unknown> }) {
         <Popover as={Fragment}>
             {({ open }) => (
                 <>
-                    <Popover.Button>
-                        <DefaultTooltip content="Filter">
+                    <Popover.Button aria-label="filter">
+                        <DefaultTooltip content="Filter" >
                             {open || column.getIsFiltered() ? (
                                 <FunnelIconSolid className="w-4 h-4" />
                             ) : (
@@ -393,7 +414,10 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
         defaultValues: {
             filters: (defaultValues as FilterObjType[]) ?? [
                 {
-                    operation: { label: 'Equals', value: '=' },
+                    operation:
+                        column.columnDef.meta?.type === 'timestamp'
+                            ? { label: 'Greater than', value: '>' }
+                            : { label: 'Equals', value: '=' },
                     value: '',
                     link: null,
                 },
@@ -412,14 +436,20 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
         <FormProvider {...formObj}>
             <div className="flex flex-col gap-y-2 py-4 px-4">
                 <div className="flex flex-col gap-y-2 justify-center items-center">
-                    <Filters />
+                    <Filters
+                        datePicker={column.columnDef.meta?.type === 'timestamp'}
+                    />
                 </div>
             </div>
         </FormProvider>
     )
 }
 
-export default function Filters() {
+export default function Filters({
+    datePicker = false,
+}: {
+    datePicker?: boolean
+}) {
     const formObj = useFormContext<FilterFormType>()
     const { register, control, setValue, watch, getValues } = formObj
     const { append, fields, remove } = useFieldArray({
@@ -448,7 +478,7 @@ export default function Filters() {
             {fields.map((field, index) => (
                 <div
                     key={field.id}
-                    className="flex flex-col items-center gap-y-2"
+                    className="flex flex-col items-center gap-y-2 w-full"
                 >
                     <SimpleSelect
                         formObj={formObj}
@@ -478,7 +508,14 @@ export default function Filters() {
                                 label: 'Smaller or equal than',
                                 value: '<=',
                             },
-                        ]}
+                        ].filter((o) => {
+                            if (!datePicker) return true
+                            return (
+                                datePicker &&
+                                o.value !== '=' &&
+                                o.value !== '!='
+                            )
+                        })}
                         placeholder="Select a filter"
                     />
                     <Controller
@@ -486,27 +523,31 @@ export default function Filters() {
                         name={`filters.${index}.value`}
                         render={({
                             field: { onChange, onBlur, value, ref },
-                        }) => (
-                            <DebouncedInput
-                                onChange={onChange} // send value to hook form
-                                onBlur={onBlur} // notify when input is touched/blur
-                                value={value}
-                                icon={
-                                    fields.length > 1 && (
-                                        <DefaultTooltip content="Remove filter">
-                                            <button
-                                                onClick={() =>
-                                                    removeFilter(index)
-                                                }
-                                                className="w-4 h-4"
-                                            >
-                                                <XCircleIcon className="text-red-600" />
-                                            </button>
-                                        </DefaultTooltip>
-                                    )
-                                }
-                            />
-                        )}
+                        }) =>
+                            datePicker ? (
+                                <DatePicker date={value} setDate={onChange} />
+                            ) : (
+                                <DebouncedInput
+                                    onChange={onChange} // send value to hook form
+                                    onBlur={onBlur} // notify when input is touched/blur
+                                    value={value}
+                                    icon={
+                                        fields.length > 1 && (
+                                            <DefaultTooltip content="Remove filter">
+                                                <button
+                                                    onClick={() =>
+                                                        removeFilter(index)
+                                                    }
+                                                    className="w-4 h-4"
+                                                >
+                                                    <XCircleIcon className="text-red-600" />
+                                                </button>
+                                            </DefaultTooltip>
+                                        )
+                                    }
+                                />
+                            )
+                        }
                     />
                     {field.link && (
                         <span className="text-xs text-gray-500 uppercase">

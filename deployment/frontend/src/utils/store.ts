@@ -1,3 +1,4 @@
+import { Resource, View } from '@/interfaces/dataset.interface'
 import {
     ActiveLayerGroup,
     Basemap,
@@ -6,10 +7,11 @@ import {
     State,
     Bounds,
 } from '@/interfaces/state.interface'
+import { template } from 'lodash'
 import { useLayoutEffect } from 'react'
 import { ViewState } from 'react-map-gl'
-import create, { UseBoundStore } from 'zustand'
-import createContext from 'zustand/context'
+import { create, UseBoundStore } from 'zustand'
+import { createContext } from 'zustand-utils'
 import { combine } from 'zustand/middleware'
 
 let store: any
@@ -26,6 +28,11 @@ const getDefaultInitialState = () => {
         vizIndex: 0,
         dataset: null,
         relatedDatasets: null,
+        storeDirtyFields: [],
+        prevRelatedDatasets: null,
+        layerAsLayerObj: new Map(),
+        tempLayerAsLayerobj: new Map(),
+        prevLayerGroups: [],
         mapView: {
             isEmbedding: false,
             isAddingLayers: false,
@@ -38,7 +45,7 @@ const getDefaultInitialState = () => {
             viewState: {
                 latitude: 0,
                 longitude: 0,
-                zoom: 3,
+                zoom: 6,
                 bearing: 0,
                 pitch: 0,
                 padding: {
@@ -54,6 +61,8 @@ const getDefaultInitialState = () => {
             },
             isDrawing: undefined,
         },
+        activeCharts: [],
+        selectedChart: undefined,
     }
     return initialState
 }
@@ -71,9 +80,18 @@ export const initializeStore = (preloadedState: any = {}) => {
                 mapView: {
                     ...getDefaultInitialState().mapView,
                     ...preloadedState?.mapView,
+                    viewState: {
+                        ...getDefaultInitialState().mapView.viewState,
+                        ...preloadedState?.mapView?.viewState,
+                    },
                 },
             },
             (set, get) => ({
+                setStoreDirtyFields: (storeDirtyFieldsFunc: () => string[]) => {
+                    const storeDirtyFields = storeDirtyFieldsFunc()
+                    const prev = get()
+                    set({ ...prev, storeDirtyFields })
+                },
                 setVizIndex: (vizIndex: number) => {
                     const prev = get()
                     set({ ...prev, vizIndex })
@@ -217,6 +235,45 @@ export const initializeStore = (preloadedState: any = {}) => {
                         },
                     })
                 },
+                toggleActiveLayerGroup: (
+                    prevLayerGroups: ActiveLayerGroup[],
+                    tempLayerAsLayerobj: Map<string, string>
+                ) => {
+                    let activeLayerGroups = get().mapView.activeLayerGroups
+                    const prev = get()
+                    let layerAsLayerObj = prev.layerAsLayerObj
+
+                    const temp = structuredClone(activeLayerGroups)
+                    const temp2: Map<string, string> = new Map([
+                        ...layerAsLayerObj,
+                    ])
+                    activeLayerGroups = structuredClone(prevLayerGroups)
+                    prevLayerGroups = structuredClone(temp)
+                    layerAsLayerObj = new Map(tempLayerAsLayerobj)
+                    tempLayerAsLayerobj = new Map([...temp2])
+
+                    // switch prevRelatedDatasets and relatedDatasets
+                    let prevRelatedDatasets = prev.prevRelatedDatasets
+                    let relatedDatasets = prev.relatedDatasets
+
+                    const tempRelatedDataset =
+                        structuredClone(prevRelatedDatasets)
+                    prevRelatedDatasets = structuredClone(relatedDatasets)
+                    relatedDatasets = structuredClone(tempRelatedDataset)
+
+                    set({
+                        ...prev,
+                        tempLayerAsLayerobj: tempLayerAsLayerobj,
+                        layerAsLayerObj: layerAsLayerObj,
+                        prevLayerGroups: prevLayerGroups,
+                        prevRelatedDatasets: prevRelatedDatasets,
+                        relatedDatasets: relatedDatasets,
+                        mapView: {
+                            ...prev.mapView,
+                            activeLayerGroups: activeLayerGroups,
+                        },
+                    })
+                },
                 removeLayerFromLayerGroup: (
                     layerId: string,
                     datasetId: string
@@ -268,6 +325,15 @@ export const initializeStore = (preloadedState: any = {}) => {
                             layers: [layerId],
                         })
                     }
+                    //set default view state
+                    const currentLayers = get().mapView.layers
+                    currentLayers.set(layerId, {
+                        visibility: true,
+                        active: true,
+                        opacity: 1,
+                        threshold: 20,
+                        zIndex: Object.keys(currentLayers).length + 11,
+                    })
 
                     set({
                         ...prev,
@@ -298,11 +364,22 @@ export const initializeStore = (preloadedState: any = {}) => {
                             layers: layerIds,
                         })
                     } else {
-                        console.log(newActiveLayerGroups)
                         newActiveLayerGroups = newActiveLayerGroups.filter(
                             (lg: ActiveLayerGroup) => lg.datasetId != datasetId
                         )
                     }
+                    //set default view state
+                    const currentLayers = get().mapView.layers
+                    layerIds.forEach((_id: string, index: number) => {
+                        currentLayers.set(_id, {
+                            visibility: index === 0,
+                            active: index === 0,
+                            opacity: 1,
+                            threshold: 20,
+                            zIndex:
+                                Object.keys(currentLayers).length + 11 + index,
+                        })
+                    })
 
                     set({
                         ...prev,
@@ -332,6 +409,28 @@ export const initializeStore = (preloadedState: any = {}) => {
                             ...prev.mapView,
                             layers: currentLayers,
                         },
+                    })
+                },
+                addCharts: (views: View[]) => {
+                    const prev = get()
+                    set({
+                        ...prev,
+                        activeCharts: [...prev.activeCharts, ...views],
+                    })
+                },
+                removeCharts: (chartIds: string[]) => {
+                    const prev = get()
+                    set({
+                        activeCharts: [
+                            ...prev.activeCharts.filter(
+                                (c: View) => !chartIds.includes(c.id ?? '')
+                            ),
+                        ],
+                    })
+                },
+                selectChart: (view: View | null) => {
+                    set({
+                        selectedChart: view,
                     })
                 },
             })

@@ -1,7 +1,8 @@
-import { Dataset } from '@/interfaces/dataset.interface'
+import { Dataset, Resource } from '@/interfaces/dataset.interface'
 import type {
     Group,
-    Organization,
+    Tag,
+    Activity as CkanActivity,
     User as CkanUser,
 } from '@portaljs/ckan'
 
@@ -38,8 +39,8 @@ export interface User {
     number_created_packages?: number
     apikey?: string
     email?: string
-    image_display_url?: string,
-    capacity?: string,
+    image_display_url?: string
+    capacity?: string
 }
 
 export interface Activity {
@@ -75,7 +76,9 @@ export interface ActivityDisplay {
 }
 
 export interface WriDataset extends Dataset {
+    has_chart_views?: boolean
     methodology?: string
+    usecases?: string
     technical_notes?: string
     temporal_coverage_start: string
     temporal_coverage_end: string
@@ -113,6 +116,18 @@ export interface WriDataset extends Dataset {
     connectorType?: string
     provider?: string
     tableName?: string
+    user?: User
+    approval_status?: string
+    draft?: boolean
+    issue_count?: number
+    resources: Resource[]
+    rw_dataset?: boolean
+    is_approved?: boolean
+    release_notes: string
+}
+
+export type WriDatasetWithoutDetails = Omit<WriDataset, 'resources'> & {
+    resources: { datastore_active?: boolean | null; format?: string }[]
 }
 
 export interface Extra {
@@ -125,6 +140,26 @@ export interface OpenIn {
     url: string
 }
 
+export interface Organization {
+    id: string
+    name: string
+    title: string
+    display_name?: string
+    type?: string
+    description?: string
+    image_url?: string
+    image_display_url?: string
+    created?: string
+    is_organization: boolean
+    package_count?: number
+    approval_status?: 'approved'
+    state: 'active'
+    packages?: Array<Dataset>
+    activity_stream?: Array<CkanActivity>
+    users?: Array<User>
+    tags?: Array<Tag>
+}
+
 export interface WriOrganization extends Organization {
     groups?: Group[]
     users?: WriUser[]
@@ -134,6 +169,7 @@ export interface WriOrganization extends Organization {
 export interface WriUser extends CkanUser {
     capacity?: string
     gravatar_url?: string
+    organizations?: WriOrganization[]
 }
 
 export interface GroupTree {
@@ -150,6 +186,7 @@ export interface Collaborator {
     user_id: string
     capacity: 'admin' | 'editor' | 'member'
     modified: string
+    user?: WriUser
 }
 
 export interface Issue {
@@ -190,6 +227,7 @@ export interface GroupsmDetails {
     img_url: string
     description: string
     package_count: number
+    name: string
 }
 
 export interface Member {
@@ -199,4 +237,10 @@ export interface Member {
     role: string
     team: string
     teamId: string
+}
+
+export interface PendingDataset {
+    package_id: string
+    package_data: WriDataset
+    last_modified: string
 }

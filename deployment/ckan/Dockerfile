@@ -9,7 +9,7 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@fff325e0238334b54f23a392bb0682a5abc3da3f#egg=ckanext-auth' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@fd7113f076336c13b9952d6b2161c0f4339e5cc6#egg=ckanext-auth' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
 
@@ -37,8 +37,10 @@ RUN apk del build-base python3-dev && \
 
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
+COPY setup/start_ckan.sh.override ${APP_DIR}/start_ckan.sh
 RUN chown -R ckan:ckan ${APP_DIR}/src/ckanext-wri
 RUN chmod +x ${APP_DIR}/prerun.py
+RUN chmod +x ${APP_DIR}/start_ckan.sh
 
 COPY patches ${APP_DIR}/patches
 RUN apk --no-cache add patch
@@ -59,3 +61,4 @@ RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 
 USER ckan
+

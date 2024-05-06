@@ -1,14 +1,16 @@
 import { Collaborator, WriDataset } from '@/schema/ckan.schema'
 import {
     CapacityUnion,
+    DataDictionaryFormType,
     DatasetFormType,
     DatasetSchema,
+    ResourceFormType,
 } from '@/schema/dataset.schema'
 import classNames from '@/utils/classnames'
 import { Tab } from '@headlessui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { OverviewForm } from './metadata/Overview'
 import { DescriptionForm } from './metadata/DescriptionForm'
@@ -24,17 +26,45 @@ import {
 } from './formOptions'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import { Button, LoaderButton } from '@/components/_shared/Button'
+import { LoaderButton } from '@/components/_shared/Button'
 import Link from 'next/link'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { EditDataFilesSection } from './datafiles/EditDataFilesSection'
 import { useSession } from 'next-auth/react'
 import { match } from 'ts-pattern'
 import { Collaborators } from './metadata/Collaborators'
-import Modal from '@/components/_shared/Modal'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
+import { EditRwSection } from './datafiles/EditRwSection'
+import { VersioningForm } from './metadata/VersioningForm'
+
+function getDiff<T>(dirtyObject: T, changedFields: string[]) {
+    for (const key in dirtyObject) {
+        const value = dirtyObject[key]
+        if (typeof value !== 'boolean') {
+            if (Array.isArray(value) && value.length > 0) {
+                const arrayChanged: string[] = []
+                const changed = getDiff(value, arrayChanged)
+                if (changed.length > 0) {
+                    changedFields.push(key)
+                }
+            } else if (typeof value === 'object') {
+                //@ts-ignore
+                if (Object.keys(value).length > 0) {
+                    const objChange: string[] = []
+                    const changed = getDiff(value, objChange)
+                    if (changed.length > 0) {
+                        changedFields.push(key)
+                    }
+                }
+            }
+        } else {
+            if (value) {
+                changedFields.push(key)
+            }
+        }
+    }
+    return changedFields
+}
 
 //change image
 //change title
@@ -52,7 +82,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     const possibleLicenses = api.dataset.getLicenses.useQuery()
     const { data: teamUsers } = api.teams.getTeamUsers.useQuery(
         {
-            id: dataset.organization?.id ?? '',
+            id: dataset.organization?.id ?? dataset.owner_org ?? '',
             capacity: 'admin',
         },
         { enabled: !!dataset.organization?.id }
@@ -85,6 +115,29 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         })
         .otherwise(() => false)
 
+    const resourceForm = dataset.resources.sort((a, b) => {
+        const isLayer = (r: any) =>
+            r.type === 'layer' ||
+            r.type === 'layer-raw' ||
+            r.type === 'empty-layer'
+
+        const isALayer = isLayer(a)
+        const isBLayer = isLayer(b)
+
+        if (isALayer && isBLayer) {
+            return 0
+        }
+
+        if (!isALayer && isBLayer) {
+            return -1
+        }
+
+        if (isALayer && !isBLayer) {
+            return 1
+        }
+
+        return 0
+    }) as unknown as ResourceFormType[]
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
@@ -92,7 +145,8 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             ...dataset,
             id: dataset.id,
             rw_id: dataset.rw_id,
-            rw_dataset: !!dataset.rw_id,
+            author_email: dataset?.author_email ? dataset.author_email : null,
+            rw_dataset: dataset.rw_id ? !!dataset.rw_id : !!dataset.rw_dataset,
             tags: dataset.tags ? dataset.tags.map((tag) => tag.name) : [],
             temporal_coverage_start: dataset.temporal_coverage_start
                 ? Number(dataset.temporal_coverage_start)
@@ -134,10 +188,16 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       ),
                   }))
                 : [],
-            resources: dataset.resources.map((resource) => ({
-                ...resource,
-                schema: resource.schema ? resource.schema.value : undefined,
-            })),
+            resources: resourceForm.map((resource) => {
+                const schema = resource.schema as unknown as {
+                    value: DataDictionaryFormType
+                }
+                return {
+                    ...resource,
+                    resourceId: resource.id as string,
+                    schema: resource.schema ? schema.value : undefined,
+                }
+            }),
             spatial_type: dataset.spatial_address
                 ? 'address'
                 : dataset.spatial
@@ -152,16 +212,21 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 `Successfully edited the "${title ?? name}" dataset`,
                 'success'
             )
-            router.push('/dashboard/datasets')
+            window.location.href = '/dashboard/datasets'
         },
         onError: (error) => {
             setErrorMessage(error.message)
         },
     })
 
+    const {
+        formState: { dirtyFields, touchedFields },
+    } = formObj
+
     const tabs = [
         { name: 'Metadata', enabled: true },
         { name: 'Data Files', enabled: true },
+        { name: 'Layers / Dataset Views', enabled: true },
         { name: 'Collaborators', enabled: canEditCollaborators },
     ]
 
@@ -170,14 +235,14 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             <Tab.Group>
                 <div>
                     <Tab.List
-                        className="max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
+                        className="max-w-screen md:max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
                         aria-label="Tabs"
                     >
-                        <div className="flex-col justify-start flex sm:flex-row gap-y-4 sm:gap-x-8 sm:border-b-2 border-gray-300 w-full">
+                        <div className="flex-col justify-start flex lg:flex-row gap-y-4 sm:gap-x-8 sm:border-b-2 border-gray-300 w-full">
                             {tabs
                                 .filter((tab) => tab.enabled)
                                 .map((tab) => (
-                                    <Tab as={Fragment}>
+                                    <Tab key={tab.name} as={Fragment}>
                                         {({ selected }) => (
                                             <div
                                                 key={tab.name}
@@ -207,7 +272,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         >
                             <form
                                 onSubmit={formObj.handleSubmit((data) => {
-                                    console.log('Data', data)
                                     editDataset.mutate(data)
                                 })}
                             >
@@ -220,6 +284,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 <PointOfContactForm formObj={formObj} />
                                 <MoreDetailsForm formObj={formObj} />
                                 <OpenInForm formObj={formObj} />
+                                <VersioningForm formObj={formObj} />
                                 <CustomFieldsForm formObj={formObj} />
                             </form>
                         </Tab.Panel>
@@ -227,7 +292,19 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
-                            <EditDataFilesSection formObj={formObj} />
+                            <EditDataFilesSection
+                                formObj={formObj}
+                                dataset={dataset}
+                            />
+                        </Tab.Panel>
+                        <Tab.Panel
+                            as="div"
+                            className="flex flex-col gap-y-12 mt-8"
+                        >
+                            <EditRwSection
+                                formObj={formObj}
+                                dataset={dataset}
+                            />
                         </Tab.Panel>
                         {canEditCollaborators && (
                             <Tab.Panel
@@ -255,15 +332,132 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 )}
             </div>
             <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-6 xxl:px-0">
-                <Button type="button" variant="outline">
-                    <Link href="/dashboard/datasets">Cancel</Link>
-                </Button>
+                {/* <Button type="button" variant="outline"> */}
+                <Link
+                    href="/dashboard/datasets"
+                    className="inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold h-11 px-6 py-4 rounded-[3px] text-base"
+                >
+                    Cancel
+                </Link>
+                {/* </Button> */}
                 <LoaderButton
                     loading={editDataset.isLoading}
                     type="submit"
-                    onClick={formObj.handleSubmit((data) => {
-                        editDataset.mutate(data)
-                    })}
+                    onClick={formObj.handleSubmit(
+                        (data) => {
+                            const diffLayerResources =
+                                dirtyFields?.resources?.filter(
+                                    (r) => !r?.layerObj
+                                )
+
+                            const newDirtyFields = {
+                                ...dirtyFields,
+                                resources: diffLayerResources
+                                    ? diffLayerResources
+                                    : false,
+                            }
+
+                            const changedFields: string[] = []
+
+                            getDiff(newDirtyFields, changedFields)
+                            if (data.featured_image !== dataset.featured_image)
+                                changedFields.push('featured_dataset')
+
+                            const toBeSavedData: Partial<DatasetFormType> = data
+
+                            const storedDirty =
+                                sessionStorage.getItem('dirtyFields')
+
+                            // check if layerobj was updated
+                            if (storedDirty) {
+                                sessionStorage.removeItem('dirtyFields')
+                                return editDataset.mutate(toBeSavedData)
+                            } else {
+                                const defaultvalues = structuredClone(
+                                    formObj.formState.defaultValues
+                                )
+                                const newData = structuredClone(data)
+
+                                // check if new resource was added
+                                if (
+                                    newData.resources?.length !==
+                                    defaultvalues?.resources?.length
+                                ) {
+                                    return editDataset.mutate(toBeSavedData)
+                                }
+
+                                // check if changefield is just collaborators
+                                if (
+                                    changedFields.length === 1 &&
+                                    changedFields[0] === 'collaborators'
+                                ) {
+                                    // filter out collaborators and id
+                                    const newData = Object.fromEntries(
+                                        Object.entries(toBeSavedData).filter(
+                                            ([key]) =>
+                                                [
+                                                    'collaborators',
+                                                    'id',
+                                                ].includes(key)
+                                        )
+                                    )
+
+                                    return editDataset.mutate(newData)
+                                } else if (
+                                    changedFields.length === 2 &&
+                                    changedFields.includes('language')
+                                ) {
+                                    // check for language
+                                    // language is set to dirty if `Add another {collaborator | data file} is clicked
+                                    // so we need to check if the language is different from the default
+                                    const defaultLang = defaultvalues?.language
+                                        ? defaultvalues?.language
+                                        : { value: '', label: '' }
+                                    if (
+                                        newData.language?.value !==
+                                        defaultLang?.value
+                                    ) {
+                                        return editDataset.mutate(toBeSavedData)
+                                    } else {
+                                        if (
+                                            changedFields.includes(
+                                                'collaborators'
+                                            )
+                                        ) {
+                                            const newData = Object.fromEntries(
+                                                Object.entries(
+                                                    toBeSavedData
+                                                ).filter(([key]) =>
+                                                    [
+                                                        'collaborators',
+                                                        'id',
+                                                    ].includes(key)
+                                                )
+                                            )
+
+                                            return editDataset.mutate(newData)
+                                        } else {
+                                            return editDataset.mutate(
+                                                toBeSavedData
+                                            )
+                                        }
+                                    }
+                                } else if (changedFields.length > 0) {
+                                    // if by anymeans the changed fields get here and is not empty
+                                    return editDataset.mutate(toBeSavedData)
+                                } else {
+                                    notify(
+                                        'No changes to the dataset',
+                                        'success'
+                                    )
+                                    router.push('/dashboard/datasets')
+                                }
+                            }
+                        },
+                        (err) => {
+                            console.error(err)
+                        }
+                    )}
                 >
                     Update Dataset
                 </LoaderButton>

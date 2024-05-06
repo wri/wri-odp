@@ -31,7 +31,7 @@ export default function LegendItemButtonThreshold<
     const { control } = useForm()
 
     const hasThreshold = activeLayer?.layerConfig?.params_config?.some(
-        (item: any) => item.key == 'thresh'
+        (item: any) => item.key == 'thresh' || item.key === 'threshold'
     )
 
     const options = [10, 15, 20, 25, 30, 50, 75].map((item) => ({
@@ -39,7 +39,7 @@ export default function LegendItemButtonThreshold<
         value: item,
         default: activeLayer.threshold
             ? item == activeLayer.threshold
-            : item == 30,
+            : item == 20,
     }))
 
     return hasThreshold ? (

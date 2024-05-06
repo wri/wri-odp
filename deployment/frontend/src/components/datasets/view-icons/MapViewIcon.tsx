@@ -1,8 +1,12 @@
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { WriDataset } from '@/schema/ckan.schema'
+import { WriDataset, WriDatasetWithoutDetails } from '@/schema/ckan.schema'
 import { GlobeAltIcon } from '@heroicons/react/20/solid'
 
-export default function MapViewIcon({ dataset }: { dataset: WriDataset }) {
+export default function MapViewIcon({
+    dataset,
+}: {
+    dataset: WriDatasetWithoutDetails
+}) {
     const hasMapView = dataset?.resources?.some((r) => r.format == 'Layer')
 
     return hasMapView ? (

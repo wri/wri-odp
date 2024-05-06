@@ -205,6 +205,7 @@ attribute with the form `ckan-X.Y` -->
     <field name="spatial_address" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="approval_status" type="string" indexed="true" stored="true"/>
     <field name="draft" type="boolean" indexed="true" stored="true"/>
+    <field name="is_approved" type="boolean" indexed="true" stored="true"/>
 </fields>
 
 <uniqueKey>index_id</uniqueKey>

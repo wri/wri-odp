@@ -29,19 +29,24 @@ const DefaultTooltip = ({
     content,
     disabled = false,
     side = 'top',
+    contentClassName = '',
 }: {
     children: React.ReactNode
     content: React.ReactNode | string
     disabled?: boolean
     side?: 'top' | 'bottom' | 'left' | 'right'
+    contentClassName?: string
 }) => {
     if (disabled) return <>{children}</>
     return (
         <TooltipProvider delayDuration={100}>
             <Tooltip>
                 <TooltipTrigger asChild>{children}</TooltipTrigger>
-                <TooltipContent className="bg-white z-50" side={side}>
-                    <p>{content}</p>
+                <TooltipContent
+                    className={`bg-white whitespace-normal z-[10000] ${contentClassName}`}
+                    side={side}
+                >
+                    <p className='text-wrap max-w-sm'>{content}</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
@@ -54,3 +59,4 @@ export {
     TooltipContent,
     TooltipProvider,
 }
+export default DefaultTooltip

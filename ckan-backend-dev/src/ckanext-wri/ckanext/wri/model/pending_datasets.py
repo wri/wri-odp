@@ -3,6 +3,7 @@ from typing import Optional
 import sqlalchemy
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import JSONB
+from ckanext.wri.model.resource_location import ResourceLocation
 
 import ckan.model.meta as meta
 from ckan.common import _
@@ -59,9 +60,12 @@ class PendingDatasets(object):
             pending_dataset = PendingDatasets(package_id, package_data)
             meta.Session.add(pending_dataset)
             meta.Session.commit()
+
+            package_data = ResourceLocation.index_dataset_resources_by_location(package_data, True)
+
             return {
                 "package_id": pending_dataset.package_id,
-                "package_data": pending_dataset.package_data,
+                "package_data": package_data,
                 "last_modified": pending_dataset.last_modified,
             }
         except Exception as e:
@@ -85,9 +89,12 @@ class PendingDatasets(object):
             if pending_dataset:
                 pending_dataset.package_data = package_data
                 meta.Session.commit()
+
+                package_data = ResourceLocation.index_dataset_resources_by_location(package_data, True)
+
                 return {
                     "package_id": pending_dataset.package_id,
-                    "package_data": pending_dataset.package_data,
+                    "package_data": package_data,
                     "last_modified": pending_dataset.last_modified,
                 }
             else:

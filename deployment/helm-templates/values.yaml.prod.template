@@ -30,7 +30,7 @@ ckan:
       CKAN__SITE_TITLE: WRI Open Data Platform
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
-      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
+      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri wri_api_tracking auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
       CKAN__SITE_TITLE: WRI Open Data Platform
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
@@ -44,6 +44,9 @@ ckan:
       CKAN___SCHEMING__PRESETS: ckanext.wri.schema:presets.json
       CKANEXT__AUTH__INCLUDE_FRONTEND_LOGIN_TOKEN: "True"
       CKAN__DATASTORE__SQLSEARCH__ENABLED: "True"
+      CKANEXT__WRI__MIGRATION_DEPLOYMENT_NAME: migration_deployment
+      CKANEXT__WRI__MIGRATION_FLOW_NAME: trigger-migration
+      CKANEXT__WRI__MIGRATION_DEPLOYMENT_ENV: prod
     hpa:
       enable: true
       minReplicas: 2
@@ -52,14 +55,14 @@ ckan:
     resources:
       limits:
         cpu: 800m
-        memory: 2.8G
+        memory: 4G
       requests:
         cpu: 400m
-        memory: 2.5G
+        memory: 3G
     image:
       pullPolicy: Always
       repository: {{REGISTRY}}/{{CKAN_REPO}}
-      tag: {{GITHUB_SHA}}
+      tag: prod-{{GITHUB_SHA}}
     runInitContainers: true
     service:
       port: 80
@@ -70,18 +73,39 @@ ckan:
       DATAPUSHER_MAX_CONTENT_LENGTH: "5368709120"
     resources:
       limits:
-        cpu: 300m
-        memory: 1G
+        cpu: 800m
+        memory: 4.5G
       requests:
-        cpu: 200m
-        memory: 0.5G
+        cpu: 300m
+        memory: 4G
     hpa:
       enable: true
       minReplicas: 1
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: latest
+      tag: prod-{{GITHUB_SHA}}
+      pullPolicy: Always
+      repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
+    replicaCount: 1
+  migrationApp:
+    enable: enable
+    env:
+      DATAPUSHER_MAX_CONTENT_LENGTH: "5368709120"
+    resources:
+      limits:
+        cpu: 300m
+        memory: 1.5G
+      requests:
+        cpu: 250m
+        memory: 1G
+    hpa:
+      enable: true
+      minReplicas: 1
+      maxReplicas: 2
+      targetMemoryUtilizationPercentage: 80
+    image:
+      tag: prod-{{GITHUB_SHA}}-migration
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
@@ -100,7 +124,7 @@ ckan:
     enable: true
     image:
       repository: {{REGISTRY}}/{{FRONTEND_REPO}}
-      tag: {{GITHUB_SHA}}
+      tag: prod-{{GITHUB_SHA}}
     env:
       SITE_TITLE: WRI ODP
     targetPort: 3000
@@ -155,10 +179,11 @@ ckan:
     enableExternal: false
     extraAnnotations:
       cert-manager.io/cluster-issuer: cert-manager
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+      nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
       nginx.ingress.kubernetes.io/configuration-snippet: |
         more_set_headers "server: hide";
         more_set_headers "X-Content-Type-Options: nosniff";
-        more_set_headers "X-Frame-Options: SAMEORIGIN";
         more_set_headers "X-Xss-Protection: 1";
         more_set_headers "Referrer-Policy: origin";
         more_set_headers "Expect-CT: max-age=86400, enforce, report-uri='[reportURL]'";

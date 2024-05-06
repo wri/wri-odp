@@ -4,18 +4,22 @@ import { CheckIcon } from "@heroicons/react/20/solid";
 import { match } from "ts-pattern";
 
 export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
+  console.log('CURRENT STEP', currentStep)
   const steps = [
     { id: 0, name: "Metadata", href: "#" },
     { id: 1, name: "Datafiles", href: "#" },
-    { id: 2, name: "Preview", href: "#" },
+    { id: 2, name: "Map Visualizations", href: "#" },
+    { id: 3, name: "Preview", href: "#" },
   ].map((step) => {
     return match(step.id - currentStep)
       .with(0, () => ({ ...step, status: "current" }))
       .with(1, () => ({ ...step, status: "upcoming" }))
       .with(2, () => ({ ...step, status: "upcoming" }))
+      .with(3, () => ({ ...step, status: "upcoming" }))
       .otherwise(() => ({ ...step, status: "complete" }));
   });
 
+  console.log('STEPS', steps.length)
   return (
     <Tab.List
       as="nav"
@@ -45,7 +49,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
                   aria-hidden="true"
                 />
               </span>
-              <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-300">
+              <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-600">
                 {step.name}
               </span>
             </div>
@@ -99,7 +103,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
                   <span className="text-xs text-stone-300">{step.id}</span>
                 </span>
               </span>
-              <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-300">
+              <span className="h-6 w-36 font-acumin text-lg font-normal text-stone-600">
                 {step.name}
               </span>
             </div>

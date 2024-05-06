@@ -1,48 +1,101 @@
-import { z } from "zod";
+import { z } from 'zod'
 import {
-  createTRPCRouter,
-  protectedProcedure
-} from "@/server/api/trpc";
-import { env } from "@/env.mjs";
-import type { Activity, ActivityDisplay, CkanResponse, User } from "@/schema/ckan.schema";
-import { getUser, activityDetails } from "@/utils/apiUtils";
-import { searchArrayForKeyword } from "@/utils/general";
-import { searchSchema } from "@/schema/search.schema";
-import { filterObjects } from "@/utils/general";
+    createTRPCRouter,
+    protectedProcedure,
+    publicProcedure,
+} from '@/server/api/trpc'
+import { env } from '@/env.mjs'
+import type {
+    Activity,
+    ActivityDisplay,
+    CkanResponse,
+    User,
+} from '@/schema/ckan.schema'
+import { getUser, activityDetails } from '@/utils/apiUtils'
+import { searchArrayForKeyword } from '@/utils/general'
+import { searchSchema } from '@/schema/search.schema'
+import { filterObjects } from '@/utils/general'
 
 export const activityStreamRouter = createTRPCRouter({
-  listActivityStreamDashboard: protectedProcedure
-    .input(searchSchema)
-    .query(async ({ input, ctx }) => {
-      const response = await fetch(`${env.CKAN_URL}/api/3/action/dashboard_activity_list`,
-        {
-          headers: {
-            "Authorization": ctx.session.user.apikey,
-          }
-        })
+    listPackageActivity: publicProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ input, ctx }) => {
+            let url = `${env.CKAN_URL}/api/3/action/package_activity_list?id=${input.id}`
+            const fetchOps: any = { headers: {} }
 
-      const data = (await response.json()) as CkanResponse<Activity[]>;
-      const activities = await Promise.all(data.result.map(async (activity: Activity) => {
-        let user_data = await getUser({ userId: activity.user_id, apiKey: ctx.session.user.apikey });
-        user_data = user_data === undefined ? null : user_data;
-        const actitvityDetails = activityDetails(activity);
-        actitvityDetails.description = `${user_data?.name} ${actitvityDetails.description}`
-        return actitvityDetails;
-      }));
+            const user = ctx.session?.user
+            if (user) {
+                fetchOps.headers['Authorization'] = user.apikey
+            }
 
-      let result = activities;
-      if (input.search) {
-        result = searchArrayForKeyword<ActivityDisplay>(activities, input.search);
-      }
+            const response = await fetch(url, fetchOps)
 
-      if (input.fq && activities) {
-        result = filterObjects(activities, input.fq);
-      }
+            const data: CkanResponse<Activity[]> = await response.json()
 
-      return {
-        activity: result ? result.slice(input.page.start, input.page.start + input.page.rows) : [],
-        count: result.length,
-      };
-    }),
+            return data.result
+        }),
+    listActivityStreamDashboard: protectedProcedure
+        .input(searchSchema)
+        .query(async ({ input, ctx }) => {
+            let url = `${env.CKAN_URL}/api/3/action/dashboard_activity_listv2`
+            let search = ''
 
-});
+            if (input.fq) {
+                if ('packageId' in input.fq) {
+                    if (input.fq['packageId'] === 'all') {
+                        search = 'packageId'
+                    } else {
+                        url = `${env.CKAN_URL}/api/3/action/package_activity_list_wri?id=${input.fq['packageId']}`
+                    }
+                } else if ('orgId' in input.fq) {
+                    if (input.fq['orgId'] === 'all') {
+                        search = 'orgId'
+                    } else {
+                        url = `${env.CKAN_URL}/api/3/action/organization_activity_list_wri?id=${input.fq['orgId']}`
+                    }
+                } else if ('groupId' in input.fq) {
+                    if (input.fq['groupId'] === 'all') {
+                        search = 'groupId'
+                    } else {
+                        url = `${env.CKAN_URL}/api/3/action/group_activity_list_wri?id=${input.fq['groupId']}`
+                    }
+                }
+            }
+            const response = await fetch(url, {
+                headers: {
+                    Authorization: ctx.session.user.apikey,
+                },
+            })
+
+            const data = (await response.json()) as CkanResponse<Activity[]>
+            const activities = data.result.map((activity: Activity) => {
+                let user_data = activity.user_data as User
+                const actitvityDetails = activityDetails(activity)
+                actitvityDetails.description = `${user_data?.name} ${actitvityDetails.description}`
+                return actitvityDetails
+            })
+
+            let result = activities
+            if (search) {
+                result = activities.filter((activity) => {
+                    if (search === 'packageId') {
+                        return activity.packageId
+                    } else if (search === 'orgId') {
+                        return activity.orgId
+                    } else if (search === 'groupId') {
+                        return activity.groupId
+                    }
+                })
+            }
+
+            return {
+                activity: result
+                    ? result.slice(
+                          input.page.start,
+                          input.page.start + input.page.rows
+                      )
+                    : [],
+                count: result.length,
+            }
+        }),
+})

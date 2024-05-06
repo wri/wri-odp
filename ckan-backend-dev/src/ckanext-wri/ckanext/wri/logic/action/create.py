@@ -1,16 +1,130 @@
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, Any
 import logging
+import requests
+from urllib.parse import urljoin
+import json
 
 from ckanext.wri.model.notification import Notification, notification_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
 from ckanext.wri.logic.auth import schema
+import ckan.logic as logic
 
-from ckan.common import _
+from ckan.common import _, config
 import ckan.plugins.toolkit as tk
 from ckan.types import Context, DataDict
+import ckan.plugins as p
+import ckan.lib.helpers as h
+
 
 NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
+
+
+# Most of SCHEMA_FIELDS and SCHEMA_SYNONYMS are not currently
+# supported in Whitelist and Blacklist, but they might be later.
+SCHEMA_FIELDS = [
+    "author",
+    "author_email",
+    "isopen",
+    "license_id",
+    "license_title",
+    "maintainer",
+    "maintainer_email",
+    "notes",
+    "organization",
+    "title",
+    "url",
+    "resources",
+    "extras",
+    "language",
+    "citation",
+    "cautions",
+    "spatial",
+    "spatial_address",
+    "update_frequency",
+    "temporal_coverage_start",
+    "temporal_coverage_end",
+    "featured_dataset",
+    "groups",
+    "project",
+    "function",
+    "methodology",
+    "open_in",
+    "release_notes",
+    "restrictions",
+    "reason_for_adding",
+    "short_description",
+    "learn_more",
+    "wri_data",
+    "technical_notes",
+    "visibility_type",
+    "approval_status",
+    "is_approved"
+]
+
+SCHEMA_SYNONYMS = {
+    'organization': 'owner_org',
+    'team': 'owner_org',
+    'owner_org': 'owner_org',
+    'groups': 'groups',
+    'group': 'groups',
+    'topics': 'groups',
+    'topic': 'groups',
+    'resources': 'resources',
+    'resource': 'resources',
+    'layers': 'resources',
+    'layer': 'resources',
+}
+
+
+def _trigger_prefect_flow(data_dict: DataDict) -> dict[str, Any]:
+    prefect_url = config.get("ckanext.wri.prefect_url")
+    migration_flow_name = config.get("ckanext.wri.migration_flow_name")
+    deployment_name = config.get("ckanext.wri.migration_deployment_name")
+    deployment_env = config.get("ckanext.wri.migration_deployment_env")
+
+    if any(
+        [
+            not prefect_url,
+            not migration_flow_name,
+            not deployment_name,
+        ]
+    ):
+        error: dict[str, Any] = {
+            "message": "Prefect Configuration Error",
+            "details": "prefect_url, migration_flow_name, and migration_deployment_name are required",
+        }
+        raise p.toolkit.ValidationError(error)
+
+    try:
+        deployment = requests.get(
+            urljoin(
+                prefect_url,
+                f"/api/deployments/name/{migration_flow_name}/{deployment_name}_{deployment_env}",
+            )
+        )
+        deployment = deployment.json()
+        deployment_id = deployment["id"]
+
+        r = requests.post(
+            urljoin(prefect_url, f"api/deployments/{deployment_id}/create_flow_run"),
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(
+                {
+                    "parameters": {
+                        "data_dict": data_dict,
+                    },
+                    "state": {"type": "SCHEDULED", "state_details": {}},
+                }
+            ),
+        )
+        return r.json()
+    except requests.exceptions.ConnectionError as e:
+        error: dict[str, Any] = {
+            "message": "Request Failed",
+            "details": str(e),
+        }
+        raise p.toolkit.ValidationError(error)
 
 
 def notification_create(
@@ -55,7 +169,6 @@ def pending_dataset_create(context: Context, data_dict: DataDict):
     """Create a Pending Dataset"""
     package_id = data_dict.get("package_id")
     package_data = data_dict.get("package_data")
-    log.error(package_data)
 
     if not package_id:
         raise tk.ValidationError(_("package_id is required"))
@@ -63,7 +176,7 @@ def pending_dataset_create(context: Context, data_dict: DataDict):
     if not package_data:
         raise tk.ValidationError(_("package_data is required"))
 
-    tk.check_access("pending_dataset_create", context, package_data)
+    tk.check_access("package_update", context, package_data)
 
     pending_dataset = None
 
@@ -77,3 +190,142 @@ def pending_dataset_create(context: Context, data_dict: DataDict):
         raise tk.ValidationError(_(f"Pending Dataset not found: {package_id}"))
 
     return pending_dataset
+
+
+@logic.side_effect_free
+def trigger_migration(context: Context, data_dict: DataDict):
+    if not logic.check_access("sysadmin", context=context):
+        raise tk.NotAuthorized(_("Only sysadmins can trigger migrations"))
+
+    data_dict['is_bulk'] = True
+
+    data_dict = _black_white_list("whitelist", data_dict)
+    data_dict = _black_white_list("blacklist", data_dict)
+
+    if data_dict.get("whitelist") and data_dict.get("blacklist"):
+        raise tk.ValidationError(_("Whitelist and blacklist cannot be used together"))
+
+    return _trigger_prefect_flow(data_dict)
+
+
+@logic.side_effect_free
+def migrate_dataset(context: Context, data_dict: DataDict):
+    dataset_id = data_dict.get("id")
+    application = data_dict.get("application")
+    data_dict = _black_white_list("whitelist", data_dict)
+    data_dict = _black_white_list("blacklist", data_dict)
+
+    if data_dict.get("whitelist") and data_dict.get("blacklist"):
+        raise tk.ValidationError(_("Whitelist and blacklist cannot be used together"))
+
+    if not dataset_id:
+        raise tk.ValidationError(_("Dataset 'id' is required"))
+
+    if not application:
+        raise tk.ValidationError(_("Application is required"))
+
+    team = data_dict.get("team")
+    topics = data_dict.get("topics")
+
+    tk.check_access("package_create", context, data_dict)
+
+    if team:
+        try:
+            team_dict = tk.get_action("organization_show")(
+                context, {"id": team, "include_users": True}
+            )
+            tk.check_access("organization_update", context, team_dict)
+        except logic.NotFound:
+            raise tk.ValidationError(_(f"Team '{team}' not found"))
+
+    if topics:
+        if isinstance(topics, str):
+            topics = topics.split(",")
+
+            for topic in topics:
+                try:
+                    topic_dict = tk.get_action("group_show")(
+                        context, {"id": topic, "include_users": True}
+                    )
+                    tk.check_access("group_update", context, topic_dict)
+
+                    data_dict["topics"] = topics
+                except logic.NotFound:
+                    raise tk.ValidationError(_(f"Topic '{topic}' not found"))
+
+        else:
+            raise tk.ValidationError(
+                _(
+                    "Topics must be a string (comma separated if it contains multiple topics)"
+                )
+            )
+
+    return _trigger_prefect_flow(data_dict)
+
+
+def _black_white_list(list_type: str, data_dict: DataDict):
+    list_fields = data_dict.get(list_type)
+
+    if list_fields:
+        if isinstance(list_fields, str):
+            list_fields = list_fields.split(",")
+
+            for field in list_fields:
+                if field in [
+                    "owner_org",
+                    "organization",
+                    "orgainzations",
+                    "team",
+                    "teams",
+                    "groups",
+                    "group",
+                    "topics",
+                    "topic",
+                ]:
+                    raise tk.ValidationError(
+                        _(
+                            f"{list_type.capitalize()} field '{field}' is not supported in {list_type.capitalize()} list"
+                        )
+                    )
+                if field not in SCHEMA_FIELDS:
+                    raise tk.ValidationError(
+                        _(
+                            f"{list_type.capitalize()} field '{field}' is not a valid field"
+                        )
+                    )
+
+            data_dict[list_type] = [
+                SCHEMA_SYNONYMS.get(field, field) for field in list_fields
+            ]
+        else:
+            raise tk.ValidationError(
+                _(f"{list_type.capitalize()} fields must be a comma-separated string")
+            )
+
+    return data_dict
+
+
+@logic.side_effect_free
+def migration_status(context: Context, data_dict: DataDict):
+    prefect_url = config.get("ckanext.wri.prefect_url")
+    flow_run_id = data_dict.get("id")
+
+    if not flow_run_id:
+        raise tk.ValidationError(_("'id' is required"))
+
+    if not prefect_url:
+        error: dict[str, Any] = {
+            "message": "Prefect Configuration Error",
+            "details": "Prefect URL is required",
+        }
+        raise p.toolkit.ValidationError(error)
+
+    try:
+        flow_run = requests.get(urljoin(prefect_url, f"/api/flow_runs/{flow_run_id}"))
+        return flow_run.json()
+    except requests.exceptions.ConnectionError as e:
+        error: dict[str, Any] = {
+            "message": "Request Failed",
+            "details": str(e),
+        }
+        raise p.toolkit.ValidationError(error)

@@ -3,6 +3,7 @@ import defaultTheme from 'tailwindcss/defaultTheme'
 
 export default {
     content: ['./src/**/*.{js,ts,jsx,tsx}'],
+    safelist: ['text-nowrap'],
     theme: {
         extend: {
             fontFamily: {
@@ -16,8 +17,40 @@ export default {
             },
             animation: {
                 'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;',
+                'accordion-down': 'accordion-down 0.2s ease-out',
+                'accordion-up': 'accordion-up 0.2s ease-out',
             },
             colors: {
+                'pre-code': 'rgb(245, 242, 240)',
+                border: 'hsl(var(--border))',
+                input: 'hsl(var(--input))',
+                ring: 'hsl(var(--ring))',
+                background: 'hsl(var(--background))',
+                foreground: 'hsl(var(--foreground))',
+                primary: {
+                    DEFAULT: 'hsl(var(--primary))',
+                    foreground: 'hsl(var(--primary-foreground))',
+                },
+                secondary: {
+                    DEFAULT: 'hsl(var(--secondary))',
+                    foreground: 'hsl(var(--secondary-foreground))',
+                },
+                destructive: {
+                    DEFAULT: 'hsl(var(--destructive))',
+                    foreground: 'hsl(var(--destructive-foreground))',
+                },
+                accent: {
+                    DEFAULT: 'hsl(var(--accent))',
+                    foreground: 'hsl(var(--accent-foreground))',
+                },
+                popover: {
+                    DEFAULT: 'hsl(var(--popover))',
+                    foreground: 'hsl(var(--popover-foreground))',
+                },
+                card: {
+                    DEFAULT: 'hsl(var(--card))',
+                    foreground: 'hsl(var(--card-foreground))',
+                },
                 white: '#FFFFFF',
                 'wri-gold': '#F3B229',
                 'wri-black': '#1A1919',
@@ -32,7 +65,10 @@ export default {
                 'wri-dark-gray': '#666666',
                 'wri-row-gray': '#F9F9F9',
                 'wri-slate': '#EFF5F7',
-                muted: 'hsl(210 40% 96.1%)',
+                muted: {
+                    DEFAULT: 'hsl(210 40% 96.1%)',
+                    foreground: 'hsl(var(--muted-foreground))',
+                },
             },
             screens: {
                 '4xl': '2048px',
@@ -42,6 +78,16 @@ export default {
             maxWidth: {
                 '8xl': '1350px',
                 '9xl': '1440px',
+            },
+            keyframes: {
+                'accordion-down': {
+                    from: { height: '0' },
+                    to: { height: 'var(--radix-accordion-content-height)' },
+                },
+                'accordion-up': {
+                    from: { height: 'var(--radix-accordion-content-height)' },
+                    to: { height: '0' },
+                },
             },
         },
     },
@@ -54,6 +100,7 @@ export default {
         }) {
             addVariant('not-last', '&:not(:last-child)')
         }),
+        require('tailwindcss-animate'),
         require('@tailwindcss/forms'),
         require('@tailwindcss/typography'),
     ],

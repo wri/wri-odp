@@ -23,6 +23,7 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import "cypress-axe";
 
 const cypressUpload = require("cypress-file-upload");
 const headers = { Authorization: Cypress.env("API_KEY") };
@@ -216,6 +217,20 @@ Cypress.Commands.add("createOrganizationAPI", (name) => {
 });
 
 // Command for frontend test sepecific
+Cypress.Commands.add("createOrganizationMemberAPI", (org, member, role = 'editor') => {
+  cy.request({
+    method: "POST",
+    url: apiUrl("organization_member_create"),
+    headers: headers,
+    body: {
+      id: org,
+      username: member,
+      role,
+    },
+  });
+});
+
+// Command for frontend test sepecific
 Cypress.Commands.add("createGroupAPI", (name) => {
   cy.request({
     method: "POST",
@@ -259,6 +274,9 @@ Cypress.Commands.add(
         name: name,
         author: "datopian",
         license_id: "notspecified",
+        approval_status: "approved",
+        is_approved: "true",
+        draft: "false",
         tags: [{ display_name: "subscriable", name: "subscriable" }],
         ...otherFields,
       },
@@ -522,30 +540,63 @@ Cypress.Commands.add("userMetadata", (name) => {
     });
 });
 
-// Cypress.Commands.add("addNotificationApi", async ( object_id) => {
+Cypress.Commands.add(
+  "createPendingDataset",
+  (package_id, dataset) => {
+    const request = cy.request({
+      method: "POST",
+      url: apiUrl("pending_dataset_create"),
+      headers: headers,
+      body: {
+        package_id: package_id,
+        package_data: dataset
+      },
+    });
+  }
+);
 
-//   const dataset = await cy.request({
-//     method: "GET",
-//     url: apiUrl("package_show"),
-//     headers: headers,
-//     qs: {
-//       id: object_id,
-//     },
-//   });
+function printAccessibilityViolations(violations) {
+  cy.task(
+    "table", violations.map(({ id, impact, description, nodes }) => ({
+      impact,
+      description: `${description} (${id})`,
+      nodes: nodes.map((el) => el.target).join(" / "),
+    }))
+  );
+}
 
-//   const dataset_id = dataset.body.result.id;
-//   console.log(dataset_id);
+Cypress.Commands.add(
+  "checkAccessibility",
+  {
+    prevSubject: "optional",
+  },
+  ({ skipFailures = false, context = null, options = null } = {}) => {
+    //  By default, exclude CKAN debugger elements
+    const defaultContext = {
+      exclude: [
+        
+      ],
+    };
 
-//   cy.request({
-//     method: "POST",
-//     url: apiUrl("notification_create"),
-//     headers: headers,
-//     body: {
-//       recipient_id: "2b6f6d69-5f13-4091-8131-2182be659ea1",
-//       sender_id: "b53a31a7-55f0-425b-bd6e-db9a20b517c6",
-//       activity_type: "deleted dataset",
-//       object_id: dataset_id,
-//       object_type: "dataset"
-//     },
-//   });
-// });
+    if (!context) {
+      context = defaultContext;
+    } else {
+      context = { ...defaultContext, ...context };
+    }
+    
+    cy.checkA11y(
+      context,
+      {
+        ...options,
+        runOnly: {
+          type: "tag",
+          values: [
+            "wcag2aa",
+          ],
+        },
+      },
+      printAccessibilityViolations,
+      skipFailures
+    );
+  }
+);

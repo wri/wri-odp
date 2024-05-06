@@ -69,11 +69,12 @@ export default function RedirectedSearchInput() {
                 >
                     <input
                         placeholder="Search data"
+                        aria-label='search'
                         className="h-14 rounded-sm block w-full border-0 px-5 py-2 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 border-b-2 border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
                         {...register('search')}
                     />
                     <div className="absolute right-8 top-[1rem]">
-                        <button type="submit">
+                        <button type="submit" aria-label='submit search query'>
                             <MagnifyingGlassIcon className="h-5 w-5 text-wri-black" />
                         </button>
                     </div>

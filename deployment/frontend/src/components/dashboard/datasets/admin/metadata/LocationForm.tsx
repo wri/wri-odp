@@ -35,11 +35,10 @@ export function LocationForm({
 
     const uploadInputRef = useRef<HTMLInputElement>(null)
 
-
     /*
-    * This useEffect prevents page from scrolling to the map
-    *
-    */
+     * This useEffect prevents page from scrolling to the map
+     *
+     */
     useEffect(() => {
         const chooseAddress = document.getElementById('choose-address')
 
@@ -80,7 +79,7 @@ export function LocationForm({
                 const json = JSON.parse(event?.target?.result as string)
                 setValue(`spatial`, json)
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 notify('Failed to parse GeoJSON file', 'error')
             }
         })
@@ -94,7 +93,7 @@ export function LocationForm({
             label={
                 <>
                     <MapPinIcon className="h-7 w-7" />
-                    Location
+                    Location Coverage
                     <DefaultTooltip content="This field defines whether a dataset will show up on the results or not when doing a search by location">
                         <InformationCircleIcon
                             className="h-5 w-5 text-neutral-500"
@@ -178,7 +177,7 @@ export function LocationForm({
                         <Tab.Panel>
                             {watch('spatial') && (
                                 <Map
-                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     style={{ height: 300 }}
                                     mapStyle="mapbox://styles/mapbox/streets-v9"
                                     initialViewState={{ zoom: 2 }}
@@ -202,12 +201,12 @@ export function LocationForm({
                         </Tab.Panel>
                         <Tab.Panel id="choose-address">
                             <Map
-                                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                 style={{ height: 300 }}
                                 mapStyle="mapbox://styles/mapbox/streets-v9"
                             >
                                 <GeocoderControl
-                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     position="bottom-right"
                                     onResult={(e) => {
                                         setValue(
