@@ -18,6 +18,8 @@ from typing import Union
 import logging
 log = logging.getLogger(__name__)
 
+from .sql_context import sql_session_scope
+
 
 notification = sqlalchemy.Table('notification', meta.metadata,
     sqlalchemy.Column('id', sqlalchemy.types.UnicodeText,
@@ -75,14 +77,15 @@ class Notification(object):
         one will be created and returned.
 
         '''
-        query = meta.Session.query(Notification)
-        
-        if sender_id:
-            query = query.filter(Notification.sender_id == sender_id)
-        if recipient_id:
-            query = query.filter(Notification.recipient_id == recipient_id)
+        with sql_session_scope(raise_exceptions=False) as session:
+            query = session.query(Notification)
 
-        return query.all()
+            if sender_id:
+                query = query.filter(Notification.sender_id == sender_id)
+            if recipient_id:
+                query = query.filter(Notification.recipient_id == recipient_id)
+
+            return query.all()
     
     @classmethod
     def update(
@@ -97,54 +100,50 @@ class Notification(object):
         is_unread: bool,
         state: str,
     ) -> Optional['Notification']:
-        
-        stmt = (
-            update(Notification)
-            .where(Notification.id == notification_id)
-            .values(
-                recipient_id=recipient_id,
-                sender_id=sender_id, 
-                activity_type=activity_type, 
-                object_type=object_type, 
-                object_id=object_id,
-                time_sent=time_sent,
-                is_unread=is_unread,
-                state=state
+        with sql_session_scope() as session:
+            stmt = (
+                update(Notification)
+                .where(Notification.id == notification_id)
+                .values(
+                    recipient_id=recipient_id,
+                    sender_id=sender_id,
+                    activity_type=activity_type,
+                    object_type=object_type,
+                    object_id=object_id,
+                    time_sent=time_sent,
+                    is_unread=is_unread,
+                    state=state
+                )
+                .returning(Notification)
             )
-            .returning(Notification)
-        )
 
-        result = meta.Session.execute(stmt)
-        meta.Session.commit()
-        return result.fetchall()
+            result = session.execute(stmt)
+            return result.fetchall()
     
     @classmethod
     def bulk_update(
         cls,
         notifications: list[dict[str, Union[str, datetime.datetime, bool]]],
     ) -> Optional['Notification']:
-        stmt = (
-            update(Notification)
-            .where(Notification.id == bindparam('_id'))
-            .values(
-                recipient_id=bindparam('_recipient_id'),
-                sender_id=bindparam('_sender_id'), 
-                activity_type=bindparam('_activity_type'), 
-                object_type=bindparam('_object_type'), 
-                object_id=bindparam('_object_id'),
-                time_sent=bindparam('_time_sent'),
-                is_unread=bindparam('_is_unread'),
-                state=bindparam('_state')
+        with sql_session_scope() as session:
+            stmt = (
+                update(Notification)
+                .where(Notification.id == bindparam('_id'))
+                .values(
+                    recipient_id=bindparam('_recipient_id'),
+                    sender_id=bindparam('_sender_id'),
+                    activity_type=bindparam('_activity_type'),
+                    object_type=bindparam('_object_type'),
+                    object_id=bindparam('_object_id'),
+                    time_sent=bindparam('_time_sent'),
+                    is_unread=bindparam('_is_unread'),
+                    state=bindparam('_state')
+                )
             )
-        )
 
-        try:
-            result = meta.Session.execute(stmt, notifications)
-            meta.Session.commit()
+            result = session.execute(stmt, notifications)
             return result.rowcount
-        except Exception as e:
-            meta.Session.rollback()  
-            raise e
+
 
 def notification_dictize(notification: Notification, context: Context) -> dict[str, Any]:
     return table_dictize(notification, context)
