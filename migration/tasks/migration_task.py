@@ -6,6 +6,7 @@ import requests
 import re
 import json
 import pycountry
+import markdown
 import os
 
 import ckanapi
@@ -675,12 +676,12 @@ def prepare_dataset(
 
     dataset_values = {
         'title': title,
-        'notes': description,
+        'notes': markdown.markdown(description) if description else '',
         'extras': extras,
-        'cautions': cautions,
+        'cautions': markdown.markdown(cautions) if cautions else '',
         'language': language,
         'citation': citation,
-        'function': function,
+        'function': markdown.markdown(function) if function else '',
         'url': data_download_link,
         'learn_more': learn_more_link,
         'update_frequency': '',
