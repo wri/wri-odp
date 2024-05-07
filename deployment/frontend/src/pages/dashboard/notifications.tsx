@@ -8,6 +8,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
+import { env } from '@/env.mjs'
 
 import { getServerAuthSession } from '@/server/auth'
 
@@ -18,7 +19,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await helpers.notification.getAllNotifications.prefetch()
+    await helpers.notification.getAllNotifications.prefetch({returnLength: true})
+    await helpers.user.getUserCapacity.prefetch()
+
+    await helpers.dataset.getPendingDatasets.prefetch({
+        search: '',
+        page: { start: 0, rows: 10 },
+        sortBy: 'metadata_modified desc',
+    })
     return {
         props: {
             trpcState: helpers.dehydrate(),
@@ -29,7 +37,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 export default function Notifications() {
     return (
         <>
-            <NextSeo title={`Notifications - Dashboard`} />
+            <NextSeo
+                title={`Notifications - Dashboard`}
+                description={`Notifications - Dashboard -- WRI Open Data Catalog`}
+                openGraph={{
+                    title: `Notifications - Dashboard`,
+                    description: `Notifications - Dashboard -- WRI Open Data Catalog`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/notifications`,
+                }}
+            />
             <Header />
             <Layout>
                 <NotificationList />

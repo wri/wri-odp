@@ -29,7 +29,7 @@ export function PointOfContactForm({
                 </>
             }
         >
-            <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-24 py-5 md:grid-cols-2">
+            <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-24 py-5 lg:grid-cols-2">
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup label="Author Name" required>
                         <Input
@@ -39,7 +39,7 @@ export function PointOfContactForm({
                         />
                         <ErrorDisplay name="author" errors={errors} />
                     </InputGroup>
-                    <InputGroup label="Author Email" required>
+                    <InputGroup label="Author Email">
                         <Input
                             {...register('author_email')}
                             placeholder="email@gmail.com"

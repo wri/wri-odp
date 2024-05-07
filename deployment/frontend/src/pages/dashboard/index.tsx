@@ -1,46 +1,80 @@
 import React from 'react'
 import Header from '@/components/_shared/Header'
-import Layout from "@/components/dashboard/Layout";
-import Dashboard from '@/components/dashboard/Dashboard';
-import Footer from "@/components/_shared/Footer";
-import { getServerAuthSession } from "../../server/auth";
-import type { GetServerSideProps } from "next";
-import {NextSeo} from 'next-seo';
+import Layout from '@/components/dashboard/Layout'
+import Dashboard from '@/components/dashboard/Dashboard'
+import Footer from '@/components/_shared/Footer'
+import { getServerAuthSession } from '../../server/auth'
+import { NextSeo } from 'next-seo'
+import { env } from '@/env.mjs'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import superjson from 'superjson'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import { appRouter } from '@/server/api/root'
 
-export default function index() {
-  return (
-    <>
-      <NextSeo title={`Dashboard`} />
-      <Header />
-      <Layout >
-        <Dashboard />
-      </Layout>
-      <Footer
-        links={{
-          primary: { title: "Advanced Search", href: "/search" },
-          secondary: { title: "Explore Topics", href: "/topics" },
-        }}
-        style='mt-0'
-      />
-    </>
-  )
+
+export default function index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    return (
+        <>
+            <NextSeo
+                title={`Dashboard`}
+                noindex={true}
+                nofollow={true}
+                description={`Dashboard - WRI Open Data Catalog`}
+                openGraph={{
+                    title: `Dashboard`,
+                    description: `Dashboard - WRI Open Data Catalog`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard`,
+                }}
+            />
+            <Header />
+            <Layout>
+                <Dashboard />
+            </Layout>
+            <Footer
+                links={{
+                    primary: { title: 'Advanced Search', href: '/search' },
+                    secondary: { title: 'Explore Topics', href: '/topics' },
+                }}
+                style="mt-0"
+            />
+        </>
+    )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerAuthSession(context);
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const session = await getServerAuthSession(context)
+    const helpers = createServerSideHelpers({
+        router: appRouter,
+        ctx: { session },
+        transformer: superjson,
+    })
 
-  if (!session) {
+    await helpers.notification.getAllNotifications.prefetch({returnLength: true})
+    await helpers.user.getUserCapacity.prefetch()
+
+    await helpers.dataset.getPendingDatasets.prefetch({
+        search: '',
+        page: { start: 0, rows: 10 },
+        sortBy: 'metadata_modified desc',
+    })
+
+    await helpers.dataset.getFavoriteDataset.prefetch()
+    await helpers.dashboardActivity.listActivityStreamDashboard.prefetch({ search: '', page: { start: 0, rows: 6 } })
+
+
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/auth/signin',
+                permanent: false,
+            },
+        }
+    }
+
     return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      session,
-    },
-  };
-};
+        props: {
+            trpcState: helpers.dehydrate(),
+            session,
+        },
+    }
+}

@@ -1,5 +1,7 @@
 import { DataDictionaryFormType } from '@/schema/dataset.schema'
 import { Activity, Group, Organization } from '@portaljs/ckan'
+import { APILayerSpec } from './layer.interface'
+import { PlotParams } from 'react-plotly.js'
 
 export interface Dataset {
     author?: string
@@ -37,7 +39,7 @@ export interface Resource {
     cache_last_updated?: string
     cache_url?: string
     created?: string
-    datastore_active?: boolean
+    datastore_active?: boolean | null
     description?: string
     format?: string
     hash?: string
@@ -56,8 +58,22 @@ export interface Resource {
     url?: string
     url_type?: string
     key?: string
+    advanced_api_usage?: string
     schema?: { value: DataDictionaryFormType }
     rw_id?: string
+    layerObjRaw: APILayerSpec | null
+    layerObj: APILayerSpec | null
+    connectorType?: string
+    connectorUrl?: string
+    provider?: string
+    tableName?: string
+    type: 'link' | 'upload' | 'layer' | 'empty' | 'layer-raw'
+    _hasChartView?: boolean
+    _views?: View[]
+    total_record_count?: number
+    spatial_geom?: any
+    spatial_address?: string
+    spatial_coordinates?: any
 }
 
 export interface DatasetListQueryOptions {
@@ -83,3 +99,27 @@ export interface Tag {
     state: 'active'
     vocabulary_id?: string
 }
+
+export interface View {
+    id?: string
+    title: string
+    description: string
+    view_type: 'custom'
+    config_obj: ViewConfig
+}
+
+export type ViewType = 'chart'
+
+export type ViewConfig = {
+    type: ViewType
+    config: ChartViewConfig
+    form_state: any /* | OtherViewConfig ... */
+}
+
+export interface ChartViewConfig {
+    provider: 'datastore' | 'rw'
+    id: string
+    props: PlotParams
+}
+
+export type ViewState = View & { _state: 'new' | 'saved' | 'edit'; _id: number }

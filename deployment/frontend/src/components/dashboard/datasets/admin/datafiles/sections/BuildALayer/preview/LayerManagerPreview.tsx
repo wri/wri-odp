@@ -1,4 +1,5 @@
-import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl'
+//@ts-ignore
+import { PluginMapboxGl } from 'layer-manager'
 import { useMap } from 'react-map-gl'
 import VizzLayerManager from '@/components/_shared/map/VizzLayerManager'
 import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'

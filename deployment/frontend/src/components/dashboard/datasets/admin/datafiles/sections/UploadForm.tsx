@@ -10,13 +10,20 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/_shared/Table'
-import { MinusCircleIcon, PaperClipIcon } from '@heroicons/react/24/outline'
+import {
+    InformationCircleIcon,
+    MinusCircleIcon,
+    PaperClipIcon,
+} from '@heroicons/react/24/outline'
 import { DatasetFormType } from '@/schema/dataset.schema'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { convertBytes } from '@/utils/convertBytes'
 import Spinner from '@/components/_shared/Spinner'
 import FormatInput from '../FormatInput'
 import { DataDictionaryTable } from '../DataDictionaryTable'
+import DefaultTooltip from '@/components/_shared/Tooltip'
+import { DatafileLocation } from '../DatafileLocation'
+import { SimpleEditor } from '../../metadata/RTE/SimpleEditor'
 
 export function UploadForm({
     removeFile,
@@ -92,11 +99,41 @@ export function UploadForm({
                     name={`resources.${index}.format`}
                 />
             </InputGroup>
+            <InputGroup
+                label={
+                    <span className="flex items-center gap-x-1">
+                        Advanced API Usage
+                        <DefaultTooltip content="This field will end up in the Datafile API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
+                            <InformationCircleIcon className="h-5 w-5" />
+                        </DefaultTooltip>
+                    </span>
+                }
+                className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+            >
+                <SimpleEditor
+                    formObj={formObj}
+                    name={`resources.${index}.advanced_api_usage`}
+                    className="min-h-[320px]"
+                    defaultValue=""
+                />
+            </InputGroup>
             {dataDictionaryLoading && watch(`resources.${index}.schema`) ? (
                 <Spinner />
             ) : (
                 <DataDictionaryTable formObj={formObj} resourceIndex={index} />
             )}
+            <div className="mt-10">
+                <h2 className="font-semibold text-lg flex items-center gap-x-2">
+                    Location Coverage
+                    <DefaultTooltip content="This field defines whether a data file will show up on the results or not when doing a search by location">
+                        <InformationCircleIcon
+                            className="h-5 w-5 text-neutral-500"
+                            aria-hidden="true"
+                        />
+                    </DefaultTooltip>
+                </h2>
+                <DatafileLocation formObj={formObj} index={index} />
+            </div>
         </div>
     )
 }

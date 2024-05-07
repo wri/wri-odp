@@ -78,8 +78,8 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                         className={classNames(
                                             selected && selected.label
                                                 ? ''
-                                                : 'text-zinc-400',
-                                            'block truncate'
+                                                : 'text-zinc-500',
+                                            'block'
                                         )}
                                     >
                                         {selected && selected.label

@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic'
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+})
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { democracy_index } from '@/templateLayers/democracy_index'
 import { energy_facilities } from '@/templateLayers/energy_facilities'
@@ -14,6 +17,7 @@ import { LayerFormType } from '../layer.schema'
 import { convertLayerObjToForm } from '../convertObjects'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import Image from 'next/image'
+import { ScrollArea, ScrollBar } from '@/components/_shared/ScrollArea'
 
 interface IProps {
     setOpen: (open: boolean) => void
@@ -57,7 +61,7 @@ export function ChooseTemplates(props: IProps) {
         <Modal open={open} setOpen={setOpen} className="max-w-2xl">
             <div className="p-6">
                 <div className="border-b border-zinc-100 pb-5">
-                    <div className="font-acumin text-3xl font-normal text-black">
+                    <div className="font-acumin text-3xl  text-neutral-700">
                         Use a template
                     </div>
                     <div className="font-acumin text-base font-light text-neutral-600">
@@ -65,55 +69,89 @@ export function ChooseTemplates(props: IProps) {
                         a basis
                     </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <Image
-                        onClick={() => setTemplate(democracy_index as any)}
-                        src={democracy_index.thumbnailUrl}
-                        alt="Thumbnail image for the democracy index template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                    <Image
-                        onClick={() => setTemplate(hdi as any)}
-                        src={hdi.thumbnailUrl}
-                        alt="Thumbnail image for the HDI template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                    <Image
-                        onClick={() => setTemplate(roads as any)}
-                        src={roads.thumbnailUrl}
-                        alt="Thumbnail image for the roads template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                    <Image
-                        onClick={() => setTemplate(marine_ecoregions as any)}
-                        src={marine_ecoregions.thumbnailUrl}
-                        alt="Thumbnail image for the marine ecoregions template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                    <Image
-                        onClick={() => setTemplate(temperature as any)}
-                        src={temperature.thumbnailUrl}
-                        alt="Thumbnail image for the temperature template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
-                    <Image
-                        onClick={() => setTemplate(energy_facilities as any)}
-                        src={energy_facilities.thumbnailUrl}
-                        alt="Thumbnail image for the energy facilities template"
-                        className="cursor-pointer"
-                        height={300}
-                        width={300}
-                    />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="flex flex-col gap-4">
+                        <h2 className="font-acumin text-base font-bold  text-neutral-700">
+                            Continous Data - Polygon - Using filters
+                        </h2>
+                        <Image
+                            onClick={() => setTemplate(democracy_index as any)}
+                            src={democracy_index.thumbnailUrl}
+                            alt="Thumbnail image for the democracy index template"
+                            className="cursor-pointer"
+                            height={300}
+                            width={300}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <h2 className="font-acumin text-base font-bold  text-neutral-700">
+                            Continous Data - Polygon - Using steps
+                        </h2>
+                        <Image
+                            onClick={() => setTemplate(hdi as any)}
+                            src={hdi.thumbnailUrl}
+                            alt="Thumbnail image for the HDI template"
+                            className="cursor-pointer"
+                            height={300}
+                            width={300}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <h2 className="font-acumin text-base font-bold  text-neutral-700">
+                            Categorical Data - Lines - Using filters
+                        </h2>
+                        <Image
+                            onClick={() => setTemplate(roads as any)}
+                            src={roads.thumbnailUrl}
+                            alt="Thumbnail image for the roads template"
+                            className="cursor-pointer"
+                            height={300}
+                            width={300}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <h2 className="font-acumin text-base font-bold  text-neutral-700">
+                            Categorical Data - Polygon - Using filters
+                        </h2>
+                        <Image
+                            onClick={() =>
+                                setTemplate(marine_ecoregions as any)
+                            }
+                            src={marine_ecoregions.thumbnailUrl}
+                            alt="Thumbnail image for the marine ecoregions template"
+                            className="cursor-pointer"
+                            height={300}
+                            width={300}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <h2 className="font-acumin text-base font-bold  text-neutral-700">
+                            Continous Data - Polygon - Using ramps
+                        </h2>
+                        <Image
+                            onClick={() => setTemplate(temperature as any)}
+                            src={temperature.thumbnailUrl}
+                            alt="Thumbnail image for the temperature template"
+                            className="cursor-pointer"
+                            height={300}
+                            width={300}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <h2 className="font-acumin text-base font-bold  text-neutral-700">
+                            Continous Data - Point - Using filters
+                        </h2>
+                        <Image
+                            onClick={() =>
+                                setTemplate(energy_facilities as any)
+                            }
+                            src={energy_facilities.thumbnailUrl}
+                            alt="Thumbnail image for the energy facilities template"
+                            className="cursor-pointer"
+                            height={300}
+                            width={300}
+                        />
+                    </div>
                 </div>
                 <div>
                     <div className="font-acumin text-base font-light pt-6 text-neutral-600">

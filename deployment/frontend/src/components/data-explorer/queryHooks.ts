@@ -11,41 +11,64 @@ import { env } from '@/env.mjs'
 import { CkanResponse } from '@/schema/ckan.schema'
 import { FilterObjType } from './search.schema'
 import { DataExplorerColumnFilter } from './DataExplorer'
+import { useSession } from 'next-auth/react'
 
 export interface FieldsResponse {
     tableName: string
-    fields: Record<string, any>
+    fields: Record<string, any> | Array<{ name: string; alias: string }>
 }
 
-export function useFields({ id, provider }: TabularResource) {
-    if (provider === 'datastore') {
-        return useQuery(['fields', id], async () => {
-            const fieldsRes = await fetch(
-                `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/datastore_info`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        id,
-                    }),
-                }
-            )
-            const fields: CkanResponse<{ fields: Array<{ id: string }> }> =
-                await fieldsRes.json()
-            return {
-                tableName: id,
-                columns: fields.result.fields.map((field) => ({
-                    key: field.id,
-                    name: field.id,
-                })),
-            }
-        })
+export function useFields({ id, provider, apiKey }: TabularResource) {
+    const session = useSession()
+
+    const headers = {
+        'Content-Type': 'application/json',
+    } as any
+
+    if (apiKey) {
+        headers['Authorization'] = apiKey
+    } else if (session.data?.user.apikey) {
+        headers['Authorization'] = session.data?.user.apikey
     }
-    return api.rw.getFields.useQuery({
-        id,
+
+    const datastoreHook = useQuery(['fields', id], async () => {
+        const fieldsRes = await fetch(
+            `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/datastore_info`,
+            {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    id,
+                }),
+            }
+        )
+        const fields: CkanResponse<{
+            fields: Array<{
+                id: string
+                name: string
+                info: { label: string | null; default: string | null }
+                type: string
+            }>
+        }> = await fieldsRes.json()
+
+        return {
+            tableName: id,
+            columns: fields.result.fields.map((field) => ({
+                key: field.id,
+                name: field.info.label ?? field.id,
+                type: field.type,
+                default: field.info.default ?? '',
+            })),
+        }
     })
+    const rwHook = api.rw.getFields.useQuery({
+        id,
+        provider,
+    })
+    if (provider === 'datastore') {
+        return datastoreHook
+    }
+    return rwHook
 }
 
 export function useNumberOfRows({
@@ -103,6 +126,7 @@ export function useTableData({
     enabled = true,
     filters,
     provider,
+    groupBy,
 }: {
     pagination: PaginationState
     sorting: ColumnSort[]
@@ -112,6 +136,7 @@ export function useTableData({
     enabled?: boolean
     filters: ColumnFilter[]
     provider: string
+    groupBy?: string[]
 }) {
     if (provider === 'datastore') {
         return api.datastore.getData.useQuery(
@@ -124,6 +149,7 @@ export function useTableData({
                     id: string
                     value: FilterObjType[]
                 }[],
+                groupBy,
             },
             {
                 enabled: !!tableName && enabled,

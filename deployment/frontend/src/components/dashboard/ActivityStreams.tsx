@@ -17,7 +17,7 @@ function ActivityStreamUser({ activity }: { activity: activity }) {
   )
 }
 export default function UserActivityStreams({ drag }: { drag: boolean }) {
-  const { data, isLoading } = api.dashboardActivity.listActivityStreamDashboard.useQuery({ search: '', page: { start: 0, rows: 100 } });
+  const { data, isLoading } = api.dashboardActivity.listActivityStreamDashboard.useQuery({ search: '', page: { start: 0, rows: 6 } });
 
   return (
     <section id="activities" className={`p-6 w-full shadow-wri h-full overflow-y-auto ${drag ? "border-dashed border border-wri-black " : ""}`}>

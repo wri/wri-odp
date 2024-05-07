@@ -1,13 +1,19 @@
 import { WriDataset } from '@/schema/ckan.schema'
 import { ViewState } from 'react-map-gl'
+import { View } from './dataset.interface'
 
 export interface State {
     vizIndex: number
     dataset: WriDataset | null
-    relatedDatasets: WriDataset[] | null,
+    relatedDatasets: WriDataset[] | null
+    prevRelatedDatasets: WriDataset[] | null
+    layerAsLayerObj: Map<string, string>
+    tempLayerAsLayerobj: Map<string, string>
+    prevLayerGroups: ActiveLayerGroup[]
+    storeDirtyFields: string[]
     mapView: {
-        isEmbedding: boolean,
-        isAddingLayers?: boolean,
+        isEmbedding: boolean
+        isAddingLayers?: boolean
         viewState: ViewState
         basemap: Basemap
         labels: Labels
@@ -17,6 +23,8 @@ export interface State {
         isDrawing: boolean | undefined
         layersParsed: Array<[string, LayerState]>
     } & Layers
+    activeCharts: View[]
+    selectedChart?: View
 }
 
 export interface ActiveLayerGroup {

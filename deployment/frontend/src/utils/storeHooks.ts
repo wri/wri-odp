@@ -15,6 +15,23 @@ export const useDataset = () => {
     return { dataset }
 }
 
+export const useLayerAsLayerObj = () => {
+    const { layerAsLayerObj } = useStore((store) => ({
+        layerAsLayerObj: store.layerAsLayerObj,
+    }))
+
+    return { layerAsLayerObj }
+}
+export const useActiveCharts = () => {
+    return useStore((store) => ({
+        activeCharts: store.activeCharts,
+        addCharts: store.addCharts,
+        removeCharts: store.removeCharts,
+        selectedChart: store.selectedChart,
+        selectChart: store.selectChart,
+    }))
+}
+
 export const useRelatedDatasets = () => {
     const { relatedDatasets } = useStore((store) => ({
         relatedDatasets: store.relatedDatasets,
@@ -29,6 +46,16 @@ export const useIsEmbeddingMap = () => {
     }))
 
     return { isEmbedding }
+}
+
+export const useToggleLayergroups = () => {
+    const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
+        useStore((store) => ({
+            tempLayerAsLayerobj: store.tempLayerAsLayerobj,
+            prevLayerGroups: store.prevLayerGroups,
+            setToggleLayergroups: store.toggleActiveLayerGroup,
+        }))
+    return { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups }
 }
 
 export const useIsAddingLayers = () => {
@@ -48,7 +75,6 @@ export const useMapState = () => {
         }),
         shallow
     )
-
     return { viewState, setViewState }
 }
 
@@ -149,4 +175,13 @@ export const useBounds = () => {
     }))
 
     return { bounds, setBounds }
+}
+
+export const useStoreDirtyFields = () => {
+    const { storeDirtyFields, setStoreDirtyFields } = useStore((store) => ({
+        storeDirtyFields: store.storeDirtyFields,
+        setStoreDirtyFields: store.setStoreDirtyFields,
+    }))
+
+    return { storeDirtyFields, setStoreDirtyFields }
 }

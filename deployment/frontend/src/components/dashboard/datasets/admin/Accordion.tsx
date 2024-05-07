@@ -5,7 +5,7 @@ import { Disclosure, Transition } from "@headlessui/react";
 import classNames from "@/utils/classnames";
 
 interface AccordionProps {
-  title: string;
+  title: string | React.ReactNode;
   children: React.ReactNode;
   icon: React.ReactNode;
   className?: string;

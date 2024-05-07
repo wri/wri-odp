@@ -11,10 +11,14 @@ ARG NEXTAUTH_SECRET
 ARG NEXTAUTH_URL
 ARG CKAN_URL
 ARG NEXT_PUBLIC_CKAN_URL
+ARG NEXT_PUBLIC_NEXTAUTH_URL
+ARG NEXT_PUBLIC_GTM_ID
 ARG AZURE_AD_CLIENT_ID
 ARG AZURE_AD_CLIENT_SECRET
 ARG AZURE_AD_TENANT_ID
 ARG RW_API_KEY
+ARG NEXT_PUBLIC_DISABLE_HOTJAR
+ARG NEXT_PUBLIC_HOTJAR_ID
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -34,6 +38,7 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/next.config.mjs ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/bypassApiTrackingFetch.js ./bypassApiTrackingFetch.js
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
@@ -41,5 +46,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 EXPOSE 3000
 ENV PORT 3000
+ENV NODE_OPTIONS='-r /app/bypassApiTrackingFetch.js --experimental-fetch'
 
 CMD ["node", "server.js"]

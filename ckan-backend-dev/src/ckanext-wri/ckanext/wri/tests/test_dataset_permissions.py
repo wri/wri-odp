@@ -110,7 +110,7 @@ def test_package_create():
 
     dataset_draft = dict(dataset_public)
     dataset_draft["draft"] = True
-    dataset_draft["visibility_type"] = "internal"
+    dataset_draft["visibility_type"] = None
     dataset_draft["name"] = "draft-dataset" 
 
     dataset_private = dict(dataset_public)

@@ -58,6 +58,44 @@ def notification_update(
     return notification_dicts
 
 
+def notification_bulk_update(
+    context: Context, data_dict: DataDict
+) -> NotificationGetUserViewedActivity:
+    """Bulk Update notification status for a user"""
+
+    tk.check_access("notification_create", context, data_dict)
+    sch = context.get("schema") or schema.default_update_notification_schema()
+    payload = data_dict.get("payload", False)
+    if not payload:
+        raise tk.ValidationError("payload is required")
+    
+    first_payload = payload[0]
+    data, errors = tk.navl_validate(first_payload, sch, context)
+    if errors:
+        raise tk.ValidationError(errors)
+
+    model = context["model"]
+    session = context["session"]
+    user_obj = model.User.get(context["user"])
+
+
+    filtered_payload = [
+        {
+            f"_{key}": value 
+            for key, value in notification.items() 
+            if key in {'id', 'recipient_id', 'sender_id', 'activity_type', 'object_type', 'object_id', 'time_sent', 'is_unread', 'state'}
+        } 
+        for notification in payload
+    ]
+
+    user_notifications = Notification.bulk_update(
+        notifications=filtered_payload
+    )
+    
+    return user_notifications
+
+
+
 def pending_dataset_update(context: Context, data_dict: DataDict):
     """Update a Pending Dataset"""
     package_id = data_dict.get("package_id")
@@ -69,7 +107,7 @@ def pending_dataset_update(context: Context, data_dict: DataDict):
     if not package_data:
         raise tk.ValidationError(_("package_data is required"))
 
-    tk.check_access("pending_dataset_update", context, package_data)
+    tk.check_access("package_create", context, package_data)
 
     pending_dataset = None
 

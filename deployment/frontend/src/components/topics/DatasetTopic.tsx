@@ -23,7 +23,6 @@ export default function DatasetTopic({ topics }: { topics: GroupTree[] }) {
     })
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
 
-    console.log('data: ', data?.datasets)
     return (
         <section>
             <div className="font-['Acumin Pro SemiCondensed'] text-2xl font-semibold text-black truncate whitespace-normal">

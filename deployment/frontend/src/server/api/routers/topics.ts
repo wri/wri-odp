@@ -11,6 +11,7 @@ import {
     searchHierarchy,
     getUserGroups,
     findAllNameInTree,
+    getAllDatasetFq,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -66,7 +67,12 @@ export const TopicRouter = createTRPCRouter({
 
             const result = groupTree
             return {
-                topics: result,
+                topics: input.pageEnabled
+                    ? result.slice(
+                          input.page.start,
+                          input.page.start + input.page.rows
+                      )
+                    : result,
                 topic2Image: topic2Image,
                 count: result.length,
             }
@@ -144,7 +150,7 @@ export const TopicRouter = createTRPCRouter({
                         'topic'
                     )
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                 }
                 input.users = newMembers
                 const body = JSON.stringify({
@@ -222,7 +228,6 @@ export const TopicRouter = createTRPCRouter({
                     throw Error(replaceNames(topic.error.message))
                 throw Error(replaceNames(JSON.stringify(topic.error)))
             }
-            console.log(topic)
             return {
                 ...topic.result,
             }
@@ -316,11 +321,23 @@ export const TopicRouter = createTRPCRouter({
                         img_url: org.image_display_url,
                         description: org.description,
                         package_count: org.package_count,
+                        name: org.name,
                     }
                     return acc
                 },
                 {} as Record<string, GroupsmDetails>
             )
+
+            for (const group in topicDetails) {
+                const topic = topicDetails[group]!
+                const packagedetails = (await getAllDatasetFq({
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    fq: `groups:${topic.name}+is_approved:true`,
+                    query: { search: '', page: { start: 0, rows: 10000 } },
+                }))!
+                topic.package_count = packagedetails.count
+            }
+
             if (input.search) {
                 groupTree = await searchHierarchy({
                     isSysadmin: true,

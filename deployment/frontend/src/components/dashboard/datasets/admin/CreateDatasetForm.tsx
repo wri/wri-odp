@@ -2,6 +2,7 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { CreateDatasetTabs } from '@/components/dashboard/datasets/admin/CreateDatasetTabs'
 import { CreateDataFilesSection } from '@/components/dashboard/datasets/admin/datafiles/CreateDatafilesSection'
+import { CreateLayersSection } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection'
 import { CustomFieldsForm } from '@/components/dashboard/datasets/admin/metadata/CustomFields'
 import { DescriptionForm } from '@/components/dashboard/datasets/admin/metadata/DescriptionForm'
 import { MoreDetailsForm } from '@/components/dashboard/datasets/admin/metadata/MoreDetails'
@@ -23,10 +24,18 @@ import { v4 as uuidv4 } from 'uuid'
 import { OpenInForm } from './metadata/OpenIn'
 import Link from 'next/link'
 import { LocationForm } from './metadata/LocationForm'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
+import { InformationCircleIcon } from '@heroicons/react/24/outline'
+import { Dialog } from '@headlessui/react'
+import { VersioningForm } from './metadata/VersioningForm'
 
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [selectedIndex, setSelectedIndex] = useState(0)
+    const [isOpen, setIsOpen] = useState(false)
     const router = useRouter()
 
     const formObj = useForm<DatasetFormType>({
@@ -62,7 +71,14 @@ export default function CreateDatasetForm() {
                 {
                     resourceId: uuidv4(),
                     title: 'Example title',
-                    type: 'empty',
+                    type: 'empty-file',
+                    format: '',
+                    schema: [],
+                },
+                {
+                    resourceId: uuidv4(),
+                    title: 'Example layer',
+                    type: 'empty-layer',
                     format: '',
                     schema: [],
                 },
@@ -76,6 +92,7 @@ export default function CreateDatasetForm() {
                 `Successfully created the "${title ?? name}" dataset`,
                 'success'
             )
+            setIsOpen(false)
             router.push('/dashboard/datasets')
             formObj.reset()
         },
@@ -91,7 +108,6 @@ export default function CreateDatasetForm() {
         formState: { dirtyFields, errors },
     } = formObj
 
-    console.log('Errors', errors)
     useEffect(() => {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])
@@ -120,18 +136,21 @@ export default function CreateDatasetForm() {
                             <PointOfContactForm formObj={formObj} />
                             <MoreDetailsForm formObj={formObj} />
                             <OpenInForm formObj={formObj} />
+                            <VersioningForm formObj={formObj} />
                             <CustomFieldsForm formObj={formObj} />
                         </form>
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <CreateDataFilesSection formObj={formObj} />
                     </Tab.Panel>
+                    <Tab.Panel as="div" className="flex flex-col gap-y-12">
+                        <CreateLayersSection formObj={formObj} />
+                    </Tab.Panel>
                     <Tab.Panel as="div">
                         <form
                             className="flex flex-col gap-y-12"
                             id="create_dataset_form"
                             onSubmit={formObj.handleSubmit((data) => {
-                        console.log(data)
                                 createDataset.mutate(data)
                             })}
                         >
@@ -155,26 +174,22 @@ export default function CreateDatasetForm() {
             <div
                 className={classNames(
                     'flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] justify-between font-acumin text-2xl font-semibold text-black px-4 xl:px-0',
-                    selectedIndex === 2 ? 'max-w-[71rem] xxl:px-0' : ''
+                    selectedIndex === 3 ? 'max-w-[71rem] xxl:px-0' : ''
                 )}
             >
                 <Button
-                    onClick={formObj.handleSubmit((data) => {
-                        createDataset.mutate({
-                            ...data,
-                            visibility_type: { value: 'draft', label: 'Draft' },
-                        })
-                    })}
+                    onClick={() => setIsOpen(true)}
                     variant="muted"
                     type="button"
                     className="w-fit"
                 >
                     Save as Draft
                 </Button>
-                <div className="flex items-center gap-x-2">
-                    <Button type="button" variant="outline">
-                        <Link href="/dashboard/datasets">Cancel</Link>
-                    </Button>
+                <div className="flex items-center gap-x-2 flex-wrap gap-y-5">
+                    <Link href="/dashboard/datasets"
+                        className='inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold h-11 px-6 py-4 rounded-[3px] text-base'>
+                        Cancel
+                    </Link>
                     {selectedIndex !== 0 && (
                         <Button
                             type="button"
@@ -184,7 +199,7 @@ export default function CreateDatasetForm() {
                             Back
                         </Button>
                     )}
-                    {selectedIndex !== 2 && (
+                    {selectedIndex !== 3 && (
                         <Button
                             type="button"
                             onClick={async () => {
@@ -196,10 +211,11 @@ export default function CreateDatasetForm() {
                             Next:{' '}
                             {match(selectedIndex)
                                 .with(0, () => 'Datafiles')
+                                .with(1, () => 'Map Visualizations')
                                 .otherwise(() => 'Preview')}
                         </Button>
                     )}
-                    {selectedIndex === 2 && (
+                    {selectedIndex === 3 && (
                         <LoaderButton
                             loading={createDataset.isLoading}
                             type="submit"
@@ -209,6 +225,58 @@ export default function CreateDatasetForm() {
                         </LoaderButton>
                     )}
                 </div>
+                <Modal
+                    open={isOpen}
+                    setOpen={setIsOpen}
+                    className="sm:w-full sm:max-w-lg"
+                >
+                    <div className="sm:flex sm:items-start">
+                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <InformationCircleIcon
+                                className="h-6 w-6 text-green-600"
+                                aria-hidden="true"
+                            />
+                        </div>
+                        <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                            <Dialog.Title
+                                as="h3"
+                                className="text-base font-semibold leading-6 text-gray-900"
+                            >
+                                Save as Draft
+                            </Dialog.Title>
+                            <div className="mt-2">
+                                <p className="text-sm text-gray-500">
+                                    Are you sure you want to save this dataset
+                                    as draft?
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
+                        <LoaderButton
+                            variant="default"
+                            loading={createDataset.isLoading}
+                            onClick={formObj.handleSubmit((data) => {
+                                createDataset.mutate({
+                                    ...data,
+                                    visibility_type: {
+                                        value: 'draft',
+                                        label: 'Draft',
+                                    },
+                                })
+                            })}
+                        >
+                            Save as Draft
+                        </LoaderButton>
+                        <Button
+                            variant="outline"
+                            type="button"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                </Modal>
             </div>
         </>
     )

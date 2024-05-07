@@ -12,6 +12,7 @@ import { rwRouter } from "./routers/rw";
 import { datastoreRouter } from "./routers/datastore";
 import { notificationRouter } from "./routers/notification";
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
+import { prefectRouter } from "./routers/prefect";
 
 /**
  * This is the primary router for your server.
@@ -31,6 +32,7 @@ export const appRouter = createTRPCRouter({
   notification: notificationRouter,
   rw: rwRouter,
   datastore: datastoreRouter,
+  prefect: prefectRouter,
 });
 
 // export type definition of API
