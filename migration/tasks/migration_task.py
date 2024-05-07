@@ -676,12 +676,12 @@ def prepare_dataset(
 
     dataset_values = {
         'title': title,
-        'notes': markdown.markdown(description),
+        'notes': markdown.markdown(description) if description else '',
         'extras': extras,
-        'cautions': markdown.markdown(cautions),
+        'cautions': markdown.markdown(cautions) if cautions else '',
         'language': language,
         'citation': citation,
-        'function': markdown.markdown(function),
+        'function': markdown.markdown(function) if function else '',
         'url': data_download_link,
         'learn_more': learn_more_link,
         'update_frequency': '',
