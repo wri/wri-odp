@@ -210,9 +210,19 @@ export function Hero() {
                         <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
                             Data Explorer is WRI's primary data catalog. This is
                             the best way to discover and explore data produced
-                            by WRI and our partners. Data in our catalog is open
-                            by default and meets our high standards for{' '}
-                            <a href="#" className=" text-blue-500">
+                            by WRI and our partners. Data in our catalog is{' '}
+                            <a
+                                href="https://www.wri.org/data/open-data-commitment"
+                                className=" text-blue-500 underline"
+                            >
+                                {' '}
+                                open by default
+                            </a>{' '}
+                            and meets our high standards for{' '}
+                            <a
+                                href="https://www.wri.org/research/excellence"
+                                className=" text-blue-500 underline"
+                            >
                                 research excellence.
                             </a>
                         </p>
