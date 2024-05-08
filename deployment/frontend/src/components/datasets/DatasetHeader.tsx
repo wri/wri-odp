@@ -865,23 +865,6 @@ export function DatasetHeader({
                             </div>
                         )}
                 </div>
-                {dataset?.technical_notes && (
-                    <a
-                        href={dataset?.technical_notes}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={classNames(
-                            'flex items-center gap-x-1 mt-4 w-fit',
-                            highlighted('technical_notes')
-                        )}
-                    >
-                        <LinkIcon className="h-4 w-4 text-wri-green" />
-                        <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
-                            Technical Notes
-                        </div>
-                    </a>
-                )}
-
                 <div className="flex space-x-2">
                     {dataset?.connectorUrl &&
                         dataset?.provider &&
