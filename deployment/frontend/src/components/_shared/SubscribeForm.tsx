@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { ErrorDisplay } from './InputGroup'
 import { useMutation } from 'react-query'
 import { toast } from 'react-toastify'
+
 export function SubscribeForm() {
     const {
         formState: { errors },
@@ -22,13 +23,9 @@ export function SubscribeForm() {
     })
     const submitNewsletter = useMutation({
         mutationFn: async (data: { email: string }) => {
-            console.log(data)
-            const res = await fetch('https://reqres.in/api/users', {
+            const res = await fetch('/api/proxy-ortto', {
                 method: 'POST',
-                body: JSON.stringify({
-                    name: 'morpheus',
-                    job: 'leader',
-                }),
+                body: JSON.stringify(data),
             })
             const subscribe = await res.json()
             return subscribe
