@@ -8,6 +8,7 @@ import json
 import pycountry
 import markdown
 import os
+from xml.etree import ElementTree as ET
 
 import ckanapi
 
@@ -372,32 +373,48 @@ def migrate_dataset(data_dict):
                 updated_dataset['owner_org'] = ''
 
         existing_extras = dataset.get('extras', [])
+        existing_migration_extras = dataset.get('migration_extras', {})
         new_extras = data_dict.get('extras', [])
-        normalized_existing_extras_by_key = {
+        new_migration_extras = data_dict.get('migration_extras', {})
+        normalized_existing_extras = {
             extra.get('key'): normalize_value(extra.get('value'))
             for extra in existing_extras
         }
-        normalized_new_extras_by_key = {
-            extra.get('key'): normalize_value(extra.get('value'))
-            for extra in new_extras
+        normalized_existing_migration_extras = {
+            key: normalize_value(value) for key, value in existing_migration_extras.items()
+        }
+        normalized_new_migration_extras = {
+            key: normalize_value(value) for key, value in new_migration_extras.items()
         }
 
-        if (len(existing_extras) != len(new_extras)) or (
-            any(
-                normalized_new_extras_by_key.get(extra.get('key'))
-                != normalized_existing_extras_by_key.get(extra.get('key'))
-                for extra in new_extras
-            )
-        ):
-            log.info(f'{log_name} Extras changed...')
+        for key, value in normalized_new_migration_extras.items():
+            if normalized_existing_extras.get(key) == value:
+                del normalized_existing_extras[key]
+
+        if len(normalized_existing_extras) != len(existing_extras):
+            log.info(f'{log_name} Found old migration_extras in extras. Removing...')
             log.info(f'{log_name} Existing extras: {json.dumps(existing_extras, indent=2)}')
             log.info(f'{log_name} New extras: {json.dumps(new_extras, indent=2)}')
-            updated_dataset['extras'] = [
-                {'key': key, 'value': value}
-                for key, value in normalized_new_extras_by_key.items()
+            updated_extras = [
+                {'key': key, 'value': value} for key, value in normalized_existing_extras.items()
             ]
+            updated_dataset['extras'] = updated_extras
+
+        if (len(existing_migration_extras) != len(new_migration_extras)) or (
+            any(
+                normalized_new_migration_extras.get(key)
+                != normalized_existing_migration_extras.get(key)
+                for key in new_migration_extras
+            )
+        ):
+            log.info(f'{log_name} Migration extras changed...')
+            log.info(
+                f'{log_name} Existing migration extras: {json.dumps(existing_migration_extras, indent=2)}'
+            )
+            log.info(f'{log_name} New migration extras: {json.dumps(new_migration_extras, indent=2)}')
+            updated_dataset['migration_extras'] = new_migration_extras
         else:
-            log.info(f'{log_name} No extras changes')
+            log.info(f'{log_name} No migration extras changes')
 
         existing_resources = dataset.get('resources', [])
         new_resources = data_dict.get('resources', [])
@@ -659,9 +676,11 @@ def prepare_dataset(
         else get_value('data_download_link')
     )
 
-    extras = [
-        {'key': p[0], 'value': normalize_value(p[1])} for p in set(get_paths(data_dict))
-    ]
+    extras = dataset.get('extras', [])
+
+    migration_extras = {
+        p[0]: normalize_value(p[1]) for p in set(get_paths(data_dict))
+    }
 
     required_dataset_values = {
         'name': name,
@@ -674,9 +693,18 @@ def prepare_dataset(
         'visibility_type': 'public',
     }
 
+    html_notes = markdown.markdown(description) if description else ''
+    short_description = ''
+
+    if html_notes:
+        tree = ET.fromstring(f'<root>{html_notes}</root>')
+        short_description = ''.join(tree.itertext())
+
     dataset_values = {
         'title': title,
-        'notes': markdown.markdown(description) if description else '',
+        'notes': html_notes,
+        'short_description': short_description,
+        'migration_extras': migration_extras,
         'extras': extras,
         'cautions': markdown.markdown(cautions) if cautions else '',
         'language': language,
