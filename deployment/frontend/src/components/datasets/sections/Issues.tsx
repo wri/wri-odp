@@ -173,22 +173,6 @@ function IssueCard({
         onError: (error) => setErrorMessage(error.message),
     })
 
-    const deleteIssueApi = api.dataset.deleteIssue.useMutation({
-        onSuccess: async (data) => {
-            await utils.dataset.getDatasetIssues.invalidate({
-                id: datasetName,
-            })
-            await utils.dataset.getPendingDatasets.invalidate({
-                search: '',
-                page: { start: 0, rows: 10 },
-                sortBy: 'metadata_modified desc',
-            })
-            setOpenDelete(false)
-            notify(`Issue #${data} successfully deleted`, 'error')
-        },
-        onError: (error) => setErrorMessage(error.message),
-    })
-
     const OnSubmit = (data: CommentIssueType) => {
         if (!isOpenClose && !isOpenDelete) {
             setIsubmiting(true)
