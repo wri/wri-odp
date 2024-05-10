@@ -8,111 +8,54 @@ import SubtopicCard from '../topics/SubtopicCard'
 import Image from 'next/image'
 import { AutoCarousel } from '../_shared/AutoCarousel'
 import Link from 'next/link'
+import { api } from '@/utils/api'
+import { ErrorAlert } from '../_shared/Alerts'
+import Spinner from '../_shared/Spinner'
+import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 
-const topics = [
-    {
-        title: 'Subtopic 1',
-        numOfDatasets: 163,
-        img: '/images/topics/2.png',
-    },
-    {
-        title: 'Subtopic 2',
-        numOfDatasets: 163,
-        img: '/images/topics/3.png',
-    },
-    {
-        title: 'Subtopic 3',
-        numOfDatasets: 163,
-        img: '/images/topics/4.png',
-    },
-    {
-        title: 'Subtopic 4',
-        numOfDatasets: 163,
-        img: '/images/topics/5.png',
-    },
-    {
-        title: 'Subtopic 5',
-        numOfDatasets: 163,
-        img: '/images/topics/6.png',
-    },
-    {
-        title: 'Subtopic 6',
-        numOfDatasets: 163,
-        img: '/images/topics/7.png',
-    },
-    {
-        title: 'Subtopic 7',
-        numOfDatasets: 163,
-        img: '/images/topics/2.png',
-    },
-    {
-        title: 'Subtopic 8',
-        numOfDatasets: 163,
-        img: '/images/topics/3.png',
-    },
-    {
-        title: 'Subtopic 9',
-        numOfDatasets: 163,
-        img: '/images/topics/4.png',
-    },
-    {
-        title: 'Subtopic 8',
-        numOfDatasets: 163,
-        img: '/images/topics/3.png',
-    },
-    {
-        title: 'Subtopic 9',
-        numOfDatasets: 163,
-        img: '/images/topics/4.png',
-    },
-    {
-        title: 'Subtopic 8',
-        numOfDatasets: 163,
-        img: '/images/topics/3.png',
-    },
-    {
-        title: 'Subtopic 9',
-        numOfDatasets: 163,
-        img: '/images/topics/4.png',
-    },
-    {
-        title: 'Subtopic 8',
-        numOfDatasets: 163,
-        img: '/images/topics/3.png',
-    },
-    {
-        title: 'Subtopic 9',
-        numOfDatasets: 163,
-        img: '/images/topics/4.png',
-    },
-]
-
-export interface TopicProps {
-    title: string
-    numOfDatasets: number
-    img: string
-}
-
-function TopicCard({ topic }: { topic: TopicProps }) {
+function TopicCard({
+    topic,
+    topicDetails,
+}: {
+    topic: GroupTree
+    topicDetails: Record<string, GroupsmDetails>
+}) {
+    const datasetCount = topicDetails[topic.id]?.package_count
     return (
         <Link
-            href="/topics/x"
-            className="flex w-full flex-col gap-1 pr-4 font-acumin"
+            href={`/topics/${topic.name}`}
+            className="flex w-full flex-col gap-1 font-acumin shadow-wri pb-6"
         >
-            <div className="relative aspect-square h-72 w-full">
-                <Image src={`${topic.img}`} alt="higlight" fill sizes="288px" />
+            <div className="relative aspect-square h-72 w-full bg-white">
+                <Image
+                    src={`${
+                        topicDetails[topic.id]?.img_url
+                            ? topicDetails[topic.id]?.img_url
+                            : '/images/placeholders/topics/topicsdefault.png'
+                    }`}
+                    alt={`Topic - ${topic.title}`}
+                    fill
+                    className="object-contain"
+                />
             </div>
-            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black">
-                Topic 1
+            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pl-4 ">
+                {topic.title}
             </p>
-            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700">
-                163 Datasets
+            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700 pl-4  ">
+                {datasetCount && datasetCount > 1
+                    ? `${datasetCount} datasets`
+                    : `${datasetCount} dataset`}
             </p>
         </Link>
     )
 }
 
 export function TopicsCarousel() {
+    const { data, isLoading, error } = api.topics.getGeneralTopics.useQuery({
+        search: '',
+        page: { start: 0, rows: 50 },
+        allTree: true,
+    })
     return (
         <div className="relative">
             <div className="peer">
@@ -121,9 +64,27 @@ export function TopicsCarousel() {
                     prevButton={<PrevButton />}
                     nextButton={<NextButton />}
                 >
-                    {topics.map((topic, index) => (
+                    {error && (
+                        <ErrorAlert
+                            title="Error loading topics"
+                            text={error.message}
+                        />
+                    )}
+
+                    {isLoading && (
+                        <div className="w-full flex justify-center">
+                            <Spinner />
+                        </div>
+                    )}
+
+                    {data?.topics.map((topic, index) => (
                         <SwiperSlide key={index} className="">
-                            <TopicCard topic={topic} />
+                            <div className=" w-80 pr-6">
+                                <TopicCard
+                                    topic={topic}
+                                    topicDetails={data.topicDetails}
+                                />
+                            </div>
                         </SwiperSlide>
                     ))}
                 </AutoCarousel>
