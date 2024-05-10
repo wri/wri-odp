@@ -1,0 +1,22 @@
+{% ckan_extends %}
+
+{% block form_actions %}
+<div class="form-actions" style="border-top: none;">
+    
+    {% if can_edit_issue %}
+        {% if issue.status == 'open' %}
+        <button class="btn btn-default" type="submit" name="close" tabindex="3">
+            {{ _('Close') }}
+        </button>
+        {% else %}
+        <button class="btn btn-default" type="submit" name="reopen" tabindex="3">
+            {{ _('Re-open') }}
+        </button>
+    {% endif %}
+    {% endif %}
+    <button class="btn btn-success" type="submit" name="save"
+    tabindex="2">
+    {{ _('Comment') }}
+    </button>
+</div>
+{% endblock %}
