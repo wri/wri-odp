@@ -24,7 +24,7 @@ function TopicCard({
     return (
         <Link
             href={`/topics/${topic.name}`}
-            className="flex w-full flex-col gap-1 pr-4 font-acumin "
+            className="flex w-full flex-col gap-1 font-acumin shadow-wri pb-6"
         >
             <div className="relative aspect-square h-72 w-full bg-white">
                 <Image
@@ -38,10 +38,10 @@ function TopicCard({
                     className="object-contain"
                 />
             </div>
-            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black">
+            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pl-4 ">
                 {topic.title}
             </p>
-            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700">
+            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700 pl-4  ">
                 {datasetCount && datasetCount > 1
                     ? `${datasetCount} datasets`
                     : `${datasetCount} dataset`}
@@ -79,10 +79,12 @@ export function TopicsCarousel() {
 
                     {data?.topics.map((topic, index) => (
                         <SwiperSlide key={index} className="">
-                            <TopicCard
-                                topic={topic}
-                                topicDetails={data.topicDetails}
-                            />
+                            <div className=" w-80 pr-6">
+                                <TopicCard
+                                    topic={topic}
+                                    topicDetails={data.topicDetails}
+                                />
+                            </div>
                         </SwiperSlide>
                     ))}
                 </AutoCarousel>
