@@ -52,11 +52,6 @@ export default function Header() {
             href: '/topics',
             active: false,
         },
-        {
-            title: 'About',
-            href: '/about',
-            active: false,
-        },
     ]
 
     navigation.forEach((item) => {

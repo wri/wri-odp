@@ -242,7 +242,7 @@ export function EditDataFile({
                                                             : undefined
                                                     }
                                                 >
-                                                    Views
+                                                    Add and View Charts
                                                 </div>
                                             )}
                                         </Tab>
