@@ -50,7 +50,7 @@ describe("Login modal", () => {
 
     cy.get("#forgot-password-button").click();
 
-    cy.get('input[name="email"]').type("datopian@gmail.com");
+    cy.get('input[name="email"]').first().type("datopian@gmail.com");
 
     cy.get("#request-reset-button").click();
 
