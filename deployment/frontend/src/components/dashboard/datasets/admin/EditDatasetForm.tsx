@@ -36,6 +36,7 @@ import { Collaborators } from './metadata/Collaborators'
 import { LocationForm } from './metadata/LocationForm'
 import { EditRwSection } from './datafiles/EditRwSection'
 import { VersioningForm } from './metadata/VersioningForm'
+import { ErrorMessage } from '@hookform/error-message'
 
 function getDiff<T>(dirtyObject: T, changedFields: string[]) {
     for (const key in dirtyObject) {
@@ -208,6 +209,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     : undefined,
         },
     })
+    console.log('ERRORS', formObj.formState.errors)
 
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
@@ -331,6 +333,43 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 {errorMessage && (
                     <div className="py-4">
                         <ErrorAlert text={errorMessage} />
+                    </div>
+                )}
+                {Object.keys(formObj.formState.errors).length > 0 && (
+                    <div className="py-4">
+                        <ErrorAlert
+                            text={
+                                <div>
+                                    The following fields have invalid information
+                                    <ul>
+                                        {Object.entries(
+                                            formObj.formState.errors
+                                        ).map(([key, _value]) => {
+                                            return (
+                                                <li key={key}>
+                                                    {key}:{' '}
+                                                    <ErrorMessage
+                                                        errors={
+                                                            formObj.formState
+                                                                .errors
+                                                        }
+                                                        render={({
+                                                            message,
+                                                        }) => (
+                                                            <>
+                                                                {message ??
+                                                                    ((_value as any).value.message)}
+                                                            </>
+                                                        )}
+                                                        name={key}
+                                                    />
+                                                </li>
+                                            )
+                                        })}
+                                    </ul>
+                                </div>
+                            }
+                        />
                     </div>
                 )}
             </div>
