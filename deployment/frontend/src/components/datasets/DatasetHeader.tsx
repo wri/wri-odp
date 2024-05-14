@@ -47,6 +47,7 @@ import { match } from 'ts-pattern'
 import Image from 'next/image'
 import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover'
 import { env } from '@/env.mjs'
+import { useRouter } from 'next/router'
 
 function OpenInButton({
     open_in,
@@ -293,6 +294,8 @@ export function DatasetHeader({
     datasetAuth?: boolean
     is_approved?: boolean
 }) {
+    const router = useRouter()
+
     const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
         useToggleLayergroups()
     const { activeCharts, addCharts, removeCharts } = useActiveCharts()
@@ -402,12 +405,11 @@ export function DatasetHeader({
         <div className="flex w-full flex-col pb-10 font-acumin">
             {!session.data?.user ? (
                 <div className="my-4 flex items-center gap-x-3 px-4 sm:px-6">
-                    <Link href="/search">
-                        <Button variant="outline">
-                            <ChevronLeftIcon className="mb-1 h-5 w-5" />
-                            Go back
-                        </Button>
-                    </Link>
+                    <Button variant="outline" onClick={() => router.back()}>
+                        <ChevronLeftIcon className="mb-1 h-5 w-5" />
+                        Go back
+                    </Button>
+
                     <OpenInButton
                         open_in={dataset?.open_in ?? []}
                         highlighted={highlighted('open_in')}
@@ -416,13 +418,15 @@ export function DatasetHeader({
             ) : (
                 <div className="mb-4 flex justify-between gap-x-3 bg-white shadow sm:px-6 px-4 pb-4 sm:pr-12">
                     <div className="flex items-center gap-x-3">
-                        <Link
+                        <Button
+                            variant="outline"
                             className="flex gap-x-2 items-center text-center text-stone-900 text-base font-bold font-acumin"
-                            href="/search"
+                            onClick={() => router.back()}
                         >
                             <ChevronLeftIcon className="mb-1 h-5 w-5" />
                             Go back
-                        </Link>
+                        </Button>
+
                         <OpenInButton
                             open_in={dataset?.open_in ?? []}
                             highlighted={highlighted('open_in')}
