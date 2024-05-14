@@ -106,6 +106,7 @@ export default function SearchPage(
             let keyFq
 
             const keyFilters = filters.filter((f) => f.key == key)
+
             if ((key as string) == 'temporal_coverage_start') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageStart = keyFilters[0]
@@ -115,9 +116,9 @@ export default function SearchPage(
 
                     keyFq = `[${temporalCoverageStart?.value} TO *]`
 
-                    if (temporalCoverageEnd) {
-                        keyFq = `[* TO ${temporalCoverageEnd}]`
-                    }
+                    // if (temporalCoverageEnd) {
+                    //     keyFq = `[* TO ${temporalCoverageEnd}]`
+                    // }
                 }
             } else if ((key as string) == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
@@ -128,9 +129,9 @@ export default function SearchPage(
 
                     keyFq = `[* TO ${temporalCoverageEnd?.value}]`
 
-                    if (temporalCoverageStart) {
-                        keyFq = `[${temporalCoverageStart} TO *]`
-                    }
+                    // if (temporalCoverageStart) {
+                    //     keyFq = `[${temporalCoverageStart} TO *]`
+                    // }
                 }
             } else if (
                 key === 'metadata_modified_since' ||
@@ -190,8 +191,10 @@ export default function SearchPage(
                 extLocationQ,
                 extAddressQ,
                 extGlobalQ:
-                    filters.find((e) => e?.key == 'extGlobalQ')?.value as 'only' | 'exclude' | 'include' ??
-                    'include',
+                    (filters.find((e) => e?.key == 'extGlobalQ')?.value as
+                        | 'only'
+                        | 'exclude'
+                        | 'include') ?? 'include',
             }
         })
     }, [filters])
