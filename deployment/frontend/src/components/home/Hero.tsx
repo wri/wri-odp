@@ -31,8 +31,13 @@ export function Hero() {
     const router = useRouter()
     const navigation = [
         {
-            title: 'Search',
+            title: 'Explore',
             href: '/search',
+            active: false,
+        },
+        {
+            title: 'Search',
+            href: '/search_advanced',
             active: false,
         },
         {
