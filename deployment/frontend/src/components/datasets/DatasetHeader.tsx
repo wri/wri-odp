@@ -52,13 +52,84 @@ import { useRouter } from 'next/router'
 function OpenInButton({
     open_in,
     highlighted = '',
+    rw_id,
 }: {
     open_in: OpenIn[]
     highlighted?: string
+    rw_id?: string
 }) {
     const session = useSession()
+
+    const { data } = useQuery([rw_id], async () => {
+        const datasetRes = await fetch(
+            `https://api.resourcewatch.org/v1/dataset/${rw_id}`
+        )
+        const dataset: RwDatasetResp = await datasetRes.json()
+        if (isRwError(dataset)) throw new Error(dataset.errors[0].detail)
+        return dataset.data.attributes
+    })
+    if (data) {
+        switch (data.provider) {
+            case 'cartodb':
+                open_in = [
+                    ...open_in,
+                    {
+                        title: 'Carto',
+                        url: data.connectorUrl,
+                    },
+                ]
+                break
+            case 'featureservice':
+                open_in = [
+                    ...open_in,
+                    {
+                        title: 'ArcGIS',
+                        url: data.connectorUrl,
+                    },
+                ]
+                break
+            case 'gfw':
+                open_in = [
+                    ...open_in,
+                    {
+                        title: 'GFW',
+                        url: data.connectorUrl,
+                    },
+                ]
+                break
+            case 'gee':
+                open_in = [
+                    ...open_in,
+                    {
+                        title: 'GEE',
+                        url: `https://developers.google.com/earth-engine/datasets/catalog/${data.tableName.replaceAll(
+                            '/',
+                            '_'
+                        )}`,
+                    },
+                ]
+                break
+            default:
+                open_in = [
+                    ...open_in,
+                    ...data.sources.map((source, i) => {
+                        if (data.sources.length === 1) {
+                            return {
+                                title: data.provider.toUpperCase(),
+                                url: source,
+                            }
+                        }
+                        return {
+                            title: `Source ${i + 1}`,
+                            url: source,
+                        }
+                    }),
+                ]
+        }
+    }
+
     if (open_in.length === 0) return <></>
-    if (open_in.length === 1 && !session.data?.user) {
+    if (open_in.length === 0 && !session.data?.user) {
         return (
             <a
                 href={open_in[0]?.url}
@@ -73,7 +144,7 @@ function OpenInButton({
             </a>
         )
     }
-    if (open_in.length === 1 && session.data?.user) {
+    if (open_in.length === 0 && session.data?.user) {
         return (
             <a
                 href={open_in[0]?.url}
@@ -413,6 +484,7 @@ export function DatasetHeader({
                     <OpenInButton
                         open_in={dataset?.open_in ?? []}
                         highlighted={highlighted('open_in')}
+                        rw_id={dataset.rw_id}
                     />
                 </div>
             ) : (
@@ -430,6 +502,7 @@ export function DatasetHeader({
                         <OpenInButton
                             open_in={dataset?.open_in ?? []}
                             highlighted={highlighted('open_in')}
+                            rw_id={dataset.rw_id}
                         />
                     </div>
                     <div className="flex items-center gap-x-2">
@@ -966,11 +1039,11 @@ export function DatasetHeader({
                             </div>
                         )}
                 </div>
-                {dataset?.rw_id && (
+                {/* {dataset?.rw_id && (
                     <div>
                         <ExternalService rw_id={dataset.rw_id} />
                     </div>
-                )}
+                )} */}
             </div>
         </div>
     )
