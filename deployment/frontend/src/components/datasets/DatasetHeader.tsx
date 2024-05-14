@@ -2,6 +2,7 @@ import {
     ArrowUpRightIcon,
     ChevronLeftIcon,
     ExclamationTriangleIcon,
+    ExclamationCircleIcon,
     InformationCircleIcon,
 } from '@heroicons/react/20/solid'
 import { Button } from '../_shared/Button'
@@ -862,7 +863,7 @@ export function DatasetHeader({
                 </div>
                 {dataset?.cautions && (
                     <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-x-3 rounded-sm bg-cyan-700 bg-opacity-10 p-3">
-                        <ExclamationTriangleIcon className="col-span-1 grow max-h-8 max-w-8 text-yellow-600 sm:h-12 sm:w-12" />
+                        <ExclamationCircleIcon className="col-span-1 grow max-h-8 max-w-8 text-black sm:h-12 sm:w-12" />
                         <div className="col-span-11">
                             <span
                                 className={`font-acumin text-sm font-semibold leading-none text-black ${highlighted(
