@@ -335,12 +335,12 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         <ErrorAlert text={errorMessage} />
                     </div>
                 )}
-                {formObj.formState.errors && (
+                {Object.keys(formObj.formState.errors).length > 0 && (
                     <div className="py-4">
                         <ErrorAlert
                             text={
                                 <div>
-                                    The following fields had invalid information
+                                    The following fields have invalid information
                                     <ul>
                                         {Object.entries(
                                             formObj.formState.errors

@@ -31,6 +31,7 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { VersioningForm } from './metadata/VersioningForm'
+import { ErrorMessage } from '@hookform/error-message'
 
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -168,6 +169,43 @@ export default function CreateDatasetForm() {
                 {errorMessage && (
                     <div className="py-4">
                         <ErrorAlert text={errorMessage} />
+                    </div>
+                )}
+                {Object.keys(formObj.formState.errors).length > 0 && (
+                    <div className="py-4">
+                        <ErrorAlert
+                            text={
+                                <div>
+                                    The following fields have invalid information
+                                    <ul>
+                                        {Object.entries(
+                                            formObj.formState.errors
+                                        ).map(([key, _value]) => {
+                                            return (
+                                                <li key={key}>
+                                                    {key}:{' '}
+                                                    <ErrorMessage
+                                                        errors={
+                                                            formObj.formState
+                                                                .errors
+                                                        }
+                                                        render={({
+                                                            message,
+                                                        }) => (
+                                                            <>
+                                                                {message ??
+                                                                    ((_value as any).value.message)}
+                                                            </>
+                                                        )}
+                                                        name={key}
+                                                    />
+                                                </li>
+                                            )
+                                        })}
+                                    </ul>
+                                </div>
+                            }
+                        />
                     </div>
                 )}
             </div>
