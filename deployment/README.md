@@ -30,4 +30,4 @@ The CI/CD pipeline has two jobs defined in [main.yml](../.github/workflows/main.
 - **Deploy To AWS**
   - Once the "Build and Scan Image with Integration Tests" job passes, the deployment process is initiated.
   - We log into AWS and ECR using OIDC roles and configure kubeconfig.
-  - Then, we deploy using Helm upgrade, which utilizes the `values.yaml` generated from `values.yaml.develop.template` after substituting the variable values.
+  - Then, we deploy using Helm upgrade, which utilizes the `values.yaml` generated from `values.yaml.prod.template` after substituting the variable values.
