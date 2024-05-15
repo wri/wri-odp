@@ -16,6 +16,7 @@ import TemporalCoverageFacet from './TemporalCoverageFacet'
 import MetadataModifiedFacet from './MetadataModifiedFacet'
 import Spinner from '../_shared/Spinner'
 import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants'
+import Tags from './Tag'
 
 export default function FilteredSearchLayout({
     children,
@@ -23,12 +24,16 @@ export default function FilteredSearchLayout({
     filters,
     facetSelectedCount,
     setFacetSelectedCount,
+    value,
+    setValue,
 }: {
     children: React.ReactNode
     setFilters: Dispatch<SetStateAction<Filter[]>>
     filters: Filter[]
     facetSelectedCount: Record<string, number>
     setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>
+    value: string[]
+    setValue: Dispatch<SetStateAction<string[]>>
 }) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -218,6 +223,60 @@ export default function FilteredSearchLayout({
                                                                                 setFilters
                                                                             }
                                                                         />
+                                                                    ) : ff.key ===
+                                                                      'tags' ? (
+                                                                        <Tags
+                                                                            value={
+                                                                                value
+                                                                            }
+                                                                            setValue={
+                                                                                setValue
+                                                                            }
+                                                                            facetSelectedCount={
+                                                                                facetSelectedCount
+                                                                            }
+                                                                            setFacetSelectedCount={
+                                                                                setFacetSelectedCount
+                                                                            }
+                                                                            options={
+                                                                                searchFacets &&
+                                                                                searchFacets[
+                                                                                    ff
+                                                                                        .key
+                                                                                ]
+                                                                                    ? searchFacets[
+                                                                                          ff
+                                                                                              .key
+                                                                                      ]?.items
+                                                                                          .filter(
+                                                                                              (
+                                                                                                  o
+                                                                                              ) =>
+                                                                                                  o.name
+                                                                                          )
+                                                                                          .map(
+                                                                                              (
+                                                                                                  o
+                                                                                              ) => ({
+                                                                                                  label:
+                                                                                                      o.display_name ??
+                                                                                                      o.name,
+                                                                                                  value: o.name,
+                                                                                              })
+                                                                                          ) ||
+                                                                                      []
+                                                                                    : []
+                                                                            }
+                                                                            fqKey={
+                                                                                ff.key
+                                                                            }
+                                                                            setFilters={
+                                                                                setFilters
+                                                                            }
+                                                                            filters={
+                                                                                filters
+                                                                            }
+                                                                        />
                                                                     ) : (
                                                                         <Facet
                                                                             text={
@@ -351,6 +410,60 @@ export default function FilteredSearchLayout({
                                                                     }
                                                                     setFilters={
                                                                         setFilters
+                                                                    }
+                                                                />
+                                                            ) : ff.key ===
+                                                              'tags' ? (
+                                                                <Tags
+                                                                    value={
+                                                                        value
+                                                                    }
+                                                                    setValue={
+                                                                        setValue
+                                                                    }
+                                                                    facetSelectedCount={
+                                                                        facetSelectedCount
+                                                                    }
+                                                                    setFacetSelectedCount={
+                                                                        setFacetSelectedCount
+                                                                    }
+                                                                    options={
+                                                                        searchFacets &&
+                                                                        searchFacets[
+                                                                            ff
+                                                                                .key
+                                                                        ]
+                                                                            ? searchFacets[
+                                                                                  ff
+                                                                                      .key
+                                                                              ]?.items
+                                                                                  .filter(
+                                                                                      (
+                                                                                          o
+                                                                                      ) =>
+                                                                                          o.name
+                                                                                  )
+                                                                                  .map(
+                                                                                      (
+                                                                                          o
+                                                                                      ) => ({
+                                                                                          label:
+                                                                                              o.display_name ??
+                                                                                              o.name,
+                                                                                          value: o.name,
+                                                                                      })
+                                                                                  ) ||
+                                                                              []
+                                                                            : []
+                                                                    }
+                                                                    fqKey={
+                                                                        ff.key
+                                                                    }
+                                                                    setFilters={
+                                                                        setFilters
+                                                                    }
+                                                                    filters={
+                                                                        filters
                                                                     }
                                                                 />
                                                             ) : (

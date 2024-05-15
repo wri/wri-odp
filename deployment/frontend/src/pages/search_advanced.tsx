@@ -22,8 +22,18 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerAuthSession } from '@/server/auth'
 import { advance_search_query } from '@/utils/apiUtils'
 
+interface Option {
+    value: string
+    label: string
+}
+
 function filterCount(key: string, filters: Filter[]): number {
     return filters.filter((f) => f.key === key).length
+}
+
+function defaultSelectedTagOptions(filters: Filter[]): string[] {
+    const f = filters.filter((f) => f.key === 'tags').map((f) => f.label)
+    return f
 }
 
 export async function getServerSideProps(
@@ -104,6 +114,9 @@ export default function SearchPage(
         wri_data: filterCount('wri_data', filters) || 0,
         visibility_type: filterCount('visibility_type', filters) || 0,
     })
+    const [value, setValue] = useState<string[]>(
+        defaultSelectedTagOptions(filters) || []
+    )
 
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
 
@@ -263,6 +276,8 @@ export default function SearchPage(
                     filters={filters}
                     facetSelectedCount={facetSelectedCount}
                     setFacetSelectedCount={setFacetSelectedCount}
+                    value={value}
+                    setValue={setValue}
                 >
                     <SortBy
                         count={data?.count ?? 0}
@@ -273,6 +288,7 @@ export default function SearchPage(
                         filters={filters}
                         setFilters={setFilters}
                         setFacetSelectedCount={setFacetSelectedCount}
+                        setValue={setValue}
                     />
                     <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
                         {data?.datasets.map((dataset, number) => (

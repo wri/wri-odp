@@ -6,10 +6,12 @@ export default function FiltersSelected({
     filters,
     setFilters,
     setFacetSelectedCount,
+    setValue,
 }: {
     filters: Filter[]
     setFilters: Dispatch<SetStateAction<Filter[]>>
     setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>
+    setValue: Dispatch<SetStateAction<string[]>>
 }) {
     return (
         <div className="flex flex-col lg:flex-row gap-y-4 lg:items-center justify-between">
@@ -37,6 +39,12 @@ export default function FiltersSelected({
                                     const newFacetSelectedCount = { ...prev }
                                     newFacetSelectedCount[f.key] -= 1
                                     return newFacetSelectedCount
+                                })
+
+                                setValue((prev) => {
+                                    return prev.filter(
+                                        (value) => value !== f.label
+                                    )
                                 })
                             }}
                         >
