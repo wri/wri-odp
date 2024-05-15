@@ -115,7 +115,7 @@ export default function TeamsPage(
                         out to the point of contact in the dataset or to{' '}
                         <a
                             href="mailto:test@gmail.com"
-                            className="text-blue-500"
+                            className="text-blue-700"
                         >
                             {' '}
                             [add email here]
