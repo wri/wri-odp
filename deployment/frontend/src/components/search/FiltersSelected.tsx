@@ -10,8 +10,8 @@ export default function FiltersSelected({
 }: {
     filters: Filter[]
     setFilters: Dispatch<SetStateAction<Filter[]>>
-    setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>
-    setValue: Dispatch<SetStateAction<string[]>>
+    setFacetSelectedCount?: Dispatch<SetStateAction<Record<string, number>>>
+    setValue?: Dispatch<SetStateAction<string[]>>
 }) {
     return (
         <div className="flex flex-col lg:flex-row gap-y-4 lg:items-center justify-between">
@@ -35,17 +35,22 @@ export default function FiltersSelected({
                                     )
                                     return newFilters
                                 })
-                                setFacetSelectedCount((prev) => {
-                                    const newFacetSelectedCount = { ...prev }
-                                    newFacetSelectedCount[f.key] -= 1
-                                    return newFacetSelectedCount
-                                })
+                                if (setFacetSelectedCount)
+                                    setFacetSelectedCount((prev) => {
+                                        const newFacetSelectedCount = {
+                                            ...prev,
+                                        }
+                                        //@ts-ignore
+                                        newFacetSelectedCount[f.key] -= 1
+                                        return newFacetSelectedCount
+                                    })
 
-                                setValue((prev) => {
-                                    return prev.filter(
-                                        (value) => value !== f.label
-                                    )
-                                })
+                                if (setValue)
+                                    setValue((prev) => {
+                                        return prev.filter(
+                                            (value) => value !== f.label
+                                        )
+                                    })
                             }}
                         >
                             <XCircleIcon className="h-4 w-4 text-red-600 cursor-pointer" />
