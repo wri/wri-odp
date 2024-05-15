@@ -90,6 +90,17 @@ export default function SearchPage(
             />
             <Header />
             <RedirectedSearchInput />
+            <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
+                <div className="max-w-[705px] ml-2 2xl:ml-2">
+                    <div className="default-home-container w-full border-t-[4px] border-stone-900" />
+                    <h3 className="pt-1 font-acumin text-2xl font-bold font-acumin text-xl font-light leading-loose text-neutral-700 ">
+                        Explore our data catalog by searching the keywords
+                        relevant to the topics of your interest. Use the
+                        Advanced Search option to filter results by topic,
+                        format, language and more.
+                    </h3>
+                </div>
+            </section>
             <Highlights />
             {isLoadingRecentlyAdded ? (
                 <div className="w-full flex justify-center items-center h-10">
