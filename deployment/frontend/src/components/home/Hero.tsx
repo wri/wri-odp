@@ -214,6 +214,7 @@ export function Hero() {
                             <a
                                 href="https://www.wri.org/data/open-data-commitment"
                                 className=" text-blue-500 underline"
+                                target="_blank"
                             >
                                 {' '}
                                 open by default
@@ -222,6 +223,7 @@ export function Hero() {
                             <a
                                 href="https://www.wri.org/research/excellence"
                                 className=" text-blue-500 underline"
+                                target="_blank"
                             >
                                 research excellence.
                             </a>
