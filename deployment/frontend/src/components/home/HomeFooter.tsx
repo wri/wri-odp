@@ -18,7 +18,7 @@ export function HomeFooter() {
                             options
                         </h5>
                     </div>
-                    <Link href="/advanced_search">
+                    <Link href="/search_advanced">
                         <Button className="mt-10 md:mt-0">Advanced Search</Button>
                     </Link>
                 </div>
