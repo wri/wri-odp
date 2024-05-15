@@ -118,10 +118,10 @@ export default function Home(
                                 to
                                 <a
                                     href="mailto:test@gmail.com"
-                                    className="text-primary-500"
+                                    className="text-blue-500"
                                 >
                                     {' '}
-                                    add email here
+                                    [add email here]
                                 </a>
                             </li>
                             <li>
