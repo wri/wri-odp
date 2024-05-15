@@ -1,8 +1,13 @@
 ## Directory Structure
 
-The `ckan-deployment` directory contains:
+The `datapusher` directory contains:
+- Dockerfile for building the datapusher container that run the prefect jobs for the datapusher.
+- All the prefect tasks and config files.
+
+The `deployment` directory contains:
 
 - The `ckan` directory that houses the `Dockerfile` and the setup files needed for building the CKAN image.
+- The `frontend` directory that houses the `Dockerfile` and the setup files needed for building the Frontend image.
 - The `helm-templates` directory that contains all the charts and templates required for deployment.
   - All the variables are set in `values.yaml.template`, while the secrets are stored in the secret repository.
 
