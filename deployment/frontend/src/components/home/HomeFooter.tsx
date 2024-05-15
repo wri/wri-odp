@@ -19,7 +19,7 @@ export function HomeFooter() {
                         </h5>
                     </div>
                     <Link href="/advanced_search">
-                        <Button className="mt-10 md:mt-0">Read More</Button>
+                        <Button className="mt-10 md:mt-0">Advanced Search</Button>
                     </Link>
                 </div>
             </section>
