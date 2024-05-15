@@ -5,17 +5,18 @@ from ckan.logic.auth.create import _check_group_auth
 from ckan.common import _
 import ckan.logic.auth as logic_auth
 
+
 @tk.auth_allow_anonymous_access
-def package_update(context: Context, data_dict: DataDict) -> AuthResult:
-    model = context['model']
-    user = context.get('user')
+def _package_update(context: Context, data_dict: DataDict) -> AuthResult:
+    model = context["model"]
+    user = context.get("user")
 
     package = logic_auth.get_package_object(context, data_dict)
     if package.owner_org:
         # if there is an owner org then we must have update_dataset
         # permission for that organization
         check1 = authz.has_user_permission_for_group_or_org(
-            package.owner_org, user, 'update_dataset'
+            package.owner_org, user, "update_dataset"
         )
     else:
         check1 = False
@@ -35,27 +36,99 @@ def package_update(context: Context, data_dict: DataDict) -> AuthResult:
 
     if not check1:
         success = False
-        if authz.check_config_permission('allow_dataset_collaborators'):
+        if authz.check_config_permission("allow_dataset_collaborators"):
             # if org-level auth failed, check dataset-level auth
             # (ie if user is a collaborator)
             user_obj = model.User.get(user)
             if user_obj:
                 if user_obj.id == package.creator_user_id:
-                    return {'success': True}
+                    return {"success": True}
                 success = authz.user_is_collaborator_on_dataset(
-                    user_obj.id, package.id, ['admin', 'editor'])
+                    user_obj.id, package.id, ["admin", "editor"]
+                )
         if not success:
-            return {'success': False,
-                    'msg': _('User %s not authorized to edit package %s') %
-                            (str(user), package.id)}
+            return {
+                "success": False,
+                "msg": _("User %s not authorized to edit package %s")
+                % (str(user), package.id),
+            }
     else:
         check2 = _check_group_auth(context, data_dict)
         if not check2:
-            return {'success': False,
-                    'msg': _('User %s not authorized to edit these groups') %
-                            (str(user))}
+            return {
+                "success": False,
+                "msg": _("User %s not authorized to edit these groups") % (str(user)),
+            }
 
-    return {'success': True}
+    return {"success": True}
+
+
+@tk.chained_auth_function
+def package_create(up_func, context, data_dict):
+    """
+    Only allow the creation of packages if the approval status is set as pending and the is_approved flag is false
+    """
+    if data_dict and data_dict.get("visibility_type") != "private":
+        if (
+            data_dict.get("approval_status") != "pending"
+            or (data_dict.get("is_approved") != False and data_dict.get("is_approved") is not None)
+        ):
+            print(data_dict, flush=True)
+            return {
+                "success": False,
+                "msg": _(
+                    "User %s not authorized to create public packages without going thru the approval process"
+                )
+                % (str(context["user"])),
+            }
+    return up_func(context, data_dict)
+
+
+@tk.chained_auth_function
+def package_update(up_func, context, data_dict):
+    """
+    Only allow the updating directly of packages if the user is an admin in the org or in the package
+    """
+    user = context.get("user")
+    model = context["model"]
+    user_obj = model.User.get(user)
+    package = logic_auth.get_package_object(context, data_dict)
+    if data_dict and data_dict.get("visibility_type") != "private":
+        print("GOT HERE", flush=True)
+        print(data_dict, flush=True)
+        print(package, flush=True)
+        if package.owner_org:
+            # if there is an owner org then we must have update_dataset
+            # permission for that organization
+            if authz.users_role_for_group_or_org(package.owner_org, user) != "admin":
+                return {
+                    "success": False,
+                    "msg": _("User %s not authorized to edit package %s")
+                    % (str(user), package.id),
+                }
+        else:
+            if authz.check_config_permission("allow_dataset_collaborators"):
+                print("GOT HERE 2", flush=True)
+                # if org-level auth failed, check dataset-level auth
+                # (ie if user is a collaborator)
+                if user_obj:
+                    if user_obj.id == package.creator_user_id:
+                        print("CREATOR ID")
+                        return {"success": True}
+                    if (
+                        authz.user_is_collaborator_on_dataset(
+                            user_obj.id, package.id, ["admin"]
+                        ) == False
+                    ):
+                        return {
+                            "success": False,
+                            "msg": _("User %s not authorized to edit package %s")
+                            % (str(user), package.id),
+                        }
+    print("GOT HERE 3", flush=True)
+    print(authz.user_is_collaborator_on_dataset(user_obj.id, package.id, ['admin']), flush=True)
+    return _package_update(context, data_dict)
+
 
 @tk.auth_allow_anonymous_access
 def notification_get_all(context: Context, data_dict: DataDict) -> AuthResult:
@@ -85,6 +158,7 @@ def pending_dataset_show(context: Context, data_dict: DataDict) -> AuthResult:
             "success": False,
             "msg": tk._("Unauthorized to access pending dataset."),
         }
+
 
 def pending_dataset_update(context: Context, data_dict: DataDict) -> AuthResult:
     return tk.check_access("package_update", context, data_dict)
