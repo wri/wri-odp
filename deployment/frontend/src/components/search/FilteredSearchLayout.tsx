@@ -21,10 +21,14 @@ export default function FilteredSearchLayout({
     children,
     setFilters,
     filters,
+    facetSelectedCount,
+    setFacetSelectedCount,
 }: {
     children: React.ReactNode
     setFilters: Dispatch<SetStateAction<Filter[]>>
     filters: Filter[]
+    facetSelectedCount: Record<string, number>
+    setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>
 }) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -222,6 +226,12 @@ export default function FilteredSearchLayout({
                                                                             key={
                                                                                 ff.key
                                                                             }
+                                                                            facetSelectedCount={
+                                                                                facetSelectedCount
+                                                                            }
+                                                                            setFacetSelectedCount={
+                                                                                setFacetSelectedCount
+                                                                            }
                                                                             options={
                                                                                 searchFacets &&
                                                                                 searchFacets[
@@ -347,6 +357,12 @@ export default function FilteredSearchLayout({
                                                                 <Facet
                                                                     text={
                                                                         ff.title
+                                                                    }
+                                                                    facetSelectedCount={
+                                                                        facetSelectedCount
+                                                                    }
+                                                                    setFacetSelectedCount={
+                                                                        setFacetSelectedCount
                                                                     }
                                                                     options={
                                                                         searchFacets &&

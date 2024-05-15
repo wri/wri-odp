@@ -5,9 +5,11 @@ import { Dispatch, SetStateAction } from 'react'
 export default function FiltersSelected({
     filters,
     setFilters,
+    setFacetSelectedCount,
 }: {
     filters: Filter[]
     setFilters: Dispatch<SetStateAction<Filter[]>>
+    setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>
 }) {
     return (
         <div className="flex flex-col lg:flex-row gap-y-4 lg:items-center justify-between">
@@ -30,6 +32,11 @@ export default function FiltersSelected({
                                         1
                                     )
                                     return newFilters
+                                })
+                                setFacetSelectedCount((prev) => {
+                                    const newFacetSelectedCount = { ...prev }
+                                    newFacetSelectedCount[f.key] -= 1
+                                    return newFacetSelectedCount
                                 })
                             }}
                         >

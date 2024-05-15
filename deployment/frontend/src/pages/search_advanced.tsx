@@ -21,7 +21,10 @@ import superjson from 'superjson'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerAuthSession } from '@/server/auth'
 import { advance_search_query } from '@/utils/apiUtils'
-import { log } from 'console'
+
+function filterCount(key: string, filters: Filter[]): number {
+    return filters.filter((f) => f.key === key).length
+}
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ query: any }>
@@ -85,6 +88,22 @@ export default function SearchPage(
         removeUnecessaryDataInResources: true,
     })
     const [filters, setFilters] = useState<Filter[]>(initialFilters)
+
+    const [facetSelectedCount, setFacetSelectedCount] = useState<
+        Record<string, number>
+    >({
+        application: filterCount('application', filters) || 0,
+        project: filterCount('project', filters) || 0,
+        organization: filterCount('organization', filters) || 0,
+        groups: filterCount('groups', filters) || 0,
+        tags: filterCount('tags', filters) || 0,
+        update_frequency: filterCount('update_frequency', filters) || 0,
+        res_format: filterCount('res_format', filters) || 0,
+        license_id: filterCount('license_id', filters) || 0,
+        language: filterCount('language', filters) || 0,
+        wri_data: filterCount('wri_data', filters) || 0,
+        visibility_type: filterCount('visibility_type', filters) || 0,
+    })
 
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
 
@@ -239,7 +258,12 @@ export default function SearchPage(
                 </div>
             )}
             {session.status != 'loading' && (
-                <FilteredSearchLayout setFilters={setFilters} filters={filters}>
+                <FilteredSearchLayout
+                    setFilters={setFilters}
+                    filters={filters}
+                    facetSelectedCount={facetSelectedCount}
+                    setFacetSelectedCount={setFacetSelectedCount}
+                >
                     <SortBy
                         count={data?.count ?? 0}
                         setQuery={setQuery}
@@ -248,6 +272,7 @@ export default function SearchPage(
                     <FiltersSelected
                         filters={filters}
                         setFilters={setFilters}
+                        setFacetSelectedCount={setFacetSelectedCount}
                     />
                     <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
                         {data?.datasets.map((dataset, number) => (
