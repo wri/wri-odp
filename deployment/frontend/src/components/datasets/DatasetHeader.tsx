@@ -130,7 +130,7 @@ function OpenInButton({
     }
 
     if (open_in.length === 0) return <></>
-    if (open_in.length === 0 && !session.data?.user) {
+    if (open_in.length === 1 && !session.data?.user) {
         return (
             <a
                 href={open_in[0]?.url}
@@ -145,7 +145,7 @@ function OpenInButton({
             </a>
         )
     }
-    if (open_in.length === 0 && session.data?.user) {
+    if (open_in.length === 1 && session.data?.user) {
         return (
             <a
                 href={open_in[0]?.url}
