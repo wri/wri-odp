@@ -3,6 +3,7 @@ import { SearchInput } from '@/schema/search.schema'
 import { Disclosure, Transition } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { set } from 'lodash'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -18,13 +19,18 @@ export default function Facet({
     fqKey,
     setFilters,
     filters,
+    facetSelectedCount,
+    setFacetSelectedCount,
 }: {
     text: string
     options: Option[]
     fqKey: string
     setFilters: Dispatch<SetStateAction<Filter[]>>
     filters: Filter[]
+    facetSelectedCount?: Record<string, number>
+    setFacetSelectedCount?: Dispatch<SetStateAction<Record<string, number>>>
 }) {
+    // console.log('Facetselect79000: ', facetSelectedCount)
     const getUpdatedOptionsState = () => {
         return options.reduce((a, v) => {
             const checked = filters.find(
@@ -60,7 +66,9 @@ export default function Facet({
                                 {text}
                             </p>
                             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 p-1 text-xs font-normal text-black">
-                                {options.length}
+                                {facetSelectedCount
+                                    ? facetSelectedCount[fqKey] ?? 0
+                                    : options.length}
                             </span>
                         </div>
                         <ChevronDownIcon
@@ -128,6 +136,41 @@ export default function Facet({
 
                                                             return newFilters
                                                         })
+
+                                                        if (
+                                                            setFacetSelectedCount
+                                                        ) {
+                                                            setFacetSelectedCount(
+                                                                (prev) => {
+                                                                    if (
+                                                                        checked
+                                                                    ) {
+                                                                        return {
+                                                                            ...prev,
+                                                                            [fqKey]:
+                                                                                (prev[
+                                                                                    fqKey
+                                                                                ] ??
+                                                                                    0) +
+                                                                                1,
+                                                                        }
+                                                                    } else {
+                                                                        return {
+                                                                            ...prev,
+                                                                            [fqKey]:
+                                                                                Math.max(
+                                                                                    (prev[
+                                                                                        fqKey
+                                                                                    ] ??
+                                                                                        0) -
+                                                                                        1,
+                                                                                    0
+                                                                                ),
+                                                                        }
+                                                                    }
+                                                                }
+                                                            )
+                                                        }
                                                     }}
                                                 />
                                             </div>

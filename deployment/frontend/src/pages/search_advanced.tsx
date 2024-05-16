@@ -21,7 +21,20 @@ import superjson from 'superjson'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerAuthSession } from '@/server/auth'
 import { advance_search_query } from '@/utils/apiUtils'
-import { log } from 'console'
+
+interface Option {
+    value: string
+    label: string
+}
+
+function filterCount(key: string, filters: Filter[]): number {
+    return filters.filter((f) => f.key === key).length
+}
+
+function defaultSelectedTagOptions(filters: Filter[]): string[] {
+    const f = filters.filter((f) => f.key === 'tags').map((f) => f.label)
+    return f
+}
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ query: any }>
@@ -86,6 +99,25 @@ export default function SearchPage(
     })
     const [filters, setFilters] = useState<Filter[]>(initialFilters)
 
+    const [facetSelectedCount, setFacetSelectedCount] = useState<
+        Record<string, number>
+    >({
+        application: filterCount('application', filters) || 0,
+        project: filterCount('project', filters) || 0,
+        organization: filterCount('organization', filters) || 0,
+        groups: filterCount('groups', filters) || 0,
+        tags: filterCount('tags', filters) || 0,
+        update_frequency: filterCount('update_frequency', filters) || 0,
+        res_format: filterCount('res_format', filters) || 0,
+        license_id: filterCount('license_id', filters) || 0,
+        language: filterCount('language', filters) || 0,
+        wri_data: filterCount('wri_data', filters) || 0,
+        visibility_type: filterCount('visibility_type', filters) || 0,
+    })
+    const [value, setValue] = useState<string[]>(
+        defaultSelectedTagOptions(filters) || []
+    )
+
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
 
     /*
@@ -106,6 +138,7 @@ export default function SearchPage(
             let keyFq
 
             const keyFilters = filters.filter((f) => f.key == key)
+
             if ((key as string) == 'temporal_coverage_start') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageStart = keyFilters[0]
@@ -115,9 +148,9 @@ export default function SearchPage(
 
                     keyFq = `[${temporalCoverageStart?.value} TO *]`
 
-                    if (temporalCoverageEnd) {
-                        keyFq = `[* TO ${temporalCoverageEnd}]`
-                    }
+                    // if (temporalCoverageEnd) {
+                    //     keyFq = `[* TO ${temporalCoverageEnd}]`
+                    // }
                 }
             } else if ((key as string) == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
@@ -128,9 +161,9 @@ export default function SearchPage(
 
                     keyFq = `[* TO ${temporalCoverageEnd?.value}]`
 
-                    if (temporalCoverageStart) {
-                        keyFq = `[${temporalCoverageStart} TO *]`
-                    }
+                    // if (temporalCoverageStart) {
+                    //     keyFq = `[${temporalCoverageStart} TO *]`
+                    // }
                 }
             } else if (
                 key === 'metadata_modified_since' ||
@@ -190,8 +223,10 @@ export default function SearchPage(
                 extLocationQ,
                 extAddressQ,
                 extGlobalQ:
-                    filters.find((e) => e?.key == 'extGlobalQ')?.value as 'only' | 'exclude' | 'include' ??
-                    'include',
+                    (filters.find((e) => e?.key == 'extGlobalQ')?.value as
+                        | 'only'
+                        | 'exclude'
+                        | 'include') ?? 'include',
             }
         })
     }, [filters])
@@ -236,7 +271,14 @@ export default function SearchPage(
                 </div>
             )}
             {session.status != 'loading' && (
-                <FilteredSearchLayout setFilters={setFilters} filters={filters}>
+                <FilteredSearchLayout
+                    setFilters={setFilters}
+                    filters={filters}
+                    facetSelectedCount={facetSelectedCount}
+                    setFacetSelectedCount={setFacetSelectedCount}
+                    value={value}
+                    setValue={setValue}
+                >
                     <SortBy
                         count={data?.count ?? 0}
                         setQuery={setQuery}
@@ -245,6 +287,8 @@ export default function SearchPage(
                     <FiltersSelected
                         filters={filters}
                         setFilters={setFilters}
+                        setFacetSelectedCount={setFacetSelectedCount}
+                        setValue={setValue}
                     />
                     <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
                         {data?.datasets.map((dataset, number) => (
