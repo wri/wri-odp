@@ -151,6 +151,9 @@ def pending_dataset_create(context: Context, data_dict: DataDict) -> AuthResult:
 
 
 def pending_dataset_show(context: Context, data_dict: DataDict) -> AuthResult:
+    dataset_id = data_dict.get("dataset_id")
+    if dataset_id:
+        data_dict["id"] = dataset_id
     if tk.check_access("package_show", context, data_dict):
         return {"success": True}
     else:
