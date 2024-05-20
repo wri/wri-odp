@@ -19,7 +19,9 @@ export function HomeFooter() {
                         </h5>
                     </div>
                     <Link href="/search_advanced">
-                        <Button className="mt-10 md:mt-0">Advanced Search</Button>
+                        <Button className="mt-10 md:mt-0">
+                            Advanced Search
+                        </Button>
                     </Link>
                 </div>
             </section>
@@ -33,10 +35,18 @@ export function HomeFooter() {
                         >
                             About us
                         </a>
-                        <a href="/our-mission" className=" font-normal">
+                        <a
+                            href="https://www.wri.org/our-work"
+                            target="_blank"
+                            className=" font-normal"
+                        >
                             Our Work
                         </a>
-                        <a href="/our-approach" className=" font-normal">
+                        <a
+                            href="https://www.wri.org/our-approach"
+                            target="_blank"
+                            className=" font-normal"
+                        >
                             Our Approach
                         </a>
                     </div>
