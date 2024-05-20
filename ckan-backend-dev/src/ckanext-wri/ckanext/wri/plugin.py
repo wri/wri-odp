@@ -25,6 +25,7 @@ from ckanext.wri.logic.action.update import (
     notification_update,
     pending_dataset_update,
     notification_bulk_update,
+    issue_delete
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -55,7 +56,7 @@ from ckanext.wri.logic.action.datapusher_download import (
     download_callback,
 )
 import ckanext.wri.views.api as api_blueprint
-
+import ckanext.issues.logic.action as issue_action
 import queue
 import logging
 
@@ -74,6 +75,9 @@ class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IResourceView, inherit=True)
     plugins.implements(plugins.IResourceController, inherit=True)
+
+    #over-write issue delete api
+    issue_action.issue_delete = issue_delete
 
     # IConfigurer
     def configure(self, config):
@@ -202,6 +206,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "issue_search_wri": issue_search_wri,
             "package_collaborator_list_wri": package_collaborator_list_wri,
             "resource_location_search": resource_search,
+            
         }
 
     # IPermissionLabels

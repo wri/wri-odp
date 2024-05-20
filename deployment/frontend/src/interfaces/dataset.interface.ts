@@ -74,6 +74,7 @@ export interface Resource {
     spatial_geom?: any
     spatial_address?: string
     spatial_coordinates?: any
+    spatial_type?: string
 }
 
 export interface DatasetListQueryOptions {
