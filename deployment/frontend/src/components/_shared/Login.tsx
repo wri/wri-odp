@@ -253,6 +253,7 @@ function ResetPasswordForm({
                             <input
                                 type="text"
                                 placeholder="Email"
+                                id="reset-link-email"
                                 className=" focus:outline-none  placeholder:text-xs placeholder:font-light placeholder:text-[#353535] text-xs font-light w-full !border-none"
                                 {...register('email')}
                             />

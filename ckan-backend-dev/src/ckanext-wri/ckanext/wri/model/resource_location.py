@@ -21,6 +21,8 @@ import shapely
 import json
 import logging
 
+from .sql_context import sql_session_scope
+
 log = logging.getLogger(__name__)
 
 
@@ -68,32 +70,33 @@ class ResourceLocation(object):
     @classmethod
     def get(cls, resource_id: str, is_pending: bool) -> Optional["ResourceLocation"]:
         """Return the ResourceLocation object for the given resource_id."""
-        query = meta.Session.query(
-            ResourceLocation.resource_id,
-            ResourceLocation.spatial_address,
-            geo_funcs.ST_AsGeoJSON(ResourceLocation.spatial_geom).label("spatial_geom"),
-            geo_funcs.ST_AsGeoJSON(ResourceLocation.spatial_coordinates).label(
-                "spatial_coordinates"
-            ),
-        )
+        with sql_session_scope(raise_exceptions=False) as session:
+            query = session.query(
+                ResourceLocation.resource_id,
+                ResourceLocation.spatial_address,
+                geo_funcs.ST_AsGeoJSON(ResourceLocation.spatial_geom).label("spatial_geom"),
+                geo_funcs.ST_AsGeoJSON(ResourceLocation.spatial_coordinates).label(
+                    "spatial_coordinates"
+                ),
+            )
 
-        query = query.filter(ResourceLocation.resource_id == resource_id).filter(
-            ResourceLocation.is_pending == is_pending
-        )
+            query = query.filter(ResourceLocation.resource_id == resource_id).filter(
+                ResourceLocation.is_pending == is_pending
+            )
 
-        result = query.first()
+            result = query.first()
 
-        if result is not None:
-            obj = {
-                "resource_id": result[0],
-                "spatial_addess": result[1],
-                "spatial_geom": result[2],
-                "spatial_coordinates": result[3],
-            }
+            if result is not None:
+                obj = {
+                    "resource_id": result[0],
+                    "spatial_addess": result[1],
+                    "spatial_geom": result[2],
+                    "spatial_coordinates": result[3],
+                }
 
-            return obj
+                return obj
 
-        return None
+            return None
 
     @classmethod
     def create(
@@ -104,7 +107,7 @@ class ResourceLocation(object):
         spatial_coordinates,
         is_pending,
     ) -> Optional[dict]:
-        try:
+        with sql_session_scope() as session:
             _spatial_coordinates = None
             if spatial_coordinates:
                 _spatial_coordinates = (
@@ -118,8 +121,8 @@ class ResourceLocation(object):
                 is_pending,
                 spatial_coordinates=_spatial_coordinates,
             )
-            meta.Session.add(resource_location)
-            meta.Session.commit()
+            session.add(resource_location)
+
             return {
                 "resource_id": resource_location.resource_id,
                 "spatial_address": resource_location.spatial_address,
@@ -127,16 +130,12 @@ class ResourceLocation(object):
                 "is_pending": resource_location.is_pending,
                 "spatial_coordinates": resource_location.spatial_coordinates,
             }
-        except Exception as e:
-            log.error(e)
-            meta.Session.rollback()
-            raise
 
     @classmethod
     def update(
         cls, resource_id, spatial_address, spatial_geom, spatial_coordinates, is_pending
     ) -> Optional["ResourceLocation"]:
-        try:
+        with sql_session_scope(raise_exceptions=False) as session:
             spatial_geom = ResourceLocation.get_geometry_from_geojson(spatial_geom)
             _spatial_coordinates = None
             if spatial_coordinates:
@@ -158,7 +157,7 @@ class ResourceLocation(object):
                 .returning(ResourceLocation)
             )
 
-            result = meta.Session.execute(stmt)
+            result = session.execute(stmt)
 
             resource = Resource.get(resource_id)
             extras = resource.get("extras")
@@ -174,12 +173,7 @@ class ResourceLocation(object):
             #
             # meta.Session.execute(geom_cleanup)
 
-            meta.Session.commit()
             return result.fetchall()
-        except Exception as e:
-            log.error(e)
-            meta.Session.rollback()
-            raise e
 
     @classmethod
     def get_geometry_from_geojson(self, spatial_geom):

@@ -81,7 +81,7 @@ export const ResourceSchema = z
         spatial_address: z.string().optional(),
         spatial_geom: z.any().optional(),
         spatial_coordinates: z.any().optional(),
-        spatial_type: z.enum(['address', 'geom']).optional(),
+        spatial_type: z.enum(['address', 'geom', 'global']).optional(),
     })
     .refine(
         (obj) => {
@@ -210,7 +210,7 @@ export const DatasetSchemaObject = z.object({
     collaborators: z.array(CollaboratorSchema).default([]),
     spatial_address: z.string().optional(),
     spatial: z.any().optional(),
-    spatial_type: z.enum(['address', 'geom']).optional(),
+    spatial_type: z.enum(['address', 'geom', 'global']).optional(),
     release_notes: z.string().optional(),
 })
 

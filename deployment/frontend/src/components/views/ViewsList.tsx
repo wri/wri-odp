@@ -115,7 +115,7 @@ export default function ViewsList(props: ViewsListProps) {
                                         onClick={addNewChartView}
                                         disabled={!isCanCreateChartview}
                                     >
-                                        <div className="text-left w-full">
+                                        <div className="text-left w-full chart-popup-item">
                                             Chart
                                         </div>
                                     </Button>

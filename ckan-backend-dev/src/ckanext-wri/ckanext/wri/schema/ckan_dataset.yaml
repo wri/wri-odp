@@ -247,6 +247,11 @@ dataset_fields:
   form_snippet: markdown.html
   form_placeholder: eg. A description of the dataset changes
 
+- field_name: migration_extras
+  label: Migration Extras
+  form_placeholder: 'eg. {"title": "External site", "url": "http://example.com"}'
+  preset: json_object
+
 resource_fields:
   - field_name: url
     label: URL

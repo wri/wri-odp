@@ -1163,6 +1163,7 @@ export const DatasetRouter = createTRPCRouter({
                 sortBy: input.sortBy,
                 extLocationQ: input.extLocationQ,
                 extAddressQ: input.extAddressQ,
+                extGlobalQ: input.extGlobalQ,
             }))!
 
             const _datasets = input.removeUnecessaryDataInResources
@@ -1397,7 +1398,7 @@ export const DatasetRouter = createTRPCRouter({
                     method: 'POST',
                     body: JSON.stringify({ package_id: input }),
                     headers: {
-                       Authorization: ctx.session.user.apikey,
+                        Authorization: ctx.session.user.apikey,
                         'Content-Type': 'application/json',
                     },
                 }
@@ -1572,46 +1573,6 @@ export const DatasetRouter = createTRPCRouter({
                 throw Error('Error in sending issue /comment notification')
             }
             return input.status
-        }),
-
-    deleteIssue: protectedProcedure
-        .input(CommentSchema)
-        .mutation(async ({ input, ctx }) => {
-            const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/issue_delete`,
-                {
-                    method: 'POST',
-                    body: JSON.stringify(input),
-                    headers: {
-                        Authorization: ctx.session.user.apikey,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
-
-            const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error)
-                throw Error(JSON.stringify(data.error))
-            try {
-                // get dataset collaborators id
-                const collab = await fetchDatasetCollabIds(
-                    input.dataset_id,
-                    ctx.session.user.apikey
-                )
-                await sendIssueOrCommentNotigication({
-                    owner_org: input.owner_org,
-                    creator_id: input.creator_id,
-                    collaborator_id: collab,
-                    dataset_id: input.dataset_id,
-                    session: ctx.session,
-                    title: input.issuetitle,
-                    action: 'deleted',
-                })
-            } catch (error) {
-                console.error(error)
-                throw Error('Error in sending issue /comment notification')
-            }
-            return input.issue_number
         }),
     createIssue: protectedProcedure
         .input(IssueSchema)

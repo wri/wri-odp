@@ -75,7 +75,7 @@ describe("Chart view", () => {
 
       cy.contains("Add a view").click();
 
-      cy.contains("Chart").click();
+      cy.get(".chart-popup-item").click();
 
       cy.contains("Add a chart view", { timeout: 40000 })
         .parent()
