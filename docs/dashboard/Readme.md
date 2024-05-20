@@ -244,14 +244,6 @@ let comment and re-open an issue
 
 ![](./approv11.png)
 
-Delete a dataset
-
-![](./approv13.png)
-
-result after delete
-
-![](./approv14.png)
-
 User can go do `dashboard/datasets` and click Awaiting approval to see list of awaiting approval dataset
 
 ![](./approv6.png)

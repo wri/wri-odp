@@ -124,3 +124,6 @@ def pending_dataset_update(context: Context, data_dict: DataDict):
         raise logic.NotFound(_(f"Pending Dataset not found: {package_id}"))
 
     return pending_dataset
+
+def issue_delete(context: Context, data_dict: DataDict):
+    return 'Issue delete is deprecated'

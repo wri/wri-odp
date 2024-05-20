@@ -6,8 +6,47 @@ import { TopicsCarousel } from '@/components/home/TopicsCarousel'
 import Head from 'next/head'
 import { env } from '@/env.mjs'
 import { NextSeo } from 'next-seo'
+import Link from 'next/link'
+import { useState } from 'react'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import superjson from 'superjson'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import { appRouter } from '@/server/api/root'
+import { getServerAuthSession } from '@/server/auth'
 
-export default function Home() {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const session = await getServerAuthSession(context)
+    const helpers = createServerSideHelpers({
+        router: appRouter,
+        ctx: { session },
+        transformer: superjson,
+    })
+
+    await helpers.topics.getGeneralTopics.prefetch({
+        search: '',
+        page: { start: 0, rows: 50 },
+        allTree: true,
+    })
+
+    await helpers.dataset.getFeaturedDatasets.prefetch({
+        search: '',
+        page: { start: 0, rows: 8 },
+        sortBy: 'metadata_modified desc',
+        _isUserSearch: false,
+        removeUnecessaryDataInResources: true,
+    })
+
+    return {
+        props: {
+            trpcState: helpers.dehydrate(),
+        },
+    }
+}
+
+export default function Home(
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
+    const [readmore, setReadmore] = useState(false)
     return (
         <>
             <Head>
@@ -23,25 +62,76 @@ export default function Home() {
                 }}
             />
             <Hero />
-            <main className="default-home-container gap-x-[4.25rem] mx-auto grid grid-cols-1 py-24 md:grid-cols-5">
+            <main
+                id="about-explorer"
+                className="default-home-container gap-x-[4.25rem] mx-auto grid grid-cols-1 py-24 md:grid-cols-5"
+            >
                 <div className="col-span-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
                     <h3 className="pt-1 font-acumin text-2xl font-bold leading-loose text-stone-900">
-                        About the portal
+                        About the Explorer
                     </h3>
                 </div>
                 <div className="col-span-3 flex flex-col gap-y-4">
-                    <p className="font-acumin text-xl font-light leading-loose text-neutral-700">
-                        This is an open data portal which aggregates data from X
-                        Y Z places, data, organizations and blahblahblah. Lorem
-                        ipsum dolor sit amet, consectetur adipiscing elit, sed
-                        do eiusmod tempor incididunt ut labore et dolore. Lorem
-                        ipsum dolor sit amet, consectetur adipiscing elit, sed
-                        do eiusmod tempor incididunt ut labore et dolore. Lorem
-                        ipsum dolor sit amet, consectetur adipiscing elit, sed
-                        do eiusmod tempor incididunt ut labore et dolore.
-                    </p>
-                    <Button className="mr-auto">Read More</Button>
+                    <div
+                        className={`w-full font-acumin text-xl font-light leading-loose text-neutral-700 overflow-hidden max-h-[100vh] transition duration-300 ease-in-out ${
+                            readmore ? 'h-auto' : 'line-clamp-4'
+                        }`}
+                    >
+                        <p>
+                            WRI believes that good data is the foundation of
+                            good decision-making. Increasing access to
+                            high-quality, open data is the key to delivering for
+                            protect people, nature and climate. WRI Data
+                            Explorer is your entry point to data from WRI&apos;s
+                            teams around the world. It is designed for you to
+                            explore data on the key topics that help understand
+                            and transform the human systems driving
+                            unsustainable production and consumption — food,
+                            land and water; energy; and cities — as well as the
+                            economic, financial and governance systems that
+                            underpin them.
+                            <br />
+                            With the Data Explorer you can:
+                        </p>
+                        <ul className="list-disc pl-8">
+                            <li>
+                                Discover: Search for data by keyword, topic, or
+                                location
+                            </li>
+                            <li>Preview: See the data in a map or table</li>
+                            <li>
+                                Use: Download or access the data via our API or
+                                a third-party platform
+                            </li>
+                            <li>
+                                As the one-stop shop for all WRI data, the Data
+                                Explorer covers data from our Land & Carbon Lab,
+                                Global Forest Watch Open Data Portal, Resource
+                                Watch, and the former Open Data Portal, in
+                                addition to hundreds of other datasets. All in
+                                one place.
+                                <br />
+                                WRI Data Explorer is managed by the Data Lab. If
+                                you can’t find the data you would expect to see
+                                here or have other feedback to share, reach out
+                                to
+                                <a
+                                    href="mailto:test@gmail.com"
+                                    className="text-blue-500"
+                                >
+                                    {' '}
+                                    [add email here]
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <Button
+                        className="mr-auto"
+                        onClick={() => {
+                            setReadmore(!readmore)
+                        }}
+                    >{`${readmore ? 'Show less' : 'Read More'}`}</Button>
                 </div>
             </main>
             <main className="flex min-h-screen flex-col items-center justify-center gap-y-8 bg-neutral-50 py-20">
