@@ -200,14 +200,14 @@ This extension includes a migration API that allows users to migrate datasets fr
 
 **Note**: The functionality of this endpoint is limited to the user's permissions in CKAN. For example, if a user has the correct permissions to create a dataset but doesn't have permissions to add it to the Team or Topic specified, the request will return an authorization error.
 
-Migrates an RW dataset/metadata to CKAN. It maps all supported RW fields to CKAN fields. All additional RW fields (except objects) are stored in the `extras` field of the CKAN dataset. This endpoint handles both the creation and updating of datasets (this is determined automatically—no need to specify).
+Migrates an RW dataset/metadata to CKAN. It maps all supported RW fields to CKAN fields. All additional RW fields (except objects) are stored in the `migration_extras` field of the CKAN dataset. This endpoint handles both the creation and updating of datasets (this is determined automatically—no need to specify).
 
 **Parameters:**
 - **id** (string) – The RW UUID of the dataset to migrate (required). Example: `c0b5f4b1-4f3b-4f1e-8f1e-3f4b1f3b4f1e`.
 - **application** (string) – The RW application of the dataset to migrate (required). Example: `rw`.
 - **team** (string) – The `name` (`slug`) of the Team to associate the dataset with (optional). Example: `land-carbon-lab`.
 - **topics** (string) – A comma-separated list of Topic `slug`s to associate the dataset with (optional). Example: `atmosphere,biodiversity`.
-- **blacklist** (string) – A comma-separated list of CKAN fields to exclude from the migration mapping (optional—cannot be used with `whitelist`). Example: `resources,extras` will exclude the `resources` (Layers) and `extras` (additional unsupported fields) fields from the migration mapping.
+- **blacklist** (string) – A comma-separated list of CKAN fields to exclude from the migration mapping (optional—cannot be used with `whitelist`). Example: `resources,notes` will exclude the `resources` (Layers) and `notes` (Description) fields from the migration mapping.
 - **whitelist** (string) – A comma-separated list of CKAN fields to include in the migration mapping (optional—cannot be used with `blacklist`). Example: `title,notes` will only include the `title` (Title) and `notes` (Description) fields in the migration mapping.
 
 A successful request will return the Prefect status of the new migration job.
@@ -306,7 +306,7 @@ You'll need this ID: `"id": "2b3d8bf5-80a1-4816-a2f0-55a97f720471"` (`result.id`
 Triggers a full migration of RW datasets/metadata using the pre-defined [`datasets.csv` file](../../../migration/files/datasets.csv). There's currently no way to change the dataset list without modifying the CSV file, and only `blacklist` and `whitelist` parameters are supported. This endpoint handles both the creation and updating of datasets (this is determined automatically—no need to specify).
 
 **Parameters:**
-- **blacklist** (string) – A comma-separated list of CKAN fields to exclude from the migration mapping (optional—cannot be used with `whitelist`). Example: `resources,extras` will exclude the `resources` (Layers) and `extras` (additional unsupported fields) fields from the migration mapping.
+- **blacklist** (string) – A comma-separated list of CKAN fields to exclude from the migration mapping (optional—cannot be used with `whitelist`). Example: `resources,notes` will exclude the `resources` (Layers) and `notes` (Description) fields from the migration mapping.
 - **whitelist** (string) – A comma-separated list of CKAN fields to include in the migration mapping (optional—cannot be used with `blacklist`). Example: `title,notes` will only include the `title` (Title) and `notes` (Description) fields in the migration mapping.
 
 A successful request will return the Prefect status of the new migration job.
@@ -496,7 +496,6 @@ The following fields are supported for the `blacklist` and `whitelist` parameter
 
 - `cautions` - Maps to `cautions` in the RW dataset.
 - `citation` - Maps to `citation` in the RW dataset.
-- `extras` - Maps all unsupported RW fields to the `extras` field in the CKAN dataset (except objects).
 - `function` - Maps to `function` or `functions` in the RW dataset.
 - `language` - Maps to `language` in the RW dataset. **Note**: This field in CKAN requires an ISO 639-1 language code. If the incoming language is not an ISO 639-1 code, it will be ignored.
 - `learn_more` - Maps to the `learn_more_link` in the RW dataset.
@@ -506,6 +505,78 @@ The following fields are supported for the `blacklist` and `whitelist` parameter
 - `url` - Maps to the `data_download_original_link` if exists, otherwise, uses `data_download_link`. **Note**: This field in CKAN requires a valid URL. If the incoming URL is not valid, it will be ignored.
 
 In all cases above, both the RW metadata and dataset are checked for a value, defaulting to the RW metadata value if it exists. In most cases, there's no comparable key/value in the RW dataset, but there are a few cases where the RW dataset has a key that's not in the RW metadata.
+
+#### Unsupported Fields
+
+Most fields that are not mapped directly to CKAN are stored in a custom field called `migration_extras` (Note: some data is not migrated, such as objects, e.g., the full layer metadata, application config, etc.). This field holds a JSON object where the keys are the paths within the source dataset objects and the values are the values of those paths. For example:
+
+```json
+{
+  ... (other CKAN dataset fields) ...
+  "migration_extras": {
+    "dataset.dataPath": "None",
+    "metadata.info.sources.0.id": "0",
+    "metadata.info.citation": "National Geospatial Intelligence Agency. 2019. \"World Port Index.\" Accessed from https://msi.nga.mil/NGAPortal/MSI.portal?_nfpb=true&_pageLabel=msi_portal_page_62&pubCode=0015. Accessed through Resource Watch, (date). [www.resourcewatch.org](https://www.resourcewatch.org).",
+    "metadata.updatedAt": "2022-03-18T04:56:01.316Z",
+    "dataset.overwrite": "false",
+    "dataset.protected": "false",
+    "metadata.info.geographic_coverage": "Global",
+    "metadata.info.technical_title": "World Port Index",
+    "metadata.info.cautions": "Any changes to the port facilities that have occurred since the last publication will not be reflected. This reproduction, partial or complete, of any National Geospatial-Intelligence Agency (NGA), National Imagery and Mapping Agency (NIMA), or Defense Mapping Agency (DMA) product, information, or data is not approved, authorized, or endorsed by the Secretary of Defense, the Director of National Intelligence, the Director of the NGA, or any other element of the U.S. government. The U.S. government and the NGA accept no liability for the accuracy or quality of this reproduction or the use of any NGA, NIMA, or DMA products, information, or data.",
+    "dataset.taskId": "None",
+    "dataset.type": "tabular",
+    "dataset.application.0": "rw",
+    "metadata.info.data_download_link": "https://wri-public-data.s3.amazonaws.com/resourcewatch/com_017_rw2_major_ports.zip",
+    "dataset.tableName": "com_017_rw2_major_ports_edit",
+    "dataset.requested_application": "rw",
+    "metadata.resource.type": "dataset",
+    "dataset.name": "com.017.rw2 Major Ports",
+    "dataset.published": "true",
+    "dataset.dataLastUpdated": "None",
+    "dataset.subtitle": "None",
+    "metadata.info.data_type": "Vector",
+    "metadata.info.license_link": "https://creativecommons.org/share-your-work/public-domain/",
+    "metadata.dataset": "28d1f505-571c-4a52-8215-48ea02aa4928",
+    "metadata.createdAt": "2020-09-22T17:42:17.618Z",
+    "metadata.dataset_type": "metadata",
+    "metadata.application": "rw",
+    "dataset.createdAt": "2020-09-22T17:42:11.637Z",
+    "dataset.env": "production",
+    "dataset.updatedAt": "2020-09-25T13:05:42.080Z",
+    "metadata.language": "en",
+    "dataset.errorMessage": "",
+    "dataset.mainDateField": "None",
+    "metadata.info.sources.0.source-name": "",
+    "metadata.source": "NGA",
+    "metadata.info.sources.0.source-description": "National Geospatial-Intelligence Agency (NGA)",
+    "metadata.info.license": "Public domain",
+    "dataset.provider": "cartodb",
+    "dataset.connectorUrl": "https://wri-rw.carto.com/tables/com_017_rw2_major_ports_edit/public",
+    "metadata.resource.id": "28d1f505-571c-4a52-8215-48ea02aa4928",
+    "metadata.info.frequency_of_updates": "Varies",
+    "metadata.info.functions": "Locations, physical characteristics, facilities, and services offered by major ports around the world",
+    "metadata.info.learn_more_link": "https://msi.nga.mil/Publications/WPI",
+    "metadata.dataset_id": "5f6a3779b16c4d001a2f0f40",
+    "metadata.info.spatial_resolution": "None",
+    "metadata.name": "Major Ports",
+    "dataset.userId": "5efe38618e222c0010996c3c",
+    "dataset.dataset_type": "dataset",
+    "metadata.status": "published",
+    "metadata.info.name": "Major Ports",
+    "dataset.connectorType": "rest",
+    "metadata.info.date_of_content": "2019",
+    "metadata.info.data_download_original_link": "https://msi.nga.mil/Publications/WPI",
+    "metadata.info.rwId": "com.017.rw2",
+    "dataset.dataset_id": "28d1f505-571c-4a52-8215-48ea02aa4928",
+    "dataset.status": "saved",
+    "dataset.geoInfo": "true",
+    "dataset.slug": "com017rw2-Major-Ports",
+    "metadata.description": "The World Port Index is created by the Maritime Security Office of the National Geospatial-Intelligence Agency (NGA) to document the locations and features of major ports around the world. The Maritime Security Office requests that mariners send it corrections in plain language, which the office subsequently codes to create a consistent record of port facilities. Resource Watch shows only a subset of the data set. For access to the full data set and additional information, see the Learn More link.  \n  \n### Additional Information  \n  \nResource Watch shows only a subset of the dataset. For access to the full dataset and additional information, click on the “Learn more” button.  \n  \n### Disclaimer  \n  \nExcerpts of this description page were taken from the source metadata.",
+    "dataset.attributesPath": "None"
+  },
+  ... (other CKAN dataset fields) ...
+}
+```
 
 ## API Analytics Tracking
 

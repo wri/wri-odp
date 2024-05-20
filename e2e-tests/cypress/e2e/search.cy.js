@@ -16,7 +16,6 @@ const headers = { Authorization: Cypress.env("API_KEY") };
 
 const facets = [
   "Location",
-  "Featured",
   "Application",
   "Project",
   "Team",

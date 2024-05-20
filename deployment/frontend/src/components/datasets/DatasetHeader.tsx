@@ -2,6 +2,7 @@ import {
     ArrowUpRightIcon,
     ChevronLeftIcon,
     ExclamationTriangleIcon,
+    ExclamationCircleIcon,
     InformationCircleIcon,
 } from '@heroicons/react/20/solid'
 import { Button } from '../_shared/Button'
@@ -47,15 +48,87 @@ import { match } from 'ts-pattern'
 import Image from 'next/image'
 import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover'
 import { env } from '@/env.mjs'
+import { useRouter } from 'next/router'
 
 function OpenInButton({
     open_in,
     highlighted = '',
+    rw_id,
 }: {
     open_in: OpenIn[]
     highlighted?: string
+    rw_id?: string
 }) {
     const session = useSession()
+
+    const { data } = useQuery([rw_id], async () => {
+        const datasetRes = await fetch(
+            `https://api.resourcewatch.org/v1/dataset/${rw_id}`
+        )
+        const dataset: RwDatasetResp = await datasetRes.json()
+        if (isRwError(dataset)) throw new Error(dataset.errors[0].detail)
+        return dataset.data.attributes
+    })
+    if (data) {
+        switch (data.provider) {
+            case 'cartodb':
+                open_in = [
+                    ...open_in,
+                    {
+                        title: 'Carto',
+                        url: data.connectorUrl,
+                    },
+                ]
+                break
+            case 'featureservice':
+                open_in = [
+                    ...open_in,
+                    {
+                        title: 'ArcGIS',
+                        url: data.connectorUrl,
+                    },
+                ]
+                break
+            case 'gfw':
+                open_in = [
+                    ...open_in,
+                    {
+                        title: 'GFW',
+                        url: data.connectorUrl,
+                    },
+                ]
+                break
+            case 'gee':
+                open_in = [
+                    ...open_in,
+                    {
+                        title: 'GEE',
+                        url: `https://developers.google.com/earth-engine/datasets/catalog/${data.tableName.replaceAll(
+                            '/',
+                            '_'
+                        )}`,
+                    },
+                ]
+                break
+            default:
+                open_in = [
+                    ...open_in,
+                    ...data.sources.map((source, i) => {
+                        if (data.sources.length === 1) {
+                            return {
+                                title: data.provider.toUpperCase(),
+                                url: source,
+                            }
+                        }
+                        return {
+                            title: `Source ${i + 1}`,
+                            url: source,
+                        }
+                    }),
+                ]
+        }
+    }
+
     if (open_in.length === 0) return <></>
     if (open_in.length === 1 && !session.data?.user) {
         return (
@@ -293,6 +366,8 @@ export function DatasetHeader({
     datasetAuth?: boolean
     is_approved?: boolean
 }) {
+    const router = useRouter()
+
     const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
         useToggleLayergroups()
     const { activeCharts, addCharts, removeCharts } = useActiveCharts()
@@ -402,30 +477,33 @@ export function DatasetHeader({
         <div className="flex w-full flex-col pb-10 font-acumin">
             {!session.data?.user ? (
                 <div className="my-4 flex items-center gap-x-3 px-4 sm:px-6">
-                    <Link href="/search">
-                        <Button variant="outline">
-                            <ChevronLeftIcon className="mb-1 h-5 w-5" />
-                            Go back
-                        </Button>
-                    </Link>
+                    <Button variant="outline" onClick={() => router.back()}>
+                        <ChevronLeftIcon className="mb-1 h-5 w-5" />
+                        Go back
+                    </Button>
+
                     <OpenInButton
                         open_in={dataset?.open_in ?? []}
                         highlighted={highlighted('open_in')}
+                        rw_id={dataset?.rw_id}
                     />
                 </div>
             ) : (
                 <div className="mb-4 flex justify-between gap-x-3 bg-white shadow sm:px-6 px-4 pb-4 sm:pr-12">
                     <div className="flex items-center gap-x-3">
-                        <Link
+                        <Button
+                            variant="outline"
                             className="flex gap-x-2 items-center text-center text-stone-900 text-base font-bold font-acumin"
-                            href="/search"
+                            onClick={() => router.back()}
                         >
                             <ChevronLeftIcon className="mb-1 h-5 w-5" />
                             Go back
-                        </Link>
+                        </Button>
+
                         <OpenInButton
                             open_in={dataset?.open_in ?? []}
                             highlighted={highlighted('open_in')}
+                            rw_id={dataset?.rw_id}
                         />
                     </div>
                     <div className="flex items-center gap-x-2">
@@ -785,7 +863,7 @@ export function DatasetHeader({
                 </div>
                 {dataset?.cautions && (
                     <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-x-3 rounded-sm bg-cyan-700 bg-opacity-10 p-3">
-                        <ExclamationTriangleIcon className="col-span-1 grow max-h-8 max-w-8 text-yellow-600 sm:h-12 sm:w-12" />
+                        <ExclamationCircleIcon className="col-span-1 grow max-h-8 max-w-8 text-wri-gold sm:h-12 sm:w-12" />
                         <div className="col-span-11">
                             <span
                                 className={`font-acumin text-sm font-semibold leading-none text-black ${highlighted(
@@ -865,23 +943,6 @@ export function DatasetHeader({
                             </div>
                         )}
                 </div>
-                {dataset?.technical_notes && (
-                    <a
-                        href={dataset?.technical_notes}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={classNames(
-                            'flex items-center gap-x-1 mt-4 w-fit',
-                            highlighted('technical_notes')
-                        )}
-                    >
-                        <LinkIcon className="h-4 w-4 text-wri-green" />
-                        <div className="font-['Acumin Pro SemiCondensed'] text-sm font-semibold text-green-700">
-                            Technical Notes
-                        </div>
-                    </a>
-                )}
-
                 <div className="flex space-x-2">
                     {dataset?.connectorUrl &&
                         dataset?.provider &&
@@ -979,11 +1040,11 @@ export function DatasetHeader({
                             </div>
                         )}
                 </div>
-                {dataset?.rw_id && (
+                {/* {dataset?.rw_id && (
                     <div>
                         <ExternalService rw_id={dataset.rw_id} />
                     </div>
-                )}
+                )} */}
             </div>
         </div>
     )

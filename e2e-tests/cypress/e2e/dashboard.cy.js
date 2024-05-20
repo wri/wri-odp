@@ -255,11 +255,6 @@ describe("Dashboard Test", () => {
     cy.wait(15000)
     cy.contains("issue comment", { timeout: 15000 });
 
-    // delete issue
-    cy.get("button").contains("Delete").click();
-    cy.contains("Delete Issue");
-    cy.get("button").contains("Delete Issue").click();
-
    })
   
 

@@ -100,6 +100,15 @@ export default function TopicsPage(
                 setQuery={setQuery}
                 query={query}
             />
+            <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
+                <div className="max-w-[705px] ml-2 2xl:ml-2">
+                    <div className="default-home-container w-full border-t-[4px] border-stone-900" />
+                    <h3 className="pt-1 font-bold font-acumin text-xl font-light leading-loose text-neutral-700 ">
+                        Explore reliable datasets filtered by the topic of your
+                        interest.
+                    </h3>
+                </div>
+            </section>
             {isLoading ? (
                 <Spinner className="mx-auto" />
             ) : (

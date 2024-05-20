@@ -104,6 +104,26 @@ export default function TeamsPage(
                 query={query}
             />
 
+            <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
+                <div className="max-w-[705px] ml-2 2xl:ml-2">
+                    <div className="default-home-container w-full border-t-[4px] border-stone-900" />
+                    <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
+                        This page lets you explore all the data associated with
+                        a specific WRI project or team.
+                        <br />
+                        If you have questions about a project&apos;s data reach
+                        out to the point of contact in the dataset or to{' '}
+                        <a
+                            href="mailto:test@gmail.com"
+                            className="text-blue-700"
+                        >
+                            {' '}
+                            [add email here]
+                        </a>
+                    </h3>
+                </div>
+            </section>
+
             {isLoading ? (
                 <Spinner className="mx-auto" />
             ) : (
