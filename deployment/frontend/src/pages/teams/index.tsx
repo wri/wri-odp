@@ -114,11 +114,11 @@ export default function TeamsPage(
                         If you have questions about a project&apos;s data reach
                         out to the point of contact in the dataset or to{' '}
                         <a
-                            href="mailto:test@gmail.com"
+                            href="mailto:data@wri.org"
                             className="text-blue-700"
                         >
                             {' '}
-                            [add email here]
+                            data@wri.org
                         </a>
                     </h3>
                 </div>
