@@ -6,6 +6,11 @@ import ckan.model as model
 from ckanext.wri.model.notification import Notification, notification_list_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
 from ckanext.wri.logic.auth import schema
+from ckanext.wri.logic.action.rw_helpers import (
+    create_dataset_rw,
+    create_layer_rw,
+    edit_layer_rw,
+)
 import ckan.plugins.toolkit as tk
 import ckan.logic as logic
 from ckan.common import _
@@ -140,9 +145,9 @@ def pending_dataset_update(context: Context, data_dict: DataDict):
 def issue_delete(context: Context, data_dict: DataDict):
     return "Issue delete is deprecated"
 
+
 def approve_pending_dataset(context: Context, data_dict: DataDict):
     dataset_id = data_dict.get("dataset_id")
-    print("Trying to fetch pending dataset show", flush=True)
     # Fetch Pending Dataset Information
     try:
         pending_dataset_dict = tk.get_action("pending_dataset_show")(
@@ -156,7 +161,9 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
     else:
         # Fetch dataset from package_show
         try:
-            dataset_dict = tk.get_action("package_show")(context, {"id": dataset_id})["package_data"]
+            dataset_dict = tk.get_action("package_show")(context, {"id": dataset_id})[
+                "package_data"
+            ]
         except Exception as err:
             raise err
         if dataset_dict:
@@ -197,63 +204,41 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
 
     if not rw_id and is_layer and layer:
         rw_dataset = {
-            'title': pending_dataset.get('title', ''),
-            'connectorType': layer.get('connectorType', ''),
-            'connectorUrl': layer.get('connectorUrl', ''),
-            'provider': layer.get('provider', ''),
-            'tableName': layer.get('tableName', ''),
+            "title": pending_dataset.get("title", ""),
+            "connectorType": layer.get("connectorType", ""),
+            "connectorUrl": layer.get("connectorUrl", ""),
+            "provider": layer.get("provider", ""),
+            "tableName": layer.get("tableName", ""),
         }
         dataset_rw = create_dataset_rw(rw_dataset)
-        rw_id = dataset_rw.get('id')
-    
+        print("DATASET RW", flush=True)
+        print(dataset_rw, flush=True)
+        rw_id = dataset_rw.get("id")
+
     # Handle Layer Information
     resources_to_edit_layer = []
     resources_to_create_layer = []
-    
-    for resource in pending_dataset['resources']:
-        #if (resource.get('layerObj') or resource.get('layerObjRaw')) and resource.get('rw_id') and resource.get('url'):
-        #    rr = resource
-        #    if resource.get('layerObj'):
-        #        layer_form = convert_layer_obj_to_form(resource['layerObj'])
-        #        rr['layerObj'] = layer_form
-        #        resources_to_edit_layer.append(edit_layer_rw(rr))
-        #    elif resource.get('layerObjRaw'):
-        #        raw_layer_form = get_raw_obj_from_api_spec(resource['layerObjRaw'])
-        #        rr['layerObjRaw'] = raw_layer_form
-        #        resources_to_edit_layer.append(edit_layer_rw(rr))
-    
-        if (resource.get('layerObj') or resource.get('layerObjRaw')) and not resource.get('url'):
-            rr = resource
-            if resource.get('layerObj'):
-                layer_form = convert_layer_obj_to_form(resource['layerObj'])
-                rr['layerObj'] = layer_form
-                resources_to_create_layer.append(create_layer_rw(rr, rw_id))
-            elif resource.get('layerObjRaw'):
-                raw_layer_form = get_raw_obj_from_api_spec(resource['layerObjRaw'])
-                rr['layerObjRaw'] = raw_layer_form
-                resources_to_create_layer.append(create_layer_rw(rr, rw_id))
-    
-    # Handle Errors when creating layers
-    error_message = ''
-    for result in resources_to_create_layer:
-        if result.get('status') == 'rejected':
-            error_message += ' - ' + result.get('reason', '')
-            delete_layer_rw(result.get('value'))
-    
-    if error_message:
-        raise Exception(error_message)
-    
-    resources = resources_without_layer + [r.get('value') for r in resources_to_create_layer if r.get('status') == 'fulfilled'] + resources_to_edit_layer
-    
-    pending_dataset['rw_id'] = rw_id
+
+    for resource in pending_dataset["resources"]:
+        if (resource.get("layer")) and resource.get("rw_id") and resource.get("url"):
+            resources_to_edit_layer.append(edit_layer_rw(resource))
+        if (resource.get("layer")) and not resource.get("url"):
+            resources_to_create_layer.append(create_layer_rw(resource, rw_id))
+
+    resources = (
+        resources_without_layer + resources_to_create_layer + resources_to_edit_layer
+    )
+
+    pending_dataset["rw_id"] = rw_id
 
     # Update resources
-    for resource in resources_without_layer:
+    for resource in resources:
         schema = resource.get("schema", {}).get("value")
         resource["format"] = resource.get("format", "")
         resource["new"] = False
         resource["layerObjRaw"] = None
         resource["layerObj"] = None
+        resource["layer"] = None
         resource["url_type"] = resource.get("type")
         resource["schema"] = {"value": schema} if schema else "{}"
         resource["url"] = resource.get("url", resource.get("name"))
@@ -282,14 +267,15 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
             collab = tk.get_action("package_collaborator_list")(
                 context, {"id": dataset["id"]}
             )
-            send_group_notification(context,
+            send_group_notification(
+                context,
                 {
                     "owner_org": dataset.get("owner_org"),
                     "creator_id": dataset.get("creator_user_id"),
                     "collaborator_id": collab,
                     "dataset_id": dataset["id"],
                     "action": "approved_dataset",
-                }
+                },
             )
         except Exception as e:
             print(f"Error in sending issue/comment notification: {e}")
@@ -300,12 +286,8 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
         context, {"package_id": dataset_id}
     )
 
-    if "success" in delete_data and delete_data["success"]:
+    if delete_data:
         return dataset
-    else:
-        raise Exception(
-            f"Error deleting pending dataset: {json.dumps(delete_data.get('error', ''))}"
-        )
 
 
 class GroupNotificationParams(TypedDict):
@@ -349,16 +331,16 @@ def send_group_notification(context, GroupNotificationParams):
     action = GroupNotificationParams.get("action")
     if owner_org:
         _context = context.copy()
-        _context['ignore_auth'] = True
+        _context["ignore_auth"] = True
         org = tk.get_action("organization_show")(_context, {"id": owner_org})
-        org_users = org['users']
+        org_users = org["users"]
         recipient_users = list(
             filter(
-                lambda u: u['capacity'] == "admin" or u['capacity'] == "member",
-                org_users
+                lambda u: u["capacity"] == "admin" or u["capacity"] == "member",
+                org_users,
             )
         )
-        recipient_ids = list(map(lambda u: u['id'], recipient_users))
+        recipient_ids = list(map(lambda u: u["id"], recipient_users))
     if not any(user["id"] == creator_id for user in recipient_users) and creator_id:
         recipient_ids.append(creator_id)
         creator_user = tk.get_action("user_show")(context, {"id": creator_id})
@@ -396,14 +378,12 @@ def send_group_notification(context, GroupNotificationParams):
 
     dataset = tk.get_action("package_show")(context, {"id": dataset_id})
     if len(recipient_ids) > 0:
-        print("CONTEXT", flush=True)
-        print(context, flush=True)
         notifications_sent = [
             tk.get_action("notification_create")(
                 context,
                 {
                     "recipient_id": recipient_id,
-                    "sender_id": context['auth_user_obj'].id,
+                    "sender_id": context["auth_user_obj"].id,
                     "activity_type": action,
                     "object_type": "dataset",
                     "object_id": dataset_id,
@@ -412,11 +392,10 @@ def send_group_notification(context, GroupNotificationParams):
             )
             for recipient_id in recipient_ids
         ]
-        print("NOTIFICATIONS SENT: ", notifications_sent, flush=True)
         if recipient_users:
             for recipient_user in recipient_users:
                 if recipient_user.get("email"):
-                    user_obj = model.User.get(recipient_user.get('id'))
+                    user_obj = model.User.get(recipient_user.get("id"))
                     mainAction = action.split("_")[0]
                     subject = f"Approval status on dataset {dataset['title']}"
                     body = f"""
