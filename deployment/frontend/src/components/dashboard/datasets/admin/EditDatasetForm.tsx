@@ -209,7 +209,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     : undefined,
         },
     })
-    console.log('ERRORS', formObj.formState.errors)
 
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
@@ -340,7 +339,8 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         <ErrorAlert
                             text={
                                 <div>
-                                    The following fields have invalid information
+                                    The following fields have invalid
+                                    information
                                     <ul>
                                         {Object.entries(
                                             formObj.formState.errors
@@ -358,7 +358,10 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                                         }) => (
                                                             <>
                                                                 {message ??
-                                                                    ((_value as any).value.message)}
+                                                                    (
+                                                                        _value as any
+                                                                    ).value
+                                                                        .message}
                                                             </>
                                                         )}
                                                         name={key}

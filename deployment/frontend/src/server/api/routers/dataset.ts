@@ -214,6 +214,18 @@ export const DatasetRouter = createTRPCRouter({
                                           resource.layerObjRaw
                                         ? 'Layer'
                                         : '',
+                                    layer: resource.layerObj
+                                        ? convertFormToLayerObj(
+                                              resource.layerObj
+                                          )
+                                        : resource.layerObjRaw
+                                        ? getApiSpecFromRawObj(
+                                              resource.layerObjRaw as Record<
+                                                  string,
+                                                  any
+                                              >
+                                          )
+                                        : null,
                                     layerObj: resource.layerObj
                                         ? convertFormToLayerObj(
                                               resource.layerObj
@@ -579,6 +591,18 @@ export const DatasetRouter = createTRPCRouter({
                                             input.tableName ??
                                             rr?.tableName ??
                                             '',
+                                        layer: resource.layerObj
+                                            ? convertFormToLayerObj(
+                                                  resource.layerObj
+                                              )
+                                            : resource.layerObjRaw
+                                            ? getApiSpecFromRawObj(
+                                                  resource.layerObjRaw as Record<
+                                                      string,
+                                                      any
+                                                  >
+                                              )
+                                            : null,
                                         package_id: input.id ?? '',
                                         format: resource.format
                                             ? resource.format
