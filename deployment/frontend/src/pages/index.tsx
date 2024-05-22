@@ -117,11 +117,11 @@ export default function Home(
                                 here or have other feedback to share, reach out
                                 to
                                 <a
-                                    href="mailto:test@gmail.com"
+                                    href="mailto:data@wri.org"
                                     className="text-blue-500"
                                 >
                                     {' '}
-                                    [add email here]
+                                    data@wri.org
                                 </a>
                             </li>
                         </ul>
