@@ -7,6 +7,10 @@ import json
 from ckanext.wri.model.notification import Notification, notification_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
 from ckanext.wri.logic.auth import schema
+from ckanext.wri.logic.action.send_group_notification import (
+    GroupNotificationParams,
+    send_group_notification,
+)
 import ckan.logic as logic
 
 from ckan.common import _, config
@@ -14,7 +18,7 @@ import ckan.plugins.toolkit as tk
 from ckan.types import Context, DataDict
 import ckan.plugins as p
 import ckan.lib.helpers as h
-
+import ckan.logic as l
 
 NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
@@ -59,21 +63,21 @@ SCHEMA_FIELDS = [
     "technical_notes",
     "visibility_type",
     "approval_status",
-    "is_approved"
+    "is_approved",
 ]
 
 SCHEMA_SYNONYMS = {
-    'organization': 'owner_org',
-    'team': 'owner_org',
-    'owner_org': 'owner_org',
-    'groups': 'groups',
-    'group': 'groups',
-    'topics': 'groups',
-    'topic': 'groups',
-    'resources': 'resources',
-    'resource': 'resources',
-    'layers': 'resources',
-    'layer': 'resources',
+    "organization": "owner_org",
+    "team": "owner_org",
+    "owner_org": "owner_org",
+    "groups": "groups",
+    "group": "groups",
+    "topics": "groups",
+    "topic": "groups",
+    "resources": "resources",
+    "resource": "resources",
+    "layers": "resources",
+    "layer": "resources",
 }
 
 
@@ -136,7 +140,7 @@ def notification_create(
     session = context["session"]
     user_obj = model.User.get(context["user"])
 
-    tk.check_access("notification_create", context, data_dict)
+    # tk.check_access("notification_create", context, data_dict)
     sch = context.get("schema") or schema.default_create_notification_schema()
     data, errors = tk.navl_validate(data_dict, sch, context)
     if errors:
@@ -197,7 +201,7 @@ def trigger_migration(context: Context, data_dict: DataDict):
     if not logic.check_access("sysadmin", context=context):
         raise tk.NotAuthorized(_("Only sysadmins can trigger migrations"))
 
-    data_dict['is_bulk'] = True
+    data_dict["is_bulk"] = True
 
     data_dict = _black_white_list("whitelist", data_dict)
     data_dict = _black_white_list("blacklist", data_dict)
@@ -329,3 +333,55 @@ def migration_status(context: Context, data_dict: DataDict):
             "details": str(e),
         }
         raise p.toolkit.ValidationError(error)
+
+
+def package_create(context: Context, data_dict: DataDict):
+    # add is_pending
+    if data_dict and data_dict.get("visibility_type") != "private":
+        data_dict["is_pending"] = True
+        data_dict["is_approved"] = False
+        data_dict["approval_status"] = "pending"
+    dataset = l.action.create.package_create(context, data_dict)
+    print("DATASET", flush=True)
+    print(dataset, flush=True)
+    if data_dict.get("owner_org"):
+        org = tk.get_action("organization_show")(
+            context, {"id": data_dict.get("owner_org")}
+        )
+        print("HERE 1", flush=True)
+        custom_org = {
+            "id": org.get("id"),
+            "name": org.get("name"),
+            "title": org.get("title"),
+            "description": org.get("description"),
+            "image_url": org.get("image_url"),
+            "created": org.get("created"),
+            "approval_status": org.get("approval_status"),
+            "is_organization": org.get("is_organization"),
+            "state": org.get("state"),
+            "type": org.get("type"),
+        }
+        dataset["organization"] = custom_org
+    print("HERE 2", flush=True),
+    pending_dataset = tk.get_action("pending_dataset_create")(
+        context, {"package_id": dataset.get("id"), "package_data": dataset}
+    )
+    print("HERE 3", flush=True)
+    collab = tk.get_action("package_collaborator_list")(context, {"id": dataset["id"]})
+    send_group_notification(
+        context,
+        {
+            "owner_org": dataset.get("owner_org"),
+            "creator_id": dataset.get("creator_user_id"),
+            "collaborator_id": collab,
+            "dataset_id": dataset["id"],
+            "action": "pending_dataset",
+        },
+    )
+    if (
+        dataset.get("visibility_type") == "private"
+        or dataset.get("visibility_type") == "draft"
+    ):
+        tk.get_action("approve_pending_dataset")(context, {"id": dataset.get("id")})
+
+    return dataset

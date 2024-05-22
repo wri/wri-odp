@@ -69,17 +69,15 @@ def package_create(up_func, context, data_dict):
     Only allow the creation of packages if the approval status is set as pending and the is_approved flag is false
     """
     if data_dict and data_dict.get("visibility_type") != "private":
-        if (
-            data_dict.get("approval_status") != "pending"
-            or (data_dict.get("is_approved") != False and data_dict.get("is_approved") is not None)
+        if data_dict.get("approval_status") != "pending" or (
+            data_dict.get("is_approved") != False
+            and data_dict.get("is_approved") is not None
         ):
-            print(data_dict, flush=True)
             return {
                 "success": False,
                 "msg": _(
-                    "User %s not authorized to create public packages without going thru the approval process"
-                )
-                % (str(context["user"])),
+                    "All packages must go thru the approval workflow to be created, please set the approval_status to 'pending' and is_approved to 'false'"
+                ),
             }
     return up_func(context, data_dict)
 
@@ -94,9 +92,6 @@ def package_update(up_func, context, data_dict):
     user_obj = model.User.get(user)
     package = logic_auth.get_package_object(context, data_dict)
     if data_dict and data_dict.get("visibility_type") != "private":
-        print("GOT HERE", flush=True)
-        print(data_dict, flush=True)
-        print(package, flush=True)
         if package.owner_org:
             # if there is an owner org then we must have update_dataset
             # permission for that organization
@@ -108,7 +103,6 @@ def package_update(up_func, context, data_dict):
                 }
         else:
             if authz.check_config_permission("allow_dataset_collaborators"):
-                print("GOT HERE 2", flush=True)
                 # if org-level auth failed, check dataset-level auth
                 # (ie if user is a collaborator)
                 if user_obj:
@@ -118,15 +112,18 @@ def package_update(up_func, context, data_dict):
                     if (
                         authz.user_is_collaborator_on_dataset(
                             user_obj.id, package.id, ["admin"]
-                        ) == False
+                        )
+                        == False
                     ):
                         return {
                             "success": False,
                             "msg": _("User %s not authorized to edit package %s")
                             % (str(user), package.id),
                         }
-    print("GOT HERE 3", flush=True)
-    print(authz.user_is_collaborator_on_dataset(user_obj.id, package.id, ['admin']), flush=True)
+    print(
+        authz.user_is_collaborator_on_dataset(user_obj.id, package.id, ["admin"]),
+        flush=True,
+    )
     return _package_update(context, data_dict)
 
 

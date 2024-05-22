@@ -26,6 +26,7 @@ from ckanext.wri.logic.action.create import (
     trigger_migration,
     migrate_dataset,
     migration_status,
+    package_create,
 )
 from ckanext.wri.logic.action.update import (
     notification_update,
@@ -215,6 +216,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "package_collaborator_list_wri": package_collaborator_list_wri,
             "resource_location_search": resource_search,
             "approve_pending_dataset": approve_pending_dataset,
+            "package_create": package_create,
         }
 
     # IPermissionLabels

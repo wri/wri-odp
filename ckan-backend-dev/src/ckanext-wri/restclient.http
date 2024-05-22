@@ -3,5 +3,356 @@ Content-Type: application/json
 Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJqdGkiOiJqeVN3UjNYaHNBbGk2djVKTl9Dbnhtck9MRHg2a0NKcnFHUzZ3WlFwVlMwIiwiaWF0IjoxNzE2MDYwODUxfQ.VOhjpMOg3Lb9CIGLgaeu5CUroZimNJRPH6Ymd9B1EI1vDlyJd5EtN9HSQZ0tnHfJVs88pIjdVj30zq0fUXf4bD7Y1jXn958Pmh8KTEo68jXNgDvLuKAQKkj8aDBrn_k4JmCSIN_1fcUX5vQEMb5ajbls9IAju_QvONIl3yC2O5Zi7bC3EM7ePcBJUTG4q31mvbUXCLqNbAtMOD3L_WJQBaYipUKTqA6mkw9jetiVD9p3_YB_BIPCilswU-i_ugyJwiCk6dFV02eGVh2UZ_XsBfpP-2irN6gUjFWvj64tDgrQA7_0P5ehNJeG7DlhEBDyy3AKG74f8AuLQbbIX6ELHg
 
 {
-    "dataset_id": "3297c60f-9555-4c0a-bcc0-4b8e6afe4183"
+    "dataset_id": "84499b2f-a72f-4859-9f67-1e0458e6ccd1"
+}
+
+###
+
+POST http://ckan-dev:5000/api/action/package_create
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJqdGkiOiJqeVN3UjNYaHNBbGk2djVKTl9Dbnhtck9MRHg2a0NKcnFHUzZ3WlFwVlMwIiwiaWF0IjoxNzE2MDYwODUxfQ.VOhjpMOg3Lb9CIGLgaeu5CUroZimNJRPH6Ymd9B1EI1vDlyJd5EtN9HSQZ0tnHfJVs88pIjdVj30zq0fUXf4bD7Y1jXn958Pmh8KTEo68jXNgDvLuKAQKkj8aDBrn_k4JmCSIN_1fcUX5vQEMb5ajbls9IAju_QvONIl3yC2O5Zi7bC3EM7ePcBJUTG4q31mvbUXCLqNbAtMOD3L_WJQBaYipUKTqA6mkw9jetiVD9p3_YB_BIPCilswU-i_ugyJwiCk6dFV02eGVh2UZ_XsBfpP-2irN6gUjFWvj64tDgrQA7_0P5ehNJeG7DlhEBDyy3AKG74f8AuLQbbIX6ELHg
+
+{
+  "application": "",
+  "author": "x",
+  "citation": "",
+  "has_chart_views": false,
+  "approval_status": "pending",
+  "is_approved": false,
+  "isopen": false,
+  "license_id": "notspecified",
+  "license_title": "License not specified",
+  "maintainer": "x",
+  "maintainer_email": "luccasmmg@gmail.com",
+  "name": "test-create-api-9",
+  "open_in": "[]",
+  "owner_org": "0f49ce88-3b19-4ba8-8c0e-9467893c25a9",
+  "private": false,
+  "project": "",
+  "rw_dataset": true,
+  "short_description": "x",
+  "state": "active",
+  "technical_notes": "https://google.com",
+  "title": "test create api 9",
+  "type": "dataset",
+  "update_frequency": "monthly",
+  "url": "",
+  "version": null,
+  "visibility_type": "public",
+  "wri_data": false,
+  "resources": [
+    {
+      "cache_last_updated": null,
+      "cache_url": null,
+      "datastore_active": false,
+      "description": "",
+      "format": "",
+      "hash": "",
+      "last_modified": null,
+      "layerObj": null,
+      "layerObjRaw": null,
+      "mimetype": null,
+      "mimetype_inner": null,
+      "new": false,
+      "position": 0,
+      "schema": {},
+      "size": null,
+      "state": "active",
+      "title": "Example Create API",
+      "total_record_count": null,
+      "type": "link",
+      "url": "https://google.com",
+      "url_type": "link"
+    },
+    {
+      "cache_last_updated": null,
+      "cache_url": null,
+      "connectorType": "rest",
+      "connectorUrl": "https://wri-01.carto.com/tables/wdpa_protected_areas/table",
+      "description": "A composite index measuring average achievement in 3 basic dimensions of human development: a long and healthy life, knowledge, and a decent standard of living. 2015 Index scores are displayed.",
+      "format": "Layer",
+      "hash": "",
+      "last_modified": null,
+      "layerObj": {
+        "env": "staging",
+        "iso": [],
+        "name": "Create Layer API",
+        "slug": "2015-human-development-index",
+        "type": "layer",
+        "dataset": "",
+        "default": false,
+        "provider": "cartodb",
+        "protected": false,
+        "published": false,
+        "application": [
+          "data-explorer"
+        ],
+        "description": "A composite index measuring average achievement in 3 basic dimensions of human development: a long and healthy life, knowledge, and a decent standard of living. 2015 Index scores are displayed.",
+        "layerConfig": {
+          "type": "vector",
+          "render": {
+            "layers": [
+              {
+                "type": "fill",
+                "paint": {
+                  "fill-color": [
+                    "step",
+                    [
+                      "to-number",
+                      [
+                        "get",
+                        "yr_data"
+                      ]
+                    ],
+                    "#ffffff",
+                    0.5,
+                    "#ffffff",
+                    0.7,
+                    "#ffffff",
+                    0.75,
+                    "#000000",
+                    0.85,
+                    "#ff00ff"
+                  ],
+                  "fill-opacity": 1
+                },
+                "filter": [
+                  "all"
+                ],
+                "source-layer": "layer0"
+              },
+              {
+                "type": "line",
+                "paint": {
+                  "line-color": "#fff",
+                  "line-width": 0.5,
+                  "line-opacity": 0.8
+                },
+                "filter": [
+                  "all"
+                ],
+                "source-layer": "layer0"
+              }
+            ]
+          },
+          "source": {
+            "type": "vector",
+            "provider": {
+              "type": "carto",
+              "layers": [
+                {
+                  "options": {
+                    "sql": "SELECT wri.cartodb_id, wri.the_geom_webmercator, data.rw_country_name, data.rw_country_code, data.datetime, data.yr_data FROM soc_004_human_development_index data LEFT OUTER JOIN wri_countries_a wri ON data.rw_country_code = wri.iso_a3 WHERE EXTRACT(YEAR FROM data.datetime) = 2015 and data.yr_data is not null",
+                    "type": "cartodb"
+                  }
+                }
+              ],
+              "account": "wri-rw"
+            }
+          },
+          "timeline": false
+        },
+        "connectorUrl": "https://wri-rw.carto.com:443/api/v2/sql?q=SELECT wri.cartodb_id, wri.the_geom_webmercator, data.rw_country_name, data.rw_country_code, data.datetime, data.yr_data FROM soc_004_human_development_index data LEFT OUTER JOIN wri_countries_a wri ON data.rw_country_code = wri.iso_a3 WHERE EXTRACT(YEAR FROM data.datetime) = 2015 and data.yr_data is not null",
+        "legendConfig": {
+          "type": "choropleth",
+          "items": [
+            {
+              "name": "<0.5",
+              "color": "#ffffcc"
+            },
+            {
+              "name": "<0.7",
+              "color": "#a1dab4"
+            },
+            {
+              "name": "<0.75",
+              "color": "#41b6c4"
+            },
+            {
+              "name": "<0.85",
+              "color": "#2c7fb8"
+            },
+            {
+              "name": "<0.95",
+              "color": "#253494"
+            }
+          ]
+        },
+        "thumbnailUrl": "https://s3.amazonaws.com/wri-api-backups/resourcewatch/prod/thumbnails/00b9c036-38ea-4ece-a00f-ca315e25e0e0-1643743980009.png",
+        "applicationConfig": {},
+        "interactionConfig": {
+          "output": [
+            {
+              "type": "string",
+              "column": "rw_country_name",
+              "format": null,
+              "prefix": "",
+              "suffix": "",
+              "enabled": true,
+              "property": "Country"
+            },
+            {
+              "type": "number",
+              "column": "yr_data",
+              "format": null,
+              "prefix": "",
+              "suffix": "",
+              "enabled": true,
+              "property": "2015 Human Development Index"
+            }
+          ]
+        },
+        "staticImageConfig": {}
+      },
+      "layer": {
+        "env": "staging",
+        "iso": [],
+        "name": "Create Layer API",
+        "slug": "2015-human-development-index",
+        "type": "layer",
+        "dataset": "",
+        "default": false,
+        "provider": "cartodb",
+        "protected": false,
+        "published": false,
+        "application": [
+          "data-explorer"
+        ],
+        "description": "A composite index measuring average achievement in 3 basic dimensions of human development: a long and healthy life, knowledge, and a decent standard of living. 2015 Index scores are displayed.",
+        "layerConfig": {
+          "type": "vector",
+          "render": {
+            "layers": [
+              {
+                "type": "fill",
+                "paint": {
+                  "fill-color": [
+                    "step",
+                    [
+                      "to-number",
+                      [
+                        "get",
+                        "yr_data"
+                      ]
+                    ],
+                    "#ffffff",
+                    0.5,
+                    "#ffffff",
+                    0.7,
+                    "#ffffff",
+                    0.75,
+                    "#000000",
+                    0.85,
+                    "#ff00ff"
+                  ],
+                  "fill-opacity": 1
+                },
+                "filter": [
+                  "all"
+                ],
+                "source-layer": "layer0"
+              },
+              {
+                "type": "line",
+                "paint": {
+                  "line-color": "#fff",
+                  "line-width": 0.5,
+                  "line-opacity": 0.8
+                },
+                "filter": [
+                  "all"
+                ],
+                "source-layer": "layer0"
+              }
+            ]
+          },
+          "source": {
+            "type": "vector",
+            "provider": {
+              "type": "carto",
+              "layers": [
+                {
+                  "options": {
+                    "sql": "SELECT wri.cartodb_id, wri.the_geom_webmercator, data.rw_country_name, data.rw_country_code, data.datetime, data.yr_data FROM soc_004_human_development_index data LEFT OUTER JOIN wri_countries_a wri ON data.rw_country_code = wri.iso_a3 WHERE EXTRACT(YEAR FROM data.datetime) = 2015 and data.yr_data is not null",
+                    "type": "cartodb"
+                  }
+                }
+              ],
+              "account": "wri-rw"
+            }
+          },
+          "timeline": false
+        },
+        "connectorUrl": "https://wri-rw.carto.com:443/api/v2/sql?q=SELECT wri.cartodb_id, wri.the_geom_webmercator, data.rw_country_name, data.rw_country_code, data.datetime, data.yr_data FROM soc_004_human_development_index data LEFT OUTER JOIN wri_countries_a wri ON data.rw_country_code = wri.iso_a3 WHERE EXTRACT(YEAR FROM data.datetime) = 2015 and data.yr_data is not null",
+        "legendConfig": {
+          "type": "choropleth",
+          "items": [
+            {
+              "name": "<0.5",
+              "color": "#ffffcc"
+            },
+            {
+              "name": "<0.7",
+              "color": "#a1dab4"
+            },
+            {
+              "name": "<0.75",
+              "color": "#41b6c4"
+            },
+            {
+              "name": "<0.85",
+              "color": "#2c7fb8"
+            },
+            {
+              "name": "<0.95",
+              "color": "#253494"
+            }
+          ]
+        },
+        "thumbnailUrl": "https://s3.amazonaws.com/wri-api-backups/resourcewatch/prod/thumbnails/00b9c036-38ea-4ece-a00f-ca315e25e0e0-1643743980009.png",
+        "applicationConfig": {},
+        "interactionConfig": {
+          "output": [
+            {
+              "type": "string",
+              "column": "rw_country_name",
+              "format": null,
+              "prefix": "",
+              "suffix": "",
+              "enabled": true,
+              "property": "Country"
+            },
+            {
+              "type": "number",
+              "column": "yr_data",
+              "format": null,
+              "prefix": "",
+              "suffix": "",
+              "enabled": true,
+              "property": "2015 Human Development Index"
+            }
+          ]
+        },
+        "staticImageConfig": {}
+      },
+      "mimetype": null,
+      "mimetype_inner": null,
+      "name": "created-api",
+      "new": false,
+      "position": 1,
+      "provider": "cartodb",
+      "resource_type": null,
+      "schema": {},
+      "size": null,
+      "state": "active",
+      "tableName": "wdpa_protected_areas",
+      "title": "Created Layer API",
+      "type": "layer",
+      "url_type": "layer"
+    }
+  ],
+  "tags": [],
+  "groups": [],
+  "relationships_as_subject": [],
+  "relationships_as_object": []
 }
