@@ -13,7 +13,6 @@ from xml.etree import ElementTree as ET
 import ckanapi
 
 
-DATASETS_FILE = "files/datasets.csv"
 RW_API = "https://api.resourcewatch.org/v1/dataset"
 DEPLOYMENT_ENV = os.environ["FLOW_DEPLOYMENT_ENV"]
 CKAN_API_KEY = Secret.load(f"ckan-api-key-{DEPLOYMENT_ENV}").get()
@@ -257,29 +256,41 @@ def check_dataset_exists(dataset_id, rw_id=None, application=None):
 
 
 @task(retries=3, retry_delay_seconds=5)
-def get_datasets_from_csv():
+def get_datasets_from_csv(file_name):
     """
     Read datasets from CSV file.
     """
-    with open(DATASETS_FILE, "r", encoding="utf-8-sig") as f:
+    file_path = f"files/{file_name}"
+    with open(file_path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         datasets = []
 
         for row in reader:
             dataset = {}
-            dataset_id = row["datasetId"]
+            dataset_id = row["dataset_id"]
             application = row["application"]
             team = row.get("team")
             topics = row.get("topics")
+            layer_ids = row.get("layer_ids")
+            maintainer = row.get("maintainer")
+            maintainer_email = row.get("maintainer_email")
+            geographic_coverage = row.get("geographic_coverage")
 
             if topics:
                 topics = topics.split(",")
+
+            if layer_ids:
+                layer_ids = layer_ids.split(",")
 
             dataset = {
                 "id": dataset_id,
                 "application": application,
                 "team": team,
                 "topics": topics,
+                "layer_ids": layer_ids,
+                "maintainer": maintainer,
+                "maintainer_email": maintainer_email,
+                "geographic_coverage": geographic_coverage,
             }
             datasets.append(dataset)
 
@@ -288,13 +299,16 @@ def get_datasets_from_csv():
 
 @task(retries=10, retry_delay_seconds=5)
 def send_migration_dataset(data_dict):
+    log = get_run_logger()
+
     dataset_id = data_dict.get("id")
+
+    if not dataset_id:
+        log.error("Dataset ID not found in data_dict")
+        return None, None, None, None
+
     application = data_dict.get("application")
-    team = data_dict.get("team")
-    topics = data_dict.get("topics")
     dataset = get_dataset_from_api(dataset_id, application)
-    whitelist = data_dict.get("whitelist")
-    blacklist = data_dict.get("blacklist")
 
     dataset_slug = dataset.get("dataset", {}).get("slug")
 
@@ -303,7 +317,7 @@ def send_migration_dataset(data_dict):
     if dataset_slug:
         rw_dataset_url = f"https://resourcewatch.org/data/explore/{dataset_slug}"
 
-    dataset = prepare_dataset(dataset, application, team, topics, whitelist, blacklist)
+    dataset = prepare_dataset(dataset, data_dict)
 
     dataset_name = dataset.get("name")
 
@@ -342,13 +356,19 @@ def migrate_dataset(data_dict):
         dataset_changed = False
 
         for key, value in data_dict.items():
-            if dataset.get(key) != value and key not in [
-                "resources",
-                "extras",
-                "groups",
-                "organization",
-                "owner_org_name",
-            ]:
+            dataset_value = dataset.get(key)
+            if (
+                (dataset_value != None and value != "")
+                and dataset_value != value
+                and key
+                not in [
+                    "resources",
+                    "extras",
+                    "groups",
+                    "organization",
+                    "owner_org_name",
+                ]
+            ):
                 dataset_changed = True
                 log.info(f"{log_name} {key} changed: {dataset.get(key)} -> {value}")
                 updated_dataset[key] = value
@@ -632,10 +652,18 @@ def get_dataset_from_api(dataset_id, application):
     return output_object
 
 
-def prepare_dataset(
-    data_dict, application, team=None, topics=None, whitelist=None, blacklist=None
-):
+def prepare_dataset(data_dict, original_data_dict):
     log = get_run_logger()
+
+    application = original_data_dict.get("application")
+    team = original_data_dict.get("team")
+    topics = original_data_dict.get("topics")
+    whitelist = original_data_dict.get("whitelist")
+    blacklist = original_data_dict.get("blacklist")
+    layer_ids = original_data_dict.get("layer_ids")
+    maintainer = original_data_dict.get("maintainer")
+    maintainer_email = original_data_dict.get("maintainer_email")
+    geographic_coverage = original_data_dict.get("geographic_coverage")
 
     def get_value(key, default="", data_object=None):
         data_objects = [dataset, resource]
@@ -704,16 +732,18 @@ def prepare_dataset(
 
     citation = get_value("citation")
     learn_more_link = get_value("learn_more_link")
-    function = (
-        get_value("function")
-        if get_value("function", False) not in [None, ""]
-        else get_value("functions")
-    )
-    data_download_link = url_validator(
-        get_value("data_download_original_link")
-        if get_value("data_download_original_link", False) not in [None, ""]
-        else get_value("data_download_link")
-    )
+    function = get_value("functions")
+
+    if function in [None, ""]:
+        function = get_value("function")
+
+    data_download_link = get_value("data_download_original_link")
+
+    if data_download_link in [None, ""]:
+        data_download_link = get_value("data_download_link")
+
+    if data_download_link:
+        data_download_link = url_validator(data_download_link)
 
     extras = dataset.get("extras", [])
 
@@ -731,10 +761,11 @@ def prepare_dataset(
     }
 
     html_notes = markdown.markdown(description) if description else ""
+    function_text = markdown.markdown(function) if function else ""
     short_description = ""
 
-    if html_notes:
-        tree = ET.fromstring(f"<root>{html_notes}</root>")
+    if function_text:
+        tree = ET.fromstring(f"<root>{function_text}</root>")
         short_description = "".join(tree.itertext())
 
     dataset_values = {
@@ -746,13 +777,16 @@ def prepare_dataset(
         "cautions": markdown.markdown(cautions) if cautions else "",
         "language": language,
         "citation": citation,
-        "function": markdown.markdown(function) if function else "",
+        "function": function_text,
         "url": data_download_link,
         "learn_more": learn_more_link,
         "update_frequency": "",
+        "spatial_address": geographic_coverage,
+        "maintainer": maintainer,
+        "maintainer_email": maintainer_email,
     }
 
-    dataset_dict = {key: value for key, value in dataset_values.items() if value}
+    dataset_dict = {key: value for key, value in dataset_values.items()}
 
     if team:
         try:
@@ -781,6 +815,9 @@ def prepare_dataset(
 
     if application not in ["aqueduct", "aqueduct-water-risk"]:
         for layer in layers:
+            if layer_ids and layer["id"] not in layer_ids:
+                continue
+
             resource_dict = {}
             layer_dict = layer.get("attributes", {})
             layer_id = layer.get("id")

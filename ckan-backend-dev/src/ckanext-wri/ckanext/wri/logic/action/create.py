@@ -59,22 +59,42 @@ SCHEMA_FIELDS = [
     "technical_notes",
     "visibility_type",
     "approval_status",
-    "is_approved"
+    "is_approved",
 ]
 
 SCHEMA_SYNONYMS = {
-    'organization': 'owner_org',
-    'team': 'owner_org',
-    'owner_org': 'owner_org',
-    'groups': 'groups',
-    'group': 'groups',
-    'topics': 'groups',
-    'topic': 'groups',
-    'resources': 'resources',
-    'resource': 'resources',
-    'layers': 'resources',
-    'layer': 'resources',
+    "organization": "owner_org",
+    "team": "owner_org",
+    "owner_org": "owner_org",
+    "groups": "groups",
+    "group": "groups",
+    "topics": "groups",
+    "topic": "groups",
+    "resources": "resources",
+    "resource": "resources",
+    "layers": "resources",
+    "layer": "resources",
 }
+
+TRIGGER_MIGRATION_PARAMS = [
+    "is_bulk",
+    "file_name",
+    "whitelist",
+    "blacklist",
+]
+
+MIGRATE_DATASET_PARAMS = [
+    "id",
+    "application",
+    "team",
+    "topics",
+    "layer_ids",
+    "maintainer",
+    "maintainer_email",
+    "geographic_coverage",
+    "whitelist",
+    "blacklist",
+]
 
 
 def _trigger_prefect_flow(data_dict: DataDict) -> dict[str, Any]:
@@ -197,13 +217,18 @@ def trigger_migration(context: Context, data_dict: DataDict):
     if not logic.check_access("sysadmin", context=context):
         raise tk.NotAuthorized(_("Only sysadmins can trigger migrations"))
 
-    data_dict['is_bulk'] = True
+    data_dict["is_bulk"] = True
 
     data_dict = _black_white_list("whitelist", data_dict)
     data_dict = _black_white_list("blacklist", data_dict)
 
     if data_dict.get("whitelist") and data_dict.get("blacklist"):
         raise tk.ValidationError(_("Whitelist and blacklist cannot be used together"))
+
+    invalid_params = set(data_dict.keys()) - set(TRIGGER_MIGRATION_PARAMS)
+
+    if invalid_params:
+        raise tk.ValidationError(_(f"Invalid parameters: {', '.join(invalid_params)}"))
 
     return _trigger_prefect_flow(data_dict)
 
@@ -259,6 +284,11 @@ def migrate_dataset(context: Context, data_dict: DataDict):
                     "Topics must be a string (comma separated if it contains multiple topics)"
                 )
             )
+
+    invalid_params = set(data_dict.keys()) - set(MIGRATE_DATASET_PARAMS)
+
+    if invalid_params:
+        raise tk.ValidationError(_(f"Invalid parameters: {', '.join(invalid_params)}"))
 
     return _trigger_prefect_flow(data_dict)
 
