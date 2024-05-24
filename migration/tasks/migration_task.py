@@ -256,43 +256,52 @@ def check_dataset_exists(dataset_id, rw_id=None, application=None):
 
 
 @task(retries=3, retry_delay_seconds=5)
-def get_datasets_from_csv(file_name):
+def get_datasets_from_csv(file_name="datasets", encryption_secret_name="secret", encryption_secret_key=None):
     """
     Read datasets from CSV file.
     """
-    file_path = f"files/{file_name}"
-    with open(file_path, "r", encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
-        datasets = []
+    log = get_run_logger()
+    from cryptography.fernet import Fernet
+    import io
+    encryption_secret_name = encryption_secret_name or Secret.load("encryption-secret-name").get()
+    encryption_secret_key = encryption_secret_key or Secret.load(
+        "encryption-secret-key"
+    ).get()
+    file_path = f"files/{file_name}_encrypted_{encryption_secret_name}.csv"
 
-        for row in reader:
-            dataset = {}
-            dataset_id = row["dataset_id"]
-            application = row["application"]
-            team = row.get("team")
-            topics = row.get("topics")
-            layer_ids = row.get("layer_ids")
-            maintainer = row.get("maintainer")
-            maintainer_email = row.get("maintainer_email")
-            geographic_coverage = row.get("geographic_coverage")
+    cipher_suite = Fernet(encryption_secret_key)
 
-            if topics:
-                topics = topics.split(",")
+    with open(file_path, "rb") as encrypted_file:
+        encrypted_data = encrypted_file.read()
 
-            if layer_ids:
-                layer_ids = layer_ids.split(",")
+    decrypted_data = cipher_suite.decrypt(encrypted_data)
 
-            dataset = {
-                "id": dataset_id,
-                "application": application,
-                "team": team,
-                "topics": topics,
-                "layer_ids": layer_ids,
-                "maintainer": maintainer,
-                "maintainer_email": maintainer_email,
-                "geographic_coverage": geographic_coverage,
-            }
-            datasets.append(dataset)
+    datasets = []
+    csv_data = io.StringIO(decrypted_data.decode("utf-8-sig"))
+    reader = csv.DictReader(csv_data)
+
+    for row in reader:
+        log.error(row)
+        topics = row.get("topics")
+        layer_ids = row.get("layer_ids")
+
+        if topics:
+            topics = topics.split(",")
+
+        if layer_ids:
+            layer_ids = layer_ids.split(",")
+
+        dataset = {
+            "id": row["dataset_id"],
+            "application": row["application"],
+            "team": row.get("team"),
+            "topics": topics,
+            "layer_ids": layer_ids,
+            "maintainer": row.get("maintainer"),
+            "maintainer_email": row.get("maintainer_email"),
+            "geographic_coverage": row.get("geographic_coverage"),
+        }
+        datasets.append(dataset)
 
     return datasets
 

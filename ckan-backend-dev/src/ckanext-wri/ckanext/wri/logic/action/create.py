@@ -94,6 +94,8 @@ MIGRATE_DATASET_PARAMS = [
     "geographic_coverage",
     "whitelist",
     "blacklist",
+    "encryption_secret_name",
+    "encryption_secret_key",
 ]
 
 
