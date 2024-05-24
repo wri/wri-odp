@@ -151,13 +151,14 @@ def issue_delete(context: Context, data_dict: DataDict):
 
 
 def approve_pending_dataset(context: Context, data_dict: DataDict):
-    print("GOT HERE", flush=True)
+    print("HERE", flush=True)
     dataset_id = data_dict.get("dataset_id")
     # Fetch Pending Dataset Information
     try:
         pending_dataset_dict = tk.get_action("pending_dataset_show")(
             context, {"package_id": dataset_id}
         )["package_data"]
+        print("HERE 2-1", flush=True)
     except:
         pending_dataset_dict = None
 
@@ -166,9 +167,9 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
     else:
         # Fetch dataset from package_show
         try:
-            dataset_dict = tk.get_action("package_show")(context, {"id": dataset_id})[
-                "package_data"
-            ]
+            dataset_dict = tk.get_action("package_show")(context, {"id": dataset_id})
+            print(dataset_dict, flush=True)
+            print("HERE 2-2", flush=True)
         except Exception as err:
             raise err
         if dataset_dict:
@@ -186,6 +187,7 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
         for r in initial_dataset["resources"]
         if not r.get("layerObj") and not r.get("layerObjRaw")
     ]
+    print("HERE 3", flush=True)
     resources_without_layer = [
         r
         for r in pending_dataset["resources"]
@@ -256,8 +258,12 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
         resource["url"] = resource.get("url", resource.get("name"))
 
     # Update Dataset
+    print("HERE 4", flush=True)
     try:
-        dataset = tk.get_action("package_update")(context, pending_dataset)
+        print("HERE 5", flush=True)
+        dataset = tk.get_action("package_update")(
+            {"ignore_auth": True}, pending_dataset
+        )
     except Exception as err:
         raise err
 
@@ -271,10 +277,12 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
                 "dataset_id": dataset["id"],
                 "status": "closed",
             }
+            print("HERE 6", flush=True)
             tk.get_action("issue_update")(context, input_data)
 
     # Send Notifications
     if dataset.get("visibility_type") not in ["private", "draft"]:
+        print("HERE 7", flush=True)
         try:
             collab = tk.get_action("package_collaborator_list")(
                 context, {"id": dataset["id"]}
@@ -294,8 +302,9 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
             raise Exception("Error in sending issue/comment notification")
 
     # Delete Pending Dataset
+    print("HERE 8", flush=True)
     delete_data = tk.get_action("pending_dataset_delete")(
-        context, {"package_id": dataset_id}
+        { "ignore_auth": True }, {"package_id": dataset_id}
     )
 
     if delete_data:

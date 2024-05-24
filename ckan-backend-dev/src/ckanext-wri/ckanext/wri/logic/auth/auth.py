@@ -68,7 +68,10 @@ def package_create(up_func, context, data_dict):
     """
     Only allow the creation of packages if the approval status is set as pending and the is_approved flag is false
     """
-    if data_dict and data_dict.get("visibility_type") != "private":
+    if data_dict and (
+        data_dict.get("visibility_type") != "private"
+        and data_dict.get("visibility_type") != "draft"
+    ):
         if data_dict.get("approval_status") != "pending" or (
             data_dict.get("is_approved") != False
             and data_dict.get("is_approved") is not None
@@ -91,7 +94,11 @@ def package_update(up_func, context, data_dict):
     model = context["model"]
     user_obj = model.User.get(user)
     package = logic_auth.get_package_object(context, data_dict)
-    if data_dict and data_dict.get("visibility_type") != "private":
+    if (
+        data_dict
+        and data_dict.get("visibility_type") != "private"
+        and data_dict.get("visibility_type") != "draft"
+    ):
         if package.owner_org:
             # if there is an owner org then we must have update_dataset
             # permission for that organization
@@ -144,7 +151,9 @@ def notification_create(context: Context, data_dict: DataDict) -> AuthResult:
 
 
 def pending_dataset_create(context: Context, data_dict: DataDict) -> AuthResult:
-    return tk.check_access("package_update", context, data_dict)
+    print("PENDING DATASET UPDATE", flush=True)
+    print(data_dict, flush=True)
+    return tk.check_access("package_create", context, data_dict)
 
 
 def pending_dataset_show(context: Context, data_dict: DataDict) -> AuthResult:
@@ -161,6 +170,8 @@ def pending_dataset_show(context: Context, data_dict: DataDict) -> AuthResult:
 
 
 def pending_dataset_update(context: Context, data_dict: DataDict) -> AuthResult:
+    print("PENDING DATASET UPDATE", flush=True)
+    print(data_dict, flush=True)
     return tk.check_access("package_update", context, data_dict)
 
 
