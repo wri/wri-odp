@@ -15,14 +15,12 @@ def trigger_migration(data_dict):
     log = get_run_logger()
     is_bulk = data_dict.get("is_bulk", False)
     file_name = data_dict.get("file_name", "datasets.csv")
-    encryption_secret_name = data_dict.get("encryption_secret_name", "secret")
-    encryption_secret_key = data_dict.get("encryption_secret_key")
 
     if is_bulk:
         start_time = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         dataset_csv = [["dataset_id", "rw_url", "ckan_url"]]
 
-        datasets = get_datasets_from_csv(file_name, encryption_secret_name, encryption_secret_key)
+        datasets = get_datasets_from_csv(file_name)
 
         for data in datasets:
             data.update(data_dict)
