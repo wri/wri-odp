@@ -34,15 +34,12 @@ def create_dataset_rw(dataset):
 
 
 def create_layer_rw(r, dataset_rw_id):
-    if not r.get("layer"):
-        return r
-
     url = f"https://api.resourcewatch.org/v1/dataset/{dataset_rw_id}/layer"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {config.get('ckanext.wri.rw_api_key')}",
     }
-    body = r["layer"]
+    body = r["layerObj"] if r.get("layerObj") else r["layerObjRaw"]
     response = requests.post(url, headers=headers, data=json.dumps(body))
 
     layer_rw = response.json()

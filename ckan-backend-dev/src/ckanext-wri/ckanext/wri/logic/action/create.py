@@ -180,7 +180,7 @@ def pending_dataset_create(context: Context, data_dict: DataDict):
     if not package_data:
         raise tk.ValidationError(_("package_data is required"))
 
-    tk.check_access("package_update", context, package_data)
+    # tk.check_access("package_update", context, package_data)
 
     pending_dataset = None
 
@@ -366,7 +366,6 @@ def package_create(context: Context, data_dict: DataDict):
         dataset.get("visibility_type") != "private"
         and dataset.get("visibility_type") != "draft"
     ):
-        print("HERE 3-1", flush=True)
         collab = tk.get_action("package_collaborator_list")(
             {"ignore_auth": True}, {"id": dataset["id"]}
         )

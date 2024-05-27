@@ -117,6 +117,7 @@ def notification_bulk_update(
 
 
 def pending_dataset_update(context: Context, data_dict: DataDict):
+    print("GOT HERE PENDING DATASET UPDATE", flush=True)
     """Update a Pending Dataset"""
     package_id = data_dict.get("package_id")
     package_data = data_dict.get("package_data")
@@ -137,6 +138,8 @@ def pending_dataset_update(context: Context, data_dict: DataDict):
             package_data=package_data,
         )
     except Exception as e:
+        print("THERE WAS AN ERROR", flush=True)
+        print(e, flush=True)
         log.error(e)
         raise tk.ValidationError(e)
 
@@ -190,12 +193,12 @@ def package_patch(context: Context, data_dict: DataDict):
             "state": org.get("state"),
             "type": org.get("type"),
         }
-        dataset["organization"] = org
+        pending_dataset["organization"] = org
     data_dict["is_pending"] = True
     data_dict["is_approved"] = False
     data_dict["approval_status"] = "pending"
-    patch_dataset = tk.get_action("package_patch")(
-        context,
+    patch_dataset = logic.action.patch.package_patch(
+        {"ignore_auth": True},
         {
             "id": dataset_id,
             "approval_status": "pending",
@@ -206,12 +209,13 @@ def package_patch(context: Context, data_dict: DataDict):
             ),
         },
     )
+    _pending_dataset = {**pending_dataset, **data_dict}
     try:
         pending_update = tk.get_action("pending_dataset_update")(
             context,
             {
                 "package_id": dataset_id,
-                "package_data": data_dict,
+                "package_data": _pending_dataset,
             },
         )
     except logic.NotFound:
@@ -219,12 +223,12 @@ def package_patch(context: Context, data_dict: DataDict):
             context,
             {
                 "package_id": dataset_id,
-                "package_data": data_dict,
+                "package_data": _pending_dataset,
             },
         )
         if (
-            dataset.get("visibility_type") != "private"
-            and dataset.get("visibility_type") != "draft"
+            _pending_dataset.get("visibility_type") != "private"
+            and _pending_dataset.get("visibility_type") != "draft"
         ):
             collab = tk.get_action("package_collaborator_list")(
                 {"ignore_auth": True}, {"id": dataset["id"]}
@@ -312,9 +316,15 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
     resources_to_create_layer = []
 
     for resource in pending_dataset["resources"]:
-        if (resource.get("layer")) and resource.get("rw_id") and resource.get("url"):
+        if (
+            ((resource.get("layerObjRaw")) or resource.get("layerObj"))
+            and resource.get("rw_id")
+            and resource.get("url")
+        ):
             resources_to_edit_layer.append(edit_layer_rw(resource))
-        if (resource.get("layer")) and not resource.get("url"):
+        if (
+            (resource.get("layerObjRaw") or resource.get("layerObjRaw"))
+        ) and not resource.get("url"):
             resources_to_create_layer.append(create_layer_rw(resource, rw_id))
 
     resources = (

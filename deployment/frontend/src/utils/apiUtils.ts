@@ -2302,7 +2302,7 @@ export async function approvePendingDataset(
     }) as Resource[]
 
     const datasetRes = await fetch(
-        `${env.CKAN_URL}/api/action/package_update`,
+        `${env.CKAN_URL}/api/action/old_package_update`,
         {
             method: 'POST',
             headers: {
@@ -2315,8 +2315,8 @@ export async function approvePendingDataset(
     const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
     if (!dataset.success && dataset.error) {
         if (dataset.error.message)
-            throw Error(JSON.stringify(dataset.error).concat('package_update'))
-        throw Error(JSON.stringify(dataset.error).concat('package_update'))
+            throw Error(JSON.stringify(dataset.error).concat('old_package_update'))
+        throw Error(JSON.stringify(dataset.error).concat('old_package_update'))
     }
 
     // get and close all dataset issues
