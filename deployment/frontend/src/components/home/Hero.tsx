@@ -50,11 +50,6 @@ export function Hero() {
             href: '/topics',
             active: false,
         },
-        {
-            title: 'About',
-            href: '/about',
-            active: false,
-        },
     ]
     navigation.forEach((item) => {
         item.active = asPath.startsWith(item.href)
