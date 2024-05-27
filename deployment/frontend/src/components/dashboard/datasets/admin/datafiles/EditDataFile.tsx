@@ -50,18 +50,6 @@ export function EditDataFile({
         formState: { errors },
     } = formObj
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const editResource = api.dataset.editResource.useMutation({
-        onSuccess: async ({ title, name, id }) => {
-            notify(
-                `Successfully edited the "${title ?? name ?? id}" resource`,
-                'success'
-            )
-        },
-        onError: (error) => {
-            setErrorMessage(error.message)
-        },
-    })
-
     const allDataFiles = watch('resources')
     const notLayers = allDataFiles.filter(
         (datafile) =>
@@ -427,23 +415,6 @@ export function EditDataFile({
                                 <ErrorAlert text={errorMessage} />
                             </div>
                         )}
-                    </div>
-                    <div
-                        className={classNames(
-                            'px-4 sm:px-6 xxl:px-0 py-2 w-full flex justify-end',
-                            datafile.type === 'layer' ? 'sm:px-0 px-0' : ''
-                        )}
-                    >
-                        <LoaderButton
-                            variant="muted"
-                            type="button"
-                            onClick={() => {
-                                editResource.mutate(datafile)
-                            }}
-                            loading={editResource.isLoading}
-                        >
-                            Update Data File
-                        </LoaderButton>
                     </div>
                 </div>
             </DataFileAccordion>
