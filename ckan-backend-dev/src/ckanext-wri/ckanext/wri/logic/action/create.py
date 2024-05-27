@@ -340,7 +340,6 @@ def package_create(context: Context, data_dict: DataDict):
     data_dict["is_pending"] = True
     data_dict["is_approved"] = False
     data_dict["approval_status"] = "pending"
-    print("HERE", flush=True)
     dataset = l.action.create.package_create(context, data_dict)
     if data_dict.get("owner_org"):
         org = tk.get_action("organization_show")(
@@ -359,19 +358,17 @@ def package_create(context: Context, data_dict: DataDict):
             "type": org.get("type"),
         }
         dataset["organization"] = custom_org
-    print("HERE 2", flush=True)
     pending_dataset = tk.get_action("pending_dataset_create")(
         {"ignore_auth": True},
         {"package_id": dataset.get("id"), "package_data": dataset},
     )
-    print("HERE 3", flush=True)
     if (
         dataset.get("visibility_type") != "private"
         and dataset.get("visibility_type") != "draft"
     ):
         print("HERE 3-1", flush=True)
         collab = tk.get_action("package_collaborator_list")(
-            { "ignore_auth": True }, {"id": dataset["id"]}
+            {"ignore_auth": True}, {"id": dataset["id"]}
         )
         send_group_notification(
             context,
@@ -387,10 +384,8 @@ def package_create(context: Context, data_dict: DataDict):
         dataset.get("visibility_type") == "private"
         or dataset.get("visibility_type") == "draft"
     ):
-        print("HERE 3-2", flush=True)
         tk.get_action("approve_pending_dataset")(
             context, {"dataset_id": dataset.get("id")}
         )
 
-    print("HERE 4", flush=True)
     return dataset

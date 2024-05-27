@@ -150,15 +150,12 @@ def issue_delete(context: Context, data_dict: DataDict):
     return "Issue delete is deprecated"
 
 
-def approve_pending_dataset(context: Context, data_dict: DataDict):
-    print("HERE", flush=True)
-    dataset_id = data_dict.get("dataset_id")
-    # Fetch Pending Dataset Information
+def package_patch(context: Context, data_dict: DataDict):
+    dataset_id = data_dict.get("id")
     try:
         pending_dataset_dict = tk.get_action("pending_dataset_show")(
             context, {"package_id": dataset_id}
         )["package_data"]
-        print("HERE 2-1", flush=True)
     except:
         pending_dataset_dict = None
 
@@ -168,8 +165,98 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
         # Fetch dataset from package_show
         try:
             dataset_dict = tk.get_action("package_show")(context, {"id": dataset_id})
-            print(dataset_dict, flush=True)
-            print("HERE 2-2", flush=True)
+        except Exception as err:
+            raise err
+        if dataset_dict:
+            pending_dataset = dataset_dict
+
+    dataset_details = tk.get_action("package_show")(context, {"id": dataset_id})
+
+    rw_id = data_dict.get("rw_id", None)
+    org = None
+    if data_dict.get("owner_org"):
+        org = tk.get_action("organization_show")(
+            context, {"id": data_dict.get("owner_org")}
+        )
+        org = {
+            "id": org.get("id"),
+            "name": org.get("name"),
+            "title": org.get("title"),
+            "description": org.get("description"),
+            "image_url": org.get("image_url"),
+            "created": org.get("created"),
+            "approval_status": org.get("approval_status"),
+            "is_organization": org.get("is_organization"),
+            "state": org.get("state"),
+            "type": org.get("type"),
+        }
+        dataset["organization"] = org
+    data_dict["is_pending"] = True
+    data_dict["is_approved"] = False
+    data_dict["approval_status"] = "pending"
+    patch_dataset = tk.get_action("package_patch")(
+        context,
+        {
+            "id": dataset_id,
+            "approval_status": "pending",
+            "visibility_type": (
+                data_dict.get("visibility_type")
+                if data_dict.get("visibility_type")
+                else "draft"
+            ),
+        },
+    )
+    try:
+        pending_update = tk.get_action("pending_dataset_update")(
+            context,
+            {
+                "package_id": dataset_id,
+                "package_data": data_dict,
+            },
+        )
+    except logic.NotFound:
+        pending_update = tk.get_action("pending_dataset_create")(
+            context,
+            {
+                "package_id": dataset_id,
+                "package_data": data_dict,
+            },
+        )
+        if (
+            dataset.get("visibility_type") != "private"
+            and dataset.get("visibility_type") != "draft"
+        ):
+            collab = tk.get_action("package_collaborator_list")(
+                {"ignore_auth": True}, {"id": dataset["id"]}
+            )
+            send_group_notification(
+                context,
+                {
+                    "owner_org": dataset.get("owner_org"),
+                    "creator_id": dataset.get("creator_user_id"),
+                    "collaborator_id": collab,
+                    "dataset_id": dataset["id"],
+                    "action": "pending_dataset",
+                },
+            )
+
+
+def approve_pending_dataset(context: Context, data_dict: DataDict):
+    dataset_id = data_dict.get("dataset_id")
+    # Fetch Pending Dataset Information
+    try:
+        pending_dataset_dict = tk.get_action("pending_dataset_show")(
+            context, {"package_id": dataset_id}
+        )["package_data"]
+    except:
+        pending_dataset_dict = None
+
+    if pending_dataset_dict:
+        pending_dataset = pending_dataset_dict
+    else:
+        # Fetch dataset from package_show
+        try:
+            dataset_dict = tk.get_action("package_show")(context, {"id": dataset_id})
         except Exception as err:
             raise err
         if dataset_dict:
@@ -187,7 +274,6 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
         for r in initial_dataset["resources"]
         if not r.get("layerObj") and not r.get("layerObjRaw")
     ]
-    print("HERE 3", flush=True)
     resources_without_layer = [
         r
         for r in pending_dataset["resources"]
@@ -218,8 +304,6 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
             "tableName": layer.get("tableName", ""),
         }
         dataset_rw = create_dataset_rw(rw_dataset)
-        print("DATASET RW", flush=True)
-        print(dataset_rw, flush=True)
         rw_id = dataset_rw.get("id")
 
     # Handle Layer Information
@@ -258,9 +342,7 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
         resource["url"] = resource.get("url", resource.get("name"))
 
     # Update Dataset
-    print("HERE 4", flush=True)
     try:
-        print("HERE 5", flush=True)
         dataset = tk.get_action("package_update")(
             {"ignore_auth": True}, pending_dataset
         )
@@ -277,12 +359,10 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
                 "dataset_id": dataset["id"],
                 "status": "closed",
             }
-            print("HERE 6", flush=True)
             tk.get_action("issue_update")(context, input_data)
 
     # Send Notifications
     if dataset.get("visibility_type") not in ["private", "draft"]:
-        print("HERE 7", flush=True)
         try:
             collab = tk.get_action("package_collaborator_list")(
                 context, {"id": dataset["id"]}
@@ -302,9 +382,8 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
             raise Exception("Error in sending issue/comment notification")
 
     # Delete Pending Dataset
-    print("HERE 8", flush=True)
     delete_data = tk.get_action("pending_dataset_delete")(
-        { "ignore_auth": True }, {"package_id": dataset_id}
+        {"ignore_auth": True}, {"package_id": dataset_id}
     )
 
     if delete_data:
