@@ -239,6 +239,7 @@ def package_patch(context: Context, data_dict: DataDict):
                     "action": "pending_dataset",
                 },
             )
+    return pending_update.get("package_data")
 
 
 def approve_pending_dataset(context: Context, data_dict: DataDict):

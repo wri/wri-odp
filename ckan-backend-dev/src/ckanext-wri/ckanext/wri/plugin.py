@@ -34,6 +34,7 @@ from ckanext.wri.logic.action.update import (
     notification_bulk_update,
     issue_delete,
     approve_pending_dataset,
+    package_patch,
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -217,6 +218,8 @@ class WriPlugin(plugins.SingletonPlugin):
             "resource_location_search": resource_search,
             "approve_pending_dataset": approve_pending_dataset,
             "package_create": package_create,
+            "package_patch": package_patch,
+            "old_package_update": logic.action.update.package_update,
         }
 
     # IPermissionLabels
