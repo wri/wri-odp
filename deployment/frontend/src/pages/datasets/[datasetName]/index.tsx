@@ -783,7 +783,6 @@ export default function DatasetPage(
                 }
             />
             <Footer
-                style=""
                 links={{
                     primary: { title: 'Explore Teams', href: '/teams' },
                     secondary: { title: 'Explore Topics', href: '/topics' },
