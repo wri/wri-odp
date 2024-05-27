@@ -47,18 +47,21 @@ export default function Footer({
                         <p className="text-base font-bold">ABOUT WRI</p>
                         <a
                             href="https://www.wri.org/about"
+                            target="_blank"
                             className=" font-normal"
                         >
                             About us
                         </a>
                         <a
                             href="https://www.wri.org/our-work"
+                            target="_blank"
                             className=" font-normal"
                         >
                             Our Work
                         </a>
                         <a
                             href="https://www.wri.org/our-approach"
+                            target="_blank"
                             className=" font-normal"
                         >
                             Our Approach

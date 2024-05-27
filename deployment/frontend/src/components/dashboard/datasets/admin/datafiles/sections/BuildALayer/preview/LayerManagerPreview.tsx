@@ -4,6 +4,7 @@ import { useMap } from 'react-map-gl'
 import {
     Layer,
     LayerManager as VizzLayerManager,
+//@ts-ignore
 } from 'layer-manager/dist/components'
 import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
 import pick from 'lodash/pick'

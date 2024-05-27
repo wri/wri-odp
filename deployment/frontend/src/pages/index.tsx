@@ -117,67 +117,14 @@ export default function Home(
                                 here or have other feedback to share, reach out
                                 to
                                 <a
-                                    href="mailto:test@gmail.com"
-                                    className="text-primary-500"
+                                    href="mailto:data@wri.org"
+                                    className="text-blue-500"
                                 >
                                     {' '}
-                                    add email here
+                                    data@wri.org
                                 </a>
                             </li>
-                            <li>
-                                <Link
-                                    href="/search"
-                                    className=" text-xl text-blue-600 underline"
-                                >
-                                    SEARCH - Explore Data
-                                </Link>
-                                : Explore our data catalog by searching the
-                                keywords relevant to the topics of your
-                                interest. Use the Advanced Search option to
-                                filter results by topic, format, language and
-                                more.
-                            </li>
-                            <li>
-                                <Link
-                                    href="/search_advanced"
-                                    className=" text-xl text-blue-600 underline"
-                                >
-                                    SEARCH - Advanced Search
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    href="/topics"
-                                    className=" text-xl text-blue-600 underline"
-                                >
-                                    TOPICS
-                                </Link>
-                                &nbsp; Explore reliable datasets filtered by the
-                                topic of your interest.
-                            </li>
-                            <li>
-                                <Link
-                                    href="/teams"
-                                    className=" text-xl text-blue-600 underline"
-                                >
-                                    TOPICS
-                                </Link>
-                                &nbsp;This page lets you explore all the data
-                                associated with a specific WRI project or team.
-                            </li>
                         </ul>
-                        <p>
-                            If you have questions about a project&apos;s data
-                            reach out to the point of contact in the dataset or
-                            to{' '}
-                            <a
-                                href="mailto:test@gmail.com"
-                                className="text-primary-500"
-                            >
-                                {' '}
-                                add email here
-                            </a>
-                        </p>
                     </div>
                     <Button
                         className="mr-auto"

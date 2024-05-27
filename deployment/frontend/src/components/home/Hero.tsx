@@ -31,8 +31,13 @@ export function Hero() {
     const router = useRouter()
     const navigation = [
         {
-            title: 'Search',
+            title: 'Explore',
             href: '/search',
+            active: false,
+        },
+        {
+            title: 'Search',
+            href: '/search_advanced',
             active: false,
         },
         {
@@ -43,11 +48,6 @@ export function Hero() {
         {
             title: 'Topics',
             href: '/topics',
-            active: false,
-        },
-        {
-            title: 'About',
-            href: '/about',
             active: false,
         },
     ]
@@ -214,6 +214,7 @@ export function Hero() {
                             <a
                                 href="https://www.wri.org/data/open-data-commitment"
                                 className=" text-blue-500 underline"
+                                target="_blank"
                             >
                                 {' '}
                                 open by default
@@ -222,6 +223,7 @@ export function Hero() {
                             <a
                                 href="https://www.wri.org/research/excellence"
                                 className=" text-blue-500 underline"
+                                target="_blank"
                             >
                                 research excellence.
                             </a>

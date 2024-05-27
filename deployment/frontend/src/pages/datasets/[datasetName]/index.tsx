@@ -42,6 +42,7 @@ import { matchesAnyPattern } from '@/utils/general'
 import { Versioning } from '@/components/datasets/sections/Versioning'
 
 import { useActiveLayerGroups } from '@/utils/storeHooks'
+import Footer from '@/components/_shared/Footer'
 
 function customDataLayer(data: { event: string; resource_name: string }) {
     if (env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
@@ -780,6 +781,12 @@ export default function DatasetPage(
                         mapDisplayPreview={mapDisplayPreview}
                     />
                 }
+            />
+            <Footer
+                links={{
+                    primary: { title: 'Explore Teams', href: '/teams' },
+                    secondary: { title: 'Explore Topics', href: '/topics' },
+                }}
             />
         </>
     )

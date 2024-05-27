@@ -13,7 +13,6 @@ export default async function handler(
             'content-type': 'application/x-www-form-urlencoded',
         },
     })
-    const json = await response.json()
-
-    return res.json(json)
+    const json = await response.text()
+    return res.status(response.status).json(json)
 }
