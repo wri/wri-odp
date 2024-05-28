@@ -354,7 +354,7 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
 
     # Update Dataset
     try:
-        dataset = tk.get_action("package_update")(
+        dataset = tk.get_action("old_package_update")(
             {"ignore_auth": True}, pending_dataset
         )
     except Exception as err:
@@ -376,7 +376,7 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
     if dataset.get("visibility_type") not in ["private", "draft"]:
         try:
             collab = tk.get_action("package_collaborator_list")(
-                context, {"id": dataset["id"]}
+                { "ignore_auth": True}, {"id": dataset["id"]}
             )
             send_group_notification(
                 context,

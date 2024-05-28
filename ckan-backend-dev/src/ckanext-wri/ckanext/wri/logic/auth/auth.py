@@ -177,3 +177,6 @@ def pending_dataset_update(context: Context, data_dict: DataDict) -> AuthResult:
 
 def pending_dataset_delete(context: Context, data_dict: DataDict) -> AuthResult:
     return tk.check_access("package_delete", context, data_dict)
+
+def package_collaborator_list(context: Context, data_dict: DataDict) -> AuthResult:
+    return tk.check_access("package_show", context, data_dict)
