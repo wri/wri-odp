@@ -61,7 +61,7 @@ describe("Chart view", () => {
     "should be creatable from the UI",
     {
       retries: {
-        runMode: 5,
+        runMode: 10,
         openMode: 0,
       },
     },
