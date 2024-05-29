@@ -154,7 +154,7 @@ def notification_create(
 
     user_notifications = Notification(
         recipient_id=recipient_id,
-        sender_id=sender_id,
+        sender_id=sender_id if sender_id else '',
         activity_type=activity_type,
         object_type=object_type,
         object_id=object_id,

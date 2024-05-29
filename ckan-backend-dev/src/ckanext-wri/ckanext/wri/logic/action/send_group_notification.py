@@ -38,7 +38,7 @@ def send_group_notification(context, GroupNotificationParams):
     recipient_ids = []
     recipient_users = []
     owner_org = GroupNotificationParams.get("owner_org")
-    creator_id = GroupNotificationParams.get("creator_id")
+    creator_id = GroupNotificationParams.get("creator_id", None)
     collaborator_id = GroupNotificationParams.get("collaborator_id")
     dataset_id = GroupNotificationParams.get("dataset_id")
     action = GroupNotificationParams.get("action")
@@ -96,7 +96,7 @@ def send_group_notification(context, GroupNotificationParams):
                 context,
                 {
                     "recipient_id": recipient_id,
-                    "sender_id": context["auth_user_obj"].id,
+                    "sender_id": context["auth_user_obj"].id if context.get("auth_user_obj") else None,
                     "activity_type": action,
                     "object_type": "dataset",
                     "object_id": dataset_id,

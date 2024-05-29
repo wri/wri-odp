@@ -7,7 +7,6 @@ from ckan import model
 
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def _setup():
-    user = factories.Sysadmin()
     dataset = factories.Dataset(
         notes="My dataset description",
         private=False,
@@ -16,23 +15,23 @@ def _setup():
         wri_data=False,
     )
 
-    context = {
-        "user": user["name"],
-        "user_obj": user,
-    }
-    context['auth_user_obj'] = model.User.get(context['user'])
 
     data_dict = {
         "package_id": dataset["id"],
         "package_data": dataset,
     }
 
-    return dataset, context, data_dict
+    return dataset, data_dict
 
 
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_create():
-   dataset, context, data_dict = _setup()
+   user = factories.Sysadmin()
+   dataset, data_dict = _setup()
+   context = {
+        "user": user["name"],
+        "user_obj": user,
+   }
    context['auth_user_obj'] = model.User.get(context['user'])
 
    result = get_action("pending_dataset_create")(context, data_dict)
@@ -43,7 +42,12 @@ def test_pending_dataset_create():
 
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_show():
-   dataset, context, data_dict = _setup()
+   user = factories.Sysadmin()
+   dataset, data_dict = _setup()
+   context = {
+        "user": user["name"],
+        "user_obj": user,
+   }
    context['auth_user_obj'] = model.User.get(context['user'])
 
    get_action("pending_dataset_create")(context, data_dict)
@@ -56,7 +60,12 @@ def test_pending_dataset_show():
 
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_update():
-   dataset, context, data_dict = _setup()
+   user = factories.Sysadmin()
+   dataset, data_dict = _setup()
+   context = {
+        "user": user["name"],
+        "user_obj": user,
+   }
    context['auth_user_obj'] = model.User.get(context['user'])
 
    get_action("pending_dataset_create")(context, data_dict)
@@ -82,7 +91,12 @@ def test_pending_dataset_update():
 
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_delete():
-   dataset, context, data_dict = _setup()
+   user = factories.Sysadmin()
+   dataset, data_dict = _setup()
+   context = {
+        "user": user["name"],
+        "user_obj": user,
+   }
    context['auth_user_obj'] = model.User.get(context['user'])
 
    get_action("pending_dataset_create")(context, data_dict)
@@ -102,7 +116,12 @@ def test_pending_dataset_delete():
 
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_diff_show():
-    dataset, context, data_dict = _setup()
+    user = factories.Sysadmin()
+    dataset, data_dict = _setup()
+    context = {
+         "user": user["name"],
+         "user_obj": user,
+    }
     context['auth_user_obj'] = model.User.get(context['user'])
 
     get_action("pending_dataset_create")(context, data_dict)

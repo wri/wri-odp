@@ -6,7 +6,6 @@ from ckan.common import _
 import ckan.logic.auth as logic_auth
 
 
-@tk.auth_allow_anonymous_access
 def _package_update(context: Context, data_dict: DataDict) -> AuthResult:
     model = context["model"]
     user = context.get("user")
