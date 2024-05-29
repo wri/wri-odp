@@ -59,8 +59,10 @@ describe("Search page", () => {
         language: i < 7 ? "en" : "pt",
         wri_data: i < 7 ? true : false,
         visibility_type: "public",
+      }).then((response) => {
+        cy.approvePendingDatasetAPI(name);
+        datasets.push(name);
       });
-      datasets.push(name);
     });
   });
 
