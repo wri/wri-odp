@@ -4,7 +4,6 @@ import pytest
 from ckan.logic import NotFound, NotAuthorized, get_action, ValidationError
 from ckan import model
 import ckan.tests.factories as factories
-from ckan.logic import get_action
 
 
 @pytest.mark.usefixtures(u"with_plugins", u"test_request_context")
@@ -24,30 +23,35 @@ def test_package_create():
         "user": userobj_sysadmin["name"], 
         "user_obj": userobj_sysadmin
     }
+    context_sysadmin["auth_user_obj"] = model.User.get(context_sysadmin["user"])
 
     context_org_admin = {
         "model": model, "session": session,
         "user": userobj_org_admin["name"], 
         "user_obj": userobj_org_admin
     }
+    context_org_admin["auth_user_obj"] = model.User.get(context_org_admin["user"])
 
     context_org_editor = {
         "model": model, "session": session,
         "user": userobj_org_editor["name"], 
         "user_obj": userobj_org_editor
     }
+    context_org_editor["auth_user_obj"] = model.User.get(context_org_editor["user"])
 
     context_org_member = {
         "model": model, "session": session,
         "user": userobj_org_member["name"], 
         "user_obj": userobj_org_member
     }
+    context_org_member["auth_user_obj"] = model.User.get(context_org_member["user"])
 
     context_general = {
         "model": model, "session": session,
         "user": userobj_general["name"], 
         "user_obj": userobj_general
     }
+    context_general["auth_user_obj"] = model.User.get(context_general["user"])
 
     get_action("organization_member_create")(
         context=context_sysadmin,
@@ -110,7 +114,7 @@ def test_package_create():
 
     dataset_draft = dict(dataset_public)
     dataset_draft["draft"] = True
-    dataset_draft["visibility_type"] = None
+    dataset_draft["visibility_type"] = 'private'
     dataset_draft["name"] = "draft-dataset" 
 
     dataset_private = dict(dataset_public)

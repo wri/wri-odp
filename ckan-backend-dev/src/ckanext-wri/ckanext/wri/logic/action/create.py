@@ -366,15 +366,12 @@ def package_create(context: Context, data_dict: DataDict):
         dataset.get("visibility_type") != "private"
         and dataset.get("visibility_type") != "draft"
     ):
-        collab = tk.get_action("package_collaborator_list")(
-            {"ignore_auth": True}, {"id": dataset["id"]}
-        )
         send_group_notification(
             context,
             {
                 "owner_org": dataset.get("owner_org"),
                 "creator_id": dataset.get("creator_user_id"),
-                "collaborator_id": collab,
+                "collaborator_id": [],
                 "dataset_id": dataset["id"],
                 "action": "pending_dataset",
             },

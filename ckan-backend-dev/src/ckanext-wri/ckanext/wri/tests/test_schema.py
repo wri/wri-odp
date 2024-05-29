@@ -15,6 +15,7 @@ def test_package_create():
         "user": userobj["name"], "ignore_auth": True,
         "user_obj": userobj
     }
+    context["auth_user_obj"] = model.User.get(context["user"])
 
     organization_dict = factories.Organization()
     group_dict = factories.Group()

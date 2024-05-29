@@ -389,14 +389,17 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
 
     # Update Dataset
     try:
-        dataset = tk.get_action("old_package_update")(
+        dataset = tk.get_action("package_update")(
             {"ignore_auth": True}, pending_dataset
         )
     except Exception as err:
         raise err
 
     # Close Associated Issues
-    issues = tk.get_action("issue_search")(context, {"dataset_id": dataset["id"]})
+    try:
+        issues = tk.get_action("issue_search")(context, {"dataset_id": dataset["id"]})
+    except:
+        issues = {"count": 0}
 
     if issues.get("count") > 0:
         for issue in issues:
@@ -500,7 +503,7 @@ def resource_update(
 
     try:
         context["use_cache"] = False
-        updated_pkg_dict = _get_action("old_package_update")(context, pkg_dict)
+        updated_pkg_dict = _get_action("package_update")(context, pkg_dict)
     except ValidationError as e:
         try:
             error_dict = cast("list[ErrorDict]", e.error_dict["resources"])[n]

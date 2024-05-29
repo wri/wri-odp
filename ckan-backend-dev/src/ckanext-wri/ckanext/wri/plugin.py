@@ -222,8 +222,8 @@ class WriPlugin(plugins.SingletonPlugin):
             "package_create": package_create,
             "package_patch": package_patch,
             "old_package_patch": logic.action.patch.package_patch,
-            "old_package_update": logic.action.update.package_update,
             "resource_update": resource_update,
+            #"package_delete": package_delete,
         }
 
     # IPermissionLabels
@@ -328,7 +328,6 @@ class WriPlugin(plugins.SingletonPlugin):
     # IPackageController
 
     def after_dataset_create(self, context, pkg_dict):
-        log.error("!@#!@#!@#!")
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)
@@ -337,8 +336,6 @@ class WriPlugin(plugins.SingletonPlugin):
             ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
-        log.error("!@#!@#!@#!")
-        log.error(pkg_dict)
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment

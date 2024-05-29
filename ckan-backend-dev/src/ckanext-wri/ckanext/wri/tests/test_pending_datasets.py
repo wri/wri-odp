@@ -2,6 +2,7 @@ import pytest
 
 import ckan.tests.factories as factories
 from ckan.logic import get_action
+from ckan import model
 
 
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
@@ -19,6 +20,7 @@ def _setup():
         "user": user["name"],
         "user_obj": user,
     }
+    context['auth_user_obj'] = model.User.get(context['user'])
 
     data_dict = {
         "package_id": dataset["id"],
@@ -31,6 +33,7 @@ def _setup():
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_create():
    dataset, context, data_dict = _setup()
+   context['auth_user_obj'] = model.User.get(context['user'])
 
    result = get_action("pending_dataset_create")(context, data_dict)
 
@@ -41,6 +44,7 @@ def test_pending_dataset_create():
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_show():
    dataset, context, data_dict = _setup()
+   context['auth_user_obj'] = model.User.get(context['user'])
 
    get_action("pending_dataset_create")(context, data_dict)
 
@@ -53,6 +57,7 @@ def test_pending_dataset_show():
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_update():
    dataset, context, data_dict = _setup()
+   context['auth_user_obj'] = model.User.get(context['user'])
 
    get_action("pending_dataset_create")(context, data_dict)
 
@@ -78,6 +83,7 @@ def test_pending_dataset_update():
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_delete():
    dataset, context, data_dict = _setup()
+   context['auth_user_obj'] = model.User.get(context['user'])
 
    get_action("pending_dataset_create")(context, data_dict)
 
@@ -97,6 +103,7 @@ def test_pending_dataset_delete():
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_diff_show():
     dataset, context, data_dict = _setup()
+    context['auth_user_obj'] = model.User.get(context['user'])
 
     get_action("pending_dataset_create")(context, data_dict)
 
