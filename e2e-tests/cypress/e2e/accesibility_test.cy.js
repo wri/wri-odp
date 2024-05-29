@@ -39,30 +39,34 @@ const replaceParams = (route) => {
 describe("Pages meet the accessibility requirements onload ", () => {
   before(function () {
     cy.createOrganizationAPI(team);
-    cy.fixture("airtravel.csv").then((fileContent) => {
-      cy.createDatasetAPI(team, datasetName, true, {
-        notes: "test",
-        draft: "true",
-        approval_status: "pending",
-        short_description: "test",
-        technical_notes: "https://source.com/stat",
-        visibility_type: "public",
-        maintainer: "Stephen Oni",
-        maintainer_email: "stephenoni2@gmail.com",
-        author: "Stephen",
-        author_email: "stephenoni2@gmail.com",
-        update_frequency: "hourly",
-        is_approved: "false",
-        resources: [
-          {
-            format: "CSV",
-            name: "airtravel",
-            description: "airtravel",
-            upload: fileContent,
-          },
-        ]
-      });
+    cy.createDatasetAPI(team, datasetName, true, {
+      notes: "test",
+      draft: "true",
+      approval_status: "pending",
+      short_description: "test",
+      technical_notes: "https://source.com/stat",
+      visibility_type: "public",
+      maintainer: "Stephen Oni",
+      maintainer_email: "stephenoni2@gmail.com",
+      author: "Stephen",
+      author_email: "stephenoni2@gmail.com",
+      update_frequency: "hourly",
+      is_approved: "false",
     });
+  });
+  cy.fixture("airtravel.csv").then((fileContent) => {
+    cy.createDatasetAPI(team, datasetName2, true, {
+      resources: [
+        {
+          format: "CSV",
+          name: "airtravel",
+          description: "airtravel",
+          upload: fileContent,
+        },
+      ],
+    });
+    cy.approvePendingDatasetAPI(datasetName);
+    cy.approvePendingDatasetAPI(datasetName2);
 
     cy.createGroupAPI(topic);
   });
