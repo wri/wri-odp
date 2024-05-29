@@ -53,22 +53,22 @@ describe("Pages meet the accessibility requirements onload ", () => {
       update_frequency: "hourly",
       is_approved: "false",
     });
-  });
-  cy.fixture("airtravel.csv").then((fileContent) => {
-    cy.createDatasetAPI(team, datasetName2, true, {
-      resources: [
-        {
-          format: "CSV",
-          name: "airtravel",
-          description: "airtravel",
-          upload: fileContent,
-        },
-      ],
-    });
-    cy.approvePendingDatasetAPI(datasetName);
-    cy.approvePendingDatasetAPI(datasetName2);
+    cy.fixture("airtravel.csv").then((fileContent) => {
+      cy.createDatasetAPI(team, datasetName2, true, {
+        resources: [
+          {
+            format: "CSV",
+            name: "airtravel",
+            description: "airtravel",
+            upload: fileContent,
+          },
+        ],
+      });
+      cy.approvePendingDatasetAPI(datasetName);
+      cy.approvePendingDatasetAPI(datasetName2);
 
-    cy.createGroupAPI(topic);
+      cy.createGroupAPI(topic);
+    });
   });
 
   beforeEach(() => {
