@@ -55,20 +55,10 @@ services:
       #      - SMTP_PASSWORD=${SMTP_PASSWORD}
       #      - SMTP_FROM=${SMTP_FROM}
       #      - PREFECT_INTERNAL_URL=http://prefect:4200
-      #    depends_on:
-      #      ckan-dev:
-      #        condition: service_healthy
       #    ports:
       #      - "0.0.0.0:3000:3000"
       #    healthcheck:
       #      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
-
-        #  datapusher:
-        #    container_name: ${DATAPUSHER_CONTAINER_NAME}
-        #    image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}
-        #    restart: unless-stopped
-        #    healthcheck:
-        #      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
 
   prefect:
     container_name: prefect-server
