@@ -415,7 +415,7 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
         try:
             collab = tk.get_action("package_collaborator_list")(
                 {"ignore_auth": True}, {"id": dataset["id"]}
-            )
+            ) if ckan.authz.check_config_permission('allow_dataset_collaborators') else []
             send_group_notification(
                 context,
                 {
