@@ -651,7 +651,7 @@ def dataset_release_notes(context: Context, data_dict: DataDict):
                     and activity_type='changed package'
                     and ((data::json->>'package')::json->>'release_notes') != ''
                order by
-                    1, 2 DESC
+                    timestamp DESC
                """.format(
             id
         )
