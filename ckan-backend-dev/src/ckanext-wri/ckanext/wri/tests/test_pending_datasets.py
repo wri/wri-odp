@@ -3,8 +3,10 @@ import pytest
 import ckan.tests.factories as factories
 from ckan.logic import get_action
 from ckan import model
+import unittest.mock as mock
 
 
+@mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def _setup():
     dataset = factories.Dataset(
@@ -24,6 +26,7 @@ def _setup():
     return dataset, data_dict
 
 
+@mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_create():
    user = factories.Sysadmin()
@@ -41,6 +44,7 @@ def test_pending_dataset_create():
    assert result["package_data"] == dataset
 
 
+@mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_show():
    user = factories.Sysadmin()
@@ -60,6 +64,7 @@ def test_pending_dataset_show():
    assert result["package_data"] == dataset
 
 
+@mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_update():
    user = factories.Sysadmin()
@@ -92,6 +97,7 @@ def test_pending_dataset_update():
    assert result["package_data"]["title"] == "New Title"
 
 
+@mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_delete():
    user = factories.Sysadmin()
@@ -118,6 +124,7 @@ def test_pending_dataset_delete():
        assert e.message == f"Pending Dataset not found: {dataset['id']}"
 
 
+@mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_diff_show():
     user = factories.Sysadmin()

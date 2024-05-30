@@ -4,10 +4,12 @@ from ckan.logic import NotFound, get_action, ValidationError
 from ckan import model
 import ckan.tests.factories as factories
 from ckan.logic import get_action
+import unittest.mock as mock
 
 import json
 
 
+@mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures(u'with_plugins', u'test_request_context')
 def test_location_search():
     userobj = factories.Sysadmin()
