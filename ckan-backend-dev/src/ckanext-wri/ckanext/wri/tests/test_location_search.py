@@ -11,7 +11,7 @@ import json
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures(u'with_plugins', u'test_request_context')
-def test_location_search():
+def test_location_search(mail_user):
     userobj = factories.Sysadmin()
     session = model.Session
     context = {

@@ -9,7 +9,7 @@ import unittest.mock as mock
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures(u"with_plugins", u"test_request_context")
-def test_package_create():
+def test_package_create(mail_user):
     userobj = factories.Sysadmin()
     session = model.Session
     context = {

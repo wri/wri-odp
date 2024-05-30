@@ -9,7 +9,7 @@ from ckan.logic import get_action
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
-def test_search_queries():
+def test_search_queries(mail_user):
     userobj = factories.Sysadmin()
     session = model.Session
     context = {

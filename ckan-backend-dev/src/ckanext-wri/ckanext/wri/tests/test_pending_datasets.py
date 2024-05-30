@@ -28,7 +28,7 @@ def _setup():
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
-def test_pending_dataset_create():
+def test_pending_dataset_create(mail_user):
    user = factories.Sysadmin()
    dataset, data_dict = _setup()
    context = {
@@ -46,7 +46,7 @@ def test_pending_dataset_create():
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
-def test_pending_dataset_show():
+def test_pending_dataset_show(mail_user):
    user = factories.Sysadmin()
    dataset, data_dict = _setup()
    context = {
@@ -66,7 +66,7 @@ def test_pending_dataset_show():
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
-def test_pending_dataset_update():
+def test_pending_dataset_update(mail_user):
    user = factories.Sysadmin()
    dataset, data_dict = _setup()
    context = {
@@ -99,7 +99,7 @@ def test_pending_dataset_update():
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
-def test_pending_dataset_delete():
+def test_pending_dataset_delete(mail_user):
    user = factories.Sysadmin()
    dataset, data_dict = _setup()
    context = {
@@ -126,7 +126,7 @@ def test_pending_dataset_delete():
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
-def test_pending_diff_show():
+def test_pending_diff_show(mail_user):
     user = factories.Sysadmin()
     dataset, data_dict = _setup()
     context = {
