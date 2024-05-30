@@ -186,9 +186,12 @@ def pending_dataset_create(context: Context, data_dict: DataDict):
 
     try:
         pending_dataset = PendingDatasets.create(package_id, package_data)
-    except Exception as e:
-        log.error(e)
-        raise tk.ValidationError(e)
+    except Exception as _e:
+        log.error(_e)
+        try:
+            pending_dataset = PendingDatasets.get(package_id)
+        except Exception as e:
+            raise tk.ValidationError(_e)
 
     if not pending_dataset:
         raise tk.ValidationError(_(f"Pending Dataset not found: {package_id}"))
