@@ -33,6 +33,7 @@ def test_pending_dataset_create():
         "user_obj": user,
    }
    context['auth_user_obj'] = model.User.get(context['user'])
+   data_dict['creator_id'] = model.User.get(context['user']).id
 
    result = get_action("pending_dataset_create")(context, data_dict)
 
@@ -49,6 +50,7 @@ def test_pending_dataset_show():
         "user_obj": user,
    }
    context['auth_user_obj'] = model.User.get(context['user'])
+   data_dict['creator_id'] = model.User.get(context['user']).id
 
    get_action("pending_dataset_create")(context, data_dict)
 
@@ -67,6 +69,7 @@ def test_pending_dataset_update():
         "user_obj": user,
    }
    context['auth_user_obj'] = model.User.get(context['user'])
+   data_dict['creator_id'] = model.User.get(context['user']).id
 
    get_action("pending_dataset_create")(context, data_dict)
 
@@ -100,6 +103,7 @@ def test_pending_dataset_delete():
    context['auth_user_obj'] = model.User.get(context['user'])
 
    get_action("pending_dataset_create")(context, data_dict)
+   data_dict['creator_id'] = model.User.get(context['user']).id
 
    result = get_action("pending_dataset_show")(context, {"package_id": dataset["id"]})
 
@@ -125,6 +129,7 @@ def test_pending_diff_show():
     context['auth_user_obj'] = model.User.get(context['user'])
 
     get_action("pending_dataset_create")(context, data_dict)
+    data_dict['creator_id'] = model.User.get(context['user']).id
 
     updated_dataset = dataset.copy()
     updated_dataset["title"] = "New Title"
