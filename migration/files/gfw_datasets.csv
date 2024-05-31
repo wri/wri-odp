@@ -1,4 +1,4 @@
-dataset_id,application,team,topics,query,gfw_datasets,layer_ids
+dataset_id,application,team,topics,query,gfw_dataset,layer_ids
 de961ce7-6f25-4474-a27a-bc5abbd87336,gfw,global-forest-watch,"land,ghg-emissions,forest","filterIncludesByEnv=true&includes=vocabulary,metadata,layer,widget&env=production",gfw_forest_carbon_gross_emissions,53b216a9-17c8-4f6b-8585-af5f68eabdef
 1d51d813-f944-4cfe-b6fa-b2ef3a6d7cce,gfw,global-forest-watch,"land,ghg-emissions,forest","filterIncludesByEnv=true&includes=vocabulary,metadata,layer,widget&env=production",gfw_forest_carbon_net_flux,f401eb8c-b49f-44a1-adf2-b110bd92d53f
 d98dffe9-7ea3-46ca-b378-e89a4cd26bce,gfw,global-forest-watch,"land,ghg-emissions,forest","filterIncludesByEnv=true&includes=vocabulary,metadata,layer,widget&env=production",gfw_forest_carbon_gross_removals,73297b00-6c45-4652-8688-c29b46837fa1

@@ -150,7 +150,14 @@ export function LocationSearch({
                     <Source key={index} type="geojson" data={geojson}>
                         <Layer
                             type="fill"
-                            paint={{ 'fill-color': '#F3B229' }}
+                            paint={{ 'fill-color': '#BAE1BD' }}
+                        />
+                        <Layer
+                            type="line"
+                            paint={{
+                                'line-width': 1,
+                                'line-color': '#32864B'
+                            }}
                         />
                     </Source>
                 ))}{' '}

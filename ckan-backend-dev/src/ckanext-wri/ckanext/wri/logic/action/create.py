@@ -85,6 +85,9 @@ TRIGGER_MIGRATION_PARAMS = [
 
 MIGRATE_DATASET_PARAMS = [
     "id",
+    "gfw_dataset",
+    "gfw_only",
+    "gfw_version",
     "application",
     "team",
     "topics",
@@ -237,6 +240,8 @@ def trigger_migration(context: Context, data_dict: DataDict):
 def migrate_dataset(context: Context, data_dict: DataDict):
     dataset_id = data_dict.get("id")
     application = data_dict.get("application")
+    gfw_dataset = data_dict.get("gfw_dataset")
+
     data_dict = _black_white_list("whitelist", data_dict)
     data_dict = _black_white_list("blacklist", data_dict)
 
@@ -244,10 +249,14 @@ def migrate_dataset(context: Context, data_dict: DataDict):
         raise tk.ValidationError(_("Whitelist and blacklist cannot be used together"))
 
     if not dataset_id:
-        raise tk.ValidationError(_("Dataset 'id' is required"))
+        if not gfw_dataset:
+            raise tk.ValidationError(_("Dataset 'id' or 'gfw_dataset' is required"))
+        else:
+            data_dict["gfw_only"] = True
 
     if not application:
-        raise tk.ValidationError(_("Application is required"))
+        if not gfw_dataset:
+            raise tk.ValidationError(_("Application is required"))
 
     team = data_dict.get("team")
     topics = data_dict.get("topics")

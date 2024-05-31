@@ -14,6 +14,7 @@ import ckanapi
 
 
 RW_API = "https://api.resourcewatch.org/v1/dataset"
+GFW_API = "https://data-api.globalforestwatch.org"
 DEPLOYMENT_ENV = os.environ["FLOW_DEPLOYMENT_ENV"]
 CKAN_API_KEY = Secret.load(f"ckan-api-key-{DEPLOYMENT_ENV}").get()
 CKAN_URL = variables.get(f"ckan_url_{DEPLOYMENT_ENV}")
@@ -268,6 +269,7 @@ def get_datasets_from_csv(file_name):
         for row in reader:
             dataset = {}
             dataset_id = row["dataset_id"]
+            gfw_dataset = row.get("gfw_dataset")
             application = row["application"]
             team = row.get("team")
             topics = row.get("topics")
@@ -284,6 +286,7 @@ def get_datasets_from_csv(file_name):
 
             dataset = {
                 "id": dataset_id,
+                "gfw_dataset": gfw_dataset,
                 "application": application,
                 "team": team,
                 "topics": topics,
@@ -302,22 +305,34 @@ def send_migration_dataset(data_dict):
     log = get_run_logger()
 
     dataset_id = data_dict.get("id")
+    gfw_dataset = data_dict.get("gfw_dataset")
+    application = data_dict.get("application")
+    gfw_only = data_dict.get("gfw_only")
+    gfw_version = data_dict.get("gfw_version")
 
     if not dataset_id:
-        log.error("Dataset ID not found in data_dict")
-        return None, None, None, None
+        if not gfw_dataset:
+            log.error("Dataset ID or GFW dataset ID not found")
+            return None, None, None, None
+        else:
+            dataset_id = gfw_dataset
+            gfw_only = True
+            application = "gfw"
+    else:
+        gfw_only = False
 
-    application = data_dict.get("application")
-    dataset = get_dataset_from_api(dataset_id, application)
+    dataset = get_dataset_from_api(dataset_id, application, gfw_only, gfw_version)
 
-    dataset_slug = dataset.get("dataset", {}).get("slug")
+    dataset_slug = (
+        dataset.get("dataset", {}).get("slug") if not gfw_only else dataset_id
+    )
 
     rw_dataset_url = None
 
     if dataset_slug:
         rw_dataset_url = f"https://resourcewatch.org/data/explore/{dataset_slug}"
 
-    dataset = prepare_dataset(dataset, data_dict)
+    dataset = prepare_dataset(dataset, data_dict, gfw_only)
 
     dataset_name = dataset.get("name")
 
@@ -326,10 +341,49 @@ def send_migration_dataset(data_dict):
     if dataset_name:
         ckan_dataset_url = f"{FRONTEND_CKAN_URL}/datasets/{dataset_name}"
 
-    return migrate_dataset(dataset), rw_dataset_url, ckan_dataset_url, dataset_id
+    return (
+        migrate_dataset(dataset, gfw_only),
+        rw_dataset_url,
+        ckan_dataset_url,
+        dataset_id,
+    )
 
 
-def migrate_dataset(data_dict):
+def update_existing_resources(
+    dataset, existing_resources, new_resources, compare_fields, main_key
+):
+    updated_resources = []
+    existing_by_id = {r.get(main_key): r for r in existing_resources if r.get(main_key)}
+    new_by_id = {r.get(main_key): r for r in new_resources if r.get(main_key)}
+
+    for key, existing_resource in existing_by_id.items():
+        if key in new_by_id:
+            new_resource = new_by_id[key]
+            updated_resource = {
+                "id": existing_resource.get("id"),
+                "package_id": existing_resource.get("package_id"),
+                "is_pending": False,
+            }
+
+            for field in compare_fields:
+                if new_resource.get(field) != existing_resource.get(field):
+                    updated_resource[field] = new_resource.get(field)
+                else:
+                    if field == "url":
+                        updated_resource[field] = new_resource.get(field)
+
+            updated_resources.append(updated_resource)
+
+            del new_by_id[key]
+
+    for key, new_resource in new_by_id.items():
+        new_resource["package_id"] = dataset.get("id")
+        updated_resources.append(new_resource)
+
+    return updated_resources
+
+
+def migrate_dataset(data_dict, gfw_only=False):
     log = get_run_logger()
 
     dataset_name = data_dict.get("name")
@@ -357,8 +411,9 @@ def migrate_dataset(data_dict):
 
         for key, value in data_dict.items():
             dataset_value = dataset.get(key)
+
             if (
-                (dataset_value != None and value != "")
+                not all(v in ["", None] for v in [dataset_value, value])
                 and dataset_value != value
                 and key
                 not in [
@@ -472,41 +527,34 @@ def migrate_dataset(data_dict):
 
         existing_resources = dataset.get("resources", [])
         new_resources = data_dict.get("resources", [])
-        new_layers_by_id = {r.get("rw_id"): r for r in new_resources if r.get("rw_id")}
-        existing_layers_by_id = {
-            r.get("rw_id"): r for r in existing_resources if r.get("rw_id")
-        }
-
         updated_resources = []
 
-        for rw_id, existing_resource in existing_layers_by_id.items():
-            if rw_id in new_layers_by_id:
-                new_resource = new_layers_by_id[rw_id]
-                rw_fields = ["rw_id", "url", "type", "url_type", "name"]
-                updated_resource = {
-                    "id": existing_resource.get("id"),
-                    "package_id": existing_resource.get("package_id"),
-                }
-
-                for field in rw_fields:
-                    if new_resource.get(field) != existing_resource.get(field):
-                        updated_resource[field] = new_resource.get(field)
-
-                updated_resources.append(updated_resource)
-
-                del new_layers_by_id[rw_id]
-
-        for rw_id, new_resource in new_layers_by_id.items():
-            new_resource["package_id"] = dataset.get("id")
-            updated_resources.append(new_resource)
+        if not gfw_only:
+            updated_resources = update_existing_resources(
+                dataset,
+                existing_resources,
+                new_resources,
+                ["rw_id", "url", "type", "url_type", "name", "format"],
+                "rw_id",
+            )
+        else:
+            updated_resources = update_existing_resources(
+                dataset,
+                existing_resources,
+                new_resources,
+                ["url", "type", "url_type", "name", "format", "spatial_geom"],
+                "name",
+            )
 
         resource_changes = True
         remove_resources = existing_resources and not new_resources
 
         if (
             all(
-                len(updated_resource) == 2
-                and all(k in updated_resource for k in ["id", "package_id"])
+                len(updated_resource) == 3
+                and all(
+                    k in updated_resource for k in ["id", "package_id", "is_pending"]
+                )
                 for updated_resource in updated_resources
             )
             and not remove_resources
@@ -592,67 +640,122 @@ def get_paths(data):
     return paths
 
 
-def get_dataset_from_api(dataset_id, application):
+def get_dataset_from_api(dataset_id, application, gfw_only=False, gfw_version=None):
     log = get_run_logger()
 
-    url = f"{RW_API}/{dataset_id}/metadata"
+    if gfw_only:
+        url = f"{GFW_API}/dataset/{dataset_id}"
+    else:
+        url = f"{RW_API}/{dataset_id}/metadata"
+
     response = requests.get(url)
     output_object = {"metadata": {}, "dataset": {}}
 
-    if response.status_code == 200:
+    if check_reponse_status(response):
         datasets = response.json()["data"]
 
         if datasets:
-            metadata = [
-                m
-                for m in datasets
-                if m["attributes"]["application"] == application
-                and m["attributes"]["language"] == "en"
-            ]
+            if gfw_only:
+                metadata = datasets.get("metadata", {})
+                metadata["dataset_id"] = dataset_id
+                metadata["name"] = dataset_id
+                metadata["versions"] = datasets.get("versions", [])
+                output_object["metadata"] = metadata
+            else:
+                metadata = [
+                    m
+                    for m in datasets
+                    if m["attributes"]["application"] == application
+                    and m["attributes"]["language"] == "en"
+                ]
 
-            if len(metadata) > 0:
-                full_metadata = metadata[0].get("attributes", {})
-                output_metadata = {}
+                if len(metadata) > 0:
+                    full_metadata = metadata[0].get("attributes", {})
+                    output_metadata = {}
 
-                for key, value in full_metadata.items():
-                    if key in ["resource", "info"] or type(value) != dict:
-                        output_metadata[key] = value
+                    for key, value in full_metadata.items():
+                        if key in ["resource", "info"] or type(value) != dict:
+                            output_metadata[key] = value
 
-                output_object["metadata"] = output_metadata
+                    output_object["metadata"] = output_metadata
 
-                if output_object["metadata"]:
-                    output_object["metadata"]["dataset_id"] = metadata[0]["id"]
-                    output_object["metadata"]["dataset_type"] = metadata[0]["type"]
+                    if output_object["metadata"]:
+                        output_object["metadata"]["dataset_id"] = metadata[0]["id"]
+                        output_object["metadata"]["dataset_type"] = metadata[0]["type"]
+
+    gfw_config = None
+    gfw_asset_id = None
+    gfw_dataset_version = gfw_version or "latest"
+
+    if gfw_only:
+        dataset_url = f"{GFW_API}/dataset/{dataset_id}/{gfw_dataset_version}/assets"
+        dataset_response = requests.get(dataset_url)
+
+        if check_reponse_status(dataset_response):
+            gfw_assets = dataset_response.json()["data"]
+
+            if gfw_assets:
+                gfw_asset = gfw_assets[0]
+                gfw_asset_id = gfw_asset.get("asset_id")
+
+        if gfw_asset_id:
+            gfw_config_response = requests.get(
+                f"{GFW_API}/asset/{gfw_asset_id}/creation_options"
+            )
+
+            if check_reponse_status(gfw_config_response):
+                gfw_config = gfw_config_response.json()["data"]
+                log.info(f"GFW config: {gfw_config}")
+                output_object["gfw_config"] = gfw_config
+
+            tiles_info_url = f"{GFW_API}/asset/{gfw_asset_id}/tiles_info"
+            tiles_info_response = requests.get(tiles_info_url)
+
+            if check_reponse_status(tiles_info_response):
+                tiles_info = tiles_info_response.json()["features"]
+
+                gfw_tiles = {
+                    n["properties"]["name"]
+                    .split("/")[-1]
+                    .replace(".tif", ""): {"type": n["type"], "geometry": n["geometry"]}
+                    for n in tiles_info
+                    if n.get("properties", {}).get("name")
+                }
+                output_object["gfw_tiles_info"] = gfw_tiles
+
+        output_object["gfw_version"] = gfw_dataset_version
+
     else:
-        log.error(f"Error: {response.status_code} - {response.text}")
-        raise Exception(f"Error: {response.status_code} - {response.text}")
+        resource_url = f"{RW_API}/{dataset_id}?includes=layer"
+        resource_response = requests.get(resource_url)
 
-    resource_url = f"{RW_API}/{dataset_id}?includes=layer"
-    resource_response = requests.get(resource_url)
+        if check_reponse_status(resource_response):
+            resource = resource_response.json()["data"]
+            full_resource = resource.get("attributes", {})
+            output_resource = {}
 
-    if resource_response.status_code == 200:
-        resource = resource_response.json()["data"]
-        full_resource = resource.get("attributes", {})
-        output_resource = {}
+            for key, value in full_resource.items():
+                if type(value) != dict:
+                    output_resource[key] = value
 
-        for key, value in full_resource.items():
-            if type(value) != dict:
-                output_resource[key] = value
-
-        output_object["dataset"] = output_resource
-        output_object["dataset"]["dataset_id"] = resource["id"]
-        output_object["dataset"]["dataset_type"] = resource["type"]
-        output_object["dataset"]["requested_application"] = application.lower()
-    else:
-        log.error(f"Error: {resource_response.status_code} - {resource_response.text}")
-        raise Exception(
-            f"Error: {resource_response.status_code} - {resource_response.text}"
-        )
+            output_object["dataset"] = output_resource
+            output_object["dataset"]["dataset_id"] = resource["id"]
+            output_object["dataset"]["dataset_type"] = resource["type"]
+            output_object["dataset"]["requested_application"] = application.lower()
 
     return output_object
 
 
-def prepare_dataset(data_dict, original_data_dict):
+def check_reponse_status(response):
+    log = get_run_logger()
+
+    if response.status_code != 200:
+        log.error(f"Error: {response.status_code} - {response.text}")
+        raise Exception(f"Error: {response.status_code} - {response.text}")
+    return True
+
+
+def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     log = get_run_logger()
 
     application = original_data_dict.get("application")
@@ -710,6 +813,11 @@ def prepare_dataset(data_dict, original_data_dict):
             warnings.append(f"Requested application: {requested_application}")
 
     application = requested_application
+    gfw_title = None
+
+    if gfw_only:
+        application = "gfw"
+        gfw_title = get_value("title", data_object="metadata")
 
     name = munge_title_to_name(f"{base_name} {application}")
 
@@ -724,6 +832,10 @@ def prepare_dataset(data_dict, original_data_dict):
     layers = resource.get("layer")
     description = get_value("description")
     title = get_value("name") or base_name
+
+    if gfw_only:
+        title = gfw_title or title
+
     cautions = get_value("cautions")
     language = get_value("language")
 
@@ -811,9 +923,9 @@ def prepare_dataset(data_dict, original_data_dict):
 
     resources = []
 
-    required_dataset_values["rw_id"] = resource["dataset_id"]
+    if application not in ["aqueduct", "aqueduct-water-risk"] and not gfw_only:
+        required_dataset_values["rw_id"] = resource["dataset_id"]
 
-    if application not in ["aqueduct", "aqueduct-water-risk"]:
         for layer in layers:
             if layer_ids and layer["id"] not in layer_ids:
                 continue
@@ -822,18 +934,37 @@ def prepare_dataset(data_dict, original_data_dict):
             layer_dict = layer.get("attributes", {})
             layer_id = layer.get("id")
             resource_dict["rw_id"] = layer_id
-            resource_dict["url"] = (
-                f'https://api.resourcewatch.org/v1/dataset/{resource["dataset_id"]}/layer/{layer_id}'
-            )
+            resource_dict["url"] = f"{RW_API}/{resource['dataset_id']}/layer/{layer_id}"
             resource_dict["type"] = "layer-raw"
             resource_dict["url_type"] = "layer-raw"
             resource_dict["name"] = layer_dict.get("name", "")
             resource_dict["format"] = "Layer"
+            resource_dict["is_pending"] = False
 
             resources.append(resource_dict)
 
-        if resources:
-            dataset_dict["resources"] = resources
+    if gfw_only:
+        gfw_tiles = data_dict.get("gfw_tiles_info", [])
+        gfw_config = data_dict.get("gfw_config", {})
+        gfw_version = data_dict.get("gfw_version")
+
+        if gfw_tiles and gfw_config:
+            for tile_id, spatial_geom in gfw_tiles.items():
+
+                resource_dict = {
+                    "url": f"{GFW_API}/dataset/{base_name}/{gfw_version}/download/geotiff?grid={gfw_config.get('grid')}&tile_id={tile_id}&pixel_meaning={gfw_config.get('pixel_meaning')}&x-api-key=2d60cd88-8348-4c0f-a6d5-bd9adb585a8c",
+                    "type": "url",
+                    "url_type": "link",
+                    "name": tile_id,
+                    "format": "TIF",
+                    "is_pending": False,
+                    "spatial_geom": spatial_geom,
+                }
+
+                resources.append(resource_dict)
+
+    if resources:
+        dataset_dict["resources"] = resources
 
     if whitelist:
         dataset_dict = {
