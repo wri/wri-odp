@@ -339,7 +339,6 @@ def migration_status(context: Context, data_dict: DataDict):
 
 
 def package_create(context: Context, data_dict: DataDict):
-    # add is_pending
     data_dict["is_pending"] = True
     data_dict["is_approved"] = False
     data_dict["approval_status"] = "pending"
@@ -387,4 +386,8 @@ def package_create(context: Context, data_dict: DataDict):
             context, {"dataset_id": dataset.get("id")}
         )
 
+    if (dataset.get("visibility_type") == "internal"):
+        print("INTERNAL PENDING DATASET")
+
+        __import__('pprint').pprint(pending_dataset)
     return dataset

@@ -96,7 +96,7 @@ def send_group_notification(context, GroupNotificationParams):
                 context,
                 {
                     "recipient_id": recipient_id,
-                    "sender_id": context["auth_user_obj"].id if context.get("auth_user_obj") else None,
+                    "sender_id": creator_id if creator_id else '',
                     "activity_type": action,
                     "object_type": "dataset",
                     "object_id": dataset_id,

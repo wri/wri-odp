@@ -156,6 +156,7 @@ def test_pending_dataset_delete(mail_user):
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_diff_show(mail_user):
     user = factories.Sysadmin()
+    session = model.Session
     dataset = factories.Dataset(
         notes="My dataset description",
         private=False,
@@ -169,8 +170,9 @@ def test_pending_diff_show(mail_user):
         "package_data": dataset,
     }
     context = {
-         "user": user["name"],
-         "user_obj": user,
+        'model': model, 'session': session,
+        'user': user['name'], 'ignore_auth': True,
+        'user_obj': user
     }
     context['auth_user_obj'] = model.User.get(context['user'])
 
@@ -180,7 +182,6 @@ def test_pending_diff_show(mail_user):
     updated_dataset = dataset.copy()
     updated_dataset["title"] = "New Title"
     updated_dataset["notes"] = "New description"
-    updated_dataset["private"] = True
     updated_dataset["rw_dataset"] = False
     updated_dataset["wri_data"] = True
 
