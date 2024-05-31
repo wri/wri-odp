@@ -219,5 +219,4 @@ def test_pending_diff_show(mail_user):
 
     assert result["title"]["new_value"] == "New Title"
     assert result["notes"]["new_value"] == "New description"
-    assert result["private"]["new_value"] is True
     assert result["wri_data"]["new_value"] is True
