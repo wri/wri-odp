@@ -150,24 +150,41 @@ def test_package_create(mail_user):
     except NotFound:
         pass
 
+    print("Dataset public:")
+    print(dataset_public['name'])
     result_create_public = get_action("package_create")(
         context=context_sysadmin,
         data_dict=dataset_public
     )
+    result_approve_public = get_action('approve_pending_dataset')(
+        context=context_sysadmin,
+        data_dict={'dataset_id': result_create_public['id']}
+    )
 
+    print("Dataset draft:")
+    print(dataset_draft['name'])
     result_create_draft = get_action("package_create")(
         context=context_org_editor,
         data_dict=dataset_draft
     )
 
+    print("Dataset private:")
+    print(dataset_private['name'])
     result_create_private = get_action("package_create")(
         context=context_sysadmin,
         data_dict=dataset_private
     )
 
+    print("Dataset internal:")
+    print(dataset_internal['name'])
     result_create_internal = get_action("package_create")(
         context=context_sysadmin,
         data_dict=dataset_internal
+    )
+
+    result_approve_internal = get_action('approve_pending_dataset')(
+        context=context_sysadmin,
+        data_dict={'dataset_id': result_create_internal['id']}
     )
 
     # Sysadmin

@@ -8,29 +8,21 @@ import unittest.mock as mock
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
-def _setup():
-    dataset = factories.Dataset(
-        notes="My dataset description",
-        private=False,
-        rw_dataset=True,
-        title="My dataset",
-        wri_data=False,
-    )
-
-
-    data_dict = {
-        "package_id": dataset["id"],
-        "package_data": dataset,
-    }
-
-    return dataset, data_dict
-
-
-@mock.patch("ckan.plugins.toolkit.mail_user")
-@pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_create(mail_user):
    user = factories.Sysadmin()
-   dataset, data_dict = _setup()
+   dataset = factories.Dataset(
+       notes="My dataset description",
+       private=False,
+       rw_dataset=True,
+       title="My dataset",
+       wri_data=False,
+   )
+
+
+   data_dict = {
+       "package_id": dataset["id"],
+       "package_data": dataset,
+   }
    context = {
         "user": user["name"],
         "user_obj": user,
@@ -48,7 +40,19 @@ def test_pending_dataset_create(mail_user):
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_show(mail_user):
    user = factories.Sysadmin()
-   dataset, data_dict = _setup()
+   dataset = factories.Dataset(
+       notes="My dataset description",
+       private=False,
+       rw_dataset=True,
+       title="My dataset",
+       wri_data=False,
+   )
+
+
+   data_dict = {
+       "package_id": dataset["id"],
+       "package_data": dataset,
+   }
    context = {
         "user": user["name"],
         "user_obj": user,
@@ -68,7 +72,19 @@ def test_pending_dataset_show(mail_user):
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_update(mail_user):
    user = factories.Sysadmin()
-   dataset, data_dict = _setup()
+   dataset = factories.Dataset(
+       notes="My dataset description",
+       private=False,
+       rw_dataset=True,
+       title="My dataset",
+       wri_data=False,
+   )
+
+
+   data_dict = {
+       "package_id": dataset["id"],
+       "package_data": dataset,
+   }
    context = {
         "user": user["name"],
         "user_obj": user,
@@ -101,7 +117,19 @@ def test_pending_dataset_update(mail_user):
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_dataset_delete(mail_user):
    user = factories.Sysadmin()
-   dataset, data_dict = _setup()
+   dataset = factories.Dataset(
+       notes="My dataset description",
+       private=False,
+       rw_dataset=True,
+       title="My dataset",
+       wri_data=False,
+   )
+
+
+   data_dict = {
+       "package_id": dataset["id"],
+       "package_data": dataset,
+   }
    context = {
         "user": user["name"],
         "user_obj": user,
@@ -128,7 +156,18 @@ def test_pending_dataset_delete(mail_user):
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_pending_diff_show(mail_user):
     user = factories.Sysadmin()
-    dataset, data_dict = _setup()
+    dataset = factories.Dataset(
+        notes="My dataset description",
+        private=False,
+        rw_dataset=True,
+        title="My dataset",
+        wri_data=False,
+    )
+
+    data_dict = {
+        "package_id": dataset["id"],
+        "package_data": dataset,
+    }
     context = {
          "user": user["name"],
          "user_obj": user,
