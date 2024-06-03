@@ -6,7 +6,7 @@ import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
 import {
     Layer,
     LayerManager as VizzLayerManager,
-//@ts-ignore
+    //@ts-ignore
 } from 'layer-manager/dist/components'
 import pick from 'lodash/pick'
 import { CartoProvider } from '@/utils/providers/cartoProvider'
@@ -76,7 +76,6 @@ const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
         return parsedLayers
     }, [layers, currentLayers])
 
-    console.log('PARSED LEYS', parsedLayers)
     return map && map.getMap() ? (
         <VizzLayerManager
             map={map.getMap()}
@@ -84,9 +83,11 @@ const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
             providers={providers}
         >
             {parsedLayers &&
-                parsedLayers.filter(l => l.visibility).map((_layer: any) => {
-                    return <Layer key={_layer.id} {..._layer} />
-                })}
+                parsedLayers
+                    .filter((l) => l.visibility)
+                    .map((_layer: any) => {
+                        return <Layer key={_layer.id} {..._layer} />
+                    })}
         </VizzLayerManager>
     ) : (
         <></>
