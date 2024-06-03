@@ -98,7 +98,6 @@ function TipTapEditor({
 }: TEditorProps) {
     const editor = useEditor({
         onUpdate({ editor }) {
-            console.log(editor.getJSON())
             const value = editor.getHTML()
             onChange(value)
         },
