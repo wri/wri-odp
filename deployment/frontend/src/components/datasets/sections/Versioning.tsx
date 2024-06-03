@@ -32,7 +32,6 @@ export function Versioning({
         diffFields.includes('release_notes') && !isCurrentVersion
 
     const isFirstReleaseNotes = !releaseNotes?.length && dataset.release_notes
-
     const sortedReleaseNotes = releaseNotes?.sort((a, b) => {
         const aDate = new Date(a.date)
         const bDate = new Date(b.date)
@@ -44,6 +43,7 @@ export function Versioning({
         }
         return 0
     })
+
     return (
         <div className="flex flex-col gap-y-4 py-2">
             {isReleaseNotesLoading && (
