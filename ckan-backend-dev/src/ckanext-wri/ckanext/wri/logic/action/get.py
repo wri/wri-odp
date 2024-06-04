@@ -601,12 +601,12 @@ def _diff(existing, pending, path=""):
 def _process_lists(existing_list, pending_list, path):
     list_diff = {}
 
-    if path == 'resources':
+    if path == "resources":
         for index, pending_res in enumerate(pending_list):
             item_path = f"{path}[{index}]"
-            item_existing_list = list(filter(
-                lambda r: r.get("id") == pending_res.get("id"),
-                existing_list))
+            item_existing_list = list(
+                filter(lambda r: r.get("id") == pending_res.get("id"), existing_list)
+            )
 
             if len(item_existing_list) > 0:
                 existing_res = item_existing_list[0]
@@ -614,7 +614,6 @@ def _process_lists(existing_list, pending_list, path):
                 list_diff.update(item_diff)
 
         return list_diff
-
 
     for index, (item_existing, item_pending) in enumerate(
         zip_longest(existing_list, pending_list)
@@ -644,7 +643,7 @@ def dataset_release_notes(context: Context, data_dict: DataDict):
                select
                    distinct on ((data::json->>'package')::json->>'release_notes')
                    ((data::json->>'package')::json->>'release_notes') as release_notes,
-                    to_char(timestamp::date, 'YYYY-MM-DD') as date
+                    to_char(timestamp, 'YYYY-MM-DD HH24:MI:SS.FF3') as date
                from
                     activity
                where
@@ -718,6 +717,7 @@ def organization_activity_list_wri(context: Context, data_dict: DataDict):
             result["user_data"] = temp
             user_data[user_id] = temp
     return results
+
 
 @logic.side_effect_free
 def group_activity_list_wri(context: Context, data_dict: DataDict):
@@ -1000,7 +1000,11 @@ def resource_search(context: Context, data_dict: DataDict):
 
     q = (
         model.Session.query(model.Resource)
-        .join(ResourceLocation, ResourceLocation.resource_id == model.Resource.id, isouter=True)
+        .join(
+            ResourceLocation,
+            ResourceLocation.resource_id == model.Resource.id,
+            isouter=True,
+        )
         .join(Package, model.Package.id == model.Resource.package_id, isouter=True)
         .filter(ResourceLocation.is_pending == (is_pending == "true"))
         .filter(model.Package.state == "active")

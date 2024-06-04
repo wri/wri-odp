@@ -32,6 +32,17 @@ export function Versioning({
         diffFields.includes('release_notes') && !isCurrentVersion
 
     const isFirstReleaseNotes = !releaseNotes?.length && dataset.release_notes
+    const sortedReleaseNotes = releaseNotes?.sort((a, b) => {
+        const aDate = new Date(a.date)
+        const bDate = new Date(b.date)
+        if (bDate > aDate) {
+            return 1
+        }
+        if (bDate < aDate) {
+            return -1
+        }
+        return 0
+    })
 
     return (
         <div className="flex flex-col gap-y-4 py-2">
@@ -51,11 +62,13 @@ export function Versioning({
                         />
                     )}
                     {!isFirstReleaseNotes &&
-                        releaseNotes?.map((rn, i) => (
+                        sortedReleaseNotes?.map((rn, i) => (
                             <ReleaseNotesCard
                                 releaseNotes={rn.release_notes}
                                 date={rn.date}
-                                version={`Version ${releaseNotes?.length - i}`}
+                                version={`Version ${
+                                    sortedReleaseNotes.length - i
+                                }`}
                                 key={`release-notes-${i}`}
                                 defaultOpen={!isReleaseNotesChanged && i == 0}
                             />
