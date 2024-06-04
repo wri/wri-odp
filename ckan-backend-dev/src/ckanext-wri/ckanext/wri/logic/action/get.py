@@ -362,11 +362,22 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                         ):
                             package_dict = item.before_dataset_view(package_dict)
 
-                    if return_user:
-                        user = model_dictize.user_dictize(
-                            model.User.get(package_dict.get("creator_user_id")), context
+                    try:
+                        if return_user:
+                            user = model_dictize.user_dictize(
+                                model.User.get(package_dict.get("creator_user_id")), context
+                            )
+                            package_dict["user"] = user
+                    except:
+                        log.error(
+                            "No user is coming from solr for package id %s",
+                            package_dict.get("id"),
                         )
-                        package_dict["user"] = user
+                        package_dict["user"] = {
+                            "name": "Unknown",
+                            "fullname": "Unknown",
+                            "email": "Unknown",
+                        }
                     results.append(package_dict)
                 else:
                     log.error(
@@ -517,9 +528,13 @@ def notification_get_all(
 def pending_dataset_show(context: Context, data_dict: DataDict):
     """Get a pending dataset by package_id"""
     package_id = data_dict.get("package_id")
+    package_name = data_dict.get("package_name")
 
-    if not package_id:
+    if not package_id and not package_name:
         raise logic.ValidationError(_("package_id is required"))
+
+    if package_name:
+        package_id = Package.get(package_name).id
 
     tk.check_access("pending_dataset_show", context, {"id": package_id})
 

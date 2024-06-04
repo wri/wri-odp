@@ -129,6 +129,8 @@ dataset_fields:
     label: Hourly
   - value: as_needed
     label: As Needed
+  - value: not_planned
+    label: Not Planned
 
 - field_name: citation
   label: Citation
