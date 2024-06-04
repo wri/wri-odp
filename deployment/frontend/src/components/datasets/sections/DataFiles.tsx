@@ -732,6 +732,7 @@ function DatafileCard({
                                             id={`layerviews-${datafile.id}`}
                                             className="text-xs 2xl:text-sm whitespace-nowrap"
                                             onClick={() => {
+                          console.log(datafile)
                                                 // @ts-ignore
                                                 if (datafile.rw_id) {
                                                     if (!mapDisplaypreview) {

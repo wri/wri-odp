@@ -30,3 +30,14 @@ def pending_dataset_delete(context: Context, data_dict: DataDict):
     # was returining pending_dataset db object
     # change to return package_id or can  none either way
     return package_id
+
+#@tk.chained_action
+#def package_delete(up_func, context, data_dict):
+#    log.error("PUTA KI PARIU MEU IRMAO")
+#    dataset_dict = up_func(context, data_dict)
+#    log.error(dataset_dict)
+#    try:
+#        pending_dataset = PendingDatasets.delete(dataset_dict.get("id"))
+#    except:
+#        pass
+#    return dataset_dict

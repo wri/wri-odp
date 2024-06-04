@@ -77,10 +77,6 @@ describe("Dashboard Test", () => {
         });
       });
     });
-    cy.get("@dataset").then((dataset) => {
-      cy.createPendingDataset(dataset.id, dataset)
-    });
-
   });
 
   
