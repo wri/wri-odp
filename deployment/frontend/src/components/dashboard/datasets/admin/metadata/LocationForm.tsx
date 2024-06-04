@@ -217,12 +217,12 @@ export function LocationForm({
                                     >
                                         <Layer
                                             type="fill"
-                                            paint={{ 'fill-color': '#BAE1BD' }}
+                                            paint={{ 'fill-color': '#BAE1BD', 'fill-opacity': 0.3 }}
                                         />
                                         <Layer
                                             type="line"
                                             paint={{
-                                                'line-width': 1,
+                                                'line-width': 0.5,
                                                 'line-color': '#32864B'
                                             }}
                                         />

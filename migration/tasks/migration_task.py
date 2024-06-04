@@ -277,6 +277,7 @@ def get_datasets_from_csv(file_name):
             maintainer = row.get("maintainer")
             maintainer_email = row.get("maintainer_email")
             geographic_coverage = row.get("geographic_coverage")
+            layer_names = row.get("layer_names")
 
             if topics:
                 topics = topics.split(",")
@@ -291,6 +292,7 @@ def get_datasets_from_csv(file_name):
                 "team": team,
                 "topics": topics,
                 "layer_ids": layer_ids,
+                "layer_names": layer_names,
                 "maintainer": maintainer,
                 "maintainer_email": maintainer_email,
                 "geographic_coverage": geographic_coverage,
@@ -352,6 +354,7 @@ def send_migration_dataset(data_dict):
 def update_existing_resources(
     dataset, existing_resources, new_resources, compare_fields, main_key
 ):
+    log = get_run_logger()
     updated_resources = []
     existing_by_id = {r.get(main_key): r for r in existing_resources if r.get(main_key)}
     new_by_id = {r.get(main_key): r for r in new_resources if r.get(main_key)}
@@ -364,13 +367,17 @@ def update_existing_resources(
                 "package_id": existing_resource.get("package_id"),
                 "is_pending": False,
             }
+            updated = False
 
             for field in compare_fields:
                 if new_resource.get(field) != existing_resource.get(field):
-                    updated_resource[field] = new_resource.get(field)
-                else:
-                    if field == "url":
-                        updated_resource[field] = new_resource.get(field)
+                    log.info(
+                        f"Resource field changed: {field} - {existing_resource.get(field)} -> {new_resource.get(field)}"
+                    )
+                    updated = True
+
+            if updated:
+                updated_resource = {**updated_resource, **new_resource}
 
             updated_resources.append(updated_resource)
 
@@ -551,9 +558,12 @@ def migrate_dataset(data_dict, gfw_only=False):
 
         if (
             all(
-                len(updated_resource) == 3
-                and all(
-                    k in updated_resource for k in ["id", "package_id", "is_pending"]
+                (
+                    len(updated_resource) == 3
+                    and all(
+                        v in ["id", "package_id", "is_pending"]
+                        for v in updated_resource
+                    )
                 )
                 for updated_resource in updated_resources
             )
@@ -708,20 +718,24 @@ def get_dataset_from_api(dataset_id, application, gfw_only=False, gfw_version=No
                 log.info(f"GFW config: {gfw_config}")
                 output_object["gfw_config"] = gfw_config
 
-            tiles_info_url = f"{GFW_API}/asset/{gfw_asset_id}/tiles_info"
-            tiles_info_response = requests.get(tiles_info_url)
+            if gfw_config and gfw_config.get("source_type") == "raster":
+                tiles_info_url = f"{GFW_API}/asset/{gfw_asset_id}/tiles_info"
+                tiles_info_response = requests.get(tiles_info_url)
 
-            if check_reponse_status(tiles_info_response):
-                tiles_info = tiles_info_response.json()["features"]
+                if check_reponse_status(tiles_info_response):
+                    tiles_info = tiles_info_response.json()["features"]
 
-                gfw_tiles = {
-                    n["properties"]["name"]
-                    .split("/")[-1]
-                    .replace(".tif", ""): {"type": n["type"], "geometry": n["geometry"]}
-                    for n in tiles_info
-                    if n.get("properties", {}).get("name")
-                }
-                output_object["gfw_tiles_info"] = gfw_tiles
+                    gfw_tiles = {
+                        n["properties"]["name"]
+                        .split("/")[-1]
+                        .replace(".tif", ""): {
+                            "type": n["type"],
+                            "geometry": n["geometry"],
+                        }
+                        for n in tiles_info
+                        if n.get("properties", {}).get("name")
+                    }
+                    output_object["gfw_tiles_info"] = gfw_tiles
 
         output_object["gfw_version"] = gfw_dataset_version
 
@@ -764,6 +778,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     whitelist = original_data_dict.get("whitelist")
     blacklist = original_data_dict.get("blacklist")
     layer_ids = original_data_dict.get("layer_ids")
+    layer_names = original_data_dict.get("layer_names")
     maintainer = original_data_dict.get("maintainer")
     maintainer_email = original_data_dict.get("maintainer_email")
     geographic_coverage = original_data_dict.get("geographic_coverage")
@@ -818,6 +833,12 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     if gfw_only:
         application = "gfw"
         gfw_title = get_value("title", data_object="metadata")
+
+        if not gfw_title and layer_names:
+            layer_name = re.split(r",(?=\S)", layer_names)
+
+            if len(layer_name) == 1:
+                gfw_title = layer_name[0]
 
     name = munge_title_to_name(f"{base_name} {application}")
 
@@ -952,7 +973,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
             for tile_id, spatial_geom in gfw_tiles.items():
 
                 resource_dict = {
-                    "url": f"{GFW_API}/dataset/{base_name}/{gfw_version}/download/geotiff?grid={gfw_config.get('grid')}&tile_id={tile_id}&pixel_meaning={gfw_config.get('pixel_meaning')}&x-api-key=2d60cd88-8348-4c0f-a6d5-bd9adb585a8c",
+                    "url": f"{GFW_API}/dataset/{base_name}/{gfw_version}/download/geotiff?grid={gfw_config.get('grid')}&tile_id={tile_id}&pixel_meaning={gfw_config.get('pixel_meaning')}",
                     "type": "url",
                     "url_type": "link",
                     "name": tile_id,
