@@ -100,6 +100,10 @@ export function LocationSearch({
             if (f.geometry.coordinates[0].length === 5) {
                 setValue('point', null)
                 setValue('location', '')
+                console.log('bbox draw', [
+                    f.geometry.coordinates[0][2],
+                    f.geometry.coordinates[0][4],
+                ])
                 setValue('bbox', [
                     f.geometry.coordinates[0][2],
                     f.geometry.coordinates[0][4],
@@ -131,9 +135,12 @@ export function LocationSearch({
                 placeholder="Search datafiles by location"
                 initialValue={formObj.getValues('location')}
                 onResult={(e) => {
-                    setValue('point', e.result.geometry.coordinates)
-                    setValue('bbox', null)
-                    setValue('location', e.result.place_name)
+                    setValue('bbox', [
+                        [e.result.bbox[0], e.result.bbox[1]],
+                        [e.result.bbox[2], e.result.bbox[3]],
+                    ])
+                    setValue('point', null)
+                    setValue('location', '')
                 }}
                 onClear={(e) => {
                     setValue('point', null)
@@ -215,6 +222,7 @@ export function DataFiles({
             global: 'include',
         },
     })
+    console.log(formObj.watch('bbox'))
     const { data: searchedResources, isLoading: isLoadingLocationSearch } =
         api.dataset.resourceLocationSearch.useQuery({
             bbox: formObj.watch('bbox'),
@@ -251,11 +259,13 @@ export function DataFiles({
     }
 
     const geojsons = useMemo(() => {
-        return filteredDatafilesByName.filter(r => r.spatial_type !== 'global').map((df) => ({
-            ...df.spatial_geom,
-            address: df.spatial_address,
-            id: df.id,
-        }))
+        return filteredDatafilesByName
+            .filter((r) => r.spatial_type !== 'global')
+            .map((df) => ({
+                ...df.spatial_geom,
+                address: df.spatial_address,
+                id: df.id,
+            }))
     }, [filteredDatafilesByName.length])
 
     const addDatafileToDownload = (datafile: Resource) => {
