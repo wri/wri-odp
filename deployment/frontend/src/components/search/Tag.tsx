@@ -50,8 +50,6 @@ export default function Tags({
         setOptionsState(getUpdatedOptionsState)
     }, [filters])
 
-    console.log('optionsState: ', options)
-
     return (
         <Disclosure
             as="div"

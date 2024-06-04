@@ -5,7 +5,7 @@ import {
     useMapState,
 } from '@/utils/storeHooks'
 import { useEffect, useRef, useState } from 'react'
-import ReactMapGL, { type MapRef } from 'react-map-gl'
+import ReactMapGL, { AttributionControl, type MapRef } from 'react-map-gl'
 import { useInteractiveLayers } from '@/utils/queryHooks'
 import Tooltip, { type TooltipRef } from './Tooltip'
 import { type APILayerSpec } from '@/interfaces/layer.interface'

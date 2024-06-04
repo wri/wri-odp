@@ -16,6 +16,7 @@ export default function LegendItemTypesList(props: any) {
 
     return legendConfigs.map((lc: any, i: number) => (
         <LegendItemTypes
+            key={i}
             {...{
                 ...props,
                 activeLayer: { ...props?.activeLayer, legendConfig: lc },
