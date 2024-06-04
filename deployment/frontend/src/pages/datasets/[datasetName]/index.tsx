@@ -60,7 +60,7 @@ const LazyViz = dynamic(
         loading: () => (
             <div className="min-h-[90vh] bg-lima-700 opacity-75 flex-col items-center justify-center">
                 <Spinner className="text-wri-green w-12 h-12" />
-                <h2 className="text-center text-xl font-semibold text-wri-green">
+                <h2 className="text-center text-xl font-semibold text-black">
                     Loading...
                 </h2>
             </div>

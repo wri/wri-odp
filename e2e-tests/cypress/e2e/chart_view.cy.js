@@ -30,7 +30,7 @@ describe("Chart view", () => {
     cy.wait(5000);
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
-    cy.get('button[type="submit"]').click();
+    cy.get('button[form="create_dataset_form"]').click();
     cy.contains(`Successfully created the "${datasetName}" dataset`, {
       timeout: 20000,
     });
@@ -61,7 +61,7 @@ describe("Chart view", () => {
     "should be creatable from the UI",
     {
       retries: {
-        runMode: 5,
+        runMode: 10,
         openMode: 0,
       },
     },

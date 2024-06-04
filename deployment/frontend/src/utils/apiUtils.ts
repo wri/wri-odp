@@ -323,10 +323,10 @@ export async function getAllDatasetFq({
 
         if (extAddressQ && extGlobalQ !== 'only') {
             if (extGlobalQ === 'exclude') {
-              url += `&ext_address_q=${extAddressQ}`
+                url += `&ext_address_q=${extAddressQ}`
             }
             if (extGlobalQ === 'include') {
-              url += `&ext_address_q=${extAddressQ}&ext_address_q=Global`
+                url += `&ext_address_q=${extAddressQ}&ext_address_q=Global`
             }
         }
 
@@ -2022,14 +2022,17 @@ export async function patchDataset({
     dataset: Partial<WriDataset>
     session: Session
 }) {
-    const datasetRes = await fetch(`${env.CKAN_URL}/api/action/package_patch`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${session.user.apikey}`,
-        },
-        body: JSON.stringify(dataset),
-    })
+    const datasetRes = await fetch(
+        `${env.CKAN_URL}/api/action/old_package_patch`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${session.user.apikey}`,
+            },
+            body: JSON.stringify(dataset),
+        }
+    )
 
     const datasetObj: CkanResponse<WriDataset> = await datasetRes.json()
     if (!datasetObj.success && datasetObj.error) {
@@ -2065,7 +2068,11 @@ export async function updateDatasetHasChartsFlag({
 
     await patchDataset({
         session,
-        dataset: { id: ckanDatasetId, has_chart_views: hasChartViews },
+        dataset: {
+            id: ckanDatasetId,
+            has_chart_views: hasChartViews,
+            visibility_type: ckanDataset.visibility_type,
+        },
     })
 }
 
@@ -2302,7 +2309,7 @@ export async function approvePendingDataset(
     }) as Resource[]
 
     const datasetRes = await fetch(
-        `${env.CKAN_URL}/api/action/package_update`,
+        `${env.CKAN_URL}/api/action/old_package_update`,
         {
             method: 'POST',
             headers: {
@@ -2315,8 +2322,10 @@ export async function approvePendingDataset(
     const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
     if (!dataset.success && dataset.error) {
         if (dataset.error.message)
-            throw Error(JSON.stringify(dataset.error).concat('package_update'))
-        throw Error(JSON.stringify(dataset.error).concat('package_update'))
+            throw Error(
+                JSON.stringify(dataset.error).concat('old_package_update')
+            )
+        throw Error(JSON.stringify(dataset.error).concat('old_package_update'))
     }
 
     // get and close all dataset issues
