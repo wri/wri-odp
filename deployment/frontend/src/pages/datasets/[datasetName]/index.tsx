@@ -78,32 +78,43 @@ export async function getServerSideProps(
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
     if (!session) {
-        const dataset = await getOneDataset(datasetName, session, true)
-        const NEXTURL = env.NEXTAUTH_URL
-        return {
-            props: {
-                NEXTURL,
-                apiKey: '',
-                dataset: JSON.stringify({
-                    ...dataset,
-                    spatial: dataset.spatial ?? null,
-                }),
-                prevdataset: null,
-                pendingExist: false,
-                is_approved: null,
-                generalAuthorized: false,
-                isPendingState: false,
-                approvalAuth: null,
-                datasetName,
-                datasetId: dataset.id,
-                initialZustandState: {
-                    dataset: JSON.stringify(dataset),
-                    relatedDatasets: [],
-                    mapView: mapState,
+        try {
+            const dataset = await getOneDataset(datasetName, session, true)
+            const NEXTURL = env.NEXTAUTH_URL
+            return {
+                props: {
+                    NEXTURL,
+                    apiKey: '',
+                    dataset: JSON.stringify({
+                        ...dataset,
+                        spatial: dataset.spatial ?? null,
+                    }),
+                    prevdataset: null,
+                    pendingExist: false,
+                    is_approved: null,
+                    generalAuthorized: false,
+                    isPendingState: false,
+                    approvalAuth: null,
+                    datasetName,
+                    datasetId: dataset.id,
+                    initialZustandState: {
+                        dataset: JSON.stringify(dataset),
+                        relatedDatasets: [],
+                        mapView: mapState,
+                    },
                 },
-            },
+            }
+        } catch (e) {
+            return {
+                props: {
+                    redirect: {
+                        destination: '/datasets/404',
+                    },
+                },
+            }
         }
     }
+
     try {
         let [prevdataset, pendingDataset] = await Promise.all([
             getOneDataset(datasetName, session, true),
