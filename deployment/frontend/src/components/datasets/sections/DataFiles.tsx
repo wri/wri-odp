@@ -278,10 +278,13 @@ export function DataFiles({
             .map((df) => ({
                 ...df.spatial_geom,
                 address: df.spatial_address,
-                filtered: filteredDatafiles.some((f) => f.id === df.id),
+                filtered:
+                    filteredDatafiles.length !==
+                        filteredDatafilesByName.length &&
+                    filteredDatafiles.some((f) => f.id === df.id),
                 id: df.id,
             }))
-    }, [filteredDatafilesByName.length, filteredDatafiles.length])
+    }, [filteredDatafilesByName, filteredDatafiles])
 
     const addDatafileToDownload = (datafile: Resource) => {
         setDatafilesToDownload((prev) => [...prev, datafile])
