@@ -659,7 +659,7 @@ export async function getOnePendingDataset(
 ) {
     const user = session?.user
     const response = await fetch(
-        `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
+        `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_name=${datasetName}`,
         {
             headers: {
                 Authorization: session?.user.apikey ?? '',

@@ -90,6 +90,7 @@ export interface WriDataset extends Dataset {
         | 'weekly'
         | 'daily'
         | 'as_needed'
+        | 'not_planned'
         | 'hourly'
     visibility_type: 'public' | 'private' | 'internal' | 'draft'
     short_description?: string

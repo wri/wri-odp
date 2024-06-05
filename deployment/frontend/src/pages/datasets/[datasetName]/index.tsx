@@ -77,14 +77,49 @@ export async function getServerSideProps(
 
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
-    try {
-        let prevdataset = await getOneDataset(datasetName, session, true)
+    if (!session) {
+        try {
+            const dataset = await getOneDataset(datasetName, session, true)
+            const NEXTURL = env.NEXTAUTH_URL
+            return {
+                props: {
+                    NEXTURL,
+                    apiKey: '',
+                    dataset: JSON.stringify({
+                        ...dataset,
+                        spatial: dataset.spatial ?? null,
+                    }),
+                    prevdataset: null,
+                    pendingExist: false,
+                    is_approved: null,
+                    generalAuthorized: false,
+                    isPendingState: false,
+                    approvalAuth: null,
+                    datasetName,
+                    datasetId: dataset.id,
+                    initialZustandState: {
+                        dataset: JSON.stringify(dataset),
+                        relatedDatasets: [],
+                        mapView: mapState,
+                    },
+                },
+            }
+        } catch (e) {
+            return {
+                props: {
+                    redirect: {
+                        destination: '/datasets/404',
+                    },
+                },
+            }
+        }
+    }
 
-        const pendingDataset = await getOnePendingDataset(
-            prevdataset.id,
-            session,
-            true
-        )
+    try {
+        let [prevdataset, pendingDataset] = await Promise.all([
+            getOneDataset(datasetName, session, true),
+            getOnePendingDataset(datasetName, session, true),
+        ])
 
         let dataset = prevdataset
 
@@ -168,6 +203,7 @@ export async function getServerSideProps(
             dataset.resources = []
         }
         const NEXTURL = env.NEXTAUTH_URL
+        console.timeEnd('datasetPage')
         return {
             props: {
                 NEXTURL,
