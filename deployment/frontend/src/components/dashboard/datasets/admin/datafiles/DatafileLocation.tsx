@@ -254,7 +254,14 @@ export function DatafileLocation({
                                     >
                                         <Layer
                                             type="fill"
-                                            paint={{ 'fill-color': '#F3B229' }}
+                                            paint={{ 'fill-color': '#BAE1BD', 'fill-opacity': 0.3 }}
+                                        />
+                                        <Layer
+                                            type="line"
+                                            paint={{
+                                                'line-width': 0.5,
+                                                'line-color': '#32864B'
+                                            }}
                                         />
                                     </Source>
                                 </Map>

@@ -42,7 +42,7 @@ export const marine_ecoregions = {
                 {
                     paint: {
                         'fill-color': ' #30c2df',
-                        'fill-opacity': 0.2,
+                        'fill-opacity': 0.3,
                     },
                     'source-layer': 'layer0',
                     type: 'fill',
@@ -59,7 +59,7 @@ export const marine_ecoregions = {
                 {
                     paint: {
                         'fill-color': ' #0570b0',
-                        'fill-opacity': 0.2,
+                        'fill-opacity': 0.3,
                     },
                     'source-layer': 'layer0',
                     type: 'fill',
@@ -76,7 +76,7 @@ export const marine_ecoregions = {
                 {
                     paint: {
                         'fill-color': '#beefee',
-                        'fill-opacity': 0.2,
+                        'fill-opacity': 0.3,
                     },
                     'source-layer': 'layer0',
                     type: 'fill',

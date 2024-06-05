@@ -157,7 +157,14 @@ export function LocationSearch({
                     <Source key={index} type="geojson" data={geojson}>
                         <Layer
                             type="fill"
-                            paint={{ 'fill-color': '#F3B229' }}
+                            paint={{ 'fill-color': '#BAE1BD', 'fill-opacity': 0.3 }}
+                        />
+                        <Layer
+                            type="line"
+                            paint={{
+                                'line-width': 0.5,
+                                'line-color': '#32864B'
+                            }}
                         />
                     </Source>
                 ))}{' '}
@@ -735,6 +742,7 @@ function DatafileCard({
                                             id={`layerviews-${datafile.id}`}
                                             className="text-xs 2xl:text-sm whitespace-nowrap"
                                             onClick={() => {
+                          console.log(datafile)
                                                 // @ts-ignore
                                                 if (datafile.rw_id) {
                                                     if (!mapDisplaypreview) {

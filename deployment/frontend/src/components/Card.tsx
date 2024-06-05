@@ -19,7 +19,7 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                 {dataset?.title ?? dataset?.name}
             </h2>
             <article className=" line-clamp-3 w-[88%] font-light text-base mt-4 leading-[1.375rem] h-[4em]">
-                {dataset?.short_description ?? dataset?.notes}
+                {dataset?.short_description ?? ''}
             </article>
             <div className="flex font-light text-sm text-wri-black mt-4 leading-[1.375rem] h-[1.5em]">
                 {dataset.temporal_coverage_start ||
