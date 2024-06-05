@@ -965,9 +965,10 @@ def resource_search(context: Context, data_dict: DataDict):
     is_pending = data_dict.get("is_pending")
 
     bbox = data_dict.get("bbox")
+    spatial_address = data_dict.get("spatial_address")
 
     bbox_query = None
-    if bbox:
+    if bbox and spatial_address is None:
         bbox_coordinates = bbox.split(",")
 
         if len(bbox_coordinates) != 4:
@@ -995,7 +996,6 @@ def resource_search(context: Context, data_dict: DataDict):
             ResourceLocation.spatial_geom, "POINT({} {})".format(*point)
         )
 
-    spatial_address = data_dict.get("spatial_address")
 
     # if query is None:
     #     raise ValidationError({'query': _('Missing value')})
@@ -1021,7 +1021,6 @@ def resource_search(context: Context, data_dict: DataDict):
             isouter=True,
         )
         .join(Package, model.Package.id == model.Resource.package_id, isouter=True)
-        .filter(ResourceLocation.is_pending == (is_pending == "true"))
         .filter(model.Package.state == "active")
         .filter(model.Package.private == False)
         .filter(model.Package.name == package_id)
@@ -1057,7 +1056,7 @@ def resource_search(context: Context, data_dict: DataDict):
                 )
             )
         if len(segments) == 1:
-            country = f"{segments[1].strip()}"
+            country = f"{segments[0].strip()}"
             location_queries.append(
                 ResourceLocation.spatial_address.like(f"%{country}"),
             )
@@ -1103,6 +1102,8 @@ def resource_search(context: Context, data_dict: DataDict):
                     spatial_geom = geoalchemy2.functions.ST_GeomFromText(
                         merged_geometry.wkt
                     )
+                    print("SPATIAL GEOM", flush=True)
+                    print(spatial_geom, flush=True)
 
                     location_queries.append(
                         geoalchemy2.functions.ST_Intersects(
@@ -1128,6 +1129,8 @@ def resource_search(context: Context, data_dict: DataDict):
 
     if location_queries:
         q = q.filter(_or_(*location_queries))
+        print("LOCATION QUERIES", flush=True)
+        print(q, flush=True)
 
     resource_fields = model.Resource.get_columns()
     for field, term in fields.items():
