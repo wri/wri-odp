@@ -58,6 +58,7 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM=${SMTP_FROM}
       - PREFECT_INTERNAL_URL=http://prefect:4200
+      - NEXT_PUBLIC_GFW_API_KEY="1111"
     depends_on:
       ckan-dev:
         condition: service_healthy
