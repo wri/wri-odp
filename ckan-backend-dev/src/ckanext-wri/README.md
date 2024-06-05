@@ -67,7 +67,7 @@ The parameters `time_sent` (set to the current timestamp), `state` (set as `acti
 - **activity_type** (string) – The type of activity that triggers the notification, such as `dataset_create`, etc. (required).
 - **object_type** (string) – The type of the object on which the action is being performed (e.g., dataset, resource, etc.) (required).
 - **object_id** (string) – The ID of the object on which the action is being performed (required).
-- **time_sent** (datetime withut timezone) – The timestamp of the sent time (required).
+- **time_sent** (datetime without timezone) – The timestamp of the sent time (required).
 - **is_unread** (string) – Indicates whether the notification is read or not (required).
 - **state** (string) – `active` or `deleted` (required).
 
