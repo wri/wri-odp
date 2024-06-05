@@ -68,7 +68,7 @@ export default function DatasetHorizontalCard({
                         </div>
 
                         <p className="font-['Acumin Pro SemiCondensed'] text-base font-light text-stone-900 h-[4.5em] line-clamp-3">
-                            {dataset.short_description ?? dataset.notes}
+                            {dataset.short_description ?? ''}
                         </p>
                         <div className="mt-[0.33rem] flex justify-start gap-x-3">
                             <TooltipProvider>

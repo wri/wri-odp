@@ -80,6 +80,29 @@ SCHEMA_SYNONYMS = {
     "layer": "resources",
 }
 
+TRIGGER_MIGRATION_PARAMS = [
+    "is_bulk",
+    "file_name",
+    "whitelist",
+    "blacklist",
+]
+
+MIGRATE_DATASET_PARAMS = [
+    "id",
+    "gfw_dataset",
+    "gfw_only",
+    "gfw_version",
+    "application",
+    "team",
+    "topics",
+    "layer_ids",
+    "maintainer",
+    "maintainer_email",
+    "geographic_coverage",
+    "whitelist",
+    "blacklist",
+]
+
 
 def _trigger_prefect_flow(data_dict: DataDict) -> dict[str, Any]:
     prefect_url = config.get("ckanext.wri.prefect_url")
@@ -212,6 +235,11 @@ def trigger_migration(context: Context, data_dict: DataDict):
     if data_dict.get("whitelist") and data_dict.get("blacklist"):
         raise tk.ValidationError(_("Whitelist and blacklist cannot be used together"))
 
+    invalid_params = set(data_dict.keys()) - set(TRIGGER_MIGRATION_PARAMS)
+
+    if invalid_params:
+        raise tk.ValidationError(_(f"Invalid parameters: {', '.join(invalid_params)}"))
+
     return _trigger_prefect_flow(data_dict)
 
 
@@ -219,6 +247,8 @@ def trigger_migration(context: Context, data_dict: DataDict):
 def migrate_dataset(context: Context, data_dict: DataDict):
     dataset_id = data_dict.get("id")
     application = data_dict.get("application")
+    gfw_dataset = data_dict.get("gfw_dataset")
+
     data_dict = _black_white_list("whitelist", data_dict)
     data_dict = _black_white_list("blacklist", data_dict)
 
@@ -226,10 +256,14 @@ def migrate_dataset(context: Context, data_dict: DataDict):
         raise tk.ValidationError(_("Whitelist and blacklist cannot be used together"))
 
     if not dataset_id:
-        raise tk.ValidationError(_("Dataset 'id' is required"))
+        if not gfw_dataset:
+            raise tk.ValidationError(_("Dataset 'id' or 'gfw_dataset' is required"))
+        else:
+            data_dict["gfw_only"] = True
 
     if not application:
-        raise tk.ValidationError(_("Application is required"))
+        if not gfw_dataset:
+            raise tk.ValidationError(_("Application is required"))
 
     team = data_dict.get("team")
     topics = data_dict.get("topics")
@@ -266,6 +300,11 @@ def migrate_dataset(context: Context, data_dict: DataDict):
                     "Topics must be a string (comma separated if it contains multiple topics)"
                 )
             )
+
+    invalid_params = set(data_dict.keys()) - set(MIGRATE_DATASET_PARAMS)
+
+    if invalid_params:
+        raise tk.ValidationError(_(f"Invalid parameters: {', '.join(invalid_params)}"))
 
     return _trigger_prefect_flow(data_dict)
 
