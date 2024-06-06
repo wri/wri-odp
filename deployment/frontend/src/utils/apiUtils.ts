@@ -577,12 +577,16 @@ export async function getOneDataset(
 
     const resources = await Promise.all(
         dataset.result.resources.map(async (r) => {
-            const _views = await getResourceViews({
-                id: r.id,
-                session: session,
-            })
-
             if (r.url_type === 'upload' || r.url_type === 'link') {
+                let _views: View[] = []
+                try {
+                    _views = await getResourceViews({
+                        id: r.id,
+                        session: session,
+                    })
+                } catch (e) {
+                    _views = []
+                }
                 const resourceHasChartView =
                     r.datastore_active &&
                     _views.some(
@@ -593,7 +597,8 @@ export async function getOneDataset(
 
                 r._hasChartView = resourceHasChartView!
 
-                return { ...r, _views }
+                const _r = { ...r, _views }
+                return _r
             }
 
             if (
@@ -643,7 +648,6 @@ export async function getOneDataset(
             return r
         })
     )
-
     return {
         ...dataset.result,
         resources,
@@ -1699,6 +1703,9 @@ export async function getResourceViews({
 
     const url = `${env.CKAN_URL}/api/action/resource_view_list?id=${id}`
     const viewsRes = await fetch(url, { headers })
+    if (viewsRes.status !== 200) {
+        console.log('error', viewsRes)
+    }
 
     const views: CkanResponse<View[]> = await viewsRes.json()
 

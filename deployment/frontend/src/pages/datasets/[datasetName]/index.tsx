@@ -77,9 +77,11 @@ export async function getServerSideProps(
 
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
+    console.log('SESSION', session)
     if (!session) {
         try {
             const dataset = await getOneDataset(datasetName, session, true)
+            console.log('DATASET', dataset)
             const NEXTURL = env.NEXTAUTH_URL
             return {
                 props: {
@@ -105,6 +107,8 @@ export async function getServerSideProps(
                 },
             }
         } catch (e) {
+            console.log('TESTANDO')
+            console.log(e)
             return {
                 props: {
                     redirect: {
@@ -203,7 +207,6 @@ export async function getServerSideProps(
             dataset.resources = []
         }
         const NEXTURL = env.NEXTAUTH_URL
-        console.timeEnd('datasetPage')
         return {
             props: {
                 NEXTURL,
@@ -285,6 +288,8 @@ export default function DatasetPage(
         // @ts-ignore
         { retry: 0, initialData: dataset }
     )
+  console.log('DATASET ID', datasetId)
+  console.log('DATASET ERROR', datasetError)
 
     const {
         data: prevDatasetData,
