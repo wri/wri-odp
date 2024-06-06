@@ -596,7 +596,11 @@ export async function getOneDataset(
                 return { ...r, _views }
             }
 
-            if (!r.url && !r.layerObj && !r.layerObjRaw) return r
+            if (
+                (!r.url && !r.layerObj && !r.layerObjRaw) ||
+                (r.url_type && !['layer', 'layer-raw'].includes(r.url_type))
+            )
+                return r
             if (!r.layerObj && !r.layerObjRaw) {
                 const layerObj = await getLayerRw(r.url!)
                 if (r.url_type === 'layer')
@@ -694,7 +698,11 @@ export async function getOnePendingDataset(
     const resources = await Promise.all(
         dataset.resources.map(async (r) => {
             if (r.url_type === 'upload' || r.url_type === 'link') return r
-            if (!r.url && !r.layerObj && !r.layerObjRaw) return r
+            if (
+                (!r.url && !r.layerObj && !r.layerObjRaw) ||
+                (r.url_type && !['layer', 'layer-raw'].includes(r.url_type))
+            )
+                return r
             if (!r.layerObj && !r.layerObjRaw) {
                 const layerObj = await getLayerRw(r.url!)
                 if (r.url_type === 'layer')

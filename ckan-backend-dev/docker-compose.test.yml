@@ -39,6 +39,7 @@ services:
         - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
         - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
         - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
+        - NEXT_PUBLIC_GFW_API_KEY="1111"
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
