@@ -202,7 +202,6 @@ export async function getServerSideProps(
             dataset.resources = []
         }
         const NEXTURL = env.NEXTAUTH_URL
-        console.timeEnd('datasetPage')
         return {
             props: {
                 NEXTURL,
