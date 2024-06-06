@@ -1703,9 +1703,6 @@ export async function getResourceViews({
 
     const url = `${env.CKAN_URL}/api/action/resource_view_list?id=${id}`
     const viewsRes = await fetch(url, { headers })
-    if (viewsRes.status !== 200) {
-        console.log('error', viewsRes)
-    }
 
     const views: CkanResponse<View[]> = await viewsRes.json()
 
