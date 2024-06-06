@@ -1727,6 +1727,7 @@ export const DatasetRouter = createTRPCRouter({
             if (!input.bbox && !input.point) {
                 return null
             }
+            console.log('INPUT', input)
             const bbox = input.bbox ? `&bbox=${input.bbox?.join(',')}` : ''
             const point = input.point ? `&point=${input.point?.join(',')}` : ''
             const spatial_address = input.location

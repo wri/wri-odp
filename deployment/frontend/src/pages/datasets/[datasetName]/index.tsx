@@ -114,7 +114,6 @@ export async function getServerSideProps(
             }
         }
     }
-
     try {
         let [prevdataset, pendingDataset] = await Promise.all([
             getOneDataset(datasetName, session, true),
