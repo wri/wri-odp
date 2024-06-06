@@ -80,18 +80,21 @@ export function HomeFooter() {
                             <a
                                 href="https://facebook.com/worldresources"
                                 className="relative h-5 w-5 "
+                                aria-label='Facebook'
                             >
                                 <Image src="/icons/fb.svg" alt="" fill />
                             </a>
                             <a
                                 href="https://twitter.com/WorldResources"
                                 className="relative h-5 w-5 "
+                                aria-label='Twitter'
                             >
                                 <Image src="/icons/x.svg" alt={''} fill />
                             </a>
                             <a
                                 href="https://www.linkedin.com/company/world-resources-institute"
                                 className="relative h-5 w-5 "
+                                aria-label='LinkedIn'
                             >
                                 <Image
                                     src="/icons/linkedin.svg"
