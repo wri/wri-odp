@@ -114,7 +114,6 @@ export async function getServerSideProps(
             }
         }
     }
-
     try {
         let [prevdataset, pendingDataset] = await Promise.all([
             getOneDataset(datasetName, session, true),
@@ -203,7 +202,6 @@ export async function getServerSideProps(
             dataset.resources = []
         }
         const NEXTURL = env.NEXTAUTH_URL
-        console.timeEnd('datasetPage')
         return {
             props: {
                 NEXTURL,

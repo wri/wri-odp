@@ -124,6 +124,9 @@ def _trigger_prefect_flow(data_dict: DataDict) -> dict[str, Any]:
         raise p.toolkit.ValidationError(error)
 
     try:
+        print(migration_flow_name, flush=True)
+        print(deployment_name, flush=True)
+        print(deployment_env, flush=True)
         deployment = requests.get(
             urljoin(
                 prefect_url,

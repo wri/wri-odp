@@ -74,7 +74,7 @@ export default function Home(
                 </div>
                 <div className="col-span-3 flex flex-col gap-y-4">
                     <div
-                        className={`w-full font-acumin text-xl font-light leading-loose text-neutral-700 overflow-hidden max-h-[100vh] transition duration-300 ease-in-out ${
+                        className={`w-full font-acumin text-xl font-light leading-loose text-neutral-700  md:overflow-hidden md:max-h-[100vh] transition duration-300 ease-in-out ${
                             readmore ? 'h-auto' : 'line-clamp-4'
                         }`}
                     >
