@@ -323,10 +323,10 @@ export async function getAllDatasetFq({
 
         if (extAddressQ && extGlobalQ !== 'only') {
             if (extGlobalQ === 'exclude') {
-              url += `&ext_address_q=${extAddressQ}`
+                url += `&ext_address_q=${extAddressQ}`
             }
             if (extGlobalQ === 'include') {
-              url += `&ext_address_q=${extAddressQ}&ext_address_q=Global`
+                url += `&ext_address_q=${extAddressQ}&ext_address_q=Global`
             }
         }
 
@@ -577,12 +577,16 @@ export async function getOneDataset(
    
     const resources = await Promise.all(
         dataset.result.resources.map(async (r) => {
-            const _views = await getResourceViews({
-                id: r.id,
-                session: session,
-            })
-
             if (r.url_type === 'upload' || r.url_type === 'link') {
+                let _views: View[] = []
+                try {
+                    _views = await getResourceViews({
+                        id: r.id,
+                        session: session,
+                    })
+                } catch (e) {
+                    _views = []
+                }
                 const resourceHasChartView =
                     r.datastore_active &&
                     _views.some(
@@ -593,10 +597,15 @@ export async function getOneDataset(
 
                 r._hasChartView = resourceHasChartView!
 
-                return { ...r, _views }
+                const _r = { ...r, _views }
+                return _r
             }
 
-            if (!r.url && !r.layerObj && !r.layerObjRaw) return r
+            if (
+                (!r.url && !r.layerObj && !r.layerObjRaw) ||
+                (r.url_type && !['layer', 'layer-raw'].includes(r.url_type))
+            )
+                return r
             if (!r.layerObj && !r.layerObjRaw) {
                 const layerObj = await getLayerRw(r.url!)
                 if (r.url_type === 'layer')
@@ -639,7 +648,6 @@ export async function getOneDataset(
             return r
         })
     )
-
     return {
         ...dataset.result,
         resources,
@@ -659,7 +667,7 @@ export async function getOnePendingDataset(
 ) {
     const user = session?.user
     const response = await fetch(
-        `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
+        `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_name=${datasetName}`,
         {
             headers: {
                 Authorization: session?.user.apikey ?? '',
@@ -694,7 +702,11 @@ export async function getOnePendingDataset(
     const resources = await Promise.all(
         dataset.resources.map(async (r) => {
             if (r.url_type === 'upload' || r.url_type === 'link') return r
-            if (!r.url && !r.layerObj && !r.layerObjRaw) return r
+            if (
+                (!r.url && !r.layerObj && !r.layerObjRaw) ||
+                (r.url_type && !['layer', 'layer-raw'].includes(r.url_type))
+            )
+                return r
             if (!r.layerObj && !r.layerObjRaw) {
                 const layerObj = await getLayerRw(r.url!)
                 if (r.url_type === 'layer')
@@ -2022,14 +2034,17 @@ export async function patchDataset({
     dataset: Partial<WriDataset>
     session: Session
 }) {
-    const datasetRes = await fetch(`${env.CKAN_URL}/api/action/package_patch`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${session.user.apikey}`,
-        },
-        body: JSON.stringify(dataset),
-    })
+    const datasetRes = await fetch(
+        `${env.CKAN_URL}/api/action/old_package_patch`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${session.user.apikey}`,
+            },
+            body: JSON.stringify(dataset),
+        }
+    )
 
     const datasetObj: CkanResponse<WriDataset> = await datasetRes.json()
     if (!datasetObj.success && datasetObj.error) {
@@ -2065,7 +2080,11 @@ export async function updateDatasetHasChartsFlag({
 
     await patchDataset({
         session,
-        dataset: { id: ckanDatasetId, has_chart_views: hasChartViews },
+        dataset: {
+            id: ckanDatasetId,
+            has_chart_views: hasChartViews,
+            visibility_type: ckanDataset.visibility_type,
+        },
     })
 }
 
@@ -2302,7 +2321,7 @@ export async function approvePendingDataset(
     }) as Resource[]
 
     const datasetRes = await fetch(
-        `${env.CKAN_URL}/api/action/package_update`,
+        `${env.CKAN_URL}/api/action/old_package_update`,
         {
             method: 'POST',
             headers: {
@@ -2315,8 +2334,10 @@ export async function approvePendingDataset(
     const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
     if (!dataset.success && dataset.error) {
         if (dataset.error.message)
-            throw Error(JSON.stringify(dataset.error).concat('package_update'))
-        throw Error(JSON.stringify(dataset.error).concat('package_update'))
+            throw Error(
+                JSON.stringify(dataset.error).concat('old_package_update')
+            )
+        throw Error(JSON.stringify(dataset.error).concat('old_package_update'))
     }
 
     // get and close all dataset issues

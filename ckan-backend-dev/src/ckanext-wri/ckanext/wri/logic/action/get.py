@@ -362,11 +362,22 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                         ):
                             package_dict = item.before_dataset_view(package_dict)
 
-                    if return_user:
-                        user = model_dictize.user_dictize(
-                            model.User.get(package_dict.get("creator_user_id")), context
+                    try:
+                        if return_user:
+                            user = model_dictize.user_dictize(
+                                model.User.get(package_dict.get("creator_user_id")), context
+                            )
+                            package_dict["user"] = user
+                    except:
+                        log.error(
+                            "No user is coming from solr for package id %s",
+                            package_dict.get("id"),
                         )
-                        package_dict["user"] = user
+                        package_dict["user"] = {
+                            "name": "Unknown",
+                            "fullname": "Unknown",
+                            "email": "Unknown",
+                        }
                     results.append(package_dict)
                 else:
                     log.error(
@@ -517,9 +528,13 @@ def notification_get_all(
 def pending_dataset_show(context: Context, data_dict: DataDict):
     """Get a pending dataset by package_id"""
     package_id = data_dict.get("package_id")
+    package_name = data_dict.get("package_name")
 
-    if not package_id:
+    if not package_id and not package_name:
         raise logic.ValidationError(_("package_id is required"))
+
+    if package_name:
+        package_id = Package.get(package_name).id
 
     tk.check_access("pending_dataset_show", context, {"id": package_id})
 
@@ -950,9 +965,10 @@ def resource_search(context: Context, data_dict: DataDict):
     is_pending = data_dict.get("is_pending")
 
     bbox = data_dict.get("bbox")
+    spatial_address = data_dict.get("spatial_address")
 
     bbox_query = None
-    if bbox:
+    if bbox and spatial_address is None:
         bbox_coordinates = bbox.split(",")
 
         if len(bbox_coordinates) != 4:
@@ -980,7 +996,6 @@ def resource_search(context: Context, data_dict: DataDict):
             ResourceLocation.spatial_geom, "POINT({} {})".format(*point)
         )
 
-    spatial_address = data_dict.get("spatial_address")
 
     # if query is None:
     #     raise ValidationError({'query': _('Missing value')})
@@ -1006,7 +1021,6 @@ def resource_search(context: Context, data_dict: DataDict):
             isouter=True,
         )
         .join(Package, model.Package.id == model.Resource.package_id, isouter=True)
-        .filter(ResourceLocation.is_pending == (is_pending == "true"))
         .filter(model.Package.state == "active")
         .filter(model.Package.private == False)
         .filter(model.Package.name == package_id)
@@ -1042,7 +1056,7 @@ def resource_search(context: Context, data_dict: DataDict):
                 )
             )
         if len(segments) == 1:
-            country = f"{segments[1].strip()}"
+            country = f"{segments[0].strip()}"
             location_queries.append(
                 ResourceLocation.spatial_address.like(f"%{country}"),
             )
@@ -1088,6 +1102,8 @@ def resource_search(context: Context, data_dict: DataDict):
                     spatial_geom = geoalchemy2.functions.ST_GeomFromText(
                         merged_geometry.wkt
                     )
+                    print("SPATIAL GEOM", flush=True)
+                    print(spatial_geom, flush=True)
 
                     location_queries.append(
                         geoalchemy2.functions.ST_Intersects(
@@ -1113,6 +1129,8 @@ def resource_search(context: Context, data_dict: DataDict):
 
     if location_queries:
         q = q.filter(_or_(*location_queries))
+        print("LOCATION QUERIES", flush=True)
+        print(q, flush=True)
 
     resource_fields = model.Resource.get_columns()
     for field, term in fields.items():

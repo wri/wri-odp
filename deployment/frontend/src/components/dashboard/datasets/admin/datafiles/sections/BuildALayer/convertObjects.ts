@@ -364,6 +364,7 @@ function parseRender(render: any) {
 }
 
 export const getApiSpecFromRawObj = (rawLayerFormObj: RawLayerFormType) => {
+    console.log('RW LAYER OBJ FORM', rawLayerFormObj)
     const { generalConfig, layerConfig, interactionConfig, legendConfig } =
         rawLayerFormObj
     try {

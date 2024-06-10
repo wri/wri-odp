@@ -9,6 +9,7 @@ const updateFrequencySchema = z.enum([
     'biannually',
     'weekly',
     'as_needed',
+    'not_planned',
     'hourly',
     'monthly',
     'quarterly',

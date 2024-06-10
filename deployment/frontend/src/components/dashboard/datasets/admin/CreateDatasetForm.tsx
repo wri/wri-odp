@@ -24,10 +24,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { OpenInForm } from './metadata/OpenIn'
 import Link from 'next/link'
 import { LocationForm } from './metadata/LocationForm'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { VersioningForm } from './metadata/VersioningForm'
@@ -176,7 +176,8 @@ export default function CreateDatasetForm() {
                         <ErrorAlert
                             text={
                                 <div>
-                                    The following fields have invalid information
+                                    The following fields have invalid
+                                    information
                                     <ul>
                                         {Object.entries(
                                             formObj.formState.errors
@@ -194,7 +195,11 @@ export default function CreateDatasetForm() {
                                                         }) => (
                                                             <>
                                                                 {message ??
-                                                                    ((_value as any).value.message)}
+                                                                    (
+                                                                        _value as any
+                                                                    )?.value
+                                                                        ?.message ??
+                                                                    'Invalid data'}
                                                             </>
                                                         )}
                                                         name={key}
@@ -224,8 +229,10 @@ export default function CreateDatasetForm() {
                     Save as Draft
                 </Button>
                 <div className="flex items-center gap-x-2 flex-wrap gap-y-5">
-                    <Link href="/dashboard/datasets"
-                        className='inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold h-11 px-6 py-4 rounded-[3px] text-base'>
+                    <Link
+                        href="/dashboard/datasets"
+                        className="inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold h-11 px-6 py-4 rounded-[3px] text-base"
+                    >
                         Cancel
                     </Link>
                     {selectedIndex !== 0 && (
