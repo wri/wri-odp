@@ -266,15 +266,15 @@ def package_patch(context: Context, data_dict: DataDict):
             and _pending_dataset.get("visibility_type") != "draft"
         ):
             collab = tk.get_action("package_collaborator_list")(
-                {"ignore_auth": True}, {"id": dataset["id"]}
+                {"ignore_auth": True}, {"id": patch_dataset["id"]}
             )
             send_group_notification(
                 context,
                 {
-                    "owner_org": dataset.get("owner_org"),
-                    "creator_id": dataset.get("creator_user_id"),
+                    "owner_org": patch_dataset.get("owner_org"),
+                    "creator_id": patch_dataset.get("creator_user_id"),
                     "collaborator_id": collab,
-                    "dataset_id": dataset["id"],
+                    "dataset_id": patch_dataset["id"],
                     "action": "pending_dataset",
                 },
             )
