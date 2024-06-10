@@ -100,6 +100,10 @@ export function LocationSearch({
             if (f.geometry.coordinates[0].length === 5) {
                 setValue('point', null)
                 setValue('location', '')
+                console.log('bbox draw', [
+                    f.geometry.coordinates[0][2],
+                    f.geometry.coordinates[0][4],
+                ])
                 setValue('bbox', [
                     f.geometry.coordinates[0][2],
                     f.geometry.coordinates[0][4],
@@ -131,9 +135,14 @@ export function LocationSearch({
                 placeholder="Search datafiles by location"
                 initialValue={formObj.getValues('location')}
                 onResult={(e) => {
-                    setValue('point', e.result.geometry.coordinates)
-                    setValue('bbox', null)
-                    setValue('location', e.result.place_name)
+                    setValue('bbox', [
+                        [e.result.bbox[0], e.result.bbox[1]],
+                        [e.result.bbox[2], e.result.bbox[3]],
+                    ])
+                    setValue('point', null)
+                    if (e.result.place_name.split(',').length <= 2) {
+                        setValue('location', e.result.place_name)
+                    }
                 }}
                 onClear={(e) => {
                     setValue('point', null)
@@ -150,7 +159,19 @@ export function LocationSearch({
                     <Source key={index} type="geojson" data={geojson}>
                         <Layer
                             type="fill"
-                            paint={{ 'fill-color': '#F3B229' }}
+                            paint={{
+                                'fill-color': geojson.filtered
+                                    ? '#023020'
+                                    : '#BAE1BD',
+                                'fill-opacity': 0.3,
+                            }}
+                        />
+                        <Layer
+                            type="line"
+                            paint={{
+                                'line-width': 0.5,
+                                'line-color': '#32864B',
+                            }}
                         />
                     </Source>
                 ))}{' '}
@@ -215,6 +236,7 @@ export function DataFiles({
             global: 'include',
         },
     })
+    console.log(formObj.watch('bbox'))
     const { data: searchedResources, isLoading: isLoadingLocationSearch } =
         api.dataset.resourceLocationSearch.useQuery({
             bbox: formObj.watch('bbox'),
@@ -251,12 +273,18 @@ export function DataFiles({
     }
 
     const geojsons = useMemo(() => {
-        return filteredDatafilesByName.filter(r => r.spatial_type !== 'global').map((df) => ({
-            ...df.spatial_geom,
-            address: df.spatial_address,
-            id: df.id,
-        }))
-    }, [filteredDatafilesByName.length])
+        return filteredDatafilesByName
+            .filter((r) => r.spatial_type !== 'global')
+            .map((df) => ({
+                ...df.spatial_geom,
+                address: df.spatial_address,
+                filtered:
+                    filteredDatafiles.length !==
+                        filteredDatafilesByName.length &&
+                    filteredDatafiles.some((f) => f.id === df.id),
+                id: df.id,
+            }))
+    }, [filteredDatafilesByName, filteredDatafiles])
 
     const addDatafileToDownload = (datafile: Resource) => {
         setDatafilesToDownload((prev) => [...prev, datafile])
@@ -293,82 +321,86 @@ export function DataFiles({
                     placeholder="Search datafiles by title or description"
                 />
                 <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
-                <Disclosure>
-                    {({ open }) => (
-                        <>
-                            <Disclosure.Button as={Fragment}>
-                                <Button className="my-2 ml-auto group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
-                                    Filter by Location
-                                    <GlobeAmericasIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
-                                </Button>
-                            </Disclosure.Button>
-                            <Disclosure.Panel
-                                unmount={false}
-                                className="pb-3 w-full"
-                            >
-                                <div className="pb-3 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
-                                    <div className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            onChange={() =>
-                                                formObj.setValue(
-                                                    'global',
-                                                    formObj.watch('global') ===
-                                                        'only'
-                                                        ? 'include'
-                                                        : 'only'
-                                                )
-                                            }
-                                            checked={
-                                                formObj.watch('global') ===
-                                                'only'
-                                            }
-                                            className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
-                                        />
-                                        <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
-                                            Only global
-                                        </label>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            onChange={() =>
-                                                formObj.setValue(
-                                                    'global',
-                                                    formObj.watch('global') ===
-                                                        'exclude'
-                                                        ? 'include'
-                                                        : 'exclude'
-                                                )
-                                            }
-                                            checked={
-                                                formObj.watch('global') ===
-                                                'exclude'
-                                            }
-                                            className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
-                                        />
-                                        <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
-                                            Exclude global
-                                        </label>
-                                    </div>
-                                </div>
-                                <div
-                                    className={classNames(
-                                        formObj.watch('global') === 'only'
-                                            ? 'hidden'
-                                            : 'block'
-                                    )}
+                {dataset.is_approved && (
+                    <Disclosure>
+                        {({ open }) => (
+                            <>
+                                <Disclosure.Button as={Fragment}>
+                                    <Button className="my-2 ml-auto group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
+                                        Filter by Location
+                                        <GlobeAmericasIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
+                                    </Button>
+                                </Disclosure.Button>
+                                <Disclosure.Panel
+                                    unmount={false}
+                                    className="pb-3 w-full"
                                 >
-                                    <LocationSearch
-                                        open={open}
-                                        geojsons={geojsons}
-                                        formObj={formObj}
-                                    />
-                                </div>
-                            </Disclosure.Panel>
-                        </>
-                    )}
-                </Disclosure>
+                                    <div className="pb-3 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                        <div className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                onChange={() =>
+                                                    formObj.setValue(
+                                                        'global',
+                                                        formObj.watch(
+                                                            'global'
+                                                        ) === 'only'
+                                                            ? 'include'
+                                                            : 'only'
+                                                    )
+                                                }
+                                                checked={
+                                                    formObj.watch('global') ===
+                                                    'only'
+                                                }
+                                                className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
+                                            />
+                                            <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                                Only global
+                                            </label>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                onChange={() =>
+                                                    formObj.setValue(
+                                                        'global',
+                                                        formObj.watch(
+                                                            'global'
+                                                        ) === 'exclude'
+                                                            ? 'include'
+                                                            : 'exclude'
+                                                    )
+                                                }
+                                                checked={
+                                                    formObj.watch('global') ===
+                                                    'exclude'
+                                                }
+                                                className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
+                                            />
+                                            <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                                Exclude global
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div
+                                        className={classNames(
+                                            formObj.watch('global') === 'only'
+                                                ? 'hidden'
+                                                : 'block'
+                                        )}
+                                    >
+                                        <LocationSearch
+                                            open={open}
+                                            geojsons={geojsons}
+                                            formObj={formObj}
+                                        />
+                                    </div>
+                                </Disclosure.Panel>
+                            </>
+                        )}
+                    </Disclosure>
+                )}
             </div>
             <span className="font-acumin text-base font-normal text-black">
                 {filteredDatafiles?.length ?? 0} Data Files
@@ -725,6 +757,7 @@ function DatafileCard({
                                             id={`layerviews-${datafile.id}`}
                                             className="text-xs 2xl:text-sm whitespace-nowrap"
                                             onClick={() => {
+                                                console.log(datafile)
                                                 // @ts-ignore
                                                 if (datafile.rw_id) {
                                                     if (!mapDisplaypreview) {

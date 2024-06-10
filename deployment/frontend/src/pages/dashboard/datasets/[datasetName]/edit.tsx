@@ -91,6 +91,7 @@ export default function EditDatasetPage(
         id: datasetId,
         isPending: pendingExist,
     })
+  console.log('DATASET', dataset)
     const deleteDataset = api.dataset.deleteDataset.useMutation({
         onSuccess: async () => {
             await utils.dataset.getOneActualOrPendingDataset.invalidate({

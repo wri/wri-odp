@@ -118,7 +118,7 @@ export default function ApprovalRequestCard({
         <>
             <div className="bg-slate-100 w-full h-40 sm:h-20  flex  flex-col sm:flex-row justify-center items-center  gap-x-2 gap-y-4">
                 <button
-                    className="flex justify-center items-center  bg-[#58B161] rounded-md text-white font-semibold text-base px-6 py-2"
+                    className="flex justify-center items-center bg-[#58B161] rounded-md text-white font-semibold text-base px-6 py-2"
                     onClick={() => setApproveOpen(true)}
                 >
                     <CheckIcon className="w-5 h-5 text-white mr-2" />

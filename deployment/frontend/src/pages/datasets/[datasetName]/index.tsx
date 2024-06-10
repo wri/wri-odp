@@ -60,7 +60,7 @@ const LazyViz = dynamic(
         loading: () => (
             <div className="min-h-[90vh] bg-lima-700 opacity-75 flex-col items-center justify-center">
                 <Spinner className="text-wri-green w-12 h-12" />
-                <h2 className="text-center text-xl font-semibold text-wri-green">
+                <h2 className="text-center text-xl font-semibold text-black">
                     Loading...
                 </h2>
             </div>
@@ -77,14 +77,48 @@ export async function getServerSideProps(
 
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
+    if (!session) {
+        try {
+            const dataset = await getOneDataset(datasetName, session, true)
+            const NEXTURL = env.NEXTAUTH_URL
+            return {
+                props: {
+                    NEXTURL,
+                    apiKey: '',
+                    dataset: JSON.stringify({
+                        ...dataset,
+                        spatial: dataset.spatial ?? null,
+                    }),
+                    prevdataset: null,
+                    pendingExist: false,
+                    is_approved: null,
+                    generalAuthorized: false,
+                    isPendingState: false,
+                    approvalAuth: null,
+                    datasetName,
+                    datasetId: dataset.id,
+                    initialZustandState: {
+                        dataset: JSON.stringify(dataset),
+                        relatedDatasets: [],
+                        mapView: mapState,
+                    },
+                },
+            }
+        } catch (e) {
+            return {
+                props: {
+                    redirect: {
+                        destination: '/datasets/404',
+                    },
+                },
+            }
+        }
+    }
     try {
-        let prevdataset = await getOneDataset(datasetName, session, true)
-
-        const pendingDataset = await getOnePendingDataset(
-            prevdataset.id,
-            session,
-            true
-        )
+        let [prevdataset, pendingDataset] = await Promise.all([
+            getOneDataset(datasetName, session, true),
+            getOnePendingDataset(datasetName, session, true),
+        ])
 
         let dataset = prevdataset
 
