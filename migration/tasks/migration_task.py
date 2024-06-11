@@ -431,6 +431,7 @@ def migrate_dataset(data_dict, gfw_only=False):
                     "groups",
                     "organization",
                     "owner_org_name",
+                    "migration_extras",
                 ]
             ):
                 dataset_changed = True
@@ -484,8 +485,8 @@ def migrate_dataset(data_dict, gfw_only=False):
 
         existing_extras = dataset.get("extras", [])
         existing_migration_extras = dataset.get("migration_extras", {})
-        new_extras = data_dict.get("extras", [])
         new_migration_extras = data_dict.get("migration_extras", {})
+
         normalized_existing_extras = {
             extra.get("key"): normalize_value(extra.get("value"))
             for extra in existing_extras
@@ -495,7 +496,7 @@ def migrate_dataset(data_dict, gfw_only=False):
             for key, value in existing_migration_extras.items()
         }
         normalized_new_migration_extras = {
-            key: normalize_value(value) for key, value in new_migration_extras.items()
+            key: value for key, value in new_migration_extras.items()
         }
 
         old_migration_extras = []
@@ -510,13 +511,18 @@ def migrate_dataset(data_dict, gfw_only=False):
         if old_migration_extras:
             log.info(f"{log_name} Found old migration_extras in extras. Removing...")
             log.info(
-                f"{log_name} Existing extras: {json.dumps(existing_extras, indent=2)}"
+                f"{log_name} Existing extras: {json.dumps(normalized_existing_extras, indent=2)}"
             )
-            log.info(f"{log_name} New extras: {json.dumps(new_extras, indent=2)}")
+            log.info(
+                f"{log_name} New extras: {json.dumps(normalized_new_migration_extras, indent=2)}"
+            )
 
             updated_dataset["extras"] = old_extras
 
-        if (len(existing_migration_extras) != len(new_migration_extras)) or (
+        if (
+            len(normalized_new_migration_extras)
+            != len(normalized_existing_migration_extras)
+        ) or (
             any(
                 normalized_new_migration_extras.get(key)
                 != normalized_existing_migration_extras.get(key)
@@ -525,12 +531,12 @@ def migrate_dataset(data_dict, gfw_only=False):
         ):
             log.info(f"{log_name} Migration extras changed...")
             log.info(
-                f"{log_name} Existing migration extras: {json.dumps(existing_migration_extras, indent=2)}"
+                f"{log_name} Existing migration extras: {json.dumps(normalized_existing_migration_extras, indent=2)}"
             )
             log.info(
-                f"{log_name} New migration extras: {json.dumps(new_migration_extras, indent=2)}"
+                f"{log_name} New migration extras: {json.dumps(normalized_new_migration_extras, indent=2)}"
             )
-            updated_dataset["migration_extras"] = new_migration_extras
+            updated_dataset["migration_extras"] = normalized_new_migration_extras
         else:
             log.info(f"{log_name} No migration extras changes")
 
@@ -906,6 +912,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     extras = dataset.get("extras", [])
 
     migration_extras = {p[0]: normalize_value(p[1]) for p in set(get_paths(data_dict))}
+    migration_extras = {key: value for key, value in migration_extras.items() if value != "None"}
 
     required_dataset_values = {
         "name": name,
@@ -1012,7 +1019,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
 
                 resource_dict = {
                     "url": f"{GFW_API}/dataset/{base_name}/{gfw_version}/download/geotiff?grid={gfw_config.get('grid')}&tile_id={tile_id}&pixel_meaning={gfw_config.get('pixel_meaning')}",
-                    "type": "url",
+                    "type": "link",
                     "url_type": "link",
                     "name": tile_id,
                     "format": "TIF",
