@@ -25,7 +25,9 @@ UWSGI_OPTS="--socket /tmp/uwsgi.sock \
             --master --enable-threads \
             --lazy-apps \
             -p 6 -L -b 32768 --vacuum \
-            --harakiri $UWSGI_HARAKIRI"
+            --harakiri $UWSGI_HARAKIRI" \
+            --http-timeout $UWSGI_HTTP_TIMEOUT \
+            --harakiri-verbose
 
 if [ $? -eq 0 ]
 then
