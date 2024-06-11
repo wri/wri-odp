@@ -79,7 +79,46 @@ export function About({
                     </TextWithReadMore>
                 </div>
             )}
+            {dataset.learn_more && (
+                <Button
+                    className={`font-acumin w-fit text-sm font-semibold text-neutral-700 ${highlighted(
+                        'learn_more'
+                    )}`}
+                >
+                    <a
+                        href={dataset.learn_more}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Learn more
+                    </a>
+                </Button>
+            )}
             <div className="flex flex-col gap-y-2">
+                {dataset.url && (
+                    <div className="flex items-center gap-x-1">
+                        <>
+                            <dt
+                                className={`font-acumin text-sm font-semibold text-neutral-700 ${highlighted(
+                                    'url'
+                                )}`}
+                            >
+                                {' '}
+                                Source:
+                            </dt>
+                            <dd className="mb-1 text-sm font-light text-stone-900">
+                                <a
+                                    className="text-blue-800 underline"
+                                    href={dataset.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    {dataset.url ?? ' - '}
+                                </a>
+                            </dd>
+                        </>
+                    </div>
+                )}
                 {dataset.project && (
                     <div className="flex items-center gap-x-1">
                         <>
