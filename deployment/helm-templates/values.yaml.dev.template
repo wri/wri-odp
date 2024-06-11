@@ -5,7 +5,7 @@ ckan:
     replicaCount: 2
     envVarsSecretName: ckan-cloud-centeralized-sql
     env:
-      UWSGI_HARAKIRI: "180"
+      UWSGI_HARAKIRI: "600"
       CKANEXT__DCAT__ENABLE_CONTENT_NEGOTIATION: "True"
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
