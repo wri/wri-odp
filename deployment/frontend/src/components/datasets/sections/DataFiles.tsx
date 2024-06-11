@@ -146,6 +146,7 @@ export function LocationSearch({
                 }}
                 onClear={(e) => {
                     setValue('point', null)
+                    setValue('bbox', null)
                     setValue('location', '')
                 }}
             />
@@ -296,10 +297,12 @@ export function DataFiles({
     }
 
     const filteredUploadedDatafiles = filteredDatafiles.filter(
-        (r) => r.url_type === 'upload'
+        (r) => r.url_type === 'upload' || r.url_type === 'link'
     )
 
-    const uploadedDatafiles = datafiles.filter((r) => r.url_type === 'upload')
+    const uploadedDatafiles = datafiles.filter(
+        (r) => r.url_type === 'upload' || r.url_type === 'link'
+    )
 
     const filteredDatafilesEqualToDownloadDatafiles = () => {
         return (
@@ -407,7 +410,9 @@ export function DataFiles({
             </span>
             <div className="flex justify-end pb-1 lg:flex-col xl:flex-row">
                 <div className="flex gap-x-4 lg:justify-end">
-                    {datafiles.some((r) => r.url_type === 'upload') && (
+                    {datafiles.some(
+                        (r) => r.url_type === 'upload' || r.url_type === 'link'
+                    ) && (
                         <>
                             {' '}
                             {datafilesToDownload.length !==
@@ -565,7 +570,7 @@ export function DataFiles({
             <DownloadModal
                 keys={
                     datafilesToDownload
-                        .map((r) => r.key)
+                        .map((r) => r.key ?? r.url)
                         .filter(Boolean) as string[]
                 }
                 dataset_id={dataset.id}
@@ -662,25 +667,28 @@ function DatafileCard({
                         )}
                     >
                         <div className="flex items-center gap-3">
-                            {datafile.url_type === 'upload' && (
-                                <DefaultTooltip content="Select to download">
-                                    <input
-                                        aria-label={`Select ${datafile.title}`}
-                                        type="checkbox"
-                                        className="h-4 w-4  rounded  bg-white "
-                                        checked={selected}
-                                        onChange={() => {
-                                            if (selected) {
-                                                removeDatafileToDownload(
-                                                    datafile
-                                                )
-                                            } else {
-                                                addDatafileToDownload(datafile)
-                                            }
-                                        }}
-                                    />
-                                </DefaultTooltip>
-                            )}
+                            {datafile.url_type === 'upload' ||
+                                (datafile.url_type === 'link' && (
+                                    <DefaultTooltip content="Select to download">
+                                        <input
+                                            aria-label={`Select ${datafile.title}`}
+                                            type="checkbox"
+                                            className="h-4 w-4  rounded  bg-white "
+                                            checked={selected}
+                                            onChange={() => {
+                                                if (selected) {
+                                                    removeDatafileToDownload(
+                                                        datafile
+                                                    )
+                                                } else {
+                                                    addDatafileToDownload(
+                                                        datafile
+                                                    )
+                                                }
+                                            }}
+                                        />
+                                    </DefaultTooltip>
+                                ))}
                             {datafile?.format && (
                                 <span
                                     className={classNames(
@@ -1102,15 +1110,15 @@ function DatafileCard({
                                 </div>
                             </div>
                             <div className="grid max-w-[30rem] grid-cols-3 gap-x-3 py-4 ">
-                                {!datafile.rw_id ||
-                                    (datafile.rw_id === '' && (
-                                        <>
-                                            <DownloadButton
-                                                datafile={datafile}
-                                            />
-                                            <OpenInButton />
-                                        </>
-                                    ))}
+                                {datafile.url_type === 'link' ||
+                                datafile.url_type === 'upload' ? (
+                                    <>
+                                        <DownloadButton datafile={datafile} />
+                                        <OpenInButton />
+                                    </>
+                                ) : (
+                                    <></>
+                                )}
                                 {/*<LearnMoreButton datafile={datafile} dataset={dataset} />*/}
                                 <APIButton datafile={datafile} />
                             </div>
