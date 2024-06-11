@@ -606,7 +606,9 @@ def migrate_dataset(data_dict, gfw_only=False):
 
     if created_or_updated:
         try:
-            ckan.action.approve_pending_dataset(dataset_id=dataset.get("id", dataset_name))
+            ckan.action.approve_pending_dataset(
+                dataset_id=dataset.get("id", dataset_name)
+            )
             log.info(f"{log_name} Dataset approved")
         except ckanapi.errors.ValidationError as e:
             log.error(f"{log_name} Validation error: {e}")
@@ -752,7 +754,7 @@ def get_dataset_from_api(dataset_id, application, gfw_only=False, gfw_version=No
         output_object["gfw_version"] = gfw_dataset_version
 
     else:
-        resource_url = f"{RW_API}/{dataset_id}?includes=layer"
+        resource_url = f"{RW_API}/{dataset_id}?includes=layer,vocabulary"
         resource_response = requests.get(resource_url)
 
         if check_reponse_status(resource_response):
@@ -865,6 +867,17 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     layers = resource.get("layer")
     description = get_value("description")
     title = get_value("name") or base_name
+    vocabularies = get_value("vocabulary")
+
+    tag_names = [
+        tag
+        for vocabulary in vocabularies
+        for tag in vocabulary.get("attributes", {}).get("tags", [])
+    ]
+    tag_names_cleaned = [
+        re.sub(r"[^a-zA-Z0-9-_\. ]", "", tag)[:100] for tag in tag_names
+    ]
+    tags = [{"name": tag} for tag in tag_names_cleaned]
 
     if gfw_only:
         title = gfw_title or title
@@ -906,6 +919,17 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     }
 
     html_notes = markdown.markdown(description) if description else ""
+
+    methodology = None
+
+    if html_notes:
+        methodology_pattern = re.compile(
+            r"(<h3>Methodology</h3>.*?)(?=<h3>)", re.DOTALL
+        )
+        methodology_match = methodology_pattern.search(html_notes)
+        methodology = methodology_match.group(1) if methodology_match else None
+        html_notes = methodology_pattern.sub("", html_notes)
+
     function_text = markdown.markdown(function) if function else ""
     short_description = ""
 
@@ -929,6 +953,8 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
         "spatial_address": geographic_coverage,
         "maintainer": maintainer,
         "maintainer_email": maintainer_email,
+        "tags": tags,
+        "methodology": methodology,
     }
 
     dataset_dict = {key: value for key, value in dataset_values.items()}
