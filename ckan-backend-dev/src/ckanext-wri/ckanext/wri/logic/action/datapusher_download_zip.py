@@ -42,7 +42,8 @@ def check_for_existing_file_in_s3(filename: str, download_filename: str):
 
 
 def build_filename(dataset_id: str, keys: list[str]) -> str:
-    name = f"{dataset_id}-{','.join(keys)}"
+    sorted_keys = sorted(keys)
+    name = f"{dataset_id}-{','.join(sorted_keys)}"
     return calculate_md5(name)
 
 
@@ -79,7 +80,7 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
     filename = build_filename(dataset_id, keys)
     download_filename = build_download_filename(dataset_id, context)
 
-    cached_file_url = check_for_existing_file_in_s3(filename, download_filename)
+    cached_file_url = check_for_existing_file_in_s3(f"{filename}.zip", download_filename)
     if cached_file_url:
         send_email([email], cached_file_url, download_filename)
         return True
