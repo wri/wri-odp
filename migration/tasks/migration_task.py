@@ -348,6 +348,7 @@ def send_migration_dataset(data_dict):
         rw_dataset_url,
         ckan_dataset_url,
         dataset_id,
+        dataset_name
     )
 
 
@@ -1006,6 +1007,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
             resource_dict["name"] = layer_dict.get("name", "")
             resource_dict["format"] = "Layer"
             resource_dict["is_pending"] = False
+            resource_dict["title"] = layer_dict.get("name", "")
 
             resources.append(resource_dict)
 
@@ -1025,6 +1027,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
                     "format": "TIF",
                     "is_pending": False,
                     "spatial_geom": spatial_geom,
+                    "title": tile_id
                 }
 
                 resources.append(resource_dict)
