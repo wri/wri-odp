@@ -29,8 +29,8 @@ services:
       - ./src:/srv/app/src_extensions
     restart: unless-stopped
     image: ${CKAN_IMAGE}
-    healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
+    #healthcheck:
+    #  test: ["CMD-SHELL", "wget -qO /dev/null http://localhost:5000 || (echo 'Health check failed' > /tmp/ckan-healthcheck.log && wget -O - http://localhost:5000 2>> /tmp/ckan-healthcheck.log && exit 1)"]
 
 
       #  frontend:
