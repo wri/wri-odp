@@ -221,6 +221,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "resource_location_search": resource_search,
             "approve_pending_dataset": approve_pending_dataset,
             "package_create": package_create,
+            "old_package_create": logic.action.create.package_create,
             "package_patch": package_patch,
             "old_package_patch": old_package_patch,
             "old_package_update": logic.action.update.package_update,
