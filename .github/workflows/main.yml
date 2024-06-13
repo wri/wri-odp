@@ -88,6 +88,9 @@ jobs:
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
+      - name: Check healthcheck logs
+        run: docker exec ckan-wri cat /tmp/ckan-healthcheck.log
+        working-directory: ./ckan-backend-dev
       - name: Initialize the Extensions
         run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Cypress Install and CKAN setup
