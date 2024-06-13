@@ -61,8 +61,8 @@ services:
       - PREFECT_INTERNAL_URL=http://prefect:4200
       - NEXT_PUBLIC_GFW_API_KEY="1111"
     depends_on:
-      ckan-dev:
-        condition: service_healthy
+      #ckan-dev:
+      #  condition: service_healthy
       prefect:
         condition: service_healthy
       my-datapusher:
@@ -163,8 +163,8 @@ services:
     command: server --console-address ":39323" /data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-    depends_on:
-      - ckan-dev
+    #depends_on:
+    #  - ckan-dev
 
   minio-setup:
     image: minio/mc
