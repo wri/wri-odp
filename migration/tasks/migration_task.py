@@ -402,12 +402,10 @@ def migrate_dataset(data_dict, gfw_only=False):
     log_name = f'{dataset_name if dataset_name else "Unknown dataset"} -'
 
     msg = "Dataset migrated"
-    created_or_updated = False
 
     if not dataset_exists:
         try:
-            dataset = ckan.action.package_create(**data_dict)
-            created_or_updated = True
+            dataset = ckan.action.old_package_create(**data_dict)
             log.info(f"{log_name} Dataset created")
         except ckanapi.errors.ValidationError as e:
             log.error(f"{log_name} Validation error: {e}")
@@ -599,8 +597,7 @@ def migrate_dataset(data_dict, gfw_only=False):
             log.info(f"{log_name} Updating dataset")
 
             try:
-                ckan.action.package_patch(**updated_dataset)
-                created_or_updated = True
+                ckan.action.old_package_patch(**updated_dataset)
                 log.info(f"{log_name} Dataset updated: {dataset_name}")
             except ckanapi.errors.ValidationError as e:
                 log.error(f"{log_name} Validation error: {e}")
@@ -610,17 +607,6 @@ def migrate_dataset(data_dict, gfw_only=False):
                 raise e
         else:
             log.info(f"{log_name} No changes required for dataset")
-
-    if created_or_updated:
-        try:
-            ckan.action.approve_pending_dataset(
-                dataset_id=dataset.get("id", dataset_name)
-            )
-            log.info(f"{log_name} Dataset approved")
-        except ckanapi.errors.ValidationError as e:
-            log.error(f"{log_name} Validation error: {e}")
-            log.error(f"{log_name} Dataset:", json.dumps(dataset, indent=2))
-            raise e
 
     log.info(f"{log_name} FINISHED DATASET MIGRATION")
 
