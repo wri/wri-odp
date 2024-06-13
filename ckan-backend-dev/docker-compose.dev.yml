@@ -29,6 +29,8 @@ services:
       - ./src:/srv/app/src_extensions
     restart: unless-stopped
     image: ${CKAN_IMAGE}
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
 
 
       #  frontend:

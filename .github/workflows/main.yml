@@ -149,11 +149,7 @@ jobs:
         if: failure()
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
-        run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example logs db
-          docker compose -f docker-compose.test.yml --env-file .env.example logs solr
-          docker compose -f docker-compose.test.yml --env-file .env.example logs redis
-          docker compose -f docker-compose.test.yml --env-file .env.example logs ckan-dev
+        run: docker compose -f docker-compose.test.yml --env-file .env.example logs > error_logs.txt && cat error_logs.txt
         working-directory: ./ckan-backend-dev
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
