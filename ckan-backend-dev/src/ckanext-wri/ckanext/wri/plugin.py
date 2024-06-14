@@ -36,6 +36,7 @@ from ckanext.wri.logic.action.update import (
     approve_pending_dataset,
     package_patch,
     resource_update,
+    old_package_patch,
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -220,8 +221,10 @@ class WriPlugin(plugins.SingletonPlugin):
             "resource_location_search": resource_search,
             "approve_pending_dataset": approve_pending_dataset,
             "package_create": package_create,
+            "old_package_create": logic.action.create.package_create,
             "package_patch": package_patch,
-            "old_package_patch": logic.action.patch.package_patch,
+            "old_package_patch": old_package_patch,
+            "old_package_update": logic.action.update.package_update,
             "resource_update": resource_update,
             #"package_delete": package_delete,
         }

@@ -348,6 +348,7 @@ def send_migration_dataset(data_dict):
         rw_dataset_url,
         ckan_dataset_url,
         dataset_id,
+        dataset_name
     )
 
 
@@ -401,12 +402,10 @@ def migrate_dataset(data_dict, gfw_only=False):
     log_name = f'{dataset_name if dataset_name else "Unknown dataset"} -'
 
     msg = "Dataset migrated"
-    created_or_updated = False
 
     if not dataset_exists:
         try:
-            dataset = ckan.action.package_create(**data_dict)
-            created_or_updated = True
+            dataset = ckan.action.old_package_create(**data_dict)
             log.info(f"{log_name} Dataset created")
         except ckanapi.errors.ValidationError as e:
             log.error(f"{log_name} Validation error: {e}")
@@ -598,8 +597,7 @@ def migrate_dataset(data_dict, gfw_only=False):
             log.info(f"{log_name} Updating dataset")
 
             try:
-                ckan.action.package_patch(**updated_dataset)
-                created_or_updated = True
+                ckan.action.old_package_patch(**updated_dataset)
                 log.info(f"{log_name} Dataset updated: {dataset_name}")
             except ckanapi.errors.ValidationError as e:
                 log.error(f"{log_name} Validation error: {e}")
@@ -609,17 +607,6 @@ def migrate_dataset(data_dict, gfw_only=False):
                 raise e
         else:
             log.info(f"{log_name} No changes required for dataset")
-
-    if created_or_updated:
-        try:
-            ckan.action.approve_pending_dataset(
-                dataset_id=dataset.get("id", dataset_name)
-            )
-            log.info(f"{log_name} Dataset approved")
-        except ckanapi.errors.ValidationError as e:
-            log.error(f"{log_name} Validation error: {e}")
-            log.error(f"{log_name} Dataset:", json.dumps(dataset, indent=2))
-            raise e
 
     log.info(f"{log_name} FINISHED DATASET MIGRATION")
 
@@ -1006,6 +993,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
             resource_dict["name"] = layer_dict.get("name", "")
             resource_dict["format"] = "Layer"
             resource_dict["is_pending"] = False
+            resource_dict["title"] = layer_dict.get("name", "")
 
             resources.append(resource_dict)
 
@@ -1025,6 +1013,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
                     "format": "TIF",
                     "is_pending": False,
                     "spatial_geom": spatial_geom,
+                    "title": tile_id
                 }
 
                 resources.append(resource_dict)
