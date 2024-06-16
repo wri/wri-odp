@@ -11,8 +11,9 @@ import superjson from 'superjson'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import { appRouter } from '@/server/api/root'
 
-
-export default function index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function index(
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
     return (
         <>
             <NextSeo
@@ -49,18 +50,24 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         transformer: superjson,
     })
 
-    await helpers.notification.getAllNotifications.prefetch({returnLength: true})
-    await helpers.user.getUserCapacity.prefetch()
+    await Promise.all([
+        helpers.notification.getAllNotifications.prefetch({
+            returnLength: true,
+        }),
+        helpers.user.getUserCapacity.prefetch(),
 
-    await helpers.dataset.getPendingDatasets.prefetch({
-        search: '',
-        page: { start: 0, rows: 10 },
-        sortBy: 'metadata_modified desc',
-    })
+        helpers.dataset.getPendingDatasets.prefetch({
+            search: '',
+            page: { start: 0, rows: 10 },
+            sortBy: 'metadata_modified desc',
+        }),
 
-    await helpers.dataset.getFavoriteDataset.prefetch()
-    await helpers.dashboardActivity.listActivityStreamDashboard.prefetch({ search: '', page: { start: 0, rows: 6 } })
-
+        helpers.dataset.getFavoriteDataset.prefetch(),
+        helpers.dashboardActivity.listActivityStreamDashboard.prefetch({
+            search: '',
+            page: { start: 0, rows: 6 },
+        }),
+    ])
 
     if (!session) {
         return {
