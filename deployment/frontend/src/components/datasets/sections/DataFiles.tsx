@@ -1114,7 +1114,6 @@ function DatafileCard({
                                 datafile.url_type === 'upload' ? (
                                     <>
                                         <DownloadButton datafile={datafile} />
-                                        <OpenInButton />
                                     </>
                                 ) : (
                                     <></>
