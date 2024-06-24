@@ -6,6 +6,7 @@ import {
     LayerManager as VizzLayerManager,
 //@ts-ignore
 } from 'layer-manager/dist/components'
+//@ts-ignore
 import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
 import pick from 'lodash/pick'
 import { CartoProvider } from '@/utils/providers/cartoProvider'
