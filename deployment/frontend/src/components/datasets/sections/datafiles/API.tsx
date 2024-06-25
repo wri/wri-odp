@@ -48,6 +48,16 @@ export function MoreInfo() {
                 >
                     Datastore API documentation
                 </a>
+                . Also see{' '}
+                <a
+                    href="https://www.globalforestwatch.org/help/developers/guides/create-and-use-an-api-key/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className=" text-blue-700 italic underline"
+                >
+                    GFW API key documentation
+                </a>{' '}
+                to generate api token to access raw file.
             </div>
         </div>
     )
@@ -302,8 +312,12 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
                         style={{ cursor: 'pointer' }}
                     >
                         <QueryEndpoint
-                            description="Get raw file"
+                            description="Get raw file <a>c</a>"
                             url={ckanResourcGetFileUrl}
+                            method="POST"
+                            headers={{
+                                Authorization: '<API_TOKEN>',
+                            }}
                         />
                     </a>
                     <form
@@ -444,7 +458,11 @@ const SnippetInstructions = ({
             {ckanResourcGetFileSnippet && (
                 <SnippetEndpoint
                     description="Get raw file"
-                    snippet={ckanResourcGetFileSnippet}
+                    snippet={getSnippetFn(
+                        datafile.url || '',
+                        'GET',
+                        JSON.stringify({})
+                    )}
                     language={language}
                 />
             )}
