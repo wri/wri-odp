@@ -20,12 +20,23 @@ from ckanext.wri.logic.action.datapusher import (
     datapusher_latest_task,
     datapusher_submit,
 )
-from ckanext.wri.logic.action.create import notification_create, pending_dataset_create, trigger_migration, migrate_dataset, migration_status
+from ckanext.wri.logic.action.create import (
+    notification_create,
+    pending_dataset_create,
+    trigger_migration,
+    migrate_dataset,
+    migration_status,
+    package_create,
+)
 from ckanext.wri.logic.action.update import (
     notification_update,
     pending_dataset_update,
     notification_bulk_update,
-    issue_delete
+    issue_delete,
+    approve_pending_dataset,
+    package_patch,
+    resource_update,
+    old_package_patch,
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -76,7 +87,7 @@ class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IResourceView, inherit=True)
     plugins.implements(plugins.IResourceController, inherit=True)
 
-    #over-write issue delete api
+    # over-write issue delete api
     issue_action.issue_delete = issue_delete
 
     # IConfigurer
@@ -135,6 +146,8 @@ class WriPlugin(plugins.SingletonPlugin):
             "pending_dataset_update": auth.pending_dataset_update,
             "pending_dataset_delete": auth.pending_dataset_delete,
             "package_update": auth.package_update,
+            "package_collaborator_list": auth.package_collaborator_list,
+            "package_create": auth.package_create,
         }
 
     # IValidators
@@ -206,7 +219,14 @@ class WriPlugin(plugins.SingletonPlugin):
             "issue_search_wri": issue_search_wri,
             "package_collaborator_list_wri": package_collaborator_list_wri,
             "resource_location_search": resource_search,
-            
+            "approve_pending_dataset": approve_pending_dataset,
+            "package_create": package_create,
+            "old_package_create": logic.action.create.package_create,
+            "package_patch": package_patch,
+            "old_package_patch": old_package_patch,
+            "old_package_update": logic.action.update.package_update,
+            "resource_update": resource_update,
+            #"package_delete": package_delete,
         }
 
     # IPermissionLabels
@@ -311,7 +331,6 @@ class WriPlugin(plugins.SingletonPlugin):
     # IPackageController
 
     def after_dataset_create(self, context, pkg_dict):
-        log.error("!@#!@#!@#!")
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)
@@ -320,8 +339,6 @@ class WriPlugin(plugins.SingletonPlugin):
             ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
-        log.error("!@#!@#!@#!")
-        log.error(pkg_dict)
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment
@@ -403,17 +420,21 @@ class WriApiTracking(plugins.SingletonPlugin):
 
     def configure(self, config):
         self.wri_api_analytics_measurement_id = config.get(
-            'ckanext.wri.api_analytics.measurement_id'
+            "ckanext.wri.api_analytics.measurement_id"
         )
-        self.wri_api_analytics_api_secret = config.get('ckanext.wri.api_analytics.api_secret')
+        self.wri_api_analytics_api_secret = config.get(
+            "ckanext.wri.api_analytics.api_secret"
+        )
 
         variables = {
-            'ckanext.wri.api_analytics.measurement_id': self.wri_api_analytics_measurement_id,
-            'ckanext.wri.api_analytics.api_secret': self.wri_api_analytics_api_secret,
+            "ckanext.wri.api_analytics.measurement_id": self.wri_api_analytics_measurement_id,
+            "ckanext.wri.api_analytics.api_secret": self.wri_api_analytics_api_secret,
         }
         if not all(variables.values()):
-            missing_variables = '\n'.join([k for k, v in variables.items() if not v])
-            msg = f'The following variables are not configured:\n\n{missing_variables}\n'
+            missing_variables = "\n".join([k for k, v in variables.items() if not v])
+            msg = (
+                f"The following variables are not configured:\n\n{missing_variables}\n"
+            )
             raise RuntimeError(msg)
 
         # spawn a pool of 5 threads, and pass them queue instance

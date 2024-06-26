@@ -30,6 +30,7 @@ export default function UserProfile() {
                     <Image
                         src={`https://gravatar.com/avatar/${data?.userdetails?.email_hash}?s=270&d=identicon`}
                         alt="Gravatar"
+                        sizes="(max-width: 638px) 208px, 244px"
                         fill
                     />
                 )}

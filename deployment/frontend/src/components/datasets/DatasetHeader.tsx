@@ -200,21 +200,23 @@ function OpenInButton({
                         {open_in.map((item) => (
                             <Menu.Item key={item.url}>
                                 {({ active }) => (
-                                    <a
-                                        id="openin"
-                                        href={item.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={classNames(
-                                            active
-                                                ? 'bg-gray-100 text-gray-900'
-                                                : 'text-gray-700',
-                                            'block px-4 py-2 text-sm',
-                                            highlighted
-                                        )}
-                                    >
-                                        {item.title}
-                                    </a>
+                                    <div>
+                                        <a
+                                            id="openin"
+                                            href={item.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={classNames(
+                                                active
+                                                    ? 'bg-gray-100 text-gray-900'
+                                                    : 'text-gray-700',
+                                                'block px-4 py-2 text-sm',
+                                                highlighted
+                                            )}
+                                        >
+                                            {item.title}
+                                        </a>
+                                    </div>
                                 )}
                             </Menu.Item>
                         ))}

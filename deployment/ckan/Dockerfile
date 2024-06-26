@@ -61,4 +61,3 @@ RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 
 USER ckan
-
