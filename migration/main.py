@@ -14,19 +14,20 @@ DEPLOYMENT_ENV = os.environ["FLOW_DEPLOYMENT_ENV"]
 def trigger_migration(data_dict):
     log = get_run_logger()
     is_bulk = data_dict.get("is_bulk", False)
+    file_name = data_dict.get("file_name", "datasets.csv")
 
     if is_bulk:
         start_time = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-        dataset_csv = [["dataset_id", "rw_url", "ckan_url"]]
+        dataset_csv = [["dataset_id", "rw_url", "ckan_url", "new_dataset_name"]]
 
-        datasets = get_datasets_from_csv()
+        datasets = get_datasets_from_csv(file_name)
 
         for data in datasets:
             data.update(data_dict)
-            migration, rw_url, ckan_url, dataset_id = send_migration_dataset(data)
+            migration, rw_url, ckan_url, dataset_id, dataset_name = send_migration_dataset(data)
 
             if rw_url and ckan_url:
-                dataset_csv.append([dataset_id, rw_url, ckan_url])
+                dataset_csv.append([dataset_id, rw_url, ckan_url, dataset_name])
 
         with open(f"flow_logs/bulk_migration_{start_time}.csv", "w") as f:
             writer = csv.writer(f)
@@ -36,15 +37,17 @@ def trigger_migration(data_dict):
 
     else:
         start_time = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-        migration, rw_url, ckan_url, dataset_id = send_migration_dataset(data_dict)
+        migration, rw_url, ckan_url, dataset_id, dataset_name = send_migration_dataset(
+            data_dict
+        )
 
         if rw_url and ckan_url:
             with open(f"flow_logs/dataset_migration_{start_time}.csv", "w") as f:
                 writer = csv.writer(f)
                 writer.writerows(
                     [
-                        ["dataset_id", "rw_url", "ckan_url"],
-                        [dataset_id, rw_url, ckan_url],
+                        ["dataset_id", "rw_url", "ckan_url", "new_dataset_name"],
+                        [dataset_id, rw_url, ckan_url, dataset_name],
                     ]
                 )
 

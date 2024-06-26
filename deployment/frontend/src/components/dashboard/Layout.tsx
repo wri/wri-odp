@@ -179,7 +179,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                 </li>
                                                 {navigation.map((item) => {
                                                     return (
-                                                        <>
+                                                        <Fragment key={item.name}>
                                                             {item.name ==
                                                             'Requests for approval' ? (
                                                                 <>
@@ -283,7 +283,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                     </Link>
                                                                 </li>
                                                             )}
-                                                        </>
+                                                        </Fragment>
                                                     )
                                                 })}
                                             </ul>
@@ -314,7 +314,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                         </li>
                                         {navigation.map((item) => {
                                             return (
-                                                <>
+                                                <Fragment key={item.name}>
                                                     {item.name ==
                                                     'Requests for approval' ? (
                                                         <>
@@ -415,7 +415,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                             </Link>
                                                         </li>
                                                     )}
-                                                </>
+                                                </Fragment>
                                             )
                                         })}
                                     </ul>

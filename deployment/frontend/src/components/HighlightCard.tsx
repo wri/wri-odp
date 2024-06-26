@@ -33,7 +33,7 @@ export default function HighlightCard({
                 {highlight.title ?? highlight.name}
             </h2>
             <article className="px-4 line-clamp-3 w-[88%] font-light text-base mt-4 leading-[1.375rem] line-clamp-3 h-[4em]">
-                {highlight.short_description ?? highlight.notes}
+                {highlight.short_description ?? ''}
             </article>
             <div className="px-4 flex font-light text-sm text-wri-black mt-4 leading-[1.375rem] h-3">
                 {highlight.temporal_coverage_start ||

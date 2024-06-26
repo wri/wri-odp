@@ -1,260 +1,260 @@
-datasetId,application,team,topics,geographic_coverage,name
-d491f094-ad6e-4015-b248-1d1cd83667fa,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,Aquifers
-b318381e-485d-46c9-8958-c9a9d75d7e91,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Custom weights layers Aqueduct 4.0
-faf79d2c-5e54-4591-9d70-4bd1029c18e6,crt,agriadapt,atmosphere,Global,cli.057.rw1 Projected Change in Cumulative Precipitation
-13f4e065-b579-41f0-938d-b97c9dd54ce2,rw,ocean-watch,,Global,wat.070a.rw0 Soil Erosion
-bc2c749d-49a0-46c0-9582-eb33946a983e,prep,water-peace-security,land,Global,foo.027 Observed and Potential Crop Yields [Archived]
-66d28bbc-1e6e-4156-9ba2-875ecab665af,crt,agriadapt,atmosphere,Global,cli.059.rw1 Projected Change in Extreme Precipitation Days
-39fec76b-2bba-4d5c-aa02-0283be6be91a,aqueduct-water-risk,aqueduct,freshwater,Global,Country Baseline Aqueduct 4.0
-1e0e82e9-17a2-46e7-bbf8-c9b906335c74,rw,water-peace-security,"atmosphere,freshwater,water-risks",Global,wps.017 24 month SPI
-4eeb9cf7-68ee-4caf-a497-52022a002cf7,aqueduct-water-risk,aqueduct,freshwater,Global,Province Baseline Aqueduct 4.0
-0f2cec21-135b-4e2c-8cf8-79e8c2070284,aqueduct-country-rankings,aqueduct,freshwater,Global,Aqueduct Country Rankings Futures -- Global
-7391a48f-70e3-45d0-94ef-a4fe145ca715,aqueduct-country-rankings,aqueduct,freshwater,Global,Aqueduct Province Rankings Futures
-54af072c-7bb5-4bb1-af84-ea7ba0b4fc22,crt,agriadapt,"land,land-use-status",Global,foo.005.rw1 Crop Land Area and Production
-cc354f7f-2622-44cb-91c1-73559373de72,rw,water-peace-security,socio-demographics,Global,soc.074 Employment in agriculture
-a00c3514-94ba-48bd-bf56-a2e65722be34,rw,water-peace-security,land,Global,foo.001 Global Croplands and Watering Source
-95b013a3-389a-4367-83b7-c9d68c28c406,rw,water-peace-security,land,Global,"foo.043 Agriculture, Value Added"
-7455e557-e33b-4068-9a41-b99d8c808db2,rw,water-peace-security,,Global,wps_013_fractionalization
-a36bf77b-4d10-4855-8ef6-aece72e23971,rw,water-peace-security,"economy-industry,power-sector",Global,ene.040.rw0 Electricity Distribution Losses
-29a3cc91-9bf7-480f-b324-58570d9cd68f,rw,water-peace-security,,Global,cit.044 Distribution of Consumer Spending by Sector
-f31dece0-9256-428a-84de-3a59f5c06bb7,rw,ocean-watch,land,Global,for.005b.rw0 Mangrove Extent Change
-7a8b5296-d283-4832-9be1-edd760bbb58f,rw,water-peace-security,human-well-being,Global,soc.043b.rw0 Origin Countries of Refugees and Displaced Persons
-3b77d3d6-e2ec-42c5-a2b4-04a3ebbd90f7,rw,water-peace-security,economy-industry,Global,ene.036.rw0 Pump Price for Diesel Fuel
-deb6af7d-bf58-4320-b7cb-80403acfcef1,rw,ocean-watch,,Global,ocn.calcs.006 Tourism Expenditure by Region
-68e4a641-1f5e-4255-9bc7-bd604f715849,rw,water-peace-security,land,Global,wps.015 Percent of Crops that are Rainfed (%)
-4d2d47c1-fed1-4484-83e3-c91c3f6f7315,crt,agriadapt,,Global,cli.029.rw2 Vulnerability to Climate Change Index
-2eeed325-7630-4045-9c53-8627748235fc,rw,water-peace-security,freshwater,Global,wat.058 Aqueduct Untreated Connected Wastewater
-d2f6245d-5b9b-4508-874b-d42a2be7d058,rw,water-peace-security,human-well-being,Global,soc.062c Internal Displacement NRT
-c856396d-d0f2-4aae-9671-4903b2ebed4d,rw,water-peace-security,human-well-being,Global,soc.043a.rw0 Host Countries of Refugees and Internally Displaced Persons
-e0b94aef-4a3c-4fe3-8a58-7b713a4234a2,prep,water-peace-security,economy-industry,Global,com.017.rw0 Major Ports [Archived]
-51159bdb-4904-4101-a88e-ca7bd4f67cb0,prep,water-peace-security,"cities,urban-infrastructure",Global,com.002 Airports
-943f3702-421f-47a4-9b99-e2d5a9f544a7,prep,water-peace-security,"cities,urban-infrastructure,mobility",Global,cit.016 Road Network
-983c7ba9-0b03-4be6-99d1-c70c2cd8bc15,rw,water-peace-security,"economy-industry,land",Global,wps.010 Value of Crop Production
-2ca58fd1-c493-4f93-aff7-e7d2ec824342,rw,water-peace-security,"governance-law,administrative-boundaries",Global,wps_country_borders
-ed130910-d81f-4822-8379-f40c0ed7b89d,rw,water-peace-security,socio-demographics,Global,wps_003_stunting
-6c49f6df-e5fb-454e-bad5-e879ba2f3d42,rw,water-peace-security,cities,Global,wps_011_urbanization
-81bad673-b00a-49e9-bde6-6fd2ccff6c6a,rw,water-peace-security,,Global,wpsi.004 wpsi water mask carto
-c2142922-84d9-4564-8216-a4867b9e48c5,rw,ocean-watch,"land,land-use-status",,com.022 Mining Concessions
-0603d35d-d57e-4aba-a518-4520880e1607,rw,ocean-watch,,Global,wat.070b.rw0 Sediment Pressure Zones
-cef9d930-61c3-4641-87b1-9f3072210d84,crt,agriadapt,,Global,soc.085.rw1 Elevation
-e488781e-2b7a-4e49-ab5d-682f646363f1,rw,ocean-watch,"oceans-seas-coasts,socio-demographics",Global,"ocn.021b.rw0 Coastal Population (Grid, 100m)"
-28d1f505-571c-4a52-8215-48ea02aa4928,rw,ocean-watch,economy-industry,Global,com.017.rw2 Major Ports
-5dba42e7-39da-496f-94ae-ee55863595e3,rw,ocean-watch,oceans-seas-coasts,Global,ocn.025.rw0 Ocean Nationally Determined Contributions
-2dcd7aeb-d290-414b-80a2-8d90c44ae02a,crt,agriadapt,"food,economy-industry",Global,com.039.rw0 Agricultural Trade Statistics
-5a796ce9-71d4-42b0-922d-056a86e5eb72,rw,land-carbon-lab,,Global,cli.001.rw0 Snow/Ice Change
-6ab25d91-bdff-4215-b0af-902f6c85141d,aqueduct,aqueduct,,Global,Annual indicator layers - 1630103176094
-adba3cb5-7f18-491f-b31a-1b8b8c03fa67,rw,ocean-watch,food,Global,foo.063 Nutrient Balance
-c6e02718-decb-41e5-bc0c-8f0ab6f4078e,rw,water-peace-security,human-well-being,Global,wps.002 ACLED Conflict Past 12 Months
-fa4643e8-76b7-4af7-880e-5c57062ea99c,rw,water-peace-security,human-well-being,Global,wps_003_bayesian_corruption_index
-cfbe4903-2aaa-47e1-b26b-70a600363f5b,aqueduct,aqueduct,economy-industry,Global,Net trade
-6880e51c-fda2-4de5-8456-e981d548853a,aqueduct,aqueduct,food,Global,Food Demand
-57748f05-aa1d-476f-9044-9ae9ca8a09c5,aqueduct,aqueduct,"human-well-being,food",Global,Pop. at risk of hunger
-b6864a7c-4711-4fd1-9e39-3eb3b36761bf,aqueduct,aqueduct,food,Global,Food production
-c6d487f0-42ad-4513-ac99-108d4c51dab1,aqueduct,aqueduct,food,Global,Kcal per capita
-ea9dacf1-c11e-4e6a-ad63-8804111a75ba,aqueduct,aqueduct,,Global,Country mask
-4a2b250e-25ab-4da3-9b83-dc318995eee1,aqueduct,aqueduct,land,Global,All Worldwide Crops 2010
-f39f474d-f6d3-4113-a0d4-ceedd53d5bc3,aqueduct,aqueduct,"freshwater,water-risks",Global,Aqueduct_floods_hazard
-5152c286-53c1-4583-9519-816a6e41889d,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Annual indicator layers
-14a65097-974b-4084-932d-c7bdc5fe70f3,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,FAO hydrobasins
-86d2a776-8744-468d-a66f-77f8d05d06a8,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Annual indicator layer Aqueduct 4.0
-7665cb4d-34ff-4a2d-a3bc-f59246d58578,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Monthly Aqueduct 4.0
-605288fd-b146-480a-9098-3d2f46f2c403,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Water Risk Indicators Annual Aqueduct 4.0
-851b8ad1-1d80-46a7-b71a-e9dfa062f7b0,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Projected indicator layers Aqueduct 4.0
-d6ac0804-d2d9-4a76-95b7-4fca7d3063aa,rw,land-carbon-lab,land,Global,Dynamic World
-c66d7f3a-d1a8-488f-af8b-302b0f2c3840,crt,"agriadapt,wps","freshwater,water-risks",Global,wat.050 Aqueduct Baseline Water Stress
-b75d8398-34f2-447d-832d-ea570451995a,crt,agriadapt,"atmosphere,atmospheric-composition",Global,cit.035a.nrt Air Quality - Satellite Measurements - TROPOMI (NO₂)
-6b523d76-ca2d-4059-b0a6-d90a6b8ba5a6,rw,"water-peace-security,ocean-watch","food,land,land-use-status",Global,foo.055.rw1 Gridded Livestock Version 3
-b2f00f99-46ed-43e6-a7a1-a5809d9369d4,rw,ocean-watch,"land,land-use-status",Global,soc.104a Global Land Cover
-a86d906d-9862-4783-9e30-cdb68cd808b8,rw,water-peace-security,"economy-industry,power-sector",Global,Global Power Plant Database
-0ce24533-7877-4926-b962-a6c726332d82,rw,water-peace-security,"land,land-use-status",Global,foo.049 Cropland and Pasture Area 2000
-2596f568-afc3-4fc0-97d8-59f3fc42d528,rw,ocean-watch,"oceans-seas-coasts,economy-industry",Global,ocn.012 Coral Reef Tourism Value
-ccbcaf7b-1619-4298-8275-b135d1e8e04e,crt,"water-peace-security,agriadapt","cities,mobility",Global,cit.017.rw0 Accessibility to Cities
-6ad0f556-20fd-4ddf-a5cc-bf93c003a463,rw,ocean-watch,oceans-seas-coasts,Global,ocn.011.nrt.rw0 Total Suspended Matter
-92327c78-a473-402b-8edf-409869823216,rw,ocean-watch,oceans-seas-coasts,Global,ocn.020a.rw0.nrt Nitrate Concentration
-5c5e654e-182b-4ab4-8a3c-edff79cc68ea,rw,water-peace-security,"land,forest",Global,for.008a Tree Cover Loss
-9748a184-cf87-4363-bf81-2bf3030e2e53,rw,ocean-watch,oceans-seas-coasts,Global,ocn.010 Projected Coral Bleaching
-1d3e6c9e-b64a-4614-8c5a-0a6a2924806a,rw,water-peace-security,freshwater,Global,soc.109.wps_lstm
-acf42a1b-104b-4f81-acd0-549f805873fb,rw,water-peace-security,"food,economy-industry",Global,foo.053.nrt Food Price Spikes
-877cdf39-5536-409c-bcba-2220e1b72796,rw,ocean-watch,"oceans-seas-coasts,marine-environment",Global,ocn.020c.rw0.nrt Dissolved Oxygen Concentration
-d4e91298-b994-4e2c-947c-4f6486a66f30,rw,ocean-watch,"oceans-seas-coasts,marine-environment",Global,bio.037 Chlorophyll-a
-574f0b71-8363-4e3a-978f-2b1ce58c1c33,rw,ocean-watch,"oceans-seas-coasts,marine-environment",Global,ocn.007 Coral Bleaching Monitoring
-d6e42176-90c4-429d-8cae-7619c545a458,rw,ocean-watch,socio-demographics,Global,"soc.107 Population (Grid, 100m)"
-c29aee50-a46f-4c10-a8b1-152e4821be81,rw,water-peace-security,"economy-industry,human-well-being,power-sector,basic-needs",Global,ene.012a Access to Electricity (National)
-f1aa9ec7-c3b6-441c-b395-96fc796b7612,rw,ocean-watch,oceans-seas-coasts,Global,ocn.020b.rw0.nrt Phosphate Concentration
-4ca6826c-718d-457d-b4e2-e9277d7ed62c,crt,agriadapt,"atmosphere,climate-model-outputs",Global,cli.050.rw1 Projected Change in Annual Average Temperature
-055be02e-7606-4683-a4fd-7dc9169c4c7e,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,ocn.013 Coral Reef Fisheries Relative Catch
-c12446ce-174f-4ffb-b2f7-77ecb0116aba,rw,water-peace-security,"land,biodiversity",Global,foo.024.nrt Vegetation Health Index_replacement
-4a3f2c5b-1fe3-4707-82b5-2bb25d66fb52,rw,ocean-watch,"oceans-seas-coasts,coastal-zone",Global,ocn.014 Index of Shoreline Protection by Coral Reefs
-eef10736-8d8b-4ac9-a715-ef0653a83196,rw,water-peace-security,"economy-industry,power-sector",Global,ene.034 Electricity Consumption
-bc30d648-2a4f-4f5f-8a1c-b7a471e412bd,rw,water-peace-security,"governance-law,freshwater",Global,wat.065.rw0 Hydropolitical Tension and Institutional Vulnerability
-c621aa29-3e88-4608-b5b6-b4a22ff9bdf3,rw,water-peace-security,socio-demographics,Global,wps_015_age_sex
-765e5c3f-f569-4d91-806e-5056c5d1663e,crt,agriadapt,"freshwater,water-risks",Global,wat.067.rw0 Aqueduct Riverine Flood Hazard
-d43690a2-75cc-473c-bf41-7af938ccf280,rw,ocean-watch,oceans-seas-coasts,Global,ocn.016 Ocean Plastic Distribution
-d64ec5d7-d186-41fa-b5b7-d1f246ff6d77,rw,ocean-watch,"natural-hazards,atmosphere,weather-measurements",Global,ocn.005 Historical Cyclone Intensity
-c665f519-eef9-4f67-a8bf-7e3e6dc8bfcd,rw,water-peace-security,"human-well-being,basic-needs",Global,ene.028 Access to Clean Cooking Fuels
-6ac302e7-36c3-4f36-9a89-3be244ef9057,rw,ocean-watch,"oceans-seas-coasts,marine-environment",Global,ocn.008 Historical Coral Bleaching Stress Frequency
-f3855c03-ef91-47a5-8167-69c8625f0978,rw,water-peace-security,"freshwater,surface-water-bodies",Global,ene.001a Global Reservoir and Dam GRanD v1.3
-3d8e2e82-b33a-4898-90e5-6e4a1d007b82,crt,agriadapt,atmosphere,Global,cli.051a.rw1  Projected Change in Annual Average Minimum Temperature
-d5e7884d-e4dd-47dd-8f28-c5b9c2318a9f,rw,"water-peace-security,ocean-watch","oceans-seas-coasts,coastal-zone",Global,wat.059 Aqueduct Coastal Eutrophication Potential
-82d19d37-21fe-47a9-964d-75dee7aac318,rw,ocean-watch,"atmosphere,oceans-seas-coasts,climate-model-outputs",Global,ocn.003 Projected Sea Level Rise
-11278cb6-b298-49a1-bf71-f1e269f40758,rw,water-peace-security,socio-demographics,Global,soc.025 Gender Inequality Index
-ea2db3a6-49c8-4d41-a2ab-758eb6fe4bc0,crt,agriadapt,natural-hazards,Global,dis.007 Landslide Susceptibility_replacement
-cb4db45c-e1e8-44a4-837a-e513d3c9d9fe,rw,ocean-watch,oceans-seas-coasts,Global,ocn.006b Projected Ocean Acidification for Coral Reefs
-4429cf8f-7537-485f-b98a-5e67c56290b9,rw,ocean-watch,"oceans-seas-coasts,governance-law,protected-areas,marine-environment",Global,ocn.018 Fully and Highly Protected Marine Areas
-ea208a8b-4559-434b-82ee-95e041596a3a,rw,water-peace-security,human-well-being,Global,soc.016.nrt Conflict and Protest Events
-00abb46f-34e2-4bf7-be30-1fb0b1de022f,rw,water-peace-security,economy-industry,Global,"soc.008 Gross Domestic Product Per Capita (PPP, current international $)"
-8711d841-8421-4fcb-8ee2-881e573856e0,rw,water-peace-security,"human-well-being,socio-demographics,economic-well-being",Global,soc.101 Population in Poverty ($3.20/day)
-67cf410f-4cdf-4437-aa09-187e5fa590ae,rw,water-peace-security,"economy-industry,power-sector",Global,ene.033 Energy Consumption
-ed521429-58b4-4c55-9bbe-4f4bfd2fcb1f,crt,"water-peace-security,agriadapt","freshwater,food,water-risks",Global,wat.033.rw0 Agricultural Water Demand and Depletion
-5e156d22-7f84-4cd2-9724-c1a519a83e0a,rw,water-peace-security,socio-demographics,Global,cit.001 Populated Places
-141ef6ab-eed9-4081-8066-7be364a48af0,prep,water-peace-security,socio-demographics,Global,"soc.031 Population Density (Grid, 1 km)"
-1ed420e2-9283-4ced-b7b6-d5268be7a324,rw,ocean-watch,"economy-industry,power-sector",Global,ene.009 Annual Renewable Generation
-24928aa3-28d3-457c-ad2a-62f3c83ef663,rw,water-peace-security,"human-well-being,freshwater",Global,soc.049.nrt Water Conflict Chronology
-2e7527a0-c601-4e5a-a205-492314501744,rw,ocean-watch,oceans-seas-coasts,Global,ocn.017 Coral Reef Connectivity
-d49d4083-edc2-4fd7-813c-eddd85fe0d6a,rw,water-peace-security,"food,land",Global,"foo.057 Crop Allocation to Food, Feed, Nonfood"
-11804f04-d9c7-47b9-8d27-27ce6ed6c042,rw,ocean-watch,"oceans-seas-coasts,coastal-zone",Global,ocn.027a.rw0 Wastewater Plumes in Coastal Areas
-683aa637-aa4f-46ab-8260-4441de896131,rw,water-peace-security,"economy-industry,power-sector",Global,ene.035.rw0 Electricity Installed Capacity
-6cfd6255-609e-4922-8709-5aaad0db9fae,rw,water-peace-security,socio-demographics,Global,soc.081 National Infant Mortality
-7c06a7a2-4c47-4ecb-a2a5-1c76eaf2db65,rw,ocean-watch,oceans-seas-coasts,Global,ocn.006a Projected Ocean Acidification
-7e846044-5afb-4571-84f9-c5ad7848475f,rw,water-peace-security,"economy-industry,power-sector",Global,ene.039.rw0 Energy Consumption per GDP
-3adc9857-7719-43ad-a9e3-f060f163dadf,rw,water-peace-security,"Documentation Responsibilities,Documentation Responsibilities",Global,ene.038.rw0 Total Energy Production
-37d04efc-0ab2-4499-a891-54dca1013c74,rw,water-peace-security,"human-well-being,basic-needs",Global,soc.040 Access to Improved Sanitation Facilities
-989dd9a4-dfb9-49ab-b8ad-00cce4312cb7,rw,water-peace-security,"economy-industry,power-sector",Global,ene.042.rw0 Electricity Imports
-d505aa58-0d29-4691-be64-672c41f7df58,rw,water-peace-security,"economy-industry,power-sector",Global,ene.041.rw0 Electricity Exports
-4996cdb1-6169-46b7-9a74-0adf0e2ef1ce,rw,water-peace-security,economy-industry,Global,soc.102 Inflation
-df9ef304-672f-4c17-97f4-f9f8fa2849ff,rw,water-peace-security,"freshwater,water-risks",Global,wat.055 Aqueduct Riverine Flood Risk
-ab6216ee-9a2b-412f-b538-8644d5834c7a,rw,ocean-watch,"freshwater,surface-water-bodies",Global,wat.068.rw0 Watersheds
-2723e90c-2bc0-435d-b6e6-e283e4dec5ba,rw,ocean-watch,"land,forest",Global,for.001b.rw2 Tree Cover
-945185f8-76b5-4f4d-84d6-eff7f96dd1f3,crt,agriadapt,"food,land",Global,foo.067.rw0 Crop Suitability Classes
-7b3e6674-9a1b-4e06-92e4-4548117aa59e,rw,water-peace-security,human-well-being,Global,wat.066.rw0 Conflict Forecast
-98b8e4f5-d961-463a-8732-7116de16808c,rw,water-peace-security,"freshwater,water-risks",Global,wat.052 Aqueduct Interannual Variability
-f4a83ced-4aea-4cf5-aa71-00927fe707e1,crt,"water-peace-security,agriadapt","freshwater,water-risks",Global,wat.053 Aqueduct Seasonal Variability
-e3e49e13-bcd1-4861-98b2-19d396bec0f1,rw,water-peace-security,"food,economy-industry",Global,foo.066a.rw0 Global Food Product Import Shares
-63a7a997-695d-4629-b6e9-9b169f5c69bf,rw,water-peace-security,"freshwater,surface-water-bodies",Global,wat.030 World Hydro Reference
-f9523ff2-27a8-4842-a78b-35f94329dcb4,rw,water-peace-security,"food,economy-industry",Global,foo.066b.rw0 Global Food Product Export Shares
-4c446fcd-8400-4f5f-8540-c5355374ecd7,rw,ocean-watch,"land,forest",Global,for.008b.rw2 Tree Cover Loss
-2a571044-1a31-4092-9af8-48f406f13072,crt,agriadapt,"freshwater,water-risks",Global,wat.006 Projected Water Stress_replacement
-24ffab8a-588d-4fb8-92de-8bc54abf7da6,rw,ocean-watch,"socio-demographics,oceans-seas-coasts",Global,"ocn.021a Population Affected by Sea Level Rise (Grid, 100m)"
-7dfd5f25-a789-415a-bb7c-d84ffec4c7eb,rw,ocean-watch,oceans-seas-coasts,Global,ocn.009 Sea Surface Temperature Variability
-483c87c7-8724-4758-b8f0-a536b3a8f8a9,rw,ocean-watch,oceans-seas-coasts,Global,bio.007b.rw0.nrt Marine Protected Areas
-c4b12251-2d61-458f-a2c0-096c37901ade,crt,agriadapt,"atmosphere,climate-model-outputs",Global,cli.052.rw1 Projected Change in Annual Average Maximum Temperature
-2442891a-157a-40e6-9092-ee596e6d30ba,rw,ocean-watch,"governance-law,protected-areas",Global,bio.007 World Database on Protected Areas_replacement
-ebdab869-5869-4965-a5b1-d1f9b0f83330,rw,ocean-watch,oceans-seas-coasts,Global,ocn.002.nrt Wave Height
-c88d0058-3af3-4034-9915-1c8b336cfb62,rw,ocean-watch,"land,land-use-status",Global,wat.070c Potential Areas for Reforestation
-06e734af-66f0-4c3e-ac71-1b99f3cbfe1d,rw,land-carbon-lab,"land,land-use-status",Global,soc.009.rw0 Land Cover Map
-83453598-c659-45f3-ad69-b78810c6ed3d,crt,agriadapt,human-well-being,Global,cli.079.rw0 Universal Thermal Climate Index
-f90c872d-1a46-40b2-9bdd-c51ca332bdc2,crt,agriadapt,"land,biodiversity",Global,foo.068.rw0 Agro-Ecological Zones
-ec282483-4f5c-4fb8-ace7-8e557826781a,rw,land-carbon-lab,land,Global,foo.065b.rw1 Global Cropland Change
-1d23838e-40da-4cf3-b61c-56258d3a5c56,rw,ocean-watch,oceans-seas-coasts,Global,bio.004a Coral Reef Locations
-fad6aa3d-02e5-4133-9656-a38145b9348f,rw,ocean-watch,oceans-seas-coasts,Global,ocn.001 GEBCO Bathymetry
-50634b51-ea2e-4cc1-9e4b-8f26a389a301,rw,land-carbon-lab,land,Global,foo.065a.rw1 Global Cropland Extent
-7ab1ab3b-2d13-4572-bc00-545044219a8e,rw,ocean-watch,"oceans-seas-coasts,biodiversity",Global,bio.045 Seagrass
-e044a0d7-b3d4-4612-9848-71322b1772cc,rw,ocean-watch,"land,forest",Global,[Suspended] for.031a Forest Landscape Integrity Index
-5c9507d1-47f7-4c6a-9e64-fc210ccc48e2,crt,agriadapt,"freshwater,water-risks",Global,wat.057 Aqueduct Drought Risk
-99a4f9e1-3056-4666-9105-15200426fbbf,rw,ocean-watch,"land,land-use-status",Global,soc.104b Land Cover Change
-0b077461-6214-42dd-b9af-4ef4a0af70b9,rw,ocean-watch,"biodiversity,oceans-seas-coasts",Global,ocn.024a.rw0 Key Biodiversity Areas
-40c8d7b8-36b6-4f07-8941-cc61dc62fc12,rw,ocean-watch,"oceans-seas-coasts,marine-environment",Global,ocn.023.rw0 Marine Protection
-dc313105-8005-4234-894b-68bfb340e80c,rw,ocean-watch,food,Global,foo.064 Food Insecurity
-c9937085-22ec-4f8c-b819-5fa02473abdb,rw,ocean-watch,economy-industry,Global,com.038.rw0 Shipping Emissions
-db84dd39-54e1-4a70-a9fc-ae90809cefa3,rw,land-carbon-lab,land,,for.033.rw0 Trees in Mosaic Landscapes
-9e1b3cad-db6f-44b0-b6fb-048df7b6c680,rw,ocean-watch,"food,oceans-seas-coasts",Global,foo.061.rw0 Food from the Sea
-1b97e47e-ca18-4e50-9aae-a2853acca3f0,rw,water-peace-security,"human-well-being,basic-needs",Global,wat.005 Access to Improved Water Source
-64a3e126-000b-46fb-aaf4-8ac765a8263b,rw,land-carbon-lab,land,Global,for.032.rw0 Forest Height Change
-e6a3f803-1222-46c2-8e6c-0ae94b3d80c8,rw,land-carbon-lab,"cities,urban-infrastructure",Global,cit.006.rw0 Built-Up Area Change
-ac9c2f07-9f23-4a33-9958-e02c571ec009,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,foo.062 Fishery Production
-11f16cb9-def0-4bd5-a60e-50c542b837e3,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,com.030a.rw1 Fishing Activity
-b83ad197-eb95-44e2-8ec3-3351ab926421,rw,land-carbon-lab,freshwater,Global,wat.002.rw0 Water Change
-5fe43cd9-0210-4a6f-86ba-d8a7b91a180d,crt,agriadapt,"cities,urban-infrastructure",Global,cit.016.rw1 Road Network
-d17e6978-0848-4a13-ba05-6f4af04ac7d1,crt,agriadapt,"food,land",Global,foo.069.rw0 Relative Change in Crop Yield
-641c0a35-f2e5-4198-8ed9-576ea7e9685a,crt,agriadapt,"food,economy-industry",Global,com.028.rw1 Effect of Agricultural Policies on Commodity Prices
-6a22c67d-9e3c-4f8c-94d2-d90fe886b476,rw,ocean-watch,"biodiversity,oceans-seas-coasts,coastal-zone",Global,wat.069.rw0 Saltmarshes
-49b76e0f-3aad-4138-b272-87a10748f2df,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,com.030d.rw0 Fishing Effort by Zone
-6ccfb266-20cd-4838-82b0-5309987a62f0,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,com.030c.rw1 Trawling Activity
-5bf349ec-3b14-4021-a7d4-fc4b8104bd74,rw,ocean-watch,"oceans-seas-coasts,coastal-zone",Global,ocn.027b.rw0 Wastewater Inputs to Coastal Areas
-42859b52-31f2-419c-ac14-8b0cbd6bbb6f,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,ocn.022.rw0 Fisheries Subsidies
-e552ecb6-409e-484c-8bfb-0c0de2e2946e,rw,land-carbon-lab,"food,land",Global,foo.065.rw0 Cropland Change
-784732cc-8e7e-4dac-be51-d4506ff2ee04,rw,ocean-watch,"oceans-seas-coasts,coastal-zone",Global,ocn.027c.rw0 Watersheds Transporting Wastewater to Coastal Ocean
-5ef0376c-8852-48a4-8ecc-14cf36ee8b23,rw,ocean-watch,oceans-seas-coasts,Global,ocn.020d.rw0.nrt Chemical Concentrations at River Mouths
-e7970826-82e2-428a-86f5-8bb498335490,rw,water-peace-security,"freshwater,water-risks",Global,wps_014_ET_anomalies_2019_liz
-4487e012-9571-4175-991a-101268d6bb3f,rw,ocean-watch,"oceans-seas-coasts,economy-industry,fisheries",Global,com.037 Fishing Employment
-113258c9-14fc-4624-8b5c-76b064ac1ae9,aqueduct,aqueduct,"freshwater,water-risks",Global,Water Risk Baseline
-3cca5144-63d2-4ddb-af53-094603b702f3,aqueduct,aqueduct,"freshwater,water-risks",Global,Water Risk Projected
-c66d7f3a-d1a8-488f-af8b-302b0f2c3840,rw,aqueduct,freshwater,Global,wat.050 Aqueduct Baseline Water Stress
-faf79d2c-5e54-4591-9d70-4bd1029c18e6,rw,,"atmosphere,climate-model-outputs",Global,cli.057.rw1 Projected Change in Cumulative Precipitation
-d553a58a-faa2-480d-b137-c96d76d5ccab,rw,,oceans-seas-coasts,Global,bio.024 Local Coral Reef Threats
-4ca6826c-718d-457d-b4e2-e9277d7ed62c,rw,,"atmosphere,climate-model-outputs",Global,cli.050.rw1 Projected Change in Annual Average Temperature
-fc8cf356-f4be-4635-a896-fb468aaaa832,rw,,land,Global,for.013 Forest Landscape Restoration Opportunity
-a2f3ac57-e2ee-4512-8952-f00b417b6820,rw,,oceans-seas-coasts,Global,wat.041 Eutrophication and Hypoxia
-66d28bbc-1e6e-4156-9ba2-875ecab665af,rw,,"atmosphere,climate-model-outputs",Global,cli.059.rw1 Projected Change in Extreme Precipitation Days
-a290675c-9528-4a51-8201-f6c2d7848744,rw,,"atmosphere,ghg-emissions",Global,cli.008 Greenhouse Gas Emissions by Country and Economic Sector
-765e5c3f-f569-4d91-806e-5056c5d1663e,rw,aqueduct,"freshwater,water-risks",Global,wat.067.rw0 Aqueduct Riverine Flood Hazard
-fe9b286f-4b28-409a-85f5-2e81b2bd5056,rw,,oceans-seas-coasts,Global,bio.031 Social and Economic Dependence on Coral Reefs_replacement
-3941bbba-181b-434a-84c3-fcdfa5234735,rw,,"atmosphere,climate-model-outputs",Global,cli.056a Projected Change in Extreme Heat Days
-dc5db1e0-12bb-4d4d-b84f-37fa492060b6,rw,,natural-hazards,Global,wat.015 Erosion Risk_replacement
-47053e23-7808-40d9-b4ae-1af73c5c8bab,rw,,"freshwater,water-risks",Global,wat.036.rw1	Water Stress Country Ranking
-3d8e2e82-b33a-4898-90e5-6e4a1d007b82,rw,,"atmosphere,climate-model-outputs",Global,cli.051a.rw1  Projected Change in Annual Average Minimum Temperature
-702f4bcb-c376-49b6-9345-cdc8aa989582,rw,,food,Global,foo.046b Food Footprint in Calories WRR update
-1ef55baf-bbbe-480d-85e9-7132c742f196,rw,,oceans-seas-coasts,Global,bio.035 Coral Bleaching Frequency Prediction
-ed521429-58b4-4c55-9bbe-4f4bfd2fcb1f,rw,,land,Global,wat.033.rw0 Agricultural Water Demand and Depletion
-6e05a9e8-ba07-4e6f-8337-31c5362d07fe,rw,global-forest-watch,"economy-industry,food,land",,com.024.rw0.nrt Oil Palm Concessions
-f4a83ced-4aea-4cf5-aa71-00927fe707e1,rw,aqueduct,freshwater,Global,wat.053 Aqueduct Seasonal Variability
-0b9f0100-ce5b-430f-ad8f-3363efa05481,rw,,governance-law,Global,soc.001 Environmental Democracy Index
-2a571044-1a31-4092-9af8-48f406f13072,rw,,"freshwater,climate-model-outputs",Global,wat.006 Projected Water Stress_replacement
-d0f46576-411d-48aa-8df8-d89a3792cdce,rw,,"atmosphere,climate-model-outputs",Global,cli.058a Projected Change in Dry Spells
-136aab69-c625-4347-b16a-c2296ee5e99e,rw,,"governance-law,legal-documents",Global,dash_cli.047 NDC ratification status
-e354f7b8-0fca-422f-bf12-fc6189812bec,rw,,"land,land-use-status",,cit.049 Urban Land Use - India (In review)
-c4b12251-2d61-458f-a2c0-096c37901ade,rw,,"atmosphere,climate-model-outputs",Global,cli.052.rw1 Projected Change in Annual Average Maximum Temperature
-6fa000b5-8d91-46c8-8502-07427bc5eafc,rw,,"atmosphere,climate-model-outputs",Global,cli.054b Projected Change in Cooling Degree Days
-b923386c-ba2e-4964-9b16-15b8cb70e128,rw,,cities,Global,cit.040 City Categorization
-5e87d53c-10d9-419e-a0e6-122e26b064ca,rw,,food,Global,Dash_foo.045 Food Loss and Waste
-1d2f4eae-10e1-4ea6-980c-501b34106de2,rw,,"atmosphere,climate-model-outputs",Global,cli.053b  Projected Change in Heating Degree Days
-c53a195f-d5f0-4acc-b1be-b773420a6606,rw,,freshwater,Global,wat.007 flood risk
-dfbf97c3-ee82-4c68-808b-3bcc60e57167,rw,,land,,cit.047 Urban Land Use - Mexico - 6 Category (In review)
-ccee0012-de06-433d-8092-8516bdfb79de,rw,,food,Global,Dash_foo.046a Food Footprint in Protein
-c161a098-7f09-4313-b176-08a32e3bb3ad,rw,,"economy-industry,power-sector",Global,ene.032 Solar Power Plant Areas
-b6a54b79-f5ea-4f0d-bd56-66eb3dcdd27d,rw,,"cities,mobility",Global,"cit.043 Cities with BRT (topic page widget, DO NOT REMOVE)"
-e1c519d3-16ea-400a-a71c-9033ba5f490b,rw,,land,,cit.048 Urban Land Use - Mexico - Roads (In review)
-40ffc305-609a-4367-a24f-816d9d43e508,rw,,"cities,land-use-status",Global,cit.037 Upward & Outward Cities Expansion Index
-b0a8ac4b-2ef0-4417-9ecb-8743bc94af68,rw,,"cities,land-use-status",Global,cit.037 Upward & Outward Cities Expansion Index (Cities Topic page DO NOT REMOVE)
-a9601ada-a39b-4a98-bde6-fb1fb97ba17d,rw,aqueduct,freshwater,Global,wat.060 Aqueduct Unimproved or No Drinking Water Access
-d3f512c0-fbb0-47d5-9ac9-a452574c8e58,rw,,"atmosphere,climate-model-outputs",Global,cli.055a Projected Change in Frost Free Season
-71b81fe0-23fc-4154-8601-ba987381594c,rw,,"land,forest",Global,for.004.rw0 Intact Forest Landscapes
-9e9b465a-bb0f-4047-ad72-9b8fabc0fd09,rw,,"atmosphere,climate-model-outputs",,cli.073.rw0 Projected Change in Extreme Heat Days in the U.S.
-e2aa09eb-c82e-4977-b614-ef71da5936ce,rw,,economy-industry,Global,com.005 Cruise Ports
-6114c6fa-0ca6-4e06-ae23-413be0677503,rw,,"atmosphere,climate-model-outputs",,cli.074.rw0 Projected Change in Heating Degree Days in the U.S.
-5c9507d1-47f7-4c6a-9e64-fc210ccc48e2,rw,aqueduct,"freshwater,water-risks",Global,wat.057 Aqueduct Drought Risk
-bc533d1b-5480-40ab-b545-802b20a5bd80,rw,aqueduct,"freshwater,water-risks",Global,wat.051 Aqueduct Baseline Water Depletion
-d39919a9-0940-4038-87ac-662f944bc846,rw,aqueduct,"freshwater,water-risks",Global,wat.056 Aqueduct Coastal Flood Risk
-a6d63d85-dc1e-4dba-8df0-c888590f94fb,rw,aqueduct,"freshwater,water-risks",Global,wat.054 Aqueduct Groundwater Table Decline
-a9567364-e5ba-415e-a834-310e279326b6,rw,,"atmosphere,climate-model-outputs",,cli.066.rw0 Projected Change in Cumulative Precipitation in the U.S.
-de9c68b6-025a-45b9-b212-7c876b02606e,rw,,freshwater,Global,wat.064 Cost of Sustainable Water Management
-a07f1bed-ca16-4fbf-b14b-d3a0344cab74,rw,,governance-law,Global,bio.017  Global Roadless Areas
-4f7992b5-3dc0-4725-b327-d8cb439ca2f5,rw,aqueduct,freshwater,Global,wat.061 Aqueduct Unimproved or No Sanitation Access
-c985d4f6-9a03-4158-9955-e9f96db109ab,rw,,"atmosphere,climate-model-outputs,water-risks",,cli.072.rw0 Projected Change in Extreme Precipitation Days in the U.S.
-83de627f-524b-4162-a10c-384dc3e8107a,rw,,"governance-law,forest",Global,com.025.rw0.nrt Wood Fiber Concessions
-86fff033-dd27-41be-be64-2ec8983b3db1,rw,,"freshwater,water-risks",Global,wat.036 Water Stress Country Ranking [Archived]
-cd91e8d6-2e3d-46c1-9601-0dd7f524c7ba,rw,,"atmosphere,climate-model-outputs,water-risks",,cli.070.rw0 Projected Change in Dry Spells in the U.S.
-ddd31af6-926c-46f6-a236-948690c5cb34,rw,global-forest-watch,"atmosphere,forest",Global,Forest Greenhouse Gas Net Flux
-412a8589-4887-44f2-9f45-3db5fb3937e7,rw,,"atmosphere,climate-model-outputs",,cli.069.rw0 Projected Change in Cooling Degree Days in the U.S.
-09e43293-98f1-4618-8e7e-d9f72cd5a4d7,rw,,"atmosphere,climate-model-outputs",,cli.071.rw0 Projected Change in Frost Free Season in the U.S.
-807eeeff-c33c-4b74-a816-3c313bafdcd4,rw,,food,Global,foo.046 Food Footprint in Calories [Archived]
-3ac5a895-b8ab-4480-b7eb-0fbb452ea76f,rw,,land,,soc.014 Land rights data
-e1b40fdd-04f9-43ab-b4f1-d3ceee39fea1,rw,,"land,forest",Global,for.011.nrt FORMA Active Clearing [Archived]
-4c6ba704-12f3-4954-92af-6c248c584233,rw,,"atmosphere,climate-model-outputs",,cli.067.rw0 Projected Change in Annual Average Maximum Temperature in the U.S.
-c5cbedcd-8cf5-4140-ac21-6791f6786f22,rw,,"atmosphere,climate-model-outputs",,cli.075.rw0 Projected Change in Annual Average Temperature in the U.S.
-7ec68890-34a9-427c-907e-2f646f0dd9c8,rw,,"atmosphere,climate-model-outputs",,cli.068.rw0 Projected Change in Annual Average Minimum Temperature in the U.S.
-7614bdfe-9870-458c-9e56-dc9e83df8f79,rw,,"cities,mobility",Global,cit.043.rw0 Bus Rapid Transit
-f3fa9e56-78ea-4539-a0b8-6c0ffac6afc7,rw,,"land,forest",,com.026 Palm Oil Mills
-f69d21d4-c654-4233-bf2d-72de37eb459c,rw,,food,Global,foo.056a Availability of Animal Based Products
-6acb7469-29b4-4712-8254-8c130314337b,rw,,oceans-seas-coasts,Global,bio.004 Coral Reef Locations_replacement [Archived]
-0c3dfe3b-2cd5-4125-ac84-9ce0a73f34b3,rw,,"human-well-being,water-risks",Global,wps.001 Conflict Forecast [archived]
-5aeb8da8-3ae6-47a4-b21b-714819e93146,rw,,food,Global,foo.056b Ruminant Availability
-3d2ce960-abda-4c9c-bd29-1929e9ca24c9,rw,,"atmosphere,climate-model-outputs,ghg-emissions",Global,cli.007 Greenhouse Gas Emissions Projections
-fbb1df1b-8049-47fb-8408-1c82108d56ba,rw,,"atmosphere,food",Global,cli.003.rw0 Future Precipitation Suitability for Coffee Growth
-62bc9990-1483-436b-a657-ca2eab65744b,rw,,"freshwater,water-risks",Global,wat.001 Current Water Stress_replacement [Archived]
-d8e0fdcb-8c4a-4465-bfa4-fc4e31c14ab4,rw,,atmosphere,Global,ene.032 CO₂ Emissions Comparison of Electric and Diesel Buses
-eba9eb93-2eb6-480d-ab86-4a4dcc8a39db,rw,,food,Global,foo.047 Food Footprint in Protein WRR update [Archived]
-96ce9416-7a34-4c67-a21f-4f9b914d0d45,rw,,"governance-law,protected-areas",Global,bio.034 Percent of Land Area Protected by Country
-478efa8c-17b1-4b2e-a46b-4ebef74c3434,rw,,"land,forest",Global,for.027 Prodes Deforestation
-5540dcf5-7622-4231-bf7c-5d2ba3c5f378,rw,,,Global,WRI Projects by Country
-6f1df550-bea2-4ed3-8c1c-f50c639c5705,rw,,"land,forest",Global,for.010.nrt FORMA Alerts [Archived]
+dataset_id,application,team,topics,geographic_coverage,name,maintainer,maintainer_email
+d491f094-ad6e-4015-b248-1d1cd83667fa,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,Aquifers,Samantha Kuzma,samantha.kuzma@wri.org
+b318381e-485d-46c9-8958-c9a9d75d7e91,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Custom weights layers Aqueduct 4.0,Samantha Kuzma,samantha.kuzma@wri.org
+faf79d2c-5e54-4591-9d70-4bd1029c18e6,crt,agriadapt,atmosphere,Global,cli.057.rw1 Projected Change in Cumulative Precipitation,Stefanie Tye,stefanie.tye@wri.org
+13f4e065-b579-41f0-938d-b97c9dd54ce2,rw,ocean-watch,,Global,wat.070a.rw0 Soil Erosion,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+bc2c749d-49a0-46c0-9582-eb33946a983e,prep,water-peace-security,land,Global,foo.027 Observed and Potential Crop Yields [Archived],Samantha Kuzma,samantha.kuzma@wri.org
+66d28bbc-1e6e-4156-9ba2-875ecab665af,crt,agriadapt,atmosphere,Global,cli.059.rw1 Projected Change in Extreme Precipitation Days,Stefanie Tye,stefanie.tye@wri.org
+39fec76b-2bba-4d5c-aa02-0283be6be91a,aqueduct-water-risk,aqueduct,freshwater,Global,Country Baseline Aqueduct 4.0,Samantha Kuzma,samantha.kuzma@wri.org
+1e0e82e9-17a2-46e7-bbf8-c9b906335c74,rw,water-peace-security,"atmosphere,freshwater,water-risks",Global,wps.017 24 month SPI,Samantha Kuzma,samantha.kuzma@wri.org
+4eeb9cf7-68ee-4caf-a497-52022a002cf7,aqueduct-water-risk,aqueduct,freshwater,Global,Province Baseline Aqueduct 4.0,Samantha Kuzma,samantha.kuzma@wri.org
+0f2cec21-135b-4e2c-8cf8-79e8c2070284,aqueduct-country-rankings,aqueduct,freshwater,Global,Aqueduct Country Rankings Futures -- Global,Samantha Kuzma,samantha.kuzma@wri.org
+7391a48f-70e3-45d0-94ef-a4fe145ca715,aqueduct-country-rankings,aqueduct,freshwater,Global,Aqueduct Province Rankings Futures,Samantha Kuzma,samantha.kuzma@wri.org
+54af072c-7bb5-4bb1-af84-ea7ba0b4fc22,crt,agriadapt,"land,land-use-status",Global,foo.005.rw1 Crop Land Area and Production,Stefanie Tye,stefanie.tye@wri.org
+cc354f7f-2622-44cb-91c1-73559373de72,rw,water-peace-security,socio-demographics,Global,soc.074 Employment in agriculture,Samantha Kuzma,samantha.kuzma@wri.org
+a00c3514-94ba-48bd-bf56-a2e65722be34,rw,water-peace-security,land,Global,foo.001 Global Croplands and Watering Source,Samantha Kuzma,samantha.kuzma@wri.org
+95b013a3-389a-4367-83b7-c9d68c28c406,rw,water-peace-security,land,Global,"foo.043 Agriculture, Value Added",Samantha Kuzma,samantha.kuzma@wri.org
+7455e557-e33b-4068-9a41-b99d8c808db2,rw,water-peace-security,,Global,wps_013_fractionalization,Samantha Kuzma,samantha.kuzma@wri.org
+a36bf77b-4d10-4855-8ef6-aece72e23971,rw,water-peace-security,"economy-industry,power-sector",Global,ene.040.rw0 Electricity Distribution Losses,Samantha Kuzma,samantha.kuzma@wri.org
+29a3cc91-9bf7-480f-b324-58570d9cd68f,rw,water-peace-security,,Global,cit.044 Distribution of Consumer Spending by Sector,Samantha Kuzma,samantha.kuzma@wri.org
+f31dece0-9256-428a-84de-3a59f5c06bb7,rw,ocean-watch,land,Global,for.005b.rw0 Mangrove Extent Change,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+7a8b5296-d283-4832-9be1-edd760bbb58f,rw,water-peace-security,human-well-being,Global,soc.043b.rw0 Origin Countries of Refugees and Displaced Persons,Samantha Kuzma,samantha.kuzma@wri.org
+3b77d3d6-e2ec-42c5-a2b4-04a3ebbd90f7,rw,water-peace-security,economy-industry,Global,ene.036.rw0 Pump Price for Diesel Fuel,Samantha Kuzma,samantha.kuzma@wri.org
+deb6af7d-bf58-4320-b7cb-80403acfcef1,rw,ocean-watch,,Global,ocn.calcs.006 Tourism Expenditure by Region,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+68e4a641-1f5e-4255-9bc7-bd604f715849,rw,water-peace-security,land,Global,wps.015 Percent of Crops that are Rainfed (%),Samantha Kuzma,samantha.kuzma@wri.org
+4d2d47c1-fed1-4484-83e3-c91c3f6f7315,crt,agriadapt,,Global,cli.029.rw2 Vulnerability to Climate Change Index,Stefanie Tye,stefanie.tye@wri.org
+2eeed325-7630-4045-9c53-8627748235fc,rw,water-peace-security,freshwater,Global,wat.058 Aqueduct Untreated Connected Wastewater,Samantha Kuzma,samantha.kuzma@wri.org
+d2f6245d-5b9b-4508-874b-d42a2be7d058,rw,water-peace-security,human-well-being,Global,soc.062c Internal Displacement NRT,Samantha Kuzma,samantha.kuzma@wri.org
+c856396d-d0f2-4aae-9671-4903b2ebed4d,rw,water-peace-security,human-well-being,Global,soc.043a.rw0 Host Countries of Refugees and Internally Displaced Persons,Samantha Kuzma,samantha.kuzma@wri.org
+e0b94aef-4a3c-4fe3-8a58-7b713a4234a2,prep,water-peace-security,economy-industry,Global,com.017.rw0 Major Ports [Archived],Samantha Kuzma,samantha.kuzma@wri.org
+51159bdb-4904-4101-a88e-ca7bd4f67cb0,prep,water-peace-security,"cities,urban-infrastructure",Global,com.002 Airports,Samantha Kuzma,samantha.kuzma@wri.org
+943f3702-421f-47a4-9b99-e2d5a9f544a7,prep,water-peace-security,"cities,urban-infrastructure,mobility",Global,cit.016 Road Network,Samantha Kuzma,samantha.kuzma@wri.org
+983c7ba9-0b03-4be6-99d1-c70c2cd8bc15,rw,water-peace-security,"economy-industry,land",Global,wps.010 Value of Crop Production,Samantha Kuzma,samantha.kuzma@wri.org
+2ca58fd1-c493-4f93-aff7-e7d2ec824342,rw,water-peace-security,"governance-law,administrative-boundaries",Global,wps_country_borders,Samantha Kuzma,samantha.kuzma@wri.org
+ed130910-d81f-4822-8379-f40c0ed7b89d,rw,water-peace-security,socio-demographics,Global,wps_003_stunting,Samantha Kuzma,samantha.kuzma@wri.org
+6c49f6df-e5fb-454e-bad5-e879ba2f3d42,rw,water-peace-security,cities,Global,wps_011_urbanization,Samantha Kuzma,samantha.kuzma@wri.org
+81bad673-b00a-49e9-bde6-6fd2ccff6c6a,rw,water-peace-security,,Global,wpsi.004 wpsi water mask carto,Samantha Kuzma,samantha.kuzma@wri.org
+c2142922-84d9-4564-8216-a4867b9e48c5,rw,ocean-watch,"land,land-use-status",,com.022 Mining Concessions,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+0603d35d-d57e-4aba-a518-4520880e1607,rw,ocean-watch,,Global,wat.070b.rw0 Sediment Pressure Zones,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+cef9d930-61c3-4641-87b1-9f3072210d84,crt,agriadapt,,Global,soc.085.rw1 Elevation,Stefanie Tye,stefanie.tye@wri.org
+e488781e-2b7a-4e49-ab5d-682f646363f1,rw,ocean-watch,"oceans-seas-coasts,socio-demographics",Global,"ocn.021b.rw0 Coastal Population (Grid, 100m)",Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+28d1f505-571c-4a52-8215-48ea02aa4928,rw,ocean-watch,economy-industry,Global,com.017.rw2 Major Ports,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+5dba42e7-39da-496f-94ae-ee55863595e3,rw,ocean-watch,oceans-seas-coasts,Global,ocn.025.rw0 Ocean Nationally Determined Contributions,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+2dcd7aeb-d290-414b-80a2-8d90c44ae02a,crt,agriadapt,"food,economy-industry",Global,com.039.rw0 Agricultural Trade Statistics,Stefanie Tye,stefanie.tye@wri.org
+5a796ce9-71d4-42b0-922d-056a86e5eb72,rw,land-carbon-lab,,Global,cli.001.rw0 Snow/Ice Change,Alyssa Barrett,abarrett@wri.org
+6ab25d91-bdff-4215-b0af-902f6c85141d,aqueduct,aqueduct,,Global,Annual indicator layers - 1630103176094,Samantha Kuzma,samantha.kuzma@wri.org
+adba3cb5-7f18-491f-b31a-1b8b8c03fa67,rw,ocean-watch,food,Global,foo.063 Nutrient Balance,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+c6e02718-decb-41e5-bc0c-8f0ab6f4078e,rw,water-peace-security,human-well-being,Global,wps.002 ACLED Conflict Past 12 Months,Samantha Kuzma,samantha.kuzma@wri.org
+fa4643e8-76b7-4af7-880e-5c57062ea99c,rw,water-peace-security,human-well-being,Global,wps_003_bayesian_corruption_index,Samantha Kuzma,samantha.kuzma@wri.org
+cfbe4903-2aaa-47e1-b26b-70a600363f5b,aqueduct,aqueduct,economy-industry,Global,Net trade,Samantha Kuzma,samantha.kuzma@wri.org
+6880e51c-fda2-4de5-8456-e981d548853a,aqueduct,aqueduct,food,Global,Food Demand,Samantha Kuzma,samantha.kuzma@wri.org
+57748f05-aa1d-476f-9044-9ae9ca8a09c5,aqueduct,aqueduct,"human-well-being,food",Global,Pop. at risk of hunger,Samantha Kuzma,samantha.kuzma@wri.org
+b6864a7c-4711-4fd1-9e39-3eb3b36761bf,aqueduct,aqueduct,food,Global,Food production,Samantha Kuzma,samantha.kuzma@wri.org
+c6d487f0-42ad-4513-ac99-108d4c51dab1,aqueduct,aqueduct,food,Global,Kcal per capita,Samantha Kuzma,samantha.kuzma@wri.org
+ea9dacf1-c11e-4e6a-ad63-8804111a75ba,aqueduct,aqueduct,,Global,Country mask,Samantha Kuzma,samantha.kuzma@wri.org
+4a2b250e-25ab-4da3-9b83-dc318995eee1,aqueduct,aqueduct,land,Global,All Worldwide Crops 2010,Samantha Kuzma,samantha.kuzma@wri.org
+f39f474d-f6d3-4113-a0d4-ceedd53d5bc3,aqueduct,aqueduct,"freshwater,water-risks",Global,Aqueduct_floods_hazard,Samantha Kuzma,samantha.kuzma@wri.org
+5152c286-53c1-4583-9519-816a6e41889d,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Annual indicator layers,Samantha Kuzma,samantha.kuzma@wri.org
+14a65097-974b-4084-932d-c7bdc5fe70f3,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,FAO hydrobasins,Samantha Kuzma,samantha.kuzma@wri.org
+86d2a776-8744-468d-a66f-77f8d05d06a8,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Annual indicator layer Aqueduct 4.0,Samantha Kuzma,samantha.kuzma@wri.org
+7665cb4d-34ff-4a2d-a3bc-f59246d58578,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Monthly Aqueduct 4.0,Samantha Kuzma,samantha.kuzma@wri.org
+605288fd-b146-480a-9098-3d2f46f2c403,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Water Risk Indicators Annual Aqueduct 4.0,Samantha Kuzma,samantha.kuzma@wri.org
+851b8ad1-1d80-46a7-b71a-e9dfa062f7b0,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,Projected indicator layers Aqueduct 4.0,Samantha Kuzma,samantha.kuzma@wri.org
+d6ac0804-d2d9-4a76-95b7-4fca7d3063aa,rw,land-carbon-lab,land,Global,Dynamic World,Alyssa Barrett,abarrett@wri.org
+c66d7f3a-d1a8-488f-af8b-302b0f2c3840,crt,agriadapt,"freshwater,water-risks",Global,wat.050 Aqueduct Baseline Water Stress,Samantha Kuzma,samantha.kuzma@wri.org
+b75d8398-34f2-447d-832d-ea570451995a,crt,agriadapt,"atmosphere,atmospheric-composition",Global,cit.035a.nrt Air Quality - Satellite Measurements - TROPOMI (NO₂),Stefanie Tye,stefanie.tye@wri.org
+6b523d76-ca2d-4059-b0a6-d90a6b8ba5a6,rw,water-peace-security,"food,land,land-use-status",Global,foo.055.rw1 Gridded Livestock Version 3,Samantha Kuzma,samantha.kuzma@wri.org
+b2f00f99-46ed-43e6-a7a1-a5809d9369d4,rw,ocean-watch,"land,land-use-status",Global,soc.104a Global Land Cover,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+a86d906d-9862-4783-9e30-cdb68cd808b8,rw,water-peace-security,"economy-industry,power-sector",Global,Global Power Plant Database,Samantha Kuzma,samantha.kuzma@wri.org
+0ce24533-7877-4926-b962-a6c726332d82,rw,water-peace-security,"land,land-use-status",Global,foo.049 Cropland and Pasture Area 2000,Samantha Kuzma,samantha.kuzma@wri.org
+2596f568-afc3-4fc0-97d8-59f3fc42d528,rw,ocean-watch,"oceans-seas-coasts,economy-industry",Global,ocn.012 Coral Reef Tourism Value,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+ccbcaf7b-1619-4298-8275-b135d1e8e04e,crt,water-peace-security,"cities,mobility",Global,cit.017.rw0 Accessibility to Cities,Samantha Kuzma,samantha.kuzma@wri.org
+6ad0f556-20fd-4ddf-a5cc-bf93c003a463,rw,ocean-watch,oceans-seas-coasts,Global,ocn.011.nrt.rw0 Total Suspended Matter,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+92327c78-a473-402b-8edf-409869823216,rw,ocean-watch,oceans-seas-coasts,Global,ocn.020a.rw0.nrt Nitrate Concentration,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+5c5e654e-182b-4ab4-8a3c-edff79cc68ea,rw,water-peace-security,"land,forest",Global,for.008a Tree Cover Loss,Samantha Kuzma,samantha.kuzma@wri.org
+9748a184-cf87-4363-bf81-2bf3030e2e53,rw,ocean-watch,oceans-seas-coasts,Global,ocn.010 Projected Coral Bleaching,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+1d3e6c9e-b64a-4614-8c5a-0a6a2924806a,rw,water-peace-security,freshwater,Global,soc.109.wps_lstm,Samantha Kuzma,samantha.kuzma@wri.org
+acf42a1b-104b-4f81-acd0-549f805873fb,rw,water-peace-security,"food,economy-industry",Global,foo.053.nrt Food Price Spikes,Samantha Kuzma,samantha.kuzma@wri.org
+877cdf39-5536-409c-bcba-2220e1b72796,rw,ocean-watch,"oceans-seas-coasts,marine-environment",Global,ocn.020c.rw0.nrt Dissolved Oxygen Concentration,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+d4e91298-b994-4e2c-947c-4f6486a66f30,rw,ocean-watch,"oceans-seas-coasts,marine-environment",Global,bio.037 Chlorophyll-a,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+574f0b71-8363-4e3a-978f-2b1ce58c1c33,rw,ocean-watch,"oceans-seas-coasts,marine-environment",Global,ocn.007 Coral Bleaching Monitoring,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+d6e42176-90c4-429d-8cae-7619c545a458,rw,ocean-watch,socio-demographics,Global,"soc.107 Population (Grid, 100m)",Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+c29aee50-a46f-4c10-a8b1-152e4821be81,rw,water-peace-security,"economy-industry,human-well-being,power-sector,basic-needs",Global,ene.012a Access to Electricity (National),Samantha Kuzma,samantha.kuzma@wri.org
+f1aa9ec7-c3b6-441c-b395-96fc796b7612,rw,ocean-watch,oceans-seas-coasts,Global,ocn.020b.rw0.nrt Phosphate Concentration,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+4ca6826c-718d-457d-b4e2-e9277d7ed62c,crt,agriadapt,"atmosphere,climate-model-outputs",Global,cli.050.rw1 Projected Change in Annual Average Temperature,Stefanie Tye,stefanie.tye@wri.org
+055be02e-7606-4683-a4fd-7dc9169c4c7e,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,ocn.013 Coral Reef Fisheries Relative Catch,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+c12446ce-174f-4ffb-b2f7-77ecb0116aba,rw,water-peace-security,"land,biodiversity",Global,foo.024.nrt Vegetation Health Index_replacement,Samantha Kuzma,samantha.kuzma@wri.org
+4a3f2c5b-1fe3-4707-82b5-2bb25d66fb52,rw,ocean-watch,"oceans-seas-coasts,coastal-zone",Global,ocn.014 Index of Shoreline Protection by Coral Reefs,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+eef10736-8d8b-4ac9-a715-ef0653a83196,rw,water-peace-security,"economy-industry,power-sector",Global,ene.034 Electricity Consumption,Samantha Kuzma,samantha.kuzma@wri.org
+bc30d648-2a4f-4f5f-8a1c-b7a471e412bd,rw,water-peace-security,"governance-law,freshwater",Global,wat.065.rw0 Hydropolitical Tension and Institutional Vulnerability,Samantha Kuzma,samantha.kuzma@wri.org
+c621aa29-3e88-4608-b5b6-b4a22ff9bdf3,rw,water-peace-security,socio-demographics,Global,wps_015_age_sex,Samantha Kuzma,samantha.kuzma@wri.org
+765e5c3f-f569-4d91-806e-5056c5d1663e,crt,agriadapt,"freshwater,water-risks",Global,wat.067.rw0 Aqueduct Riverine Flood Hazard,Stefanie Tye,stefanie.tye@wri.org
+d43690a2-75cc-473c-bf41-7af938ccf280,rw,ocean-watch,oceans-seas-coasts,Global,ocn.016 Ocean Plastic Distribution,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+d64ec5d7-d186-41fa-b5b7-d1f246ff6d77,rw,ocean-watch,"natural-hazards,atmosphere,weather-measurements",Global,ocn.005 Historical Cyclone Intensity,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+c665f519-eef9-4f67-a8bf-7e3e6dc8bfcd,rw,water-peace-security,"human-well-being,basic-needs",Global,ene.028 Access to Clean Cooking Fuels,Samantha Kuzma,samantha.kuzma@wri.org
+6ac302e7-36c3-4f36-9a89-3be244ef9057,rw,ocean-watch,"oceans-seas-coasts,marine-environment",Global,ocn.008 Historical Coral Bleaching Stress Frequency,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+f3855c03-ef91-47a5-8167-69c8625f0978,rw,water-peace-security,"freshwater,surface-water-bodies",Global,ene.001a Global Reservoir and Dam GRanD v1.3,Samantha Kuzma,samantha.kuzma@wri.org
+3d8e2e82-b33a-4898-90e5-6e4a1d007b82,crt,agriadapt,atmosphere,Global,cli.051a.rw1  Projected Change in Annual Average Minimum Temperature,Stefanie Tye,stefanie.tye@wri.org
+d5e7884d-e4dd-47dd-8f28-c5b9c2318a9f,rw,water-peace-security,"oceans-seas-coasts,coastal-zone",Global,wat.059 Aqueduct Coastal Eutrophication Potential,Samantha Kuzma,samantha.kuzma@wri.org
+82d19d37-21fe-47a9-964d-75dee7aac318,rw,ocean-watch,"atmosphere,oceans-seas-coasts,climate-model-outputs",Global,ocn.003 Projected Sea Level Rise,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+11278cb6-b298-49a1-bf71-f1e269f40758,rw,water-peace-security,socio-demographics,Global,soc.025 Gender Inequality Index,Samantha Kuzma,samantha.kuzma@wri.org
+ea2db3a6-49c8-4d41-a2ab-758eb6fe4bc0,crt,agriadapt,natural-hazards,Global,dis.007 Landslide Susceptibility_replacement,Stefanie Tye,stefanie.tye@wri.org
+cb4db45c-e1e8-44a4-837a-e513d3c9d9fe,rw,ocean-watch,oceans-seas-coasts,Global,ocn.006b Projected Ocean Acidification for Coral Reefs,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+4429cf8f-7537-485f-b98a-5e67c56290b9,rw,ocean-watch,"oceans-seas-coasts,governance-law,protected-areas,marine-environment",Global,ocn.018 Fully and Highly Protected Marine Areas,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+ea208a8b-4559-434b-82ee-95e041596a3a,rw,water-peace-security,human-well-being,Global,soc.016.nrt Conflict and Protest Events,Samantha Kuzma,samantha.kuzma@wri.org
+00abb46f-34e2-4bf7-be30-1fb0b1de022f,rw,water-peace-security,economy-industry,Global,"soc.008 Gross Domestic Product Per Capita (PPP, current international $)",Samantha Kuzma,samantha.kuzma@wri.org
+8711d841-8421-4fcb-8ee2-881e573856e0,rw,water-peace-security,"human-well-being,socio-demographics,economic-well-being",Global,soc.101 Population in Poverty ($3.20/day),Samantha Kuzma,samantha.kuzma@wri.org
+67cf410f-4cdf-4437-aa09-187e5fa590ae,rw,water-peace-security,"economy-industry,power-sector",Global,ene.033 Energy Consumption,Samantha Kuzma,samantha.kuzma@wri.org
+ed521429-58b4-4c55-9bbe-4f4bfd2fcb1f,crt,water-peace-security,"freshwater,food,water-risks",Global,wat.033.rw0 Agricultural Water Demand and Depletion,Samantha Kuzma,samantha.kuzma@wri.org
+5e156d22-7f84-4cd2-9724-c1a519a83e0a,rw,water-peace-security,socio-demographics,Global,cit.001 Populated Places,Samantha Kuzma,samantha.kuzma@wri.org
+141ef6ab-eed9-4081-8066-7be364a48af0,prep,water-peace-security,socio-demographics,Global,"soc.031 Population Density (Grid, 1 km)",Samantha Kuzma,samantha.kuzma@wri.org
+1ed420e2-9283-4ced-b7b6-d5268be7a324,rw,ocean-watch,"economy-industry,power-sector",Global,ene.009 Annual Renewable Generation,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+24928aa3-28d3-457c-ad2a-62f3c83ef663,rw,water-peace-security,"human-well-being,freshwater",Global,soc.049.nrt Water Conflict Chronology,Samantha Kuzma,samantha.kuzma@wri.org
+2e7527a0-c601-4e5a-a205-492314501744,rw,ocean-watch,oceans-seas-coasts,Global,ocn.017 Coral Reef Connectivity,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+d49d4083-edc2-4fd7-813c-eddd85fe0d6a,rw,water-peace-security,"food,land",Global,"foo.057 Crop Allocation to Food, Feed, Nonfood",Samantha Kuzma,samantha.kuzma@wri.org
+11804f04-d9c7-47b9-8d27-27ce6ed6c042,rw,ocean-watch,"oceans-seas-coasts,coastal-zone",Global,ocn.027a.rw0 Wastewater Plumes in Coastal Areas,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+683aa637-aa4f-46ab-8260-4441de896131,rw,water-peace-security,"economy-industry,power-sector",Global,ene.035.rw0 Electricity Installed Capacity,Samantha Kuzma,samantha.kuzma@wri.org
+6cfd6255-609e-4922-8709-5aaad0db9fae,rw,water-peace-security,socio-demographics,Global,soc.081 National Infant Mortality,Samantha Kuzma,samantha.kuzma@wri.org
+7c06a7a2-4c47-4ecb-a2a5-1c76eaf2db65,rw,ocean-watch,oceans-seas-coasts,Global,ocn.006a Projected Ocean Acidification,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+7e846044-5afb-4571-84f9-c5ad7848475f,rw,water-peace-security,"economy-industry,power-sector",Global,ene.039.rw0 Energy Consumption per GDP,Samantha Kuzma,samantha.kuzma@wri.org
+3adc9857-7719-43ad-a9e3-f060f163dadf,rw,water-peace-security,"Documentation Responsibilities,Documentation Responsibilities",Global,ene.038.rw0 Total Energy Production,Samantha Kuzma,samantha.kuzma@wri.org
+37d04efc-0ab2-4499-a891-54dca1013c74,rw,water-peace-security,"human-well-being,basic-needs",Global,soc.040 Access to Improved Sanitation Facilities,Samantha Kuzma,samantha.kuzma@wri.org
+989dd9a4-dfb9-49ab-b8ad-00cce4312cb7,rw,water-peace-security,"economy-industry,power-sector",Global,ene.042.rw0 Electricity Imports,Samantha Kuzma,samantha.kuzma@wri.org
+d505aa58-0d29-4691-be64-672c41f7df58,rw,water-peace-security,"economy-industry,power-sector",Global,ene.041.rw0 Electricity Exports,Samantha Kuzma,samantha.kuzma@wri.org
+4996cdb1-6169-46b7-9a74-0adf0e2ef1ce,rw,water-peace-security,economy-industry,Global,soc.102 Inflation,Samantha Kuzma,samantha.kuzma@wri.org
+df9ef304-672f-4c17-97f4-f9f8fa2849ff,rw,water-peace-security,"freshwater,water-risks",Global,wat.055 Aqueduct Riverine Flood Risk,Samantha Kuzma,samantha.kuzma@wri.org
+ab6216ee-9a2b-412f-b538-8644d5834c7a,rw,ocean-watch,"freshwater,surface-water-bodies",Global,wat.068.rw0 Watersheds,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+2723e90c-2bc0-435d-b6e6-e283e4dec5ba,rw,ocean-watch,"land,forest",Global,for.001b.rw2 Tree Cover,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+945185f8-76b5-4f4d-84d6-eff7f96dd1f3,crt,agriadapt,"food,land",Global,foo.067.rw0 Crop Suitability Classes,Stefanie Tye,stefanie.tye@wri.org
+7b3e6674-9a1b-4e06-92e4-4548117aa59e,rw,water-peace-security,human-well-being,Global,wat.066.rw0 Conflict Forecast,Samantha Kuzma,samantha.kuzma@wri.org
+98b8e4f5-d961-463a-8732-7116de16808c,rw,water-peace-security,"freshwater,water-risks",Global,wat.052 Aqueduct Interannual Variability,Samantha Kuzma,samantha.kuzma@wri.org
+f4a83ced-4aea-4cf5-aa71-00927fe707e1,crt,water-peace-security,"freshwater,water-risks",Global,wat.053 Aqueduct Seasonal Variability,Samantha Kuzma,samantha.kuzma@wri.org
+e3e49e13-bcd1-4861-98b2-19d396bec0f1,rw,water-peace-security,"food,economy-industry",Global,foo.066a.rw0 Global Food Product Import Shares,Samantha Kuzma,samantha.kuzma@wri.org
+63a7a997-695d-4629-b6e9-9b169f5c69bf,rw,water-peace-security,"freshwater,surface-water-bodies",Global,wat.030 World Hydro Reference,Samantha Kuzma,samantha.kuzma@wri.org
+f9523ff2-27a8-4842-a78b-35f94329dcb4,rw,water-peace-security,"food,economy-industry",Global,foo.066b.rw0 Global Food Product Export Shares,Samantha Kuzma,samantha.kuzma@wri.org
+4c446fcd-8400-4f5f-8540-c5355374ecd7,rw,ocean-watch,"land,forest",Global,for.008b.rw2 Tree Cover Loss,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+2a571044-1a31-4092-9af8-48f406f13072,crt,agriadapt,"freshwater,water-risks",Global,wat.006 Projected Water Stress_replacement,Stefanie Tye,stefanie.tye@wri.org
+24ffab8a-588d-4fb8-92de-8bc54abf7da6,rw,ocean-watch,"socio-demographics,oceans-seas-coasts",Global,"ocn.021a Population Affected by Sea Level Rise (Grid, 100m)",Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+7dfd5f25-a789-415a-bb7c-d84ffec4c7eb,rw,ocean-watch,oceans-seas-coasts,Global,ocn.009 Sea Surface Temperature Variability,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+483c87c7-8724-4758-b8f0-a536b3a8f8a9,rw,ocean-watch,oceans-seas-coasts,Global,bio.007b.rw0.nrt Marine Protected Areas,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+c4b12251-2d61-458f-a2c0-096c37901ade,crt,agriadapt,"atmosphere,climate-model-outputs",Global,cli.052.rw1 Projected Change in Annual Average Maximum Temperature,Stefanie Tye,stefanie.tye@wri.org
+2442891a-157a-40e6-9092-ee596e6d30ba,rw,ocean-watch,"governance-law,protected-areas",Global,bio.007 World Database on Protected Areas_replacement,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+ebdab869-5869-4965-a5b1-d1f9b0f83330,rw,ocean-watch,oceans-seas-coasts,Global,ocn.002.nrt Wave Height,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+c88d0058-3af3-4034-9915-1c8b336cfb62,rw,ocean-watch,"land,land-use-status",Global,wat.070c Potential Areas for Reforestation,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+06e734af-66f0-4c3e-ac71-1b99f3cbfe1d,rw,land-carbon-lab,"land,land-use-status",Global,soc.009.rw0 Land Cover Map,Alyssa Barrett,abarrett@wri.org
+83453598-c659-45f3-ad69-b78810c6ed3d,crt,agriadapt,human-well-being,Global,cli.079.rw0 Universal Thermal Climate Index,Stefanie Tye,stefanie.tye@wri.org
+f90c872d-1a46-40b2-9bdd-c51ca332bdc2,crt,agriadapt,"land,biodiversity",Global,foo.068.rw0 Agro-Ecological Zones,Stefanie Tye,stefanie.tye@wri.org
+ec282483-4f5c-4fb8-ace7-8e557826781a,rw,land-carbon-lab,land,Global,foo.065b.rw1 Global Cropland Change,Alyssa Barrett,abarrett@wri.org
+1d23838e-40da-4cf3-b61c-56258d3a5c56,rw,ocean-watch,oceans-seas-coasts,Global,bio.004a Coral Reef Locations,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+fad6aa3d-02e5-4133-9656-a38145b9348f,rw,ocean-watch,oceans-seas-coasts,Global,ocn.001 GEBCO Bathymetry,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+50634b51-ea2e-4cc1-9e4b-8f26a389a301,rw,land-carbon-lab,land,Global,foo.065a.rw1 Global Cropland Extent,Alyssa Barrett,abarrett@wri.org
+7ab1ab3b-2d13-4572-bc00-545044219a8e,rw,ocean-watch,"oceans-seas-coasts,biodiversity",Global,bio.045 Seagrass,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+e044a0d7-b3d4-4612-9848-71322b1772cc,rw,ocean-watch,"land,forest",Global,[Suspended] for.031a Forest Landscape Integrity Index,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+5c9507d1-47f7-4c6a-9e64-fc210ccc48e2,crt,agriadapt,"freshwater,water-risks",Global,wat.057 Aqueduct Drought Risk,Stefanie Tye,stefanie.tye@wri.org
+99a4f9e1-3056-4666-9105-15200426fbbf,rw,ocean-watch,"land,land-use-status",Global,soc.104b Land Cover Change,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+0b077461-6214-42dd-b9af-4ef4a0af70b9,rw,ocean-watch,"biodiversity,oceans-seas-coasts",Global,ocn.024a.rw0 Key Biodiversity Areas,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+40c8d7b8-36b6-4f07-8941-cc61dc62fc12,rw,ocean-watch,"oceans-seas-coasts,marine-environment",Global,ocn.023.rw0 Marine Protection,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+dc313105-8005-4234-894b-68bfb340e80c,rw,ocean-watch,food,Global,foo.064 Food Insecurity,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+c9937085-22ec-4f8c-b819-5fa02473abdb,rw,ocean-watch,economy-industry,Global,com.038.rw0 Shipping Emissions,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+db84dd39-54e1-4a70-a9fc-ae90809cefa3,rw,land-carbon-lab,land,,for.033.rw0 Trees in Mosaic Landscapes,Alyssa Barrett,abarrett@wri.org
+9e1b3cad-db6f-44b0-b6fb-048df7b6c680,rw,ocean-watch,"food,oceans-seas-coasts",Global,foo.061.rw0 Food from the Sea,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+1b97e47e-ca18-4e50-9aae-a2853acca3f0,rw,water-peace-security,"human-well-being,basic-needs",Global,wat.005 Access to Improved Water Source,Samantha Kuzma,samantha.kuzma@wri.org
+64a3e126-000b-46fb-aaf4-8ac765a8263b,rw,land-carbon-lab,land,Global,for.032.rw0 Forest Height Change,Alyssa Barrett,abarrett@wri.org
+e6a3f803-1222-46c2-8e6c-0ae94b3d80c8,rw,land-carbon-lab,"cities,urban-infrastructure",Global,cit.006.rw0 Built-Up Area Change,Alyssa Barrett,abarrett@wri.org
+ac9c2f07-9f23-4a33-9958-e02c571ec009,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,foo.062 Fishery Production,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+11f16cb9-def0-4bd5-a60e-50c542b837e3,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,com.030a.rw1 Fishing Activity,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+b83ad197-eb95-44e2-8ec3-3351ab926421,rw,land-carbon-lab,freshwater,Global,wat.002.rw0 Water Change,Alyssa Barrett,abarrett@wri.org
+5fe43cd9-0210-4a6f-86ba-d8a7b91a180d,crt,agriadapt,"cities,urban-infrastructure",Global,cit.016.rw1 Road Network,Stefanie Tye,stefanie.tye@wri.org
+d17e6978-0848-4a13-ba05-6f4af04ac7d1,crt,agriadapt,"food,land",Global,foo.069.rw0 Relative Change in Crop Yield,Stefanie Tye,stefanie.tye@wri.org
+641c0a35-f2e5-4198-8ed9-576ea7e9685a,crt,agriadapt,"food,economy-industry",Global,com.028.rw1 Effect of Agricultural Policies on Commodity Prices,Stefanie Tye,stefanie.tye@wri.org
+6a22c67d-9e3c-4f8c-94d2-d90fe886b476,rw,ocean-watch,"biodiversity,oceans-seas-coasts,coastal-zone",Global,wat.069.rw0 Saltmarshes,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+49b76e0f-3aad-4138-b272-87a10748f2df,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,com.030d.rw0 Fishing Effort by Zone,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+6ccfb266-20cd-4838-82b0-5309987a62f0,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,com.030c.rw1 Trawling Activity,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+5bf349ec-3b14-4021-a7d4-fc4b8104bd74,rw,ocean-watch,"oceans-seas-coasts,coastal-zone",Global,ocn.027b.rw0 Wastewater Inputs to Coastal Areas,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+42859b52-31f2-419c-ac14-8b0cbd6bbb6f,rw,ocean-watch,"oceans-seas-coasts,fisheries",Global,ocn.022.rw0 Fisheries Subsidies,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+e552ecb6-409e-484c-8bfb-0c0de2e2946e,rw,land-carbon-lab,"food,land",Global,foo.065.rw0 Cropland Change,Alyssa Barrett,abarrett@wri.org
+784732cc-8e7e-4dac-be51-d4506ff2ee04,rw,ocean-watch,"oceans-seas-coasts,coastal-zone",Global,ocn.027c.rw0 Watersheds Transporting Wastewater to Coastal Ocean,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+5ef0376c-8852-48a4-8ecc-14cf36ee8b23,rw,ocean-watch,oceans-seas-coasts,Global,ocn.020d.rw0.nrt Chemical Concentrations at River Mouths,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+e7970826-82e2-428a-86f5-8bb498335490,rw,water-peace-security,"freshwater,water-risks",Global,wps_014_ET_anomalies_2019_liz,Samantha Kuzma,samantha.kuzma@wri.org
+4487e012-9571-4175-991a-101268d6bb3f,rw,ocean-watch,"oceans-seas-coasts,economy-industry,fisheries",Global,com.037 Fishing Employment,Carolyn Savoldelli,Carolyn.Savoldelli@wri.org
+113258c9-14fc-4624-8b5c-76b064ac1ae9,aqueduct,aqueduct,"freshwater,water-risks",Global,Water Risk Baseline,Samantha Kuzma,samantha.kuzma@wri.org
+3cca5144-63d2-4ddb-af53-094603b702f3,aqueduct,aqueduct,"freshwater,water-risks",Global,Water Risk Projected,Samantha Kuzma,samantha.kuzma@wri.org
+c66d7f3a-d1a8-488f-af8b-302b0f2c3840,rw,aqueduct,freshwater,Global,wat.050 Aqueduct Baseline Water Stress,Samantha Kuzma,samantha.kuzma@wri.org
+faf79d2c-5e54-4591-9d70-4bd1029c18e6,rw,,"atmosphere,climate-model-outputs",Global,cli.057.rw1 Projected Change in Cumulative Precipitation,Stefanie Tye,stefanie.tye@wri.org
+d553a58a-faa2-480d-b137-c96d76d5ccab,rw,,oceans-seas-coasts,Global,bio.024 Local Coral Reef Threats,,
+4ca6826c-718d-457d-b4e2-e9277d7ed62c,rw,,"atmosphere,climate-model-outputs",Global,cli.050.rw1 Projected Change in Annual Average Temperature,Stefanie Tye,stefanie.tye@wri.org
+fc8cf356-f4be-4635-a896-fb468aaaa832,rw,,land,Global,for.013 Forest Landscape Restoration Opportunity,,
+a2f3ac57-e2ee-4512-8952-f00b417b6820,rw,,oceans-seas-coasts,Global,wat.041 Eutrophication and Hypoxia,,
+66d28bbc-1e6e-4156-9ba2-875ecab665af,rw,,"atmosphere,climate-model-outputs",Global,cli.059.rw1 Projected Change in Extreme Precipitation Days,Stefanie Tye,stefanie.tye@wri.org
+a290675c-9528-4a51-8201-f6c2d7848744,rw,,"atmosphere,ghg-emissions",Global,cli.008 Greenhouse Gas Emissions by Country and Economic Sector,,
+765e5c3f-f569-4d91-806e-5056c5d1663e,rw,aqueduct,"freshwater,water-risks",Global,wat.067.rw0 Aqueduct Riverine Flood Hazard,Samantha Kuzma,samantha.kuzma@wri.org
+fe9b286f-4b28-409a-85f5-2e81b2bd5056,rw,,oceans-seas-coasts,Global,bio.031 Social and Economic Dependence on Coral Reefs_replacement,,
+3941bbba-181b-434a-84c3-fcdfa5234735,rw,,"atmosphere,climate-model-outputs",Global,cli.056a Projected Change in Extreme Heat Days,,
+dc5db1e0-12bb-4d4d-b84f-37fa492060b6,rw,,natural-hazards,Global,wat.015 Erosion Risk_replacement,,
+47053e23-7808-40d9-b4ae-1af73c5c8bab,rw,,"freshwater,water-risks",Global,wat.036.rw1	Water Stress Country Ranking,,
+3d8e2e82-b33a-4898-90e5-6e4a1d007b82,rw,,"atmosphere,climate-model-outputs",Global,cli.051a.rw1  Projected Change in Annual Average Minimum Temperature,Stefanie Tye,stefanie.tye@wri.org
+702f4bcb-c376-49b6-9345-cdc8aa989582,rw,,food,Global,foo.046b Food Footprint in Calories WRR update,,
+1ef55baf-bbbe-480d-85e9-7132c742f196,rw,,oceans-seas-coasts,Global,bio.035 Coral Bleaching Frequency Prediction,,
+ed521429-58b4-4c55-9bbe-4f4bfd2fcb1f,rw,,land,Global,wat.033.rw0 Agricultural Water Demand and Depletion,Samantha Kuzma,samantha.kuzma@wri.org
+6e05a9e8-ba07-4e6f-8337-31c5362d07fe,rw,global-forest-watch,"economy-industry,food,land",,com.024.rw0.nrt Oil Palm Concessions,Colin Stief,Colin.Stief@wri.org
+f4a83ced-4aea-4cf5-aa71-00927fe707e1,rw,aqueduct,freshwater,Global,wat.053 Aqueduct Seasonal Variability,Samantha Kuzma,samantha.kuzma@wri.org
+0b9f0100-ce5b-430f-ad8f-3363efa05481,rw,,governance-law,Global,soc.001 Environmental Democracy Index,,
+2a571044-1a31-4092-9af8-48f406f13072,rw,,"freshwater,climate-model-outputs",Global,wat.006 Projected Water Stress_replacement,Stefanie Tye,stefanie.tye@wri.org
+d0f46576-411d-48aa-8df8-d89a3792cdce,rw,,"atmosphere,climate-model-outputs",Global,cli.058a Projected Change in Dry Spells,,
+136aab69-c625-4347-b16a-c2296ee5e99e,rw,,"governance-law,legal-documents",Global,dash_cli.047 NDC ratification status,,
+e354f7b8-0fca-422f-bf12-fc6189812bec,rw,,"land,land-use-status",,cit.049 Urban Land Use - India (In review),,
+c4b12251-2d61-458f-a2c0-096c37901ade,rw,,"atmosphere,climate-model-outputs",Global,cli.052.rw1 Projected Change in Annual Average Maximum Temperature,Stefanie Tye,stefanie.tye@wri.org
+6fa000b5-8d91-46c8-8502-07427bc5eafc,rw,,"atmosphere,climate-model-outputs",Global,cli.054b Projected Change in Cooling Degree Days,,
+b923386c-ba2e-4964-9b16-15b8cb70e128,rw,,cities,Global,cit.040 City Categorization,,
+5e87d53c-10d9-419e-a0e6-122e26b064ca,rw,,food,Global,Dash_foo.045 Food Loss and Waste,,
+1d2f4eae-10e1-4ea6-980c-501b34106de2,rw,,"atmosphere,climate-model-outputs",Global,cli.053b  Projected Change in Heating Degree Days,,
+c53a195f-d5f0-4acc-b1be-b773420a6606,rw,,freshwater,Global,wat.007 flood risk,,
+dfbf97c3-ee82-4c68-808b-3bcc60e57167,rw,,land,,cit.047 Urban Land Use - Mexico - 6 Category (In review),,
+ccee0012-de06-433d-8092-8516bdfb79de,rw,,food,Global,Dash_foo.046a Food Footprint in Protein,,
+c161a098-7f09-4313-b176-08a32e3bb3ad,rw,,"economy-industry,power-sector",Global,ene.032 Solar Power Plant Areas,,
+b6a54b79-f5ea-4f0d-bd56-66eb3dcdd27d,rw,,"cities,mobility",Global,"cit.043 Cities with BRT (topic page widget, DO NOT REMOVE)",,
+e1c519d3-16ea-400a-a71c-9033ba5f490b,rw,,land,,cit.048 Urban Land Use - Mexico - Roads (In review),,
+40ffc305-609a-4367-a24f-816d9d43e508,rw,,"cities,land-use-status",Global,cit.037 Upward & Outward Cities Expansion Index,,
+b0a8ac4b-2ef0-4417-9ecb-8743bc94af68,rw,,"cities,land-use-status",Global,cit.037 Upward & Outward Cities Expansion Index (Cities Topic page DO NOT REMOVE),,
+a9601ada-a39b-4a98-bde6-fb1fb97ba17d,rw,aqueduct,freshwater,Global,wat.060 Aqueduct Unimproved or No Drinking Water Access,Samantha Kuzma,samantha.kuzma@wri.org
+d3f512c0-fbb0-47d5-9ac9-a452574c8e58,rw,,"atmosphere,climate-model-outputs",Global,cli.055a Projected Change in Frost Free Season,,
+71b81fe0-23fc-4154-8601-ba987381594c,rw,,"land,forest",Global,for.004.rw0 Intact Forest Landscapes,,
+9e9b465a-bb0f-4047-ad72-9b8fabc0fd09,rw,,"atmosphere,climate-model-outputs",,cli.073.rw0 Projected Change in Extreme Heat Days in the U.S.,,
+e2aa09eb-c82e-4977-b614-ef71da5936ce,rw,,economy-industry,Global,com.005 Cruise Ports,,
+6114c6fa-0ca6-4e06-ae23-413be0677503,rw,,"atmosphere,climate-model-outputs",,cli.074.rw0 Projected Change in Heating Degree Days in the U.S.,,
+5c9507d1-47f7-4c6a-9e64-fc210ccc48e2,rw,aqueduct,"freshwater,water-risks",Global,wat.057 Aqueduct Drought Risk,Samantha Kuzma,samantha.kuzma@wri.org
+bc533d1b-5480-40ab-b545-802b20a5bd80,rw,aqueduct,"freshwater,water-risks",Global,wat.051 Aqueduct Baseline Water Depletion,Samantha Kuzma,samantha.kuzma@wri.org
+d39919a9-0940-4038-87ac-662f944bc846,rw,aqueduct,"freshwater,water-risks",Global,wat.056 Aqueduct Coastal Flood Risk,Samantha Kuzma,samantha.kuzma@wri.org
+a6d63d85-dc1e-4dba-8df0-c888590f94fb,rw,aqueduct,"freshwater,water-risks",Global,wat.054 Aqueduct Groundwater Table Decline,Samantha Kuzma,samantha.kuzma@wri.org
+a9567364-e5ba-415e-a834-310e279326b6,rw,,"atmosphere,climate-model-outputs",,cli.066.rw0 Projected Change in Cumulative Precipitation in the U.S.,,
+de9c68b6-025a-45b9-b212-7c876b02606e,rw,,freshwater,Global,wat.064 Cost of Sustainable Water Management,,
+a07f1bed-ca16-4fbf-b14b-d3a0344cab74,rw,,governance-law,Global,bio.017  Global Roadless Areas,,
+4f7992b5-3dc0-4725-b327-d8cb439ca2f5,rw,aqueduct,freshwater,Global,wat.061 Aqueduct Unimproved or No Sanitation Access,Samantha Kuzma,samantha.kuzma@wri.org
+c985d4f6-9a03-4158-9955-e9f96db109ab,rw,,"atmosphere,climate-model-outputs,water-risks",,cli.072.rw0 Projected Change in Extreme Precipitation Days in the U.S.,,
+83de627f-524b-4162-a10c-384dc3e8107a,rw,,"governance-law,forest",Global,com.025.rw0.nrt Wood Fiber Concessions,,
+86fff033-dd27-41be-be64-2ec8983b3db1,rw,,"freshwater,water-risks",Global,wat.036 Water Stress Country Ranking [Archived],,
+cd91e8d6-2e3d-46c1-9601-0dd7f524c7ba,rw,,"atmosphere,climate-model-outputs,water-risks",,cli.070.rw0 Projected Change in Dry Spells in the U.S.,,
+ddd31af6-926c-46f6-a236-948690c5cb34,rw,global-forest-watch,"atmosphere,forest",Global,Forest Greenhouse Gas Net Flux,Colin Stief,Colin.Stief@wri.org
+412a8589-4887-44f2-9f45-3db5fb3937e7,rw,,"atmosphere,climate-model-outputs",,cli.069.rw0 Projected Change in Cooling Degree Days in the U.S.,,
+09e43293-98f1-4618-8e7e-d9f72cd5a4d7,rw,,"atmosphere,climate-model-outputs",,cli.071.rw0 Projected Change in Frost Free Season in the U.S.,,
+807eeeff-c33c-4b74-a816-3c313bafdcd4,rw,,food,Global,foo.046 Food Footprint in Calories [Archived],,
+3ac5a895-b8ab-4480-b7eb-0fbb452ea76f,rw,,land,,soc.014 Land rights data,,
+e1b40fdd-04f9-43ab-b4f1-d3ceee39fea1,rw,,"land,forest",Global,for.011.nrt FORMA Active Clearing [Archived],,
+4c6ba704-12f3-4954-92af-6c248c584233,rw,,"atmosphere,climate-model-outputs",,cli.067.rw0 Projected Change in Annual Average Maximum Temperature in the U.S.,,
+c5cbedcd-8cf5-4140-ac21-6791f6786f22,rw,,"atmosphere,climate-model-outputs",,cli.075.rw0 Projected Change in Annual Average Temperature in the U.S.,,
+7ec68890-34a9-427c-907e-2f646f0dd9c8,rw,,"atmosphere,climate-model-outputs",,cli.068.rw0 Projected Change in Annual Average Minimum Temperature in the U.S.,,
+7614bdfe-9870-458c-9e56-dc9e83df8f79,rw,,"cities,mobility",Global,cit.043.rw0 Bus Rapid Transit,,
+f3fa9e56-78ea-4539-a0b8-6c0ffac6afc7,rw,,"land,forest",,com.026 Palm Oil Mills,,
+f69d21d4-c654-4233-bf2d-72de37eb459c,rw,,food,Global,foo.056a Availability of Animal Based Products,,
+6acb7469-29b4-4712-8254-8c130314337b,rw,,oceans-seas-coasts,Global,bio.004 Coral Reef Locations_replacement [Archived],,
+0c3dfe3b-2cd5-4125-ac84-9ce0a73f34b3,rw,,"human-well-being,water-risks",Global,wps.001 Conflict Forecast [archived],,
+5aeb8da8-3ae6-47a4-b21b-714819e93146,rw,,food,Global,foo.056b Ruminant Availability,,
+3d2ce960-abda-4c9c-bd29-1929e9ca24c9,rw,,"atmosphere,climate-model-outputs,ghg-emissions",Global,cli.007 Greenhouse Gas Emissions Projections,,
+fbb1df1b-8049-47fb-8408-1c82108d56ba,rw,,"atmosphere,food",Global,cli.003.rw0 Future Precipitation Suitability for Coffee Growth,,
+62bc9990-1483-436b-a657-ca2eab65744b,rw,,"freshwater,water-risks",Global,wat.001 Current Water Stress_replacement [Archived],,
+d8e0fdcb-8c4a-4465-bfa4-fc4e31c14ab4,rw,,atmosphere,Global,ene.032 CO₂ Emissions Comparison of Electric and Diesel Buses,,
+eba9eb93-2eb6-480d-ab86-4a4dcc8a39db,rw,,food,Global,foo.047 Food Footprint in Protein WRR update [Archived],,
+96ce9416-7a34-4c67-a21f-4f9b914d0d45,rw,,"governance-law,protected-areas",Global,bio.034 Percent of Land Area Protected by Country,,
+478efa8c-17b1-4b2e-a46b-4ebef74c3434,rw,,"land,forest",Global,for.027 Prodes Deforestation,,
+5540dcf5-7622-4231-bf7c-5d2ba3c5f378,rw,,,Global,WRI Projects by Country,,
+6f1df550-bea2-4ed3-8c1c-f50c639c5705,rw,,"land,forest",Global,for.010.nrt FORMA Alerts [Archived],,

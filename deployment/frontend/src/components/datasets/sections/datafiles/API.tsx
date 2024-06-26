@@ -26,8 +26,7 @@ hljs.registerLanguage('python', python)
 hljs.registerLanguage('javascript', js)
 hljs.registerLanguage('r', r)
 
-
-export function MoreInfo() {
+export function MoreInfo({ gfwapiurl }: { gfwapiurl?: boolean }) {
     return (
         <div>
             <div className="font-acumin text-base font-normal text-zinc-800">
@@ -49,6 +48,23 @@ export function MoreInfo() {
                 >
                     Datastore API documentation
                 </a>
+                .{' '}
+                {gfwapiurl ? (
+                    <>
+                        Also see{' '}
+                        <a
+                            href="https://www.globalforestwatch.org/help/developers/guides/create-and-use-an-api-key/"
+                            target="_blank"
+                            rel="noreferrer"
+                            className=" text-blue-700 italic underline"
+                        >
+                            GFW API key documentation
+                        </a>{' '}
+                        to generate api token to access raw file.
+                    </>
+                ) : (
+                    ''
+                )}
             </div>
         </div>
     )
@@ -222,7 +238,7 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
         : publicCkanUrl
     const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
     const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafile.id}`
-    let ckanResourcGetFileUrl
+    let ckanResourcGetFileUrl: string | undefined
     if (datafile.url) {
         ckanResourcGetFileUrl = datafile.url
     }
@@ -238,6 +254,40 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
 
     const rwBaseUrl = `https://api.resourcewatch.org/v1`
     const rwDatasetGetLayerUrl = `${rwBaseUrl}/layer/${datafile.rw_id}`
+    const gfwurl = 'https://data-api.globalforestwatch.org'
+
+    const formRef = useRef<HTMLFormElement>(null)
+
+    const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        event.preventDefault()
+
+        if (ckanResourcGetFileUrl && formRef.current) {
+            const url = new URL(ckanResourcGetFileUrl)
+
+            url.searchParams.forEach((value, key) => {
+                const input = document.createElement('input')
+                input.type = 'hidden'
+                input.name = key
+                input.value = value
+                formRef.current?.appendChild(input)
+            })
+
+            if (
+                ckanResourcGetFileUrl.startsWith(
+                    'https://data-api.globalforestwatch.org'
+                )
+            ) {
+                const input = document.createElement('input')
+                input.type = 'hidden'
+                input.name = 'x-api-key'
+                input.value = env.NEXT_PUBLIC_GFW_API_KEY
+                formRef.current?.appendChild(input)
+            }
+
+            formRef.current.action = url.toString()
+            formRef.current.submit()
+        }
+    }
 
     return (
         <>
@@ -263,10 +313,36 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
             />
 
             {ckanResourcGetFileUrl && (
-                <QueryEndpoint
-                    description="Get raw file"
-                    url={ckanResourcGetFileUrl}
-                />
+                <div>
+                    <a
+                        href="#"
+                        onClick={handleClick}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        {ckanResourcGetFileUrl?.startsWith(gfwurl) ? (
+                            <QueryEndpoint
+                                description="Get raw file"
+                                url={ckanResourcGetFileUrl}
+                                method="GET"
+                                headers={{
+                                    Authorization: '<API_TOKEN>',
+                                }}
+                            />
+                        ) : (
+                            <QueryEndpoint
+                                description="Get raw file"
+                                url={ckanResourcGetFileUrl}
+                                method="GET"
+                            />
+                        )}
+                    </a>
+                    <form
+                        ref={formRef}
+                        method="GET"
+                        target="_blank"
+                        style={{ display: 'none' }}
+                    />
+                </div>
             )}
             {ckanGetDatastoreInfoUrl && (
                 <QueryEndpoint
@@ -293,7 +369,7 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
                 />
             )}
 
-            <MoreInfo />
+            <MoreInfo gfwapiurl={ckanResourcGetFileUrl?.startsWith(gfwurl)} />
 
             {datafile.rw_id && (
                 <>
@@ -366,6 +442,7 @@ const SnippetInstructions = ({
     }
 
     const rwBaseUrl = `https://api.resourcewatch.org/v1`
+    const gfwurl = 'https://data-api.globalforestwatch.org'
 
     const rwDatasetGetLayerUrl = `${rwBaseUrl}/layer/${datafile.rw_id}`
     const rwDatasetGetLayerSnippet = getSnippetFn(rwDatasetGetLayerUrl)
@@ -396,11 +473,25 @@ const SnippetInstructions = ({
                 language={language}
             />
             {ckanResourcGetFileSnippet && (
-                <SnippetEndpoint
-                    description="Get raw file"
-                    snippet={ckanResourcGetFileSnippet}
-                    language={language}
-                />
+                <>
+                    {datafile.url?.startsWith(gfwurl) ? (
+                        <SnippetEndpoint
+                            description="Get raw file"
+                            snippet={getSnippetFn(
+                                datafile.url,
+                                'GET',
+                                JSON.stringify({})
+                            )}
+                            language={language}
+                        />
+                    ) : (
+                        <SnippetEndpoint
+                            description="Get raw file"
+                            snippet={ckanResourcGetFileSnippet}
+                            language={language}
+                        />
+                    )}
+                </>
             )}
             {ckanGetDatastoreInfoSnippet && (
                 <SnippetEndpoint
@@ -425,7 +516,7 @@ const SnippetInstructions = ({
                 />
             )}
 
-            <MoreInfo />
+            <MoreInfo gfwapiurl={datafile.url?.startsWith(gfwurl)} />
 
             {datafile.rw_id && (
                 <>

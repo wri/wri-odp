@@ -53,6 +53,7 @@ export const env = createEnv({
         NEXT_PUBLIC_GTM_ID: z.string(),
         NEXT_PUBLIC_DISABLE_HOTJAR: z.string(),
         NEXT_PUBLIC_HOTJAR_ID: z.string(),
+        NEXT_PUBLIC_GFW_API_KEY: z.string(),
     },
 
     /**
@@ -84,7 +85,7 @@ export const env = createEnv({
         NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID, 
         NEXT_PUBLIC_DISABLE_HOTJAR: process.env.NEXT_PUBLIC_DISABLE_HOTJAR || "enabled",
         NEXT_PUBLIC_HOTJAR_ID: process.env.NEXT_PUBLIC_HOTJAR_ID,
-        
+        NEXT_PUBLIC_GFW_API_KEY: process.env.NEXT_PUBLIC_GFW_API_KEY,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

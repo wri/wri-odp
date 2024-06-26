@@ -32,19 +32,21 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await helpers.dataset.getFeaturedDatasets.prefetch({
-        search: '',
-        page: { start: 0, rows: 8 },
-        sortBy: 'metadata_modified desc',
-        _isUserSearch: false,
-        removeUnecessaryDataInResources: true,
-    })
-    await helpers.dataset.getAllDataset.prefetch({
-        search: '',
-        page: { start: 0, rows: 8 },
-        sortBy: 'metadata_created desc',
-        removeUnecessaryDataInResources: true,
-    })
+    await Promise.all([
+        helpers.dataset.getFeaturedDatasets.prefetch({
+            search: '',
+            page: { start: 0, rows: 8 },
+            sortBy: 'metadata_modified desc',
+            _isUserSearch: false,
+            removeUnecessaryDataInResources: true,
+        }),
+        helpers.dataset.getAllDataset.prefetch({
+            search: '',
+            page: { start: 0, rows: 8 },
+            sortBy: 'metadata_created desc',
+            removeUnecessaryDataInResources: true,
+        }),
+    ])
     return {
         props: {
             trpcState: helpers.dehydrate(),

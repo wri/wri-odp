@@ -360,8 +360,9 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                                                 {message ??
                                                                     (
                                                                         _value as any
-                                                                    ).value
-                                                                        .message}
+                                                                    )?.value
+                                                                        ?.message ??
+                                                                    'Invalid data'}
                                                             </>
                                                         )}
                                                         name={key}

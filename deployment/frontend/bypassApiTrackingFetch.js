@@ -25,9 +25,9 @@ function bypassApiTrackingFetch(url = '', options = {}) {
         //        options.headers['X-From-Frontend-Portal'] === 'true'
         //    }`
         //)
-    } else {
-        console.log('URL is not a CKAN API endpoint: skipping...')
-    }
+    } // else {
+    // console.log('URL is not a CKAN API endpoint: skipping...')
+    //}
 
     return originalFetch(url, options).catch((error) => {
         console.error('Error occurred during fetch:', error)
