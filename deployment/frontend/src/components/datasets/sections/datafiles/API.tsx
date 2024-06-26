@@ -254,6 +254,7 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
 
     const rwBaseUrl = `https://api.resourcewatch.org/v1`
     const rwDatasetGetLayerUrl = `${rwBaseUrl}/layer/${datafile.rw_id}`
+    const gfwurl = 'https://data-api.globalforestwatch.org'
 
     const formRef = useRef<HTMLFormElement>(null)
 
@@ -318,9 +319,7 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
                         onClick={handleClick}
                         style={{ cursor: 'pointer' }}
                     >
-                        {ckanResourcGetFileUrl.startsWith(
-                            'https://data-api.globalforestwatch.org'
-                        ) ? (
+                        {ckanResourcGetFileUrl?.startsWith(gfwurl) ? (
                             <QueryEndpoint
                                 description="Get raw file"
                                 url={ckanResourcGetFileUrl}
@@ -370,11 +369,7 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
                 />
             )}
 
-            <MoreInfo
-                gfwapiurl={ckanResourcGetFileUrl.startsWith(
-                    'https://data-api.globalforestwatch.org'
-                )}
-            />
+            <MoreInfo gfwapiurl={ckanResourcGetFileUrl?.startsWith(gfwurl)} />
 
             {datafile.rw_id && (
                 <>
@@ -447,6 +442,7 @@ const SnippetInstructions = ({
     }
 
     const rwBaseUrl = `https://api.resourcewatch.org/v1`
+    const gfwurl = 'https://data-api.globalforestwatch.org'
 
     const rwDatasetGetLayerUrl = `${rwBaseUrl}/layer/${datafile.rw_id}`
     const rwDatasetGetLayerSnippet = getSnippetFn(rwDatasetGetLayerUrl)
@@ -478,9 +474,7 @@ const SnippetInstructions = ({
             />
             {ckanResourcGetFileSnippet && (
                 <>
-                    {datafile.url?.startsWith(
-                        'https://data-api.globalforestwatch.org'
-                    ) ? (
+                    {datafile.url?.startsWith(gfwurl) ? (
                         <SnippetEndpoint
                             description="Get raw file"
                             snippet={getSnippetFn(
@@ -522,11 +516,7 @@ const SnippetInstructions = ({
                 />
             )}
 
-            <MoreInfo
-                gfwapiurl={datafile.url?.startsWith(
-                    'https://data-api.globalforestwatch.org'
-                )}
-            />
+            <MoreInfo gfwapiurl={datafile.url?.startsWith(gfwurl)} />
 
             {datafile.rw_id && (
                 <>
