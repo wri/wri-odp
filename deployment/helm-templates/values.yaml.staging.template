@@ -260,7 +260,7 @@ solr:
   resources:
     limits:
       memory: 3G
-      cpu: 0.3
+      cpu: 0.6
     requests:
       memory: 2.8G
-      cpu: 0.2
+      cpu: 0.4
