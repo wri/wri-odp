@@ -19,25 +19,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.OIDC_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
-      - name: Add CKAN url to hosts
-        run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
-      - name: Add Minio url to hosts
-        run: sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
-      - name: Add Frontend url to hosts
-        run: sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
-      - name: Add Prefect url to hosts
-        run: sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+      - name: Add url(s) to hosts
+        run: |
+          sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
       - name: Build and push CKAN image to ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -135,7 +133,7 @@ jobs:
           command: node test.js
           working-directory: ./integration-tests
       - name: Check prefect url
-        uses: jtalk/url-health-check-action@v3
+        uses: jtalk/url-health-check-action@v4
         with:
           # Check the following URLs one by one sequentially
           url: http://prefect:4200
@@ -148,7 +146,7 @@ jobs:
         with:
           command: npm run test
           working-directory: ./e2e-tests
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
@@ -206,11 +204,11 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
       - name: Upload CKAN container Trivy scan results to GitHub Code scanning
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: ckan-trivy-results.sarif
       - name: Upload Frontend container Trivy scan results to GitHub Code scanning
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           category: frontend_container_trivy_results
           sarif_file: frontend-trivy-results.sarif

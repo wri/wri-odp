@@ -281,6 +281,48 @@ def package_patch(context: Context, data_dict: DataDict):
     return pending_update.get("package_data")
 
 
+def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.PackagePatch:
+    """Patch a dataset (package).
+
+    :param id: the id or name of the dataset
+    :type id: string
+
+    The difference between the update and patch methods is that the patch will
+    perform an update of the provided parameters, while leaving all other
+    parameters unchanged, whereas the update methods deletes all parameters
+    not explicitly provided in the data_dict.
+
+    You are able to partially update and/or create resources with
+    package_patch. If you are updating existing resources be sure to provide
+    the resource id. Existing resources excluded from the package_patch
+    data_dict will be removed. Resources in the package data_dict without
+    an id will be treated as new resources and will be added. New resources
+    added with the patch method do not create the default views.
+
+    You must be authorized to edit the dataset and the groups that it belongs
+    to.
+    """
+    _check_access("package_patch", context, data_dict)
+
+    show_context: Context = {
+        "model": context["model"],
+        "session": context["session"],
+        "user": context["user"],
+        "auth_user_obj": context["auth_user_obj"],
+        "ignore_auth": context.get("ignore_auth", False),
+        "for_update": True,
+    }
+
+    package_dict = _get_action("package_show")(
+        show_context, {"id": _get_or_bust(data_dict, "id")}
+    )
+
+    patched = dict(package_dict)
+    patched.update(data_dict)
+    patched["id"] = package_dict["id"]
+    return _get_action("old_package_update")(context, patched)
+
+
 def approve_pending_dataset(context: Context, data_dict: DataDict):
     dataset_id = data_dict.get("dataset_id")
     # Fetch Pending Dataset Information
