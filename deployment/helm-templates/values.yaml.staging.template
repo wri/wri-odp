@@ -3,7 +3,8 @@ ckan:
     replicaCount: 2
     envVarsSecretName: ckan-cloud-centeralized-sql
     env:
-      UWSGI_HARAKIRI: "50"
+      UWSGI_HARAKIRI: "600"
+      CKANEXT__DCAT__ENABLE_CONTENT_NEGOTIATION: "True"
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
       CKAN_SITE_ID: wri-staging
@@ -238,10 +239,10 @@ ckan:
     resources:
       limits:
         memory: 3G
-        cpu: 0.3
+        cpu: 0.6
       requests:
         memory: 2.8G
-        cpu: 0.2
+        cpu: 0.4
   ckanmiddleware:
     enable: false
   dataSubscriptions:

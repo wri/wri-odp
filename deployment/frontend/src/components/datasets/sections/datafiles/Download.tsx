@@ -24,6 +24,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { z } from 'zod'
 import { useQuery } from 'react-query'
+import { env } from '@/env.mjs'
 
 export function DownloadButton({ datafile }: { datafile: Resource }) {
     const { dataset } = useDataset()
@@ -59,6 +60,9 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
 
     if (mode == 'RES_URL' && datafile.url) {
         originalResourceDownloadUrl = datafile.url
+        if (originalResourceDownloadUrl.includes('data-api')) {
+            originalResourceDownloadUrl += `&x-api-key=${env.NEXT_PUBLIC_GFW_API_KEY}`
+        }
     } else if (mode == 'SIGNED_URL' && signedUrl && !isLoading) {
         originalResourceDownloadUrl = signedUrl
     }
@@ -80,6 +84,24 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
     )
 
     const download = (url: string) => window.open(url, '_target')
+
+    if (!datafile.datastore_active)
+        return (
+            <span
+                onClick={() => download(originalResourceDownloadUrl)}
+                className="cursor-pointer download-datafile w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
+            >
+                <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                <div className="font-acumin text-xs sm:text-sm font-normal text-black">
+                    {isLoading && mode == 'SIGNED_URL' ? 'Loading' : 'Download'}
+                </div>
+                {size && (
+                    <div className="font-acumin text-xs sm:text-xs font-normal text-black">
+                        {convertBytes(size)}
+                    </div>
+                )}
+            </span>
+        )
 
     return (
         <>
@@ -236,7 +258,7 @@ function DownloadModal({
                         download link via email when it's ready.
                     </div>
                 </div>
-                {(layerObjLoading) && (
+                {layerObjLoading && (
                     <div className="w-full flex items-center my-10 justify-center">
                         <Spinner />
                     </div>
