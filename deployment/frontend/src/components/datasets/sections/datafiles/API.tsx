@@ -325,7 +325,7 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
                                 url={ckanResourcGetFileUrl}
                                 method="GET"
                                 headers={{
-                                    Authorization: '<API_TOKEN>',
+                                    Authorization: '<GFW_API_TOKEN>',
                                 }}
                             />
                         ) : (
@@ -394,7 +394,12 @@ const SnippetInstructions = ({
     language,
 }: {
     datafile: Resource
-    getSnippetFn: (url: string, method?: string, body?: string) => string
+    getSnippetFn: (
+        url: string,
+        method?: string,
+        body?: string,
+        gfw?: boolean
+    ) => string
     language: 'javascript' | 'python' | 'r'
 }) => {
     let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
@@ -480,7 +485,8 @@ const SnippetInstructions = ({
                             snippet={getSnippetFn(
                                 datafile.url,
                                 'GET',
-                                JSON.stringify({})
+                                JSON.stringify({}),
+                                true
                             )}
                             language={language}
                         />
