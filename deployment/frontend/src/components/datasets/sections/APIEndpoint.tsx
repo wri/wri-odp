@@ -115,14 +115,17 @@ const CopyButton = ({ content }: { content: string }) => {
 export const getJsSnippet = (
     url: string,
     method: string = 'GET',
-    body: string = ''
+    body: string = '',
+    gfw?: boolean
 ) => {
     return `const response = await fetch(
     \`${url}\`, 
     { 
         method: "${method}",${
             body
-                ? `\n\t\tbody: JSON.stringify(${body}),\n\t\theaders: {\n\t\t\t"Content-Type": "application/json",\n\t\t\t"Authorization": "<API_TOKEN>"\n\t\t}`
+                ? `\n\t\tbody: JSON.stringify(${body}),\n\t\theaders: {\n\t\t\t"Content-Type": "application/json",\n\t\t\t"Authorization": "${
+                      gfw ? '<GFW_API_TOKEN>' : '<API_TOKEN>'
+                  }"\n\t\t}`
                 : ''
         }
     }
@@ -137,7 +140,8 @@ console.log(data);
 export const getPythonSnippet = (
     url: string,
     method: string = 'GET',
-    body: string = ''
+    body: string = '',
+    gfw?: boolean
 ) => {
     return `import requests
 
@@ -146,7 +150,9 @@ response = requests.request(
     "${url}",
     ${
         body
-            ? `data=${body}, headers={\n\t\t\t"Content-Type": "application/json",\n\t\t\t"Authorization": "<API_TOKEN>"\n\t\t}`
+            ? `data=${body}, headers={\n\t\t\t"Content-Type": "application/json",\n\t\t\t"Authorization": "${
+                  gfw ? '<GFW_API_TOKEN>' : '<API_TOKEN>'
+              }"\n\t\t}`
             : ''
     }
 )
@@ -160,7 +166,8 @@ print(data)
 export const getRSnippet = (
     url: string,
     method: string = 'GET',
-    body: string = ''
+    body: string = '',
+    gfw?: boolean
 ) => {
     return `library(httr)
 
@@ -169,7 +176,9 @@ response <- httr::VERB(
     "${url}",
     ${
         body
-            ? `body = toJSON(${body}), add_headers(\n\t\t\t"Content-Type" = "application/json",\n\t\t\t"Authorization" = "<API_TOKEN>"\n\t\t)`
+            ? `body = toJSON(${body}), add_headers(\n\t\t\t"Content-Type" = "application/json",\n\t\t\t"Authorization" = "${
+                  gfw ? '<GFW_API_TOKEN>' : '<API_TOKEN>'
+              }"\n\t\t)`
             : ''
     }
 )
