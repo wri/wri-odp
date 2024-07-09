@@ -3,6 +3,8 @@
 **Table of Contents**
 
 - [ckanext-wri](#ckanext-wri)
+  - [Environment Variables](#environment-variables)
+    - [Prefect Migration Variables/Blocks](#prefect-migration-variablesblocks)
   - [Notifications Feature](#notifications-feature)
     - [Database Setup](#database-setup)
     - [API Endpoints](#api-endpoints)
@@ -38,6 +40,23 @@
 # ckanext-wri
 
 This is the WRI Open Data Portal extension for CKAN. It contains CKAN backend customizations for this project.
+
+## Environment Variables
+
+| Variable | Description |
+| --- | --- |
+| `ckanext.wri.odp_url` | The URL of the frontend application, e.g., `https://wri.dev.frontend.datopian.com`. |
+| `ckanext.wri.prefect_url` | The URL of the Prefect API, e.g., `https://wri.dev.prefect.datopian.com`. |
+| `ckanext.wri.datapusher_deployment_name` | The name of the Datapusher deployment, e.g, `datapusher-dev`. |
+| `ckanext.wri.migration_deployment_name` | The name of the migration deployment, e.g., `migration_deployment`. |
+| `ckanext.wri.migration_flow_name` | The name of the migration flow, e.g., `trigger-migration`. |
+| `ckanext.wri.migration_deployment_env` | The environment of the migration deployment, e.g., `dev`, `staging`, `prod`. |
+| `ckanext.wri.api_analytics.measurement_id` | The Google Analytics measurement ID for API tracking, e.g., `G-XXXXXXXXXX`. |
+| `ckanext.wri.api_analytics.api_secret` | The Google Analytics API secret for API tracking, e.g., `XXXXXXXXXX`. |
+
+### Prefect Migration Variables/Blocks
+
+For information on the Prefect variables/blocks required for migrations, see the [migration README](../../../migration/README.md).
 
 ## Notifications Feature
 
