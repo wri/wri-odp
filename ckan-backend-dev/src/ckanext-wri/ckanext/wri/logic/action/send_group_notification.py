@@ -1,6 +1,7 @@
 from typing import Optional, TypedDict
 import ckan.model as model
 import ckan.plugins.toolkit as tk
+from ckan.common import config
 
 
 class GroupNotificationParams(TypedDict):
@@ -116,9 +117,9 @@ def send_group_notification(context, GroupNotificationParams):
                                 recipient_user['display_name'] if recipient_user.get('display_name') else recipient_user['name']
                             }</p>
                         <p>The approval status for the dataset <a href="{
-                            tk.config.get("ckan.frontend_url")
+                            config.get("ckanext.wri.frontend_url")
                         }/datasets/{dataset['name']}">${
                             dataset['title']
-                        }</a> is now <b><string>${mainAction}</strong><b></p>
+                        }</a> is now <b><strong>${mainAction}</strong><b></p>
                     """
                     tk.mail_user(user_obj, subject, body)
