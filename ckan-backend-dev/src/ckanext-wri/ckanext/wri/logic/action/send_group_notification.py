@@ -113,5 +113,5 @@ def send_group_notification(context, GroupNotificationParams):
                     mainAction = action.split("_")[0]
                     subject = f"Approval status on dataset {dataset['title']}"
                     body = f"Hi {recipient_user['display_name'] if recipient_user.get('display_name') else recipient_user['name']} The approval status for the dataset {dataset['title']} at '{config.get('ckanext.wri.frontend_url')}datasets/{dataset['name']}'is now {mainAction}"
-                    body_html = f"<p>Hi {recipient_user['display_name'] if recipient_user.get('display_name') else recipient_user['name']}</p><p>The approval status for the dataset <a href='{config.get('ckanext.wri.frontend_url')}datasets/{dataset['name']}'>${dataset['title']}</a> is now <b><strong>${mainAction}</strong><b></p>"
+                    body_html = f"<p>Hi {recipient_user['display_name'] if recipient_user.get('display_name') else recipient_user['name']}</p><p>The approval status for the dataset <a href='{config.get('ckanext.wri.frontend_url')}datasets/{dataset['name']}'>{dataset['title']}</a> is now <b><strong>{mainAction}</strong><b></p>"
                     tk.mail_user(user_obj, subject, body, body_html)
