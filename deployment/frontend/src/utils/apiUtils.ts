@@ -1947,7 +1947,7 @@ export async function sendGroupNotification({
                             env.NEXTAUTH_URL
                         }/datasets/${dataset.name}">${
                             dataset.title
-                        }</a> is now <b><string>${mainAction}</strong><b></p>`
+                        }</a> is now <b><strong>${mainAction}</strong><b></p>`
                             const email = user.email!
                             return await sendEmail(email, subject, body)
                         })
