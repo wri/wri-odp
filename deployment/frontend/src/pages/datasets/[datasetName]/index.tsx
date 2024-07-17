@@ -733,6 +733,11 @@ export default function DatasetPage(
                                                                 ? prevDatasetData.methodology
                                                                 : datasetData.methodology
                                                         }
+                                                        technical_notes={
+                                                            isCurrentVersion
+                                                                ? prevDatasetData.technical_notes
+                                                                : datasetData.technical_notes
+                                                        }
                                                     />
                                                 </Tab.Panel>
                                             )}
