@@ -317,17 +317,16 @@ export async function getAllDatasetFq({
             url += `&sort=${sortBy}`
         }
 
-        if (extLocationQ && extGlobalQ !== 'only') {
+        if (extAddressQ) {
+            url += `&ext_address_q=${extAddressQ}`
+        }
+
+        if (extLocationQ) {
             url += `&ext_location_q=${extLocationQ}`
         }
 
-        if (extAddressQ && extGlobalQ !== 'only') {
-            if (extGlobalQ === 'exclude') {
-                url += `&ext_address_q=${extAddressQ}`
-            }
-            if (extGlobalQ === 'include') {
-                url += `&ext_address_q=${extAddressQ}&ext_address_q=Global`
-            }
+        if (extGlobalQ) {
+            url += `&ext_global_q=${extGlobalQ}`
         }
 
         if (user) {
