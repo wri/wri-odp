@@ -372,6 +372,7 @@ class WriPlugin(plugins.SingletonPlugin):
     def before_dataset_search(self, search_params):
         input_point = search_params.get("extras", {}).get("ext_location_q", None)
         input_address = search_params.get("extras", {}).get("ext_address_q", None)
+        _global = search_params.get("extras", {}).get("ext_global_q", None)
 
         point = []
         if input_point:
@@ -384,7 +385,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
         if point or input_address:
             search_params = SolrSpatialFieldSearchBackend().search_params(
-                point, input_address, search_params
+                point, input_address, _global, search_params
             )
 
         return search_params

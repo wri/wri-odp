@@ -193,13 +193,24 @@ you need to split the geometry in order to fit the parts. Not indexing"""
 
         return dataset_dict
 
-    def get_point_query(self, coordinates):
+    def get_point_query(self, coordinates, include_global=True):
+        if include_global:
+            return '_query_:"{{!field f=spatial_geom}}Contains({y}, {x})" || spatial_address:Global'.format(
+                **coordinates
+            )
+        print('TESTANDO', flush=True)
         return '_query_:"{{!field f=spatial_geom}}Contains({y}, {x})"'.format(
             **coordinates
         )
 
-    def get_wkt_query(self, wkt):
+    def get_only_globals(self):
+        return 'spatial_address:Global'
+
+    def get_wkt_query(self, wkt, include_global=True):
+        if include_global:
+            return '_query_:"{{!field f=spatial_geom}}Intersects({})" || spatial_address:Global'.format(wkt)
         return '_query_:"{{!field f=spatial_geom}}Intersects({})"'.format(wkt)
+        
 
     def get_wkt_for_geojson(self, geojson):
         wkt = None
@@ -246,13 +257,15 @@ you need to split the geometry in order to fit the parts. Not indexing"""
 
             return wkt
 
-    def search_params(self, point, address, search_params):
+    def search_params(self, point, address, _global, search_params):
 
         point = fit_point(point)
 
         if not search_params.get("fq_list"):
             search_params["fq_list"] = []
 
+        if _global == 'only':
+            return search_params["fq_list"].append(self.get_only_globals())
         queries = []
 
         if address:
@@ -265,16 +278,18 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                 i for g in list_of_queries for i in g
             ]
         else:
-            queries += self.get_address_query(address, point)
+            queries += self.get_address_query(address, point, include_global=_global == 'include')
             
         search_params["fq_list"].append(" OR ".join(queries))
 
         return search_params
 
-    def get_address_query(self, address: str, point):
+    def get_address_query(self, address: str, point, include_global=True):
         cwd = os.path.abspath(os.path.dirname(__file__))
         segments = address.split(",")
         _queries = [] 
+        print("SEGMENTS", flush=True)
+        print(segments, flush=True)
         if len(segments) == 1:
             # It's a country
             try:
@@ -289,13 +304,14 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                     wkt = self.get_wkt_for_geojson(content)
 
                     if wkt:
-                        _queries.append(self.get_wkt_query(wkt))
+                        print("WKT", flush=True)
+                        _queries.append(self.get_wkt_query(wkt, include_global=include_global))
                     elif point:
-                        _queries.append(self.get_point_query(point))
+                        _queries.append(self.get_point_query(point, include_global=include_global))
 
             except Exception:
                 if point:
-                    _queries.append(self.get_point_query(point))
+                    _queries.append(self.get_point_query(point, include_global=include_global))
 
         elif len(segments) == 2:
             # It's a state
@@ -311,17 +327,24 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                     wkt = self.get_wkt_for_geojson(content)
 
                     if wkt:
-                        _queries.append(self.get_wkt_query(wkt))
+                        _queries.append(self.get_wkt_query(wkt, include_global=include_global))
                     elif point:
-                        _queries.append(self.get_point_query(point))
+                        _queries.append(self.get_point_query(point, include_global=include_global))
 
-            except Exception:
+            except Exception as e:
                 if point:
-                    _queries.append(self.get_point_query(point))
+                    _queries.append(self.get_point_query(point, include_global=include_global))
         elif len(segments) == 3:
             # It's a city
             if point:
-                _queries.append(self.get_point_query(point))
+                _queries.append(self.get_point_query(point, include_global=include_global))
+        elif len(segments) == 4:
+            # It's a city in the UK or similar
+            print("INCLUDE GLOBAL", flush=True)
+            print(include_global, flush=True)
+            if point:
+                _queries.append(self.get_point_query(point, include_global=include_global))
+        print("QUERIES", flush=True)
         return _queries
 
 
