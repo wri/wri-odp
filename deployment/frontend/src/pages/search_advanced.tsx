@@ -118,6 +118,7 @@ export default function SearchPage(
         defaultSelectedTagOptions(filters) || []
     )
 
+    console.log('QUERY', query)
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
 
     /*
@@ -191,7 +192,7 @@ export default function SearchPage(
                 const address = keyFilters[0]?.label
 
                 // @ts-ignore
-                if (coordinates) extLocationQ = coordinates.reverse().join(',')
+                if (coordinates) extLocationQ = coordinates.join(',')
                 if (address) extAddressQ = address
             } else if (key == 'extGlobalQ') {
                 const extGlobalQFilter = filters.find(
