@@ -194,30 +194,20 @@ you need to split the geometry in order to fit the parts. Not indexing"""
         return dataset_dict
 
     def get_point_query(self, coordinates, include_global=True, addressList=None):
-        query = ''
-        if include_global:
-            query = '_query_:"{{!field f=spatial_geom}}Contains({y}, {x})" || spatial_address:Global'.format(
-                **coordinates
-            )
         query = '_query_:"{{!field f=spatial_geom}}Contains({y}, {x})"'.format(
             **coordinates
         )
-        if addressList:
-            query += ' OR ' + self.build_spatial_address_query(addressList)
         return query
 
     def get_only_globals(self):
         return 'spatial_address:Global'
 
     def build_spatial_address_query(self, addressList, include_global=True):
-        query = ' OR '.join([f'spatial_address:{address}' for address in addressList])
-        if include_global:
-            query += ' OR spatial_address:Global'
-        return query
+        return [f"spatial_address:/.*{address}/" for address in addressList]
 
     def get_wkt_query(self, wkt, include_global=True):
         if include_global:
-            return '_query_:"{{!field f=spatial_geom}}Intersects({})" || spatial_address:Global'.format(wkt)
+            return '_query_:"{{!field f=spatial_geom}}Intersects({})"'.format(wkt)
         return '_query_:"{{!field f=spatial_geom}}Intersects({})"'.format(wkt)
         
 
@@ -277,9 +267,6 @@ you need to split the geometry in order to fit the parts. Not indexing"""
             return search_params["fq_list"].append(self.get_only_globals())
         queries = []
 
-     #   if address:
-     #       cwd = os.path.abspath(os.path.dirname(__file__))
-     #       queries.append("spatial_address:/.*{}/".format(address))
 
         if isinstance(address, list):
             list_of_queries = [self.get_address_query(a, point) for a in address]
@@ -315,12 +302,12 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                         _queries.append(self.get_wkt_query(wkt, include_global=include_global))
                     elif point:
                         _queries.append(self.get_point_query(point, include_global=include_global))
-                    _queries.append(self.build_spatial_address_query(segments))
+                    _queries = _queries + self.build_spatial_address_query(segments)
 
             except Exception:
                 if point:
                     _queries.append(self.get_point_query(point, include_global=include_global))
-                _queries.append(self.build_spatial_address_query(segments))
+                _queries = _queries + self.build_spatial_address_query(segments)
 
         elif len(segments) == 2:
             # It's a state
@@ -339,18 +326,21 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                         _queries.append(self.get_wkt_query(wkt, include_global=include_global))
                     elif point:
                         _queries.append(self.get_point_query(point, include_global=include_global))
-                    _queries.append(self.build_spatial_address_query(segments))
-
+                    _queries = _queries + self.build_spatial_address_query(segments)
             except Exception as e:
                 if point:
                     _queries.append(self.get_point_query(point, include_global=include_global))
-                _queries.append(self.build_spatial_address_query(segments))
+                _queries = _queries + self.build_spatial_address_query(segments)
         elif len(segments) >= 3:
             # It's a city in the UK or similar
             if point:
                 _queries.append(self.get_point_query(point, include_global=include_global, addressList=segments))
-        print("QUERIES", flush=True)
-        print(_queries, flush=True)
+
+        if address:
+            _queries.append("spatial_address:/.*{}/".format(address))
+
+        if include_global:
+            _queries.append(self.get_only_globals())
         return _queries
 
 
