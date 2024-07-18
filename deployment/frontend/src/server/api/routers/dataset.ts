@@ -889,9 +889,6 @@ export const DatasetRouter = createTRPCRouter({
                 fq += '+is_approved:true'
             }
 
-            console.log('INPUT LOCATION Q', input.extLocationQ)
-            console.log('INPUT ADDRESS', input.extAddressQ)
-
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session?.user.apikey ?? '',
                 fq: `${fq}${input.appendRawFq ?? ''}`,

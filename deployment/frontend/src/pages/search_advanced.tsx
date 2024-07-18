@@ -118,7 +118,6 @@ export default function SearchPage(
         defaultSelectedTagOptions(filters) || []
     )
 
-    console.log('QUERY', query)
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
 
     /*
