@@ -193,18 +193,27 @@ you need to split the geometry in order to fit the parts. Not indexing"""
 
         return dataset_dict
 
-    def get_point_query(self, coordinates, include_global=True):
+    def get_point_query(self, coordinates, include_global=True, addressList=None):
+        query = ''
         if include_global:
-            return '_query_:"{{!field f=spatial_geom}}Contains({y}, {x})" || spatial_address:Global'.format(
+            query = '_query_:"{{!field f=spatial_geom}}Contains({y}, {x})" || spatial_address:Global'.format(
                 **coordinates
             )
-        print('TESTANDO', flush=True)
-        return '_query_:"{{!field f=spatial_geom}}Contains({y}, {x})"'.format(
+        query = '_query_:"{{!field f=spatial_geom}}Contains({y}, {x})"'.format(
             **coordinates
         )
+        if addressList:
+            query += ' OR ' + self.build_spatial_address_query(addressList)
+        return query
 
     def get_only_globals(self):
         return 'spatial_address:Global'
+
+    def build_spatial_address_query(self, addressList, include_global=True):
+        query = ' OR '.join([f'spatial_address:{address}' for address in addressList])
+        if include_global:
+            query += ' OR spatial_address:Global'
+        return query
 
     def get_wkt_query(self, wkt, include_global=True):
         if include_global:
@@ -268,9 +277,9 @@ you need to split the geometry in order to fit the parts. Not indexing"""
             return search_params["fq_list"].append(self.get_only_globals())
         queries = []
 
-        if address:
-            cwd = os.path.abspath(os.path.dirname(__file__))
-            queries.append("spatial_address:/.*{}/".format(address))
+     #   if address:
+     #       cwd = os.path.abspath(os.path.dirname(__file__))
+     #       queries.append("spatial_address:/.*{}/".format(address))
 
         if isinstance(address, list):
             list_of_queries = [self.get_address_query(a, point) for a in address]
@@ -287,9 +296,8 @@ you need to split the geometry in order to fit the parts. Not indexing"""
     def get_address_query(self, address: str, point, include_global=True):
         cwd = os.path.abspath(os.path.dirname(__file__))
         segments = address.split(",")
+        segments = [segment.strip() for segment in segments]
         _queries = [] 
-        print("SEGMENTS", flush=True)
-        print(segments, flush=True)
         if len(segments) == 1:
             # It's a country
             try:
@@ -304,14 +312,15 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                     wkt = self.get_wkt_for_geojson(content)
 
                     if wkt:
-                        print("WKT", flush=True)
                         _queries.append(self.get_wkt_query(wkt, include_global=include_global))
                     elif point:
                         _queries.append(self.get_point_query(point, include_global=include_global))
+                    _queries.append(self.build_spatial_address_query(segments))
 
             except Exception:
                 if point:
                     _queries.append(self.get_point_query(point, include_global=include_global))
+                _queries.append(self.build_spatial_address_query(segments))
 
         elif len(segments) == 2:
             # It's a state
@@ -330,21 +339,18 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                         _queries.append(self.get_wkt_query(wkt, include_global=include_global))
                     elif point:
                         _queries.append(self.get_point_query(point, include_global=include_global))
+                    _queries.append(self.build_spatial_address_query(segments))
 
             except Exception as e:
                 if point:
                     _queries.append(self.get_point_query(point, include_global=include_global))
-        elif len(segments) == 3:
-            # It's a city
-            if point:
-                _queries.append(self.get_point_query(point, include_global=include_global))
-        elif len(segments) == 4:
+                _queries.append(self.build_spatial_address_query(segments))
+        elif len(segments) >= 3:
             # It's a city in the UK or similar
-            print("INCLUDE GLOBAL", flush=True)
-            print(include_global, flush=True)
             if point:
-                _queries.append(self.get_point_query(point, include_global=include_global))
+                _queries.append(self.get_point_query(point, include_global=include_global, addressList=segments))
         print("QUERIES", flush=True)
+        print(_queries, flush=True)
         return _queries
 
 
