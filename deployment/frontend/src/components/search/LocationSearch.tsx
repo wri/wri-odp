@@ -161,7 +161,7 @@ export default function LocationSearch({
                                                         label: e.result
                                                             .place_name,
                                                         value: e.result.geometry
-                                                            .coordinates,
+                                                            .coordinates.reverse(),
                                                     }
                                                 } else {
                                                     newFilters.push({
@@ -170,7 +170,7 @@ export default function LocationSearch({
                                                         label: e.result
                                                             .place_name,
                                                         value: e.result.geometry
-                                                            .coordinates,
+                                                            .coordinates.reverse(),
                                                     })
                                                 }
 

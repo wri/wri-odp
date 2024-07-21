@@ -191,7 +191,7 @@ export default function SearchPage(
                 const address = keyFilters[0]?.label
 
                 // @ts-ignore
-                if (coordinates) extLocationQ = coordinates.reverse().join(',')
+                if (coordinates) extLocationQ = coordinates.join(',')
                 if (address) extAddressQ = address
             } else if (key == 'extGlobalQ') {
                 const extGlobalQFilter = filters.find(
