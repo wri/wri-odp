@@ -80,7 +80,7 @@ export default function Home(
                             This page is managed by the{' '}
                             <a
                                 href="https://www.wri.org/data/data-lab"
-                                className=" text-blue-500 underline"
+                                className=" text-blue-600 underline"
                                 target="_blank"
                             >
                                 Data Lab
@@ -90,7 +90,7 @@ export default function Home(
                             out to{' '}
                             <a
                                 href="mailto:data@wri.org"
-                                className="text-blue-500"
+                                className="text-blue-600 underline"
                             >
                                 {' '}
                                 data@wri.org
