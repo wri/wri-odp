@@ -36,11 +36,6 @@ export function Hero() {
             active: false,
         },
         {
-            title: 'Search',
-            href: '/search_advanced',
-            active: false,
-        },
-        {
             title: 'Teams',
             href: '/teams',
             active: false,
@@ -205,33 +200,28 @@ export function Hero() {
                 <div className="default-home-container mx-auto py-32 sm:py-48 lg:py-56">
                     <div className="text-start">
                         <h1 className="max-w-[592px] pr-5 font-acumin text-4xl font-semibold text-white">
-                            Welcome to WRI Data Explorer
+                            Data Explorer - Beta
                         </h1>
                         <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
-                            Data Explorer is WRI's primary data catalog. This is
-                            the best way to discover and explore data produced
-                            by WRI and our partners. Data in our catalog is{' '}
-                            <a
-                                href="https://www.wri.org/data/open-data-commitment"
-                                className=" text-blue-500 underline"
-                                target="_blank"
-                            >
-                                {' '}
-                                open by default
-                            </a>{' '}
-                            and meets our high standards for{' '}
+                            WRI produces and curates hundreds of datasets as
+                            part of our commitment to turn information into
+                            action. These products are based on our research and
+                            are held to{' '}
                             <a
                                 href="https://www.wri.org/research/excellence"
                                 className=" text-blue-500 underline"
                                 target="_blank"
                             >
-                                research excellence.
+                                {' '}
+                                traditional academic standards of excellence
                             </a>
+                            {', '}
+                            including objectivity and rigor.
                         </p>
                         <br />
                         <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
-                            Explore using the search bar or select a topic to
-                            dive deeper.
+                            Explore using the search bar or use more advanced
+                            filters.
                         </p>
                         <form
                             onSubmit={handleSubmit((data) => {

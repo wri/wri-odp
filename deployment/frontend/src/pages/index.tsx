@@ -69,69 +69,35 @@ export default function Home(
                 <div className="col-span-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
                     <h3 className="pt-1 font-acumin text-2xl font-bold leading-loose text-stone-900">
-                        About the Explorer
+                        About the Data Explorer
                     </h3>
                 </div>
                 <div className="col-span-3 flex flex-col gap-y-4">
                     <div
-                        className={`w-full font-acumin text-xl font-light leading-loose text-neutral-700  md:overflow-hidden md:max-h-[100vh] transition duration-300 ease-in-out ${
-                            readmore ? 'h-auto' : 'line-clamp-4'
-                        }`}
+                        className={`w-full font-acumin text-xl font-light leading-loose text-neutral-700  md:overflow-hidden md:max-h-[100vh] transition duration-300 ease-in-out h-auto`}
                     >
                         <p>
-                            WRI believes that good data is the foundation of
-                            good decision-making. Increasing access to
-                            high-quality, open data is the key to delivering for
-                            protect people, nature and climate. WRI Data
-                            Explorer is your entry point to data from WRI&apos;s
-                            teams around the world. It is designed for you to
-                            explore data on the key topics that help understand
-                            and transform the human systems driving
-                            unsustainable production and consumption — food,
-                            land and water; energy; and cities — as well as the
-                            economic, financial and governance systems that
-                            underpin them.
-                            <br />
-                            With the Data Explorer you can:
+                            This page is managed by the{' '}
+                            <a
+                                href="https://www.wri.org/data/data-lab"
+                                className=" text-blue-500 underline"
+                                target="_blank"
+                            >
+                                Data Lab
+                            </a>{' '}
+                            If you are not able to find the data you're looking
+                            for or have other feedback to share, please reach
+                            out to{' '}
+                            <a
+                                href="mailto:data@wri.org"
+                                className="text-blue-500"
+                            >
+                                {' '}
+                                data@wri.org
+                            </a>
+                            {'.'}
                         </p>
-                        <ul className="list-disc pl-8">
-                            <li>
-                                Discover: Search for data by keyword, topic, or
-                                location
-                            </li>
-                            <li>Preview: See the data in a map or table</li>
-                            <li>
-                                Use: Download or access the data via our API or
-                                a third-party platform
-                            </li>
-                            <li>
-                                As the one-stop shop for all WRI data, the Data
-                                Explorer covers data from our Land & Carbon Lab,
-                                Global Forest Watch Open Data Portal, Resource
-                                Watch, and the former Open Data Portal, in
-                                addition to hundreds of other datasets. All in
-                                one place.
-                                <br />
-                                WRI Data Explorer is managed by the Data Lab. If
-                                you can’t find the data you would expect to see
-                                here or have other feedback to share, reach out
-                                to
-                                <a
-                                    href="mailto:data@wri.org"
-                                    className="text-blue-500"
-                                >
-                                    {' '}
-                                    data@wri.org
-                                </a>
-                            </li>
-                        </ul>
                     </div>
-                    <Button
-                        className="mr-auto"
-                        onClick={() => {
-                            setReadmore(!readmore)
-                        }}
-                    >{`${readmore ? 'Show less' : 'Read More'}`}</Button>
                 </div>
             </main>
             <main className="flex min-h-screen flex-col items-center justify-center gap-y-8 bg-neutral-50 py-20">

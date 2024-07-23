@@ -96,8 +96,9 @@ export default function SearchPage(
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
                     <h3 className="pt-1 font-bold font-acumin text-xl font-light leading-loose text-neutral-700 ">
-                        Explore our data catalog by searching the keywords
-                        relevant to the topics of your interest. Use the
+                        Explore our data catalog by searching for specific
+                        keywords, such as “tree cover,” “water,” “power plants,”
+                        “roads,” “biodiversity” or “climate models.” Use the
                         Advanced Search option to filter results by topic,
                         format, language and more.
                     </h3>
