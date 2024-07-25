@@ -58,7 +58,7 @@ describe("Home page", () => {
         language: i < 7 ? "en" : "pt",
         wri_data: i < 7 ? true : false,
         featured_dataset: true,
-        visibility_type: 'public'
+        visibility_type: "public",
       });
       datasets.push(name);
     });
@@ -66,11 +66,10 @@ describe("Home page", () => {
 
   it("display home page", () => {
     cy.visit("/");
-    cy.contains("Welcome to WRI Data Explorer");
+    cy.contains("Data Explorer - Beta");
     cy.contains("Highlights");
   });
 
- 
   it("allow searches", () => {
     cy.visit("/search");
     cy.get('[name="search"]').type(datasets[0] + "{enter}" ?? "test");
@@ -80,7 +79,7 @@ describe("Home page", () => {
     cy.contains(`Search: ${datasets[0]}`, { timeout: 40000 });
     cy.contains(`${datasets[0]}`, { timeout: 40000 });
   });
-    
+
   it("contains topics", () => {
     cy.visit("/");
     cy.contains("Topics");
@@ -88,12 +87,12 @@ describe("Home page", () => {
       cy.contains(group);
     });
   });
-    
- it("contains highlights", () => {
+
+  it("contains highlights", () => {
     cy.visit("/");
     cy.contains("Highlights");
     datasets.forEach((dataset) => {
-        cy.contains(dataset);
+      cy.contains(dataset);
     });
   });
 
