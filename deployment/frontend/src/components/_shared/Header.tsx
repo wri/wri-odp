@@ -43,11 +43,6 @@ export default function Header() {
             active: false,
         },
         {
-            title: 'Search',
-            href: '/search_advanced',
-            active: false,
-        },
-        {
             title: 'Teams',
             href: '/teams',
             active: false,
