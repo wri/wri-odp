@@ -30,19 +30,28 @@ export default function LegendItemButtonThreshold<
     const { activeLayer } = props
     const { control } = useForm()
 
-    const hasThreshold = activeLayer?.layerConfig?.params_config?.some(
+    const threshold = activeLayer?.layerConfig?.params_config?.find(
         (item: any) => item.key == 'thresh' || item.key === 'threshold'
     )
 
-    const options = [10, 15, 20, 25, 30, 50, 75].map((item) => ({
+    let options = [10, 15, 20, 25, 30, 50, 75].map((item) => ({
         label: `>${item}%`,
         value: item,
         default: activeLayer.threshold
             ? item == activeLayer.threshold
             : item == 20,
     }))
+    if (threshold?.options) {
+        options = threshold.options.map((item: any) => ({
+            label: item.label,
+            value: item.value,
+            default: activeLayer.threshold
+                ? item.value == activeLayer.threshold
+                : threshold.default,
+        }))
+    }
 
-    return hasThreshold ? (
+    return threshold ? (
         <Controller
             control={control}
             name={'threshold' as Path<T>}
@@ -79,7 +88,7 @@ export default function LegendItemButtonThreshold<
                                     </Listbox.Button>
                                 </DefaultTooltip>
 
-                                <div className="absolute bottom-[300px] right-[65px]">
+                                <div className="absolute right-[65px]">
                                     <Transition
                                         show={open}
                                         as={Fragment}
@@ -87,7 +96,7 @@ export default function LegendItemButtonThreshold<
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"
                                     >
-                                        <Listbox.Options className="fixed z-50 mt-1 max-h-64 auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                        <Listbox.Options style={{ bottom: `${(options.length > 3 ? 35 : 100) + options.length * 10}px`}} className="fixed z-50 mt-1 max-h-64 auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                             {options.map((option) => (
                                                 <Listbox.Option
                                                     key={option.value}

@@ -48,9 +48,9 @@ export default function LegendTypeGradient(
 					name || value ? (
 						<li
 							key={`legend-gradient-item-${color}-${value}-${name}`}
-							className="p-0 m-0 grow shrink basis-auto before:content-none"
+							className="p-0 m-0 grow shrink basis-auto before:content-none first:text-left text-center last:text-right"
 						>
-							<span className="block font-[inherit] text-center first:text-left last:text-rigth">
+							<span className="block font-[inherit]">
 								{name || value}
 							</span>
 						</li>
