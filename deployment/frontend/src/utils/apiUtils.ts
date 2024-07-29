@@ -101,12 +101,12 @@ export async function searchHierarchy({
             )
 
             const data = (await response.json()) as CkanResponse<GroupTree[]>
+            console.log('TESTING', data)
             groups = data.success === true ? data.result : []
         }
 
         return groups
     } catch (e) {
-        console.error(e)
         throw new Error(e as string)
     }
 }
@@ -946,6 +946,7 @@ export async function getOrganizationTreeDetails({
             q: input.search,
             group_type: 'organization',
         })
+        groupTree = groupTree.filter((x) => x.name === input.search)
         if (input.tree) {
             let groupFetchTree = groupTree[0] as GroupTree
             const findTree = findNameInTree(groupFetchTree, input.search)
@@ -1010,6 +1011,7 @@ export async function getTopicTreeDetails({
             q: input.search,
             group_type: 'group',
         })
+        groupTree = groupTree.filter((x) => x.name === input.search)
         if (input.tree) {
             let groupFetchTree = groupTree[0] as GroupTree
             const findTree = findNameInTree(groupFetchTree, input.search)

@@ -105,7 +105,7 @@ export function BuildALayerRaw({
                         />
                     </InputGroup>
                     <InputGroup
-                        label="GEE ID"
+                        label="Layer ID"
                         className="sm:grid-cols-1 gap-x-2"
                         labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                     >
