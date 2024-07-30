@@ -208,9 +208,10 @@ export function createDeckLayer(
 ) {
     // @ts-ignore
     let tileUrl = layer.source.tiles[0] ?? ''
+    const threshold = layer.params_config && (layer.params_config as unknown as Array<any>).find((p) => p.key === 'threshold' || p.key === 'thresh')
     tileUrl = tileUrl
-        .replace('{thresh}', layerState?.threshold ?? 20)
-        .replace('{threshold}', layerState?.threshold ?? 20)
+        .replace('{thresh}', layerState?.threshold ? layerState?.threshold : threshold?.default ?? 30)
+        .replace('{threshold}', layerState?.threshold ? layerState?.threshold : threshold?.default ?? 30)
     let obj = {
         ...layer,
         source: {
