@@ -433,6 +433,8 @@ export function PreviewMap({
                         mapRef.current = _map.getMap() as unknown as MapRef
                 }}
                 mapStyle="mapbox://styles/mapbox/light-v9"
+                dragRotate={false}
+                touchZoomRotate={false}
                 mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                 onMove={(evt) => setViewState(evt.viewState)}
                 onClick={onClickLayer}

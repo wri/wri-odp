@@ -331,7 +331,6 @@ export const initializeStore = (preloadedState: any = {}) => {
                         visibility: true,
                         active: true,
                         opacity: 1,
-                        threshold: 20,
                         zIndex: Object.keys(currentLayers).length + 11,
                     })
 
@@ -375,7 +374,6 @@ export const initializeStore = (preloadedState: any = {}) => {
                             visibility: index === 0,
                             active: index === 0,
                             opacity: 1,
-                            threshold: 20,
                             zIndex:
                                 Object.keys(currentLayers).length + 11 + index,
                         })

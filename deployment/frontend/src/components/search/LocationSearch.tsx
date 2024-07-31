@@ -104,7 +104,10 @@ export default function LocationSearch({
                                         checked={globalQValue == 'only'}
                                         className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
                                     />
-                                    <label htmlFor="only-global" className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                    <label
+                                        htmlFor="only-global"
+                                        className="ml-3 block text-sm font-medium leading-6 text-gray-900"
+                                    >
                                         Only global
                                     </label>
                                 </div>
@@ -122,7 +125,10 @@ export default function LocationSearch({
                                         checked={globalQValue == 'exclude'}
                                         className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
                                     />
-                                    <label htmlFor="exclude-global" className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                    <label
+                                        htmlFor="exclude-global"
+                                        className="ml-3 block text-sm font-medium leading-6 text-gray-900"
+                                    >
                                         Exclude global
                                     </label>
                                 </div>
@@ -136,6 +142,8 @@ export default function LocationSearch({
                                     mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     style={{ height: 300 }}
                                     mapStyle="mapbox://styles/mapbox/streets-v9"
+                                    dragRotate={false}
+                                    touchZoomRotate={false}
                                 >
                                     <GeocoderControl
                                         mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
@@ -160,8 +168,7 @@ export default function LocationSearch({
                                                         ],
                                                         label: e.result
                                                             .place_name,
-                                                        value: e.result.geometry
-                                                            .coordinates.reverse(),
+                                                        value: e.result.geometry.coordinates.reverse(),
                                                     }
                                                 } else {
                                                     newFilters.push({
@@ -169,8 +176,7 @@ export default function LocationSearch({
                                                         title: 'Location',
                                                         label: e.result
                                                             .place_name,
-                                                        value: e.result.geometry
-                                                            .coordinates.reverse(),
+                                                        value: e.result.geometry.coordinates.reverse(),
                                                     })
                                                 }
 

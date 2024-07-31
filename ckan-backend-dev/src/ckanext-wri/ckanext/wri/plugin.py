@@ -292,10 +292,17 @@ class WriPlugin(plugins.SingletonPlugin):
     def after_resource_create(self, context: Context, resource_dict: dict[str, Any]):
 
         self._submit_to_datapusher(resource_dict)
+        ResourceLocation.index_resource_by_location(
+                        resource_dict, False
+                    )
 
     def after_resource_update(self, context: Context, resource_dict: dict[str, Any]):
 
         self._submit_to_datapusher(resource_dict)
+        ResourceLocation.index_resource_by_location(
+                        resource_dict, False
+                    )
+
 
     def _submit_to_datapusher(self, resource_dict: dict[str, Any]):
         context = cast(
@@ -335,16 +342,16 @@ class WriPlugin(plugins.SingletonPlugin):
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)
 
-        if pkg_dict.get("is_approved", False):
-            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+#        if pkg_dict.get("is_approved", False):
+#            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment
 
-        if pkg_dict.get("is_approved", False):
-            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+#        if pkg_dict.get("is_approved", False):
+#            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)

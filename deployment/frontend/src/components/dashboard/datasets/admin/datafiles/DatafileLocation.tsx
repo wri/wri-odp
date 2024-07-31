@@ -244,6 +244,8 @@ export function DatafileLocation({
                                     mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     style={{ height: 300 }}
                                     mapStyle="mapbox://styles/mapbox/streets-v9"
+                                    dragRotate={false}
+                                    touchZoomRotate={false}
                                     initialViewState={{ zoom: 2 }}
                                 >
                                     <Source
@@ -254,13 +256,16 @@ export function DatafileLocation({
                                     >
                                         <Layer
                                             type="fill"
-                                            paint={{ 'fill-color': '#BAE1BD', 'fill-opacity': 0.3 }}
+                                            paint={{
+                                                'fill-color': '#BAE1BD',
+                                                'fill-opacity': 0.3,
+                                            }}
                                         />
                                         <Layer
                                             type="line"
                                             paint={{
                                                 'line-width': 0.5,
-                                                'line-color': '#32864B'
+                                                'line-color': '#32864B',
                                             }}
                                         />
                                     </Source>
@@ -277,6 +282,8 @@ export function DatafileLocation({
                                 mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                 style={{ height: 300 }}
                                 mapStyle="mapbox://styles/mapbox/streets-v9"
+                                dragRotate={false}
+                                touchZoomRotate={false}
                             >
                                 <GeocoderControl
                                     mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"

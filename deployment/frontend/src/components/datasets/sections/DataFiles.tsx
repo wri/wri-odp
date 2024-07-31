@@ -127,6 +127,8 @@ export function LocationSearch({
             }}
             mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
             style={{ height: 300 }}
+            dragRotate={false}
+            touchZoomRotate={false}
             mapStyle="mapbox://styles/mapbox/streets-v9"
         >
             <GeocoderControl

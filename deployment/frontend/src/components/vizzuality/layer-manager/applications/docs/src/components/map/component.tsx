@@ -150,7 +150,8 @@ export const CustomMap: FC<CustomMapProps> = ({
         mapStyle="mapbox://styles/mapbox/streets-v11"
         onLoad={handleLoad}
         dragPan={!isFlying && dragPan}
-        dragRotate={!isFlying && dragRotate}
+        dragRotate={false}
+        touchZoomRotate={false}
         scrollZoom={!isFlying && scrollZoom}
         doubleClickZoom={!isFlying && doubleClickZoom}
         {...(process.env.NODE_ENV === 'test' && { testMode: true })}
