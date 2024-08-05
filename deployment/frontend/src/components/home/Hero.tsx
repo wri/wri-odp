@@ -58,6 +58,7 @@ export function Hero() {
                     what you’re looking for, you can access the former Open Data
                     Portal{' '}
                     <a
+                        target="_blank"
                         href="https://old-datasets.wri.org"
                         className="underline font-semibold"
                     >
