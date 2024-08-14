@@ -101,6 +101,8 @@ MIGRATE_DATASET_PARAMS = [
     "geographic_coverage",
     "whitelist",
     "blacklist",
+    "dataset_slug",
+    "dataset_title",
 ]
 
 
