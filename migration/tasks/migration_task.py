@@ -811,7 +811,7 @@ def check_reponse_status(response):
 
     if response.status_code != 200:
         log.error(f"Error: {response.status_code} - {response.text}")
-        return False
+        raise Exception(f"Error: {response.status_code} - {response.text}")
     return True
 
 
@@ -850,7 +850,6 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
 
     resource = data_dict.get("dataset", {})
     dataset = data_dict.get("metadata", {})
-    log.error(f"METADATA: {json.dumps(dataset, indent=2)}")
 
     if dataset:
         dataset = {**dataset, **dataset.get("info", {})}
