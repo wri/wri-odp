@@ -435,7 +435,7 @@ You'll need this ID: `"id": "7cd8a09e-1834-4ab5-8b72-bd638e9392ae"` (`result.id`
 
 Add a custom file to the `migration/files` directory and commit it to the repo. Once deployed, you can use the `file_name` parameter to specify it. The file should be a CSV with the following columns:
 
-- `dataset_id` (required—unless `gfw_dataset` is provided—this is the same as the `id` parameter for `migrate_dataset`)
+- `rw_dataset_id` (required—unless `gfw_dataset` is provided)
 - `application` (required)
 - `team` (optional)
 - `topics` (optional)
@@ -444,7 +444,7 @@ Add a custom file to the `migration/files` directory and commit it to the repo. 
 - `maintainer_email` (optional)
 - `layer_ids` (optional)
 - `layer_names` (optional)
-- `gfw_dataset` (optional)
+- `gfw_dataset` (optional—unless `rw_dataset_id` isn't provided)
 - `gfw_version` (optional)
 - `dataset_title` (optional)
 - `dataset_slug` (optional)
@@ -452,7 +452,7 @@ Add a custom file to the `migration/files` directory and commit it to the repo. 
 Example:
 
 ```csv
-dataset_id,gfw_dataset,application,team,topics,geographic_coverage,maintainer,maintainer_email,layer_ids,dataset_title,dataset_slug
+rw_dataset_id,gfw_dataset,application,team,topics,geographic_coverage,maintainer,maintainer_email,layer_ids,dataset_title,dataset_slug
 d491f094-ad6e-4015-b248-1d1cd83667fa,,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,John Doe,john.doe@example.com,,An Aqueduct Dataset,an-aqueduct-dataset
 b318381e-485d-46c9-8958-c9a9d75d7e91,,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,John Doe,john.doe@example.com,,Another Aqueduct Dataset,another-aqueduct-dataset
 faf79d2c-5e54-4591-9d70-4bd1029c18e6,,crt,agriadapt,atmosphere,Global,Jane Doe,jane.doe@example.com,,,
