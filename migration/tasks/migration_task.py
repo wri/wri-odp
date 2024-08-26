@@ -268,9 +268,22 @@ def get_datasets_from_csv(file_name):
 
         for row in reader:
             dataset = {}
-            dataset_id = row["dataset_id"]
+            dataset_id = row.get("rw_dataset_id")
             gfw_dataset = row.get("gfw_dataset")
-            application = row["application"]
+            application = row.get("application")
+            gfw_only = row.get("gfw_only") or False
+
+            if not dataset_id:
+                if not gfw_dataset:
+                    raise ValueError("Either 'rw_dataset_id' or 'gfw_dataset' required")
+                else:
+                    dataset_id = gfw_dataset
+                    gfw_only = True
+                    application = "gfw"
+
+            if not application:
+                raise ValueError("'application' required")
+
             team = row.get("team")
             topics = row.get("topics")
             layer_ids = row.get("layer_ids")
@@ -288,8 +301,9 @@ def get_datasets_from_csv(file_name):
                 layer_ids = layer_ids.split(",")
 
             dataset = {
-                "id": dataset_id,
+                "rw_dataset_id": dataset_id,
                 "gfw_dataset": gfw_dataset,
+                "gfw_only": gfw_only,
                 "application": application,
                 "team": team,
                 "topics": topics,
@@ -310,23 +324,24 @@ def get_datasets_from_csv(file_name):
 def send_migration_dataset(data_dict):
     log = get_run_logger()
 
-    dataset_id = data_dict.get("id")
+    dataset_id = data_dict.get("rw_dataset_id")
     gfw_dataset = data_dict.get("gfw_dataset")
     application = data_dict.get("application")
     gfw_only = data_dict.get("gfw_only")
     gfw_version = data_dict.get("gfw_version")
     dataset_slug = data_dict.get("dataset_slug")
+    gfw_only = data_dict.get("gfw_only") or False
 
     if not dataset_id:
         if not gfw_dataset:
-            log.error("Dataset ID or GFW dataset ID not found")
-            return None, None, None, None
+            raise ValueError("Either 'rw_dataset_id' or 'gfw_dataset' required")
         else:
             dataset_id = gfw_dataset
             gfw_only = True
             application = "gfw"
-    else:
-        gfw_only = False
+
+    if not application:
+        raise ValueError("'application' required")
 
     dataset = get_dataset_from_api(
         dataset_id, application, gfw_dataset, gfw_only, gfw_version
@@ -367,6 +382,7 @@ def update_existing_resources(dataset, existing_resources, new_resources):
     updated_resources = []
     existing_by_id = {}
     new_by_id = {}
+    updated = False
 
     for resource in existing_resources:
         rw_id = resource.get("rw_id")
@@ -395,18 +411,15 @@ def update_existing_resources(dataset, existing_resources, new_resources):
                 "package_id": existing_resource.get("package_id"),
                 "is_pending": False,
             }
-            updated = False
-            compare_fields = ["rw_id", "url", "type", "url_type", "name", "format"]
-
-            if not rw_id:
-                compare_fields = [
-                    "url",
-                    "type",
-                    "url_type",
-                    "name",
-                    "format",
-                    "spatial_geom",
-                ]
+            compare_fields = [
+                "rw_id",
+                "url",
+                "type",
+                "url_type",
+                "name",
+                "format",
+                "spatial_geom",
+            ]
 
             for field in compare_fields:
                 if new_resource.get(field) != existing_resource.get(field):
@@ -417,16 +430,19 @@ def update_existing_resources(dataset, existing_resources, new_resources):
 
             if updated:
                 updated_resource = {**updated_resource, **new_resource}
-
-            updated_resources.append(updated_resource)
+                updated_resources.append(updated_resource)
+            else:
+                updated_resources.append(existing_resource)
 
             del new_by_id[key]
 
     for key, new_resource in new_by_id.items():
+        updated = True
         new_resource["package_id"] = dataset.get("id")
+        new_resource["is_pending"] = False
         updated_resources.append(new_resource)
 
-    return updated_resources
+    return updated_resources, updated
 
 
 def migrate_dataset(data_dict):
@@ -469,14 +485,29 @@ def migrate_dataset(data_dict):
                     "organization",
                     "owner_org_name",
                     "migration_extras",
+                    "tags",
                 ]
             ):
                 dataset_changed = True
-                log.info(f"{log_name} {key} changed: {dataset.get(key)} -> {value}")
                 updated_dataset[key] = value
 
         if dataset_changed:
             log.info(f"{log_name} Dataset changed...")
+
+            for key, value in updated_dataset.items():
+                log.info(f"{log_name} {key} changed: {dataset.get(key)} -> {value}")
+
+        existing_tags = dataset.get("tags", [])
+        new_tags = data_dict.get("tags", [])
+
+        if len(existing_tags) != len(new_tags) or any(
+            tag.get("name") not in [t.get("name") for t in new_tags]
+            for tag in existing_tags
+        ):
+            log.info(f"{log_name} Tags changed...")
+            log.info(f"{log_name} Existing tags: {json.dumps(existing_tags, indent=2)}")
+            log.info(f"{log_name} New tags: {json.dumps(new_tags, indent=2)}")
+            updated_dataset["tags"] = new_tags
 
         existing_groups = dataset.get("groups", [])
         new_groups = data_dict.get("groups", [])
@@ -579,29 +610,12 @@ def migrate_dataset(data_dict):
 
         existing_resources = dataset.get("resources", [])
         new_resources = data_dict.get("resources", [])
-        updated_resources = []
 
-        updated_resources = update_existing_resources(
+        updated_resources, resource_changes = update_existing_resources(
             dataset, existing_resources, new_resources
         )
 
-        resource_changes = True
         remove_resources = existing_resources and not new_resources
-
-        if (
-            all(
-                (
-                    len(updated_resource) == 3
-                    and all(
-                        v in ["id", "package_id", "is_pending"]
-                        for v in updated_resource
-                    )
-                )
-                for updated_resource in updated_resources
-            )
-            and not remove_resources
-        ):
-            resource_changes = False
 
         if resource_changes:
             log.info(f"{log_name} Resources/layers changed...")
@@ -688,14 +702,14 @@ def get_dataset_from_api(
     log = get_run_logger()
 
     gfw_dataset_exists = False
-    is_gfw = application == "gfw" or gfw_only
+    is_gfw = True if ((application == "gfw" or gfw_only) and gfw_dataset) else False
     url = f"{RW_API}/{dataset_id}/metadata"
-    gfw_dataset_url = f"{GFW_API}/dataset/{gfw_dataset or dataset_id}"
 
     if is_gfw:
+        gfw_dataset_url = f"{GFW_API}/dataset/{gfw_dataset}"
         dataset_response = requests.get(gfw_dataset_url)
 
-        if not check_reponse_status(dataset_response):
+        if dataset_response.status_code != 200:
             log.error(f"GFW dataset not found: {dataset_id}")
         else:
             gfw_dataset_exists = True
@@ -708,9 +722,10 @@ def get_dataset_from_api(
         datasets = response.json()["data"]
 
         if datasets:
-            if is_gfw:
+            if is_gfw and gfw_dataset_exists:
                 metadata = datasets.get("metadata", {})
                 metadata["dataset_id"] = dataset_id
+                metadata["gfw_dataset"] = gfw_dataset
                 metadata["name"] = dataset_id
                 metadata["versions"] = datasets.get("versions", [])
                 output_object["metadata"] = metadata
@@ -759,7 +774,6 @@ def get_dataset_from_api(
 
                 if check_reponse_status(gfw_config_response):
                     gfw_config = gfw_config_response.json()["data"]
-                    log.info(f"GFW config: {gfw_config}")
                     output_object["gfw_config"] = gfw_config
 
                 if gfw_config and gfw_config.get("source_type") == "raster":
@@ -830,7 +844,12 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     geographic_coverage = original_data_dict.get("geographic_coverage")
     dataset_title = original_data_dict.get("dataset_title")
     dataset_slug = original_data_dict.get("dataset_slug")
-    rw_id = original_data_dict.get("id")
+    rw_id = original_data_dict.get("rw_dataset_id")
+    is_private = False
+    approval_status = "approved"
+    is_approved = True
+    is_draft = False
+    visibility_type = "public"
 
     def get_value(key, default="", data_object=None):
         data_objects = [dataset, resource]
@@ -907,17 +926,24 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
         or gfw_title
         or (metadata_name if metadata_name != rw_id else base_name)
     )
-    vocabularies = get_value("vocabulary")
+    vocabularies = get_value("vocabulary") or []
 
-    tag_names = [tag for tag in (get_value("tags") or [])] or [
+    gfw_tags = [tag for tag in (get_value("tags") or [])]
+    gfw_tags = gfw_tags if len(gfw_tags) > 1 and gfw_tags[0] != "" else None
+    rw_tags = [
         tag
         for vocabulary in vocabularies
         for tag in vocabulary.get("attributes", {}).get("tags", [])
     ]
-    tag_names_cleaned = [
-        re.sub(r"[^a-zA-Z0-9-_\. ]", "", tag)[:100] for tag in tag_names
-    ]
-    tags = [{"name": tag} for tag in tag_names_cleaned]
+    rw_tags = rw_tags if len(rw_tags) > 1 and rw_tags[0] != "" else None
+    tag_names = gfw_tags or rw_tags
+    tags = []
+
+    if tag_names:
+        tag_names_cleaned = [
+            re.sub(r"[^a-zA-Z0-9-_\. ]", "", tag)[:100] for tag in tag_names
+        ]
+        tags = [{"name": tag} for tag in tag_names_cleaned]
 
     cautions = get_value("cautions")
     language = get_value("data_language") or get_value("language")
@@ -949,13 +975,12 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
 
     required_dataset_values = {
         "name": name,
-        "private": False,
-        "approval_status": "approved",
-        "is_approved": True,
-        "draft": False,
-        "private": False,
+        "private": is_private,
+        "approval_status": approval_status,
+        "is_approved": is_approved,
+        "draft": is_draft,
         "application": application,
-        "visibility_type": "public",
+        "visibility_type": visibility_type,
     }
 
     html_notes = markdown.markdown(description) if description else ""
@@ -1046,13 +1071,14 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     gfw_tiles = data_dict.get("gfw_tiles_info", [])
     gfw_config = data_dict.get("gfw_config", {})
     gfw_version = data_dict.get("gfw_version")
+    gfw_dataset = original_data_dict.get("gfw_dataset")
 
-    if gfw_tiles:
+    if gfw_tiles and gfw_dataset:
         if gfw_tiles and gfw_config:
             for tile_id, spatial_geom in gfw_tiles.items():
 
                 resource_dict = {
-                    "url": f"{GFW_API}/dataset/{base_name}/{gfw_version}/download/geotiff?grid={gfw_config.get('grid')}&tile_id={tile_id}&pixel_meaning={gfw_config.get('pixel_meaning')}",
+                    "url": f"{GFW_API}/dataset/{gfw_dataset}/{gfw_version}/download/geotiff?grid={gfw_config.get('grid')}&tile_id={tile_id}&pixel_meaning={gfw_config.get('pixel_meaning')}",
                     "type": "link",
                     "url_type": "link",
                     "name": tile_id,

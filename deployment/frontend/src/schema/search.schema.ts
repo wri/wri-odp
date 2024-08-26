@@ -11,7 +11,7 @@ export const searchSchema = z.object({
     fq: z.record(z.string()).optional(),
     appendRawFq: z.string().optional(),
     facetFields: z.array(z.string()).optional(),
-    sortBy: z.string().default('relevance asc').optional(),
+    sortBy: z.string().default('score desc').optional(),
     extGlobalQ: z.enum(['only', 'exclude', 'include']).default('include').optional(),
     extLocationQ: z.string().optional(),
     extAddressQ: z.string().optional(),
