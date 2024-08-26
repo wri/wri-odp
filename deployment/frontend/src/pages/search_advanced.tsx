@@ -48,7 +48,7 @@ export async function getServerSideProps(
         : { start: 0, rows: 10 }
     const initialSortBy = query.sort_by
         ? JSON.parse(query.sort_by as string)
-        : 'relevance asc'
+        : 'score desc'
 
     const session = await getServerAuthSession(context)
     const helpers = createServerSideHelpers({
