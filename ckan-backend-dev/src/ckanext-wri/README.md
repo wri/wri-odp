@@ -233,10 +233,12 @@ This extension includes a migration API that allows users to migrate datasets fr
 Migrates an RW dataset/metadata to CKAN. It maps all supported RW fields to CKAN fields. All additional RW fields (except objects) are stored in the `migration_extras` field of the CKAN dataset. This endpoint handles both the creation and updating of datasets (this is determined automatically—no need to specify).
 
 **Parameters:**
-- **id** (string) – The RW UUID of the dataset to migrate (required—unless `gfw_dataset` is provided). Example: `c0b5f4b1-4f3b-4f1e-8f1e-3f4b1f3b4f1e`.
+- **rw_dataset_id** (string) – The RW UUID of the dataset to migrate (required—unless `gfw_dataset` is provided). Example: `c0b5f4b1-4f3b-4f1e-8f1e-3f4b1f3b4f1e`.
 - **application** (string) – The RW application of the dataset to migrate (required). Example: `rw`.
-- **gfw_dataset** (string) – The GFW dataset to migrate (optional—if this dataset also has metadata in the RW API, you should also include `id`). Example: `gfw_forest_data`.
-- **gfw_version** (string) – The version of the GFW dataset to migrate (optional—will default to the latest if a specific version isn't provided). Example: `v2020.01.01`.
+- **dataset_slug** (string) – The desired slug of the dataset to migrate (optional). If you use this option, you will need to include this parameter each time you call `migrate_dataset` for this dataset. This value will override the `slug` value from the RW/GFW APIs. Example: `my-dataset`.
+- **dataset_title** (string) – The desired title of the dataset to migrate (optional). If you use this option, you will need to include this parameter each time you call `migrate_dataset` for this dataset. This value will override the `name` value from the RW API or the `title` value from the GFW API. Example: `My Dataset`.
+- **gfw_dataset** (string) – The GFW dataset to migrate (optional). If this dataset also has metadata in the RW API, you should also include `rw_dataset_id`. Example: `gfw_forest_data`.
+- **gfw_version** (string) – The version of the GFW dataset to migrate (optional). Will default to the latest if a specific version isn't provided. Example: `v2020.01.01`.
 - **team** (string) – The `name` (`slug`) of the Team to associate the dataset with (optional). Example: `land-carbon-lab`.
 - **topics** (string) – A comma-separated list of Topic `slug`s to associate the dataset with (optional). Example: `atmosphere,biodiversity`.
 - **geographic_coverage** (string) – The geographic coverage of the dataset (optional). Example: `Global`.
@@ -251,7 +253,7 @@ A successful request will return the Prefect status of the new migration job.
 ##### Usage Example
 
 ```
-% curl -H "Authorization: YOUR_API_TOKEN" "https://wri.dev.ckan.datopian.com/api/3/action/migrate_dataset?id=c12446ce-174f-4ffb-b2f7-77ecb0116aba&application=rw&team=migration-test&topics=lucas-topic,nov-16-topic"
+% curl -H "Authorization: YOUR_API_TOKEN" "https://wri.dev.ckan.datopian.com/api/3/action/migrate_dataset?rw_dataset_id=c12446ce-174f-4ffb-b2f7-77ecb0116aba&application=rw&team=migration-test&topics=lucas-topic,nov-16-topic"
 {
   "help": "https://wri.dev.ckan.datopian.com/api/3/action/help_show?name=migration_status",
   "success": true,
@@ -268,7 +270,7 @@ A successful request will return the Prefect status of the new migration job.
     "flow_version": "659bece7fac5af816d61217219193235",
     "parameters": {
       "data_dict": {
-        "id": "c12446ce-174f-4ffb-b2f7-77ecb0116aba",
+        "rw_dataset_id": "c12446ce-174f-4ffb-b2f7-77ecb0116aba",
         "team": "migration-test",
         "topics": [
           "lucas-topic",
@@ -433,7 +435,7 @@ You'll need this ID: `"id": "7cd8a09e-1834-4ab5-8b72-bd638e9392ae"` (`result.id`
 
 Add a custom file to the `migration/files` directory and commit it to the repo. Once deployed, you can use the `file_name` parameter to specify it. The file should be a CSV with the following columns:
 
-- `dataset_id` (required—unless `gfw_dataset` is provided)
+- `rw_dataset_id` (required—unless `gfw_dataset` is provided)
 - `application` (required)
 - `team` (optional)
 - `topics` (optional)
@@ -441,20 +443,23 @@ Add a custom file to the `migration/files` directory and commit it to the repo. 
 - `maintainer` (optional)
 - `maintainer_email` (optional)
 - `layer_ids` (optional)
-- `gfw_dataset` (optional)
+- `layer_names` (optional)
+- `gfw_dataset` (optional—unless `rw_dataset_id` isn't provided)
 - `gfw_version` (optional)
+- `dataset_title` (optional)
+- `dataset_slug` (optional)
 
 Example:
 
 ```csv
-dataset_id,gfw_dataset,application,team,topics,geographic_coverage,maintainer,maintainer_email,layer_ids
-d491f094-ad6e-4015-b248-1d1cd83667fa,,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,John Doe,john.doe@example.com,,
-b318381e-485d-46c9-8958-c9a9d75d7e91,,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,John Doe,john.doe@example.com,,
-faf79d2c-5e54-4591-9d70-4bd1029c18e6,,crt,agriadapt,atmosphere,Global,Jane Doe,jane.doe@example.com,,
-,gfw_forest_flux_forest_age_category,gfw,global-forest-watch,"land,ghg-emissions,forest",,Jane Doe,jane.doe@example.com,,
-,gfw_forest_flux_removal_forest_type,gfw,global-forest-watch,"land,ghg-emissions,forest",,John Doe,john.doe@example.com,,
-47a8e6cc-ea40-44a8-b1fc-6cf4fcc7d868,nasa_viirs_fire_alerts,gfw,global-forest-watch,"land,natural-hazards,forest",Global,,,2462cceb-41de-4bd2-8251-a6f75fe4e3d5
-c92b6411-f0e5-4606-bbd9-138e40e50eb8,,gfw,global-forest-watch,"land,forest",,Jeff Guy,jeff.guy@example.com,"0cba3c4f-2d3b-4fb1-8c93-c951dc1da84b,2351399c-ef2c-48da-9485-20698190acb0"
+rw_dataset_id,gfw_dataset,application,team,topics,geographic_coverage,maintainer,maintainer_email,layer_ids,dataset_title,dataset_slug
+d491f094-ad6e-4015-b248-1d1cd83667fa,,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,John Doe,john.doe@example.com,,An Aqueduct Dataset,an-aqueduct-dataset
+b318381e-485d-46c9-8958-c9a9d75d7e91,,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,John Doe,john.doe@example.com,,Another Aqueduct Dataset,another-aqueduct-dataset
+faf79d2c-5e54-4591-9d70-4bd1029c18e6,,crt,agriadapt,atmosphere,Global,Jane Doe,jane.doe@example.com,,,
+,gfw_forest_flux_forest_age_category,gfw,global-forest-watch,"land,ghg-emissions,forest",,Jane Doe,jane.doe@example.com,,,
+,gfw_forest_flux_removal_forest_type,gfw,global-forest-watch,"land,ghg-emissions,forest",,John Doe,john.doe@example.com,,Another Title Example,
+47a8e6cc-ea40-44a8-b1fc-6cf4fcc7d868,nasa_viirs_fire_alerts,gfw,global-forest-watch,"land,natural-hazards,forest",Global,,,2462cceb-41de-4bd2-8251-a6f75fe4e3d5,,another-slug-example
+c92b6411-f0e5-4606-bbd9-138e40e50eb8,,gfw,global-forest-watch,"land,forest",,Jeff Guy,jeff.guy@example.com,"0cba3c4f-2d3b-4fb1-8c93-c951dc1da84b,2351399c-ef2c-48da-9485-20698190acb0",,
 ```
 
 #### POST /api/3/action/migration_status

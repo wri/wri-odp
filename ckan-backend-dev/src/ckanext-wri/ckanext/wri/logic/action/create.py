@@ -88,7 +88,7 @@ TRIGGER_MIGRATION_PARAMS = [
 ]
 
 MIGRATE_DATASET_PARAMS = [
-    "id",
+    "rw_dataset_id",
     "gfw_dataset",
     "gfw_only",
     "gfw_version",
@@ -101,6 +101,13 @@ MIGRATE_DATASET_PARAMS = [
     "geographic_coverage",
     "whitelist",
     "blacklist",
+    "dataset_slug",
+    "dataset_title",
+    "is_private",
+    "is_approved",
+    "approval_status",
+    "visibility_type",
+    "is_draft",
 ]
 
 
@@ -248,7 +255,7 @@ def trigger_migration(context: Context, data_dict: DataDict):
 
 @logic.side_effect_free
 def migrate_dataset(context: Context, data_dict: DataDict):
-    dataset_id = data_dict.get("id")
+    dataset_id = data_dict.get("rw_dataset_id")
     application = data_dict.get("application")
     gfw_dataset = data_dict.get("gfw_dataset")
 
@@ -260,7 +267,7 @@ def migrate_dataset(context: Context, data_dict: DataDict):
 
     if not dataset_id:
         if not gfw_dataset:
-            raise tk.ValidationError(_("Dataset 'id' or 'gfw_dataset' is required"))
+            raise tk.ValidationError(_("Dataset 'rw_dataset_id' or 'gfw_dataset' is required"))
         else:
             data_dict["gfw_only"] = True
 
