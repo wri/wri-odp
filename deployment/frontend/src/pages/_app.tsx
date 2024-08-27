@@ -172,7 +172,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
         tempLayerAsLayerobj: tempLayerAsLayerobj,
         mapView: {
             ...initialZustandState?.mapView,
-            basemap: initialZustandState?.mapView?.basemap ?? 'dark',
+            basemap: initialZustandState?.mapView?.basemap ?? 'light',
+            labels: initialZustandState?.mapView?.labels ?? 'dark',
             layers: newLayersState,
             activeLayerGroups,
             viewState: {
