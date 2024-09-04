@@ -117,7 +117,7 @@ export const DatasetSchemaObject = z.object({
         value: z.string(),
         label: z.string(),
         id: z.string(),
-    }).optional(),
+    }),
     project: z.string().optional().nullable().or(emptyStringToUndefined),
     application: z.string().optional().nullable(),
     technical_notes: z
@@ -129,7 +129,7 @@ export const DatasetSchemaObject = z.object({
         .nullable()
         .or(emptyStringToUndefined),
     tags: z.array(z.string()),
-    topics: z.array(z.string()).optional(),
+    topics: z.array(z.string()),
     temporal_coverage_start: z
         .number()
         .optional()

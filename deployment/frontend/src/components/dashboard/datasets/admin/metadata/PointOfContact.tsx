@@ -55,9 +55,9 @@ export function PointOfContactForm({
                 <div className="border-b border-gray-300 pb-4 mb-4">
                     {authorFields.length === 0 && (
                         <div>
-                            <span className={errors.authors ? "text-red-600" : "text-gray-600"}>
+                            <span className={errors?.authors ? "text-red-600" : "text-gray-600"}>
                                 <i>
-                                    {errors.authors?.message || "At least one (1) Author Name and Author Email is required."}
+                                    {errors?.authors?.message || "At least one (1) Author Name and Author Email is required."}
                                 </i>
                             </span>
                         </div>
@@ -71,7 +71,7 @@ export function PointOfContactForm({
                                         placeholder="Author Name"
                                         type="text"
                                     />
-                                    {errors.authors?.[index]?.name && (
+                                    {Array.isArray(errors?.authors) && errors?.authors[index]?.name?.message && (
                                         <div>
                                             <span className="text-red-500"><i>{errors.authors[index].name.message}</i></span>
                                         </div>
@@ -83,7 +83,7 @@ export function PointOfContactForm({
                                         placeholder="email@example.com"
                                         type="email"
                                     />
-                                    {errors.authors?.[index]?.email && (
+                                    {Array.isArray(errors?.authors) && errors?.authors[index]?.email?.message && (
                                         <div>
                                             <span className="text-red-500"><i>{errors.authors[index].email.message}</i></span>
                                         </div>
@@ -109,9 +109,9 @@ export function PointOfContactForm({
                 <div className="border-b border-gray-300 pb-4 mb-4">
                     {maintainerFields.length === 0 && (
                         <div>
-                            <span className={errors.maintainers ? "text-red-600" : "text-gray-600"}>
+                            <span className={errors?.maintainers ? "text-red-600" : "text-gray-600"}>
                                 <i>
-                                    {errors.maintainers?.message || "At least one (1) Maintainer Name and Maintainer Email is required."}
+                                    {errors?.maintainers?.message || "At least one (1) Maintainer Name and Maintainer Email is required."}
                                 </i>
                             </span>
                         </div>
@@ -125,7 +125,7 @@ export function PointOfContactForm({
                                         placeholder="Maintainer Name"
                                         type="text"
                                     />
-                                    {errors.maintainers?.[index]?.name && (
+                                    {Array.isArray(errors?.maintainers) && errors?.maintainers[index]?.name?.message && (
                                         <div>
                                             <span className="text-red-500"><i>{errors.maintainers[index].name.message}</i></span>
                                         </div>
@@ -137,7 +137,7 @@ export function PointOfContactForm({
                                         placeholder="email@example.com"
                                         type="email"
                                     />
-                                    {errors.maintainers?.[index]?.email && (
+                                    {Array.isArray(errors?.maintainers) && errors?.maintainers[index]?.email?.message && (
                                         <div>
                                             <span className="text-red-500"><i>{errors.maintainers[index].email.message}</i></span>
                                         </div>
