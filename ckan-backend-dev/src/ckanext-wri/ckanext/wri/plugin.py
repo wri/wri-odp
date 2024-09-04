@@ -61,6 +61,7 @@ from ckanext.wri.logic.action.get import (
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
+from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
 from ckan.lib.navl.validators import ignore_missing
 from ckanext.wri.logic.action.datapusher_download import (
     download_request,
@@ -360,6 +361,9 @@ class WriPlugin(plugins.SingletonPlugin):
         return self.before_dataset_search(search_params)
 
     def before_dataset_index(self, pkg_dict):
+        if any(key in pkg_dict for key in ("authors", "maintainers")):
+            pkg_dict = stringify_actor_objects(pkg_dict)
+
         if not pkg_dict.get("spatial"):
             return pkg_dict
 
