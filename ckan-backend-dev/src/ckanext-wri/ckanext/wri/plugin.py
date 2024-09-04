@@ -37,6 +37,7 @@ from ckanext.wri.logic.action.update import (
     package_patch,
     resource_update,
     old_package_patch,
+    old_package_update,
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -226,7 +227,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "old_package_create": logic.action.create.package_create,
             "package_patch": package_patch,
             "old_package_patch": old_package_patch,
-            "old_package_update": logic.action.update.package_update,
+            "old_package_update": old_package_update,
             "resource_update": resource_update,
             # "package_delete": package_delete,
         }

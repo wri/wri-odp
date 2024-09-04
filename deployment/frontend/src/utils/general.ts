@@ -150,7 +150,9 @@ export const datasetFormFieldmap: Record<string, string> = {
     maintainer: 'Maintainer Name',
     maintainer_email: 'Maintainer Email',
     authors: 'Authors',
+    author_emails: 'Author Emails',
     maintainers: 'Maintainers',
+    maintainer_emails: 'Maintainer Emails',
     learn_more: 'Learn more',
     open_in: 'Open In',
     function: 'Function',
@@ -292,6 +294,18 @@ export function formatDiff(
                                       data[key]?.new_value['title'],
                         }
                     }
+                }
+            } else if (key === 'authors' || key === 'maintainers') {
+                const newKey = datasetFormFieldmap[key]!
+                const old_value = data[key]?.old_value
+                const new_value = data[key]?.new_value
+                outputDiff[newKey] = {
+                    old_value: old_value
+                        ? JSON.parse(old_value)
+                        : data[key]?.old_value ?? '',
+                    new_value: new_value
+                        ? JSON.parse(new_value)
+                        : data[key]?.new_value ?? '',
                 }
             } else {
                 if (key in datasetFormFieldmap) {

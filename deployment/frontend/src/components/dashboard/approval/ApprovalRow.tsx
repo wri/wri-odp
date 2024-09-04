@@ -286,6 +286,50 @@ function SubCardProfile({
             },
         }
     }
+    // make sure we handle authors/maintainers correctly. We need to show the name and email
+    if (diff2 && Object.keys(diff2).some((x) => x.includes('author'))) {
+        diff2 = Object.fromEntries(
+            Object.entries(diff2).filter(
+                ([key]) => !key.includes('author') && !key.includes('maintainer')
+            )
+        )
+        diff2 = {
+            ...diff2,
+            Authors: {
+                old_value: diff.old_dataset?.authors?.map(
+                    (a) => `${a.name}` ?? ''
+                ) ?? [],
+                new_value: diff.new_dataset?.authors?.map(
+                    (a) => `${a.name}` ?? ''
+                ) ?? [],
+            },
+            'Author Emails': {
+                old_value: diff.old_dataset?.authors?.map(
+                    (a) => `${a.email}` ?? ''
+                ) ?? [],
+                new_value: diff.new_dataset?.authors?.map(
+                    (a) => `${a.email}` ?? ''
+                ) ?? [],
+            },
+            Maintainers: {
+                old_value: diff.old_dataset?.maintainers?.map(
+                    (a) => `${a.name}` ?? ''
+                ) ?? [],
+                new_value: diff.new_dataset?.maintainers?.map(
+                    (a) => `${a.name}` ?? ''
+                ) ?? [],
+            },
+            'Maintainer Emails': {
+                old_value: diff.old_dataset?.maintainers?.map(
+                    (a) => `${a.email}` ?? ''
+                ) ?? [],
+                new_value: diff.new_dataset?.maintainers?.map(
+                    (a) => `${a.email}` ?? ''
+                ) ?? [],
+            },
+        }
+    }
+
     return (
         <div className="pr-4 pl-2 sm:pl-10 mx-auto my-4 overflow-auto">
             {diff &&
