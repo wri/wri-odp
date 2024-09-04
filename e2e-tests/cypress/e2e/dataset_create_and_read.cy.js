@@ -28,6 +28,7 @@ describe("Create dataset", () => {
 
   it("Should create dataset", () => {
     cy.visit("/dashboard/datasets/new");
+
     cy.get("input[name=title]").type(dataset);
     cy.get("input[name=name]").should("have.value", dataset);
     cy.get("input[name=url]").type("https://google.com");
@@ -44,7 +45,7 @@ describe("Create dataset", () => {
     cy.get("#tagsSearchInput").type("Tag 1{enter}").clear();
     cy.get("#tagsSearchInput").type("Tag 2{enter}").clear();
     cy.get("#tagsSearchInput").type("Tag 3{enter}").clear();
-    cy.get("input[name=project]").type("Project 1");
+    cy.get("input[name=project]").focus().type("Project 1");
     cy.get("input[name=technical_notes]").type("https://google.com");
     cy.get("input[name=temporal_coverage_start]").type(1998);
     cy.get("input[name=temporal_coverage_end]").type(2023);
@@ -57,10 +58,21 @@ describe("Create dataset", () => {
     });
     cy.get("textarea[name=short_description]").type("test");
     cy.contains("Description").parent().parent().find(".tiptap.ProseMirror").type("RICH TEXT EDITOR");
-    cy.get("input[name=author]").type("Luccas");
-    cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
-    cy.get("input[name=maintainer]").type("Luccas");
-    cy.get("input[name=maintainer_email]").type("luccasmmg@gmail.com");
+
+    cy.contains("Add Author").click();
+    cy.get('input[name="authors.0.name"]').type("Test Author 1");
+    cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
+    cy.contains("Add Author").click();
+    cy.get('input[name="authors.1.name"]').type("Test Author 2");
+    cy.get('input[name="authors.1.email"]').type("test-author-2@example.com");
+
+    cy.contains("Add Maintainer").click();
+    cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
+    cy.get('input[name="maintainers.0.email"]').type("test-maintainer-1@example.com");
+    cy.contains("Add Maintainer").click();
+    cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
+    cy.get('input[name="maintainers.1.email"]').type("test-maintainer-2@example.com");
+
     cy.contains("More Details").click();
     cy.contains("More Details").parent().parent().as("moredetails")
     cy.get("@moredetails").get(".tiptap.ProseMirror").eq(1).type("RICH TEXT EDITOR");
@@ -111,6 +123,16 @@ describe("Create dataset", () => {
       cy.get("h2").contains(org);
       cy.contains("Data files").click();
       cy.contains("PNG");
+      cy.contains("Contact").click();
+
+      cy.contains("Test Author 1");
+      cy.contains("test-author-1@example.com");
+      cy.contains("Test Author 2");
+      cy.contains("test-author-2@example.com");
+      cy.contains("Test Maintainer 1");
+      cy.contains("test-maintainer-1@example.com");
+      cy.contains("Test Maintainer 2");
+      cy.contains("test-maintainer-2@example.com");
     },
   );
 
@@ -158,6 +180,18 @@ describe("Create dataset", () => {
     cy.get("input[name=url]")
       .clear()
       .type("https://google.com" + ".br");
+
+    cy.contains("Authors").parent().within(() => {
+      cy.get('button:contains("Remove Author")').eq(1).click();
+    });
+    cy.contains("Maintainers").parent().within(() => {
+      cy.get('button:contains("Remove Maintainer")').eq(0).click();
+    });
+
+    cy.contains("Add Maintainer").click();
+    cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 3");
+    cy.get('input[name="maintainers.1.email"]').type("test-maintainer-3@example.com");
+
     cy.contains("More Details").click();
     cy.contains("More Details").parent().parent().as("moredetails")
     cy.get("@moredetails").get(".tiptap.ProseMirror").eq(1).type("EDITED");
@@ -194,6 +228,17 @@ describe("Create dataset", () => {
       cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
       cy.contains("Data files").click();
       cy.contains("jpg");
+      cy.contains("Contact").click();
+      cy.contains("Test Author 1");
+      cy.contains("test-author-1@example.com");
+      cy.contains("Test Maintainer 2");
+      cy.contains("test-maintainer-2@example.com");
+      cy.contains("Test Maintainer 3");
+      cy.contains("test-maintainer-3@example.com");
+      cy.contains("Test Author 2").should("not.exist");
+      cy.contains("test-author-2@example.com").should("not.exist");
+      cy.contains("Test Maintainer 1").should("not.exist");
+      cy.contains("test-maintainer-1@example.com").should("not.exist");
     },
   );
 

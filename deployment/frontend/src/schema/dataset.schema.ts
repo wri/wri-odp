@@ -117,7 +117,7 @@ export const DatasetSchemaObject = z.object({
         value: z.string(),
         label: z.string(),
         id: z.string(),
-    }),
+    }).optional(),
     project: z.string().optional().nullable().or(emptyStringToUndefined),
     application: z.string().optional().nullable(),
     technical_notes: z
@@ -129,7 +129,7 @@ export const DatasetSchemaObject = z.object({
         .nullable()
         .or(emptyStringToUndefined),
     tags: z.array(z.string()),
-    topics: z.array(z.string()),
+    topics: z.array(z.string()).optional(),
     temporal_coverage_start: z
         .number()
         .optional()
@@ -170,15 +170,22 @@ export const DatasetSchemaObject = z.object({
         .optional()
         .nullable()
         .or(emptyStringToUndefined),
-    author: z.string(),
-    author_email: z
-        .string()
-        .email()
-        .optional()
-        .nullable()
-        .or(emptyStringToUndefined),
-    maintainer: z.string(),
-    maintainer_email: z.string().email(),
+    authors: z.array(
+        z.object({
+            name: z.string().min(1, { message: 'Author Name is required' }),
+            email: z.string().email().min(1, {
+                message: 'Author Email is required',
+            }),
+        })
+    ).min(1, { message: 'At least one (1) Author Name and Author Email is required.' }),
+    maintainers: z.array(
+        z.object({
+            name: z.string().min(1, { message: 'Maintainer Name is required' }),
+            email: z.string().email().min(1, {
+                message: 'Maintainer Email is required',
+            }),
+        })
+    ).min(1, { message: 'At least one (1) Maintainer Name and Maintainer Email is required.' }),
     function: z.string().optional().nullable(),
     restrictions: z.string().optional().nullable(),
     reason_for_adding: z.string().optional().nullable(),
@@ -283,6 +290,27 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         {
             message: 'Technical notes are required for public datasets',
             path: ['technical_notes'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (obj.authors.length === 0) return false
+            return true
+        },
+        {
+            message: 'At least one (1) Author Name and Author Email is required.',
+            path: ['authors'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (obj.maintainers.length === 0) return false
+            return true
+        },
+        {
+            message:
+                'At least one (1) Maintainer Name and Maintainer Email is required.',
+            path: ['maintainers'],
         }
     )
 

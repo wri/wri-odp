@@ -19,6 +19,7 @@ from ckanext.wri.logic.action.send_group_notification import (
     GroupNotificationParams,
     send_group_notification,
 )
+from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
 import ckan.plugins.toolkit as tk
 import ckan.logic as logic
 from ckan.common import _
@@ -233,6 +234,9 @@ def package_patch(context: Context, data_dict: DataDict):
     data_dict["is_approved"] = False
     data_dict["approval_status"] = "pending"
     _pending_dataset = {**pending_dataset, **data_dict}
+
+    _pending_dataset = stringify_actor_objects(_pending_dataset)
+
     patch_dataset = logic.action.patch.package_patch(
         {"ignore_auth": True},
         {
@@ -320,6 +324,9 @@ def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.Pac
     patched = dict(package_dict)
     patched.update(data_dict)
     patched["id"] = package_dict["id"]
+
+    patched = stringify_actor_objects(patched)
+
     return _get_action("old_package_update")(context, patched)
 
 
@@ -431,6 +438,7 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
 
     # Update Dataset
     try:
+        pending_dataset = stringify_actor_objects(pending_dataset)
         dataset = tk.get_action("package_update")(
             {"ignore_auth": True}, pending_dataset
         )

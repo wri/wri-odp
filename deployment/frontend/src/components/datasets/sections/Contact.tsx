@@ -21,22 +21,35 @@ export function Contact({
     }
     return (
         <div className="grid grid-cols-2 gap-4 min-h-[300px] items-start">
-            <TeamMember
-                name={dataset.author ?? ''}
-                img="/images/placeholders/user/userdefault.png"
-                title="Author"
-                email={dataset.author_email ?? ''}
-                highlighted={(type) => highlighted(`author${type}`)}
-            />
-            <TeamMember
-                name={dataset.maintainer ?? ''}
-                img="/images/placeholders/user/userdefault.png"
-                title="Maintainer"
-                email={dataset.maintainer_email ?? ''}
-                highlighted={(type) => highlighted(`maintainer${type}`)}
-            />
+            <div>
+                <h3 className="text-lg font-semibold mb-5">Authors</h3>
+                {dataset.authors?.map((author, index) => (
+                    <TeamMember
+                        key={`author-${index}`}
+                        name={author.name ?? ''}
+                        img="/images/placeholders/user/userdefault.png"
+                        title="Author"
+                        email={author.email ?? ''}
+                        highlighted={(type) => highlighted(`author${type}`)}
+                    />
+                ))}
+            </div>
+            <div>
+                <h3 className="text-lg font-semibold mb-5">Maintainers</h3>
+                {dataset.maintainers?.map((maintainer, index) => (
+                    <TeamMember
+                        key={`maintainer-${index}`}
+                        name={maintainer.name ?? ''}
+                        img="/images/placeholders/user/userdefault.png"
+                        title="Maintainer"
+                        email={maintainer.email ?? ''}
+                        highlighted={(type) => highlighted(`maintainer${type}`)}
+                    />
+                ))}
+            </div>
         </div>
     )
+
 }
 
 interface TeamMemberProps {

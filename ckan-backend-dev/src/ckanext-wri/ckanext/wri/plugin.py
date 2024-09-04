@@ -156,6 +156,7 @@ class WriPlugin(plugins.SingletonPlugin):
         return {
             "iso_language_code": wri_validators.iso_language_code,
             "year_validator": wri_validators.year_validator,
+            "agents_json_object": wri_validators.agents_json_object
         }
 
     # IFacets
@@ -226,7 +227,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "old_package_patch": old_package_patch,
             "old_package_update": logic.action.update.package_update,
             "resource_update": resource_update,
-            #"package_delete": package_delete,
+            # "package_delete": package_delete,
         }
 
     # IPermissionLabels
@@ -303,7 +304,6 @@ class WriPlugin(plugins.SingletonPlugin):
                         resource_dict, False
                     )
 
-
     def _submit_to_datapusher(self, resource_dict: dict[str, Any]):
         context = cast(
             Context, {"model": model, "ignore_auth": True, "defer_commit": True}
@@ -342,16 +342,16 @@ class WriPlugin(plugins.SingletonPlugin):
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)
 
-#        if pkg_dict.get("is_approved", False):
-#            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+        # if pkg_dict.get("is_approved", False):
+        #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment
 
-#        if pkg_dict.get("is_approved", False):
-#            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+        # if pkg_dict.get("is_approved", False):
+        #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)
