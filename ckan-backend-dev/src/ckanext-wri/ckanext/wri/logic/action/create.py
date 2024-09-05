@@ -29,13 +29,11 @@ log = logging.getLogger(__name__)
 # Most of SCHEMA_FIELDS and SCHEMA_SYNONYMS are not currently
 # supported in Whitelist and Blacklist, but they might be later.
 SCHEMA_FIELDS = [
-    "author",
-    "author_email",
+    "authors",
     "isopen",
     "license_id",
     "license_title",
-    "maintainer",
-    "maintainer_email",
+    "maintainers",
     "notes",
     "organization",
     "title",
@@ -98,8 +96,8 @@ MIGRATE_DATASET_PARAMS = [
     "team",
     "topics",
     "layer_ids",
-    "maintainer",
-    "maintainer_email",
+    "maintainers",
+    "authors",
     "geographic_coverage",
     "whitelist",
     "blacklist",

@@ -9,7 +9,8 @@ import { Disclosure, Transition } from '@headlessui/react'
 import { MetadataAccordion } from './MetadataAccordion'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { DatasetFormType } from '@/schema/dataset.schema'
-import { MinusCircleIcon, PlusCircleIcon } from '@heroicons/react/20/solid'
+import { MinusCircleIcon, PlusCircleIcon, InformationCircleIcon } from '@heroicons/react/20/solid'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
 export function PointOfContactForm({
     formObj,
@@ -51,7 +52,23 @@ export function PointOfContactForm({
         >
             <Disclosure.Panel className="py-5 flex flex-col gap-y-6">
                 {/* Authors */}
-                <h3 className="text-lg font-semibold">Authors<span className="text-red-500">*</span></h3>
+                <InputGroup
+                    label={
+                        <div className="flex items-center gap-x-1 pb-10">
+                            <span className="text-lg font-semibold">
+                                Authors{' '}
+                            <span className="text-red-500">*</span>
+                            </span>
+                            <DefaultTooltip content="Authors are the people who created the dataset. They might not be involved in the day-to-day maintenance of the dataset anymore.">
+                                <InformationCircleIcon
+                                    className="h-5 w-5 text-neutral-500"
+                                    aria-hidden="true"
+                                />
+                            </DefaultTooltip>
+                        </div>
+                    }
+                    className="mb-2 flex flex-col items-start sm:flex-col"
+                >
                 <div className="border-b border-gray-300 pb-4 mb-4">
                     {authorFields.length === 0 && (
                         <div>
@@ -64,7 +81,7 @@ export function PointOfContactForm({
                     )}
                     {authorFields.map((field, index) => (
                         <div key={field.id} className="flex items-center gap-x-4 border-b border-gray-150 pb-4 mb-4">
-                            <div className="flex flex-col gap-y-2 flex-grow">
+                            <div className="flex flex-col gap-y-2 flex-grow flex-wrap">
                                 <InputGroup label={<span >Author Name</span>}>
                                     <Input
                                         {...register(`authors.${index}.name`)}
@@ -103,9 +120,26 @@ export function PointOfContactForm({
                         </button>
                     </div>
                 </div>
+                </InputGroup>
 
                 {/* Maintainers */}
-                <h3 className="text-lg font-semibold">Maintainers<span className="text-red-500">*</span></h3>
+                <InputGroup
+                    label={
+                        <div className="flex items-center gap-x-1 pb-10">
+                            <span className="text-lg font-semibold">
+                                Maintainers{' '}
+                            <span className="text-red-500">*</span>
+                            </span>
+                            <DefaultTooltip content="Maintainers are the people who are responsible for the day-to-day maintenance of the dataset.">
+                                <InformationCircleIcon
+                                    className="h-5 w-5 text-neutral-500"
+                                    aria-hidden="true"
+                                />
+                            </DefaultTooltip>
+                        </div>
+                    }
+                    className="mb-2 flex flex-col items-start sm:flex-col"
+                >
                 <div className="border-b border-gray-300 pb-4 mb-4">
                     {maintainerFields.length === 0 && (
                         <div>
@@ -118,7 +152,7 @@ export function PointOfContactForm({
                     )}
                     {maintainerFields.map((field, index) => (
                         <div key={field.id} className="flex items-center gap-x-4 border-b border-gray-150 pb-4 mb-4">
-                            <div className="flex flex-col gap-y-2 flex-grow">
+                            <div className="flex flex-col gap-y-2 flex-grow flex-wrap">
                                 <InputGroup label={<span >Maintainer Name</span>}>
                                     <Input
                                         {...register(`maintainers.${index}.name`)}
@@ -157,6 +191,7 @@ export function PointOfContactForm({
                         </button>
                     </div>
                 </div>
+                </InputGroup>
             </Disclosure.Panel>
         </MetadataAccordion>
     )
