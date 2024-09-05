@@ -30,7 +30,7 @@ export function Contact({
                         img="/images/placeholders/user/userdefault.png"
                         title="Author"
                         email={author.email ?? ''}
-                        highlighted={(type) => highlighted(`author${type}`)}
+                        highlighted={(type) => highlighted(`authors[${index}].${type}`)}
                     />
                 ))}
             </div>
@@ -43,7 +43,7 @@ export function Contact({
                         img="/images/placeholders/user/userdefault.png"
                         title="Maintainer"
                         email={maintainer.email ?? ''}
-                        highlighted={(type) => highlighted(`maintainer${type}`)}
+                        highlighted={(type) => highlighted(`maintainers[${index}].${type}`)}
                     />
                 ))}
             </div>
@@ -73,7 +73,7 @@ function TeamMember({ name, img, title, email, highlighted }: TeamMemberProps) {
                 <div
                     className={classNames(
                         'text-sm font-normal text-black',
-                        highlighted('')
+                        highlighted('name')
                     )}
                 >
                     {name}
@@ -81,7 +81,7 @@ function TeamMember({ name, img, title, email, highlighted }: TeamMemberProps) {
                 <div
                     className={classNames(
                         'text-sm font-normal text-black',
-                        highlighted('_email')
+                        highlighted('email')
                     )}
                 >
                     {email}
