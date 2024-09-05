@@ -87,8 +87,10 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
 
     if (!datafile.datastore_active)
         return (
-            <span
+            <button
                 onClick={() => download(originalResourceDownloadUrl)}
+                id="download"
+                data-resource={datafile.title ?? datafile.name!}
                 className="cursor-pointer download-datafile w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
             >
                 <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
@@ -100,7 +102,7 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                         {convertBytes(size)}
                     </div>
                 )}
-            </span>
+            </button>
         )
 
     return (
