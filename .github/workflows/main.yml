@@ -56,6 +56,8 @@ jobs:
           --build-arg NEXTAUTH_URL=${{ secrets.PROD_FRONTEND_NEXTAUTH_URL }} \
           --build-arg CKAN_URL=${{ secrets.PROD_FRONTEND_CKAN_URL }} \
           --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.PROD_FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.PROD_NEXT_PUBLIC_GTM_ID }} \
+          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.PROD_NEXT_PUBLIC_HOTJAR_ID }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Set up Docker Containers
