@@ -219,17 +219,16 @@ def agents_json_object(value: Any, context: Context):
 
     loaded_value = value
 
-    try:
-        loaded_value = json.loads(value)
-        log.error(f"Value is a valid JSON object: {loaded_value}")
-    except json.JSONDecodeError:
-        log.error("Value is not a valid JSON object")
-        raise Invalid("Value must be a valid JSON object")
-
-    for agent in loaded_value:
-        log.error(f"Agent: {agent}")
-        _validate_agent(agent, context)
-
-    log.error(f'Type of value: {type(value)}')
+    if isinstance(value, str):
+        try:
+            loaded_value = json.loads(value)
+            log.info(f"Value is a valid JSON object: {loaded_value}")
+        except Exception as e:
+            log.error(f"Value must be a valid JSON object: {e}")
+            raise Invalid("Value must be a valid JSON object")
+    elif isinstance(value, list):
+        for agent in loaded_value:
+            log.info(f"Agent: {agent}")
+            _validate_agent(agent, context)
 
     return value

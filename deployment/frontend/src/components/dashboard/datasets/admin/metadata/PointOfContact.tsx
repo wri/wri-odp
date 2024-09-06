@@ -9,7 +9,7 @@ import { Disclosure, Transition } from '@headlessui/react'
 import { MetadataAccordion } from './MetadataAccordion'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { DatasetFormType } from '@/schema/dataset.schema'
-import { MinusCircleIcon, PlusCircleIcon, InformationCircleIcon } from '@heroicons/react/20/solid'
+import { MinusCircleIcon, PlusCircleIcon, InformationCircleIcon } from '@heroicons/react/24/outline'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
 export function PointOfContactForm({

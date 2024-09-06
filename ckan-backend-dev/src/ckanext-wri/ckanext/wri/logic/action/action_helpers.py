@@ -38,12 +38,22 @@ def _process_actor_string(actor_string: str, actor_type: str) -> dict:
     return actor_list
 
 
+def _is_json_string(actors: str) -> dict:
+    try:
+        json.loads(actors)
+        return True
+    except TypeError:
+        return False
+
+
 def stringify_actor_objects(data_dict: DataDict) -> DataDict:
     authors = data_dict.get("authors")
     maintainers = data_dict.get("maintainers")
 
     if authors:
-        if isinstance(authors, list):
+        is_json = _is_json_string(authors)
+
+        if isinstance(authors, list) or is_json:
             data_dict["authors"] = json.dumps(authors)
         elif isinstance(authors, str):
             authors_processed = _process_actor_string(authors, "author")
@@ -52,7 +62,9 @@ def stringify_actor_objects(data_dict: DataDict) -> DataDict:
                 data_dict["authors"] = json.dumps(authors_processed)
 
     if maintainers:
-        if isinstance(maintainers, list):
+        is_json = _is_json_string(maintainers)
+
+        if isinstance(maintainers, list) or is_json:
             data_dict["maintainers"] = json.dumps(maintainers)
         elif isinstance(maintainers, str):
             maintainers_processed = _process_actor_string(maintainers, "maintainer")
