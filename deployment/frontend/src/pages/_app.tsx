@@ -3,21 +3,25 @@ import { SessionProvider } from 'next-auth/react'
 import { AppProps, type AppType } from 'next/app'
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { Provider, useCreateStore } from '@/utils/store'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import 'react-toastify/dist/ReactToastify.css'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+import '@/styles/highlight.css'
 import localFont from 'next/font/local'
 
 import { api } from '@/utils/api'
 
 import '@/styles/globals.scss'
-import '@/styles/rte.css'
+import '@/styles/rte.scss'
 import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
+import { env } from '@/env.mjs'
+import NProgress from 'nprogress'
+import Router from 'next/router'
 
 const acumin = localFont({
     src: [
@@ -50,7 +54,33 @@ const MyApp: AppType<{ session: Session | null }> = ({
     pageProps: { session, ...pageProps },
 }: AppProps) => {
     const [queryClient] = useState(() => new QueryClient())
-    const { initialZustandState, dataset } = pageProps
+    const { initialZustandState } = pageProps
+    let { dataset, prevdataset } = pageProps
+
+    useEffect(() => {
+        const handleRouteStart = () => NProgress.start()
+        const handleRouteDone = () => NProgress.done()
+
+        Router.events.on('routeChangeStart', handleRouteStart)
+        Router.events.on('routeChangeComplete', handleRouteDone)
+        Router.events.on('routeChangeError', handleRouteDone)
+
+        return () => {
+            Router.events.off('routeChangeStart', handleRouteStart)
+            Router.events.off('routeChangeComplete', handleRouteDone)
+            Router.events.off('routeChangeError', handleRouteDone)
+        }
+    }, [])
+
+    if (typeof prevdataset == 'string') {
+        prevdataset = JSON.parse(prevdataset)
+    }
+    if (typeof dataset == 'string') {
+        dataset = JSON.parse(dataset)
+    }
+    if (typeof initialZustandState?.dataset == 'string') {
+        initialZustandState.dataset = JSON.parse(initialZustandState.dataset)
+    }
 
     const newLayersState = new Map()
     if (initialZustandState && initialZustandState?.mapView?.layersParsed) {
@@ -64,31 +94,118 @@ const MyApp: AppType<{ session: Session | null }> = ({
     let activeLayerGroups =
         initialZustandState?.mapView?.activeLayerGroups || []
 
-    if (!activeLayerGroups?.length && dataset) {
-        const layers = dataset?.resources
-            .filter((r: any) => r?.format == "Layer")
-            .map((r: any) => r?.rw_id)
+    const layerAsLayerObj = new Map()
+    const tempLayerAsLayerobj = new Map()
 
-        if (layers) {
-            activeLayerGroups.push({
-                layers: layers || [],
-                datasetId: dataset.id,
-            })
+    if (dataset) {
+        for (const resource of dataset?.resources) {
+            if (resource.format == 'Layer') {
+                if (
+                    (resource['layerObj'] || resource['layerObjRaw']) &&
+                    !resource.url
+                ) {
+                    layerAsLayerObj.set(resource.rw_id, 'pending')
+                } else {
+                    layerAsLayerObj.set(resource.rw_id, 'approved')
+                }
+            }
         }
     }
+
+    if (initialZustandState && initialZustandState?.relatedDatasets?.length) {
+        const datasets = initialZustandState?.relatedDatasets
+        for (const dataset of datasets) {
+            for (const resource of dataset?.resources) {
+                if (resource.format == 'Layer') {
+                    if (
+                        (resource['layerObj'] || resource['layerObjRaw']) &&
+                        !resource.url
+                    ) {
+                        layerAsLayerObj.set(resource.rw_id, 'pending')
+                    } else {
+                        layerAsLayerObj.set(resource.rw_id, 'approved')
+                    }
+                }
+            }
+        }
+    }
+
+    if (
+        initialZustandState &&
+        initialZustandState?.prevRelatedDatasets?.length
+    ) {
+        const datasets = initialZustandState?.prevRelatedDatasets
+        for (const dataset of datasets) {
+            for (const resource of dataset?.resources) {
+                if (resource.format == 'Layer') {
+                    if (
+                        (resource['layerObj'] || resource['layerObjRaw']) &&
+                        !resource.url
+                    ) {
+                        tempLayerAsLayerobj.set(resource.rw_id, 'pending')
+                    } else {
+                        tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                    }
+                }
+            }
+        }
+    }
+
+    if (prevdataset) {
+        for (const resource of prevdataset?.resources) {
+            if (resource.format == 'Layer') {
+                if (
+                    resource['layerObj'] ||
+                    (resource['layerObjRaw'] && !resource.url)
+                ) {
+                    tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')
+                } else {
+                    tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                }
+            }
+        }
+    }
+
     const createStore = useCreateStore({
         ...initialZustandState,
+        layerAsLayerObj: layerAsLayerObj,
+        tempLayerAsLayerobj: tempLayerAsLayerobj,
         mapView: {
             ...initialZustandState?.mapView,
             basemap: initialZustandState?.mapView?.basemap ?? 'dark',
             layers: newLayersState,
             activeLayerGroups,
+            viewState: {
+                ...initialZustandState?.mapView?.viewState,
+                latitude:
+                    initialZustandState?.mapView?.viewState?.latitude ?? 0,
+                longitude:
+                    initialZustandState?.mapView?.viewState?.longitude ?? 0,
+                zoom: initialZustandState?.mapView?.viewState?.zoom ?? 3,
+            },
         },
     })
 
     return (
         <QueryClientProvider client={queryClient}>
-            <DefaultSeo titleTemplate="%s - WRI ODP" />
+            <DefaultSeo
+                titleTemplate="%s - WRI ODP"
+                openGraph={{
+                    images: [
+                        {
+                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
+                            width: 800,
+                            height: 600,
+                            alt: 'Og Image Alt',
+                        },
+                    ],
+                }}
+                twitter={{
+                    handle: '@WorldResources',
+                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
+                    cardType: 'summary_large_image',
+                }}
+            />
             <Hydrate
                 /* @ts-ignore */
                 state={pageProps.dehydratedState}

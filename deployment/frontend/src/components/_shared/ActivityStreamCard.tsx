@@ -1,5 +1,5 @@
 import React from 'react'
-import Image from 'next/image'
+import Image from "next/image"
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 import { TrashIcon, PencilIcon, PlusCircleIcon, UserGroupIcon, BuildingLibraryIcon, UserIcon } from '@heroicons/react/24/outline';
@@ -45,7 +45,7 @@ export default function ActivityStreamCard({ activity }: { activity: activity })
       </DefaultTooltip>
 
       <div className='flex flex-col'>
-        <p className=' line-clamp-1 font-normal text-base'>{activity.description}</p>
+        <p className=' line-clamp-1 font-normal text-base'>{activity.description.replace(" the package ", " the dataset ")}</p>
         <span className='font-normal text-xs text-wri-dark-gray'>{activity.time}</span>
       </div>
     </div>

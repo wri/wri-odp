@@ -3,9 +3,12 @@ from typing import Optional
 import sqlalchemy
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import JSONB
+from ckanext.wri.model.resource_location import ResourceLocation
 
 import ckan.model.meta as meta
 from ckan.common import _
+
+from .sql_context import sql_session_scope
 
 
 log = logging.getLogger(__name__)
@@ -35,56 +38,13 @@ class PendingDatasets(object):
 
     @classmethod
     def get(cls, package_id: str) -> Optional[dict]:
-        try:
+        with sql_session_scope(raise_exceptions=False) as session:
             pending_dataset = (
-                meta.Session.query(PendingDatasets)
+                session.query(PendingDatasets)
                 .filter(PendingDatasets.package_id == package_id)
-                .one()
+                .one_or_none()
             )
-            return {
-                "package_id": pending_dataset.package_id,
-                "package_data": pending_dataset.package_data,
-                "last_modified": pending_dataset.last_modified,
-            }
-        except Exception as e:
-            log.error(e)
-
-    @classmethod
-    def create(
-        cls,
-        package_id: str,
-        package_data: dict,
-    ) -> Optional[dict]:
-        try:
-            pending_dataset = PendingDatasets(package_id, package_data)
-            meta.Session.add(pending_dataset)
-            meta.Session.commit()
-            return {
-                "package_id": pending_dataset.package_id,
-                "package_data": pending_dataset.package_data,
-                "last_modified": pending_dataset.last_modified,
-            }
-        except Exception as e:
-            log.error(e)
-            meta.Session.rollback()
-            raise
-
-    @classmethod
-    def update(
-        cls,
-        package_id: str,
-        package_data: dict,
-    ) -> Optional[dict]:
-        try:
-            pending_dataset = (
-                meta.Session.query(PendingDatasets)
-                .filter(PendingDatasets.package_id == package_id)
-                .one()
-            )
-
             if pending_dataset:
-                pending_dataset.package_data = package_data
-                meta.Session.commit()
                 return {
                     "package_id": pending_dataset.package_id,
                     "package_data": pending_dataset.package_data,
@@ -94,23 +54,75 @@ class PendingDatasets(object):
                 log.error(_(f"Pending Dataset not found: {package_id}"))
                 return
 
-        except Exception as e:
-            log.error(e)
-            meta.Session.rollback()
+    @classmethod
+    def create(
+        cls,
+        package_id: str,
+        package_data: dict,
+    ) -> Optional[dict]:
+        with sql_session_scope() as session:
+            pending_dataset = PendingDatasets(package_id, package_data)
+            session.add(pending_dataset)
+            session.commit()
+            session.refresh(pending_dataset)
+
+            package_data = ResourceLocation.index_dataset_resources_by_location(
+                package_data, True
+            )
+
+            return {
+                "package_id": pending_dataset.package_id,
+                "package_data": package_data,
+                "last_modified": pending_dataset.last_modified,
+            }
+
+    @classmethod
+    def update(
+        cls,
+        package_id: str,
+        package_data: dict,
+    ) -> Optional[dict]:
+        with sql_session_scope(raise_exceptions=False) as session:
+            pending_dataset = (
+                session.query(PendingDatasets)
+                .filter(PendingDatasets.package_id == package_id)
+                .one_or_none()
+            )
+
+            if pending_dataset:
+                pending_dataset.package_data = package_data
+                session.commit()
+                session.refresh(pending_dataset)
+
+                package_data = ResourceLocation.index_dataset_resources_by_location(
+                    package_data, True
+                )
+
+                return {
+                    "package_id": pending_dataset.package_id,
+                    "package_data": package_data,
+                    "last_modified": pending_dataset.last_modified,
+                }
+            else:
+                log.error(_(f"Pending Dataset not found: {package_id}"))
+                return
 
     @classmethod
     def delete(cls, package_id: str) -> None:
-        try:
-            pending_dataset = meta.Session.query(PendingDatasets).filter(
-                PendingDatasets.package_id == package_id
-            ).one()
-            log.error(pending_dataset)
-            meta.Session.delete(pending_dataset)
-            meta.Session.commit()
-            return pending_dataset
-        except Exception as e:
-            log.error(e)
-            meta.Session.rollback()
+        with sql_session_scope() as session:
+            pending_dataset = (
+                session.query(PendingDatasets)
+                .filter(PendingDatasets.package_id == package_id)
+                .one_or_none()
+            )
+            if pending_dataset:
+                session.delete(pending_dataset)
+                session.refresh(pending_dataset)
+
+                return pending_dataset
+            else:
+                log.error(_(f"Pending Dataset not found: {package_id}"))
+                return
 
 
 meta.mapper(PendingDatasets, pending_datasets)

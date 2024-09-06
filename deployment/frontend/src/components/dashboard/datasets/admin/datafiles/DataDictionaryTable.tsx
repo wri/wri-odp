@@ -30,13 +30,10 @@ export function DataDictionaryTable({
                         Field
                     </TableHead>
                     <TableHead className="font-acumin text-xs font-semibold text-black">
+                        Label
+                    </TableHead>
+                    <TableHead className="font-acumin text-xs font-semibold text-black">
                         Type
-                    </TableHead>
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Null
-                    </TableHead>
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Key
                     </TableHead>
                     <TableHead className="font-acumin text-xs font-semibold text-black">
                         Default
@@ -56,8 +53,9 @@ export function DataDictionaryTable({
                         <TableCell>
                             <input
                                 {...register(
-                                    `resources.${resourceIndex}.schema.${index}.field`
+                                    `resources.${resourceIndex}.schema.${index}.id`
                                 )}
+                                disabled
                                 type="text"
                                 className="p-0 border-0 ring-0 ring-offset-0"
                             />
@@ -66,7 +64,7 @@ export function DataDictionaryTable({
                             <input
                                 type="text"
                                 {...register(
-                                    `resources.${resourceIndex}.schema.${index}.type`
+                                    `resources.${resourceIndex}.schema.${index}.info.label`
                                 )}
                                 className="p-0 border-0 ring-0 ring-offset-0"
                             />
@@ -74,28 +72,20 @@ export function DataDictionaryTable({
                         <TableCell>
                             <select
                                 {...register(
-                                    `resources.${resourceIndex}.schema.${index}.null`
+                                    `resources.${resourceIndex}.schema.${index}.info.type_override`
                                 )}
-                                className="p-0 border-0 ring-0 ring-offset-0 appearance-none bg-none"
+                                className="p-0 border-0 ring-0 ring-offset-0 w-full"
                             >
-                                <option value="YES">YES</option>
-                                <option value="NO">NO</option>
+                                <option value="text">String</option>
+                                <option value="numeric">Number</option>
+                                <option value="timestamp">Datetime</option>
                             </select>
                         </TableCell>
                         <TableCell>
                             <input
                                 type="text"
                                 {...register(
-                                    `resources.${resourceIndex}.schema.${index}.key`
-                                )}
-                                className="p-0 border-0 ring-0 ring-offset-0"
-                            />
-                        </TableCell>
-                        <TableCell>
-                            <input
-                                type="text"
-                                {...register(
-                                    `resources.${resourceIndex}.schema.${index}.default`
+                                    `resources.${resourceIndex}.schema.${index}.info.default`
                                 )}
                                 className="p-0 border-0 ring-0 ring-offset-0"
                             />

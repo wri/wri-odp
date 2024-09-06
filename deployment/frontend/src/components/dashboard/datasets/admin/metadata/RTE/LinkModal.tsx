@@ -1,7 +1,10 @@
 import React from 'react'
 import ReactModal from 'react-modal'
 import * as Icons from './Icons'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
 import { Button } from '@/components/_shared/Button'
 
 interface IProps extends ReactModal.Props {

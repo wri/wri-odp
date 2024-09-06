@@ -14,4 +14,5 @@ export const updateFrequencyLabels = {
     daily: 'Daily',
     hourly: 'Hourly',
     as_needed: 'As Needed',
+    not_planned: 'Not Planned',
 }

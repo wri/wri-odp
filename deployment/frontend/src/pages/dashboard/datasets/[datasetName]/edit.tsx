@@ -10,13 +10,16 @@ import { getServerAuthSession } from '@/server/auth'
 import { P, match } from 'ts-pattern'
 import EditDatasetForm from '@/components/dashboard/datasets/admin/EditDatasetForm'
 import { useRouter } from 'next/router'
-import Modal from '@/components/_shared/Modal'
+import dynamic from 'next/dynamic'
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+})
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import notify from '@/utils/notify'
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { useState } from 'react'
-import Container from '@/components/_shared/Container'
+import { getOneDataset, getOnePendingDataset } from '@/utils/apiUtils'
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ datasetName: string }>
@@ -28,17 +31,50 @@ export async function getServerSideProps(
         transformer: superjson,
     })
     const datasetName = context.params?.datasetName as string
-    await helpers.teams.getAllTeams.prefetch()
-    await helpers.tags.getAllTags.prefetch()
-    await helpers.topics.getTopicsHierarchy.prefetch()
-    await helpers.dataset.getLicenses.prefetch()
-    await helpers.dataset.getOneDataset.prefetch({ id: datasetName })
-    await helpers.dataset.getDatasetCollaborators.prefetch({ id: datasetName })
-    return {
-        props: {
-            trpcState: helpers.dehydrate(),
-            datasetName,
-        },
+    try {
+        const prevdataset = await getOneDataset(datasetName, session)
+
+        const pendingDataset = await getOnePendingDataset(
+            prevdataset.id,
+            session
+        )
+        let initialDataset = prevdataset
+        const pendingExist =
+            pendingDataset && Object.keys(pendingDataset).length > 0
+                ? true
+                : false
+
+        if (pendingExist && pendingDataset) {
+            initialDataset = pendingDataset
+        }
+
+        await helpers.teams.getAllTeams.prefetch()
+        await helpers.tags.getAllTags.prefetch()
+        await helpers.topics.getTopicsHierarchy.prefetch()
+        await helpers.dataset.getLicenses.prefetch()
+        await helpers.dataset.getOneActualOrPendingDataset.prefetch({
+            id: initialDataset.id,
+            isPending: pendingExist,
+        })
+        await helpers.dataset.getDatasetCollaborators.prefetch({
+            id: datasetName,
+        })
+        return {
+            props: {
+                trpcState: helpers.dehydrate(),
+                datasetName,
+                pendingExist,
+                datasetId: initialDataset.id,
+            },
+        }
+    } catch (e) {
+        return {
+            props: {
+                redirect: {
+                    destination: '/datasets/404',
+                },
+            },
+        }
     }
 }
 
@@ -47,14 +83,21 @@ export default function EditDatasetPage(
 ) {
     const { datasetName } = props
     const [deleteOpen, setDeleteOpen] = useState(false)
+    const pendingExist = props.pendingExist!
+    const datasetId = props.datasetId!
     const router = useRouter()
     const utils = api.useContext()
-    const dataset = api.dataset.getOneDataset.useQuery({
-        id: datasetName,
+    const dataset = api.dataset.getOneActualOrPendingDataset.useQuery({
+        id: datasetId,
+        isPending: pendingExist,
     })
+  console.log('DATASET', dataset)
     const deleteDataset = api.dataset.deleteDataset.useMutation({
         onSuccess: async () => {
-            await utils.dataset.getOneDataset.invalidate({ id: datasetName })
+            await utils.dataset.getOneActualOrPendingDataset.invalidate({
+                id: datasetId,
+                isPending: pendingExist,
+            })
             setDeleteOpen(false)
             notify(
                 `Successfully deleted the ${
@@ -65,7 +108,7 @@ export default function EditDatasetPage(
             router.push('/dashboard/datasets')
         },
         onError: (error) => {
-            console.log('Delete error', error)
+            console.error(error)
             setDeleteOpen(false)
         },
     })
@@ -81,7 +124,6 @@ export default function EditDatasetPage(
 
     return (
         <>
-            {' '}
             <Modal
                 open={deleteOpen}
                 setOpen={setDeleteOpen}
@@ -112,7 +154,7 @@ export default function EditDatasetPage(
                     <LoaderButton
                         variant="destructive"
                         loading={deleteDataset.isLoading}
-                        onClick={() => deleteDataset.mutate(datasetName)}
+                        onClick={() => deleteDataset.mutate(datasetName!)}
                     >
                         Delete Dataset
                     </LoaderButton>
@@ -162,6 +204,7 @@ export default function EditDatasetPage(
                             )
                         )
                         .with({ data: P.select('data') }, ({ data }) => (
+                            //@ts-ignore
                             <EditDatasetForm dataset={data} />
                         ))
                         .otherwise(() => (

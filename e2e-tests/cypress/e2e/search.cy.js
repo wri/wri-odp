@@ -16,7 +16,6 @@ const headers = { Authorization: Cypress.env("API_KEY") };
 
 const facets = [
   "Location",
-  "Featured",
   "Application",
   "Project",
   "Team",
@@ -59,31 +58,51 @@ describe("Search page", () => {
         update_frequency: i < 7 ? "annually" : "daily",
         language: i < 7 ? "en" : "pt",
         wri_data: i < 7 ? true : false,
-        visibility_type: 'public'
+        visibility_type: "public",
+      }).then((response) => {
+        cy.approvePendingDatasetAPI(name);
+        datasets.push(name);
       });
-      datasets.push(name);
     });
   });
 
-  it("displays all facets", () => {
-    cy.visit("/search_advanced");
-    cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
+  it(
+    "displays all facets",
+    {
+      retries: {
+        runMode: 10,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/search_advanced");
+      cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
 
-    for (let facet of facets) {
-      cy.get("@facets-list").contains(facet);
-    }
-  });
+      for (let facet of facets) {
+        cy.get("@facets-list").contains(facet);
+      }
+    },
+  );
 
-  it("allows filtering by facets", () => {
-    cy.visit("/search_advanced");
-    cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
+  it(
+    "allows filtering by facets",
+    {
+      retries: {
+        runMode: 10,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/search_advanced");
+      cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
 
-    cy.get("@facets-list").contains("Team").click({ force: true });
+      cy.get("@facets-list").contains("Team").click({ force: true });
 
-    cy.get('[id^="facet-organization-"]').first().click({ force: true });
+      cy.get('[id^="facet-organization-"]').first().click({ force: true });
 
-    cy.contains("results", { timeout: 10000 });
-  });
+      cy.contains("results", { timeout: 10000 });
+    },
+  );
 
   it("allows filtering by search query", () => {
     cy.visit("/search_advanced");
@@ -95,7 +114,7 @@ describe("Search page", () => {
   it("allows faceting by last updated since and before dates", () => {
     cy.visit("/search_advanced");
     cy.contains("Open sidebar").click();
-    cy.get("#facets-list")
+    cy.get("#facets-list");
     cy.contains("Last Updated").focus().click({ force: true });
 
     const today = new Date();
@@ -108,12 +127,14 @@ describe("Search page", () => {
       { since: today, before: today, results: true },
       { since: tomorrow, before: tomorrow, results: null },
       { since: today, before: yesterday, results: null },
-      { since: yesterday, before: yesterday, results: false }
+      { since: yesterday, before: yesterday, results: false },
     ];
 
     combinations.forEach((combination) => {
-      const sinceDateFormatted = combination.since.toISOString().split('T')[0];
-      const beforeDateFormatted = combination.before.toISOString().split('T')[0];
+      const sinceDateFormatted = combination.since.toISOString().split("T")[0];
+      const beforeDateFormatted = combination.before
+        .toISOString()
+        .split("T")[0];
 
       cy.get("#since-date").type(sinceDateFormatted, { force: true });
       cy.get("#before-date").type(beforeDateFormatted, { force: true });

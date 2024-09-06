@@ -5,6 +5,7 @@ import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
 import type { WriDataset } from '@/schema/ckan.schema'
 import { formatDate } from '@/utils/general'
 import { useRouter } from 'next/router'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
 function subFields(dataset: WriDataset) {
     return [
@@ -34,20 +35,59 @@ function subFields(dataset: WriDataset) {
             title: 'Team',
             description: dataset?.organization?.title,
         },
+        {
+            title: 'Release Notes',
+            description: dataset?.release_notes,
+            isHtml: true,
+        },
     ]
+}
+
+function ApprovalDatasetCardProfile({ dataset }: { dataset: WriDataset }) {
+    const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
+
+    return (
+        <div className="flex  py-3 rounded-md pl-4 sm:pl-14 gap-x-2">
+            {dataset.approval_status === 'pending' ? (
+                <DefaultTooltip content="pending" side="bottom">
+                    <div className="w-2 h-2 rounded-full bg-wri-gold my-auto "></div>
+                </DefaultTooltip>
+            ) : dataset.approval_status === 'rejected' ? (
+                <DefaultTooltip content="rejected" side="bottom">
+                    <div className="w-2 h-2 rounded-full bg-red-700 my-auto "></div>
+                </DefaultTooltip>
+            ) : (
+                ''
+            )}
+            <div className="flex flex-col w-full">
+                <p className="font-semibold text-[15px]">
+                    {dataset?.title ?? dataset?.name}
+                </p>
+                <div className="flex font-normal">
+                    <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />
+                    <div className="ml-1 w-fit h-[12px] text-[12px] text-[#666666]">
+                        {formatDate(created)}
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
 function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
     const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
+
     return (
-        <div className="flex flex-col p-1 py-3 rounded-md pl-4 sm:pl-14">
-            <p className="font-semibold text-[15px]">
-                {dataset?.title ?? dataset?.name}
-            </p>
-            <div className="flex font-normal">
-                <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />
-                <div className="ml-1 w-fit h-[12px] text-[12px] text-[#666666]">
-                    {formatDate(created)}
+        <div className="flex  py-3 rounded-md pl-4 sm:pl-14 gap-x-2">
+            <div className="flex flex-col w-full">
+                <p className="font-semibold text-[15px]">
+                    {dataset?.title ?? dataset?.name}
+                </p>
+                <div className="flex font-normal">
+                    <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />
+                    <div className="ml-1 w-fit h-[12px] text-[12px] text-[#666666]">
+                        {formatDate(created)}
+                    </div>
                 </div>
             </div>
         </div>
@@ -67,7 +107,16 @@ function SubCardProfile({ dataset }: { dataset: WriDataset }) {
                                 {item.title}
                             </p>
                             <p className="font-normal text-[14px] text-[#4B4B4B]">
-                                {item.description}
+                                {!item.isHtml ? (
+                                    item.description
+                                ) : (
+                                    <div
+                                        className="prose max-w-none prose-sm pr-8 text-justify prose-a:text-wri-green"
+                                        dangerouslySetInnerHTML={{
+                                            __html: item?.description ?? '',
+                                        }}
+                                    ></div>
+                                )}
                             </p>
                         </div>
                     )
@@ -121,6 +170,57 @@ export default function DatasetRow({
             linkButton={{
                 label: 'View dataset',
                 link: `../datasets/${dataset.name}`,
+            }}
+            rowSub={<SubCardProfile dataset={dataset} />}
+            isDropDown
+        />
+    )
+}
+
+export function ApprovalDatasetRow({
+    className,
+    dataset,
+    handleOpenModal,
+    authorized,
+}: {
+    className?: string
+    dataset: WriDataset
+    authorized?: boolean
+    handleOpenModal: (dataset: WriDataset) => void
+}) {
+    const router = useRouter()
+    return (
+        <Row
+            authorized={authorized}
+            className={`pr-2 sm:pr-4 ${className ? className : ''}`}
+            rowMain={<ApprovalDatasetCardProfile dataset={dataset} />}
+            controlButtons={[
+                {
+                    label: 'Edit',
+                    color: 'bg-wri-gold hover:bg-yellow-400',
+                    icon: <PencilSquareIcon className="w-4 h-4 text-white" />,
+                    tooltip: {
+                        id: `edit-tooltip-${dataset.name}`,
+                        content: 'Edit dataset',
+                    },
+                    onClick: () => {
+                        router.push(`/dashboard/datasets/${dataset.name}/edit`)
+                    },
+                },
+                {
+                    label: 'Delete',
+                    color: 'bg-red-600 hover:bg-red-500',
+                    icon: <TrashIcon className="w-4 h-4 text-white" />,
+                    tooltip: {
+                        id: `delete-tooltip-${dataset.name}`,
+                        content: 'Delete dataset',
+                    },
+                    onClick: () => handleOpenModal(dataset),
+                },
+            ]}
+            linkButton={{
+                label: 'View Issues',
+                link: `../datasets/${dataset.name}?tab=issues`,
             }}
             rowSub={<SubCardProfile dataset={dataset} />}
             isDropDown

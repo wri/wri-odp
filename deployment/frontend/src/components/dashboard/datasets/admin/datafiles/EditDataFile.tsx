@@ -3,6 +3,7 @@ import {
     GlobeAsiaAustraliaIcon,
     PaperClipIcon,
     MinusCircleIcon,
+    InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 import { UseFormReturn } from 'react-hook-form'
 import { DataFileAccordion } from './DatafileAccordion'
@@ -13,28 +14,35 @@ import { Tab } from '@headlessui/react'
 import { Fragment, useState } from 'react'
 import classNames from '@/utils/classnames'
 import { DataDictionaryTable } from './DataDictionaryTable'
-import { InputGroup } from '../metadata/InputGroup'
-import { ErrorDisplay } from '@/components/_shared/InputGroup'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { Input } from '@/components/_shared/SimpleInput'
 import FormatInput from './FormatInput'
+import { Datapusher, DatapusherStatus } from './Datapusher'
 import { LoaderButton } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
+import ViewsList from '@/components/views/ViewsList'
+import { WriDataset } from '@/schema/ckan.schema'
+import { DatafileLocation } from './DatafileLocation'
+import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
 
 export function EditDataFile({
     remove,
     field,
     index,
     formObj,
+    dataset,
 }: {
     remove: () => void
     index: number
     field: ResourceFormType
     formObj: UseFormReturn<DatasetFormType>
+    dataset: WriDataset
 }) {
     const {
         watch,
@@ -42,25 +50,34 @@ export function EditDataFile({
         formState: { errors },
     } = formObj
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const editResource = api.dataset.editResource.useMutation({
-        onSuccess: async ({ title, name, id }) => {
-            notify(
-                `Successfully edited the "${title ?? name ?? id}" resource`,
-                'success'
-            )
-        },
-        onError: (error) => {
-            setErrorMessage(error.message)
-        },
-    })
+    const allDataFiles = watch('resources')
+    const notLayers = allDataFiles.filter(
+        (datafile) =>
+            datafile.type === 'upload' ||
+            datafile.type === 'link' ||
+            datafile.type === 'empty-file'
+    )
+    const notLayersCount = notLayers.length ?? 0
 
     const datafile = watch(`resources.${index}`)
+
+    const isLayer =
+        datafile.type !== 'upload' &&
+        datafile.type !== 'link' &&
+        datafile.type !== 'empty-file'
+
+    const heading = isLayer
+        ? `Layer ${index + 1 - notLayersCount}`
+        : `Data File ${index + 1}`
+
     return (
         <>
             <DataFileAccordion
+                id={`datafile-accordion-${datafile.id}`}
                 icon={<></>}
-                title={`Data File ${index + 1}`}
+                title={`${heading}`}
                 className="py-0"
+                remove={remove}
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
                         {match(datafile.type)
@@ -71,13 +88,14 @@ export function EditDataFile({
                                         <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
                                             {datafile.name}
                                         </span>
-                                        <span className="font-['Acumin Pro SemiCondensed'] mt-0.5 text-right text-xs font-normal leading-tight text-neutral-500">
+                                        <span className="font-['Acumin Pro SemiCondensed'] mt-0.5 text-right text-xs font-normal leading-tight text-neutral-600">
                                             {datafile.size
                                                 ? convertBytes(datafile.size)
                                                 : 'N/A'}
                                         </span>
                                     </div>
                                     <button
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -94,6 +112,7 @@ export function EditDataFile({
                                         </span>
                                     </div>
                                     <button
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -110,6 +129,7 @@ export function EditDataFile({
                                         </span>
                                     </div>
                                     <button
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -121,6 +141,7 @@ export function EditDataFile({
                                 <>
                                     <div className="flex items-center gap-x-2"></div>
                                     <button
+                                        aria-label="remove"
                                         type="button"
                                         onClick={() => remove()}
                                     >
@@ -154,6 +175,7 @@ export function EditDataFile({
                         </span>
                     </div>
                     <button
+                        aria-label="remove"
                         type="button"
                         id={`remove_${index}_datafile`}
                         onClick={() => remove()}
@@ -178,7 +200,7 @@ export function EditDataFile({
                                             {({ selected }) => (
                                                 <div
                                                     className={classNames(
-                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
                                                         selected
                                                             ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                             : 'text-black'
@@ -197,7 +219,7 @@ export function EditDataFile({
                                             {({ selected }) => (
                                                 <div
                                                     className={classNames(
-                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                        'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer views-tab',
                                                         selected
                                                             ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                             : 'text-black'
@@ -208,7 +230,7 @@ export function EditDataFile({
                                                             : undefined
                                                     }
                                                 >
-                                                    Views
+                                                    Add and View Charts
                                                 </div>
                                             )}
                                         </Tab>
@@ -218,7 +240,7 @@ export function EditDataFile({
                                                     {({ selected }) => (
                                                         <div
                                                             className={classNames(
-                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap',
+                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
                                                                 selected
                                                                     ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                                     : 'text-black'
@@ -234,6 +256,45 @@ export function EditDataFile({
                                                     )}
                                                 </Tab>
                                             )}
+                                        {[
+                                            'xls',
+                                            'xlsx',
+                                            'ods',
+                                            'xlsm',
+                                            'xlsb',
+                                            'csv',
+                                            'tsv',
+                                            'tab',
+                                        ].includes(
+                                            datafile.format?.toLowerCase() ??
+                                                'none'
+                                        ) &&
+                                            datafile.url_type === 'upload' && (
+                                                <Tab as={Fragment}>
+                                                    {({ selected }) => (
+                                                        <div
+                                                            className={classNames(
+                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
+                                                                selected
+                                                                    ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
+                                                                    : 'text-black'
+                                                            )}
+                                                            aria-current={
+                                                                selected
+                                                                    ? 'page'
+                                                                    : undefined
+                                                            }
+                                                        >
+                                                            Datapusher{' '}
+                                                            <DatapusherStatus
+                                                                datafile={
+                                                                    datafile
+                                                                }
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </Tab>
+                                            )}
                                     </div>
                                 </Tab.List>
                                 <Tab.Panels className="px-4 sm:px-6 xxl:px-0 py-4">
@@ -242,7 +303,7 @@ export function EditDataFile({
                                             <InputGroup
                                                 label="Title"
                                                 required
-                                                className="whitespace-nowrap"
+                                                className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <Input
                                                     placeholder="Some name"
@@ -259,7 +320,7 @@ export function EditDataFile({
                                             </InputGroup>
                                             <InputGroup
                                                 label="Description"
-                                                className="whitespace-nowrap"
+                                                className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <TextArea
                                                     placeholder="Add description"
@@ -272,7 +333,7 @@ export function EditDataFile({
                                             </InputGroup>
                                             <InputGroup
                                                 label="Format"
-                                                className="whitespace-nowrap"
+                                                className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <div className="max-w-[55rem] w-full">
                                                     <FormatInput
@@ -281,15 +342,62 @@ export function EditDataFile({
                                                     />
                                                 </div>
                                             </InputGroup>
+                                            <InputGroup
+                                                label={
+                                                    <span className="flex items-center gap-x-1">
+                                                        Advanced API Usage
+                                                        <DefaultTooltip content="This field will end up in the Datafile API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
+                                                            <InformationCircleIcon className="h-5 w-5" />
+                                                        </DefaultTooltip>
+                                                    </span>
+                                                }
+                                                className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                                            >
+                                                <SimpleEditor
+                                                    formObj={formObj}
+                                                    name={`resources.${index}.advanced_api_usage`}
+                                                    className="min-h-[320px]"
+                                                    defaultValue=""
+                                                />
+                                            </InputGroup>
+                                            <DatafileLocation
+                                                formObj={formObj}
+                                                index={index}
+                                            />
                                         </div>
                                     </Tab.Panel>
-                                    <Tab.Panel></Tab.Panel>
+                                    <Tab.Panel>
+                                        <ViewsList
+                                            provider="datastore"
+                                            datafile={datafile as any}
+                                            dataset={dataset}
+                                        />
+                                    </Tab.Panel>
                                     {datafile.schema &&
                                         datafile.schema.length > 0 && (
                                             <Tab.Panel>
                                                 <DataDictionaryTable
                                                     formObj={formObj}
                                                     resourceIndex={index}
+                                                />
+                                            </Tab.Panel>
+                                        )}
+                                    {[
+                                        'xls',
+                                        'xlsx',
+                                        'ods',
+                                        'xlsm',
+                                        'xlsb',
+                                        'csv',
+                                        'tsv',
+                                        'tab',
+                                    ].includes(
+                                        datafile.format?.toLowerCase() ?? 'none'
+                                    ) &&
+                                        datafile.url_type === 'upload' && (
+                                            <Tab.Panel>
+                                                <Datapusher
+                                                    datafile={datafile}
                                                 />
                                             </Tab.Panel>
                                         )}
@@ -307,21 +415,6 @@ export function EditDataFile({
                                 <ErrorAlert text={errorMessage} />
                             </div>
                         )}
-                    </div>
-                    <div
-                        className={classNames(
-                            'px-4 sm:px-6 xxl:px-0 py-2 w-full flex justify-end',
-                            datafile.type === 'layer' ? 'sm:px-0 px-0' : ''
-                        )}
-                    >
-                        <LoaderButton
-                            variant="muted"
-                            type="button"
-                            onClick={() => editResource.mutate(datafile)}
-                            loading={editResource.isLoading}
-                        >
-                            Update
-                        </LoaderButton>
                     </div>
                 </div>
             </DataFileAccordion>

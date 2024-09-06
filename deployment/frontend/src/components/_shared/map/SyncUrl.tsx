@@ -10,6 +10,7 @@ import {
 import { encodeMapParam } from '@/utils/urlEncoding'
 import { useEffect } from 'react'
 import { useDebounce } from 'usehooks-ts'
+import { env } from '@/env.mjs'
 
 export default function SyncUrl() {
     const { viewState } = useMapState()
@@ -31,6 +32,33 @@ export default function SyncUrl() {
         },
         500
     )
+
+    const debouneMapTrackValue = useDebounce(
+        {
+            zoom: debouncedValue.viewState.zoom,
+            latitude: debouncedValue.viewState.latitude,
+            longitude: debouncedValue.viewState.longitude,
+            layer:
+                activeLayerGroups.length > 0 ? activeLayerGroups[0].layers : [],
+        },
+        1500
+    )
+
+    useEffect(() => {
+        if (debouneMapTrackValue && typeof window !== 'undefined') {
+            if (env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
+                //@ts-ignore
+                dataLayer.push({
+                    event: 'map_events',
+                    lat_coord: debouneMapTrackValue.latitude + '',
+                    long_coord: debouneMapTrackValue.longitude + '',
+                    zoom_level: debouneMapTrackValue.zoom + '',
+                    layer: debouneMapTrackValue.layer.join(','),
+                })
+            }
+        }
+    }, [debouneMapTrackValue])
+
     useEffect(() => {
         if (debouncedValue && typeof window !== 'undefined') {
             const map = encodeMapParam({
@@ -45,6 +73,7 @@ export default function SyncUrl() {
                     currentLayers ? currentLayers.entries() : []
                 ),
             })
+
             updateURLParameter(window.location.href, 'map', map)
         }
     }, [

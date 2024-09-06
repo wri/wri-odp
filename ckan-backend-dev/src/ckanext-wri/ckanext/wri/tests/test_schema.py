@@ -4,10 +4,12 @@ from ckan.logic import NotFound, get_action, ValidationError
 from ckan import model
 import ckan.tests.factories as factories
 from ckan.logic import get_action
+import unittest.mock as mock
 
 
+@mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures(u"with_plugins", u"test_request_context")
-def test_package_create():
+def test_package_create(mail_user):
     userobj = factories.Sysadmin()
     session = model.Session
     context = {
@@ -15,6 +17,7 @@ def test_package_create():
         "user": userobj["name"], "ignore_auth": True,
         "user_obj": userobj
     }
+    context["auth_user_obj"] = model.User.get(context["user"])
 
     organization_dict = factories.Organization()
     group_dict = factories.Group()

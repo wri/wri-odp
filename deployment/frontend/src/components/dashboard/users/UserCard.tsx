@@ -9,7 +9,10 @@ import Spinner from '@/components/_shared/Spinner';
 import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
 import notify from '@/utils/notify'
-import Modal from '@/components/_shared/Modal';
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});;
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
@@ -237,7 +240,7 @@ export default function UserCard({username}: {username: string}) {
                           id: `edit-tooltip-${user.title}`,
                           content: "Edit user"
                         },
-                        onClick: async () => { router.push(`/dashboard/users/edit/${user.title}`) }
+                        onClick: async () => { router.push(`/dashboard/settings/edit/${user.title}`) }
                       },
                       {
                         label: "Delete", color: 'bg-red-600 hover:bg-red-500',

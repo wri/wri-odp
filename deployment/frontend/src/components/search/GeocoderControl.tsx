@@ -32,6 +32,7 @@ export default function GeocoderControl(props: GeocoderControlProps) {
                 marker: false,
                 accessToken: props.mapboxAccessToken,
                 types: 'country,region,place,locality',
+                limit: 8,
             })
             if (
                 props &&

@@ -1,5 +1,3 @@
-version: "3"
-
 volumes:
   ckan_storage:
   pg_data:
@@ -30,52 +28,76 @@ services:
       - ckan_storage:/var/lib/ckan
       - ./src:/srv/app/src_extensions
     restart: unless-stopped
+    image: ${CKAN_IMAGE}
+    #healthcheck:
+    #  test: ["CMD-SHELL", "wget -qO /dev/null http://localhost:5000 || (echo 'Health check failed' > /tmp/ckan-healthcheck.log && wget -O - http://localhost:5000 2>> /tmp/ckan-healthcheck.log && exit 1)"]
+
+      #  frontend:
+      #    container_name: wri-frontend
+      #    build:
+      #      context: ../deployment/frontend/
+      #      args:
+      #        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000
+      #    environment:
+      #      - NEXTAUTH_SECRET=secret
+      #      - NEXTAUTH_URL=http://localhost:3000
+      #      - CKAN_URL=http://ckan-dev:5000
+      #      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      #      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+      #      - S3_BUCKET_NAME=ckan
+      #      - S3_BUCKET_REGION=us-east-1
+      #      - RW_API_KEY=${RW_API_KEY}
+      #      - AZURE_AD_TENANT_ID=${AZURE_AD_TENANT_ID}
+      #      - AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}
+      #      - AZURE_AD_CLIENT_SECRET=${AZURE_AD_CLIENT_SECRET}
+      #      - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
+      #      - SMTP_SERVER=${SMTP_SERVER}
+      #      - SMTP_PORT=${SMTP_PORT}
+      #      - SMTP_USER=${SMTP_USER}
+      #      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      #      - SMTP_FROM=${SMTP_FROM}
+      #      - PREFECT_INTERNAL_URL=http://prefect:4200
+      #    ports:
+      #      - "0.0.0.0:3000:3000"
+      #    healthcheck:
+      #      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
+
+  prefect:
+    container_name: prefect-server
+    build:
+      context: ./prefect-server
+    restart: always
+    environment:
+      - PREFECT_UI_URL=http://127.0.0.1:4200/api
+      - PREFECT_API_URL=http://127.0.0.1:4200/api
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://ckandbuser:ckandbpassword@db/prefect
+    ports:
+      - "0.0.0.0:4200:4200"
     healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:4200"]
       interval: 40s
       timeout: 30s
       retries: 3
       start_period: 60s
-    image: ${CKAN_IMAGE}
 
-  frontend:
-    container_name: wri-frontend
-    build:
-      context: ../deployment/frontend/
-      args:
-        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000
-    environment:
-      - NEXTAUTH_SECRET=secret
-      - NEXTAUTH_URL=http://localhost:3000
-      - CKAN_URL=http://ckan-dev:5000
-      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
-      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
-      - S3_BUCKET_NAME=ckan
-      - S3_BUCKET_REGION=us-east-1
-      - RW_API_KEY=${RW_API_KEY}
-      - AZURE_AD_TENANT_ID=${AZURE_AD_TENANT_ID}
-      - AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}
-      - AZURE_AD_CLIENT_SECRET=${AZURE_AD_CLIENT_SECRET}
-      - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
-      - SMTP_SERVER=${SMTP_SERVER}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - SMTP_FROM=${SMTP_FROM}
-    depends_on:
-      ckan-dev:
-        condition: service_healthy
-    ports:
-      - "0.0.0.0:3000:3000"
-    healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
-
-  datapusher:
-    container_name: ${DATAPUSHER_CONTAINER_NAME}
-    image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
+  #my-datapusher:
+  #  container_name: my-datapusher
+  #  build:
+  #    context: ../datapusher
+  #  restart: always
+  #  environment:
+  #    - PREFECT_API_URL=http://prefect:4200/api
+  #    - DEPLOYMENT_NAME=datapusher-dev
+  #    - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+  #    - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+  #    - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+  #    - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+  #    - S3_BUCKET_NAME=ckan
+  #    - S3_BUCKET_REGION=us-east-1
+  #  depends_on:
+  #    prefect:
+  #      condition: service_healthy
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}

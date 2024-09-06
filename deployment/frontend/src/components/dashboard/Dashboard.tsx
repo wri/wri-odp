@@ -55,7 +55,7 @@ export default function Dashboard() {
       {
         drag.sortable ? (
           <DefaultTooltip content='save'>
-            <button className="absolute sm:top-[46%] right-0 p-4 rounded-full shadow-wri bg-white z-30"
+            <button aria-label="setting" className="absolute sm:top-[46%] right-0 p-4 rounded-full shadow-wri bg-white z-30"
               onClick={() => {
                 saveState(drag);
               }}
@@ -65,7 +65,7 @@ export default function Dashboard() {
           </DefaultTooltip>
         ) : (
           <DefaultTooltip content='edit'>
-            <button className="absolute sm:top-[46%] right-0  p-4 rounded-full shadow-wri bg-white z-30"
+            <button aria-label="checked" className="absolute sm:top-[46%] right-0  p-4 rounded-full shadow-wri bg-white z-30"
               onClick={
                 () => {
                   setDrag({
@@ -81,17 +81,17 @@ export default function Dashboard() {
       }
 
 
-      <ReactSortable list={state} setList={setState} className={`h-full grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-2 gap-6 xxl:gap-6 ${drag.sortable ? "grid" : "hidden"}`} sort={true} style={{ zIndex: 9999 }}>
+      <ReactSortable list={state} setList={setState} className={`w-[90%] mx-auto sm:w-full h-full grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-2 gap-6 xxl:gap-6 ${drag.sortable ? "grid" : "hidden"}`} sort={true} style={{ zIndex: 9999 }}>
         {state.map((item) => (
-          <div key={item.id} className="  w-full h-[463px] relative">
+          <div key={item.id} className="w-full sm:h-[463px] relative">
             <SelectComponent name={item.name} drag={true} key={item.name} />
           </div>
         ))}
       </ReactSortable>
 
-      <div className={`h-full grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-2 gap-6 xxl:gap-6 ${drag.sortable ? "hidden" : "grid"}`} >
+      <div className={`w-[90%] mx-auto sm:w-full h-full grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-2 gap-6 xxl:gap-6 ${drag.sortable ? "hidden" : "grid"}`} >
         {state.map((item) => (
-          <div key={item.id} className="  w-full h-[463px] relative">
+          <div key={item.id} className="  w-full sm:h-[463px] relative">
             <SelectComponent name={item.name} drag={false} />
           </div>
         ))}

@@ -19,7 +19,7 @@ class Layer extends PureComponent<LayerProps> {
         opacity: 1,
         visibility: true,
         zIndex: undefined,
-        threshold: 30,
+        threshold: 20,
         source: {},
         _ogSource: {},
         render: {},

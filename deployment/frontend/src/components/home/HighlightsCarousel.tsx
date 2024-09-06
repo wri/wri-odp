@@ -7,6 +7,9 @@ import CarouselNavButton from '../_shared/CarouselNavButton'
 import HighlightCard from '../HighlightCard'
 import { AutoCarousel } from '../_shared/AutoCarousel'
 import { WriDataset } from '@/schema/ckan.schema'
+import { api } from '@/utils/api'
+import { ErrorAlert } from '../_shared/Alerts'
+import Spinner from '../_shared/Spinner'
 
 export interface TopicProps {
     title: string
@@ -90,6 +93,17 @@ const highlights = [
 ]
 
 export function HighlightsCarousel() {
+    const {
+        data: featuredDatasets,
+        isLoading: isLoadingFeaturedDatasets,
+        error: errorFeaturedDatasets,
+    } = api.dataset.getFeaturedDatasets.useQuery({
+        search: '',
+        page: { start: 0, rows: 8 },
+        sortBy: 'metadata_modified desc',
+        _isUserSearch: false,
+        removeUnecessaryDataInResources: true,
+    })
     return (
         <div className="relative">
             <div className="peer">
@@ -98,10 +112,23 @@ export function HighlightsCarousel() {
                     prevButton={<PrevButton />}
                     nextButton={<NextButton />}
                 >
-                    {highlights.map((highlight) => (
-                        <SwiperSlide key={highlight.title} className="">
+                    {errorFeaturedDatasets && (
+                        <ErrorAlert
+                            title="Error loading highlight"
+                            text={errorFeaturedDatasets.message}
+                        />
+                    )}
+
+                    {isLoadingFeaturedDatasets && (
+                        <div className="w-full flex justify-center">
+                            <Spinner />
+                        </div>
+                    )}
+
+                    {featuredDatasets?.datasets.map((highlight, index) => (
+                        <SwiperSlide key={index} className="">
                             <div className="w-72 pr-6">
-                                <HighlightCard highlight={highlight as any} />
+                                <HighlightCard highlight={highlight} />
                             </div>
                         </SwiperSlide>
                     ))}

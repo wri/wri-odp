@@ -27,14 +27,7 @@ services:
       - ./src:/srv/app/src_extensions
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
-
-  datapusher:
-    container_name: ${DATAPUSHER_CONTAINER_NAME}
-    image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://ckan-dev:5000"]
 
   frontend:
     container_name: wri-frontend
@@ -42,6 +35,11 @@ services:
       context: ../deployment/frontend/
       args:
         - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000
+        - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
+        - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
+        - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
+        - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
+        - NEXT_PUBLIC_GFW_API_KEY="1111"
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
@@ -60,13 +58,59 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM=${SMTP_FROM}
+      - PREFECT_INTERNAL_URL=http://prefect:4200
+      - NEXT_PUBLIC_GFW_API_KEY="1111"
     depends_on:
       ckan-dev:
         condition: service_healthy
+      prefect:
+        condition: service_healthy
+      my-datapusher:
+        condition: service_started
     ports:
       - "0.0.0.0:3000:3000"
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
+
+  prefect:
+    container_name: prefect-server
+    build:
+      context: ./prefect-server
+    restart: always
+    environment:
+      - PREFECT_UI_URL=http://prefect:4200/api
+      - PREFECT_API_URL=http://prefect:4200/api
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://ckandbuser:ckandbpassword@db/prefect
+    ports:
+      - "0.0.0.0:4200:4200"
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:4200"]
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      ckan-dev:
+        condition: service_healthy
+
+  my-datapusher:
+    container_name: my-datapusher
+    build:
+      context: ../datapusher
+    restart: always
+    environment:
+      - PREFECT_API_URL=http://prefect:4200/api
+      - DEPLOYMENT_NAME=datapusher-dev
+      - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+      - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+      - S3_BUCKET_NAME=ckan
+      - S3_BUCKET_REGION=us-east-1
+    depends_on:
+      prefect:
+        condition: service_healthy
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}

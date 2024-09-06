@@ -20,6 +20,8 @@ import Tooltip from './preview/Tooltip'
 import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import LayerManagerPreview from './preview/LayerManagerPreview'
+import { slugify } from '@/utils/slugify'
+import { SafeParseSuccess } from 'zod'
 
 export function BuildALayer({
     formObj,
@@ -32,9 +34,15 @@ export function BuildALayer({
     const [preview, setPreview] = useState<APILayerSpec | null>(
         formObj.getValues(`resources.${index}.layerObj`)
             ? convertFormToLayerObj(
-                  layerSchema.parse(
+                  !layerSchema.safeParse(
                       formObj.getValues(`resources.${index}.layerObj`)
-                  )
+                  ).success
+                      ? formObj.getValues(`resources.${index}.layerObj`)
+                      : (
+                            layerSchema.safeParse(
+                                formObj.getValues(`resources.${index}.layerObj`)
+                            ) as SafeParseSuccess<any>
+                        ).data
               )
             : null
     )
@@ -62,6 +70,7 @@ export function BuildALayer({
         const layerObjRaw = getRawObjFromApiSpec(
             convertFormToLayerObj(layerFormObj.getValues())
         )
+        formObj.setValue(`resources.${index}.rw_id`, layerObjRaw.id ?? '')
         formObj.setValue(`resources.${index}.layerObjRaw`, layerObjRaw)
         formObj.setValue(`resources.${index}.layerObj`, null)
     }
@@ -71,16 +80,19 @@ export function BuildALayer({
         formObj.setValue(`resources.${index}.layerObj`, values)
     }
 
+    useEffect(() => {
+        syncValues()
+    }, [layerFormObj.watch()])
+
     const updatePreview = () => {
         syncValues()
-        console.log('UPDATING PREVIEW', layerFormObj.getValues())
         setPreview(convertFormToLayerObj(layerFormObj.getValues()))
     }
 
     const {
         watch,
         setValue,
-        formState: { dirtyFields },
+        formState: { dirtyFields, touchedFields },
     } = layerFormObj
     useEffect(() => {
         if (!dirtyFields['connectorUrl'])
@@ -98,6 +110,23 @@ export function BuildALayer({
         watch('layerConfig.source.provider.layers.0.options.sql'),
     ])
 
+    useEffect(() => {
+        if (!dirtyFields['slug']) setValue('slug', slugify(watch('name')))
+    }, [watch('name')])
+    useEffect(() => {
+        syncValues()
+        if (
+            Object.keys(dirtyFields).length > 0 ||
+            Object.keys(touchedFields).length > 0
+        ) {
+            const dirty = Object.keys(dirtyFields)
+            const touched = Object.keys(touchedFields)
+            dirty.push(...touched)
+            //session storage
+            sessionStorage.setItem('dirtyFields', JSON.stringify(dirty))
+        }
+    }, [watch()])
+
     return (
         <FormProvider {...layerFormObj}>
             <Steps state={current.toStrings()[0] ?? 'setSourceConfig'} />
@@ -114,6 +143,8 @@ export function BuildALayer({
                                     ? send('GO_TO_RENDER')
                                     : send('GO_TO_LEGEND')
                             }}
+                            formObj={formObj}
+                            index={index}
                         />
                     )}
                     {current.matches('setRenderConfig') && (
@@ -175,6 +206,7 @@ export function PreviewMap({
     layerFormObj: APILayerSpec | null
     updatePreview?: () => void
 }) {
+    const [isReady, setReady] = useState(false)
     const [viewState, setViewState] = useState({
         longitude: -100,
         latitude: 40,
@@ -206,7 +238,6 @@ export function PreviewMap({
     }) => {
         setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat })
         const layersInfo = []
-        console.log('LAYERS INSIDE ON CLICK', layers)
         for (let layer of layers) {
             const feature = features?.find(
                 //  @ts-ignore
@@ -214,7 +245,6 @@ export function PreviewMap({
             )
             const { interactionConfig } = layer
 
-            console.log('FOUND INTERACTION CONFIG', interactionConfig)
             const layerInfo = {
                 id: layer.id,
                 name: layer.name ?? 'sample-name',
@@ -258,15 +288,20 @@ export function PreviewMap({
                         mapRef.current = _map.getMap() as unknown as MapRef
                 }}
                 mapStyle="mapbox://styles/mapbox/light-v9"
-                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                dragRotate={false}
+                touchZoomRotate={false}
+                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                 onMove={(evt) => setViewState(evt.viewState)}
                 onClick={onClickLayer}
                 interactiveLayerIds={interactiveLayerIds ?? []}
+                onLoad={() => {
+                    setReady(true)
+                }}
                 style={{
                     height: '400px',
                 }}
             >
-                {layerFormObj && (
+                {isReady && layerFormObj && (
                     <LayerManagerPreview layers={[layerFormObj]} />
                 )}
                 <Tooltip

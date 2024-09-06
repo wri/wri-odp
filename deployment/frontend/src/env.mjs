@@ -39,6 +39,7 @@ export const env = createEnv({
         SMTP_USER: z.string(),
         SMTP_PASSWORD: z.string(),
         SMTP_FROM: z.string(),
+        PREFECT_INTERNAL_URL: z.string(),
     },
 
     /**
@@ -48,6 +49,11 @@ export const env = createEnv({
      */
     client: {
         NEXT_PUBLIC_CKAN_URL: z.string(),
+        NEXT_PUBLIC_NEXTAUTH_URL: z.string(),
+        NEXT_PUBLIC_GTM_ID: z.string(),
+        NEXT_PUBLIC_DISABLE_HOTJAR: z.string(),
+        NEXT_PUBLIC_HOTJAR_ID: z.string(),
+        NEXT_PUBLIC_GFW_API_KEY: z.string(),
     },
 
     /**
@@ -60,6 +66,7 @@ export const env = createEnv({
         NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
         NEXTAUTH_URL: process.env.NEXTAUTH_URL,
         CKAN_URL: process.env.CKAN_URL,
+        PREFECT_INTERNAL_URL: process.env.PREFECT_INTERNAL_URL,
         NEXT_PUBLIC_CKAN_URL: process.env.NEXT_PUBLIC_CKAN_URL,
         S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
         S3_SECRET_KEY_ID: process.env.S3_SECRET_KEY_ID,
@@ -74,6 +81,11 @@ export const env = createEnv({
         SMTP_USER: process.env.SMTP_USER,
         SMTP_PASSWORD: process.env.SMTP_PASSWORD,
         SMTP_FROM: process.env.SMTP_FROM,
+        NEXT_PUBLIC_NEXTAUTH_URL: process.env.NEXT_PUBLIC_NEXTAUTH_URL,
+        NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID, 
+        NEXT_PUBLIC_DISABLE_HOTJAR: process.env.NEXT_PUBLIC_DISABLE_HOTJAR || "enabled",
+        NEXT_PUBLIC_HOTJAR_ID: process.env.NEXT_PUBLIC_HOTJAR_ID,
+        NEXT_PUBLIC_GFW_API_KEY: process.env.NEXT_PUBLIC_GFW_API_KEY,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

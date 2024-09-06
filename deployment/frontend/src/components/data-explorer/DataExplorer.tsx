@@ -9,11 +9,15 @@ import {
     Updater,
     useReactTable,
     VisibilityState,
+    RowData,
 } from '@tanstack/react-table'
 import { useFields, useNumberOfRows, useTableData } from './queryHooks'
 import Spinner from '../_shared/Spinner'
 import { TabularResource } from '../datasets/visualizations/Visualizations'
 import { FilterObjType } from './search.schema'
+import '@tanstack/react-table'
+import { DownloadButton } from './DownloadButton'
+import { convertToSql } from './convertToSql'
 
 interface DataExplorerProps {
     tabularResource: TabularResource
@@ -24,19 +28,27 @@ export interface Filter {
     value: string
 }
 
+declare module '@tanstack/react-table' {
+    interface ColumnMeta<TData extends RowData, TValue> {
+        type: string
+        default?: string
+    }
+}
+
 export function DataExplorer({ tabularResource }: DataExplorerProps) {
     const { data: tableData } = useFields(tabularResource)
     if (!tableData)
         return (
             <div className="bg-lima-700 my-auto flex w-full flex-col items-center justify-center overflow-hidden opacity-75 h-full">
-                <Spinner className="text-wri-green w-12 h-12" />
-                <h2 className="text-center text-xl font-semibold text-wri-green">
+                <Spinner className="text-blue-800 w-12 h-12" />
+                <h2 className="text-center text-xl font-semibold text-blue-800">
                     Loading...
                 </h2>
             </div>
         )
     return (
         <DataExplorerInner
+            key={tabularResource.id}
             tableName={tableData.tableName}
             columns={tableData.columns}
             tabularResource={tabularResource}
@@ -47,7 +59,7 @@ export function DataExplorer({ tabularResource }: DataExplorerProps) {
 export interface DataExplorerInnerProps {
     tableName: string
     tabularResource: TabularResource
-    columns: { key: string; name: string }[]
+    columns: { key: string; name: string; type: string; default?: string }[]
 }
 
 export interface DataExplorerColumnFilter {
@@ -132,6 +144,11 @@ function DataExplorerInner({
     const tableCols = useMemo(() => {
         return cols.map((c) => ({
             accessorKey: c.key,
+            header: c.name,
+            meta: {
+                type: c.type,
+                default: c.default,
+            },
             filterFn: () => {
                 // not sure why this needs to be added
                 return true
@@ -165,13 +182,26 @@ function DataExplorerInner({
     if (pageCount < pagination.pageIndex) resetPagination()
     return (
         <div className={`w-full relative grow flex flex-col gap-y-2 mt-6`}>
-            <div className="flex flex-row justify-between items-center px-6">
+            <div className="flex flex-col gap-y-4 sm:flex-row justify-between items-end sm:items-center px-6">
                 <TopBar table={table} numOfRows={numOfRows ?? 0} />
             </div>
-            <div className="flex flex-row justify-between px-6">
-                <ListOfFilters
-                    filters={filteredColumns}
-                    setFilters={setColumnFilters}
+            <div className="flex flex-row justify-between gap-x-2 px-6">
+                <div className="flex flex-row justify-between grow">
+                    <ListOfFilters
+                        filters={filteredColumns}
+                        setFilters={setColumnFilters}
+                    />
+                </div>
+                <DownloadButton
+                    tabularResource={tabularResource}
+                    //setting this to 200 cause thats the limit of rw, so it will only call one request
+                    numOfRows={numOfRows ?? 200}
+                    sql={convertToSql({
+                        tableName,
+                        columns: columns.map((c) => c.key),
+                        filters: filteredColumns,
+                        sorting,
+                    })}
                 />
             </div>
             <div className="flex flex-col grow">

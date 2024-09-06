@@ -10,7 +10,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number }[] }) {
+export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number, highlighted?: boolean }[] }) {
   const prevEl = `.nav-prev-button--tabs`;
   const nextEl = `.nav-next-button--tabs`;
   return (
@@ -27,14 +27,16 @@ export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number }[]
       >
         {tabs.map((tab) => (
           <SwiperSlide key={tab.name} className="">
-            <Tab as="div">
+            <Tab as="div" >
               {({ selected }: { selected: boolean }) => (
-                <button
+                <div
+                  aria-label={tab.name}
                   className={classNames(
                     selected
                       ? "border-wri-green text-wri-green"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
                     "whitespace-nowrap border-b-2 px-6 font-acumin font-semibold transition",
+                    tab.highlighted ? "bg-yellow-200" : ""
                   )}
                 >
                   {tab.name}
@@ -43,18 +45,18 @@ export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number }[]
                       {tab.count}
                     </span>
                   )}
-                </button>
+                </div>
               )}
             </Tab>
           </SwiperSlide>
         ))}
       </Swiper>
-      <button className="nav-prev-button--tabs">
+      <button className="nav-prev-button--tabs" aria-label="previous button" role="tab">
         <ChevronDoubleLeftIcon
           className="h-6 w-6 text-black"
         />
       </button>
-      <button className="nav-next-button--tabs">
+      <button className="nav-next-button--tabs" aria-label="next button" role="tab">
         <ChevronDoubleRightIcon
           className="h-6 w-6 text-black"
         />

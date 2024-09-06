@@ -35,7 +35,7 @@ export function DescriptionForm({
                                 Short Description{' '}
                                 <span className="text-red-500">*</span>
                             </span>
-                            <DefaultTooltip content="This is a short description of the dataset.">
+                            <DefaultTooltip content="This description will appear in search results">
                                 <InformationCircleIcon
                                     className="h-5 w-5 text-neutral-500"
                                     aria-hidden="true"
@@ -46,6 +46,7 @@ export function DescriptionForm({
                     className="mb-2 flex  flex-col items-start whitespace-nowrap sm:flex-col"
                 >
                     <TextArea
+                        aria-label='Short Description'
                         placeholder=""
                         type="text"
                         {...register('short_description')}
@@ -57,7 +58,7 @@ export function DescriptionForm({
                     label={
                         <div className="flex items-center gap-x-1">
                             <span>Description</span>
-                            <DefaultTooltip content="This is a longer description of the dataset, with rich text support">
+                            <DefaultTooltip content="This description will appear in the About section when a user previews this dataset">
                                 <InformationCircleIcon
                                     className="h-5 w-5 text-neutral-500"
                                     aria-hidden="true"

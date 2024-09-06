@@ -1,6 +1,5 @@
 import { WriDataset } from '@/schema/ckan.schema'
 import {
-    ChartBarIcon,
     ExclamationCircleIcon,
     ExclamationTriangleIcon,
     GlobeAltIcon,
@@ -24,6 +23,7 @@ import { visibilityTypeLabels } from '@/utils/constants'
 import { getFormatColor, formatColors } from '@/utils/formatColors'
 import TabularViewIcon from '../datasets/view-icons/TabularViewIcon'
 import MapViewIcon from '../datasets/view-icons/MapViewIcon'
+import ChartViewIcon from '../datasets/view-icons/ChartViewIcon'
 
 export default function DatasetHorizontalCard({
     dataset,
@@ -68,7 +68,7 @@ export default function DatasetHorizontalCard({
                         </div>
 
                         <p className="font-['Acumin Pro SemiCondensed'] text-base font-light text-stone-900 h-[4.5em] line-clamp-3">
-                            {dataset.short_description ?? dataset.notes}
+                            {dataset.short_description ?? ''}
                         </p>
                         <div className="mt-[0.33rem] flex justify-start gap-x-3">
                             <TooltipProvider>
@@ -140,11 +140,7 @@ export default function DatasetHorizontalCard({
                                     : ''
                             } pr-3`}
                         >
-                            {false && (
-                                <div className="rounded-full bg-stone-100 p-1">
-                                    <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                                </div>
-                            )}
+                            <ChartViewIcon dataset={dataset} />
                             <MapViewIcon dataset={dataset} />
                             <TabularViewIcon dataset={dataset} />
                         </div>

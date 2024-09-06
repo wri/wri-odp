@@ -1,0 +1,35 @@
+import MdxLayout from '@/components/_shared/mdx-layout'
+ 
+# Teams / Topics discovery page
+
+These two pages are grouped because they have the same UI and functionality but the contained entity is different on each page
+
+Using the topics page, you can visit the topic page via <b>/topics</b>
+
+<img src="/images/user-guide/team1.webp" />
+
+The page contains the search input field and the listed Topics. Each topic card contains the topic title, it description, and the number of datasets and Sub-Topics as shown below
+
+<img src="/images/user-guide/team2.webp" />
+
+Using the image below, this topic has 1 dataset and it has 1 sub-topic.
+
+Since the default pages display list of Parent topics and topics without parent, by parent, I mean topics that have sub-topics; the search functionality is extensive enough for you to search through the sub-topics and it returns the Parent topics the sub-topic belongs to.
+
+<img src="/images/user-guide/team3.webp" />
+
+We searched for <b>hierarchy</b>, but the topic that has hirerachy in its title is a sub-topic, hence the parent is displayed, to view the sub-topic, you can click on the parent topic which leads us to the individual topic page
+
+<img src="/images/user-guide/team4.webp" />
+
+The individual topic page contains the Topic title and its description, it has a subtopics section. Currently, this Topic has only one, which is displayed as shown above.
+
+It also has another section to display the list of datasets associated with this topic.
+
+<img src="/images/user-guide/team5.webp" />
+
+The whole process as described in this article applies to the Teams page.
+
+export default function MDXPage({ children }) {
+    return <MdxLayout>{children}</MdxLayout>
+}

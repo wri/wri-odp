@@ -3,7 +3,6 @@ dataset_type: dataset
 about: A reimplementation of the default CKAN dataset schema
 about_url: http://github.com/ckan/ckanext-scheming
 
-
 dataset_fields:
 
 - field_name: approval_status
@@ -19,6 +18,18 @@ dataset_fields:
 
 - field_name: draft
   label: Draft
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
+- field_name: is_approved
+  label: Is Approved
+  validators: boolean_validator
+  output_validators: boolean_validator
+  preset: checkbox
+
+- field_name: has_chart_views
+  label: Has chart views
   validators: boolean_validator
   output_validators: boolean_validator
   preset: checkbox
@@ -118,6 +129,8 @@ dataset_fields:
     label: Hourly
   - value: as_needed
     label: As Needed
+  - value: not_planned
+    label: Not Planned
 
 - field_name: citation
   label: Citation
@@ -134,6 +147,8 @@ dataset_fields:
     label: Internal
   - value: public
     label: Public
+  - value: draft
+    label: Draft
 
 - field_name: license_id
   label: License
@@ -189,6 +204,11 @@ dataset_fields:
   display_snippet: email.html
   display_email_name_field: maintainer
 
+- field_name: usecases
+  label: Use cases
+  form_snippet: markdown.html
+  form_placeholder: eg. This is an example of how this data can be used...
+
 - field_name: function
   label: Function
   form_snippet: markdown.html
@@ -223,30 +243,38 @@ dataset_fields:
 - field_name: open_in
   label: Open In
   form_placeholder: 'eg. {"title": "External site", "url": "http://example.com"}'
+
+- field_name: release_notes
+  label: Release Notes
+  form_snippet: markdown.html
+  form_placeholder: eg. A description of the dataset changes
+
+- field_name: migration_extras
+  label: Migration Extras
+  form_placeholder: 'eg. {"title": "External site", "url": "http://example.com"}'
   preset: json_object
 
 resource_fields:
+  - field_name: url
+    label: URL
+    preset: resource_url_upload
 
-- field_name: url
-  label: URL
-  preset: resource_url_upload
+  - field_name: rw_id
+    label: RW ID
 
-- field_name: rw_id
-  label: RW ID
+  - field_name: name
+    label: Name
+    form_placeholder: eg. January 2011 Gold Prices
 
-- field_name: name
-  label: Name
-  form_placeholder: eg. January 2011 Gold Prices
+  - field_name: description
+    label: Description
+    form_snippet: markdown.html
+    form_placeholder: Some useful notes about the data
 
-- field_name: description
-  label: Description
-  form_snippet: markdown.html
-  form_placeholder: Some useful notes about the data
+  - field_name: format
+    label: Format
+    preset: resource_format_autocomplete
 
-- field_name: format
-  label: Format
-  preset: resource_format_autocomplete
-
-- field_name: schema
-  label: Schema
-  preset: json_object
+  - field_name: schema
+    label: Schema
+    preset: json_object

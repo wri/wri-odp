@@ -12,6 +12,7 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
+
 def _adjust_longitude(value):
     if value < -180 or value > 180:
         value = value % 360
@@ -21,6 +22,7 @@ def _adjust_longitude(value):
             value = -360 + value
     return value
 
+
 def _adjust_latitude(value):
     if value < -90 or value > 90:
         value = value % 180
@@ -29,6 +31,7 @@ def _adjust_latitude(value):
         elif value > 90:
             value = -180 + value
     return value
+
 
 def fit_bbox(bbox_dict):
     """
@@ -46,13 +49,13 @@ def fit_bbox(bbox_dict):
 
     """
 
-
     return {
         "minx": _adjust_longitude(bbox_dict["minx"]),
         "maxx": _adjust_longitude(bbox_dict["maxx"]),
         "miny": _adjust_latitude(bbox_dict["miny"]),
         "maxy": _adjust_latitude(bbox_dict["maxy"]),
     }
+
 
 def fit_point(point_dict):
     """
@@ -68,14 +71,13 @@ def fit_point(point_dict):
 
     """
 
-
     return {
         "x": _adjust_longitude(point_dict["x"]),
         "y": _adjust_latitude(point_dict["y"]),
     }
 
 
-class SolrSpatialFieldSearchBackend():
+class SolrSpatialFieldSearchBackend:
     def parse_geojson(self, geom_from_metadata):
         try:
             geometry = json.loads(geom_from_metadata)
@@ -97,8 +99,6 @@ class SolrSpatialFieldSearchBackend():
             return None
 
         return shape
-
-
 
     def fit_linear_ring(self, lr):
         bbox = {
@@ -125,7 +125,7 @@ class SolrSpatialFieldSearchBackend():
             return dataset_dict
 
         geometry = self.parse_geojson(geom_from_metadata)
-        
+
         if not geometry:
             return dataset_dict
 
@@ -134,7 +134,7 @@ class SolrSpatialFieldSearchBackend():
             geometries = geometry["geometries"]
         elif geometry["type"] == "FeatureCollection":
             geometries = list(map(lambda x: x["geometry"], geometry["features"]))
-            geometry = { "type": "GeometryCollection", "geometries": geometries }
+            geometry = {"type": "GeometryCollection", "geometries": geometries}
         else:
             geometries = [geometry]
 
@@ -193,18 +193,30 @@ you need to split the geometry in order to fit the parts. Not indexing"""
 
         return dataset_dict
 
-    def get_point_query(self, coordinates):
-        return "_query_:\"{{!field f=spatial_geom}}Contains({y}, {x})\"".format(**coordinates)
+    def get_point_query(self, coordinates, include_global=True, addressList=None):
+        query = '_query_:"{{!field f=spatial_geom}}Contains({y}, {x})"'.format(
+            **coordinates
+        )
+        return query
 
-    def get_wkt_query(self, wkt):
-        return "_query_:\"{{!field f=spatial_geom}}Intersects({})\"".format(wkt)
+    def get_only_globals(self):
+        return 'spatial_address:Global'
+
+    def build_spatial_address_query(self, addressList, include_global=True):
+        return [f"spatial_address:/.*{address}/" for address in addressList]
+
+    def get_wkt_query(self, wkt, include_global=True):
+        if include_global:
+            return '_query_:"{{!field f=spatial_geom}}Intersects({})"'.format(wkt)
+        return '_query_:"{{!field f=spatial_geom}}Intersects({})"'.format(wkt)
+        
 
     def get_wkt_for_geojson(self, geojson):
         wkt = None
-        geom_from_metadata = geojson 
+        geom_from_metadata = geojson
 
         geometry = self.parse_geojson(geom_from_metadata)
-        
+
         if geometry:
 
             # We allow multiple geometries as GeometryCollections
@@ -212,7 +224,7 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                 geometries = geometry["geometries"]
             elif geometry["type"] == "FeatureCollection":
                 geometries = list(map(lambda x: x["geometry"], geometry["features"]))
-                geometry = { "type": "GeometryCollection", "geometries": geometries }
+                geometry = {"type": "GeometryCollection", "geometries": geometries}
             else:
                 geometries = [geometry]
 
@@ -241,65 +253,94 @@ you need to split the geometry in order to fit the parts. Not indexing"""
             if not wkt:
                 shape = shapely.geometry.shape(geometry)
                 wkt = shape.wkt
-                
+
             return wkt
 
-
-    def search_params(self, point, address, search_params):
+    def search_params(self, point, address, _global, search_params):
 
         point = fit_point(point)
 
         if not search_params.get("fq_list"):
             search_params["fq_list"] = []
 
+        if _global == 'only':
+            return search_params["fq_list"].append(self.get_only_globals())
         queries = []
-        
-        if address:
-            cwd = os.path.abspath(os.path.dirname(__file__))
 
-            queries.append("spatial_address:/.*{}/".format(address))
 
-            segments = address.split(',')
+        if isinstance(address, list):
+            list_of_queries = [self.get_address_query(a, point) for a in address]
+            queries += [
+                i for g in list_of_queries for i in g
+            ]
+        else:
+            queries += self.get_address_query(address, point, include_global=_global == 'include')
             
-            if len(segments) == 1:
-                # It's a country
-                try:
-                    path = os.path.join(cwd, "../world_geojsons/countries/{}.geojson".format(segments[0].strip()))
-                    with open(path, 'r') as f:
-                        content = f.read()
-                        wkt = self.get_wkt_for_geojson(content)
-
-                        if wkt:
-                            queries.append(self.get_wkt_query(wkt))
-                        elif point:
-                            queries.append(self.get_point_query(point))
-                            
-                except Exception:
-                    if point:
-                        queries.append(self.get_point_query(point))
-
-            elif len(segments) == 2:
-                # It's a state
-                try:
-                    path = os.path.join(cwd, "../world_geojsons/states/{}/{}.geojson".format(segments[0].strip(), segments[1].strip()))
-                    with open(path, 'r') as f:
-                        content = f.read()
-                        wkt = self.get_wkt_for_geojson(content)
-
-                        if wkt:
-                            queries.append(self.get_wkt_query(wkt))
-                        elif point:
-                            queries.append(self.get_point_query(point))
-                            
-                except Exception:
-                    if point:
-                        queries.append(self.get_point_query(point))
-            elif len(segments) == 3:
-                # It's a city
-                if point:
-                    queries.append(self.get_point_query(point))
-
         search_params["fq_list"].append(" OR ".join(queries))
 
         return search_params
+
+    def get_address_query(self, address: str, point, include_global=True):
+        cwd = os.path.abspath(os.path.dirname(__file__))
+        segments = address.split(",")
+        segments = [segment.strip() for segment in segments]
+        _queries = [] 
+        if len(segments) == 1:
+            # It's a country
+            try:
+                path = os.path.join(
+                    cwd,
+                    "../world_geojsons/countries/{}.geojson".format(
+                        segments[0].strip()
+                    ),
+                )
+                with open(path, "r") as f:
+                    content = f.read()
+                    wkt = self.get_wkt_for_geojson(content)
+
+                    if wkt:
+                        _queries.append(self.get_wkt_query(wkt, include_global=include_global))
+                    elif point:
+                        _queries.append(self.get_point_query(point, include_global=include_global))
+                    _queries = _queries + self.build_spatial_address_query(segments)
+
+            except Exception:
+                if point:
+                    _queries.append(self.get_point_query(point, include_global=include_global))
+                _queries = _queries + self.build_spatial_address_query(segments)
+
+        elif len(segments) == 2:
+            # It's a state
+            try:
+                path = os.path.join(
+                    cwd,
+                    "../world_geojsons/states/{}/{}.geojson".format(
+                        segments[0].strip(), segments[1].strip()
+                    ),
+                )
+                with open(path, "r") as f:
+                    content = f.read()
+                    wkt = self.get_wkt_for_geojson(content)
+
+                    if wkt:
+                        _queries.append(self.get_wkt_query(wkt, include_global=include_global))
+                    elif point:
+                        _queries.append(self.get_point_query(point, include_global=include_global))
+                    _queries = _queries + self.build_spatial_address_query(segments)
+            except Exception as e:
+                if point:
+                    _queries.append(self.get_point_query(point, include_global=include_global))
+                _queries = _queries + self.build_spatial_address_query(segments)
+        elif len(segments) >= 3:
+            # It's a city in the UK or similar
+            if point:
+                _queries.append(self.get_point_query(point, include_global=include_global, addressList=segments))
+
+        if address:
+            _queries.append("spatial_address:/.*{}/".format(address))
+
+        if include_global:
+            _queries.append(self.get_only_globals())
+        return _queries
+
 

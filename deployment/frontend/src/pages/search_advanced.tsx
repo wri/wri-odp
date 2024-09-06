@@ -1,5 +1,4 @@
 import Search from '@/components/Search'
-import { ErrorAlert } from '@/components/_shared/Alerts'
 import Footer from '@/components/_shared/Footer'
 import Header from '@/components/_shared/Header'
 import Pagination from '@/components/datasets/Pagination'
@@ -14,9 +13,33 @@ import { api } from '@/utils/api'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import {NextSeo} from 'next-seo'
+import { NextSeo } from 'next-seo'
+import { env } from '@/env.mjs'
+import { appRouter } from '@/server/api/root'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import superjson from 'superjson'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { getServerAuthSession } from '@/server/auth'
+import { advance_search_query } from '@/utils/apiUtils'
 
-export function getServerSideProps({ query }: { query: any }) {
+interface Option {
+    value: string
+    label: string
+}
+
+function filterCount(key: string, filters: Filter[]): number {
+    return filters.filter((f) => f.key === key).length
+}
+
+function defaultSelectedTagOptions(filters: Filter[]): string[] {
+    const f = filters.filter((f) => f.key === 'tags').map((f) => f.label)
+    return f
+}
+
+export async function getServerSideProps(
+    context: GetServerSidePropsContext<{ query: any }>
+) {
+    const { query } = context
     const initialFilters = query.search
         ? JSON.parse(query.search as string)
         : []
@@ -25,16 +48,38 @@ export function getServerSideProps({ query }: { query: any }) {
         : { start: 0, rows: 10 }
     const initialSortBy = query.sort_by
         ? JSON.parse(query.sort_by as string)
-        : 'relevance asc'
+        : 'score desc'
 
-    return { props: { initialFilters, initialPage, initialSortBy } }
+    const session = await getServerAuthSession(context)
+    const helpers = createServerSideHelpers({
+        router: appRouter,
+        ctx: { session },
+        transformer: superjson,
+    })
+
+    const searchQuery = advance_search_query(initialFilters as Filter[])
+
+    await helpers.dataset.getAllDataset.prefetch({
+        ...searchQuery,
+        page: initialPage,
+        sortBy: initialSortBy,
+        removeUnecessaryDataInResources: true,
+    })
+
+    return {
+        props: {
+            trpcState: helpers.dehydrate(),
+            initialFilters,
+            initialPage,
+            initialSortBy,
+        },
+    }
 }
 
-export default function SearchPage({
-    initialFilters,
-    initialPage,
-    initialSortBy,
-}: any) {
+export default function SearchPage(
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
+    const { initialFilters, initialPage, initialSortBy } = props
     const router = useRouter()
     const session = useSession()
 
@@ -44,11 +89,34 @@ export default function SearchPage({
      */
     const [query, setQuery] = useState<SearchInput>({
         search: '',
+        extLocationQ: '',
+        extAddressQ: '',
+        extGlobalQ: 'include',
+        fq: {},
         page: initialPage,
         sortBy: initialSortBy,
+        removeUnecessaryDataInResources: true,
     })
-
     const [filters, setFilters] = useState<Filter[]>(initialFilters)
+
+    const [facetSelectedCount, setFacetSelectedCount] = useState<
+        Record<string, number>
+    >({
+        application: filterCount('application', filters) || 0,
+        project: filterCount('project', filters) || 0,
+        organization: filterCount('organization', filters) || 0,
+        groups: filterCount('groups', filters) || 0,
+        tags: filterCount('tags', filters) || 0,
+        update_frequency: filterCount('update_frequency', filters) || 0,
+        res_format: filterCount('res_format', filters) || 0,
+        license_id: filterCount('license_id', filters) || 0,
+        language: filterCount('language', filters) || 0,
+        wri_data: filterCount('wri_data', filters) || 0,
+        visibility_type: filterCount('visibility_type', filters) || 0,
+    })
+    const [value, setValue] = useState<string[]>(
+        defaultSelectedTagOptions(filters) || []
+    )
 
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
 
@@ -64,11 +132,13 @@ export default function SearchPage({
         const fq: any = {}
         let extLocationQ = ''
         let extAddressQ = ''
+        let extGlobalQ = 'include'
 
         keys.forEach((key) => {
             let keyFq
 
             const keyFilters = filters.filter((f) => f.key == key)
+
             if ((key as string) == 'temporal_coverage_start') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageStart = keyFilters[0]
@@ -78,9 +148,9 @@ export default function SearchPage({
 
                     keyFq = `[${temporalCoverageStart?.value} TO *]`
 
-                    if (temporalCoverageEnd) {
-                        keyFq = `[* TO ${temporalCoverageEnd}]`
-                    }
+                    // if (temporalCoverageEnd) {
+                    //     keyFq = `[* TO ${temporalCoverageEnd}]`
+                    // }
                 }
             } else if ((key as string) == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
@@ -91,9 +161,9 @@ export default function SearchPage({
 
                     keyFq = `[* TO ${temporalCoverageEnd?.value}]`
 
-                    if (temporalCoverageStart) {
-                        keyFq = `[${temporalCoverageStart} TO *]`
-                    }
+                    // if (temporalCoverageStart) {
+                    //     keyFq = `[${temporalCoverageStart} TO *]`
+                    // }
                 }
             } else if (
                 key === 'metadata_modified_since' ||
@@ -121,8 +191,18 @@ export default function SearchPage({
                 const address = keyFilters[0]?.label
 
                 // @ts-ignore
-                if (coordinates) extLocationQ = coordinates.reverse().join(',')
+                if (coordinates) extLocationQ = coordinates.join(',')
                 if (address) extAddressQ = address
+            } else if (key == 'extGlobalQ') {
+                const extGlobalQFilter = filters.find(
+                    (f) => f.key == 'extGlobalQ'
+                )
+                if (extGlobalQFilter && extGlobalQFilter.value === 'exclude') {
+                    fq['!spatial_address'] = 'Global'
+                }
+                if (extGlobalQFilter && extGlobalQFilter.value === 'only') {
+                    fq['spatial_address'] = 'Global'
+                }
             } else {
                 keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             }
@@ -133,6 +213,7 @@ export default function SearchPage({
         delete fq.metadata_modified_since
         delete fq.metadata_modified_before
         delete fq.spatial
+        delete fq.extGlobalQ
 
         setQuery((prev) => {
             return {
@@ -141,6 +222,11 @@ export default function SearchPage({
                 search: filters.find((e) => e?.key == 'search')?.value ?? '',
                 extLocationQ,
                 extAddressQ,
+                extGlobalQ:
+                    (filters.find((e) => e?.key == 'extGlobalQ')?.value as
+                        | 'only'
+                        | 'exclude'
+                        | 'include') ?? 'include',
             }
         })
     }, [filters])
@@ -169,7 +255,15 @@ export default function SearchPage({
     return (
         <>
             <Header />
-            <NextSeo title="Advanced Search" />
+            <NextSeo
+                title="Advanced Search"
+                description={`Explore WRI Open Data Catalog`}
+                openGraph={{
+                    title: `Explore Data`,
+                    description: `Explore WRI Open Data Catalog`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/search_advanced`,
+                }}
+            />
             <Search filters={filters} setFilters={setFilters} />
             {session.status == 'loading' && (
                 <div className="flex w-full justify-center mt-20">
@@ -177,7 +271,14 @@ export default function SearchPage({
                 </div>
             )}
             {session.status != 'loading' && (
-                <FilteredSearchLayout setFilters={setFilters} filters={filters}>
+                <FilteredSearchLayout
+                    setFilters={setFilters}
+                    filters={filters}
+                    facetSelectedCount={facetSelectedCount}
+                    setFacetSelectedCount={setFacetSelectedCount}
+                    value={value}
+                    setValue={setValue}
+                >
                     <SortBy
                         count={data?.count ?? 0}
                         setQuery={setQuery}
@@ -186,6 +287,8 @@ export default function SearchPage({
                     <FiltersSelected
                         filters={filters}
                         setFilters={setFilters}
+                        setFacetSelectedCount={setFacetSelectedCount}
+                        setValue={setValue}
                     />
                     <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
                         {data?.datasets.map((dataset, number) => (

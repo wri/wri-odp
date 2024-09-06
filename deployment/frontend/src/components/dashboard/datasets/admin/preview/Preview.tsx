@@ -33,6 +33,7 @@ import {
     LayerFormType,
     RawLayerFormType,
 } from '../datafiles/sections/BuildALayer/layer.schema'
+import { InfoAlert } from '@/components/_shared/Alerts'
 
 export function Preview({
     formObj,
@@ -190,6 +191,31 @@ export function Preview({
                             </div>
                         </div>
                     )}
+                    {watch('release_notes') && (
+                        <div className="border-b border-stone-50 py-8 pb-6">
+                            <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
+                                Versioning
+                            </h3>
+                            <div>
+                                <dl className="flex flex-col gap-y-6">
+                                    <SimpleDescription
+                                        label="Release Notes"
+                                        text={
+                                            <div
+                                                className="prose max-w-none prose-sm prose-a:text-wri-green min-h-[100px]"
+                                                dangerouslySetInnerHTML={{
+                                                    __html:
+                                                        watch(
+                                                            'release_notes'
+                                                        ) ?? '_',
+                                                }}
+                                            ></div>
+                                        }
+                                    />
+                                </dl>
+                            </div>
+                        </div>
+                    )}
                     {(watch('function') ||
                         watch('restrictions') ||
                         watch('learn_more') ||
@@ -249,36 +275,75 @@ export function Preview({
                                             }}
                                         ></div>
                                     </FullDescription>
+                                    <FullDescription label="Use cases">
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html:
+                                                    watch('usecases') ?? '_',
+                                            }}
+                                        ></div>
+                                    </FullDescription>
                                 </dl>
                             </div>
                         </div>
                     )}
+                    <InfoAlert
+                        text={
+                            <ul className="list-disc">
+                                <li>
+                                    To add a chart view to your dataset, the
+                                    system first needs to load your data file.
+                                    Please wait 10-15 minutes and then choose to
+                                    edit your dataset. You will then be able to
+                                    add a chart.
+                                </li>
+                                <li>
+                                    Charts views cannot be created while the
+                                    dataset is awaiting approval
+                                </li>
+                            </ul>
+                        }
+                        title="Attention"
+                    />
                     {watch('resources') && watch('resources').length > 0 && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
                                 Data files
                             </h3>
                             <div>
-                                {watch('resources').map((resource) => (
-                                    <Datafile
-                                        key={resource.resourceId}
-                                        name={
-                                            resource.name ?? resource.url ?? resource.title ?? '-'
-                                        }
-                                        title={resource.title ?? '-'}
-                                        type={resource.type ?? 'empty'}
-                                        format={resource.format ?? '-'}
-                                        size={resource.size ?? null}
-                                        layerObj={resource.layerObj ?? null}
-                                        layerObjRaw={
-                                            resource.layerObjRaw ?? null
-                                        }
-                                        description={
-                                            resource.description ?? '-'
-                                        }
-                                        dataDictionary={resource.schema ?? []}
-                                    />
-                                ))}
+                                {watch('resources')
+                                    .filter(
+                                        (r) =>
+                                            ![
+                                                'empty-file',
+                                                'empty-layer',
+                                            ].includes(r.type)
+                                    )
+                                    .map((resource) => (
+                                        <Datafile
+                                            key={resource.resourceId}
+                                            name={
+                                                resource.name ??
+                                                resource.url ??
+                                                resource.title ??
+                                                '-'
+                                            }
+                                            title={resource.title ?? '-'}
+                                            type={resource.type ?? 'empty-file'}
+                                            format={resource.format ?? '-'}
+                                            size={resource.size ?? null}
+                                            layerObj={resource.layerObj ?? null}
+                                            layerObjRaw={
+                                                resource.layerObjRaw ?? null
+                                            }
+                                            description={
+                                                resource.description ?? '-'
+                                            }
+                                            dataDictionary={
+                                                resource.schema ?? []
+                                            }
+                                        />
+                                    ))}
                             </div>
                         </div>
                     )}
@@ -340,7 +405,13 @@ function FullDescription({
     )
 }
 
-function SimpleDescription({ label, text }: { label: string; text: string }) {
+function SimpleDescription({
+    label,
+    text,
+}: {
+    label: string
+    text: string | React.ReactNode
+}) {
     return (
         <div>
             <dt className="font-['Acumin Pro SemiCondensed'] text-lg font-semibold leading-tight text-black">
@@ -359,7 +430,7 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
             <dt className="font-['Acumin Pro SemiCondensed'] text-lg font-semibold leading-tight text-black">
                 {label}
             </dt>
-            <div className="flex flex-wrap gap-3">
+            <dd className="flex flex-wrap gap-3">
                 {items.map((item, index) => (
                     <span
                         key={index}
@@ -370,13 +441,19 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
                         </span>
                     </span>
                 ))}
-            </div>
+            </dd>
         </div>
     )
 }
 
 interface DatafilePreviewProps {
-    type: 'link' | 'upload' | 'layer' | 'empty' | 'layer-raw'
+    type:
+        | 'link'
+        | 'upload'
+        | 'layer'
+        | 'empty-file'
+        | 'empty-layer'
+        | 'layer-raw'
     name: string
     title: string
     format: string
@@ -437,7 +514,8 @@ function Datafile({
                                             </span>
                                         </>
                                     ))
-                                    .with('empty', () => <></>)
+                                    .with('empty-layer', () => <></>)
+                                    .with('empty-file', () => <></>)
                                     .otherwise(() => (
                                         <>
                                             <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
@@ -531,13 +609,10 @@ function PreviewTable({
                         Field
                     </TableHead>
                     <TableHead className="font-acumin text-xs font-semibold text-black">
+                        Label
+                    </TableHead>
+                    <TableHead className="font-acumin text-xs font-semibold text-black">
                         Type
-                    </TableHead>
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Null
-                    </TableHead>
-                    <TableHead className="font-acumin text-xs font-semibold text-black">
-                        Key
                     </TableHead>
                     <TableHead className="font-acumin text-xs font-semibold text-black">
                         Default
@@ -554,11 +629,10 @@ function PreviewTable({
                                 : 'border-0 bg-white'
                         }
                     >
-                        <TableCell>{field.field}</TableCell>
-                        <TableCell>{field.type}</TableCell>
-                        <TableCell>{field.null ? 'YES' : 'NO'}</TableCell>
-                        <TableCell>{field.key}</TableCell>
-                        <TableCell>{field.default}</TableCell>
+                        <TableCell>{field.id}</TableCell>
+                        <TableCell>{field.info.label}</TableCell>
+                        <TableCell>{field.info.type_override}</TableCell>
+                        <TableCell>{field.info.default}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>

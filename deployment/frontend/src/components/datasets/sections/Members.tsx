@@ -1,15 +1,13 @@
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from '@/components/_shared/Table'
 import { RouterOutput } from '@/server/api/root'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { PencilIcon } from '@heroicons/react/24/outline'
+import Image from 'next/image'
 
 type DatasetMembers = RouterOutput['dataset']['getDatasetCollaborators']
 
@@ -48,7 +46,8 @@ export function Members({ members }: { members: DatasetMembers }) {
                             >
                                 <TableCell className="flex flex-col items-center gap-x-2 font-medium sm:flex-row">
                                     <div className="relative h-6 w-6 rounded-full bg-zinc-300">
-                                        <img
+                                        <Image
+                                            fill
                                             className="absolute inset-0 h-full w-full object-cover rounded-full"
                                             src={
                                                 (user?.image_display_url as string)

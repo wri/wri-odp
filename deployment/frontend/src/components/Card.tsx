@@ -1,10 +1,10 @@
 import React from 'react'
-import { ChartBarIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import { WriDataset } from '@/schema/ckan.schema'
 import Link from 'next/link'
 import MapViewIcon from './datasets/view-icons/MapViewIcon'
 import TabularViewIcon from './datasets/view-icons/TabularViewIcon'
+import ChartViewIcon from './datasets/view-icons/ChartViewIcon'
 
 export default function Card({ dataset }: { dataset: WriDataset }) {
     return (
@@ -19,7 +19,7 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                 {dataset?.title ?? dataset?.name}
             </h2>
             <article className=" line-clamp-3 w-[88%] font-light text-base mt-4 leading-[1.375rem] h-[4em]">
-                {dataset?.short_description ?? dataset?.notes}
+                {dataset?.short_description ?? ''}
             </article>
             <div className="flex font-light text-sm text-wri-black mt-4 leading-[1.375rem] h-[1.5em]">
                 {dataset.temporal_coverage_start ||
@@ -58,11 +58,7 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                 )}
             </div>
             <div className="mt-4 flex gap-x-2 text-sm font-light leading-[1.375rem] text-wri-black h-7">
-                {false && (
-                    <div className="rounded-full bg-stone-100 p-1">
-                        <ChartBarIcon className="h-5 w-5 text-blue-700" />
-                    </div>
-                )}
+                <ChartViewIcon dataset={dataset} />
                 <MapViewIcon dataset={dataset} />
                 <TabularViewIcon dataset={dataset} />
             </div>
