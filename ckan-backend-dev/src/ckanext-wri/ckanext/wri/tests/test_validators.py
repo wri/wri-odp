@@ -50,23 +50,23 @@ def test_iso_language_code(value, expected):
     "value,expected",
     [
         (
-            '[{"name": "Test User", "email": "test@example.com"}, {"name": "Test User 2", "email": "test.user.2@example.com"}]',
-            '[{"name": "Test User", "email": "test@example.com"}, {"name": "Test User 2", "email": "test.user.2@example.com"}]',
+            [{"name": "Test User", "email": "test@example.com"}, {"name": "Test User 2", "email": "test.user.2@example.com"}],
+            [{"name": "Test User", "email": "test@example.com"}, {"name": "Test User 2", "email": "test.user.2@example.com"}],
         ),
         (
-            '[{"name": "Test User", "email": "not an email address"}, {"name": "Test User 2", "email": "test.user.2@example.com"}]',
+            [{"name": "Test User", "email": "not an email address"}, {"name": "Test User 2", "email": "test.user.2@example.com"}],
             Invalid,
         ),
         (
-            '[{"name": "Test User", "email": "test@example.com", "unsupported_key": "some value"}, {"name": "Test User 2", "email": "test.user.2@example.com"}]',
+            [{"name": "Test User", "email": "test@example.com", "unsupported_key": "some value"}, {"name": "Test User 2", "email": "test.user.2@example.com"}],
             Invalid,
         ),
         (
-            '[{"name": "Test User"}, {"name": "Test User 2", "email": "test.user.2@example.com"}]',
+            [{"name": "Test User"}, {"name": "Test User 2", "email": "test.user.2@example.com"}],
             Invalid,
         ),
         (
-            '[{"name": "Test User", "email": "test@example.com"}, {"email": "test.user.2@example.com"}]',
+            [{"name": "Test User", "email": "test@example.com"}, {"email": "test.user.2@example.com"}],
             Invalid,
         ),
     ],
