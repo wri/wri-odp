@@ -174,7 +174,22 @@ export function formatDiff(
     > = {}
     if (data) {
         for (const key in data) {
-            if (
+            if (key.startsWith('authors') || key.startsWith('maintainers')) {
+                const key_cleaned = key.includes('authors') ? 'authors' : 'maintainers'
+                const newKey = datasetFormFieldmap[key_cleaned]!
+
+                const old_value = data[key]?.old_value
+                const new_value = data[key]?.new_value
+
+                outputDiff[newKey] = {
+                    old_value: old_value && typeof old_value === 'string' && old_value.startsWith('[{')
+                        ? JSON.parse(old_value)
+                        : old_value || '',
+                    new_value: new_value && typeof new_value === 'string' && new_value.startsWith('[{')
+                        ? JSON.parse(new_value)
+                        : new_value || '',
+                }
+            } else if (
                 !key.startsWith('resource') &&
                 (key.match(/\[\d+\]\.\w+/) || key.match(/\[\d+\]/))
             ) {
@@ -294,18 +309,6 @@ export function formatDiff(
                                       data[key]?.new_value['title'],
                         }
                     }
-                }
-            } else if (key === 'authors' || key === 'maintainers') {
-                const newKey = datasetFormFieldmap[key]!
-                const old_value = data[key]?.old_value
-                const new_value = data[key]?.new_value
-                outputDiff[newKey] = {
-                    old_value: old_value
-                        ? JSON.parse(old_value)
-                        : data[key]?.old_value ?? '',
-                    new_value: new_value
-                        ? JSON.parse(new_value)
-                        : data[key]?.new_value ?? '',
                 }
             } else {
                 if (key in datasetFormFieldmap) {

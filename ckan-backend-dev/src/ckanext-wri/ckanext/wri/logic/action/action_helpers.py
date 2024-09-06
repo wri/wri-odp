@@ -1,7 +1,11 @@
 import json
+import logging
 
 from ckan.types import DataDict
 from ckan.logic.validators import email_validator
+
+
+log = logging.getLogger(__name__)
 
 
 def _process_actor_string(actor_string: str, actor_type: str) -> dict:
@@ -38,11 +42,12 @@ def _process_actor_string(actor_string: str, actor_type: str) -> dict:
     return actor_list
 
 
-def _is_json_string(actors: str) -> dict:
+def _is_json_string(actors: str) -> bool:
     try:
         json.loads(actors)
         return True
-    except TypeError:
+    except Exception as e:
+        log.warn(f"Value is not a valid JSON object: {e}")
         return False
 
 
@@ -53,9 +58,9 @@ def stringify_actor_objects(data_dict: DataDict) -> DataDict:
     if authors:
         is_json = _is_json_string(authors)
 
-        if isinstance(authors, list) or is_json:
+        if isinstance(authors, list):
             data_dict["authors"] = json.dumps(authors)
-        elif isinstance(authors, str):
+        elif isinstance(authors, str) and not is_json:
             authors_processed = _process_actor_string(authors, "author")
 
             if authors_processed:
@@ -64,9 +69,9 @@ def stringify_actor_objects(data_dict: DataDict) -> DataDict:
     if maintainers:
         is_json = _is_json_string(maintainers)
 
-        if isinstance(maintainers, list) or is_json:
+        if isinstance(maintainers, list):
             data_dict["maintainers"] = json.dumps(maintainers)
-        elif isinstance(maintainers, str):
+        elif isinstance(maintainers, str) and not is_json:
             maintainers_processed = _process_actor_string(maintainers, "maintainer")
 
             if maintainers_processed:

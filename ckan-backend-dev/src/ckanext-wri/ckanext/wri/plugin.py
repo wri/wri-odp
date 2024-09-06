@@ -1,3 +1,5 @@
+import json
+
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.plugins as lib_plugins
@@ -354,6 +356,26 @@ class WriPlugin(plugins.SingletonPlugin):
 
         # if pkg_dict.get("is_approved", False):
         #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+
+    def after_dataset_show(self, context, pkg_dict):
+        authors = pkg_dict.get("authors")
+        maintainers = pkg_dict.get("maintainers")
+
+        if isinstance(authors, str):
+            try:
+                authors = json.loads(authors)
+                pkg_dict["authors"] = authors
+            except Exception as e:
+                log.error(f"Error parsing authors: {e}")
+
+        if isinstance(maintainers, str):
+            try:
+                maintainers = json.loads(maintainers)
+                pkg_dict["maintainers"] = maintainers
+            except Exception as e:
+                log.error(f"Error parsing maintainers: {e}")
+
+        return pkg_dict
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)
