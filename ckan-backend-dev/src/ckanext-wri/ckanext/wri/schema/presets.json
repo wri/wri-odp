@@ -130,6 +130,15 @@
       }
     },
     {
+      "preset_name": "agents_json_object",
+      "values": {
+        "validators": "scheming_required agents_json_object",
+        "output_validators": "scheming_load_json",
+        "form_snippet": "json.html",
+        "display_snippet": "json.html"
+      }
+    },
+    {
       "preset_name": "multiple_text",
       "values": {
         "form_snippet": "multiple_text.html",
