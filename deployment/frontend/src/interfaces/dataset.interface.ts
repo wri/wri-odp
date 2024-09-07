@@ -5,6 +5,7 @@ import { PlotParams } from 'react-plotly.js'
 
 export interface Dataset {
     author?: string
+    authors?: Array<{ name: string; email: string }>
     author_email?: string
     creator_user_id?: string
     id: string
@@ -12,6 +13,7 @@ export interface Dataset {
     license_id?: string
     license_title?: string
     maintainer?: string
+    maintainers?: Array<{ name: string; email: string }>
     maintainer_email?: string
     metadata_created?: string
     metadata_modified?: string

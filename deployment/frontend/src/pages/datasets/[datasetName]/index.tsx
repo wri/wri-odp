@@ -491,10 +491,12 @@ export default function DatasetPage(
                 diffFields &&
                 diffFields.some((f) =>
                     [
-                        'maintainer',
-                        'author',
-                        'maintainer_email',
-                        'author_email',
+                        //'maintainer',
+                        //'author',
+                        //'maintainer_email',
+                        //'author_email',
+                        'authors',
+                        'maintainers',
                     ].some((x) => f.includes(x))
                 ),
         },
