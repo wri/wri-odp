@@ -290,18 +290,16 @@ class WriPlugin(plugins.SingletonPlugin):
     # IResourceController
 
     def after_resource_create(self, context: Context, resource_dict: dict[str, Any]):
-
-        self._submit_to_datapusher(resource_dict)
         ResourceLocation.index_resource_by_location(
                         resource_dict, False
                     )
+        self._submit_to_datapusher(resource_dict)
 
     def after_resource_update(self, context: Context, resource_dict: dict[str, Any]):
-
-        self._submit_to_datapusher(resource_dict)
         ResourceLocation.index_resource_by_location(
                         resource_dict, False
                     )
+        self._submit_to_datapusher(resource_dict)
 
 
     def _submit_to_datapusher(self, resource_dict: dict[str, Any]):
