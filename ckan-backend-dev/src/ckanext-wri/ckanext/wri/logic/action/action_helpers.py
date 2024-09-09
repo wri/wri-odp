@@ -31,7 +31,7 @@ def _process_actor_string(actor_string: str, actor_type: str) -> dict:
                         f"{invalid_actor_string_msg}{actor_string}\nEmpty name or email in {actor_type} string"
                     )
 
-                email_validator(email)
+                email_validator(email, {})
 
                 actor_list.append({"name": name, "email": email})
             else:

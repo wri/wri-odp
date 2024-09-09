@@ -242,8 +242,8 @@ Migrates an RW dataset/metadata to CKAN. It maps all supported RW fields to CKAN
 - **team** (string) – The `name` (`slug`) of the Team to associate the dataset with (optional). Example: `land-carbon-lab`.
 - **topics** (string) – A comma-separated list of Topic `slug`s to associate the dataset with (optional). Example: `atmosphere,biodiversity`.
 - **geographic_coverage** (string) – The geographic coverage of the dataset (optional). Example: `Global`.
-- **maintainer** (string) – The `name` of the dataset maintainer (optional). Example: `John Doe`.
-- **maintainer_email** (string) – The email of the dataset maintainer (optional). Example: `john.doe@example.com`.
+- **authors** (array of objects or string) – An array of objects containing the `name` and `email` of the authors of the dataset (optional). Example: `[{"name": "John Smith", "email": "john.smith@example.com"}, {"name": "Jane Smith", "email": "jane.smith@example.com"}]`. Alternatively, you can use the following string format, with each author name and email separated by a colon (`:`) and each pair of author name/email separated by a semicolon (`;`). Example: `John Smith:john.smith@example.com;Jane Smith:jane.smith@example.com`.
+- **maintainers** (array of objects or string) – An array of objects containing the `name` and `email` of the maintainers of the dataset (optional). Example: `[{"name": "John Smith", "email": "john.smith@example.com"}, {"name": "Jane Smith", "email": "jane.smith@example.com"}]`. Alternatively, you can use the following string format, with each maintainer name and email separated by a colon (`:`) and each pair of maintainer name/email separated by a semicolon (`;`). Example: `John Smith:john.smith@example.com;Jane Smith:jane.smith@example.com`.
 - **layer_ids** (string) – A comma-separated list of RW Layer UUIDs to associate with the dataset (optional). All other layers will be skipped. Example: `c0b5f4b1-4f3b-4f1e-8f1e-3f4b1f3b4f1e,c0b5f4b1-4f3b-4f1e-8f1e-3f4b1f3b4f1e`.
 - **blacklist** (string) – A comma-separated list of CKAN fields to exclude from the migration mapping (optional—cannot be used with `whitelist`). Example: `resources,notes` will exclude the `resources` (Layers) and `notes` (Description) fields from the migration mapping.
 - **whitelist** (string) – A comma-separated list of CKAN fields to include in the migration mapping (optional—cannot be used with `blacklist`). Example: `title,notes` will only include the `title` (Title) and `notes` (Description) fields in the migration mapping.
@@ -440,8 +440,8 @@ Add a custom file to the `migration/files` directory and commit it to the repo. 
 - `team` (optional)
 - `topics` (optional)
 - `geographic_coverage` (optional)
-- `maintainer` (optional)
-- `maintainer_email` (optional)
+- `authors` (optional)
+- `maintainers` (optional)
 - `layer_ids` (optional)
 - `layer_names` (optional)
 - `gfw_dataset` (optional—unless `rw_dataset_id` isn't provided)
@@ -449,17 +449,19 @@ Add a custom file to the `migration/files` directory and commit it to the repo. 
 - `dataset_title` (optional)
 - `dataset_slug` (optional)
 
+**Note**: `authors` and `maintainers` must follow the format `Author One:Author One Email;Author Two:Author Two Email;Author Three:Author Three Email`. Each author/maintainer name and email must be separated by a colon (`:`), and each author/maintainer pair must be separated by a semicolon (`;`). If there's only one author/maintainer, you shouldn't include a semicolon.
+
 Example:
 
 ```csv
-rw_dataset_id,gfw_dataset,application,team,topics,geographic_coverage,maintainer,maintainer_email,layer_ids,dataset_title,dataset_slug
-d491f094-ad6e-4015-b248-1d1cd83667fa,,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,John Doe,john.doe@example.com,,An Aqueduct Dataset,an-aqueduct-dataset
-b318381e-485d-46c9-8958-c9a9d75d7e91,,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,John Doe,john.doe@example.com,,Another Aqueduct Dataset,another-aqueduct-dataset
-faf79d2c-5e54-4591-9d70-4bd1029c18e6,,crt,agriadapt,atmosphere,Global,Jane Doe,jane.doe@example.com,,,
-,gfw_forest_flux_forest_age_category,gfw,global-forest-watch,"land,ghg-emissions,forest",,Jane Doe,jane.doe@example.com,,,
-,gfw_forest_flux_removal_forest_type,gfw,global-forest-watch,"land,ghg-emissions,forest",,John Doe,john.doe@example.com,,Another Title Example,
+rw_dataset_id,gfw_dataset,application,team,topics,geographic_coverage,authors,maintainers,layer_ids,dataset_title,dataset_slug
+d491f094-ad6e-4015-b248-1d1cd83667fa,,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,,John Smith:john.smith@example.com;Jane Smith:jane.smith@example.com,,An Aqueduct Dataset,an-aqueduct-dataset
+b318381e-485d-46c9-8958-c9a9d75d7e91,,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,John Smith:john.smith@example.com;Jane Smith:jane.smith@example.com,,,Another Aqueduct Dataset,another-aqueduct-dataset
+faf79d2c-5e54-4591-9d70-4bd1029c18e6,,crt,agriadapt,atmosphere,Global,John Smith:john.smith@example.com,Jane Smith:jane.smith@example.com,,,
+,gfw_forest_flux_forest_age_category,gfw,global-forest-watch,"land,ghg-emissions,forest",,,John Smith:john.smith@example.com,,,
+,gfw_forest_flux_removal_forest_type,gfw,global-forest-watch,"land,ghg-emissions,forest",,Jane Smith:jane.smith@example.com,John Smith:john.smith@example.com,,Another Title Example,
 47a8e6cc-ea40-44a8-b1fc-6cf4fcc7d868,nasa_viirs_fire_alerts,gfw,global-forest-watch,"land,natural-hazards,forest",Global,,,2462cceb-41de-4bd2-8251-a6f75fe4e3d5,,another-slug-example
-c92b6411-f0e5-4606-bbd9-138e40e50eb8,,gfw,global-forest-watch,"land,forest",,Jeff Guy,jeff.guy@example.com,"0cba3c4f-2d3b-4fb1-8c93-c951dc1da84b,2351399c-ef2c-48da-9485-20698190acb0",,
+c92b6411-f0e5-4606-bbd9-138e40e50eb8,,gfw,global-forest-watch,"land,forest",,Jane Smith:jane.smith@example.com,,"0cba3c4f-2d3b-4fb1-8c93-c951dc1da84b,2351399c-ef2c-48da-9485-20698190acb0",,
 ```
 
 #### POST /api/3/action/migration_status
