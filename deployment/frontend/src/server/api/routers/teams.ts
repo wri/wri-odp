@@ -281,6 +281,7 @@ export const teamRouter = createTRPCRouter({
                 team.package_count = packagedetails.count
             }
 
+            groupTree = groupTree.filter((x) => x.name === input.search)
             if (input.search) {
                 groupTree = await searchHierarchy({
                     isSysadmin: true,
