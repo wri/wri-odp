@@ -24,6 +24,27 @@ FRONTEND_CKAN_URL = variables.get(f"ckan_frontend_url_{DEPLOYMENT_ENV}")
 ckan = ckanapi.RemoteCKAN(CKAN_URL, apikey=CKAN_API_KEY)
 
 
+# pattern from https://html.spec.whatwg.org/#e-mail-state-(type=email)
+email_pattern = re.compile(
+    # additional pattern to reject malformed dots usage
+    r"^(?!\.)(?!.*\.$)(?!.*?\.\.)"
+    r"[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9]"
+    r"(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9]"
+    r"(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+)
+
+
+def email_validator(value, agent_type, log, log_name):
+    """Validate email input"""
+
+    if value and email_pattern.match(value):
+        return True
+
+    log.error(f"{log_name} Invalid {agent_type} email: {value if value else 'None'}")
+
+    return False
+
+
 def munge_title_to_name(name: str) -> str:
     # Taken from CKAN 2.10 codebase
     """Munge a package title into a package name."""
@@ -287,8 +308,8 @@ def get_datasets_from_csv(file_name):
             team = row.get("team")
             topics = row.get("topics")
             layer_ids = row.get("layer_ids")
-            maintainer = row.get("maintainer")
-            maintainer_email = row.get("maintainer_email")
+            authors = row.get("authors")
+            maintainers = row.get("maintainers")
             geographic_coverage = row.get("geographic_coverage")
             layer_names = row.get("layer_names")
             dataset_title = row.get("dataset_title")
@@ -307,10 +328,10 @@ def get_datasets_from_csv(file_name):
                 "application": application,
                 "team": team,
                 "topics": topics,
+                "authors": authors,
+                "maintainers": maintainers,
                 "layer_ids": layer_ids,
                 "layer_names": layer_names,
-                "maintainer": maintainer,
-                "maintainer_email": maintainer_email,
                 "geographic_coverage": geographic_coverage,
                 "dataset_title": dataset_title,
                 "dataset_slug": dataset_slug,
@@ -829,6 +850,91 @@ def check_reponse_status(response):
     return True
 
 
+def unstringify_agents(agents, agent_type, log, log_name):
+    processed_agents = []
+    invalid_format_msg = f"{agent_type.capitalize()} must include both a name and email in the following format: '<AUTHOR_1_NAME>:<AUTHOR_1_EMAIL>;<AUTHOR_2_NAME>:<AUTHOR_2_EMAIL>'"
+
+    if not agents:
+        log.error(f"{log_name} Missing {agent_type}s")
+        return processed_agents
+
+    if isinstance(agents, str):
+        agent_list = agents.split(";")
+
+        log.info(f"{log_name} {agent_type}s list: {agent_list}")
+
+        for agent in agent_list:
+            if not agent.strip():
+                log.error(
+                    f"{log_name} Empty {agent_type} found in {agent_type} list\n{invalid_format_msg}"
+                )
+                continue
+
+            if ":" in agent:
+                if agent.count(":") > 1:
+                    log.error(
+                        f"{log_name} Multiple colons found in {agent_type}\n{invalid_format_msg}"
+                    )
+                    continue
+
+                name, email = agent.split(":")
+                name = name.strip() if name else None
+                email = email.strip() if email and email_validator(email, agent_type, log, log_name) else None
+
+                if not name or not email:
+                    log.error(
+                        f"{log_name} Missing name or email in {agent_type}\n{invalid_format_msg}"
+                    )
+                    continue
+
+                processed_agents.append({"name": name, "email": email})
+            else:
+                log.error(
+                    f"{log_name} Unrecognized format for: {agent}\nType: {type(agent)}\n{invalid_format_msg}"
+                )
+                continue
+
+    elif isinstance(agents, list):
+        for agent in agents:
+            if isinstance(agent, dict):
+                name = agent.get("name")
+                email = agent.get("email")
+                name = name.strip() if name else None
+                email = email.strip() if email and email_validator(email, agent_type, log, log_name) else None
+
+                if not name or not email:
+                    log.error(
+                        f"{log_name} Missing name or email in {agent_type}\n{invalid_format_msg}"
+                    )
+                    continue
+
+                processed_agents.append({"name": name, "email": email})
+            else:
+                log.error(
+                    f"{log_name} Unrecognized format for: {agent}\nType: {type(agent)}\n{invalid_format_msg}"
+                )
+                continue
+    else:
+        log.error(
+            f"{log_name} Unrecognized format for: {agents}\nType: {type(agents)}\n{invalid_format_msg}"
+        )
+
+    return processed_agents
+
+
+def stringify_agents(data_dict):
+    authors = data_dict.get("authors")
+    maintainers = data_dict.get("maintainers")
+
+    if authors and isinstance(authors, list):
+        data_dict["authors"] = json.dumps(authors)
+
+    if maintainers and isinstance(maintainers, list):
+        data_dict["maintainers"] = json.dumps(maintainers)
+
+    return data_dict
+
+
 def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     log = get_run_logger()
 
@@ -839,8 +945,6 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     blacklist = original_data_dict.get("blacklist")
     layer_ids = original_data_dict.get("layer_ids")
     layer_names = original_data_dict.get("layer_names")
-    maintainer = original_data_dict.get("maintainer")
-    maintainer_email = original_data_dict.get("maintainer_email")
     geographic_coverage = original_data_dict.get("geographic_coverage")
     dataset_title = original_data_dict.get("dataset_title")
     dataset_slug = original_data_dict.get("dataset_slug")
@@ -914,6 +1018,13 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
 
     log.info(f"{log_name} STARTING MIGRATION")
     log.info(f"{log_name} Beginning preparation...")
+
+    authors = unstringify_agents(
+        original_data_dict.get("authors"), "author", log, log_name
+    )
+    maintainers = unstringify_agents(
+        original_data_dict.get("maintainers"), "maintainer", log, log_name
+    )
 
     for warning in warnings:
         log.warning(warning)
@@ -1016,8 +1127,8 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
         "learn_more": learn_more_link,
         "update_frequency": "",
         "spatial_address": geographic_coverage,
-        "maintainer": maintainer,
-        "maintainer_email": maintainer_email,
+        "authors": authors,
+        "maintainers": maintainers,
         "tags": tags,
         "methodology": methodology,
     }
@@ -1104,6 +1215,8 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
         }
 
     dataset_dict = {**required_dataset_values, **dataset_dict}
+
+    dataset_dict = stringify_agents(dataset_dict)
 
     log.info(
         f"{log_name} Finished preparing dataset: \n{json.dumps(dataset_dict, indent=2)}"

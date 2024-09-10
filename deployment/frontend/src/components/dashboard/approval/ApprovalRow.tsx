@@ -61,15 +61,6 @@ function filteredDataset(dataset: WriDataset) {
             title: 'Title',
             description: dataset.title,
         },
-
-        {
-            title: 'Maintainer Name',
-            description: dataset?.maintainer ?? '',
-        },
-        {
-            title: 'Maintainer Email',
-            description: dataset?.maintainer_email ?? '',
-        },
         {
             title: 'Short description',
             description: dataset?.short_description ?? '',
@@ -85,7 +76,7 @@ function filteredDataset(dataset: WriDataset) {
         {
             title: 'Release Notes',
             description: dataset?.release_notes ?? '',
-            isHtml: true
+            isHtml: true,
         },
     ]
 }
@@ -286,6 +277,67 @@ function SubCardProfile({
             },
         }
     }
+
+    if (diff2 && Object.keys(diff2).some((x) => x.includes('Authors'))) {
+        diff2 = Object.fromEntries(
+            Object.entries(diff2).filter(([key]) => !key.includes('Authors'))
+        )
+        let oldAuthors =
+            diff.old_dataset?.authors &&
+            typeof diff.old_dataset?.authors === 'string'
+                ? JSON.parse(diff.old_dataset?.authors)
+                : diff.old_dataset?.authors ?? []
+        let newAuthors =
+            diff.new_dataset?.authors &&
+            typeof diff.new_dataset?.authors === 'string'
+                ? JSON.parse(diff.new_dataset?.authors)
+                : diff.new_dataset?.authors ?? []
+        diff2 = {
+            ...diff2,
+            Authors: {
+                old_value:
+                    oldAuthors?.map(
+                        (a: any) => `${a.name} (${a.email})` ?? ''
+                    ) ?? [],
+                new_value:
+                    newAuthors?.map(
+                        (a: any) => `${a.name} (${a.email})` ?? ''
+                    ) ?? [],
+            },
+        }
+    }
+
+    if (diff2 && Object.keys(diff2).some((x) => x.includes('Maintainers'))) {
+        diff2 = Object.fromEntries(
+            Object.entries(diff2).filter(
+                ([key]) => !key.includes('Maintainers')
+            )
+        )
+        let oldMaintainers =
+            diff.old_dataset?.maintainers &&
+            typeof diff.old_dataset?.maintainers === 'string'
+                ? JSON.parse(diff.old_dataset?.maintainers)
+                : diff.old_dataset?.maintainers ?? []
+        let newMaintainers =
+            diff.new_dataset?.maintainers &&
+            typeof diff.new_dataset?.maintainers === 'string'
+                ? JSON.parse(diff.new_dataset?.maintainers)
+                : diff.new_dataset?.maintainers ?? []
+        diff2 = {
+            ...diff2,
+            Maintainers: {
+                old_value:
+                    oldMaintainers?.map(
+                        (a: any) => `${a.name} (${a.email})` ?? ''
+                    ) ?? [],
+                new_value:
+                    newMaintainers?.map(
+                        (a: any) => `${a.name} (${a.email})` ?? ''
+                    ) ?? [],
+            },
+        }
+    }
+
     return (
         <div className="pr-4 pl-2 sm:pl-10 mx-auto my-4 overflow-auto">
             {diff &&
