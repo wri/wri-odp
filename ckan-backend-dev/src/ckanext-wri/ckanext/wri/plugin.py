@@ -1,3 +1,5 @@
+import json
+
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.plugins as lib_plugins
@@ -37,6 +39,7 @@ from ckanext.wri.logic.action.update import (
     package_patch,
     resource_update,
     old_package_patch,
+    old_package_update,
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -61,6 +64,7 @@ from ckanext.wri.logic.action.get import (
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
+from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
 from ckan.lib.navl.validators import ignore_missing
 from ckanext.wri.logic.action.datapusher_download import (
     download_request,
@@ -156,6 +160,7 @@ class WriPlugin(plugins.SingletonPlugin):
         return {
             "iso_language_code": wri_validators.iso_language_code,
             "year_validator": wri_validators.year_validator,
+            "agents_json_object": wri_validators.agents_json_object
         }
 
     # IFacets
@@ -224,9 +229,9 @@ class WriPlugin(plugins.SingletonPlugin):
             "old_package_create": logic.action.create.package_create,
             "package_patch": package_patch,
             "old_package_patch": old_package_patch,
-            "old_package_update": logic.action.update.package_update,
+            "old_package_update": old_package_update,
             "resource_update": resource_update,
-            #"package_delete": package_delete,
+            # "package_delete": package_delete,
         }
 
     # IPermissionLabels
@@ -290,19 +295,16 @@ class WriPlugin(plugins.SingletonPlugin):
     # IResourceController
 
     def after_resource_create(self, context: Context, resource_dict: dict[str, Any]):
-
-        self._submit_to_datapusher(resource_dict)
         ResourceLocation.index_resource_by_location(
                         resource_dict, False
                     )
+        self._submit_to_datapusher(resource_dict)
 
     def after_resource_update(self, context: Context, resource_dict: dict[str, Any]):
-
-        self._submit_to_datapusher(resource_dict)
         ResourceLocation.index_resource_by_location(
                         resource_dict, False
                     )
-
+        self._submit_to_datapusher(resource_dict)
 
     def _submit_to_datapusher(self, resource_dict: dict[str, Any]):
         context = cast(
@@ -342,16 +344,36 @@ class WriPlugin(plugins.SingletonPlugin):
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)
 
-#        if pkg_dict.get("is_approved", False):
-#            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+        # if pkg_dict.get("is_approved", False):
+        #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment
 
-#        if pkg_dict.get("is_approved", False):
-#            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+        # if pkg_dict.get("is_approved", False):
+        #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+
+    def after_dataset_show(self, context, pkg_dict):
+        authors = pkg_dict.get("authors")
+        maintainers = pkg_dict.get("maintainers")
+
+        if isinstance(authors, str):
+            try:
+                authors = json.loads(authors)
+                pkg_dict["authors"] = authors
+            except Exception as e:
+                log.error(f"Error parsing authors: {e}")
+
+        if isinstance(maintainers, str):
+            try:
+                maintainers = json.loads(maintainers)
+                pkg_dict["maintainers"] = maintainers
+            except Exception as e:
+                log.error(f"Error parsing maintainers: {e}")
+
+        return pkg_dict
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)
@@ -360,6 +382,9 @@ class WriPlugin(plugins.SingletonPlugin):
         return self.before_dataset_search(search_params)
 
     def before_dataset_index(self, pkg_dict):
+        if any(key in pkg_dict for key in ("authors", "maintainers")):
+            pkg_dict = stringify_actor_objects(pkg_dict)
+
         if not pkg_dict.get("spatial"):
             return pkg_dict
 

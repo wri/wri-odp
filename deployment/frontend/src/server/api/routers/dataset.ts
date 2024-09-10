@@ -174,6 +174,14 @@ export const DatasetRouter = createTRPCRouter({
                                 : input.featured_image
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
+                    authors: input.authors.map((author) => ({
+                        name: author.name,
+                        email: author.email,
+                    })),
+                    maintainers: input.maintainers.map((maintainer) => ({
+                        name: maintainer.name,
+                        email: maintainer.email,
+                    })),
                     resources: input.resources
                         .filter(
                             (resource) =>
@@ -459,6 +467,14 @@ export const DatasetRouter = createTRPCRouter({
                                     : input.featured_image
                                 : null,
                         visibility_type: input.visibility_type?.value ?? '',
+                        authors: input.authors?.map((author) => ({
+                            name: author.name,
+                            email: author.email,
+                        })),
+                        maintainers: input.maintainers?.map((maintainer) => ({
+                            name: maintainer.name,
+                            email: maintainer.email,
+                        })),
                         resources: input.resources
                             ?.filter(
                                 (resource) =>

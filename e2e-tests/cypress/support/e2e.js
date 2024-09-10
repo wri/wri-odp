@@ -53,6 +53,7 @@ Cypress.Commands.add("login", (username, password) => {
 });
 
 Cypress.Commands.add("logout", () => {
+  cy.visit("/");
   cy.get("#nav-user-menu").click();
   cy.get(":nth-child(3) > .px-2").should("be.visible").as("menuItem");
   cy.get("@menuItem").click();
@@ -275,7 +276,8 @@ Cypress.Commands.add(
       body: {
         owner_org: organization,
         name: name,
-        author: "datopian",
+        authors: [{ name: "Datopian", email: "datopian@example.com" }],
+        maintainers: [{ name: "Datopian", email: "datopian@example.com" }],
         license_id: "notspecified",
         approval_status: "approved",
         is_approved: "true",

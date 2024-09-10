@@ -5,6 +5,10 @@ from ckan.logic.auth.create import _check_group_auth
 from ckan.common import _
 import ckan.logic.auth as logic_auth
 
+import logging
+
+log = logging.getLogger(__name__)
+
 
 def _package_update(context: Context, data_dict: DataDict) -> AuthResult:
     model = context["model"]
@@ -150,8 +154,8 @@ def notification_create(context: Context, data_dict: DataDict) -> AuthResult:
 
 
 def pending_dataset_create(context: Context, data_dict: DataDict) -> AuthResult:
-    print("PENDING DATASET UPDATE", flush=True)
-    print(data_dict, flush=True)
+    #print("PENDING DATASET UPDATE", flush=True)
+    #print(data_dict, flush=True)
     return tk.check_access("package_create", context, data_dict)
 
 
@@ -169,8 +173,8 @@ def pending_dataset_show(context: Context, data_dict: DataDict) -> AuthResult:
 
 
 def pending_dataset_update(context: Context, data_dict: DataDict) -> AuthResult:
-    print("PENDING DATASET UPDATE", flush=True)
-    print(data_dict, flush=True)
+    #print("PENDING DATASET UPDATE", flush=True)
+    #print(data_dict, flush=True)
     return tk.check_access("package_update", context, data_dict)
 
 

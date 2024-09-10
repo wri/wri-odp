@@ -159,38 +159,45 @@ export function Preview({
                             </dl>
                         </div>
                     )}
-                    {(watch('author') ||
-                        watch('author_email') ||
-                        watch('maintainer') ||
-                        watch('maintainer_email')) && (
+                    {(watch('authors')?.length > 0 ||
+                      watch('maintainers')?.length > 0) && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
                                 Points of Contact
                             </h3>
                             <div className="grid sm:grid-cols-2">
                                 <dl className="flex flex-col gap-y-6">
-                                    <SimpleDescription
-                                        label="Author Name"
-                                        text={watch('author') ?? '_'}
-                                    />
-                                    <SimpleDescription
-                                        label="Author Email"
-                                        text={watch('author_email') ?? '_'}
-                                    />
+                                    {watch('authors')?.map((author, index) => (
+                                        <div key={`author-${index}`}>
+                                            <SimpleDescription
+                                                label="Author Name"
+                                                text={author.name ?? '_'}
+                                            />
+                                            <SimpleDescription
+                                                label="Author Email"
+                                                text={author.email ?? '_'}
+                                            />
+                                        </div>
+                                    ))}
                                 </dl>
                                 <dl className="flex flex-col gap-y-6">
-                                    <SimpleDescription
-                                        label="Maintainer Name"
-                                        text={watch('maintainer') ?? '_'}
-                                    />
-                                    <SimpleDescription
-                                        label="Maintainer Email"
-                                        text={watch('maintainer_email') ?? '_'}
-                                    />
+                                    {watch('maintainers')?.map((maintainer, index) => (
+                                        <div key={`maintainer-${index}`}>
+                                            <SimpleDescription
+                                                label="Maintainer Name"
+                                                text={maintainer.name ?? '_'}
+                                            />
+                                            <SimpleDescription
+                                                label="Maintainer Email"
+                                                text={maintainer.email ?? '_'}
+                                            />
+                                        </div>
+                                    ))}
                                 </dl>
                             </div>
                         </div>
                     )}
+
                     {watch('release_notes') && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
