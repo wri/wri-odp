@@ -51,10 +51,13 @@ RUN apk del build-base python3-dev && \
     rm -rf /var/cache/apk/*
  
 # Update ckanext-s3filestore test.ini with minio credentials
+USER root
 RUN sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \
     sed -i "s|ckanext.s3filestore.aws_secret_access_key = test-secret-key|ckanext.s3filestore.aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}|g" src/ckanext-s3filestore/test.ini && \
     sed -i "s|ckanext.s3filestore.aws_bucket_name = test-bucket|ckanext.s3filestore.aws_bucket_name = ${AWS_BUCKET_NAME}|g" src/ckanext-s3filestore/test.ini && \
     sed -i "s|ckanext.s3filestore.host_name = http://127.0.0.1:9000|ckanext.s3filestore.host_name = ${HOST_NAME}|g" src/ckanext-s3filestore/test.ini
+
+RUN chmod -R 777 src
 
 COPY scripts/run_unit_tests.sh ${APP_DIR}/run_unit_tests.sh
 RUN chmod +x ${APP_DIR}/run_unit_tests.sh
