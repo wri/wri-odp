@@ -49,6 +49,8 @@ RUN pip install --disable-pip-version-check Shapely==2.0.1
 
 RUN apk del build-base python3-dev && \
     rm -rf /var/cache/apk/*
+
+RUN conda install -c conda-forge proj proj-dev proj-utils
  
 # Update ckanext-s3filestore test.ini with minio credentials
 RUN sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \
