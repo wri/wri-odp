@@ -1,8 +1,10 @@
-FROM viderum/ckan:v2.10-dev-security-fix
+FROM viderum/ckan:v2.10.3-alpine-3.18
 
 ENV CKAN_INI /srv/app/production.ini
 ENV APP_DIR=/srv/app
 
+USER root
+RUN pip3 install --upgrade setuptools==70.0.0
 # Install any extensions needed by your CKAN instance
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
@@ -34,6 +36,9 @@ RUN pip install --disable-pip-version-check Shapely==2.0.1
 
 RUN apk del build-base python3-dev && \
     rm -rf /var/cache/apk/*
+
+RUN apk add proj proj-dev proj-util musl-dev python3-dev
+RUN pip3 install pyproj --no-binary pyproj
 
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
