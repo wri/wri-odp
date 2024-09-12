@@ -28,11 +28,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await helpers.topics.getGeneralTopics.prefetch({
-        search: '',
-        page: { start: 0, rows: 10000 },
-        allTree: true,
-    })
+    await Promise.all([
+        await helpers.topics.getGeneralTopics.prefetch({
+            search: '',
+            page: { start: 0, rows: 10000 },
+            allTree: true,
+        }),
+        await helpers.topics.list.prefetch(),
+    ])
 
     return {
         props: {
@@ -54,21 +57,22 @@ export default function TopicsPage(
         page: { start: 0, rows: 1000 },
         allTree: true,
     })
+    const { data: allTopics } = api.topics.list.useQuery()
 
     const indexTopics = new Index({
         tokenize: 'full',
     })
-    if (data?.topics) {
-        data?.topics.forEach((topic) => {
+    if (allTopics?.topics) {
+        allTopics?.topics.forEach((topic) => {
             indexTopics.add(topic.id, JSON.stringify(topic))
         })
     }
 
     function ProcessTopics() {
-        if (!data) return { topics: [], topicDetails: {}, count: 0 }
+        if (!data || !allTopics) return { topics: [], topicDetails: {}, count: 0 }
         const filteredTopics =
             query !== ''
-                ? data.topics.filter((t) =>
+                ? allTopics.topics.filter((t) =>
                       indexTopics.search(query).includes(t.id)
                   )
                 : data.topics
@@ -103,7 +107,7 @@ export default function TopicsPage(
             <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
-                    <h3 className="pt-1 font-bold font-acumin text-xl font-light leading-loose text-neutral-700 ">
+                    <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
                         Explore reliable datasets filtered by the topic of your
                         interest.
                     </h3>

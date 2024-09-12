@@ -403,6 +403,23 @@ export const TopicRouter = createTRPCRouter({
                 topic: topic.result,
             }
         }),
+    list: publicProcedure
+        .query(async ({ ctx, input }) => {
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const topic: CkanResponse<Group[]> = await topicRes.json()
+            if (!topic.success && topic.error)
+                throw Error(replaceNames(topic.error.message))
+            return {
+                topics: topic.result,
+            }
+        }),
 
     getFollowedTopics: protectedProcedure.query(async ({ ctx }) => {
         const response = await fetch(
