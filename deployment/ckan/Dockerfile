@@ -4,8 +4,6 @@ ENV CKAN_INI /srv/app/production.ini
 ENV APP_DIR=/srv/app
 
 USER root
-RUN apk add sed=4.1.0
-RUN sed --version
 RUN pip3 install --upgrade setuptools==70.0.0
 # Install any extensions needed by your CKAN instance
 RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
@@ -18,6 +16,8 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
 
 USER root
+
+RUN chmod 777 ${APP_DIR}/src/ckanext-s3filestore
 
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
