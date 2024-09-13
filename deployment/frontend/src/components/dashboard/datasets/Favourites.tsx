@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import SearchHeader from '../_shared/SearchHeader'
 import { FavouriteRow } from './DatasetRow'
 import { api } from '@/utils/api'
@@ -8,23 +8,26 @@ import Pagination from '../_shared/Pagination'
 import { useQuery } from 'react-query'
 import type { WriDataset } from '@/schema/ckan.schema'
 import notify from '@/utils/notify'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 
-export default function Favourite() {
+export default function Favourite({
+    setQuery,
+    query,
+}: {
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
+    query: SearchInput
+}) {
     const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [open, setOpen] = useState(false)
-    const [query, setQuery] = useState<SearchInput>({
-        search: '',
-        page: { start: 0, rows: 10 },
-    })
+
     const { data, isLoading, refetch } =
         api.dataset.getFavoriteDataset.useQuery()
     const removeFromFavorites = api.dataset.unFollowDataset.useMutation({
