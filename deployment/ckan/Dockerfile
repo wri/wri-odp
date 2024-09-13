@@ -65,5 +65,7 @@ ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_vi
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 
+RUN apk add sed=4.1.0
+RUN sed --version
 USER ckan
 
