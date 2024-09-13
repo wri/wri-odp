@@ -40,6 +40,7 @@ export const env = createEnv({
         SMTP_PASSWORD: z.string(),
         SMTP_FROM: z.string(),
         PREFECT_INTERNAL_URL: z.string(),
+        OSANO_URL: z.string(),
     },
 
     /**
@@ -86,6 +87,7 @@ export const env = createEnv({
         NEXT_PUBLIC_DISABLE_HOTJAR: process.env.NEXT_PUBLIC_DISABLE_HOTJAR || "enabled",
         NEXT_PUBLIC_HOTJAR_ID: process.env.NEXT_PUBLIC_HOTJAR_ID,
         NEXT_PUBLIC_GFW_API_KEY: process.env.NEXT_PUBLIC_GFW_API_KEY,
+        OSANO_URL: process.env.OSANO_URL,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

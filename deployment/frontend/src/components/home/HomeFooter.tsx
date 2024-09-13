@@ -70,6 +70,21 @@ export function HomeFooter() {
                         <Link href="/user-guide" className=" font-normal">
                             User Guide
                         </Link>
+                        <a href="" className="osano-cookie-preference-link font-normal" title="Manage privacy and cookie preferences">Cookie Preferences</a>
+                        <script dangerouslySetInnerHTML={{
+                            __html: `
+                              var elements = document.getElementsByClassName("osano-cookie-preference-link");
+
+                              var showOsanaDialog = function(e) {
+                                e.preventDefault();
+                                Osano.cm.showDrawer('osano-cm-dom-info-dialog-open');
+                              };
+
+                              for (var i = 0; i < elements.length; i++) {
+                                elements[i].addEventListener('click', showOsanaDialog, false);
+                              }
+                              `
+                        }} />
                     </div>
                     <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start xl:min-w-[420px]">
                         <div className="font-acumin text-xl font-bold text-gray-800">
