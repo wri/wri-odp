@@ -345,17 +345,15 @@ export const TopicRouter = createTRPCRouter({
                     q: input.search,
                     group_type: 'group',
                 })
-                groupTree = groupTree.filter((x) => x.name === input.search)
+
                 if (input.tree) {
-                    let groupFetchTree = groupTree[0] as GroupTree
-                    const findTree = findNameInTree(
-                        groupFetchTree,
-                        input.search
-                    )
-                    if (findTree) {
-                        groupFetchTree = findTree
+                    for (const gtree of groupTree) {
+                        const findtree = findNameInTree(gtree, input.search)
+                        if (findtree) {
+                            groupTree = [findtree]
+                            break
+                        }
                     }
-                    groupTree = [groupFetchTree]
                 }
                 if (input.allTree) {
                     const filterTree = groupTree.flatMap((group) => {

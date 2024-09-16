@@ -1004,6 +1004,7 @@ export async function getTopicTreeDetails({
         }))!
         topic.package_count = packagedetails.count
     }
+
     if (input.search) {
         groupTree = await searchHierarchy({
             isSysadmin: true,
@@ -1011,14 +1012,15 @@ export async function getTopicTreeDetails({
             q: input.search,
             group_type: 'group',
         })
-        groupTree = groupTree.filter((x) => x.name === input.search)
+
         if (input.tree) {
-            let groupFetchTree = groupTree[0] as GroupTree
-            const findTree = findNameInTree(groupFetchTree, input.search)
-            if (findTree) {
-                groupFetchTree = findTree
+            for (const gtree of groupTree) {
+                const findtree = findNameInTree(gtree, input.search)
+                if (findtree) {
+                    groupTree = [findtree]
+                    break
+                }
             }
-            groupTree = [groupFetchTree]
         }
     } else {
         groupTree = await getGroups({
@@ -1027,6 +1029,7 @@ export async function getTopicTreeDetails({
     }
 
     const result = groupTree
+
     return {
         topics: result,
         topicDetails: topicDetails,

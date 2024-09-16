@@ -43,7 +43,11 @@ export async function getServerSideProps(
             session: session,
         })
 
-        const topic = topics.topics[0] as GroupTree
+        if (topics.topics.length === 0) {
+            throw new Error('Topic not found')
+        }
+
+        const topic = topics!.topics[0] as GroupTree
         const topicTitle = topic.title ?? topic.name
 
         await helpers.dataset.getAllDataset.prefetch({
@@ -67,10 +71,9 @@ export async function getServerSideProps(
         }
     } catch {
         return {
-            props: {
-                redirect: {
-                    destination: '/datasets/404',
-                },
+            props: {},
+            redirect: {
+                destination: '/topics/404',
             },
         }
     }
