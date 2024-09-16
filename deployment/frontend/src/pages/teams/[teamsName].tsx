@@ -15,7 +15,7 @@ import GroupBreadcrumb from '@/components/team/GroupBreadcrumb'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getOrganizationTreeDetails } from '@/utils/apiUtils'
 import { getServerAuthSession } from '@/server/auth'
-import { GroupTree } from '@/schema/ckan.schema'
+import { GroupsmDetails, GroupTree } from '@/schema/ckan.schema'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
@@ -47,6 +47,10 @@ export async function getServerSideProps(
             session: session,
         })
 
+        if (teams.teams.length === 0) {
+            throw new Error('Teams not found')
+        }
+
         const team = teams.teams[0] as GroupTree
         const teamTitle = team.title ?? team.name
 
@@ -72,10 +76,9 @@ export async function getServerSideProps(
         }
     } catch {
         return {
-            props: {
-                redirect: {
-                    destination: '/datasets/404',
-                },
+            props: {},
+            redirect: {
+                destination: '/teams/404',
             },
         }
     }
@@ -84,9 +87,11 @@ export default function teams(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
     const router = useRouter()
-    // const { teamsName } = router.query
-
-    const { teams } = props
+    const teams = props.teams as {
+        teams: GroupTree[]
+        teamsDetails: Record<string, GroupsmDetails>
+        count: number
+    }
     const teamName = props.teamsName as string
     const teamTitle = props.teamTitle as string
 
