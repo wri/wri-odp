@@ -8,6 +8,12 @@ import json
 from typing import Any, cast
 import re
 from itertools import zip_longest
+import requests
+from shapely.geometry import shape
+from shapely import wkb, wkt
+from shapely.ops import transform
+from pyproj import Transformer
+import binascii
 
 from ckan.common import config, asbool
 from ckan.model import Package
@@ -365,7 +371,8 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                     try:
                         if return_user:
                             user = model_dictize.user_dictize(
-                                model.User.get(package_dict.get("creator_user_id")), context
+                                model.User.get(package_dict.get("creator_user_id")),
+                                context,
                             )
                             package_dict["user"] = user
                     except:
@@ -951,6 +958,77 @@ def package_collaborator_list_wri(context: Context, data_dict: DataDict):
     return result
 
 
+def get_geojson_from_dataapi(address: str, point):
+    api_key: str = config.get("ckanext.wri.gfw_api_key", '')
+    headers = {"x-api-key": api_key, "Content-Type": "application/json"}
+    split_address = address.split(",")
+    shape = None
+    if len(split_address) == 1:
+        url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query/json?sql=SELECT ST_AsText(ST_Simplify(geom_wm, 1000.0)) AS simplified_shape FROM gadm_administrative_boundaries WHERE adm_level = '0' AND ST_Contains(ST_Transform(geom_wm, 4326), ST_GeomFromText('POINT({point[0]} {point[1]})', 4326)) limit 1;"
+        print('URL', flush=True)
+        print(url, flush=True)
+        response = requests.get(url, headers=headers)
+        data = response.json()
+        shape = data["data"][0]["simplified_shape"]
+        if len(data["data"]) > 0:
+            shape = data["data"][0]["simplified_shape"]
+    if len(split_address) == 2:
+        url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query/json?sql=SELECT ST_AsText(ST_Simplify(geom_wm, 1000.0)) AS simplified_shape FROM gadm_administrative_boundaries WHERE adm_level = '1' AND  ST_Contains(ST_Transform(geom_wm, 4326), ST_GeomFromText('POINT({point[0]} {point[1]})', 4326))  limit 1;"
+        response = requests.get(url, headers=headers)
+        data = response.json()
+        if len(data["data"]) > 0:
+            shape = data["data"][0]["simplified_shape"]
+    if shape is None:
+        return
+    shape = wkt.loads(shape)
+    transformer = Transformer.from_crs(3857, 4326, always_xy=True)
+    shape = transform(transformer.transform, shape)
+    spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
+    print("Getting geojson from data-api", flush=True)
+    return spatial_geom
+
+
+def get_geojson_from_filesystem(address: str):
+    segments = address.split(",")
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    if len(segments) == 1:
+        path = os.path.join(
+            cwd,
+            "../../world_geojsons/countries/{}.geojson".format(segments[0].strip()),
+        )
+    else:
+        path = os.path.join(
+            cwd,
+            "../../world_geojsons/states/{}/{}.geojson".format(
+                segments[1].strip(), segments[0].strip()
+            ),
+        )
+
+    with open(path, "r") as f:
+        content = f.read()
+        geojson = json.loads(content)
+        geometries = []
+
+        if geojson["type"] == "GeometryCollection":
+            geometries = geojson["geometries"]
+        elif geojson["type"] == "FeatureCollection":
+            geometries = [x["geometry"] for x in geojson["features"]]
+        else:
+            geometries = [geojson]
+
+        valid_geometries = []
+        for geom in geometries:
+            json_str = json.dumps(geom)
+            shape = shapely.from_geojson(json_str)
+            if shape.is_valid:
+                valid_geometries.append(shape)
+
+        merged_geometry = unary_union(valid_geometries)
+        spatial_geom = geoalchemy2.functions.ST_GeomFromText(merged_geometry.wkt)
+        print("Getting geojson from filesystem", flush=True)
+        return spatial_geom
+
+
 @logic.side_effect_free
 def resource_search(context: Context, data_dict: DataDict):
     _check_access("resource_search", context, data_dict)
@@ -996,7 +1074,6 @@ def resource_search(context: Context, data_dict: DataDict):
             ResourceLocation.spatial_geom, "POINT({} {})".format(*point)
         )
 
-
     # if query is None:
     #     raise ValidationError({'query': _('Missing value')})
 
@@ -1028,10 +1105,6 @@ def resource_search(context: Context, data_dict: DataDict):
     )
     location_queries = []
     if spatial_address:
-        log.info("SPATIAL ADDRESS")
-        log.info(spatial_address)
-        cwd = os.path.abspath(os.path.dirname(__file__))
-
         segments = spatial_address.split(",")
         if len(segments) == 3:
             full_address = (
@@ -1061,65 +1134,32 @@ def resource_search(context: Context, data_dict: DataDict):
                 ResourceLocation.spatial_address.like(f"%{country}"),
             )
 
-        if len(segments) in [1, 2]:
-            # It's a country or a state
-            try:
-                if len(segments) == 1:
-                    path = os.path.join(
-                        cwd,
-                        "../../world_geojsons/countries/{}.geojson".format(
-                            segments[0].strip()
-                        ),
-                    )
-                else:
-                    path = os.path.join(
-                        cwd,
-                        "../../world_geojsons/states/{}/{}.geojson".format(
-                            segments[1].strip(), segments[0].strip()
-                        ),
-                    )
-
-                with open(path, "r") as f:
-                    content = f.read()
-                    geojson = json.loads(content)
-                    geometries = []
-
-                    if geojson["type"] == "GeometryCollection":
-                        geometries = geojson["geometries"]
-                    elif geojson["type"] == "FeatureCollection":
-                        geometries = [x["geometry"] for x in geojson["features"]]
-                    else:
-                        geometries = [geojson]
-
-                    valid_geometries = []
-                    for geom in geometries:
-                        json_str = json.dumps(geom)
-                        shape = shapely.from_geojson(json_str)
-                        if shape.is_valid:
-                            valid_geometries.append(shape)
-
-                    merged_geometry = unary_union(valid_geometries)
-                    spatial_geom = geoalchemy2.functions.ST_GeomFromText(
-                        merged_geometry.wkt
-                    )
-                    print("SPATIAL GEOM", flush=True)
-                    print(spatial_geom, flush=True)
-
-                    location_queries.append(
-                        geoalchemy2.functions.ST_Intersects(
-                            ResourceLocation.spatial_geom, spatial_geom
-                        )
-                    )
-
-            except Exception as e:
-                log.error(e)
-                if point:
-                    location_queries.append(point_query)
-
         elif len(segments) == 3:
             # It's a city
             if point:
                 location_queries.append(point_query)
+
+        boundaries_from_gadm = config.get('ckanext.wri.boundaries_from_gadm', False)
+        if point and boundaries_from_gadm:
+            spatial_geom = get_geojson_from_dataapi(spatial_address, point)
+            location_queries.append(
+                geoalchemy2.functions.ST_Intersects(
+                    ResourceLocation.spatial_geom, spatial_geom
+                )
+            )
+
+        if len(segments) in [1, 2] and boundaries_from_gadm is not True:
+            try:
+                spatial_geom = get_geojson_from_filesystem(spatial_address)
+                location_queries.append(
+                    geoalchemy2.functions.ST_Intersects(
+                        ResourceLocation.spatial_geom, spatial_geom
+                    )
+                )
+            except Exception as e:
+                log.error(e)
+                if point:
+                    location_queries.append(point_query)
 
     if len(location_queries) == 0 and point_query is not None:
         location_queries.append(point_query)
@@ -1129,12 +1169,10 @@ def resource_search(context: Context, data_dict: DataDict):
 
     if location_queries:
         q = q.filter(_or_(*location_queries))
-        print("LOCATION QUERIES", flush=True)
         print(q, flush=True)
 
     resource_fields = model.Resource.get_columns()
     for field, term in fields.items():
-
         if field not in resource_fields:
             msg = _('Field "{field}" not recognised in resource_search.').format(
                 field=field

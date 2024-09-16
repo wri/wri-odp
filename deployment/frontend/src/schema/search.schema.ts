@@ -20,6 +20,7 @@ export const searchSchema = z.object({
     allTree: z.boolean().optional(),
     pageEnabled: z.boolean().optional(),
     removeUnecessaryDataInResources: z.boolean().optional(),
+    tab: z.string().optional(),
 })
 
 export type SearchInput = z.infer<typeof searchSchema>
