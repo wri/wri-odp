@@ -27,6 +27,7 @@ import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 import { TopicSchema } from '@/schema/topic.schema'
 import { replaceNames } from '@/utils/replaceNames'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
+import { flattenTree } from '@/utils/flattenGroupTree'
 
 export const TopicRouter = createTRPCRouter({
     getUsersTopics: protectedProcedure
@@ -419,6 +420,22 @@ export const TopicRouter = createTRPCRouter({
             return {
                 topics: topic.result,
             }
+        }),
+    getNumberOfSubtopics: publicProcedure
+        .query(async ({ ctx, input }) => {
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/group_list_wri?q=`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const topics: CkanResponse<GroupTree[]> = await topicRes.json()
+            if (!topics.success && topics.error)
+                throw Error(replaceNames(topics.error.message))
+            const numOfSubtopics = flattenTree(topics.result)
+            return numOfSubtopics 
         }),
 
     getFollowedTopics: protectedProcedure.query(async ({ ctx }) => {

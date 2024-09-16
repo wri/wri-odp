@@ -8,14 +8,16 @@ export default function TopicsSearchResults({
     topics,
     topicDetails,
     count,
+  filtered,
 }: {
     topics: GroupTree[]
     topicDetails: Record<string, GroupsmDetails>
     count: number
+    filtered: boolean
 }) {
     return (
         <Container className="mb-28">
-            <span className="font-semibold text-xl">{count} topics</span>
+            <span className="font-semibold text-xl">{count} {!filtered ? 'top level topics' : 'topics'}</span>
             <CardsGrid<GroupTree>
                 className="mt-5"
                 items={topics}

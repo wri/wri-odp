@@ -35,6 +35,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             allTree: true,
         }),
         await helpers.topics.list.prefetch(),
+        await helpers.topics.getNumberOfSubtopics.prefetch(),
     ])
 
     return {
@@ -63,13 +64,21 @@ export default function TopicsPage(
         tokenize: 'full',
     })
     if (allTopics?.topics) {
+    console.log('ALL TOPICS', allTopics?.topics)
         allTopics?.topics.forEach((topic) => {
-            indexTopics.add(topic.id, JSON.stringify(topic))
+            indexTopics.add(
+                topic.id,
+                JSON.stringify({
+                    title: topic.title,
+                    description: topic.description,
+                })
+            )
         })
     }
 
     function ProcessTopics() {
-        if (!data || !allTopics) return { topics: [], topicDetails: {}, count: 0 }
+        if (!data || !allTopics)
+            return { topics: [], topicDetails: {}, count: 0 }
         const filteredTopics =
             query !== ''
                 ? allTopics.topics.filter((t) =>
@@ -118,6 +127,11 @@ export default function TopicsPage(
             ) : (
                 <>
                     <TopicsSearchResults
+                        filtered={
+                            query !== '' &&
+                            query !== null &&
+                            typeof query !== 'undefined'
+                        }
                         count={filteredTopics.count}
                         topics={filteredTopics.topics}
                         topicDetails={filteredTopics.topicDetails}
