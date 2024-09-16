@@ -41,7 +41,6 @@ export const env = createEnv({
         SMTP_FROM: z.string(),
         PREFECT_INTERNAL_URL: z.string(),
         OSANO_URL: z.string(),
-        NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL: z.string().optional(),
     },
 
     /**
@@ -56,6 +55,7 @@ export const env = createEnv({
         NEXT_PUBLIC_DISABLE_HOTJAR: z.string(),
         NEXT_PUBLIC_HOTJAR_ID: z.string(),
         NEXT_PUBLIC_GFW_API_KEY: z.string(),
+        NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL: z.string(),
     },
 
     /**
