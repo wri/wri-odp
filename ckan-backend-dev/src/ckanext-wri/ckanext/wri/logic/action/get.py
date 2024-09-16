@@ -958,23 +958,22 @@ def package_collaborator_list_wri(context: Context, data_dict: DataDict):
     return result
 
 
-def get_geojson_from_dataapi(address: str):
+def get_geojson_from_dataapi(address: str, point):
     api_key: str = config.get("ckanext.wri.gfw_api_key", '')
     headers = {"x-api-key": api_key, "Content-Type": "application/json"}
     split_address = address.split(",")
     shape = None
     if len(split_address) == 1:
-        country = address.strip()
-        url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query/json?sql=SELECT ST_AsText(ST_Simplify(geom_wm, 1000.0)) AS simplified_shape FROM gadm_administrative_boundaries WHERE adm_level = '0' AND country = '{country}' limit 1;"
+        url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query/json?sql=SELECT ST_AsText(ST_Simplify(geom_wm, 1000.0)) AS simplified_shape FROM gadm_administrative_boundaries WHERE adm_level = '0' AND ST_Contains(ST_Transform(geom_wm, 4326), ST_GeomFromText('POINT({point[0]} {point[1]})', 4326)) limit 1;"
+        print('URL', flush=True)
+        print(url, flush=True)
         response = requests.get(url, headers=headers)
         data = response.json()
         shape = data["data"][0]["simplified_shape"]
         if len(data["data"]) > 0:
             shape = data["data"][0]["simplified_shape"]
     if len(split_address) == 2:
-        country = split_address[1].strip()
-        region = split_address[0].strip()
-        url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query/json?sql=SELECT ST_AsText(ST_Simplify(geom_wm, 1000.0)) AS simplified_shape FROM gadm_administrative_boundaries WHERE adm_level = '1' AND country = '{country}' AND name_1 = '{region}' limit 1;"
+        url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query/json?sql=SELECT ST_AsText(ST_Simplify(geom_wm, 1000.0)) AS simplified_shape FROM gadm_administrative_boundaries WHERE adm_level = '1' AND  ST_Contains(ST_Transform(geom_wm, 4326), ST_GeomFromText('POINT({point[0]} {point[1]})', 4326))  limit 1;"
         response = requests.get(url, headers=headers)
         data = response.json()
         if len(data["data"]) > 0:
@@ -982,10 +981,8 @@ def get_geojson_from_dataapi(address: str):
     if shape is None:
         return
     shape = wkt.loads(shape)
-    print("SHAPE", flush=True)
     transformer = Transformer.from_crs(3857, 4326, always_xy=True)
     shape = transform(transformer.transform, shape)
-    print("SHAPE", flush=True)
     spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
     print("Getting geojson from data-api", flush=True)
     return spatial_geom
@@ -1137,46 +1134,32 @@ def resource_search(context: Context, data_dict: DataDict):
                 ResourceLocation.spatial_address.like(f"%{country}"),
             )
 
-        if len(segments) in [1, 2]:
-            boundaries_from_gadm = config.get('ckanext.wri.boundaries_from_gadm', False)
-            if boundaries_from_gadm:
-                try:
-                    spatial_geom = get_geojson_from_dataapi(spatial_address)
-                    location_queries.append(
-                        geoalchemy2.functions.ST_Intersects(
-                            ResourceLocation.spatial_geom, spatial_geom
-                        )
-                    )
-                except Exception as e:
-                    print(e, flush=True)
-                    try:
-                        spatial_geom = get_geojson_from_filesystem(spatial_address)
-                        location_queries.append(
-                            geoalchemy2.functions.ST_Intersects(
-                                ResourceLocation.spatial_geom, spatial_geom
-                            )
-                        )
-                    except Exception as e:
-                        log.error(e)
-                        if point:
-                            location_queries.append(point_query)
-            else:
-                try:
-                    spatial_geom = get_geojson_from_filesystem(spatial_address)
-                    location_queries.append(
-                        geoalchemy2.functions.ST_Intersects(
-                            ResourceLocation.spatial_geom, spatial_geom
-                        )
-                    )
-                except Exception as e:
-                    log.error(e)
-                    if point:
-                        location_queries.append(point_query)
-
         elif len(segments) == 3:
             # It's a city
             if point:
                 location_queries.append(point_query)
+
+        boundaries_from_gadm = config.get('ckanext.wri.boundaries_from_gadm', False)
+        if point and boundaries_from_gadm:
+            spatial_geom = get_geojson_from_dataapi(spatial_address, point)
+            location_queries.append(
+                geoalchemy2.functions.ST_Intersects(
+                    ResourceLocation.spatial_geom, spatial_geom
+                )
+            )
+
+        if len(segments) in [1, 2] and boundaries_from_gadm is not True:
+            try:
+                spatial_geom = get_geojson_from_filesystem(spatial_address)
+                location_queries.append(
+                    geoalchemy2.functions.ST_Intersects(
+                        ResourceLocation.spatial_geom, spatial_geom
+                    )
+                )
+            except Exception as e:
+                log.error(e)
+                if point:
+                    location_queries.append(point_query)
 
     if len(location_queries) == 0 and point_query is not None:
         location_queries.append(point_query)
@@ -1186,7 +1169,6 @@ def resource_search(context: Context, data_dict: DataDict):
 
     if location_queries:
         q = q.filter(_or_(*location_queries))
-        print("LOCATION QUERIES", flush=True)
         print(q, flush=True)
 
     resource_fields = model.Resource.get_columns()
