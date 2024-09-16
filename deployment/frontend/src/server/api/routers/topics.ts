@@ -27,6 +27,7 @@ import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 import { TopicSchema } from '@/schema/topic.schema'
 import { replaceNames } from '@/utils/replaceNames'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
+import { group } from 'console'
 
 export const TopicRouter = createTRPCRouter({
     getUsersTopics: protectedProcedure
@@ -346,6 +347,14 @@ export const TopicRouter = createTRPCRouter({
                 groupTree = await getGroups({
                     apiKey: ctx?.session?.user.apikey ?? '',
                 })
+            }
+
+            if (groupTree.length === 0) {
+                return {
+                    topics: [],
+                    topicDetails: {},
+                    count: 0,
+                }
             }
 
             const allGroups = (await getUserGroups({
