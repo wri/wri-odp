@@ -30,7 +30,7 @@ export function Contact({
                         img="/images/placeholders/user/userdefault.png"
                         title="Author"
                         email={author.email ?? ''}
-                        highlighted={(type) => highlighted(`authors[${index}].${type}`)}
+                        highlighted={(field) => highlighted(`authors[${index}].${field}`)}
                     />
                 ))}
             </div>
@@ -43,7 +43,7 @@ export function Contact({
                         img="/images/placeholders/user/userdefault.png"
                         title="Maintainer"
                         email={maintainer.email ?? ''}
-                        highlighted={(type) => highlighted(`maintainers[${index}].${type}`)}
+                        highlighted={(field) => highlighted(`maintainers[${index}].${field}`)}
                     />
                 ))}
             </div>

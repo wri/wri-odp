@@ -43,7 +43,11 @@ export async function getServerSideProps(
             session: session,
         })
 
-        const topic = topics.topics[0] as GroupTree
+        if (topics.topics.length === 0) {
+            throw new Error('Topic not found')
+        }
+
+        const topic = topics!.topics[0] as GroupTree
         const topicTitle = topic.title ?? topic.name
 
         await helpers.dataset.getAllDataset.prefetch({
@@ -67,10 +71,9 @@ export async function getServerSideProps(
         }
     } catch {
         return {
-            props: {
-                redirect: {
-                    destination: '/datasets/404',
-                },
+            props: {},
+            redirect: {
+                destination: '/topics/404',
             },
         }
     }
@@ -80,22 +83,10 @@ export default function TopicPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
     const router = useRouter()
-    const { topics } = props
+    const { topics: data } = props
+
     const topicName = props.topicName as string
     const topicTitle = props.topicTitle as string
-
-    const { data, isLoading: topicIsLoading } =
-        api.topics.getGeneralTopics.useQuery(
-            {
-                search: topicName,
-                page: { start: 0, rows: 100 },
-                tree: true,
-            },
-            {
-                retry: 0,
-                initialData: topics,
-            }
-        )
 
     const links = [
         {
@@ -123,26 +114,15 @@ export default function TopicPage(
             />
             <Header />
             <Breadcrumbs links={links} />
-            {topicIsLoading ? (
-                <Spinner className="mx-auto" />
-            ) : (
-                <>
-                    <Hero
-                        topics={data?.topics}
-                        topicsDetails={data?.topicDetails!}
-                    />
-                    <Subtopics
-                        topics={data?.topics}
-                        topicsDetails={data?.topicDetails!}
-                    />
-                    <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
-                        <DatasetTopic
-                            topics={data?.topics!}
-                            key={router.asPath}
-                        />
-                    </div>
-                </>
-            )}
+            <Hero topics={data?.topics} topicsDetails={data?.topicDetails!} />
+            <Subtopics
+                topics={data?.topics}
+                topicsDetails={data?.topicDetails!}
+            />
+            <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
+                <DatasetTopic topics={data?.topics!} key={router.asPath} />
+            </div>
+
             <Footer />
         </>
     )

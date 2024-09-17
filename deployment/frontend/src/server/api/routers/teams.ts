@@ -292,15 +292,13 @@ export const teamRouter = createTRPCRouter({
                 })
 
                 if (input.tree) {
-                    let groupFetchTree = groupTree[0] as GroupTree
-                    const findTree = findNameInTree(
-                        groupFetchTree,
-                        input.search
-                    )
-                    if (findTree) {
-                        groupFetchTree = findTree
+                    for (const gtree of groupTree) {
+                        const findtree = findNameInTree(gtree, input.search)
+                        if (findtree) {
+                            groupTree = [findtree]
+                            break
+                        }
                     }
-                    groupTree = [groupFetchTree]
                 }
 
                 if (input.allTree) {
