@@ -8,7 +8,7 @@ const getRandomOrganizationName = () =>
 const getRandomGroupName = () =>
   Math.random().toString(36).slice(2) + Cypress.env("GROUP_NAME_SUFFIX");
 
-const subgroup = "Subtopic-" + getRandomGroupName();
+const subgroup = "subtopic" + getRandomGroupName();
 
 const orgs = [];
 const groups = [];
