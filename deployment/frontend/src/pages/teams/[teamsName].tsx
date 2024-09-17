@@ -87,26 +87,13 @@ export default function teams(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
     const router = useRouter()
-    const teams = props.teams as {
+    const data = props.teams as {
         teams: GroupTree[]
         teamsDetails: Record<string, GroupsmDetails>
         count: number
     }
     const teamName = props.teamsName as string
     const teamTitle = props.teamTitle as string
-
-    const { data, isLoading: topicIsLoading } =
-        api.teams.getGeneralTeam.useQuery(
-            {
-                search: teamName as string,
-                page: { start: 0, rows: 100 },
-                tree: true,
-            },
-            {
-                retry: 0,
-                initialData: teams,
-            }
-        )
 
     const links = [
         {
@@ -134,26 +121,16 @@ export default function teams(
             />
             <Header />
             <Breadcrumbs links={links} />
-            {topicIsLoading ? (
-                <Spinner className="mx-auto" />
-            ) : (
-                <>
-                    <TeamHeaderCard
-                        teams={data?.teams}
-                        teamsDetails={data?.teamsDetails!}
-                    />
-                    <SubTeams
-                        teams={data?.teams}
-                        teamsDetails={data?.teamsDetails!}
-                    />
-                    <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
-                        <DatasetTeams
-                            teams={data?.teams!}
-                            key={router.asPath}
-                        />
-                    </div>
-                </>
-            )}
+
+            <TeamHeaderCard
+                teams={data?.teams}
+                teamsDetails={data?.teamsDetails!}
+            />
+            <SubTeams teams={data?.teams} teamsDetails={data?.teamsDetails!} />
+            <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
+                <DatasetTeams teams={data?.teams!} key={router.asPath} />
+            </div>
+
             <Footer />
         </>
     )

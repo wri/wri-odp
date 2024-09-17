@@ -32,7 +32,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     })
     await helpers.teams.getGeneralTeam.prefetch({
         search: '',
-        page: { start: 0, rows: 10000 },
+        page: { start: 0, rows: 100 },
         allTree: true,
     })
 
@@ -55,7 +55,7 @@ export default function TeamsPage(
 
     const { data, isLoading } = api.teams.getGeneralTeam.useQuery({
         search: '',
-        page: { start: 0, rows: 1000 },
+        page: { start: 0, rows: 100 },
         allTree: true,
     })
     const indexTeams = new Index({
@@ -113,10 +113,7 @@ export default function TeamsPage(
                         <br />
                         If you have questions about a project&apos;s data reach
                         out to the point of contact in the dataset or to{' '}
-                        <a
-                            href="mailto:data@wri.org"
-                            className="text-blue-700"
-                        >
+                        <a href="mailto:data@wri.org" className="text-blue-700">
                             {' '}
                             data@wri.org
                         </a>
