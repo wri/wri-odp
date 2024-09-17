@@ -235,12 +235,17 @@ Cypress.Commands.add(
 );
 
 // Command for frontend test sepecific
-Cypress.Commands.add("createGroupAPI", (name) => {
+Cypress.Commands.add("createGroupAPI", (name, parent=null) => {
   cy.request({
     method: "POST",
     url: apiUrl("group_create"),
     headers: headers,
-    body: {
+    body: parent? {
+      name: name,
+      title: name,
+      description: "Some sub-topic description",
+      groups: [{name: parent}],
+    } :{
       name: name,
       title: name,
       description: "Some group description",

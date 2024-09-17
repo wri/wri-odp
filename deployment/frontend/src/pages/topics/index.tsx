@@ -51,7 +51,7 @@ export default function TopicsPage(
     const [query, setQuery] = useState<string>('')
     const { data, isLoading } = api.topics.getGeneralTopics.useQuery({
         search: '',
-        page: { start: 0, rows: 1000 },
+        page: { start: 0, rows: 10000 },
         allTree: true,
     })
 
