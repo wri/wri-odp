@@ -30,11 +30,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await helpers.teams.getGeneralTeam.prefetch({
-        search: '',
-        page: { start: 0, rows: 10000 },
-        allTree: true,
-    })
+    await Promise.all([
+        await helpers.teams.getGeneralTeam.prefetch({
+            search: '',
+            page: { start: 0, rows: 10000 },
+            allTree: true,
+        }),
+        await helpers.teams.list.prefetch(),
+        await helpers.teams.getNumberOfSubTeams.prefetch(),
+    ])
 
     return {
         props: {
@@ -58,20 +62,27 @@ export default function TeamsPage(
         page: { start: 0, rows: 1000 },
         allTree: true,
     })
+    const { data: allTeams } = api.teams.list.useQuery()
     const indexTeams = new Index({
         tokenize: 'full',
     })
-    if (data?.teams) {
-        data?.teams.forEach((team) => {
-            indexTeams.add(team.id, JSON.stringify(team))
+    if (allTeams?.teams) {
+        allTeams?.teams.forEach((team) => {
+            indexTeams.add(
+                team.id,
+                JSON.stringify({
+                    title: team.title,
+                    description: team.description,
+                })
+            )
         })
     }
 
     function ProcessTeams() {
-        if (!data) return { teams: [], teamsDetails: {}, count: 0 }
+        if (!data || !allTeams) return { teams: [], teamsDetails: {}, count: 0 }
         const filteredTeams =
             query !== ''
-                ? data.teams.filter((t) =>
+                ? allTeams.teams.filter((t) =>
                       indexTeams.search(query).includes(t.id)
                   )
                 : data.teams
@@ -113,10 +124,7 @@ export default function TeamsPage(
                         <br />
                         If you have questions about a project&apos;s data reach
                         out to the point of contact in the dataset or to{' '}
-                        <a
-                            href="mailto:data@wri.org"
-                            className="text-blue-700"
-                        >
+                        <a href="mailto:data@wri.org" className="text-blue-700">
                             {' '}
                             data@wri.org
                         </a>
@@ -129,6 +137,11 @@ export default function TeamsPage(
             ) : (
                 <>
                     <TeamsSearchResults
+                        filtered={
+                            query !== '' &&
+                            query !== null &&
+                            typeof query !== 'undefined'
+                        }
                         count={filteredTeams.count}
                         teams={filteredTeams?.teams}
                         teamsDetails={filteredTeams?.teamsDetails}

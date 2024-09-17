@@ -64,7 +64,6 @@ export default function TopicsPage(
         tokenize: 'full',
     })
     if (allTopics?.topics) {
-    console.log('ALL TOPICS', allTopics?.topics)
         allTopics?.topics.forEach((topic) => {
             indexTopics.add(
                 topic.id,
