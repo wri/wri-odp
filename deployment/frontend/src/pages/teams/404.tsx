@@ -2,7 +2,7 @@ import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
 import Header from '@/components/_shared/Header'
 import { NextSeo } from 'next-seo'
 
-export default function DatasetNotFound() {
+export default function TeamsNotFound() {
     const links = [{ label: 'Teams', url: '/teams', current: false }]
     return (
         <>
