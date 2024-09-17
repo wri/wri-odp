@@ -7,11 +7,28 @@ export default class CustomDocument extends Document {
         return (
             <Html>
                 <Head>
+                    <script dangerouslySetInnerHTML={{
+                      __html: `
+                      window.dataLayer = window.dataLayer ||[];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('consent','default',{
+                        'ad_storage':'denied',
+                        'analytics_storage':'denied',
+                        'ad_user_data':'denied',
+                        'ad_personalization':'denied',
+                        'personalization_storage':'denied',
+                        'functionality_storage':'granted',
+                        'security_storage':'granted',
+                        'wait_for_update': 500
+                      });
+                      gtag("set", "ads_data_redaction", true);
+                      `
+                    }} />
+                    <script src={ env.OSANO_URL }></script>
                     <link
                         rel="stylesheet"
                         href="https://use.typekit.net/ckz5ous.css"
                     />
-                   
                     {
                         env.NEXT_PUBLIC_DISABLE_HOTJAR === "disabled" ? "" :
                                  <Script
@@ -43,9 +60,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 `,
                         }}
                     />
-                            
                     }
-                    
                 </Head>
                 <body className="font-acumin">
                     <noscript
