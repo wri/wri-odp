@@ -8,6 +8,8 @@ const getRandomOrganizationName = () =>
 const getRandomGroupName = () =>
   Math.random().toString(36).slice(2) + Cypress.env("GROUP_NAME_SUFFIX");
 
+const subgroup = "Subtopic-" + getRandomGroupName();
+
 const orgs = [];
 const groups = [];
 const datasets = [];
@@ -43,6 +45,9 @@ describe("Explore data page", () => {
       cy.createGroupAPI(name);
       groups.push(name);
     });
+
+    // sub group
+    cy.createGroupAPI(subgroup, groups[0]);
 
     // Create datasets
     [...new Array(14).keys()].map((k, i) => {
@@ -85,11 +90,22 @@ describe("Explore data page", () => {
     cy.contains("Subtopics")
   });
 
+  it("should display not found page", () => {
+    cy.visit("/topics/randomtopicname");
+    cy.contains("Sorry, we couldn’t find the page you’re looking for.", { timeout: 40000 });
+  });
+
+  it("shoud display subtopic page", () => {
+    cy.visit(`/topics/${subgroup}`);
+    cy.contains(`${subgroup}`, { timeout: 40000 });
+  });
+
   after(() => {
     // Delete and purge datasets
     datasets.forEach((name) => cy.deleteDatasetAPI(name));
     // datasets.forEach((name) => cy.purgeDataset(name));
 
+    cy.deleteGroupAPI(subgroup);
     groups.forEach((name) => cy.deleteGroupAPI(name));
     groups.forEach((name) => cy.purgeGroup(name));
 
