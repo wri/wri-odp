@@ -842,6 +842,8 @@ def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any):
         )
         if q:
             group_tree["highlighted"] = True
+        else:
+            group_tree["highlighted"] = False
         group_hierarchy_ids += recurcive_tree_ids(group_tree)
         results.append(group_tree)
     return results
