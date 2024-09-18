@@ -18,10 +18,13 @@ import superjson from 'superjson'
 import { env } from '@/env.mjs'
 import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
+import { Organization as CkanOrg } from '@portaljs/ckan'
 
 const TeamsSearchResults = dynamic(
     () => import('@/components/team/TeamsSearchResults')
 )
+
+type Organization = CkanOrg & { numSubTeams: number }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
@@ -89,7 +92,7 @@ export default function TeamsPage(
         const teams = filteredTeams.slice(
             pagination.page.start,
             pagination.page.start + pagination.page.rows
-        )
+        ) as GroupTree[] | Organization[]
         const teamsDetails = data?.teamsDetails
         return { teams, teamsDetails, count: filteredTeams.length }
     }

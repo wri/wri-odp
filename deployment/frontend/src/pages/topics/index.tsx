@@ -17,6 +17,9 @@ import superjson from 'superjson'
 import { env } from '@/env.mjs'
 import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
+import { Group as CkanGroup } from '@portaljs/ckan'
+type Group = CkanGroup & { numSubtopics: number }
+
 const TopicsSearchResults = dynamic(
     () => import('@/components/topics/TopicsSearchResults')
 )
@@ -87,7 +90,7 @@ export default function TopicsPage(
         const topics = filteredTopics.slice(
             pagination.page.start,
             pagination.page.start + pagination.page.rows
-        )
+        ) as GroupTree[] | Group[]
         const topicDetails = data.topicDetails
         return { topics, topicDetails, count: filteredTopics.length }
     }

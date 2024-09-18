@@ -3,6 +3,8 @@ import CardsGrid from '../_shared/CardsGrid'
 import Container from '../_shared/Container'
 import TopicCard from './TopicCard'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { Group as CkanGroup } from '@portaljs/ckan'
+type Group = CkanGroup & { numSubtopics: number }
 
 export default function TopicsSearchResults({
     topics,
@@ -10,7 +12,7 @@ export default function TopicsSearchResults({
     count,
   filtered,
 }: {
-    topics: GroupTree[]
+    topics: GroupTree[] | Group[]
     topicDetails: Record<string, GroupsmDetails>
     count: number
     filtered: boolean
@@ -18,7 +20,7 @@ export default function TopicsSearchResults({
     return (
         <Container className="mb-28">
             <span className="font-semibold text-xl">{count} {!filtered ? 'top level topics' : 'topics'}</span>
-            <CardsGrid<GroupTree>
+            <CardsGrid<GroupTree | Group>
                 className="mt-5"
                 items={topics}
                 Card={({ item: topic }) => {
