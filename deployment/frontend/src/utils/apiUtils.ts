@@ -310,7 +310,8 @@ export async function getAllDatasetFq({
         }
 
         if (facetFields) {
-            url += `&facet.field=["${facetFields.join('","')}"]`
+            const _facetFields = facetFields.filter(f => f !== 'metadata_modified')
+            url += `&facet.field=["${_facetFields.join('","')}"]`
         }
 
         if (sortBy) {
