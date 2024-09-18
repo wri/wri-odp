@@ -4,6 +4,7 @@ import Topic from '@/interfaces/topic.interface'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { Group } from '@portaljs/ckan'
 import { api } from '@/utils/api'
+import Link from 'next/link'
 
 //write a typeguard to check if the topic is a GroupTree
 function isGroupTree(topic: GroupTree | Group): topic is GroupTree {
@@ -14,13 +15,12 @@ export default function TopicCard({
     topic,
     topicDetails,
 }: {
-    topic: GroupTree | Group & { numSubtopics: number }
+    topic: GroupTree | (Group & { numSubtopics: number })
     topicDetails: Record<string, GroupsmDetails>
 }) {
     const { data: numOfSubtopics } = api.topics.getNumberOfSubtopics.useQuery()
-  console.log('NUM OF SUBTOPICS', numOfSubtopics)
     return (
-        <a
+        <Link
             href={`/topics/${topic.name}`}
             className="text-wri-black flex flex-col w-full font-acumin max-w-[400px] ml-auto mr-auto"
         >
@@ -48,8 +48,8 @@ export default function TopicCard({
                 <span className="mr-2">
                     {isGroupTree(topic)
                         ? topicDetails[topic.id]?.package_count
-                        : topic.package_count}
-                    {' '}datasets
+                        : topic.package_count}{' '}
+                    datasets
                 </span>
                 {isGroupTree(topic) && (
                     <>
@@ -64,12 +64,14 @@ export default function TopicCard({
                         <div className="border-l border-wri-black h-4  mx-2"></div>
                         <span className="ml-2">
                             {
-                //@ts-ignore
-                numOfSubtopics[topic.name]} Subtopics
+                                //@ts-ignore
+                                numOfSubtopics[topic.name]
+                            }{' '}
+                            Subtopics
                         </span>
                     </>
                 )}
             </div>
-        </a>
+        </Link>
     )
 }
