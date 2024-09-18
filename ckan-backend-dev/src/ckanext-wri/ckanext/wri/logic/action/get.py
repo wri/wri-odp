@@ -8,16 +8,11 @@ import json
 from typing import Any, cast
 import re
 from itertools import zip_longest
-import requests
-from shapely.geometry import shape
-from shapely import wkb, wkt
-from shapely.ops import transform
-from pyproj import Transformer
-import binascii
 
 from ckan.common import config, asbool
 from ckan.model import Package
 from sqlalchemy import text, engine
+from shapely import wkb, wkt
 
 
 import ckan
@@ -37,6 +32,7 @@ from ckan.lib.dictization import table_dictize
 from ckan.common import _
 from ckan.types import ActionResult, Context, DataDict
 from typing_extensions import TypeAlias
+from ckanext.wri.helpers.data_api import get_shape_from_dataapi
 from ckanext.wri.model.notification import (
     Notification,
     notification_dictize,
@@ -958,36 +954,6 @@ def package_collaborator_list_wri(context: Context, data_dict: DataDict):
     return result
 
 
-def get_geojson_from_dataapi(address: str, point):
-    api_key: str = config.get("ckanext.wri.gfw_api_key", '')
-    headers = {"x-api-key": api_key, "Content-Type": "application/json"}
-    split_address = address.split(",")
-    shape = None
-    if len(split_address) == 1:
-        url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query/json?sql=SELECT ST_AsText(ST_Simplify(geom_wm, 1000.0)) AS simplified_shape FROM gadm_administrative_boundaries WHERE adm_level = '0' AND ST_Contains(ST_Transform(geom_wm, 4326), ST_GeomFromText('POINT({point[0]} {point[1]})', 4326)) limit 1;"
-        print('URL', flush=True)
-        print(url, flush=True)
-        response = requests.get(url, headers=headers)
-        data = response.json()
-        shape = data["data"][0]["simplified_shape"]
-        if len(data["data"]) > 0:
-            shape = data["data"][0]["simplified_shape"]
-    if len(split_address) == 2:
-        url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query/json?sql=SELECT ST_AsText(ST_Simplify(geom_wm, 1000.0)) AS simplified_shape FROM gadm_administrative_boundaries WHERE adm_level = '1' AND  ST_Contains(ST_Transform(geom_wm, 4326), ST_GeomFromText('POINT({point[0]} {point[1]})', 4326))  limit 1;"
-        response = requests.get(url, headers=headers)
-        data = response.json()
-        if len(data["data"]) > 0:
-            shape = data["data"][0]["simplified_shape"]
-    if shape is None:
-        return
-    shape = wkt.loads(shape)
-    transformer = Transformer.from_crs(3857, 4326, always_xy=True)
-    shape = transform(transformer.transform, shape)
-    spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
-    print("Getting geojson from data-api", flush=True)
-    return spatial_geom
-
-
 def get_geojson_from_filesystem(address: str):
     segments = address.split(",")
     cwd = os.path.abspath(os.path.dirname(__file__))
@@ -1141,12 +1107,15 @@ def resource_search(context: Context, data_dict: DataDict):
 
         boundaries_from_gadm = config.get('ckanext.wri.boundaries_from_gadm', False)
         if point and boundaries_from_gadm:
-            spatial_geom = get_geojson_from_dataapi(spatial_address, point)
-            location_queries.append(
-                geoalchemy2.functions.ST_Intersects(
-                    ResourceLocation.spatial_geom, spatial_geom
+            shape = get_shape_from_dataapi(spatial_address, point)
+            if shape:
+                shape = wkt.loads(shape)
+                spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
+                location_queries.append(
+                    geoalchemy2.functions.ST_Intersects(
+                        ResourceLocation.spatial_geom, spatial_geom
+                    )
                 )
-            )
 
         if len(segments) in [1, 2] and boundaries_from_gadm is not True:
             try:

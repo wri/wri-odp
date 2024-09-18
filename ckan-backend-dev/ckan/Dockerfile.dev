@@ -60,7 +60,6 @@ USER root
 RUN chmod -R 777 src 
 RUN chmod -R 777 ${APP_DIR}/src/
 RUN chmod -R 777 ${APP_DIR}/src/*
-RUN apk add sed=4.1.0
 RUN sed --version
 RUN TMPDIR=/tmp sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \
     TMPDIR=/tmp sed -i "s|ckanext.s3filestore.aws_secret_access_key = test-secret-key|ckanext.s3filestore.aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}|g" src/ckanext-s3filestore/test.ini && \

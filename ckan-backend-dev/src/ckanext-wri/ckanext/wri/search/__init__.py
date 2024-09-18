@@ -2,7 +2,12 @@ import json
 import logging
 import os.path
 
+from shapely import concave_hull
 import shapely.geometry
+from shapely.wkt import loads
+from shapely.geometry import MultiPolygon
+
+from ckanext.wri.helpers.data_api import get_shape_from_dataapi
 
 try:
     from shapely.errors import GeometryTypeError
@@ -12,6 +17,15 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
+def convert_multipolygon_to_polygon(multipolygon_wkt):
+    multipolygon = loads(multipolygon_wkt)
+    
+    if isinstance(multipolygon, MultiPolygon):
+        # Get the largest polygon by area
+        largest_polygon = max(multipolygon, key=lambda polygon: polygon.area)
+        return largest_polygon.wkt
+    else:
+        return multipolygon_wkt  # Return the original WKT if it's not a MultiPolygon
 
 def _adjust_longitude(value):
     if value < -180 or value > 180:
@@ -119,6 +133,7 @@ class SolrSpatialFieldSearchBackend:
         ]
 
     def index_dataset(self, dataset_dict):
+        print("INDEXING DATASET", flush=True)
         wkt = None
         geom_from_metadata = dataset_dict.get("spatial")
         if not geom_from_metadata:
@@ -135,6 +150,9 @@ class SolrSpatialFieldSearchBackend:
         elif geometry["type"] == "FeatureCollection":
             geometries = list(map(lambda x: x["geometry"], geometry["features"]))
             geometry = {"type": "GeometryCollection", "geometries": geometries}
+        elif geometry["type"] == "Feature":
+            geometry = geometry.get("geometry")
+            geometries = [geometry]
         else:
             geometries = [geometry]
 
@@ -281,64 +299,19 @@ you need to split the geometry in order to fit the parts. Not indexing"""
         return search_params
 
     def get_address_query(self, address: str, point, include_global=True):
-        cwd = os.path.abspath(os.path.dirname(__file__))
         segments = address.split(",")
         segments = [segment.strip() for segment in segments]
         _queries = [] 
-        if len(segments) == 1:
-            # It's a country
-            try:
-                path = os.path.join(
-                    cwd,
-                    "../world_geojsons/countries/{}.geojson".format(
-                        segments[0].strip()
-                    ),
-                )
-                with open(path, "r") as f:
-                    content = f.read()
-                    wkt = self.get_wkt_for_geojson(content)
-
-                    if wkt:
-                        _queries.append(self.get_wkt_query(wkt, include_global=include_global))
-                    elif point:
-                        _queries.append(self.get_point_query(point, include_global=include_global))
-                    _queries = _queries + self.build_spatial_address_query(segments)
-
-            except Exception:
-                if point:
-                    _queries.append(self.get_point_query(point, include_global=include_global))
-                _queries = _queries + self.build_spatial_address_query(segments)
-
-        elif len(segments) == 2:
-            # It's a state
-            try:
-                path = os.path.join(
-                    cwd,
-                    "../world_geojsons/states/{}/{}.geojson".format(
-                        segments[0].strip(), segments[1].strip()
-                    ),
-                )
-                with open(path, "r") as f:
-                    content = f.read()
-                    wkt = self.get_wkt_for_geojson(content)
-
-                    if wkt:
-                        _queries.append(self.get_wkt_query(wkt, include_global=include_global))
-                    elif point:
-                        _queries.append(self.get_point_query(point, include_global=include_global))
-                    _queries = _queries + self.build_spatial_address_query(segments)
-            except Exception as e:
-                if point:
-                    _queries.append(self.get_point_query(point, include_global=include_global))
-                _queries = _queries + self.build_spatial_address_query(segments)
-        elif len(segments) >= 3:
-            # It's a city in the UK or similar
-            if point:
-                _queries.append(self.get_point_query(point, include_global=include_global, addressList=segments))
-
+        if len(segments) in [1, 2]:
+            spatial_geom = get_shape_from_dataapi(address, [point["x"], point["y"]])
+            multipolygon = loads(spatial_geom)
+            spatial_geom = concave_hull(multipolygon, 1).wkt
+            _queries.append(self.get_wkt_query(spatial_geom, include_global=include_global))
+            _queries = _queries + self.build_spatial_address_query(segments)
+        if point:
+            _queries.append(self.get_point_query(point, include_global=include_global))
         if address:
             _queries.append("spatial_address:/.*{}/".format(address))
-
         if include_global:
             _queries.append(self.get_only_globals())
         return _queries
