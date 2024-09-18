@@ -304,10 +304,11 @@ you need to split the geometry in order to fit the parts. Not indexing"""
         _queries = [] 
         if len(segments) in [1, 2]:
             spatial_geom = get_shape_from_dataapi(address, [point["x"], point["y"]])
-            multipolygon = loads(spatial_geom)
-            spatial_geom = concave_hull(multipolygon, 1).wkt
-            _queries.append(self.get_wkt_query(spatial_geom, include_global=include_global))
-            _queries = _queries + self.build_spatial_address_query(segments)
+            if spatial_geom:
+                multipolygon = loads(spatial_geom)
+                spatial_geom = concave_hull(multipolygon, 1).wkt
+                _queries.append(self.get_wkt_query(spatial_geom, include_global=include_global))
+                _queries = _queries + self.build_spatial_address_query(segments)
         if point:
             _queries.append(self.get_point_query(point, include_global=include_global))
         if address:
