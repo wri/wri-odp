@@ -217,7 +217,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 'success'
             )
 
-            return router.push(`/datasets/${name}`)
+            router.push(`/datasets/${name}`)
         },
         onError: (error) => {
             setErrorMessage(error.message)
