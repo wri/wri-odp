@@ -930,16 +930,18 @@ export async function getOrganizationTreeDetails({
             }
         }
     } else {
-        groupTree = await getGroups({
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
             apiKey: session?.user.apikey ?? '',
+            q: '',
             group_type: 'organization',
         })
     }
 
     if (groupTree.length === 0) {
         return {
-            teams: [],
-            teamsDetails: [],
+            teams: groupTree,
+            teamsDetails: {} as Record<string, GroupsmDetails>,
             count: 0,
         }
     }
@@ -1005,15 +1007,18 @@ export async function getTopicTreeDetails({
             }
         }
     } else {
-        groupTree = await getGroups({
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
             apiKey: session?.user.apikey ?? '',
+            q: '',
+            group_type: 'group',
         })
     }
 
     if (groupTree.length === 0) {
         return {
-            topics: [],
-            topicDetails: {},
+            topics: groupTree,
+            topicDetails: {} as Record<string, GroupsmDetails>,
             count: 0,
         }
     }

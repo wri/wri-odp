@@ -54,17 +54,11 @@ export const TopicRouter = createTRPCRouter({
                     group_type: 'group',
                 })
             } else {
-                if (ctx.session.user.sysadmin) {
-                    groupTree = await getGroups({
-                        apiKey: ctx.session.user.apikey,
-                    })
-                } else {
-                    groupTree = await searchHierarchy({
-                        isSysadmin: ctx.session.user.sysadmin,
-                        apiKey: ctx.session.user.apikey,
-                        group_type: 'group',
-                    })
-                }
+                groupTree = await searchHierarchy({
+                    isSysadmin: ctx.session.user.sysadmin,
+                    apiKey: ctx.session.user.apikey,
+                    group_type: 'group',
+                })
             }
 
             const result = groupTree
@@ -345,15 +339,18 @@ export const TopicRouter = createTRPCRouter({
                     groupTree = filterTree
                 }
             } else {
-                groupTree = await getGroups({
+                groupTree = await searchHierarchy({
+                    isSysadmin: true,
                     apiKey: ctx?.session?.user.apikey ?? '',
+                    q: '',
+                    group_type: 'group',
                 })
             }
 
             if (groupTree.length === 0) {
                 return {
-                    topics: [],
-                    topicDetails: {},
+                    topics: groupTree,
+                    topicDetails: {} as Record<string, GroupsmDetails>,
                     count: 0,
                 }
             }
@@ -412,39 +409,37 @@ export const TopicRouter = createTRPCRouter({
                 topic: topic.result,
             }
         }),
-    list: publicProcedure
-        .query(async ({ ctx, input }) => {
-            const topicRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
-            const topic: CkanResponse<Group[]> = await topicRes.json()
-            if (!topic.success && topic.error)
-                throw Error(replaceNames(topic.error.message))
-            return {
-                topics: topic.result,
+    list: publicProcedure.query(async ({ ctx, input }) => {
+        const topicRes = await fetch(
+            `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             }
-        }),
-    getNumberOfSubtopics: publicProcedure
-        .query(async ({ ctx, input }) => {
-            const topicRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_list_wri?q=`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
-            const topics: CkanResponse<GroupTree[]> = await topicRes.json()
-            if (!topics.success && topics.error)
-                throw Error(replaceNames(topics.error.message))
-            const numOfSubtopics = flattenTree(topics.result)
-            return numOfSubtopics 
-        }),
+        )
+        const topic: CkanResponse<Group[]> = await topicRes.json()
+        if (!topic.success && topic.error)
+            throw Error(replaceNames(topic.error.message))
+        return {
+            topics: topic.result,
+        }
+    }),
+    getNumberOfSubtopics: publicProcedure.query(async ({ ctx, input }) => {
+        const topicRes = await fetch(
+            `${env.CKAN_URL}/api/action/group_list_wri?q=`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+        const topics: CkanResponse<GroupTree[]> = await topicRes.json()
+        if (!topics.success && topics.error)
+            throw Error(replaceNames(topics.error.message))
+        const numOfSubtopics = flattenTree(topics.result)
+        return numOfSubtopics
+    }),
 
     getFollowedTopics: protectedProcedure.query(async ({ ctx }) => {
         const response = await fetch(
