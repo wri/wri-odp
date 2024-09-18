@@ -25,6 +25,7 @@ import {
 } from '@/utils/apiUtils'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
 import { json } from 'stream/consumers'
+import { flattenTree } from '@/utils/flattenGroupTree'
 
 export const teamRouter = createTRPCRouter({
     getAllTeams: protectedProcedure.query(async ({ ctx }) => {
@@ -396,6 +397,37 @@ export const teamRouter = createTRPCRouter({
 
             return team.result.users
         }),
+    list: publicProcedure.query(async ({ ctx, input }) => {
+        const teamRes = await fetch(
+            `${env.CKAN_URL}/api/action/organization_list?all_fields=True`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+        const team: CkanResponse<Organization[]> = await teamRes.json()
+        if (!team.success && team.error)
+            throw Error(replaceNames(team.error.message))
+        return {
+            teams: team.result,
+        }
+    }),
+    getNumberOfSubTeams: publicProcedure.query(async ({ ctx, input }) => {
+        const teamRes = await fetch(
+            `${env.CKAN_URL}/api/action/organization_list_wri?q=`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+        const team: CkanResponse<GroupTree[]> = await teamRes.json()
+        if (!team.success && team.error)
+            throw Error(replaceNames(team.error.message))
+        const numOfSubtopics = flattenTree(team.result)
+        return numOfSubtopics
+    }),
     removeMember: protectedProcedure
         .input(z.object({ id: z.string(), username: z.string() }))
         .mutation(async ({ ctx, input }) => {
