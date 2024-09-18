@@ -27,6 +27,8 @@ import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 import { TopicSchema } from '@/schema/topic.schema'
 import { replaceNames } from '@/utils/replaceNames'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
+import { flattenTree } from '@/utils/flattenGroupTree'
+import { group } from 'console'
 
 export const TopicRouter = createTRPCRouter({
     getUsersTopics: protectedProcedure
@@ -311,6 +313,51 @@ export const TopicRouter = createTRPCRouter({
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             let groupTree: GroupTree[] = []
+
+            if (input.search) {
+                groupTree = await searchHierarchy({
+                    isSysadmin: true,
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    q: input.search,
+                    group_type: 'group',
+                })
+
+                if (input.tree) {
+                    for (const gtree of groupTree) {
+                        const findtree = findNameInTree(gtree, input.search)
+                        if (findtree) {
+                            groupTree = [findtree]
+                            break
+                        }
+                    }
+                }
+                if (input.allTree) {
+                    const filterTree = groupTree.flatMap((group) => {
+                        const search = input.search.toLowerCase()
+                        if (
+                            group.name.toLowerCase().includes(search) ||
+                            group.title?.toLowerCase().includes(search)
+                        )
+                            return [group]
+                        const findtree = findAllNameInTree(group, search)
+                        return findtree
+                    })
+                    groupTree = filterTree
+                }
+            } else {
+                groupTree = await getGroups({
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                })
+            }
+
+            if (groupTree.length === 0) {
+                return {
+                    topics: [],
+                    topicDetails: {},
+                    count: 0,
+                }
+            }
+
             const allGroups = (await getUserGroups({
                 apiKey: ctx?.session?.user.apikey ?? '',
                 userId: '',
@@ -336,44 +383,6 @@ export const TopicRouter = createTRPCRouter({
                     query: { search: '', page: { start: 0, rows: 10000 } },
                 }))!
                 topic.package_count = packagedetails.count
-            }
-
-            if (input.search) {
-                groupTree = await searchHierarchy({
-                    isSysadmin: true,
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    q: input.search,
-                    group_type: 'group',
-                })
-                groupTree = groupTree.filter((x) => x.name === input.search)
-                if (input.tree) {
-                    let groupFetchTree = groupTree[0] as GroupTree
-                    const findTree = findNameInTree(
-                        groupFetchTree,
-                        input.search
-                    )
-                    if (findTree) {
-                        groupFetchTree = findTree
-                    }
-                    groupTree = [groupFetchTree]
-                }
-                if (input.allTree) {
-                    const filterTree = groupTree.flatMap((group) => {
-                        const search = input.search.toLowerCase()
-                        if (
-                            group.name.toLowerCase().includes(search) ||
-                            group.title?.toLowerCase().includes(search)
-                        )
-                            return [group]
-                        const findtree = findAllNameInTree(group, search)
-                        return findtree
-                    })
-                    groupTree = filterTree
-                }
-            } else {
-                groupTree = await getGroups({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                })
             }
 
             const result = groupTree
@@ -402,6 +411,39 @@ export const TopicRouter = createTRPCRouter({
             return {
                 topic: topic.result,
             }
+        }),
+    list: publicProcedure
+        .query(async ({ ctx, input }) => {
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const topic: CkanResponse<Group[]> = await topicRes.json()
+            if (!topic.success && topic.error)
+                throw Error(replaceNames(topic.error.message))
+            return {
+                topics: topic.result,
+            }
+        }),
+    getNumberOfSubtopics: publicProcedure
+        .query(async ({ ctx, input }) => {
+            const topicRes = await fetch(
+                `${env.CKAN_URL}/api/action/group_list_wri?q=`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const topics: CkanResponse<GroupTree[]> = await topicRes.json()
+            if (!topics.success && topics.error)
+                throw Error(replaceNames(topics.error.message))
+            const numOfSubtopics = flattenTree(topics.result)
+            return numOfSubtopics 
         }),
 
     getFollowedTopics: protectedProcedure.query(async ({ ctx }) => {

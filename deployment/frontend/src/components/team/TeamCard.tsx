@@ -2,14 +2,22 @@ import React from 'react'
 import Image from 'next/image'
 import Team from '@/interfaces/team.interface'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { api } from '@/utils/api'
+import { Organization } from '@portaljs/ckan'
+
+//write a typeguard to check if the topic is a GroupTree
+function isGroupTree(org: GroupTree | Organization): org is GroupTree {
+    return (org as GroupTree).children !== undefined
+}
 
 export default function TeamCard({
     team,
     teamsDetails,
 }: {
-    team: GroupTree
+    team: GroupTree | (Organization & { numSubTeams: number })
     teamsDetails: Record<string, GroupsmDetails>
 }) {
+    const { data: numOfSubTeams } = api.teams.getNumberOfSubTeams.useQuery()
     return (
         <a
             href={`/teams/${team.name}`}
@@ -22,7 +30,7 @@ export default function TeamCard({
                             ? teamsDetails[team.id]?.img_url
                             : '/images/placeholders/teams/teamdefault.png'
                     }`}
-                    alt={`Topic - ${team.title}`}
+                    alt={`Team - ${team.title}`}
                     fill
                     className="object-contain"
                 />
@@ -31,17 +39,48 @@ export default function TeamCard({
                 <h2 className="text-2xl font-bold w-[80%]">{team.title}</h2>
             </div>
             <article className=" line-clamp-3 w-[88%] font-light text-base mt-2 leading-[1.375rem] h-16">
-                {teamsDetails[team.id]?.description}
+                {isGroupTree(team)
+                    ? teamsDetails[team.id]?.description
+                    : team.description}
             </article>
             <div className="flex font-light text-sm text-wri-black mt-1 leading-[1.375rem] items-center">
-                <span className="mr-2">
-                    {teamsDetails[team.id]?.package_count &&
-                    (teamsDetails[team.id]?.package_count as number) <= 1
-                        ? `${teamsDetails[team.id]?.package_count} dataset`
-                        : `${teamsDetails[team.id]?.package_count} datasets`}
-                </span>
-                <div className="border-l border-wri-black h-4  mx-2"></div>
-                <span className="ml-2">{team.children.length} Subteams</span>
+                {isGroupTree(team) && (
+                    <span className="mr-2">
+                        {teamsDetails[team.id]?.package_count &&
+                        (teamsDetails[team.id]?.package_count as number) <= 1
+                            ? `${teamsDetails[team.id]?.package_count} dataset`
+                            : `${teamsDetails[team.id]
+                                  ?.package_count} datasets`}
+                    </span>
+                )}
+                {!isGroupTree(team) && (
+                    <span className="mr-2">
+                        {team.package_count &&
+                        (team.package_count as number) <= 1
+                            ? `${team.package_count} dataset`
+                            : `${team.package_count} datasets`}
+                    </span>
+                )}
+                {isGroupTree(team) && (
+                    <>
+                        <div className="border-l border-wri-black h-4  mx-2"></div>
+                        <span className="ml-2">
+                            {team.children.length} Subteams
+                        </span>
+                    </>
+                )}
+                {!isGroupTree(team) && numOfSubTeams && (
+                    <>
+                        <div className="border-l border-wri-black h-4  mx-2"></div>
+                        <span className="ml-2">
+                            {
+                                //@ts-ignore
+                                numOfSubTeams[team.name]
+                            }{' '}
+                            Subteams
+                        </span>
+                    </>
+                )}
             </div>
         </a>
     )
