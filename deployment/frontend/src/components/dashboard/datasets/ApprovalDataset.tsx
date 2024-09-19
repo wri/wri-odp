@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import SearchHeader from '../_shared/SearchHeader'
 import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner'
@@ -14,10 +14,10 @@ import SelectFilter from '../_shared/SelectFilter'
 import { useQuery } from 'react-query'
 import { searchArrayForKeyword, filterObjects } from '@/utils/general'
 
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 
 function customSort(obj: WriDataset) {
     return [obj.approval_status === 'rejected', new Date(obj.metadata_created!)]
@@ -57,12 +57,13 @@ export function ApprovalSelect({
     )
 }
 
-export default function ApprovalDataset() {
-    const [query, setQuery] = useState<SearchInput>({
-        search: '',
-        page: { start: 0, rows: 10000 },
-        _isUserSearch: true,
-    })
+export default function ApprovalDataset({
+    setQuery,
+    query,
+}: {
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
+    query: SearchInput
+}) {
     const { data, isLoading, refetch } =
         api.dataset.getPendingDatasets.useQuery({
             search: '',

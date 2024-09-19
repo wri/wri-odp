@@ -342,3 +342,13 @@ $dark-pink: #c32d7b;
         transform: rotate(360deg);
     }
 }
+
+.osano-cm-powered-by {
+    display: none;
+}
+.osano-cm-widget {
+    display: none;
+}
+li.osano-cm-drawer-item:nth-child(5) {
+    display: none;
+}

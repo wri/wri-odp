@@ -100,10 +100,6 @@ export function LocationSearch({
             if (f.geometry.coordinates[0].length === 5) {
                 setValue('point', null)
                 setValue('location', '')
-                console.log('bbox draw', [
-                    f.geometry.coordinates[0][2],
-                    f.geometry.coordinates[0][4],
-                ])
                 setValue('bbox', [
                     f.geometry.coordinates[0][2],
                     f.geometry.coordinates[0][4],
@@ -137,11 +133,12 @@ export function LocationSearch({
                 placeholder="Search datafiles by location"
                 initialValue={formObj.getValues('location')}
                 onResult={(e) => {
+                    console.log('GEOCODING RESULT', e)
                     setValue('bbox', [
                         [e.result.bbox[0], e.result.bbox[1]],
                         [e.result.bbox[2], e.result.bbox[3]],
                     ])
-                    setValue('point', null)
+                    setValue('point', e.result.center)
                     if (e.result.place_name.split(',').length <= 2) {
                         setValue('location', e.result.place_name)
                     }
@@ -239,7 +236,6 @@ export function DataFiles({
             global: 'include',
         },
     })
-    console.log(formObj.watch('bbox'))
     const { data: searchedResources, isLoading: isLoadingLocationSearch } =
         api.dataset.resourceLocationSearch.useQuery({
             bbox: formObj.watch('bbox'),
@@ -767,7 +763,6 @@ function DatafileCard({
                                             id={`layerviews-${datafile.id}`}
                                             className="text-xs 2xl:text-sm whitespace-nowrap"
                                             onClick={() => {
-                                                console.log(datafile)
                                                 // @ts-ignore
                                                 if (datafile.rw_id) {
                                                     if (!mapDisplaypreview) {

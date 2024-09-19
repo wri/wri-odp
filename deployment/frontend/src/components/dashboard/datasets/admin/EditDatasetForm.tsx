@@ -216,7 +216,8 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 `Successfully edited the "${title ?? name}" dataset`,
                 'success'
             )
-            window.location.href = '/dashboard/datasets'
+
+            router.push(`/datasets/${name}`)
         },
         onError: (error) => {
             setErrorMessage(error.message)
@@ -496,7 +497,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                         'No changes to the dataset',
                                         'success'
                                     )
-                                    router.push('/dashboard/datasets')
+                                    router.push(`/datasets/${dataset.name}`)
                                 }
                             }
                         },
