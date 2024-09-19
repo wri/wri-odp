@@ -764,7 +764,7 @@ export const DatasetRouter = createTRPCRouter({
                     )
                 ) {
                     try {
-                        approvePendingDataset(input.id ?? '', ctx.session)
+                        await approvePendingDataset(input.id ?? '', ctx.session)
                     } catch (e) {
                         console.error(e)
                     }
@@ -1556,7 +1556,7 @@ export const DatasetRouter = createTRPCRouter({
                 id: z.string(),
                 isPending: z.boolean(),
                 noLayer: z.boolean().optional(),
-           })
+            })
         )
         .query(async ({ input, ctx }) => {
             if (input.isPending) {

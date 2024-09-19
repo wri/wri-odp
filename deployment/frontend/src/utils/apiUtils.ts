@@ -310,7 +310,8 @@ export async function getAllDatasetFq({
         }
 
         if (facetFields) {
-            url += `&facet.field=["${facetFields.join('","')}"]`
+            const _facetFields = facetFields.filter(f => f !== 'metadata_modified')
+            url += `&facet.field=["${_facetFields.join('","')}"]`
         }
 
         if (sortBy) {
@@ -912,6 +913,39 @@ export async function getOrganizationTreeDetails({
     session: Session | null
 }) {
     let groupTree: GroupTree[] = []
+
+    if (input.search) {
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
+            apiKey: session?.user.apikey ?? '',
+            q: input.search,
+            group_type: 'organization',
+        })
+        if (input.tree) {
+            for (const gtree of groupTree) {
+                const findtree = findNameInTree(gtree, input.search)
+                if (findtree) {
+                    groupTree = [findtree]
+                    break
+                }
+            }
+        }
+    } else {
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
+            apiKey: session?.user.apikey ?? '',
+            q: '',
+            group_type: 'organization',
+        })
+    }
+
+    if (groupTree.length === 0) {
+        return {
+            teams: groupTree,
+            teamsDetails: {} as Record<string, GroupsmDetails>,
+            count: 0,
+        }
+    }
     const allGroups = (await getAllOrganizations({
         apiKey: session?.user.apikey ?? '',
     }))!
@@ -939,29 +973,6 @@ export async function getOrganizationTreeDetails({
         team.package_count = packagedetails.count
     }
 
-    if (input.search) {
-        groupTree = await searchHierarchy({
-            isSysadmin: true,
-            apiKey: session?.user.apikey ?? '',
-            q: input.search,
-            group_type: 'organization',
-        })
-        groupTree = groupTree.filter((x) => x.name === input.search)
-        if (input.tree) {
-            let groupFetchTree = groupTree[0] as GroupTree
-            const findTree = findNameInTree(groupFetchTree, input.search)
-            if (findTree) {
-                groupFetchTree = findTree
-            }
-            groupTree = [groupFetchTree]
-        }
-    } else {
-        groupTree = await getGroups({
-            apiKey: session?.user.apikey ?? '',
-            group_type: 'organization',
-        })
-    }
-
     const result = groupTree
     return {
         teams: result,
@@ -978,6 +989,40 @@ export async function getTopicTreeDetails({
     session: Session | null
 }) {
     let groupTree: GroupTree[] = []
+
+    if (input.search) {
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
+            apiKey: session?.user.apikey ?? '',
+            q: input.search,
+            group_type: 'group',
+        })
+
+        if (input.tree) {
+            for (const gtree of groupTree) {
+                const findtree = findNameInTree(gtree, input.search)
+                if (findtree) {
+                    groupTree = [findtree]
+                    break
+                }
+            }
+        }
+    } else {
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
+            apiKey: session?.user.apikey ?? '',
+            q: '',
+            group_type: 'group',
+        })
+    }
+
+    if (groupTree.length === 0) {
+        return {
+            topics: groupTree,
+            topicDetails: {} as Record<string, GroupsmDetails>,
+            count: 0,
+        }
+    }
     const allGroups = (await getUserGroups({
         apiKey: session?.user.apikey ?? '',
         userId: '',
@@ -1004,29 +1049,9 @@ export async function getTopicTreeDetails({
         }))!
         topic.package_count = packagedetails.count
     }
-    if (input.search) {
-        groupTree = await searchHierarchy({
-            isSysadmin: true,
-            apiKey: session?.user.apikey ?? '',
-            q: input.search,
-            group_type: 'group',
-        })
-        groupTree = groupTree.filter((x) => x.name === input.search)
-        if (input.tree) {
-            let groupFetchTree = groupTree[0] as GroupTree
-            const findTree = findNameInTree(groupFetchTree, input.search)
-            if (findTree) {
-                groupFetchTree = findTree
-            }
-            groupTree = [groupFetchTree]
-        }
-    } else {
-        groupTree = await getGroups({
-            apiKey: session?.user.apikey ?? '',
-        })
-    }
 
     const result = groupTree
+
     return {
         topics: result,
         topicDetails: topicDetails,
