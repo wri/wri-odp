@@ -1107,7 +1107,7 @@ def resource_search(context: Context, data_dict: DataDict):
             if point:
                 location_queries.append(point_query)
 
-        boundaries_from_gadm = config.get('ckanext.wri.boundaries_from_gadm', False)
+        boundaries_from_gadm = config.get('ckanext.wri.boundaries_from_gadm', True)
         if point and boundaries_from_gadm:
             shape = get_shape_from_dataapi(spatial_address, point)
             if shape:
