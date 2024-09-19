@@ -43,6 +43,7 @@ ckan:
       CKANEXT__WRI__MIGRATION_DEPLOYMENT_NAME: migration_deployment
       CKANEXT__WRI__MIGRATION_FLOW_NAME: trigger-migration
       CKANEXT__WRI__MIGRATION_DEPLOYMENT_ENV: staging
+      CKANEXT__WRI__BOUNDARIES_FROM_GADM: "True"
     hpa:
       enable: true
       minReplicas: 2
