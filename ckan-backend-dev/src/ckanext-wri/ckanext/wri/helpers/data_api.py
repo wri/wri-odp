@@ -27,6 +27,7 @@ def get_shape_from_dataapi(address: str, point):
             data = response.json()
             if len(data["data"]) > 0:
                 shape = data["data"][0]["simplified_geom"]
+        log.info(f"Getting shape from Data-API")
         return shape
     except Exception as e:
         log.error(f"Error getting shape from data-api: {e}")
