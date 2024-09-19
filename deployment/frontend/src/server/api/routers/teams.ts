@@ -255,34 +255,7 @@ export const teamRouter = createTRPCRouter({
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             let groupTree: GroupTree[] = []
-            const allGroups = (await getAllOrganizations({
-                apiKey: ctx?.session?.user.apikey ?? '',
-            }))!
 
-            const teamDetails = allGroups.reduce(
-                (acc, org) => {
-                    acc[org.id] = {
-                        img_url: org.image_display_url ?? '',
-                        description: org.description ?? '',
-                        package_count: org.package_count!,
-                        name: org.name,
-                    }
-                    return acc
-                },
-                {} as Record<string, GroupsmDetails>
-            )
-
-            for (const group in teamDetails) {
-                const team = teamDetails[group]!
-                const packagedetails = (await getAllDatasetFq({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    fq: `organization:${team.name}+is_approved:true`,
-                    query: { search: '', page: { start: 0, rows: 10000 } },
-                }))!
-                team.package_count = packagedetails.count
-            }
-
-            groupTree = groupTree.filter((x) => x.name === input.search)
             if (input.search) {
                 groupTree = await searchHierarchy({
                     isSysadmin: true,
@@ -316,10 +289,46 @@ export const teamRouter = createTRPCRouter({
                     groupTree = filterTree
                 }
             } else {
-                groupTree = await getGroups({
+                groupTree = await searchHierarchy({
+                    isSysadmin: true,
                     apiKey: ctx?.session?.user.apikey ?? '',
+                    q: '',
                     group_type: 'organization',
                 })
+            }
+
+            if (groupTree.length === 0) {
+                return {
+                    teams: groupTree,
+                    teamsDetails: {} as Record<string, GroupsmDetails>,
+                    count: 0,
+                }
+            }
+            const allGroups = (await getAllOrganizations({
+                apiKey: ctx?.session?.user.apikey ?? '',
+            }))!
+
+            const teamDetails = allGroups.reduce(
+                (acc, org) => {
+                    acc[org.id] = {
+                        img_url: org.image_display_url ?? '',
+                        description: org.description ?? '',
+                        package_count: org.package_count!,
+                        name: org.name,
+                    }
+                    return acc
+                },
+                {} as Record<string, GroupsmDetails>
+            )
+
+            for (const group in teamDetails) {
+                const team = teamDetails[group]!
+                const packagedetails = (await getAllDatasetFq({
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    fq: `organization:${team.name}+is_approved:true`,
+                    query: { search: '', page: { start: 0, rows: 10000 } },
+                }))!
+                team.package_count = packagedetails.count
             }
 
             const result = groupTree

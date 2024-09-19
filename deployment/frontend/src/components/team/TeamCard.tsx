@@ -4,6 +4,7 @@ import Team from '@/interfaces/team.interface'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { api } from '@/utils/api'
 import { Organization } from '@portaljs/ckan'
+import Link from 'next/link'
 
 //write a typeguard to check if the topic is a GroupTree
 function isGroupTree(org: GroupTree | Organization): org is GroupTree {
@@ -19,7 +20,7 @@ export default function TeamCard({
 }) {
     const { data: numOfSubTeams } = api.teams.getNumberOfSubTeams.useQuery()
     return (
-        <a
+        <Link
             href={`/teams/${team.name}`}
             className="text-wri-black flex flex-col w-full font-acumin max-w-[400px] ml-auto mr-auto"
         >
@@ -82,6 +83,6 @@ export default function TeamCard({
                     </>
                 )}
             </div>
-        </a>
+        </Link>
     )
 }
