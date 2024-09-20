@@ -55,15 +55,23 @@ def _is_json_string(actors: str) -> bool:
 
 
 def _check_type(actors: str, data_dict: DataDict, actor_type: str) -> DataDict:
-    is_json = _is_json_string(actors)
-
     if isinstance(actors, list):
         data_dict[actor_type] = json.dumps(actors)
-    elif isinstance(actors, str) and not is_json:
-        actors_processed = _process_actor_string(actors, actor_type)
+    elif isinstance(actors, str):
+        actors = actors.strip()
 
-        if actors_processed:
-            data_dict[actor_type] = json.dumps(actors_processed)
+        if (
+            actors[0] == '"' and actors[-1] == '"' or actors[0] == "'" and actors[-1] == "'"
+        ) and len(actors) > 1:
+            actors = actors[1:-1]
+
+        if _is_json_string(actors):
+            data_dict[actor_type] = actors
+        else:
+            actors_processed = _process_actor_string(actors, actor_type)
+
+            if actors_processed:
+                data_dict[actor_type] = json.dumps(actors_processed)
 
     return data_dict
 
