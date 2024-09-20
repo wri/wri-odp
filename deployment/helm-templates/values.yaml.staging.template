@@ -212,12 +212,12 @@ ckan:
           - path: /(.*)
             port: 80
             service: wri-staging-ckan-svc
-      - host: wri.staging.frontend.datopian.com
-        isExternal: false
-        paths:
-          - path: /(.*)
-            port: 80
-            service: wri-staging-frontend-svc
+      #- host: wri.staging.frontend.datopian.com
+      #  isExternal: false
+      #  paths:
+      #    - path: /(.*)
+      #      port: 80
+      #      service: wri-staging-frontend-svc
     ingressNamespace: nginx-ingress
     ingressClass: nginx
     tls:
@@ -227,9 +227,9 @@ ckan:
       - hosts:
           - wri.staging.data.datopian.com
         secretName: wri.staging.data.datopian.com
-      - hosts:
-          - wri.staging.frontend.datopian.com
-        secretName: wri.staging.frontend.datopian.com
+      #- hosts:
+      #    - wri.staging.frontend.datopian.com
+      #  secretName: wri.staging.frontend.datopian.com
       - hosts:
           - wri.staging.console.datopian.com
         secretName: wri.staging.console.datopian.com
