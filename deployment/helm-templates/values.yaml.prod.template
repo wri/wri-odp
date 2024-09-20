@@ -219,12 +219,12 @@ ckan:
           - path: /(.*)
             port: 80
             service: wri-prod-ckan-svc
-      - host: wri.prod.frontend.datopian.com
-        isExternal: false
-        paths:
-          - path: /(.*)
-            port: 80
-            service: wri-prod-frontend-svc
+      #- host: wri.prod.frontend.datopian.com
+      #  isExternal: false
+      #  paths:
+      #    - path: /(.*)
+      #      port: 80
+      #      service: wri-prod-frontend-svc
     ingressNamespace: nginx-ingress
     ingressClass: nginx
     tls:
@@ -234,9 +234,9 @@ ckan:
       - hosts:
           - wri.prod.data.datopian.com
         secretName: wri.prod.data.datopian.com
-      - hosts:
-          - wri.prod.frontend.datopian.com
-        secretName: wri.prod.frontend.datopian.com
+      #- hosts:
+      #    - wri.prod.frontend.datopian.com
+      #  secretName: wri.prod.frontend.datopian.com
       - hosts:
           - wri.prod.console.datopian.com
         secretName: wri.prod.console.datopian.com
