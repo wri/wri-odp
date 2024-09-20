@@ -58,12 +58,12 @@ def _check_type(actors: str, data_dict: DataDict, actor_type: str) -> DataDict:
     is_json = _is_json_string(actors)
 
     if isinstance(actors, list):
-        data_dict[actors] = json.dumps(actors)
+        data_dict[actor_type] = json.dumps(actors)
     elif isinstance(actors, str) and not is_json:
         actors_processed = _process_actor_string(actors, actor_type)
 
         if actors_processed:
-            data_dict[actors] = json.dumps(actors_processed)
+            data_dict[actor_type] = json.dumps(actors_processed)
 
     return data_dict
 
