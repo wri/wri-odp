@@ -235,6 +235,7 @@ def package_patch(context: Context, data_dict: DataDict):
     data_dict["approval_status"] = "pending"
     _pending_dataset = {**pending_dataset, **data_dict}
 
+    # Override for authors/maintainers validation/formatting
     _pending_dataset = stringify_actor_objects(_pending_dataset)
 
     patch_dataset = logic.action.patch.package_patch(
@@ -285,6 +286,8 @@ def package_patch(context: Context, data_dict: DataDict):
     return pending_update.get("package_data")
 
 
+# IMPORTANT: This function includes an override/change for authors/maintainers (the call to stringify_actor_objects).
+# This is not a 1:1 match with the original function, though all other logic is the same.
 def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.PackageUpdate:
     """Update a dataset (package).
 
@@ -325,6 +328,7 @@ def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.Pa
         raise NotFound(_("Package was not found."))
     context["package"] = pkg
 
+    # Override for authors/maintainers validation/formatting
     data_dict = stringify_actor_objects(data_dict)
 
     # immutable fields
@@ -438,6 +442,8 @@ def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.Pa
     return output
 
 
+# IMPORTANT: This function includes an override/change for authors/maintainers (the call to stringify_actor_objects).
+# This is not a 1:1 match with the original function, though all other logic is the same.
 def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.PackagePatch:
     """Patch a dataset (package).
 
@@ -478,6 +484,7 @@ def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.Pac
     patched.update(data_dict)
     patched["id"] = package_dict["id"]
 
+    # Override for authors/maintainers validation/formatting
     patched = stringify_actor_objects(patched)
 
     return _get_action("old_package_update")(context, patched)
@@ -642,6 +649,8 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
         return dataset
 
 
+# IMPORTANT: This function includes an override/change for authors/maintainers (using old_package_update instead of package_update).
+# This is not a 1:1 match with the original function, though all other logic is the same.
 def resource_update(
     context: Context, data_dict: DataDict
 ) -> ActionResult.ResourceUpdate:
@@ -706,7 +715,8 @@ def resource_update(
 
     try:
         context["use_cache"] = False
-        updated_pkg_dict = _get_action("package_update")(context, pkg_dict)
+        # Override for authors/maintainers validation/formatting
+        updated_pkg_dict = _get_action("old_package_update")(context, pkg_dict)
     except ValidationError as e:
         try:
             error_dict = cast("list[ErrorDict]", e.error_dict["resources"])[n]
