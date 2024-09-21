@@ -16,7 +16,7 @@ def get_shape_from_dataapi(address: str, point):
         split_address = address.split(",")
         shape = None
         if len(split_address) == 1:
-            url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query?sql=SELECT country,ST_asText(ST_SimplifyPreserveTopology(ST_RemoveRepeatedPoints(geom, 0.001), 0.001)) AS simplified_geom FROM gadm_administrative_boundaries WHERE adm_level='0' AND ST_Contains(geom, ST_SetSRID(ST_Point({point[0]}, {point[1]}), 4326)) limit 1;"
+            url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query?sql=SELECT country,ST_asText(ST_SimplifyPreserveTopology(ST_RemoveRepeatedPoints(geom, 0.001), 10)) AS simplified_geom FROM gadm_administrative_boundaries WHERE adm_level='0' AND ST_Contains(geom, ST_SetSRID(ST_Point({point[0]}, {point[1]}), 4326)) limit 1;"
             response = requests.get(url, headers=headers)
             data = response.json()
             if len(data["data"]) > 0:

@@ -1108,15 +1108,18 @@ def resource_search(context: Context, data_dict: DataDict):
                 location_queries.append(point_query)
 
         if point:
-            shape = get_shape_from_dataapi(spatial_address, point)
-            if shape:
-                shape = wkt.loads(shape)
-                spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
-                location_queries.append(
-                    geoalchemy2.functions.ST_Intersects(
-                        ResourceLocation.spatial_geom, spatial_geom
+            try:
+                shape = get_shape_from_dataapi(spatial_address, point)
+                if shape:
+                    shape = wkt.loads(shape)
+                    spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
+                    location_queries.append(
+                        geoalchemy2.functions.ST_Intersects(
+                            ResourceLocation.spatial_geom, spatial_geom
+                        )
                     )
-                )
+            except Exception as e:
+                log.error(e)
 
     if len(location_queries) == 0 and point_query is not None:
         location_queries.append(point_query)
