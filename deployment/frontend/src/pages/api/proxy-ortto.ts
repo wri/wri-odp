@@ -5,8 +5,14 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    const body = JSON.parse(req.body)
-    const response = await fetch('https://ortto.wri.org/custom-forms/gfw/', {
+    const _body = JSON.parse(req.body)
+    const body = {
+        website: 'https://datasets.wri.org/',
+        'form-name': 'Footer Sign-up Form',
+        list: 'DATA - Data Explorer - NEWSL - LIST',
+        email: _body.email,
+    }
+    const response = await fetch('https://ortto.wri.org/custom-forms/', {
         method: 'POST',
         body: qs.stringify(body),
         headers: {
