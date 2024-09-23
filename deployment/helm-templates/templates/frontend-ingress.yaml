@@ -20,8 +20,23 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/server-snippet: |
-      location ~ ^/dataset/(climate-finance-100billion-breakdown|climate-vulnerable-forum-mapping-of-opportunities|cofi|electric_school_bus_adoption|globalpowerplantdatabase|index-urban-inequality-mexico|land-use-in-selected-indian-cities|local-governmnet-renewables-action-tracker|ndc-adaptation-ambition|wri_water_sanitation_15_cities_study|school_bus_fleets|city-scale-climate-hazard-indicators-warming-scenarios)$ {
+      location ~ ^/dataset/(climate-finance-100billion-breakdown|climate-vulnerable-forum-mapping-of-opportunities|cofi|index-urban-inequality-mexico|land-use-in-selected-indian-cities|ndc-adaptation-ambition|city-scale-climate-hazard-indicators-warming-scenarios)$ {
          rewrite ^/dataset/(.*)$ /datasets/$1 permanent;
+        }
+      location ~ ^/dataset/electric_school_bus_adoption {
+         rewrite ^/dataset/electric_school_bus_adoption$ /datasets/electric-school-bus-adoption permanent;
+        }
+      location ~ ^/dataset/globalpowerplantdatabase {
+         rewrite ^/dataset/globalpowerplantdatabase$ /datasets/global-power-plant-database permanent;
+        }
+      location ~ ^/dataset/local-governmnet-renewables-action-tracker {
+         rewrite ^/dataset/local-governmnet-renewables-action-tracker$ /datasets/local-government-renewables-action-tracker permanent;
+        }
+      location ~ ^/dataset/wri_water_sanitation_15_cities_study {
+         rewrite ^/dataset/wri_water_sanitation_15_cities_study$ /datasets/towards-a-more-equal-city-water-sanitation permanent;
+        }
+      location ~ ^/dataset/school_bus_fleets {
+         rewrite ^/dataset/school_bus_fleets$ /datasets/usa-school-bus-fleets permanent;
         }
     nginx.ingress.kubernetes.io/use-regex: "true"
   generation: 1
