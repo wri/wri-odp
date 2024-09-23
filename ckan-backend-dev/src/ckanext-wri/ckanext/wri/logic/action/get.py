@@ -12,7 +12,7 @@ from itertools import zip_longest
 from ckan.common import config, asbool
 from ckan.model import Package
 from sqlalchemy import text, engine
-from shapely import Polygon, wkb, wkt
+from shapely import MultiPolygon, Polygon, wkb, wkt
 from shapely import make_valid
 
 
@@ -1116,6 +1116,8 @@ def resource_search(context: Context, data_dict: DataDict):
                     bbox = Polygon([(-180, -90), (180, -90), (180, 90), (-180, 90)])
                     shape = make_valid(shape)
                     shape = shape.intersection(bbox)
+                    polygons = [geom for geom in shape.geoms if isinstance(geom, (Polygon, MultiPolygon))]
+                    shape = MultiPolygon(polygons)
                     spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
                     location_queries.append(
                         geoalchemy2.functions.ST_Intersects(

@@ -309,6 +309,8 @@ you need to split the geometry in order to fit the parts. Not indexing"""
                 bbox = Polygon([(-180, -90), (180, -90), (180, 90), (-180, 90)])
                 multipolygon = make_valid(multipolygon)
                 multipolygon = multipolygon.intersection(bbox)
+                polygons = [geom for geom in multipolygon.geoms if isinstance(geom, (Polygon, MultiPolygon))]
+                multipolygon = MultiPolygon(polygons)
                 spatial_geom = multipolygon.wkt
                 _queries.append(self.get_wkt_query(spatial_geom, include_global=include_global))
                 _queries = _queries + self.build_spatial_address_query(segments)
