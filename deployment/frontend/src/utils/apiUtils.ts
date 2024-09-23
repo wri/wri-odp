@@ -334,6 +334,7 @@ export async function getAllDatasetFq({
             url += `&user=true`
         }
 
+        console.log('URL', url)
         const response = await fetch(
             `${url}&start=${query.page?.start}&rows=${query.page?.rows}`,
             {
