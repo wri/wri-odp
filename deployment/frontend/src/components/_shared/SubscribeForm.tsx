@@ -7,8 +7,6 @@ import { z } from 'zod'
 import { ErrorDisplay } from './InputGroup'
 import { useMutation } from 'react-query'
 import { toast } from 'react-toastify'
-import qs from 'query-string'
-
 export function SubscribeForm() {
     const {
         formState: { errors },
@@ -22,36 +20,58 @@ export function SubscribeForm() {
             })
         ),
     })
+    const submitNewsletter = useMutation({
+        mutationFn: async (data: { email: string }) => {
+            const res = await fetch('/api/proxy-ortto', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+            const subscribe = await res.json()
+            return subscribe
+        },
+    })
     return (
         <form
-            method="POST"
-            action="https://ortto.wri.org/custom-forms/"
+            onSubmit={handleSubmit(async (data) => {
+                submitNewsletter.mutate(data, {
+                    onSuccess: () => {
+                        toast(
+                            "You'll receive an email confirming your subscription",
+                            { type: 'success' }
+                        )
+                    },
+                    onError: (err) => {
+                        console.error(err)
+                        toast('Failed to subscribe to newsletter', {
+                            type: 'error',
+                        })
+                    },
+                })
+            })}
             className="flex w-full flex-col gap-x-2 gap-y-4 lg:flex-row justify-between"
         >
             <div className="relative grow">
                 <input
-                    type="email"
-                    name="email"
+                    type="text"
+                    {...register('email')}
                     aria-label="email"
                     className="h-11 w-full peer grow rounded border-0 shadow outline-0 ring-0 ring-offset-0 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 "
                 />
-                <input
-                    type="hidden"
-                    name="website"
-                    value="http://datasets.wri.org "
-                />
-                <input
-                    type="hidden"
-                    name="form-name"
-                    value="Footer Sign-up Form"
-                />
-                <input
-                    type="hidden"
-                    name="list"
-                    value="DATA - Data Explorer - NEWSL - LIST"
-                />
+                {!watch('email') || watch('email') === '' ? (
+                    <div className="absolute pointer-events-none peer-focus:hidden inset-y-0 left-0 flex gap-x-2 items-center pl-3">
+                        <EnvelopeIcon className="h-6 w-5 text-gray-400" />
+                        <span className="text-xs text-gray-500">
+                            Enter your email
+                        </span>
+                    </div>
+                ) : (
+                    <></>
+                )}
+                <ErrorDisplay errors={errors} name="email" />
             </div>
-            <Button>SUBSCRIBE</Button>
+            <LoaderButton loading={submitNewsletter.isLoading}>
+                SUBSCRIBE
+            </LoaderButton>
         </form>
     )
 }
