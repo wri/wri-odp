@@ -1114,6 +1114,7 @@ def resource_search(context: Context, data_dict: DataDict):
                 if shape:
                     shape = wkt.loads(shape)
                     bbox = Polygon([(-180, -90), (180, -90), (180, 90), (-180, 90)])
+                    shape = make_valid(shape)
                     shape = shape.intersection(bbox)
                     spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
                     location_queries.append(
