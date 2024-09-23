@@ -30,12 +30,14 @@ def get_shape_from_dataapi(address: str, point):
         log.info(f"Using simplification factor of {simplification_factor}")
         if len(split_address) == 1:
             url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query?sql=SELECT country,ST_asText(ST_SimplifyPreserveTopology(ST_RemoveRepeatedPoints(geom, {simplification_factor}), {simplification_factor})) AS simplified_geom FROM gadm_administrative_boundaries WHERE adm_level='0' AND ST_Contains(geom, ST_SetSRID(ST_Point({point[0]}, {point[1]}), 4326)) limit 1;"
+            log.info(f"Using URL: {url}")
             response = requests.get(url, headers=headers)
             data = response.json()
             if len(data["data"]) > 0:
                 shape = data["data"][0]["simplified_geom"]
         if len(split_address) == 2:
             url = f"https://data-api.globalforestwatch.org/dataset/gadm_administrative_boundaries/v4.1/query?sql=SELECT country,ST_asText(ST_SimplifyPreserveTopology(ST_RemoveRepeatedPoints(geom, 0.001), 0.001)) AS simplified_geom FROM gadm_administrative_boundaries WHERE adm_level='1' AND ST_Contains(geom, ST_SetSRID(ST_Point({point[0]}, {point[1]}), 4326)) limit 1;"
+            log.info(f"Using URL: {url}")
             response = requests.get(url, headers=headers)
             data = response.json()
             if len(data["data"]) > 0:
