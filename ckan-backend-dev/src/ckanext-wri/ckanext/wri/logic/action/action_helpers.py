@@ -46,35 +46,47 @@ def _is_json_string(actors: str) -> bool:
     try:
         json.loads(actors)
         return True
+    except json.JSONDecodeError as e:
+        log.warning(f"Value is not a valid JSON object: {e}")
+        return False
     except Exception as e:
-        log.warn(f"Value is not a valid JSON object: {e}")
+        log.error(f"Error checking if value is a valid JSON object: {e}")
         return False
 
 
+def _check_type(actors: str, data_dict: DataDict, actor_type: str) -> DataDict:
+    if isinstance(actors, list):
+        data_dict[actor_type] = json.dumps(actors)
+    elif isinstance(actors, str):
+        actors = actors.strip()
+
+        if (
+            actors[0] == '"' and actors[-1] == '"' or actors[0] == "'" and actors[-1] == "'"
+        ) and len(actors) > 1:
+            actors = actors[1:-1]
+
+        if _is_json_string(actors):
+            data_dict[actor_type] = actors
+        else:
+            actors_processed = _process_actor_string(actors, actor_type)
+
+            if actors_processed:
+                data_dict[actor_type] = json.dumps(actors_processed)
+
+    return data_dict
+
+
 def stringify_actor_objects(data_dict: DataDict) -> DataDict:
-    authors = data_dict.get("authors")
-    maintainers = data_dict.get("maintainers")
+    for key in ["authors", "maintainers"]:
+        actors = data_dict.get(key)
 
-    if authors:
-        is_json = _is_json_string(authors)
+        if actors:
+            if all([k in actors for k in ["'name'", "'email'"]]):
+                log.error(
+                    f"{key} - Value must be a valid JSON object. Valid JSON uses double quotes, not single quotes: {actors}"
+                )
+                return data_dict
 
-        if isinstance(authors, list):
-            data_dict["authors"] = json.dumps(authors)
-        elif isinstance(authors, str) and not is_json:
-            authors_processed = _process_actor_string(authors, "author")
-
-            if authors_processed:
-                data_dict["authors"] = json.dumps(authors_processed)
-
-    if maintainers:
-        is_json = _is_json_string(maintainers)
-
-        if isinstance(maintainers, list):
-            data_dict["maintainers"] = json.dumps(maintainers)
-        elif isinstance(maintainers, str) and not is_json:
-            maintainers_processed = _process_actor_string(maintainers, "maintainer")
-
-            if maintainers_processed:
-                data_dict["maintainers"] = json.dumps(maintainers_processed)
+            data_dict = _check_type(actors, data_dict, key)
 
     return data_dict
