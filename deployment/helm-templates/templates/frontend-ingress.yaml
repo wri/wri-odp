@@ -1,0 +1,62 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cert-manager
+    kubernetes.io/ingress.class: nginx
+    meta.helm.sh/release-name: dx-helm-wri-prod-release
+    meta.helm.sh/release-namespace: wri-odp-prod
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "server: hide";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-Xss-Protection: 1";
+      more_set_headers "Referrer-Policy: origin";
+      more_set_headers "Expect-CT: max-age=86400, enforce, report-uri='[reportURL]'";
+      more_set_headers "X-Permitted-Cross-Domain-Policies: none";
+    nginx.ingress.kubernetes.io/limit-connections: "50"
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/proxy-body-size: 1000M
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location ~ ^/dataset/(climate-finance-100billion-breakdown|climate-vulnerable-forum-mapping-of-opportunities|cofi|index-urban-inequality-mexico|land-use-in-selected-indian-cities|ndc-adaptation-ambition|city-scale-climate-hazard-indicators-warming-scenarios)$ {
+         rewrite ^/dataset/(.*)$ /datasets/$1 permanent;
+        }
+      location ~ ^/dataset/electric_school_bus_adoption {
+         rewrite ^/dataset/electric_school_bus_adoption$ /datasets/electric-school-bus-adoption permanent;
+        }
+      location ~ ^/dataset/globalpowerplantdatabase {
+         rewrite ^/dataset/globalpowerplantdatabase$ /datasets/global-power-plant-database permanent;
+        }
+      location ~ ^/dataset/local-governmnet-renewables-action-tracker {
+         rewrite ^/dataset/local-governmnet-renewables-action-tracker$ /datasets/local-government-renewables-action-tracker permanent;
+        }
+      location ~ ^/dataset/wri_water_sanitation_15_cities_study {
+         rewrite ^/dataset/wri_water_sanitation_15_cities_study$ /datasets/towards-a-more-equal-city-water-sanitation permanent;
+        }
+      location ~ ^/dataset/school_bus_fleets {
+         rewrite ^/dataset/school_bus_fleets$ /datasets/usa-school-bus-fleets permanent;
+        }
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  generation: 1
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: wri-prod-ingress-fe-internal
+  namespace: wri-odp-prod
+spec:
+  rules:
+  - host: wri.prod.frontend.datopian.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: wri-prod-frontend-svc
+            port:
+              number: 80
+        path: /(.*)
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - wri.prod.frontend.datopian.com
+    secretName: wri.prod.frontend.datopian.com
