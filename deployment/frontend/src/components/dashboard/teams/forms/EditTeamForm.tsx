@@ -10,10 +10,10 @@ import notify from '@/utils/notify'
 import { api } from '@/utils/api'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { useRouter } from 'next/router'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import Link from 'next/link'
@@ -44,6 +44,10 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             parent: {
                 value: team.groups[0]?.name ?? '',
                 label: team.groups[0]?.name ?? '',
+            },
+            visibility: {
+                value: team.visibility,
+                label: team.visibility,
             },
             members: team.users?.map((member) => ({
                 user: {
@@ -184,47 +188,38 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                         </Tab.List>
                         <Tab.Panels>
                             <Tab.Panel>
-
-                                    <form
-                                        onSubmit={formObj.handleSubmit((data) => {
-                                            editTeam.mutate(data)
-                                        })}
-                                    >
-                                        <div className="w-full py-8 border-b border-blue-800 shadow">
-                                            <div className="px-2 sm:px-8">
-                                                <TeamForm
-                                                    formObj={formObj}
-                                                    editing={true}
-                                                />
-                                            </div>
+                                <form
+                                    onSubmit={formObj.handleSubmit((data) => {
+                                        editTeam.mutate(data)
+                                    })}
+                                >
+                                    <div className="w-full py-8 border-b border-blue-800 shadow">
+                                        <div className="px-2 sm:px-8">
+                                            <TeamForm
+                                                formObj={formObj}
+                                                editing={true}
+                                            />
                                         </div>
-                                        {errorMessage && (
-                                            <div className="py-4">
-                                                <ErrorAlert text={errorMessage} />
-                                            </div>
-                                        )}
-                                    </form>
+                                    </div>
+                                    {errorMessage && (
+                                        <div className="py-4">
+                                            <ErrorAlert text={errorMessage} />
+                                        </div>
+                                    )}
+                                </form>
                             </Tab.Panel>
                             <Tab.Panel
-                                    as="div"
-                                    className="flex flex-col gap-y-12 mt-8"
-                                >
-                                    <Members
-                                        team={team}
-                                        formObj={formObj}
-                                    />
+                                as="div"
+                                className="flex flex-col gap-y-12 mt-8"
+                            >
+                                <Members team={team} formObj={formObj} />
                             </Tab.Panel>
                         </Tab.Panels>
                     </div>
                 </Tab.Group>
                 <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-6 xxl:px-0">
-                    <Button
-                        type="button"
-                        variant="outline"
-                    >
-                        <Link href="/dashboard/teams">
-                            Cancel
-                        </Link>
+                    <Button type="button" variant="outline">
+                        <Link href="/dashboard/teams">Cancel</Link>
                     </Button>
                     <LoaderButton
                         loading={editTeam.isLoading}
