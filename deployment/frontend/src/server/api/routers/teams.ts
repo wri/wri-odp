@@ -5,7 +5,7 @@ import {
 } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import { CkanResponse, Collaborator } from '@/schema/ckan.schema'
-import { Organization } from '@portaljs/ckan'
+import { Organization } from '@/schema/ckan.schema'
 import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
@@ -37,12 +37,12 @@ export const teamRouter = createTRPCRouter({
                     user.sysadmin
                         ? `${
                               env.CKAN_URL
-                          }/api/action/organization_list?all_fields=True&limit=${
+                          }/api/action/organization_list?all_fields=True&include_extras=true&limit=${
                               (i + 1) * 25
                           }&offset=${i * 25}`
                         : `${
                               env.CKAN_URL
-                          }/api/action/organization_list_for_user?all_fields=True&limit=${
+                          }/api/action/organization_list_for_user?all_fields=True&include_extras=true&limit=${
                               (i + 1) * 25
                           }&offset=${i * 25}`,
                     {
