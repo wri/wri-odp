@@ -843,6 +843,8 @@ def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any):
         )
         if q:
             group_tree["highlighted"] = True
+        else:
+            group_tree["highlighted"] = False
         group_hierarchy_ids += recurcive_tree_ids(group_tree)
         results.append(group_tree)
     return results
@@ -1106,30 +1108,19 @@ def resource_search(context: Context, data_dict: DataDict):
             if point:
                 location_queries.append(point_query)
 
-        boundaries_from_gadm = config.get('ckanext.wri.boundaries_from_gadm', False)
-        if point and boundaries_from_gadm:
-            shape = get_shape_from_dataapi(spatial_address, point)
-            if shape:
-                shape = wkt.loads(shape)
-                spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
-                location_queries.append(
-                    geoalchemy2.functions.ST_Intersects(
-                        ResourceLocation.spatial_geom, spatial_geom
-                    )
-                )
-
-        if len(segments) in [1, 2] and boundaries_from_gadm is not True:
+        if point:
             try:
-                spatial_geom = get_geojson_from_filesystem(spatial_address)
-                location_queries.append(
-                    geoalchemy2.functions.ST_Intersects(
-                        ResourceLocation.spatial_geom, spatial_geom
+                shape = get_shape_from_dataapi(spatial_address, point)
+                if shape:
+                    shape = wkt.loads(shape)
+                    spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
+                    location_queries.append(
+                        geoalchemy2.functions.ST_Intersects(
+                            ResourceLocation.spatial_geom, spatial_geom
+                        )
                     )
-                )
             except Exception as e:
                 log.error(e)
-                if point:
-                    location_queries.append(point_query)
 
     if len(location_queries) == 0 and point_query is not None:
         location_queries.append(point_query)

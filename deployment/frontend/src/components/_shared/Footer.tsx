@@ -5,6 +5,7 @@ import { Button } from './Button'
 import Link from 'next/link'
 import { SubscribeForm } from './SubscribeForm'
 import { env } from '@/env.mjs'
+import osanoListeners from './OsanoListeners'
 
 export default function Footer({
     links = {
@@ -14,6 +15,8 @@ export default function Footer({
     style = 'mt-16',
     isHome = false,
 }) {
+    osanoListeners();
+
     return (
         <section
             id="footer"
@@ -67,6 +70,9 @@ export default function Footer({
                         >
                             Our Approach
                         </a>
+                        <Link href={env.NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL || "https://www.wri.org/about/privacy-policy?sitename=WRI%20Data%20Explorer&osanoid=c2a89d08-4931-4ad0-99cb-8d3aa022aaec"} className=" font-normal">
+                            Privacy Policy
+                        </Link>
                     </div>
                     <div className="mb-6 flex w-full flex-col items-center gap-y-4  sm:mb-0 sm:items-start">
                         <p className="text-base font-bold">USEFUL LINKS</p>
@@ -88,24 +94,7 @@ export default function Footer({
                         <Link href="/user-guide" className=" font-normal">
                             User Guide
                         </Link>
-                        <Link href={env.NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL || "https://www.wri.org/about/privacy-policy?sitename=WRI%20Data%20Explorer&osanoid=c2a89d08-4931-4ad0-99cb-8d3aa022aaec"} className=" font-normal">
-                            Privacy Policy
-                        </Link>
-                        <a href="" className="osano-cookie-preference-link font-normal" title="Manage privacy and cookie preferences">Cookie Preferences</a>
-                        <script dangerouslySetInnerHTML={{
-                            __html: `
-                              var elements = document.getElementsByClassName("osano-cookie-preference-link");
-
-                              var showOsanaDialog = function(e) {
-                                e.preventDefault();
-                                Osano.cm.showDrawer('osano-cm-dom-info-dialog-open');
-                              };
-
-                              for (var i = 0; i < elements.length; i++) {
-                                elements[i].addEventListener('click', showOsanaDialog, false);
-                              }
-                              `
-                        }} />
+                        <a className="osano-cookie-preference-link font-normal cursor-pointer" title="Manage privacy and cookie preferences">Cookie Preferences</a>
                     </div>
                     <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start xl:min-w-[420px]">
                         <div className="font-acumin text-xl font-bold text-gray-800">

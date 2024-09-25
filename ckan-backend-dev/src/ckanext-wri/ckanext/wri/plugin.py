@@ -29,6 +29,8 @@ from ckanext.wri.logic.action.create import (
     migrate_dataset,
     migration_status,
     package_create,
+    resource_create,
+    old_package_create,
 )
 from ckanext.wri.logic.action.update import (
     notification_update,
@@ -229,12 +231,13 @@ class WriPlugin(plugins.SingletonPlugin):
             "resource_location_search": resource_search,
             "approve_pending_dataset": approve_pending_dataset,
             "package_create": package_create,
-            "old_package_create": logic.action.create.package_create,
+            "old_package_create": old_package_create,
             "package_patch": package_patch,
             "old_package_patch": old_package_patch,
             "old_package_update": old_package_update,
             "resource_update": resource_update,
             "organization_list_for_user": organization_list_for_user,
+            "resource_create": resource_create,
             # "package_delete": package_delete,
         }
 
