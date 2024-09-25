@@ -11,6 +11,7 @@ import { env } from '@/env.mjs'
 import type { CkanResponse } from '@/schema/ckan.schema'
 import { Organization } from '@portaljs/ckan'
 import AzureAdProvider from 'next-auth/providers/azure-ad'
+import OktaProvider from 'next-auth/providers/okta'
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -27,6 +28,7 @@ declare module 'next-auth' {
             apikey: string
             sysadmin: boolean
             //teams: { name: string; id: string }[]
+            image: string
         }
     }
 
@@ -36,6 +38,7 @@ declare module 'next-auth' {
         apikey: string
         sysadmin: boolean
         //teams: { name: string; id: string }[]
+        image: string
     }
 }
 
@@ -53,13 +56,29 @@ export const authOptions: NextAuthOptions = {
         newUser: '/',
     },
     callbacks: {
+        async redirect({ url, baseUrl }) {
+            return url.startsWith(baseUrl) ? url : baseUrl
+        },
         async jwt({ token, user, account }) {
             if (user) {
                 token.apikey = user.apikey
                 // token.teams = user.teams
                 token.sysadmin = user.sysadmin
             }
-            if (account?.provider === 'azure-ad') {
+            let isAzureAd = account?.provider === 'azure-ad'
+            let isOkta = account?.provider === 'okta'
+            if (isAzureAd || isOkta) {
+                const reqBody: any = {
+                    email: user?.email,
+                    name: user?.name,
+                    id_token: account?.id_token,
+                }
+                if (isAzureAd) {
+                    reqBody.from_azure = true
+                }
+                if (isOkta) {
+                    reqBody.from_okta = true
+                }
                 if (account && account.access_token) {
                     const userRes = await fetch(
                         `${process.env.CKAN_URL}/api/3/action/user_login`,
@@ -68,12 +87,7 @@ export const authOptions: NextAuthOptions = {
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({
-                                from_azure: true,
-                                email: user?.email,
-                                name: user?.name,
-                                id_token: account?.id_token,
-                            }),
+                            body: JSON.stringify(reqBody),
                         }
                     )
 
@@ -111,8 +125,9 @@ export const authOptions: NextAuthOptions = {
                     name: token.name ? token.name : '',
                     apikey: token.apikey ? token.apikey : '',
                     // teams: token.teams ? token.teams : { name: '', id: '' },
-                    sysadmin: token?.sysadmin,
+                    sysadmin: token?.sysadmin ? token.sysadmin : false,
                     id: token.sub,
+                    image: typeof token.image === 'string' ? token.image : JSON.stringify(token.image || {}),
                 },
             }
         },
@@ -181,6 +196,11 @@ export const authOptions: NextAuthOptions = {
             clientId: env.AZURE_AD_CLIENT_ID ?? '',
             clientSecret: env.AZURE_AD_CLIENT_SECRET?.toString() ?? '',
             tenantId: env.AZURE_AD_TENANT_ID ?? '',
+        }),
+        OktaProvider({
+            clientId: env.OKTA_CLIENT_ID ?? '',
+            clientSecret: env.OKTA_CLIENT_SECRET?.toString() ?? '',
+            issuer: env.OKTA_ISSUER ?? '',
         }),
     ],
 }

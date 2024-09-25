@@ -64,6 +64,7 @@ function SignInForm({
     const [errorMessage, setErrorMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [isLoadingAzure, setIsLoadingAzure] = useState(false)
+    const [isLoadingOkta, setIsLoadingOkta] = useState(false)
 
     const {
         register,
@@ -89,6 +90,20 @@ function SignInForm({
             setErrorMessage('Azure AD Sign-in failed')
         }
         setIsLoadingAzure(false)
+    }
+
+    const handleOktaSignIn = async () => {
+        setIsLoadingOkta(true)
+        try {
+            await signIn('okta', {
+                callbackUrl: '/dashboard',
+                redirect: false,
+            })
+        } catch (error) {
+            console.error('Okta Sign-in error:', error)
+            setErrorMessage('Okta Sign-in failed')
+        }
+        setIsLoadingOkta(false)
     }
 
     return (
@@ -195,6 +210,21 @@ function SignInForm({
                 <div className="ml-2 w-fit font-semibold text-base text-wri-black ">
                     {!isLoadingAzure
                         ? 'Sign In with your WRI Credentials'
+                        : 'Signing in...'}
+                </div>
+            </button>
+            <button
+                type="button"
+                className="flex  mt-4 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 cursor-pointer"
+                onClick={handleOktaSignIn}
+                disabled={isLoadingOkta}
+            >
+                <div className="w-4 h-4 relative my-auto">
+                    <Image src="/images/wri_logo.png" alt="Okta Logo" fill />
+                </div>
+                <div className="ml-2 w-fit font-semibold text-base text-wri-black ">
+                    {!isLoadingOkta
+                        ? 'Sign In with your Okta Credentials'
                         : 'Signing in...'}
                 </div>
             </button>
