@@ -13,6 +13,7 @@ from ckan.common import config, asbool
 from ckan.model import Package
 from sqlalchemy import text, engine
 from shapely import wkb, wkt
+import ckan.model as model
 
 
 import ckan
@@ -30,7 +31,7 @@ import ckan.authz as authz
 from ckan.lib.dictization import table_dictize
 
 from ckan.common import _
-from ckan.types import ActionResult, Context, DataDict
+from ckan.types import ActionResult, Context, DataDict, Query, Schema
 from typing_extensions import TypeAlias
 from ckanext.wri.helpers.data_api import get_shape_from_dataapi
 from ckanext.wri.model.notification import (
@@ -1211,3 +1212,87 @@ def resource_search(context: Context, data_dict: DataDict):
 
 # TODO:  customize package_show to include spatial_geom
 # conditionally (optimization of the data file geo indexing)
+
+@logic.side_effect_free
+def organization_list_for_user(context: Context,
+                               data_dict: DataDict) -> ActionResult.OrganizationListForUser:
+    
+    model = context['model']
+    if data_dict.get('id'):
+        user_obj = model.User.get(data_dict['id'])
+        if not user_obj:
+            raise NotFound
+        user = user_obj.name
+    else:
+        user = context['user']
+
+    _check_access('organization_list_for_user', context, data_dict)
+    sysadmin = authz.is_sysadmin(user)
+
+    orgs_q = model.Session.query(model.Group) \
+        .filter(model.Group.is_organization == True) \
+        .filter(model.Group.state == 'active')
+
+    if sysadmin:
+        orgs_and_capacities = [(org, 'admin') for org in orgs_q.all()]
+    else:
+        # for non-Sysadmins check they have the required permission
+
+        permission = data_dict.get('permission', 'manage_group')
+
+        roles = authz.get_roles_with_permission(permission)
+
+        if not roles:
+            return []
+        user_id = authz.get_user_id_for_username(user, allow_none=True)
+        if not user_id:
+            return []
+
+        q: Query[tuple[model.Member, model.Group]] = model.Session.query(model.Member, model.Group) \
+            .filter(model.Member.table_name == 'user') \
+            .filter(
+                model.Member.capacity.in_(roles)
+            ) \
+            .filter(model.Member.table_id == user_id) \
+            .filter(model.Member.state == 'active') \
+            .join(model.Group)
+
+        group_ids: set[str] = set()
+        roles_that_cascade = cast(
+            "list[str]",
+            authz.check_config_permission('roles_that_cascade_to_sub_groups')
+        )
+        group_ids_to_capacities: dict[str, str] = {}
+        for member, group in q.all():
+            if member.capacity in roles_that_cascade:
+                children_group_ids = [
+                    grp_tuple[0] for grp_tuple
+                    in group.get_children_group_hierarchy(type='organization')
+                ]
+                for group_id in children_group_ids:
+                    group_ids_to_capacities[group_id] = member.capacity
+                group_ids |= set(children_group_ids)
+
+            group_ids_to_capacities[group.id] = member.capacity
+            group_ids.add(group.id)
+
+        if not group_ids:
+            return []
+
+        orgs_q = orgs_q.filter(model.Group.id.in_(group_ids))
+        orgs_and_capacities = [
+            (org, group_ids_to_capacities[org.id]) for org in orgs_q.all()]
+
+    context['with_capacity'] = True
+    orgs_list = model_dictize.group_list_dictize(orgs_and_capacities, context,
+        with_package_counts=asbool(data_dict.get('include_dataset_count')),
+        include_extras=asbool(data_dict.get('include_extras')))
+    
+    for org in orgs_list:
+        for extra in org.get('extras', []):
+            if extra['key'] == 'visibility':
+                org['visibility'] = extra['value']
+                break
+    return orgs_list
+
+
