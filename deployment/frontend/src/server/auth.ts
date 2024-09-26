@@ -65,17 +65,18 @@ export const authOptions: NextAuthOptions = {
                 // token.teams = user.teams
                 token.sysadmin = user.sysadmin
             }
-            let isAzureAd = account?.provider === 'azure-ad'
+            //let isAzureAd = account?.provider === 'azure-ad'
             let isOkta = account?.provider === 'okta'
-            if (isAzureAd || isOkta) {
+            //if (isAzureAd || isOkta) {
+            if (isOkta) {
                 const reqBody: any = {
                     email: user?.email,
                     name: user?.name,
                     id_token: account?.id_token,
                 }
-                if (isAzureAd) {
-                    reqBody.from_azure = true
-                }
+                //if (isAzureAd) {
+                //    reqBody.from_azure = true
+                //}
                 if (isOkta) {
                     reqBody.from_okta = true
                 }
@@ -192,11 +193,11 @@ export const authOptions: NextAuthOptions = {
                 }
             },
         }),
-        AzureAdProvider({
-            clientId: env.AZURE_AD_CLIENT_ID ?? '',
-            clientSecret: env.AZURE_AD_CLIENT_SECRET?.toString() ?? '',
-            tenantId: env.AZURE_AD_TENANT_ID ?? '',
-        }),
+        //AzureAdProvider({
+        //    clientId: env.AZURE_AD_CLIENT_ID ?? '',
+        //    clientSecret: env.AZURE_AD_CLIENT_SECRET?.toString() ?? '',
+        //    tenantId: env.AZURE_AD_TENANT_ID ?? '',
+        //}),
         OktaProvider({
             clientId: env.OKTA_CLIENT_ID ?? '',
             clientSecret: env.OKTA_CLIENT_SECRET?.toString() ?? '',

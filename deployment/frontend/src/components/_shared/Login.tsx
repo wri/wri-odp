@@ -198,7 +198,7 @@ function SignInForm({
                 <div className="text-wri-black ">or</div>
                 <div className="font-light text-[0.875rem] border border-1 border-wri-gray w-20 h-0" />
             </div>
-            <button
+            {/*<button
                 type="button"
                 className="flex  mt-8 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 cursor-pointer"
                 onClick={handleAzureSignIn}
@@ -212,19 +212,19 @@ function SignInForm({
                         ? 'Sign In with your WRI Credentials'
                         : 'Signing in...'}
                 </div>
-            </button>
+            </button>*/}
             <button
                 type="button"
-                className="flex  mt-4 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 cursor-pointer"
+                className="flex  mt-8 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 cursor-pointer"
                 onClick={handleOktaSignIn}
                 disabled={isLoadingOkta}
             >
                 <div className="w-4 h-4 relative my-auto">
-                    <Image src="/images/wri_logo.png" alt="Okta Logo" fill />
+                    <Image src="/images/wri_logo.png" alt="WRI Logo" fill />
                 </div>
                 <div className="ml-2 w-fit font-semibold text-base text-wri-black ">
                     {!isLoadingOkta
-                        ? 'Sign In with your Okta Credentials'
+                        ? 'Sign In with your WRI Credentials'
                         : 'Signing in...'}
                 </div>
             </button>
