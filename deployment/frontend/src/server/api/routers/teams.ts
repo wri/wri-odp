@@ -99,6 +99,7 @@ export const teamRouter = createTRPCRouter({
                         input.parent && input.parent.value !== ''
                             ? [{ name: input.parent.value }]
                             : [],
+                    visibility: input.visibility.value,
                 })
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_patch`,
@@ -141,16 +142,12 @@ export const teamRouter = createTRPCRouter({
             const team: CkanResponse<
                 WriOrganization & {
                     groups: Organization[]
-                    extras: { key: string; value: string }[]
                 }
             > = await teamRes.json()
+            console.log('TEAM', team)
             return {
                 ...team.result,
                 parent: team.result.groups[0]?.name ?? null,
-                visibility:
-                    team.result.extras.find(
-                        (extra) => extra.key === 'visibility'
-                    )?.value ?? 'public',
             }
         }),
     deleteTeam: protectedProcedure
@@ -202,7 +199,6 @@ export const teamRouter = createTRPCRouter({
     createTeam: protectedProcedure
         .input(TeamSchema)
         .mutation(async ({ ctx, input }) => {
-            console.log('INPUT TEAM', input)
             try {
                 const user = ctx.session.user
                 const body = JSON.stringify({
@@ -214,13 +210,9 @@ export const teamRouter = createTRPCRouter({
                         input.parent && input.parent.value !== ''
                             ? [{ name: input.parent.value }]
                             : [],
-                    extras: [
-                        {
-                            key: 'visibility',
-                            value: input.visibility.value,
-                        },
-                    ],
+                    visibility: input.visibility.value,
                 })
+                console.log('BODY TEAM', body)
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_create`,
                     {
