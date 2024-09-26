@@ -25,6 +25,7 @@ import ckan.logic as logic
 from ckan.common import _
 import json
 import requests
+from ckanext.wri.logic.action.get import validate_visibility
 
 # encoding: utf-8
 
@@ -190,6 +191,7 @@ def issue_delete(context: Context, data_dict: DataDict):
 
 
 def package_patch(context: Context, data_dict: DataDict):
+    validate_visibility(context, data_dict)
     dataset_id = data_dict.get("id")
     try:
         pending_dataset_dict = tk.get_action("pending_dataset_show")(
