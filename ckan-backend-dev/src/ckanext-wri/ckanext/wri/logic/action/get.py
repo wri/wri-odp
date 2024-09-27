@@ -59,6 +59,7 @@ from sqlalchemy import text
 import ckan.authz as authz
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
+import copy
 
 _select = sqlalchemy.sql.select
 _or_ = sqlalchemy.or_
@@ -760,10 +761,14 @@ def group_activity_list_wri(context: Context, data_dict: DataDict):
     return results
 
 
+
 @logic.side_effect_free
 def user_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
-    results = get_action("user_list")(context, data_dict)
+    user = context.get("user")
+    is_sysadmin = authz.is_sysadmin(user)
+    # results = get_action("user_list")(context, data_dict)
+
     query = model.Session.query(
         model.User,
         model.User.name.label("name"),
@@ -784,28 +789,36 @@ def user_list_wri(context: Context, data_dict: DataDict):
     query = query.filter(model.User.name != site_id)
     query = query.filter(model.User.state != model.State.DELETED)
     query = query.all()
+
     results = []
     org_details = {}
+
+   
     for q in query:
-        user = model_dictize.user_dictize(q[0], context)
+        user_dict = model_dictize.user_dictize(q[0], context)
 
         member_query = (
             model.Session.query(model.Member)
             .filter(
                 model.Member.state == "active",
                 model.Member.table_name == "user",
-                model.Member.table_id == user["id"],
+                model.Member.table_id == user_dict["id"],
             )
             .all()
         )
 
-        user["organizations"] = []
+        
+        user_dict["organizations"] = []
+        
 
         for member in member_query:
+            
             organization = None
             if member.group_id in org_details:
                 organization = org_details[member.group_id]
+                
             else:
+                # Query the organization details
                 org_result = (
                     model.Session.query(model.Group)
                     .filter(
@@ -814,18 +827,67 @@ def user_list_wri(context: Context, data_dict: DataDict):
                     )
                     .first()
                 )
+
                 if org_result:
-                    organization = model_dictize.group_dictize(org_result, context)
-                    org_details[member.group_id] = organization
+                    # Now perform the organization visibility check here
+                    group_extra_alias = aliased(model.GroupExtra)
+                    org_query = model.Session.query(model.Group).outerjoin(
+                        group_extra_alias, model.Group.id == group_extra_alias.group_id
+                    )
+
+                    # Non-sysadmin users get only public organizations or private if they belong to the org
+                    if not is_sysadmin:
+                        user_id = authz.get_user_id_for_username(user, allow_none=True)
+                        # Allow access to public orgs or private ones the user belongs to
+                        org_query = org_query.filter(
+                            model.Group.id == member.group_id
+                        ).filter(
+                            sqlalchemy.or_(
+                                sqlalchemy.and_(
+                                    group_extra_alias.key == "visibility",
+                                    group_extra_alias.value == "public",
+                                    model.Member.table_id == user_id,
+                                    model.Member.group_id == model.Group.id,
+                                    model.Member.table_name == "user",
+                                    model.Member.state == "active"
+                                ),
+                                sqlalchemy.and_(
+                                    group_extra_alias.key == None,
+                                    model.Member.table_id == user_id,
+                                    model.Member.group_id == model.Group.id,
+                                    model.Member.table_name == "user",
+                                    model.Member.state == "active"
+                                ),
+                                
+                                sqlalchemy.and_(
+                                    group_extra_alias.key == "visibility",
+                                    group_extra_alias.value == "private",
+                                    model.Member.table_id == user_id,
+                                    model.Member.group_id == model.Group.id,
+                                    model.Member.table_name == "user",
+                                    model.Member.state == "active"
+                                ),
+                            )
+                        )
+
+                    # Execute the organization query
+                    filtered_org = org_query.first()
+
+                    if filtered_org:
+                        organization = model_dictize.group_dictize(org_result, context,
+                                                                   include_groups=False,
+                                                                   include_users=True,
+                                                                   include_extras=False,
+                                                                   include_tags=False,
+                                                                   packages_field=None)
+                        org_details[member.group_id] = organization
 
             if organization:
-                user_org = next(
-                    filter(lambda x: x["id"] == user["id"], organization["users"])
-                )
-                organization["capacity"] = user_org["capacity"]
-                user["organizations"].append(organization)
+                org_copy = copy.deepcopy(organization)
+                org_copy["capacity"] = member.capacity
+                user_dict["organizations"].append(org_copy)
 
-        results.append(user)
+        results.append(user_dict)
 
     return results
 
