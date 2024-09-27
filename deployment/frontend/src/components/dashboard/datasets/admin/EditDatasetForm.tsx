@@ -169,6 +169,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       value: dataset.organization.name,
                       label: dataset.organization.title,
                       id: dataset.organization.id,
+                      visibility: '',
                   }
                 : { value: '', label: 'No Team', id: '' },
             license_id: license
