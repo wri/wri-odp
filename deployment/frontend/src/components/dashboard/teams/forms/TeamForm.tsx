@@ -139,7 +139,7 @@ export default function TeamForm({
                         formObj={formObj}
                         name="visibility"
                         options={[
-                            { label: 'Public', value: 'public' },
+                            { label: 'Public', value: 'public', default: true },
                             { label: 'Private', value: 'private' },
                         ]}
                         placeholder="Public"

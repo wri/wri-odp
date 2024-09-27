@@ -144,7 +144,6 @@ export const teamRouter = createTRPCRouter({
                     groups: Organization[]
                 }
             > = await teamRes.json()
-            console.log('TEAM', team)
             return {
                 ...team.result,
                 parent: team.result.groups[0]?.name ?? null,
@@ -212,7 +211,7 @@ export const teamRouter = createTRPCRouter({
                             : [],
                     visibility: input.visibility.value,
                 })
-                console.log('BODY TEAM', body)
+
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_create`,
                     {
