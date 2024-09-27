@@ -166,6 +166,7 @@ export interface WriOrganization extends Organization {
     groups?: Group[]
     users?: WriUser[]
     capacity?: string
+    parent?: string | null
 }
 
 export interface WriUser extends CkanUser {
