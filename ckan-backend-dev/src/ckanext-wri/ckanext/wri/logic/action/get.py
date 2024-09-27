@@ -14,7 +14,7 @@ from ckan.model import Package
 from sqlalchemy import text, engine
 from shapely import wkb, wkt
 import ckan.model as model
-from ckan.logic.action.get import _unpick_search
+from ckan.logic.action.get import _unpick_search, organization_show as old_organization_show
 from ckan.plugins.toolkit import chained_action
 
 import ckan
@@ -1419,6 +1419,9 @@ def organization_list(context: Context,
     :rtype: list of strings
 
     '''
+    '''
+    log.error("========CALLED ORG LIST========")    
+    '''  
     log.error("========CALLED ORG LIST========")    
     _check_access('organization_list', context, data_dict)
     data_dict['groups'] = data_dict.pop('organizations', [])
@@ -1583,16 +1586,19 @@ def _group_or_org_list(
     groups = query.all()
 
     if all_fields:
+        log.error("ALL FIELDS==========")
         action = 'organization_show' if is_org else 'group_show'
         group_list = []
         for group in groups:
             data_dict['id'] = group.id
+            log.error(group.id)
             for key in ('include_extras', 'include_users',
                         'include_groups', 'include_followers'):
                 if key not in data_dict:
                     data_dict[key] = False
-
-            group_list.append(logic.get_action(action)(context, data_dict))
+            rslt = old_organization_show(context, data_dict)
+            log.error(rslt)
+            group_list.append(rslt)
     else:
         group_list = [getattr(group, ref_group_by) for group in groups]
 

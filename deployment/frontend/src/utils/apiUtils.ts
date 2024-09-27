@@ -101,10 +101,8 @@ export async function searchHierarchy({
             )
 
             const data = (await response.json()) as CkanResponse<GroupTree[]>
-            console.log('TESTING', data)
             groups = data.success === true ? data.result : []
         }
-
         return groups
     } catch (e) {
         throw new Error(e as string)
