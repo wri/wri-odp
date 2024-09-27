@@ -14,7 +14,13 @@ from ckan.model import Package
 from sqlalchemy import text, engine
 from shapely import wkb, wkt
 import ckan.model as model
-from ckan.logic.action.get import _unpick_search, organization_show as old_organization_show
+from ckan.logic.action.get import (
+    _unpick_search, 
+    organization_show as old_organization_show)
+
+from ckan.logic.action.patch import (
+    organization_patch as old_organization_patch,
+)
 from ckan.plugins.toolkit import chained_action
 
 import ckan
@@ -1639,9 +1645,9 @@ def get_private_organizations(context: Context):
     
     return [org.name for org in private_orgs]
 
-@chained_action
+
 @logic.side_effect_free
-def organization_patch(original_action, context, data_dict):
+def organization_patch(context, data_dict):
 
     visibility = data_dict.get('visibility', "public")
 
@@ -1654,7 +1660,7 @@ def organization_patch(original_action, context, data_dict):
         public_package = get_action("package_search")(context, data_dict)
         if public_package.get("count") > 0:
             raise ValidationError({"message": _("Organization has private datasets and cannot be made private")})
-    return original_action(context, data_dict)
+    return old_organization_patch(context, data_dict)
 
 def validate_visibility(context, data_dict):
     log.error("VALIDATE VISIBILITY")
@@ -1678,10 +1684,10 @@ def validate_visibility(context, data_dict):
 
 
 
-@chained_action
+
 @logic.side_effect_free
-def organization_show(original_action, context, data_dict):
-    data_dict = original_action(context, data_dict)
+def organization_show(context, data_dict):
+    data_dict = old_organization_show(context, data_dict)
     user = context.get("user")
     if data_dict.get("visibility") == "public" or authz.is_sysadmin(user):
         return data_dict
