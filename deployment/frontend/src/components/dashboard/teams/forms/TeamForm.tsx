@@ -136,10 +136,12 @@ export default function TeamForm({
                     className="items-start"
                 >
                     <SimpleSelect
+                        key={editing ? 'edit' : 'create'}
+                        id="visibility"
                         formObj={formObj}
                         name="visibility"
                         options={[
-                            { label: 'Public', value: 'public', default: true },
+                            { label: 'Public', value: 'public' },
                             { label: 'Private', value: 'private' },
                         ]}
                         placeholder="Select visibility"
