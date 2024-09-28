@@ -532,6 +532,20 @@ export async function getOneDataset(
         throw Error(JSON.stringify(dataset.error))
     }
 
+    if (dataset.result.owner_org) {
+        const org = await getOrgDetails({
+            orgId: dataset.result.owner_org,
+            apiKey: session?.user.apikey ?? '',
+        })
+
+        const visibility = org?.visibility || 'public'
+
+        const organization = dataset.result.organization!
+        organization.visibility = visibility
+        dataset.result = { ...dataset.result, organization }
+    }
+
+
     if (dataset.result.rw_id && dataset.result.approval_status !== 'pending') {
         const rwRes = await fetch(
             `https://api.resourcewatch.org/v1/dataset/${dataset.result.rw_id}`,
@@ -683,7 +697,20 @@ export async function getOnePendingDataset(
         }
         throw Error(JSON.stringify(data.error))
     }
-    const dataset = data.result.package_data
+    let dataset = data.result.package_data
+
+    if (dataset.owner_org) {
+        const org = await getOrgDetails({
+            orgId: dataset.owner_org,
+            apiKey: session?.user.apikey ?? '',
+        })
+
+        const visibility = org?.visibility || 'public'
+
+        const organization = dataset.organization!
+        organization.visibility = visibility
+        dataset = { ...dataset, organization }
+    }
 
     // if (dataset.rw_id) {
     const resourceLayer = dataset.resources.filter(

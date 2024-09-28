@@ -1654,16 +1654,16 @@ def organization_patch(context, data_dict):
     if visibility == "private":
         rdata_dict = {
             "q": "", 
-            "fq": f"(organization:({data_dict.get('name')}) AND visibility_type:(private OR internal))", 
+            "fq": f"(organization:({data_dict.get('name')}) AND visibility_type:(public OR internal))", 
             "include_private": False  # Include private datasets in the search
         }
         public_package = get_action("package_search")(context, rdata_dict)
         if public_package.get("count") > 0:
-            raise ValidationError({"message": _("Organization has private datasets and cannot be made private")})
+            raise ValidationError({"message": _("Organization has public datasets and cannot be made private")})
     return old_organization_patch(context, data_dict)
 
 def validate_visibility(context, data_dict):
-    log.error("VALIDATE VISIBILITY")
+    
     visibility = data_dict.get('visibility_type', "public")
     owner_org = data_dict.get('owner_org', None)
     id = data_dict.get('id', None)
