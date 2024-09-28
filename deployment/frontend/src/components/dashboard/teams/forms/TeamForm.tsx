@@ -142,7 +142,7 @@ export default function TeamForm({
                             { label: 'Public', value: 'public', default: true },
                             { label: 'Private', value: 'private' },
                         ]}
-                        placeholder="Public"
+                        placeholder="Select visibility"
                     />
                     <ErrorDisplay name="parent" errors={errors} />
                 </InputGroup>

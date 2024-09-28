@@ -171,7 +171,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       id: dataset.organization.id,
                       visibility: '',
                   }
-                : { value: '', label: 'No Team', id: '' },
+                : { value: '', label: 'No Team', id: '', visibility: '' },
             license_id: license
                 ? { value: license.id, label: license.title }
                 : undefined,

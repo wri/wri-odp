@@ -129,6 +129,7 @@ export function OverviewForm({
                                                 label: 'No team',
                                                 value: '',
                                                 id: '',
+                                                visibility: '',
                                             },
                                             ...data.map((team) => ({
                                                 label: team.title ?? team.name,

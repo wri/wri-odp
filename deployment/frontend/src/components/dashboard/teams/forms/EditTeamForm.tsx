@@ -46,8 +46,8 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                 label: team.groups[0]?.name ?? '',
             },
             visibility: {
-                value: team.visibility,
-                label: team.visibility,
+                value: team.visibility || 'public',
+                label: team.visibility || 'public',
             },
             members: team.users?.map((member) => ({
                 user: {
