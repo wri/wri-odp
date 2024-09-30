@@ -1427,8 +1427,7 @@ def organization_list(context: Context,
     '''
     '''
     log.error("========CALLED ORG LIST========")    
-    '''  
-    log.error("========CALLED ORG LIST========")    
+    '''     
     _check_access('organization_list', context, data_dict)
     data_dict['groups'] = data_dict.pop('organizations', [])
     data_dict.setdefault('type', 'organization')
@@ -1517,7 +1516,6 @@ def _group_or_org_list(
         # User is logged in
         if user:
             user_id = authz.get_user_id_for_username(user, allow_none=True)
-            log.error("USER ID: " + str(user_id))
 
             # Correct filtering logic
             query = query.filter(sqlalchemy.or_(
@@ -1592,18 +1590,15 @@ def _group_or_org_list(
     groups = query.all()
 
     if all_fields:
-        log.error("ALL FIELDS==========")
         action = 'organization_show' if is_org else 'group_show'
         group_list = []
         for group in groups:
             data_dict['id'] = group.id
-            log.error(group.id)
             for key in ('include_extras', 'include_users',
                         'include_groups', 'include_followers'):
                 if key not in data_dict:
                     data_dict[key] = False
             rslt = old_organization_show(context, data_dict)
-            log.error(rslt)
             group_list.append(rslt)
     else:
         group_list = [getattr(group, ref_group_by) for group in groups]
@@ -1628,7 +1623,7 @@ def get_private_organizations(context: Context):
     # Check if the user is logged in
     if user:
         user_id = authz.get_user_id_for_username(user, allow_none=True)
-        log.error(f"Logged in as user: {user}, user_id: {user_id}")
+        
         
         # Exclude private organizations the user belongs to
         subquery = model.Session.query(model.Member.group_id).filter(
@@ -1689,7 +1684,7 @@ def validate_visibility(context, data_dict):
 def organization_show(context, data_dict):
     data_dict = old_organization_show(context, data_dict)
     user = context.get("user")
-    if data_dict.get("visibility") == "public" or authz.is_sysadmin(user):
+    if data_dict.get("visibility", "public") in ["public", "internal"] or authz.is_sysadmin(user):
         return data_dict
     
     if user:
