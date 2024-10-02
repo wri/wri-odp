@@ -46,7 +46,7 @@ metadata:
   namespace: wri-odp-prod
 spec:
   rules:
-  - host: wri.prod.frontend.datopian.com
+  - host: datasets.wri.org
     http:
       paths:
       - backend:
@@ -58,5 +58,5 @@ spec:
         pathType: ImplementationSpecific
   tls:
   - hosts:
-    - wri.prod.frontend.datopian.com
-    secretName: wri.prod.frontend.datopian.com
+    - datasets.wri.org
+    secretName: datasets.wri.org
