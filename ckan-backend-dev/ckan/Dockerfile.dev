@@ -1,6 +1,6 @@
 FROM viderum/ckan:v2.10.3-alpine-3.18
 
-# Set up environment variables
+### Set up environment variables
 ENV APP_DIR=/srv/app
 ENV AWS_ACCESS_KEY_ID=minioadmin
 ENV AWS_SECRET_ACCESS_KEY=minioadmin
