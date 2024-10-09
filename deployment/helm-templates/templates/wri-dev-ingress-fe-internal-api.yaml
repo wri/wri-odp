@@ -20,7 +20,6 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
     nginx.ingress.kubernetes.io/rewrite-target: /api/action/$1
     nginx.ingress.kubernetes.io/use-regex: "true"
-  generation: 8
   labels:
     app.kubernetes.io/managed-by: Helm
   name: wri-dev-ingress-fe-internal-api
