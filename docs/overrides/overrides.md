@@ -1,5 +1,7 @@
 # CKAN Core Overrides and Patches
 
+_Note_: The following documentation does not include completely new features (for more information on new custom features, see the rest of [the project repo documentation](https://github.com/wri/wri-odp/tree/prod/docs) and [the ckanext-wri README](https://github.com/wri/wri-odp/blob/prod/ckan-backend-dev/src/ckanext-wri/README.md)).
+
 ## CKAN Patches
 
 In some cases, code within CKAN core needs to be modified for a specific reason, and the changes might not be fit for a pull request to the CKAN core repository. Patches are a way to do this at runtime instead of modifying the CKAN core code directly.
