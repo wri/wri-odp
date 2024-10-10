@@ -1,6 +1,6 @@
 {
   "chromeWebSecurity": false,
-  "baseUrl": "http://ckan-dev:5000",
+  "baseUrl": "http://ckan-dev:5000/private-admin",
   "pageLoadTimeout": 120000,
   "video": false,
   "env": {
