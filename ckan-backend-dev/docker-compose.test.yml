@@ -27,7 +27,7 @@ services:
       - ./src:/srv/app/src_extensions
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://ckan-dev:5000/private-admin"]
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://ckan-dev:5000"]
 
   frontend:
     container_name: wri-frontend
