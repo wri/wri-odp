@@ -4,6 +4,7 @@ import { UserCircleIcon } from '@heroicons/react/20/solid'
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 
+
 export default function UserMenu({
     colors = 'dark',
 }: {
@@ -24,8 +25,20 @@ export default function UserMenu({
         },
         {
             title: 'Log Out',
-            onClick: () =>
-                signOut({ redirect: true, callbackUrl: window.location.href }),
+            onClick: async () => {
+                try {
+                    await fetch(`${process.env.NEXT_PUBLIC_CKAN_URL}/api/3/action/user_logout`, {
+                      method: 'POST',
+                      body: new URLSearchParams({
+                        id: session.data?.user.id as string,
+                      }),
+                    })
+                } catch (error) {
+                    console.error('Failed to logout from CKAN backend. The current token will not be revoked until next login.')
+                    console.error(error)
+                }
+                signOut({ redirect: true, callbackUrl: window.location.href });
+            },
         },
     ]
 

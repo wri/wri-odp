@@ -61,6 +61,9 @@ jobs:
           --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }} \
           --build-arg NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }} \
           --build-arg OSANO_URL=${{ secrets.DEV_OSANO_URL }} \
+          --build-arg OKTA_CLIENT_ID=${{ secrets.DEV_OKTA_CLIENT_ID }} \
+          --build-arg OKTA_ISSUER=${{ secrets.DEV_OKTA_ISSUER }} \
+          --build-arg OKTA_CLIENT_SECRET=${{ secrets.DEV_OKTA_CLIENT_SECRET }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Build and push Datapusher image to ECR

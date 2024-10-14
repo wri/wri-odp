@@ -159,6 +159,7 @@ function OpenInButton({
             </a>
         )
     }
+    console.log(open_in)
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>
