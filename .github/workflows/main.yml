@@ -92,7 +92,7 @@ jobs:
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
-          wait-on: 'http://localhost:5000'
+          wait-on: 'http://ckan-dev:5000/private-admin'
           wait-on-timeout: 120
           node-version: 18
           runTests: false
