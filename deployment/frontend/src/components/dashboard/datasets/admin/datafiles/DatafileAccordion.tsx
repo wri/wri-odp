@@ -40,7 +40,6 @@ export function DataFileAccordion({
         <Disclosure
             as="div"
             className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0"
-            defaultOpen
         >
             {({ open }) => (
                 <>
