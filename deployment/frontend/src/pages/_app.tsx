@@ -191,16 +191,16 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <QueryClientProvider client={queryClient}>
             <DefaultSeo
                 titleTemplate="%s - WRI ODP"
-                dangerouslySetAllPagesToNoIndex={
-                    env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
-                        ? false
-                        : true
-                }
-                dangerouslySetAllPagesToNoFollow={
-                    env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
-                        ? false
-                        : true
-                }
+                // dangerouslySetAllPagesToNoIndex={
+                //     env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
+                //         ? false
+                //         : true
+                // }
+                // dangerouslySetAllPagesToNoFollow={
+                //     env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
+                //         ? false
+                //         : true
+                // }
                 openGraph={{
                     images: [
                         {
