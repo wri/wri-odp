@@ -53,7 +53,7 @@ export function DataFileAccordion({
                             <Disclosure.Button
                                 id={id ?? ''}
                                 as="div"
-                                className="sm:px-8 px-4 col-span-full flex w-full justify-between border-b border-stone-50 py-5"
+                                className="sm:px-8 px-4 col-span-full flex w-full justify-between border-b border-stone-50 py-5 datafile-accordion-trigger"
                             >
                                 <h3 className="text-black text-xl font-normal font-['Acumin Pro SemiCondensed'] flex items-center gap-x-2">
                                     {title}

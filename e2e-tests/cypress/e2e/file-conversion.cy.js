@@ -36,6 +36,7 @@ describe("Data files", () => {
     cy.get('input[name="maintainers.1.email"]').type("test-maintainer-2@example.com");
 
     cy.contains("Next: Datafiles").click();
+    cy.get('.datafile-accordion-trigger').eq(0).click()
     cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/airtravel.csv", {
       force: true,
     });

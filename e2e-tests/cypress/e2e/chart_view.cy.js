@@ -34,6 +34,7 @@ describe("Chart view", () => {
     cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
     cy.get('input[name="maintainers.1.email"]').type("test-maintainer-2@example.com");
     cy.contains("Next: Datafiles").click();
+    cy.get('.datafile-accordion-trigger').eq(0).click()
     cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/airtravel.csv", {
       force: true,
     });
