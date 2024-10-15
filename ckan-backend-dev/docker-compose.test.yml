@@ -62,6 +62,7 @@ services:
       - PREFECT_INTERNAL_URL=http://prefect:4200
       - NEXT_PUBLIC_GFW_API_KEY="1111"
       - OSANO_URL="YOUR_OSANO_URL/osano.js"
+      - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
     depends_on:
       ckan-dev:
         condition: service_healthy
