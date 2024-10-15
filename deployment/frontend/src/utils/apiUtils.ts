@@ -101,7 +101,6 @@ export async function searchHierarchy({
             )
 
             const data = (await response.json()) as CkanResponse<GroupTree[]>
-            console.log('TESTING', data)
             groups = data.success === true ? data.result : []
         }
 
@@ -310,7 +309,9 @@ export async function getAllDatasetFq({
         }
 
         if (facetFields) {
-            const _facetFields = facetFields.filter(f => f !== 'metadata_modified')
+            const _facetFields = facetFields.filter(
+                (f) => f !== 'metadata_modified'
+            )
             url += `&facet.field=["${_facetFields.join('","')}"]`
         }
 
@@ -579,13 +580,15 @@ export async function getOneDataset(
         dataset.result.resources.map(async (r) => {
             if (r.url_type === 'upload' || r.url_type === 'link') {
                 let _views: View[] = []
-                try {
-                    _views = await getResourceViews({
-                        id: r.id,
-                        session: session,
-                    })
-                } catch (e) {
-                    _views = []
+                if (r.datastore_active) {
+                    try {
+                        _views = await getResourceViews({
+                            id: r.id,
+                            session: session,
+                        })
+                    } catch (e) {
+                        _views = []
+                    }
                 }
                 const resourceHasChartView =
                     r.datastore_active &&
