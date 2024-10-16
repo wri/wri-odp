@@ -85,6 +85,7 @@ jobs:
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
           SCRIPT_NAME: '/private-admin'
+          GITHUB_ACTIONS: true
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
