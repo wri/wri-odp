@@ -37,7 +37,7 @@ export default function TeamHeaderCard({
             className=" w-full flex flex-col md:flex-row max-w-9xl mx-auto  font-acumin gap-y-4 sm:mt-12"
         >
             <div className="relative w-full sm:px-6 md:px-0 md:w-[40%] xxl:w-[540px] h-[296px]">
-                <div className="absolute top-[78%] flex h-[68px] w-56 items-center justify-center rounded-t-[3px] bg-white ">
+                <div className="absolute z-10 top-[78%] flex h-[68px] w-56 items-center justify-center rounded-t-[3px] bg-white ">
                     <Link
                         href="/teams"
                         className="inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-400 text-stone-900 font-bold font-acumin hover:bg-yellow-500 h-11 px-6 py-4 rounded-[3px] text-base"
@@ -47,7 +47,6 @@ export default function TeamHeaderCard({
                     </Link>
                 </div>
                 <div className="w-full h-full border-b-2 border-b-wri-green  shadow flex justify-center items-center">
-                    <div className=" relative  w-[393px] h-[128px] ">
                         <Image
                             src={`${
                                 teamsDetails[team.id]?.img_url
@@ -56,9 +55,8 @@ export default function TeamHeaderCard({
                             }`}
                             alt="Team card"
                             fill
-                            className="object-contain"
+                            className="object-cover"
                         />
-                    </div>
                 </div>
             </div>
             <div className="w-full px-2 md:w-fit flex flex-col justify-center gap-y-3 md:pl-8">

@@ -35,7 +35,7 @@ function TopicCard({
                     }`}
                     alt={`Topic - ${topic.title}`}
                     fill
-                    className="object-contain"
+                    className="object-cover"
                 />
             </div>
             <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pl-4 ">
