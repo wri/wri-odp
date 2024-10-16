@@ -25,8 +25,9 @@ UWSGI_OPTS="--socket /tmp/uwsgi.sock \
             --master --enable-threads \
             --lazy-apps \
             -p 6 -L -b 32768 --vacuum \
-            --prefix /private-admin \
             --harakiri $UWSGI_HARAKIRI"
+
+export SCRIPT_NAME="/private-admin"
 
 if [ $? -eq 0 ]
 then
