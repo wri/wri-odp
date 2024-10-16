@@ -15,11 +15,6 @@ export default function Recent({
 }) {
     const identifier = title.toLowerCase().replace(' ', '-')
     return (
-        <div
-            id="highlights"
-            className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin gap-y-6 mt-16"
-        >
-            <h1 className="font-bold text-[2rem] ml-2">{title}</h1>
             <div className="relative ">
                 <div className="peer">
                     <Carousel identifier={identifier}>
@@ -43,6 +38,5 @@ export default function Recent({
                     <CarouselNavButton orientation="right" />
                 </div>
             </div>
-        </div>
     )
 }
