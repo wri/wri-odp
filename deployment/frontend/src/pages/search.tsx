@@ -117,10 +117,10 @@ export default function SearchPage(
             ) : (
                 <div
                     id="highlights"
-                    className="max-w-[94.5vw] mx-auto flex flex-col font-acumin gap-y-6 mt-16"
+                    className="max-w-8xl mx-auto flex flex-col font-acumin gap-y-6 mt-16"
                 >
                     <h1 className="font-bold text-[2rem] ml-2">
-                        Recently Added
+                        Recently added
                     </h1>
                     <Recent
                         datasets={recentlyAdded.datasets}
@@ -140,10 +140,10 @@ export default function SearchPage(
             ) : (
                 <div
                     id="highlights"
-                    className="max-w-[94.5vw] mx-auto flex flex-col font-acumin gap-y-6 mt-16"
+                    className="max-w-8xl mx-auto flex flex-col font-acumin gap-y-6 mt-16"
                 >
                     <h1 className="font-bold text-[2rem] ml-2">
-                        Recently Updated
+                        Recently updated
                     </h1>
                     <Recent
                         datasets={recentlyUpdated.datasets}
