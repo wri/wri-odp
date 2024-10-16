@@ -196,6 +196,7 @@ describe("Create dataset", () => {
     cy.contains("Data Files").click();
     cy.wait(5000);
     cy.get("button").contains("Add another data file").click();
+    cy.get('.datafile-accordion-trigger').eq(1).click()
     cy.get("input[type=file]").eq(1).selectFile("cypress/fixtures/logo_2.jpg", {
       force: true,
     });

@@ -58,6 +58,7 @@ describe("Chart view", () => {
     () => {
       cy.visit("/dashboard/datasets/" + datasetName + "/edit");
       cy.contains("Data Files").click();
+      cy.get('.datafile-accordion-trigger').eq(0).click()
       cy.contains("Datapusher").click();
       cy.contains("Submit to Datapusher").click();
       cy.contains(`Successfully submited datafile to the datapusher`, {
