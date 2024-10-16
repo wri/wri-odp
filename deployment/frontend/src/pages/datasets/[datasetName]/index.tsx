@@ -42,6 +42,17 @@ import { matchesAnyPattern } from '@/utils/general'
 import { Versioning } from '@/components/datasets/sections/Versioning'
 
 import { useActiveLayerGroups } from '@/utils/storeHooks'
+import Footer from '@/components/_shared/Footer'
+
+function customDataLayer(data: { event: string; resource_name: string }) {
+    if (env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
+        //@ts-ignore
+        dataLayer.push({
+            event: data.event,
+            resource_name: data.resource_name,
+        })
+    }
+}
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
@@ -49,7 +60,7 @@ const LazyViz = dynamic(
         loading: () => (
             <div className="min-h-[90vh] bg-lima-700 opacity-75 flex-col items-center justify-center">
                 <Spinner className="text-wri-green w-12 h-12" />
-                <h2 className="text-center text-xl font-semibold text-wri-green">
+                <h2 className="text-center text-xl font-semibold text-black">
                     Loading...
                 </h2>
             </div>
@@ -66,14 +77,48 @@ export async function getServerSideProps(
 
     const datasetName = context.params?.datasetName as string
     const session = await getServerAuthSession(context)
+    if (!session) {
+        try {
+            const dataset = await getOneDataset(datasetName, session, true)
+            const NEXTURL = env.NEXTAUTH_URL
+            return {
+                props: {
+                    NEXTURL,
+                    apiKey: '',
+                    dataset: JSON.stringify({
+                        ...dataset,
+                        spatial: dataset.spatial ?? null,
+                    }),
+                    prevdataset: null,
+                    pendingExist: false,
+                    is_approved: null,
+                    generalAuthorized: false,
+                    isPendingState: false,
+                    approvalAuth: null,
+                    datasetName,
+                    datasetId: dataset.id,
+                    initialZustandState: {
+                        dataset: JSON.stringify(dataset),
+                        relatedDatasets: [],
+                        mapView: mapState,
+                    },
+                },
+            }
+        } catch (e) {
+            return {
+                props: {
+                    redirect: {
+                        destination: '/datasets/404',
+                    },
+                },
+            }
+        }
+    }
     try {
-        let prevdataset = await getOneDataset(datasetName, session, true)
-
-        const pendingDataset = await getOnePendingDataset(
-            prevdataset.id,
-            session,
-            true
-        )
+        let [prevdataset, pendingDataset] = await Promise.all([
+            getOneDataset(datasetName, session, true),
+            getOnePendingDataset(datasetName, session, true),
+        ])
 
         let dataset = prevdataset
 
@@ -423,6 +468,14 @@ export default function DatasetPage(
                     ),
         },
         {
+            name: 'API',
+            enabled: true,
+            highlighted:
+                !isCurrentVersion &&
+                diffFields &&
+                diffFields.some((f) => f.includes('usecases')),
+        },
+        {
             name: 'Methodology',
             enabled: !!datasetData?.methodology,
             highlighted:
@@ -430,7 +483,6 @@ export default function DatasetPage(
                 diffFields &&
                 diffFields.some((f) => f.includes('methodology')),
         },
-        { name: 'Related Datasets', enabled: true },
         {
             name: 'Contact',
             enabled: true,
@@ -439,14 +491,16 @@ export default function DatasetPage(
                 diffFields &&
                 diffFields.some((f) =>
                     [
-                        'maintainer',
-                        'author',
-                        'maintainer_email',
-                        'author_email',
+                        //'maintainer',
+                        //'author',
+                        //'maintainer_email',
+                        //'author_email',
+                        'authors',
+                        'maintainers',
                     ].some((x) => f.includes(x))
                 ),
         },
-        { name: 'API', enabled: true },
+        { name: 'Related Datasets', enabled: true },
         {
             name: 'Collaborators',
             enabled: collaborators.data,
@@ -478,12 +532,20 @@ export default function DatasetPage(
                 removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id!)
                 setMapDisplayPreview(true)
                 addLayerToLayerGroup(LayerResource.rw_id!, dataset.id)
+                customDataLayer({
+                    event: 'layer_view_event',
+                    resource_name: LayerResource.title ?? LayerResource.name!,
+                })
             } else if (dataset?.provider && dataset?.rw_id) {
                 setDisplayNoPreview(false)
                 setTabularResource({
                     provider: dataset.provider as string,
                     id: dataset.rw_id as string,
                     name: dataset.name as string,
+                })
+                customDataLayer({
+                    event: 'table_view_event',
+                    resource_name: dataset.provider,
                 })
             } else if (dataset?.resources.find((d) => d.datastore_active)) {
                 const resource = dataset?.resources.find(
@@ -494,7 +556,12 @@ export default function DatasetPage(
                     provider: 'datastore',
                     id: resource?.id as string,
                     apiKey: apikey,
-                    name: resource?.title ?? resource?.name as string,
+                    name: resource?.title ?? (resource?.name as string),
+                })
+                customDataLayer({
+                    event: 'table_view_event',
+                    resource_name:
+                        resource?.title ?? (resource?.name as string),
                 })
             } else {
                 setTabularResource(null)
@@ -651,6 +718,15 @@ export default function DatasetPage(
                                                     diffFields={diffFields}
                                                 />
                                             </Tab.Panel>
+                                            <Tab.Panel as="div">
+                                                <API
+                                                    usecases={
+                                                        isCurrentVersion
+                                                            ? prevDatasetData.usecases
+                                                            : datasetData.usecases
+                                                    }
+                                                />
+                                            </Tab.Panel>
                                             {datasetData.methodology && (
                                                 <Tab.Panel as="div">
                                                     <Methodology
@@ -659,12 +735,14 @@ export default function DatasetPage(
                                                                 ? prevDatasetData.methodology
                                                                 : datasetData.methodology
                                                         }
+                                                        technical_notes={
+                                                            isCurrentVersion
+                                                                ? prevDatasetData.technical_notes
+                                                                : datasetData.technical_notes
+                                                        }
                                                     />
                                                 </Tab.Panel>
                                             )}
-                                            <Tab.Panel as="div">
-                                                <RelatedDatasets />
-                                            </Tab.Panel>
                                             <Tab.Panel as="div">
                                                 <Contact
                                                     //@ts-ignore
@@ -680,7 +758,7 @@ export default function DatasetPage(
                                                 />
                                             </Tab.Panel>
                                             <Tab.Panel as="div">
-                                                <API />
+                                                <RelatedDatasets />
                                             </Tab.Panel>
                                             {collaborators.data && (
                                                 <Tab.Panel as="div">
@@ -691,7 +769,8 @@ export default function DatasetPage(
                                                     />
                                                 </Tab.Panel>
                                             )}
-                                            {issues.data && !isCurrentVersion &&
+                                            {issues.data &&
+                                                !isCurrentVersion &&
                                                 issues.data.length > 0 && (
                                                     <Tab.Panel as="div">
                                                         <Issues
@@ -743,6 +822,12 @@ export default function DatasetPage(
                         mapDisplayPreview={mapDisplayPreview}
                     />
                 }
+            />
+            <Footer
+                links={{
+                    primary: { title: 'Explore Teams', href: '/teams' },
+                    secondary: { title: 'Explore Topics', href: '/topics' },
+                }}
             />
         </>
     )

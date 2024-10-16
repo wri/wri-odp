@@ -364,6 +364,7 @@ function parseRender(render: any) {
 }
 
 export const getApiSpecFromRawObj = (rawLayerFormObj: RawLayerFormType) => {
+    console.log('RW LAYER OBJ FORM', rawLayerFormObj)
     const { generalConfig, layerConfig, interactionConfig, legendConfig } =
         rawLayerFormObj
     try {
@@ -375,7 +376,7 @@ export const getApiSpecFromRawObj = (rawLayerFormObj: RawLayerFormType) => {
         }
         return apiSpec
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw new Error('Could not convert to layer object')
     }
 }

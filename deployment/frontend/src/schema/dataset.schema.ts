@@ -9,6 +9,7 @@ const updateFrequencySchema = z.enum([
     'biannually',
     'weekly',
     'as_needed',
+    'not_planned',
     'hourly',
     'monthly',
     'quarterly',
@@ -53,9 +54,27 @@ export const ResourceSchema = z
         format: z.string().optional().nullable(),
         size: z.number().optional().nullable(),
         title: z.string().optional(),
+        advanced_api_usage: z.string().optional().nullable(),
         fileBlob: z.any(),
-        type: z.enum(['link', 'upload', 'layer', 'empty-file', 'empty-layer', 'layer-raw']),
-        url_type: z.enum(['link', 'upload', 'layer', 'empty-file', 'empty-layer', 'layer-raw']).optional().nullable(),
+        type: z.enum([
+            'link',
+            'upload',
+            'layer',
+            'empty-file',
+            'empty-layer',
+            'layer-raw',
+        ]),
+        url_type: z
+            .enum([
+                'link',
+                'upload',
+                'layer',
+                'empty-file',
+                'empty-layer',
+                'layer-raw',
+            ])
+            .optional()
+            .nullable(),
         schema: DataDictionarySchema.optional().nullable(),
         layerObj: layerSchema.optional().nullable(),
         datastore_active: z.boolean().optional().nullable(),
@@ -63,7 +82,7 @@ export const ResourceSchema = z
         spatial_address: z.string().optional(),
         spatial_geom: z.any().optional(),
         spatial_coordinates: z.any().optional(),
-        spatial_type: z.enum(['address', 'geom']).optional(),
+        spatial_type: z.enum(['address', 'geom', 'global']).optional(),
     })
     .refine(
         (obj) => {
@@ -151,10 +170,22 @@ export const DatasetSchemaObject = z.object({
         .optional()
         .nullable()
         .or(emptyStringToUndefined),
-    author: z.string(),
-    author_email: z.string().email().optional().nullable().or(emptyStringToUndefined),
-    maintainer: z.string(),
-    maintainer_email: z.string().email(),
+    authors: z.array(
+        z.object({
+            name: z.string().min(1, { message: 'Author Name is required' }),
+            email: z.string().email().min(1, {
+                message: 'Author Email is required',
+            }),
+        })
+    ).min(1, { message: 'At least one (1) Author Name and Author Email is required.' }),
+    maintainers: z.array(
+        z.object({
+            name: z.string().min(1, { message: 'Maintainer Name is required' }),
+            email: z.string().email().min(1, {
+                message: 'Maintainer Email is required',
+            }),
+        })
+    ).min(1, { message: 'At least one (1) Maintainer Name and Maintainer Email is required.' }),
     function: z.string().optional().nullable(),
     restrictions: z.string().optional().nullable(),
     reason_for_adding: z.string().optional().nullable(),
@@ -168,6 +199,7 @@ export const DatasetSchemaObject = z.object({
         .or(emptyStringToUndefined),
     cautions: z.string().optional().nullable(),
     methodology: z.string().optional().nullable(),
+    usecases: z.string().optional().nullable(),
     extras: z.array(
         z.object({
             key: z.string(),
@@ -186,10 +218,8 @@ export const DatasetSchemaObject = z.object({
     collaborators: z.array(CollaboratorSchema).default([]),
     spatial_address: z.string().optional(),
     spatial: z.any().optional(),
-    spatial_type: z.enum(['address', 'geom']).optional(),
-    release_notes: z
-        .string()
-        .optional(),
+    spatial_type: z.enum(['address', 'geom', 'global']).optional(),
+    release_notes: z.string().optional(),
 })
 
 export const DatasetSchema = DatasetSchemaObject.refine(
@@ -228,22 +258,26 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     .refine(
         (obj) => {
             if (!obj.rw_dataset) return true
-            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName) return false
+            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName)
+                return false
             return true
         },
         {
-            message: 'ConnectorUrl is required for RW datasets, unless a table name is provided',
+            message:
+                'ConnectorUrl is required for RW datasets, unless a table name is provided',
             path: ['connectorUrl'],
         }
     )
     .refine(
         (obj) => {
             if (!obj.rw_dataset) return true
-            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName) return false
+            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName)
+                return false
             return true
         },
         {
-            message: 'Tablename is required for RW datasets, unless a connectorUrl is provided',
+            message:
+                'Tablename is required for RW datasets, unless a connectorUrl is provided',
             path: ['tableName'],
         }
     )
@@ -256,6 +290,27 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         {
             message: 'Technical notes are required for public datasets',
             path: ['technical_notes'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (obj.authors.length === 0) return false
+            return true
+        },
+        {
+            message: 'At least one (1) Author Name and Author Email is required.',
+            path: ['authors'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (obj.maintainers.length === 0) return false
+            return true
+        },
+        {
+            message:
+                'At least one (1) Maintainer Name and Maintainer Email is required.',
+            path: ['maintainers'],
         }
     )
 

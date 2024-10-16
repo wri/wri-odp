@@ -40,6 +40,7 @@ export const env = createEnv({
         SMTP_PASSWORD: z.string(),
         SMTP_FROM: z.string(),
         PREFECT_INTERNAL_URL: z.string(),
+        OSANO_URL: z.string(),
     },
 
     /**
@@ -53,6 +54,8 @@ export const env = createEnv({
         NEXT_PUBLIC_GTM_ID: z.string(),
         NEXT_PUBLIC_DISABLE_HOTJAR: z.string(),
         NEXT_PUBLIC_HOTJAR_ID: z.string(),
+        NEXT_PUBLIC_GFW_API_KEY: z.string(),
+        NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL: z.string(),
     },
 
     /**
@@ -84,7 +87,9 @@ export const env = createEnv({
         NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID, 
         NEXT_PUBLIC_DISABLE_HOTJAR: process.env.NEXT_PUBLIC_DISABLE_HOTJAR || "enabled",
         NEXT_PUBLIC_HOTJAR_ID: process.env.NEXT_PUBLIC_HOTJAR_ID,
-        
+        NEXT_PUBLIC_GFW_API_KEY: process.env.NEXT_PUBLIC_GFW_API_KEY,
+        OSANO_URL: process.env.OSANO_URL,
+        NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL: process.env.NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL || "https://www.wri.org/about/privacy-policy?sitename=WRI%20Data%20Explorer&osanoid=c2a89d08-4931-4ad0-99cb-8d3aa022aaec"
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

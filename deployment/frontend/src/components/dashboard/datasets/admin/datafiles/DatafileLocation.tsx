@@ -1,5 +1,6 @@
 import {
     ArrowUpTrayIcon,
+    GlobeEuropeAfricaIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 import { Disclosure, Tab } from '@headlessui/react'
@@ -13,7 +14,7 @@ import { Layer, Map, Source } from 'react-map-gl'
 import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner'
 import { UseFormReturn } from 'react-hook-form'
-import * as turf from "@turf/turf"
+import * as turf from '@turf/turf'
 
 export function DatafileLocation({
     formObj,
@@ -73,7 +74,6 @@ export function DatafileLocation({
         reader.addEventListener('load', (event) => {
             setIsLoadingGeoJSON(false)
             try {
-
                 const json = JSON.parse(event?.target?.result as string)
                 const geojsonType = json?.type
 
@@ -89,9 +89,9 @@ export function DatafileLocation({
                     geometries.push(json)
                 }
 
-                let union = geometries[0];
+                let union = geometries[0]
                 let i
-                for(i = 1; i < geometries.length; i++) {
+                for (i = 1; i < geometries.length; i++) {
                     union = turf.union(union, geometries[i])
                 }
 
@@ -99,7 +99,7 @@ export function DatafileLocation({
 
                 setValue(`resources.${index}.spatial_geom`, union)
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 notify('Failed to parse GeoJSON file', 'error')
             }
         })
@@ -123,6 +123,7 @@ export function DatafileLocation({
                     )
                         .with('geom', () => 0)
                         .with('address', () => 1)
+                        .with('global', () => 2)
                         .otherwise(() => undefined)}
                 >
                     <Tab.List
@@ -199,14 +200,52 @@ export function DatafileLocation({
                                 </span>
                             )}
                         </Tab>
+                        <Tab
+                            id="tabLink"
+                            onClick={() => {
+                                setValue(
+                                    `resources.${index}.spatial_type`,
+                                    'global'
+                                )
+                                setValue(
+                                    `resources.${index}.spatial_geom`,
+                                    undefined
+                                )
+                                setValue(
+                                    `resources.${index}.spatial_address`,
+                                    'Global'
+                                )
+                            }}
+                        >
+                            {({ selected }) => (
+                                <span
+                                    className={classNames(
+                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                        selected ? 'bg-amber-400' : ''
+                                    )}
+                                >
+                                    <GlobeEuropeAfricaIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                    <div
+                                        className={classNames(
+                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                            selected ? 'font-bold' : ''
+                                        )}
+                                    >
+                                        Global Datafile
+                                    </div>
+                                </span>
+                            )}
+                        </Tab>
                     </Tab.List>
                     <Tab.Panels as="div" className="mt-2">
                         <Tab.Panel>
                             {watch(`resources.${index}.spatial_geom`) && (
                                 <Map
-                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     style={{ height: 300 }}
                                     mapStyle="mapbox://styles/mapbox/streets-v9"
+                                    dragRotate={false}
+                                    touchZoomRotate={false}
                                     initialViewState={{ zoom: 2 }}
                                 >
                                     <Source
@@ -217,7 +256,17 @@ export function DatafileLocation({
                                     >
                                         <Layer
                                             type="fill"
-                                            paint={{ 'fill-color': '#F3B229' }}
+                                            paint={{
+                                                'fill-color': '#BAE1BD',
+                                                'fill-opacity': 0.3,
+                                            }}
+                                        />
+                                        <Layer
+                                            type="line"
+                                            paint={{
+                                                'line-width': 0.5,
+                                                'line-color': '#32864B',
+                                            }}
                                         />
                                     </Source>
                                 </Map>
@@ -230,12 +279,14 @@ export function DatafileLocation({
                         </Tab.Panel>
                         <Tab.Panel id={`choose-address-${index}`}>
                             <Map
-                                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                 style={{ height: 300 }}
                                 mapStyle="mapbox://styles/mapbox/streets-v9"
+                                dragRotate={false}
+                                touchZoomRotate={false}
                             >
                                 <GeocoderControl
-                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     position="bottom-right"
                                     onResult={(e) => {
                                         setValue(
@@ -263,6 +314,7 @@ export function DatafileLocation({
                                 />
                             </Map>
                         </Tab.Panel>
+                        <Tab.Panel></Tab.Panel>
                     </Tab.Panels>
                 </Tab.Group>
             </Disclosure.Panel>

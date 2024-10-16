@@ -1,14 +1,18 @@
-import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl'
+//@ts-ignore
+import { PluginMapboxGl } from 'layer-manager'
 import { useMap } from 'react-map-gl'
-import VizzLayerManager from '@/components/_shared/map/VizzLayerManager'
+import {
+    Layer,
+    LayerManager as VizzLayerManager,
+//@ts-ignore
+} from 'layer-manager/dist/components'
 import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
 import pick from 'lodash/pick'
-import CartoProvider from '@vizzuality/layer-manager-provider-carto'
+import { CartoProvider } from '@/utils/providers/cartoProvider'
 import { TileProvider } from '@/utils/providers/tileProvider'
 import { GeeProvider } from '@/utils/providers/geeProvider'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import { useMemo } from 'react'
-import Layer from '@/components/_shared/map/Layer'
 
 export const parseLayers = (layers: APILayerSpec[]): LayerSpec[] => {
     return layers.map((layer): LayerSpec => {

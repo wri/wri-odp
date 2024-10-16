@@ -22,8 +22,24 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerAuthSession } from '@/server/auth'
 import { advance_search_query } from '@/utils/apiUtils'
 
-export async function getServerSideProps(context: GetServerSidePropsContext<{ query: any }>) {
-   const { query } = context;
+interface Option {
+    value: string
+    label: string
+}
+
+function filterCount(key: string, filters: Filter[]): number {
+    return filters.filter((f) => f.key === key).length
+}
+
+function defaultSelectedTagOptions(filters: Filter[]): string[] {
+    const f = filters.filter((f) => f.key === 'tags').map((f) => f.label)
+    return f
+}
+
+export async function getServerSideProps(
+    context: GetServerSidePropsContext<{ query: any }>
+) {
+    const { query } = context
     const initialFilters = query.search
         ? JSON.parse(query.search as string)
         : []
@@ -32,8 +48,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext<{ qu
         : { start: 0, rows: 10 }
     const initialSortBy = query.sort_by
         ? JSON.parse(query.sort_by as string)
-        : 'relevance asc'
-    
+        : 'score desc'
+
     const session = await getServerAuthSession(context)
     const helpers = createServerSideHelpers({
         router: appRouter,
@@ -41,20 +57,28 @@ export async function getServerSideProps(context: GetServerSidePropsContext<{ qu
         transformer: superjson,
     })
 
-    
     const searchQuery = advance_search_query(initialFilters as Filter[])
 
     await helpers.dataset.getAllDataset.prefetch({
         ...searchQuery,
         page: initialPage,
         sortBy: initialSortBy,
+        removeUnecessaryDataInResources: true,
     })
-    
 
-    return { props: {trpcState: helpers.dehydrate(), initialFilters, initialPage, initialSortBy } }
+    return {
+        props: {
+            trpcState: helpers.dehydrate(),
+            initialFilters,
+            initialPage,
+            initialSortBy,
+        },
+    }
 }
 
-export default function SearchPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function SearchPage(
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
     const { initialFilters, initialPage, initialSortBy } = props
     const router = useRouter()
     const session = useSession()
@@ -65,11 +89,34 @@ export default function SearchPage(props: InferGetServerSidePropsType<typeof get
      */
     const [query, setQuery] = useState<SearchInput>({
         search: '',
+        extLocationQ: '',
+        extAddressQ: '',
+        extGlobalQ: 'include',
+        fq: {},
         page: initialPage,
         sortBy: initialSortBy,
+        removeUnecessaryDataInResources: true,
     })
-
     const [filters, setFilters] = useState<Filter[]>(initialFilters)
+
+    const [facetSelectedCount, setFacetSelectedCount] = useState<
+        Record<string, number>
+    >({
+        application: filterCount('application', filters) || 0,
+        project: filterCount('project', filters) || 0,
+        organization: filterCount('organization', filters) || 0,
+        groups: filterCount('groups', filters) || 0,
+        tags: filterCount('tags', filters) || 0,
+        update_frequency: filterCount('update_frequency', filters) || 0,
+        res_format: filterCount('res_format', filters) || 0,
+        license_id: filterCount('license_id', filters) || 0,
+        language: filterCount('language', filters) || 0,
+        wri_data: filterCount('wri_data', filters) || 0,
+        visibility_type: filterCount('visibility_type', filters) || 0,
+    })
+    const [value, setValue] = useState<string[]>(
+        defaultSelectedTagOptions(filters) || []
+    )
 
     const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
 
@@ -85,11 +132,13 @@ export default function SearchPage(props: InferGetServerSidePropsType<typeof get
         const fq: any = {}
         let extLocationQ = ''
         let extAddressQ = ''
+        let extGlobalQ = 'include'
 
         keys.forEach((key) => {
             let keyFq
 
             const keyFilters = filters.filter((f) => f.key == key)
+
             if ((key as string) == 'temporal_coverage_start') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageStart = keyFilters[0]
@@ -99,9 +148,9 @@ export default function SearchPage(props: InferGetServerSidePropsType<typeof get
 
                     keyFq = `[${temporalCoverageStart?.value} TO *]`
 
-                    if (temporalCoverageEnd) {
-                        keyFq = `[* TO ${temporalCoverageEnd}]`
-                    }
+                    // if (temporalCoverageEnd) {
+                    //     keyFq = `[* TO ${temporalCoverageEnd}]`
+                    // }
                 }
             } else if ((key as string) == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
@@ -112,9 +161,9 @@ export default function SearchPage(props: InferGetServerSidePropsType<typeof get
 
                     keyFq = `[* TO ${temporalCoverageEnd?.value}]`
 
-                    if (temporalCoverageStart) {
-                        keyFq = `[${temporalCoverageStart} TO *]`
-                    }
+                    // if (temporalCoverageStart) {
+                    //     keyFq = `[${temporalCoverageStart} TO *]`
+                    // }
                 }
             } else if (
                 key === 'metadata_modified_since' ||
@@ -142,8 +191,18 @@ export default function SearchPage(props: InferGetServerSidePropsType<typeof get
                 const address = keyFilters[0]?.label
 
                 // @ts-ignore
-                if (coordinates) extLocationQ = coordinates.reverse().join(',')
+                if (coordinates) extLocationQ = coordinates.join(',')
                 if (address) extAddressQ = address
+            } else if (key == 'extGlobalQ') {
+                const extGlobalQFilter = filters.find(
+                    (f) => f.key == 'extGlobalQ'
+                )
+                if (extGlobalQFilter && extGlobalQFilter.value === 'exclude') {
+                    fq['!spatial_address'] = 'Global'
+                }
+                if (extGlobalQFilter && extGlobalQFilter.value === 'only') {
+                    fq['spatial_address'] = 'Global'
+                }
             } else {
                 keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             }
@@ -154,6 +213,7 @@ export default function SearchPage(props: InferGetServerSidePropsType<typeof get
         delete fq.metadata_modified_since
         delete fq.metadata_modified_before
         delete fq.spatial
+        delete fq.extGlobalQ
 
         setQuery((prev) => {
             return {
@@ -162,6 +222,11 @@ export default function SearchPage(props: InferGetServerSidePropsType<typeof get
                 search: filters.find((e) => e?.key == 'search')?.value ?? '',
                 extLocationQ,
                 extAddressQ,
+                extGlobalQ:
+                    (filters.find((e) => e?.key == 'extGlobalQ')?.value as
+                        | 'only'
+                        | 'exclude'
+                        | 'include') ?? 'include',
             }
         })
     }, [filters])
@@ -206,7 +271,14 @@ export default function SearchPage(props: InferGetServerSidePropsType<typeof get
                 </div>
             )}
             {session.status != 'loading' && (
-                <FilteredSearchLayout setFilters={setFilters} filters={filters}>
+                <FilteredSearchLayout
+                    setFilters={setFilters}
+                    filters={filters}
+                    facetSelectedCount={facetSelectedCount}
+                    setFacetSelectedCount={setFacetSelectedCount}
+                    value={value}
+                    setValue={setValue}
+                >
                     <SortBy
                         count={data?.count ?? 0}
                         setQuery={setQuery}
@@ -215,6 +287,8 @@ export default function SearchPage(props: InferGetServerSidePropsType<typeof get
                     <FiltersSelected
                         filters={filters}
                         setFilters={setFilters}
+                        setFacetSelectedCount={setFacetSelectedCount}
+                        setValue={setValue}
                     />
                     <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
                         {data?.datasets.map((dataset, number) => (

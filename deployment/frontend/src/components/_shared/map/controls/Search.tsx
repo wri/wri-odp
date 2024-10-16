@@ -30,7 +30,7 @@ export default function Search({
             const geocoder = new MapboxGeocoder({
                 marker: false,
                 accessToken:
-                    'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w',
+                    'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA',
                 types: 'country,region,place,locality',
             })
 
@@ -124,7 +124,7 @@ export default function Search({
                 )}
             ></div>
             <IconButton
-                tooltip='Geolocation search'
+                tooltip="Geolocation search"
                 type="button"
                 className="search-control--btn "
                 onClick={() => handleSearchInput(!showSearchInput)}

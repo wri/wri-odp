@@ -117,13 +117,11 @@ function SignInForm({
 
                             setIsLoading(false)
                             if (signInStatus?.error) {
-                                // TODO: we should get the error from the response
-                                console.log(signInStatus)
                                 setErrorMessage(signInStatus.error)
                             } else {
                                 notify('Sign in successful')
                                 onSignIn ? onSignIn() : router.reload()
-                                router.push("/dashboard")
+                                router.push('/dashboard')
                             }
                         })(data)
                     }}
@@ -195,7 +193,9 @@ function SignInForm({
                     <Image src="/images/wri_logo.png" alt="WRI Logo" fill />
                 </div>
                 <div className="ml-2 w-fit font-semibold text-base text-wri-black ">
-                    {!isLoadingAzure ? "Sign In with your WRI Credentials" : "Signing in..."}
+                    {!isLoadingAzure
+                        ? 'Sign In with your WRI Credentials'
+                        : 'Signing in...'}
                 </div>
             </button>
         </>
@@ -253,6 +253,7 @@ function ResetPasswordForm({
                             <input
                                 type="text"
                                 placeholder="Email"
+                                id="reset-link-email"
                                 className=" focus:outline-none  placeholder:text-xs placeholder:font-light placeholder:text-[#353535] text-xs font-light w-full !border-none"
                                 {...register('email')}
                             />

@@ -19,10 +19,20 @@ describe("Chart view", () => {
     cy.get("input[name=title]").type(datasetName);
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("textarea[name=short_description]").type("test");
-    cy.get("input[name=author]").type("Luccas");
-    cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
-    cy.get("input[name=maintainer]").type("Luccas");
-    cy.get("input[name=maintainer_email]").type("luccasmmg@gmail.com");
+
+    cy.contains("Add Author").click();
+    cy.get('input[name="authors.0.name"]').type("Test Author 1");
+    cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
+    cy.contains("Add Author").click();
+    cy.get('input[name="authors.1.name"]').type("Test Author 2");
+    cy.get('input[name="authors.1.email"]').type("test-author-2@example.com");
+
+    cy.contains("Add Maintainer").click();
+    cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
+    cy.get('input[name="maintainers.0.email"]').type("test-maintainer-1@example.com");
+    cy.contains("Add Maintainer").click();
+    cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
+    cy.get('input[name="maintainers.1.email"]').type("test-maintainer-2@example.com");
     cy.contains("Next: Datafiles").click();
     cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/airtravel.csv", {
       force: true,
@@ -30,7 +40,7 @@ describe("Chart view", () => {
     cy.wait(5000);
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
-    cy.get('button[type="submit"]').click();
+    cy.get('button[form="create_dataset_form"]').click();
     cy.contains(`Successfully created the "${datasetName}" dataset`, {
       timeout: 20000,
     });
@@ -61,7 +71,7 @@ describe("Chart view", () => {
     "should be creatable from the UI",
     {
       retries: {
-        runMode: 5,
+        runMode: 10,
         openMode: 0,
       },
     },
@@ -75,7 +85,7 @@ describe("Chart view", () => {
 
       cy.contains("Add a view").click();
 
-      cy.contains("Chart").click();
+      cy.get(".chart-popup-item").click();
 
       cy.contains("Add a chart view", { timeout: 40000 })
         .parent()

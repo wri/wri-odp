@@ -19,25 +19,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.OIDC_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
-      - name: Add CKAN url to hosts
-        run: sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
-      - name: Add Minio url to hosts
-        run: sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
-      - name: Add Frontend url to hosts
-        run: sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
-      - name: Add Prefect url to hosts
-        run: sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+      - name: Add url(s) to hosts
+        run: |
+          sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
       - name: Build and push CKAN image to ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -70,6 +68,8 @@ jobs:
           --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.STAGING_FRONTEND_NEXTAUTH_URL }} \
           --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.STAGING_NEXT_PUBLIC_GTM_ID }} \
           --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.STAGING_NEXT_PUBLIC_HOTJAR_ID }} \
+          --build-arg NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }} \
+          --build-arg OSANO_URL=${{ secrets.DEV_OSANO_URL }} \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Build and push Datapusher image to ECR
@@ -116,7 +116,9 @@ jobs:
       - name: Initialize the Extensions
         run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Print Logs
-        run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and Frontend setup
         uses: cypress-io/github-action@v6
@@ -132,7 +134,7 @@ jobs:
           command: node test.js
           working-directory: ./integration-tests
       - name: Check prefect url
-        uses: jtalk/url-health-check-action@v3
+        uses: jtalk/url-health-check-action@v4
         with:
           # Check the following URLs one by one sequentially
           url: http://prefect:4200
@@ -145,7 +147,7 @@ jobs:
         with:
           command: npm run test
           working-directory: ./e2e-tests
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
@@ -153,7 +155,9 @@ jobs:
           if-no-files-found: ignore
       - name: Print Error Logs
         if: failure()
-        run: docker-compose -f docker-compose.test.yml --env-file .env.example logs
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Copy run_unit_tests.sh
         run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
@@ -201,17 +205,19 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
       - name: Upload CKAN container Trivy scan results to GitHub Code scanning
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: ckan-trivy-results.sarif
       - name: Upload Frontend container Trivy scan results to GitHub Code scanning
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           category: frontend_container_trivy_results
           sarif_file: frontend-trivy-results.sarif
       - name: Tear down containers
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         if: failure() || success()
-        run: docker-compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
+        run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
         working-directory: ./ckan-backend-dev
 
   deploy:

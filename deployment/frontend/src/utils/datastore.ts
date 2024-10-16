@@ -16,7 +16,6 @@ export async function sqlQueryDatastore(sql: string, session: Session | null) {
     })
     const tableData: DataResponse = await tableDataRes.json()
     if (!tableData.success && tableData.error) {
-        console.log(tableData.error)
         if (tableData.error.message) {
             throw Error(tableData.error.message)
         }
@@ -53,24 +52,27 @@ export async function queryDatastore(
         groupBy,
         aggregate,
     } = input
-    const paginationSql = `LIMIT ${pagination.pageIndex * pagination.pageSize + pagination.pageSize
-        }`
+    const paginationSql = `LIMIT ${
+        pagination.pageIndex * pagination.pageSize + pagination.pageSize
+    }`
     const sortSql =
         sorting.length > 0
             ? 'ORDER BY ' +
-            sorting
-                .map((sort) => `"${sort.id}" ${sort.desc ? 'DESC' : 'ASC'}`)
-                .join(', ')
+              sorting
+                  .map((sort) => `"${sort.id}" ${sort.desc ? 'DESC' : 'ASC'}`)
+                  .join(', ')
             : ''
     const filtersSql =
         filters.length > 0
             ? 'WHERE ' +
-            filters
-                .map(
-                    (f, i) =>
-                        `"${f.column}" ${f.operation} '${f.value}' ${f.link && i != filters.length - 1 ? f.link : ''}`
-                )
-                .join(' ')
+              filters
+                  .map(
+                      (f, i) =>
+                          `"${f.column}" ${f.operation} '${f.value}' ${
+                              f.link && i != filters.length - 1 ? f.link : ''
+                          }`
+                  )
+                  .join(' ')
             : ''
 
     const groupBySql =

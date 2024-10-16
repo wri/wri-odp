@@ -47,17 +47,24 @@ def _post_analytics(user):
 
 def action(logic_function, ver=api.API_MAX_VERSION):
     from_frontend = tk.request.headers.get('X-From-Frontend-Portal', False)
-    log.info('API action called')
-    log.info(f'action: {logic_function}')
-    log.info(f'from_frontend: {from_frontend}')
-    log.info(f'user_agent: {tk.request.environ.get("HTTP_USER_AGENT", "")}')
+    # Debugging logs
+    #log.info('API action called')
+    #log.info(f'action: {logic_function}')
+    #log.info(f'from_frontend: {from_frontend}')
+    #log.info(f'user_agent: {tk.request.environ.get("HTTP_USER_AGENT", "")}')
+    user_agent = tk.request.environ.get('HTTP_USER_AGENT', '')
+
+    if user_agent:
+        user_agent = user_agent.lower()
 
     if from_frontend is False:
         function = logic.get_action(logic_function)
         side_effect_free = getattr(function, 'side_effect_free', False)
         request_data = api._get_request_data(try_url_params=side_effect_free)
 
-        if isinstance(request_data, dict):
+        if isinstance(request_data, dict) and (
+            function != 'status_show' and 'uptime-kuma' not in user_agent
+        ):
             _post_analytics(g.user)
 
     return api.action(logic_function, ver)

@@ -12,6 +12,8 @@ from itertools import zip_longest
 from ckan.common import config, asbool
 from ckan.model import Package
 from sqlalchemy import text, engine
+from shapely import MultiPolygon, Polygon, wkb, wkt
+from shapely import make_valid
 
 
 import ckan
@@ -31,6 +33,7 @@ from ckan.lib.dictization import table_dictize
 from ckan.common import _
 from ckan.types import ActionResult, Context, DataDict
 from typing_extensions import TypeAlias
+from ckanext.wri.helpers.data_api import get_shape_from_dataapi
 from ckanext.wri.model.notification import (
     Notification,
     notification_dictize,
@@ -362,11 +365,23 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                         ):
                             package_dict = item.before_dataset_view(package_dict)
 
-                    if return_user:
-                        user = model_dictize.user_dictize(
-                            model.User.get(package_dict.get("creator_user_id")), context
+                    try:
+                        if return_user:
+                            user = model_dictize.user_dictize(
+                                model.User.get(package_dict.get("creator_user_id")),
+                                context,
+                            )
+                            package_dict["user"] = user
+                    except:
+                        log.error(
+                            "No user is coming from solr for package id %s",
+                            package_dict.get("id"),
                         )
-                        package_dict["user"] = user
+                        package_dict["user"] = {
+                            "name": "Unknown",
+                            "fullname": "Unknown",
+                            "email": "Unknown",
+                        }
                     results.append(package_dict)
                 else:
                     log.error(
@@ -495,12 +510,17 @@ def notification_get_all(
         if object_id in object_data:
             notification["object_data"] = object_data[object_id]
         else:
-            if notification["object_type"] == "dataset":
-                temp = dict(model.Package.get(notification["object_id"]).as_dict())
-            elif notification["object_type"] == "topic":
-                temp = dict(model.Group.get(notification["object_id"]).as_dict())
-            elif notification["object_type"] == "team":
-                temp = dict(model.Group.get(notification["object_id"]).as_dict())
+            temp = {}
+
+            try:
+                if notification["object_type"] == "dataset":
+                    temp = dict(model.Package.get(notification["object_id"]).as_dict())
+                elif notification["object_type"] == "topic":
+                    temp = dict(model.Group.get(notification["object_id"]).as_dict())
+                elif notification["object_type"] == "team":
+                    temp = dict(model.Group.get(notification["object_id"]).as_dict())
+            except AttributeError:
+                log.error(f"Object not found: {json.dumps(notification, indent=2)}")
 
             notification["object_data"] = temp
             object_data[object_id] = temp
@@ -512,9 +532,13 @@ def notification_get_all(
 def pending_dataset_show(context: Context, data_dict: DataDict):
     """Get a pending dataset by package_id"""
     package_id = data_dict.get("package_id")
+    package_name = data_dict.get("package_name")
 
-    if not package_id:
+    if not package_id and not package_name:
         raise logic.ValidationError(_("package_id is required"))
+
+    if package_name:
+        package_id = Package.get(package_name).id
 
     tk.check_access("pending_dataset_show", context, {"id": package_id})
 
@@ -543,8 +567,9 @@ def pending_diff_show(context: Context, data_dict: DataDict):
     tk.check_access("package_show", context, {"id": package_id})
 
     dataset_diff = None
-
     pending_dataset = None
+    existing_dataset = None
+
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
         if pending_dataset is not None:
@@ -560,6 +585,9 @@ def pending_diff_show(context: Context, data_dict: DataDict):
         # raise logic.NotFound(
         #     _("Diff not found for Pending Dataset: {}".format(package_id))
         # )
+
+    if not existing_dataset:
+        existing_dataset = {}
 
     return {
         "diff": dataset_diff,
@@ -592,12 +620,12 @@ def _diff(existing, pending, path=""):
 def _process_lists(existing_list, pending_list, path):
     list_diff = {}
 
-    if path == 'resources':
+    if path == "resources":
         for index, pending_res in enumerate(pending_list):
             item_path = f"{path}[{index}]"
-            item_existing_list = list(filter(
-                lambda r: r.get("id") == pending_res.get("id"),
-                existing_list))
+            item_existing_list = list(
+                filter(lambda r: r.get("id") == pending_res.get("id"), existing_list)
+            )
 
             if len(item_existing_list) > 0:
                 existing_res = item_existing_list[0]
@@ -605,7 +633,6 @@ def _process_lists(existing_list, pending_list, path):
                 list_diff.update(item_diff)
 
         return list_diff
-
 
     for index, (item_existing, item_pending) in enumerate(
         zip_longest(existing_list, pending_list)
@@ -635,7 +662,7 @@ def dataset_release_notes(context: Context, data_dict: DataDict):
                select
                    distinct on ((data::json->>'package')::json->>'release_notes')
                    ((data::json->>'package')::json->>'release_notes') as release_notes,
-                    to_char(timestamp::date, 'YYYY-MM-DD') as date
+                    to_char(timestamp, 'YYYY-MM-DD HH24:MI:SS.FF3') as date
                from
                     activity
                where
@@ -697,6 +724,24 @@ def package_activity_list_wri(context: Context, data_dict: DataDict):
 def organization_activity_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
     results = get_action("organization_activity_list")(context, data_dict)
+    user_data = {}
+    for result in results:
+        user_id = result["user_id"]
+        if user_id in user_data:
+            result["user_data"] = user_data[user_id]
+        else:
+            temp = model_dictize.user_dictize(
+                model.User.get(result["user_id"]), context
+            )
+            result["user_data"] = temp
+            user_data[user_id] = temp
+    return results
+
+
+@logic.side_effect_free
+def group_activity_list_wri(context: Context, data_dict: DataDict):
+    model = context["model"]
+    results = get_action("group_activity_list")(context, data_dict)
     user_data = {}
     for result in results:
         user_id = result["user_id"]
@@ -798,6 +843,8 @@ def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any):
         )
         if q:
             group_tree["highlighted"] = True
+        else:
+            group_tree["highlighted"] = False
         group_hierarchy_ids += recurcive_tree_ids(group_tree)
         results.append(group_tree)
     return results
@@ -910,6 +957,47 @@ def package_collaborator_list_wri(context: Context, data_dict: DataDict):
     return result
 
 
+def get_geojson_from_filesystem(address: str):
+    segments = address.split(",")
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    if len(segments) == 1:
+        path = os.path.join(
+            cwd,
+            "../../world_geojsons/countries/{}.geojson".format(segments[0].strip()),
+        )
+    else:
+        path = os.path.join(
+            cwd,
+            "../../world_geojsons/states/{}/{}.geojson".format(
+                segments[1].strip(), segments[0].strip()
+            ),
+        )
+
+    with open(path, "r") as f:
+        content = f.read()
+        geojson = json.loads(content)
+        geometries = []
+
+        if geojson["type"] == "GeometryCollection":
+            geometries = geojson["geometries"]
+        elif geojson["type"] == "FeatureCollection":
+            geometries = [x["geometry"] for x in geojson["features"]]
+        else:
+            geometries = [geojson]
+
+        valid_geometries = []
+        for geom in geometries:
+            json_str = json.dumps(geom)
+            shape = shapely.from_geojson(json_str)
+            if shape.is_valid:
+                valid_geometries.append(shape)
+
+        merged_geometry = unary_union(valid_geometries)
+        spatial_geom = geoalchemy2.functions.ST_GeomFromText(merged_geometry.wkt)
+        print("Getting geojson from filesystem", flush=True)
+        return spatial_geom
+
+
 @logic.side_effect_free
 def resource_search(context: Context, data_dict: DataDict):
     _check_access("resource_search", context, data_dict)
@@ -924,9 +1012,10 @@ def resource_search(context: Context, data_dict: DataDict):
     is_pending = data_dict.get("is_pending")
 
     bbox = data_dict.get("bbox")
+    spatial_address = data_dict.get("spatial_address")
 
     bbox_query = None
-    if bbox:
+    if bbox and spatial_address is None:
         bbox_coordinates = bbox.split(",")
 
         if len(bbox_coordinates) != 4:
@@ -954,8 +1043,6 @@ def resource_search(context: Context, data_dict: DataDict):
             ResourceLocation.spatial_geom, "POINT({} {})".format(*point)
         )
 
-    spatial_address = data_dict.get("spatial_address")
-
     # if query is None:
     #     raise ValidationError({'query': _('Missing value')})
 
@@ -974,9 +1061,12 @@ def resource_search(context: Context, data_dict: DataDict):
 
     q = (
         model.Session.query(model.Resource)
-        .join(ResourceLocation, ResourceLocation.resource_id == model.Resource.id, isouter=True)
+        .join(
+            ResourceLocation,
+            ResourceLocation.resource_id == model.Resource.id,
+            isouter=True,
+        )
         .join(Package, model.Package.id == model.Resource.package_id, isouter=True)
-        .filter(ResourceLocation.is_pending == (is_pending == "true"))
         .filter(model.Package.state == "active")
         .filter(model.Package.private == False)
         .filter(model.Package.name == package_id)
@@ -984,10 +1074,6 @@ def resource_search(context: Context, data_dict: DataDict):
     )
     location_queries = []
     if spatial_address:
-        log.info("SPATIAL ADDRESS")
-        log.info(spatial_address)
-        cwd = os.path.abspath(os.path.dirname(__file__))
-
         segments = spatial_address.split(",")
         if len(segments) == 3:
             full_address = (
@@ -1012,68 +1098,34 @@ def resource_search(context: Context, data_dict: DataDict):
                 )
             )
         if len(segments) == 1:
-            country = f"{segments[1].strip()}"
+            country = f"{segments[0].strip()}"
             location_queries.append(
                 ResourceLocation.spatial_address.like(f"%{country}"),
             )
-
-        if len(segments) in [1, 2]:
-            # It's a country or a state
-            try:
-                if len(segments) == 1:
-                    path = os.path.join(
-                        cwd,
-                        "../../world_geojsons/countries/{}.geojson".format(
-                            segments[0].strip()
-                        ),
-                    )
-                else:
-                    path = os.path.join(
-                        cwd,
-                        "../../world_geojsons/states/{}/{}.geojson".format(
-                            segments[1].strip(), segments[0].strip()
-                        ),
-                    )
-
-                with open(path, "r") as f:
-                    content = f.read()
-                    geojson = json.loads(content)
-                    geometries = []
-
-                    if geojson["type"] == "GeometryCollection":
-                        geometries = geojson["geometries"]
-                    elif geojson["type"] == "FeatureCollection":
-                        geometries = [x["geometry"] for x in geojson["features"]]
-                    else:
-                        geometries = [geojson]
-
-                    valid_geometries = []
-                    for geom in geometries:
-                        json_str = json.dumps(geom)
-                        shape = shapely.from_geojson(json_str)
-                        if shape.is_valid:
-                            valid_geometries.append(shape)
-
-                    merged_geometry = unary_union(valid_geometries)
-                    spatial_geom = geoalchemy2.functions.ST_GeomFromText(
-                        merged_geometry.wkt
-                    )
-
-                    location_queries.append(
-                        geoalchemy2.functions.ST_Intersects(
-                            ResourceLocation.spatial_geom, spatial_geom
-                        )
-                    )
-
-            except Exception as e:
-                log.error(e)
-                if point:
-                    location_queries.append(point_query)
 
         elif len(segments) == 3:
             # It's a city
             if point:
                 location_queries.append(point_query)
+
+        if point:
+            try:
+                shape = get_shape_from_dataapi(spatial_address, point)
+                if shape:
+                    shape = wkt.loads(shape)
+                    bbox = Polygon([(-180, -90), (180, -90), (180, 90), (-180, 90)])
+                    shape = make_valid(shape)
+                    shape = shape.intersection(bbox)
+                    polygons = [geom for geom in shape.geoms if isinstance(geom, (Polygon, MultiPolygon))]
+                    shape = MultiPolygon(polygons)
+                    spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
+                    location_queries.append(
+                        geoalchemy2.functions.ST_Intersects(
+                            ResourceLocation.spatial_geom, spatial_geom
+                        )
+                    )
+            except Exception as e:
+                log.error(e)
 
     if len(location_queries) == 0 and point_query is not None:
         location_queries.append(point_query)
@@ -1083,10 +1135,10 @@ def resource_search(context: Context, data_dict: DataDict):
 
     if location_queries:
         q = q.filter(_or_(*location_queries))
+        print(q, flush=True)
 
     resource_fields = model.Resource.get_columns()
     for field, term in fields.items():
-
         if field not in resource_fields:
             msg = _('Field "{field}" not recognised in resource_search.').format(
                 field=field

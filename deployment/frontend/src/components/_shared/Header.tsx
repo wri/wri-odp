@@ -38,7 +38,7 @@ export default function Header() {
 
     const navigation = [
         {
-            title: 'Search',
+            title: 'Explore',
             href: '/search',
             active: false,
         },
@@ -52,15 +52,14 @@ export default function Header() {
             href: '/topics',
             active: false,
         },
-        {
-            title: 'About',
-            href: '/about',
-            active: false,
-        },
     ]
 
     navigation.forEach((item) => {
-        item.active = asPath.startsWith(item.href)
+        if (asPath.includes('?')) {
+            item.active = asPath.split('?')[0] === item.href
+        } else {
+            item.active = asPath === item.href
+        }
     })
 
     return (
@@ -184,9 +183,10 @@ export default function Header() {
                                                 <Menu.Item>
                                                     {({ active }) => (
                                                         <Link
-                                                            className={`${active &&
+                                                            className={`${
+                                                                active &&
                                                                 'bg-blue-500'
-                                                                }`}
+                                                            }`}
                                                             href={item.href}
                                                         >
                                                             {item.title}

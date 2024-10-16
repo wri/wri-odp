@@ -20,7 +20,7 @@ from tasks.sort_and_dedup import sort_and_dedup
 from tasks.validate_csv import validate_csv
 from tasks.data_to_file import data_to_file
 from tasks.s3_upload import s3_upload
-from tasks.zip_files import download_keys
+from tasks.zip_files import download_keys, zip_files
 
 from tasks.send_callback import send_callback
 from tasks.query_datastore import query_datastore, query_rw, query_subset_datastore
@@ -220,8 +220,14 @@ async def download_resources_zipped(
 ):
     logger = get_run_logger()
     ckan_url = config.get("CKAN_URL")
+    print("Filename", filename)
     with tempfile.TemporaryDirectory() as temp_dir:
-        zipped_file = download_keys(keys, filename, temp_dir)
+        tasks = await download_keys(keys, filename, temp_dir)
+        data = list(tasks)
+        zipped_file = f"{filename}.zip"
+        zipped_file = os.path.join(temp_dir, zipped_file)
+        zip_files(data, zipped_file)
+        logger.info("Zipped data to {}".format(zipped_file))
         tmp_filepath = os.path.join(temp_dir, zipped_file)
         logger.info("Uploading data...")
         url = s3_upload(

@@ -10,8 +10,8 @@ import {
 import { template } from 'lodash'
 import { useLayoutEffect } from 'react'
 import { ViewState } from 'react-map-gl'
-import create, { UseBoundStore } from 'zustand'
-import createContext from 'zustand/context'
+import { create, UseBoundStore } from 'zustand'
+import { createContext } from 'zustand-utils'
 import { combine } from 'zustand/middleware'
 
 let store: any
@@ -37,15 +37,15 @@ const getDefaultInitialState = () => {
             isEmbedding: false,
             isAddingLayers: false,
             activeLayerGroups: [],
-            basemap: 'dark',
-            labels: 'light',
+            basemap: 'light',
+            labels: 'dark',
             boundaries: false,
             layersParsed: [],
             layers: new Map<string, LayerState>(),
             viewState: {
                 latitude: 0,
                 longitude: 0,
-                zoom: 3,
+                zoom: 6,
                 bearing: 0,
                 pitch: 0,
                 padding: {
@@ -80,6 +80,10 @@ export const initializeStore = (preloadedState: any = {}) => {
                 mapView: {
                     ...getDefaultInitialState().mapView,
                     ...preloadedState?.mapView,
+                    viewState: {
+                        ...getDefaultInitialState().mapView.viewState,
+                        ...preloadedState?.mapView?.viewState,
+                    },
                 },
             },
             (set, get) => ({
@@ -321,6 +325,14 @@ export const initializeStore = (preloadedState: any = {}) => {
                             layers: [layerId],
                         })
                     }
+                    //set default view state
+                    const currentLayers = get().mapView.layers
+                    currentLayers.set(layerId, {
+                        visibility: true,
+                        active: true,
+                        opacity: 1,
+                        zIndex: Object.keys(currentLayers).length + 11,
+                    })
 
                     set({
                         ...prev,
@@ -351,11 +363,21 @@ export const initializeStore = (preloadedState: any = {}) => {
                             layers: layerIds,
                         })
                     } else {
-                        console.log(newActiveLayerGroups)
                         newActiveLayerGroups = newActiveLayerGroups.filter(
                             (lg: ActiveLayerGroup) => lg.datasetId != datasetId
                         )
                     }
+                    //set default view state
+                    const currentLayers = get().mapView.layers
+                    layerIds.forEach((_id: string, index: number) => {
+                        currentLayers.set(_id, {
+                            visibility: index === 0,
+                            active: index === 0,
+                            opacity: 1,
+                            zIndex:
+                                Object.keys(currentLayers).length + 11 + index,
+                        })
+                    })
 
                     set({
                         ...prev,

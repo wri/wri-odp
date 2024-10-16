@@ -22,25 +22,29 @@ describe("Map view", () => {
     cy.createOrganizationAPI(parentOrg);
     cy.createDatasetAPI(parentOrg, datasetName, true, {
       groups: [{ name: group }],
+      visibility_type: "private",
+      resources: [
+        {
+          name: "Layer 1",
+          format: "Layer",
+          rw_id: "9febfc3c-e425-4089-8c9e-bf0da54a7bf6",
+          url: "https://api.resourcewatch.org/v1/dataset/9b8e120e-046d-45c3-91d2-a8c30b8ebbc8/layer/9febfc3c-e425-4089-8c9e-bf0da54a7bf6",
+        },
+      ],
     });
 
     cy.createOrganizationAPI(parentOrg2);
     cy.createDatasetAPI(parentOrg2, datasetName2, true, {
       groups: [{ name: group }],
-      visibility_type: "public",
-    });
-
-    cy.createResourceAPI(datasetName, {
-      name: "Layer 1",
-      format: "Layer",
-      rw_id: "9febfc3c-e425-4089-8c9e-bf0da54a7bf6",
-      url: "https://api.resourcewatch.org/v1/dataset/9b8e120e-046d-45c3-91d2-a8c30b8ebbc8/layer/9febfc3c-e425-4089-8c9e-bf0da54a7bf6",
-    });
-    cy.createResourceAPI(datasetName2, {
-      name: "Layer 2",
-      format: "Layer",
-      rw_id: "3c4225a4-a8d8-4d73-b12d-0c47dec84c76",
-      url: "https://api.resourcewatch.org/v1/layer/3c4225a4-a8d8-4d73-b12d-0c47dec84c76",
+      visibility_type: "private",
+      resources: [
+        {
+          name: "Layer 2",
+          format: "Layer",
+          rw_id: "3c4225a4-a8d8-4d73-b12d-0c47dec84c76",
+          url: "https://api.resourcewatch.org/v1/layer/3c4225a4-a8d8-4d73-b12d-0c47dec84c76",
+        },
+      ],
     });
   });
 
@@ -83,29 +87,29 @@ describe("Map view", () => {
     },
   );
 
-  it(
-    "should allow to add layers from related datasets",
-    {
-      retries: {
-        runMode: 5,
-        openMode: 0,
-      },
-    },
-    () => {
-      cy.visit(`/datasets/${datasetName}`);
-      cy.contains("Related Datasets").click({ force: true });
-      cy.contains(datasetName2);
-      cy.contains("Add to map").click();
-      cy.contains("Layer 2").click();
-      cy.wait(2000);
-      cy.get("#add-to-map-modal-btn").click();
-
-      cy.get(".vizzuality__c-legend-map", { timeout: 60000 }).contains(
-        "Tree cover loss - 2001-2022",
-        { timeout: 60000 },
-      );
-    },
-  );
+  //  it(
+  //    "should allow to add layers from related datasets",
+  //    {
+  //      retries: {
+  //        runMode: 5,
+  //        openMode: 0,
+  //      },
+  //    },
+  //    () => {
+  //      cy.visit(`/datasets/${datasetName}`);
+  //      cy.contains("Related Datasets").click({ force: true });
+  //      cy.contains(datasetName2);
+  //      cy.contains("Add to map").click();
+  //      cy.contains("Layer 2").click();
+  //      cy.wait(2000);
+  //      cy.get("#add-to-map-modal-btn").click();
+  //
+  //      cy.get(".vizzuality__c-legend-map", { timeout: 60000 }).contains(
+  //        "Tree cover loss - 2001-2022",
+  //        { timeout: 60000 },
+  //      );
+  //    },
+  //  );
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);

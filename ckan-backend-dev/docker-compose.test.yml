@@ -27,14 +27,7 @@ services:
       - ./src:/srv/app/src_extensions
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
-
-        #datapusher:
-        #  container_name: ${DATAPUSHER_CONTAINER_NAME}
-        #  image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}
-        #  restart: unless-stopped
-        #  healthcheck:
-        #    test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://ckan-dev:5000"]
 
   frontend:
     container_name: wri-frontend
@@ -46,6 +39,8 @@ services:
         - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
         - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
         - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
+        - NEXT_PUBLIC_GFW_API_KEY="1111"
+        - OSANO_URL="YOUR_OSANO_URL/osano.js"
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
@@ -65,6 +60,8 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM=${SMTP_FROM}
       - PREFECT_INTERNAL_URL=http://prefect:4200
+      - NEXT_PUBLIC_GFW_API_KEY="1111"
+      - OSANO_URL="YOUR_OSANO_URL/osano.js"
     depends_on:
       ckan-dev:
         condition: service_healthy

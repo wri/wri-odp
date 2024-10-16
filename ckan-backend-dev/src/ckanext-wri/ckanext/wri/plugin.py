@@ -1,3 +1,5 @@
+import json
+
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.plugins as lib_plugins
@@ -20,11 +22,26 @@ from ckanext.wri.logic.action.datapusher import (
     datapusher_latest_task,
     datapusher_submit,
 )
-from ckanext.wri.logic.action.create import notification_create, pending_dataset_create
+from ckanext.wri.logic.action.create import (
+    notification_create,
+    pending_dataset_create,
+    trigger_migration,
+    migrate_dataset,
+    migration_status,
+    package_create,
+    resource_create,
+    old_package_create,
+)
 from ckanext.wri.logic.action.update import (
     notification_update,
     pending_dataset_update,
     notification_bulk_update,
+    issue_delete,
+    approve_pending_dataset,
+    package_patch,
+    resource_update,
+    old_package_patch,
+    old_package_update,
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -36,6 +53,7 @@ from ckanext.wri.logic.action.get import (
     dashboard_activity_listv2,
     package_activity_list_wri,
     organization_activity_list_wri,
+    group_activity_list_wri,
     user_list_wri,
     organization_list_wri,
     group_list_wri,
@@ -48,13 +66,14 @@ from ckanext.wri.logic.action.get import (
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
+from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
 from ckan.lib.navl.validators import ignore_missing
 from ckanext.wri.logic.action.datapusher_download import (
     download_request,
     download_callback,
 )
 import ckanext.wri.views.api as api_blueprint
-
+import ckanext.issues.logic.action as issue_action
 import queue
 import logging
 
@@ -73,6 +92,9 @@ class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IResourceView, inherit=True)
     plugins.implements(plugins.IResourceController, inherit=True)
+
+    # over-write issue delete api
+    issue_action.issue_delete = issue_delete
 
     # IConfigurer
     def configure(self, config):
@@ -129,6 +151,9 @@ class WriPlugin(plugins.SingletonPlugin):
             "pending_dataset_show": auth.pending_dataset_show,
             "pending_dataset_update": auth.pending_dataset_update,
             "pending_dataset_delete": auth.pending_dataset_delete,
+            "package_update": auth.package_update,
+            "package_collaborator_list": auth.package_collaborator_list,
+            "package_create": auth.package_create,
         }
 
     # IValidators
@@ -137,6 +162,7 @@ class WriPlugin(plugins.SingletonPlugin):
         return {
             "iso_language_code": wri_validators.iso_language_code,
             "year_validator": wri_validators.year_validator,
+            "agents_json_object": wri_validators.agents_json_object
         }
 
     # IFacets
@@ -164,6 +190,9 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def get_actions(self):
         return {
+            "trigger_migration": trigger_migration,
+            "migrate_dataset": migrate_dataset,
+            "migration_status": migration_status,
             "package_search": package_search,
             "password_reset": action.password_reset,
             "notification_get_all": notification_get_all,
@@ -183,6 +212,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "dashboard_activity_listv2": dashboard_activity_listv2,
             "package_activity_list_wri": package_activity_list_wri,
             "organization_activity_list_wri": organization_activity_list_wri,
+            "group_activity_list_wri": group_activity_list_wri,
             "prefect_download_subset_from_store": subset_download_request,
             "prefect_download_subset_callback": subset_download_callback,
             "prefect_download_zipped": zipped_download_request,
@@ -196,6 +226,15 @@ class WriPlugin(plugins.SingletonPlugin):
             "issue_search_wri": issue_search_wri,
             "package_collaborator_list_wri": package_collaborator_list_wri,
             "resource_location_search": resource_search,
+            "approve_pending_dataset": approve_pending_dataset,
+            "package_create": package_create,
+            "old_package_create": old_package_create,
+            "package_patch": package_patch,
+            "old_package_patch": old_package_patch,
+            "old_package_update": old_package_update,
+            "resource_update": resource_update,
+            "resource_create": resource_create,
+            # "package_delete": package_delete,
         }
 
     # IPermissionLabels
@@ -259,11 +298,15 @@ class WriPlugin(plugins.SingletonPlugin):
     # IResourceController
 
     def after_resource_create(self, context: Context, resource_dict: dict[str, Any]):
-
+        ResourceLocation.index_resource_by_location(
+                        resource_dict, False
+                    )
         self._submit_to_datapusher(resource_dict)
 
     def after_resource_update(self, context: Context, resource_dict: dict[str, Any]):
-
+        ResourceLocation.index_resource_by_location(
+                        resource_dict, False
+                    )
         self._submit_to_datapusher(resource_dict)
 
     def _submit_to_datapusher(self, resource_dict: dict[str, Any]):
@@ -300,7 +343,6 @@ class WriPlugin(plugins.SingletonPlugin):
     # IPackageController
 
     def after_dataset_create(self, context, pkg_dict):
-        log.error("!@#!@#!@#!")
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)
@@ -309,14 +351,32 @@ class WriPlugin(plugins.SingletonPlugin):
             ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
-        log.error("!@#!@#!@#!")
-        log.error(pkg_dict)
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment
 
         if pkg_dict.get("is_approved", False):
             ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+
+    def after_dataset_show(self, context, pkg_dict):
+        authors = pkg_dict.get("authors")
+        maintainers = pkg_dict.get("maintainers")
+
+        if isinstance(authors, str):
+            try:
+                authors = json.loads(authors)
+                pkg_dict["authors"] = authors
+            except Exception as e:
+                log.error(f"Error parsing authors: {e}")
+
+        if isinstance(maintainers, str):
+            try:
+                maintainers = json.loads(maintainers)
+                pkg_dict["maintainers"] = maintainers
+            except Exception as e:
+                log.error(f"Error parsing maintainers: {e}")
+
+        return pkg_dict
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)
@@ -325,6 +385,9 @@ class WriPlugin(plugins.SingletonPlugin):
         return self.before_dataset_search(search_params)
 
     def before_dataset_index(self, pkg_dict):
+        if any(key in pkg_dict for key in ("authors", "maintainers")):
+            pkg_dict = stringify_actor_objects(pkg_dict)
+
         if not pkg_dict.get("spatial"):
             return pkg_dict
 
@@ -344,6 +407,7 @@ class WriPlugin(plugins.SingletonPlugin):
     def before_dataset_search(self, search_params):
         input_point = search_params.get("extras", {}).get("ext_location_q", None)
         input_address = search_params.get("extras", {}).get("ext_address_q", None)
+        _global = search_params.get("extras", {}).get("ext_global_q", None)
 
         point = []
         if input_point:
@@ -356,7 +420,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
         if point or input_address:
             search_params = SolrSpatialFieldSearchBackend().search_params(
-                point, input_address, search_params
+                point, input_address, _global, search_params
             )
 
         return search_params
@@ -392,17 +456,21 @@ class WriApiTracking(plugins.SingletonPlugin):
 
     def configure(self, config):
         self.wri_api_analytics_measurement_id = config.get(
-            'ckanext.wri.api_analytics.measurement_id'
+            "ckanext.wri.api_analytics.measurement_id"
         )
-        self.wri_api_analytics_api_secret = config.get('ckanext.wri.api_analytics.api_secret')
+        self.wri_api_analytics_api_secret = config.get(
+            "ckanext.wri.api_analytics.api_secret"
+        )
 
         variables = {
-            'ckanext.wri.api_analytics.measurement_id': self.wri_api_analytics_measurement_id,
-            'ckanext.wri.api_analytics.api_secret': self.wri_api_analytics_api_secret,
+            "ckanext.wri.api_analytics.measurement_id": self.wri_api_analytics_measurement_id,
+            "ckanext.wri.api_analytics.api_secret": self.wri_api_analytics_api_secret,
         }
         if not all(variables.values()):
-            missing_variables = '\n'.join([k for k, v in variables.items() if not v])
-            msg = f'The following variables are not configured:\n\n{missing_variables}\n'
+            missing_variables = "\n".join([k for k, v in variables.items() if not v])
+            msg = (
+                f"The following variables are not configured:\n\n{missing_variables}\n"
+            )
             raise RuntimeError(msg)
 
         # spawn a pool of 5 threads, and pass them queue instance

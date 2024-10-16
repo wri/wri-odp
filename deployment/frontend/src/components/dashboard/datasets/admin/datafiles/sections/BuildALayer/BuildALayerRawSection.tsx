@@ -24,6 +24,7 @@ import {
     PopoverTrigger,
 } from '@/components/_shared/Popover'
 import Image from 'next/image'
+import { SimpleEditor } from '../../../metadata/RTE/SimpleEditor'
 
 export function BuildALayerRaw({
     formObj,
@@ -44,9 +45,11 @@ export function BuildALayerRaw({
             const apiSpec = getApiSpecFromRawObj(
                 getValues(`resources.${index}.layerObjRaw`)
             )
-            console.log
             return getValues(`resources.${index}.layerObjRaw`)
-                ? { ...apiSpec, id: getValues(`resources.${index}.rw_id`) ?? uuidv4() }
+                ? {
+                      ...apiSpec,
+                      id: getValues(`resources.${index}.rw_id`) ?? uuidv4(),
+                  }
                 : null
         } catch (e) {
             return null
@@ -102,7 +105,7 @@ export function BuildALayerRaw({
                         />
                     </InputGroup>
                     <InputGroup
-                        label="GEE ID"
+                        label="Layer ID"
                         className="sm:grid-cols-1 gap-x-2"
                         labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                     >
@@ -128,6 +131,24 @@ export function BuildALayerRaw({
                             {...register(`resources.${index}.description`)}
                             type="text"
                             maxWidth="max-w-[70rem]"
+                        />
+                    </InputGroup>
+                    <InputGroup
+                        label={
+                            <span className="flex items-center gap-x-1">
+                                Advanced API Usage
+                                <DefaultTooltip content="This field will end up next to the API tab in the dataset page, you can use it to provide code samples that are useful for this particular data">
+                                    <InformationCircleIcon className="h-5 w-5" />
+                                </DefaultTooltip>
+                            </span>
+                        }
+                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                    >
+                        <SimpleEditor
+                            formObj={formObj}
+                            name={`resources.${index}.advanced_api_usage`}
+                            className="min-h-[320px]"
+                            defaultValue=""
                         />
                     </InputGroup>
                     <Accordion text="General Config">
@@ -202,9 +223,13 @@ export function BuildALayerRaw({
                                                 <Image
                                                     src="/docs/legends/basic.png"
                                                     alt="Image of basic legend"
-                                                    layout="responsive"
                                                     width={300}
                                                     height={120}
+                                                    sizes="100vw"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: 'auto',
+                                                    }}
                                                 />
                                             </li>
                                             <li>
@@ -212,9 +237,13 @@ export function BuildALayerRaw({
                                                 <Image
                                                     src="/docs/legends/choropleth.png"
                                                     alt="Image of choropleth legend"
-                                                    layout="responsive"
                                                     width={300}
                                                     height={120}
+                                                    sizes="100vw"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: 'auto',
+                                                    }}
                                                 />
                                             </li>
                                             <li>
@@ -222,9 +251,13 @@ export function BuildALayerRaw({
                                                 <Image
                                                     src="/docs/legends/gradient.png"
                                                     alt="Image of gradient legend"
-                                                    layout="responsive"
                                                     width={300}
                                                     height={120}
+                                                    sizes="100vw"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: 'auto',
+                                                    }}
                                                 />
                                             </li>
                                         </ul>
@@ -357,7 +390,6 @@ export function PreviewMap({
             )
             const { interactionConfig } = layer
 
-            console.log('FOUND INTERACTION CONFIG', interactionConfig)
             const layerInfo = {
                 id: layer.id,
                 name: layer.name ?? 'sample-name',
@@ -401,7 +433,9 @@ export function PreviewMap({
                         mapRef.current = _map.getMap() as unknown as MapRef
                 }}
                 mapStyle="mapbox://styles/mapbox/light-v9"
-                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                dragRotate={false}
+                touchZoomRotate={false}
+                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                 onMove={(evt) => setViewState(evt.viewState)}
                 onClick={onClickLayer}
                 interactiveLayerIds={interactiveLayerIds ?? []}

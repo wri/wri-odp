@@ -3,11 +3,11 @@ import Row from '../_shared/Row'
 import { NotificationType } from '@/schema/notification.schema'
 import Image from 'next/image'
 import Link from 'next/link'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 
 const DefaultTooltip = dynamic(() => import('@/components/_shared/Tooltip'), {
-  ssr: false,
-});
+    ssr: false,
+})
 function Card({
     rowProfile,
     selected,
@@ -40,10 +40,10 @@ function Card({
             )}
 
             <div className="flex items-center">
-                <DefaultTooltip content="mark as read">
+                <DefaultTooltip content="select">
                     <input
                         aria-describedby="notifications-checkbox"
-                        aria-label={`mark as read ${rowProfile?.msg}`}
+                        aria-label={`select ${rowProfile?.msg}`}
                         name="notifications"
                         type="checkbox"
                         className="h-4 w-4  rounded  bg-white "
@@ -63,14 +63,14 @@ function Card({
                                     src={`${rowProfile.sender_image}`}
                                     fill
                                     alt=""
-                                    className="rounded-md"
+                                    className="rounded-md object-cover"
                                 />
                             ) : (
                                 <Image
                                     src={`https://gravatar.com/avatar/${rowProfile?.sender_emailHash}?s=270&d=identicon`}
                                     alt="Gravatar"
                                     fill
-                                    className="rounded-md"
+                                    className="rounded-md object-cover"
                                 />
                             )}
                         </div>

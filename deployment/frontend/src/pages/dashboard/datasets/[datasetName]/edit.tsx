@@ -10,19 +10,16 @@ import { getServerAuthSession } from '@/server/auth'
 import { P, match } from 'ts-pattern'
 import EditDatasetForm from '@/components/dashboard/datasets/admin/EditDatasetForm'
 import { useRouter } from 'next/router'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import notify from '@/utils/notify'
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { useState } from 'react'
-import {
-    getOneDataset,
-    getOnePendingDataset,
-} from '@/utils/apiUtils'
+import { getOneDataset, getOnePendingDataset } from '@/utils/apiUtils'
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ datasetName: string }>
@@ -42,7 +39,6 @@ export async function getServerSideProps(
             session
         )
         let initialDataset = prevdataset
-        console.log('GET HERE getOnePendingDataset')
         const pendingExist =
             pendingDataset && Object.keys(pendingDataset).length > 0
                 ? true
@@ -72,9 +68,6 @@ export async function getServerSideProps(
             },
         }
     } catch (e) {
-        console.log('DATASET PAGE ERROR')
-        console.log(e)
-        console.log((e as any)?.message)
         return {
             props: {
                 redirect: {
@@ -98,6 +91,7 @@ export default function EditDatasetPage(
         id: datasetId,
         isPending: pendingExist,
     })
+  console.log('DATASET', dataset)
     const deleteDataset = api.dataset.deleteDataset.useMutation({
         onSuccess: async () => {
             await utils.dataset.getOneActualOrPendingDataset.invalidate({
@@ -114,7 +108,7 @@ export default function EditDatasetPage(
             router.push('/dashboard/datasets')
         },
         onError: (error) => {
-            console.log('Delete error', error)
+            console.error(error)
             setDeleteOpen(false)
         },
     })

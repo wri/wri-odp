@@ -11,6 +11,9 @@ import { useRouter } from 'next/router'
 import Login from '../_shared/Login'
 import { useSession } from 'next-auth/react'
 import UserMenu from '../_shared/UserMenu'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 
 export function Hero() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -18,9 +21,17 @@ export function Hero() {
     const session = useSession()
 
     const { asPath } = useRouter()
+    const searchSchema = z.object({ search: z.string() })
+    type searchFormType = z.infer<typeof searchSchema>
+
+    const { handleSubmit, register, reset } = useForm<searchFormType>({
+        resolver: zodResolver(searchSchema),
+        defaultValues: { search: '' },
+    })
+    const router = useRouter()
     const navigation = [
         {
-            title: 'Search',
+            title: 'Explore',
             href: '/search',
             active: false,
         },
@@ -34,11 +45,6 @@ export function Hero() {
             href: '/topics',
             active: false,
         },
-        {
-            title: 'About',
-            href: '/about',
-            active: false,
-        },
     ]
     navigation.forEach((item) => {
         item.active = asPath.startsWith(item.href)
@@ -47,6 +53,19 @@ export function Hero() {
     return (
         <div className="bg-gray-900">
             <header className="absolute inset-x-0 top-0 z-50">
+                <div className=" w-full bg-wri-green  py-2 text-center  text-white font-acumin text-lg leading-normal">
+                    This site updates WRI’s Open Data Portal. If you cannot find
+                    what you’re looking for, you can access the former Open Data
+                    Portal{' '}
+                    <a
+                        target="_blank"
+                        href="https://old-datasets.wri.org"
+                        aria-label="https://old-datasets.wri.org"
+                        className="underline font-semibold"
+                    >
+                        here
+                    </a>
+                </div>
                 <nav
                     className="flex items-center justify-between p-6 lg:px-8"
                     aria-label="Global"
@@ -179,32 +198,70 @@ export function Hero() {
                     className="absolute inset-0 -z-10 h-full w-full object-cover"
 
                 /> */}
-                <Image src="/images/bg_hero_homepage.webp" alt="" layout="fill" objectFit="cover" className='inset-0 -z-10 h-full w-full object-cover' priority/>
+                <Image
+                    src="/images/bg_hero_homepage.webp"
+                    alt=""
+                    className="inset-0 -z-10 h-full w-full object-cover"
+                    priority
+                    fill
+                    sizes="100vw"
+                    style={{
+                        objectFit: 'cover',
+                    }}
+                />
                 <div className="bg-black bg-opacity-50 absolute inset-0 -z-[9] h-full w-full object-cover" />
                 <div className="default-home-container mx-auto py-32 sm:py-48 lg:py-56">
                     <div className="text-start">
                         <h1 className="max-w-[592px] pr-5 font-acumin text-4xl font-semibold text-white">
-                            Welcome to the WRI Open Data Catalog. Neque porro
-                            quisquam est qui dolorem...
+                            Data Explorer - Beta
                         </h1>
                         <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                            elit, sed do eiusmod tempor incididunt ut labore et
-                            dolore.
+                            WRI produces and curates hundreds of datasets as
+                            part of our commitment to turn information into
+                            action. These products are based on our research and
+                            are held to{' '}
+                            <a
+                                href="https://www.wri.org/research/excellence"
+                                className=" text-blue-500 underline"
+                                target="_blank"
+                            >
+                                {' '}
+                                traditional academic standards of excellence
+                            </a>
+                            {', '}
+                            including objectivity and rigor.
                         </p>
-                        <div className="mt-10 flex relative items-start justify-start gap-x-6 w-full max-w-[932px]">
-                            <input
-                                name="search"
-                                placeholder="Search data"
-                                aria-label='search'
-                                className="placeholder:text-white text-white text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white bg-opacity-25 rounded-[3px] border-b-2 border-amber-400"
-                            />
-                            <MagnifyingGlassIcon className="w-7 h-7 text-white absolute top-[18px] right-4" />
-                        </div>
+                        <br />
+                        <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
+                            Explore using the search bar or use more advanced
+                            filters.
+                        </p>
+                        <form
+                            onSubmit={handleSubmit((data) => {
+                                router.push({
+                                    pathname: '/search_advanced',
+                                    query: `search=%5B%7B%22title%22%3A%22Search%22%2C%22key%22%3A%22search%22%2C%22label%22%3A%22${encodeURIComponent(
+                                        data.search
+                                    )}%22%2C%22value%22%3A%22${encodeURIComponent(
+                                        data.search
+                                    )}%22%7D%5D`,
+                                })
+                            })}
+                        >
+                            <div className="mt-10 flex relative items-start justify-start gap-x-6 w-full max-w-[932px]">
+                                <input
+                                    placeholder="Search data"
+                                    aria-label="search"
+                                    className="placeholder:text-white text-white text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white bg-opacity-25 rounded-[3px] border-b-2 border-amber-400"
+                                    {...register('search')}
+                                />
+                                <MagnifyingGlassIcon className="w-7 h-7 text-white absolute top-[18px] right-4" />
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-        
+
             <Transition appear show={isOpen} as={Fragment}>
                 <Dialog
                     as="div"

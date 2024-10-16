@@ -25,6 +25,7 @@ import {
 } from '@/utils/apiUtils'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
 import { json } from 'stream/consumers'
+import { flattenTree } from '@/utils/flattenGroupTree'
 
 export const teamRouter = createTRPCRouter({
     getAllTeams: protectedProcedure.query(async ({ ctx }) => {
@@ -63,7 +64,14 @@ export const teamRouter = createTRPCRouter({
                 })
             })
         )
-        return Array.from(teamsMap.values())
+        return Array.from(teamsMap.values()).sort((a, b) => {
+            const nameA = a.name.toLowerCase()
+            const nameB = b.name.toLowerCase()
+            return nameA.localeCompare(nameB, undefined, {
+                numeric: true,
+                sensitivity: 'base',
+            })
+        })
     }),
     editTeam: protectedProcedure
         .input(TeamSchema)
@@ -86,7 +94,7 @@ export const teamRouter = createTRPCRouter({
                         'team'
                     )
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                 }
                 input.users = newMembers
                 const body = JSON.stringify({
@@ -254,33 +262,6 @@ export const teamRouter = createTRPCRouter({
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             let groupTree: GroupTree[] = []
-            const allGroups = (await getAllOrganizations({
-                apiKey: ctx?.session?.user.apikey ?? '',
-            }))!
-
-            const teamDetails = allGroups.reduce(
-                (acc, org) => {
-                    acc[org.id] = {
-                        img_url: org.image_display_url ?? '',
-                        description: org.description ?? '',
-                        package_count: org.package_count!,
-                        name: org.name,
-                    }
-                    return acc
-                },
-                {} as Record<string, GroupsmDetails>
-            )
-
-            for ( const group in teamDetails) {
-                const team = teamDetails[group]!
-                const packagedetails = (await getAllDatasetFq({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    fq: `organization:${team.name}+is_approved:true`,
-                    query: {search: '', page: {start: 0, rows: 10000}},
-                }))!
-                team.package_count = packagedetails.count
-                
-            }
 
             if (input.search) {
                 groupTree = await searchHierarchy({
@@ -291,15 +272,13 @@ export const teamRouter = createTRPCRouter({
                 })
 
                 if (input.tree) {
-                    let groupFetchTree = groupTree[0] as GroupTree
-                    const findTree = findNameInTree(
-                        groupFetchTree,
-                        input.search
-                    )
-                    if (findTree) {
-                        groupFetchTree = findTree
+                    for (const gtree of groupTree) {
+                        const findtree = findNameInTree(gtree, input.search)
+                        if (findtree) {
+                            groupTree = [findtree]
+                            break
+                        }
                     }
-                    groupTree = [groupFetchTree]
                 }
 
                 if (input.allTree) {
@@ -317,10 +296,46 @@ export const teamRouter = createTRPCRouter({
                     groupTree = filterTree
                 }
             } else {
-                groupTree = await getGroups({
+                groupTree = await searchHierarchy({
+                    isSysadmin: true,
                     apiKey: ctx?.session?.user.apikey ?? '',
+                    q: '',
                     group_type: 'organization',
                 })
+            }
+
+            if (groupTree.length === 0) {
+                return {
+                    teams: groupTree,
+                    teamsDetails: {} as Record<string, GroupsmDetails>,
+                    count: 0,
+                }
+            }
+            const allGroups = (await getAllOrganizations({
+                apiKey: ctx?.session?.user.apikey ?? '',
+            }))!
+
+            const teamDetails = allGroups.reduce(
+                (acc, org) => {
+                    acc[org.id] = {
+                        img_url: org.image_display_url ?? '',
+                        description: org.description ?? '',
+                        package_count: org.package_count!,
+                        name: org.name,
+                    }
+                    return acc
+                },
+                {} as Record<string, GroupsmDetails>
+            )
+
+            for (const group in teamDetails) {
+                const team = teamDetails[group]!
+                const packagedetails = (await getAllDatasetFq({
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    fq: `organization:${team.name}+is_approved:true`,
+                    query: { search: '', page: { start: 0, rows: 10000 } },
+                }))!
+                team.package_count = packagedetails.count
             }
 
             const result = groupTree
@@ -333,7 +348,6 @@ export const teamRouter = createTRPCRouter({
     getPossibleMembers: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ ctx, input }) => {
-            console.log(input)
             const user = ctx.session.user
             const teamRes = await fetch(
                 `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
@@ -399,6 +413,37 @@ export const teamRouter = createTRPCRouter({
 
             return team.result.users
         }),
+    list: publicProcedure.query(async ({ ctx, input }) => {
+        const teamRes = await fetch(
+            `${env.CKAN_URL}/api/action/organization_list?all_fields=True`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+        const team: CkanResponse<Organization[]> = await teamRes.json()
+        if (!team.success && team.error)
+            throw Error(replaceNames(team.error.message))
+        return {
+            teams: team.result,
+        }
+    }),
+    getNumberOfSubTeams: publicProcedure.query(async ({ ctx, input }) => {
+        const teamRes = await fetch(
+            `${env.CKAN_URL}/api/action/organization_list_wri?q=`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+        const team: CkanResponse<GroupTree[]> = await teamRes.json()
+        if (!team.success && team.error)
+            throw Error(replaceNames(team.error.message))
+        const numOfSubtopics = flattenTree(team.result)
+        return numOfSubtopics
+    }),
     removeMember: protectedProcedure
         .input(z.object({ id: z.string(), username: z.string() }))
         .mutation(async ({ ctx, input }) => {

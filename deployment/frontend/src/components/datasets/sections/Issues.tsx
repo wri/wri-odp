@@ -17,10 +17,10 @@ import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import {
     ExclamationTriangleIcon,
     InformationCircleIcon,
@@ -173,22 +173,6 @@ function IssueCard({
         onError: (error) => setErrorMessage(error.message),
     })
 
-    const deleteIssueApi = api.dataset.deleteIssue.useMutation({
-        onSuccess: async (data) => {
-            await utils.dataset.getDatasetIssues.invalidate({
-                id: datasetName,
-            })
-            await utils.dataset.getPendingDatasets.invalidate({
-                search: '',
-                page: { start: 0, rows: 10 },
-                sortBy: 'metadata_modified desc',
-            })
-            setOpenDelete(false)
-            notify(`Issue #${data} successfully deleted`, 'error')
-        },
-        onError: (error) => setErrorMessage(error.message),
-    })
-
     const OnSubmit = (data: CommentIssueType) => {
         if (!isOpenClose && !isOpenDelete) {
             setIsubmiting(true)
@@ -253,7 +237,7 @@ function IssueCard({
                     </p>
                     {issue.comments.map((comment) => (
                         <li key={comment.id} className="flex gap-x-4 pt-2">
-                            <div className='relative h-12 w-12 '>
+                            <div className="relative h-12 w-12 ">
                                 <Image
                                     fill
                                     className="flex-none rounded-full bg-gray-50"
@@ -307,29 +291,17 @@ function IssueCard({
                         />
                         <div className="flex ml-auto gap-x-2 mt-2">
                             {authorized ? (
-                                <>
-                                    <Button
-                                        variant="destructive"
-                                        className="rounded-md"
-                                        onClick={() => {
-                                            setOpenDelete(true)
-                                        }}
-                                        id={issue.id.toString()}
-                                    >
-                                        Delete
-                                    </Button>
-                                    <Button
-                                        className=" bg-wri-gray border-2 rounded-md"
-                                        onClick={() => {
-                                            setOpenClose(true)
-                                        }}
-                                        id={issue.id.toString()}
-                                    >
-                                        {issue.status === 'open'
-                                            ? 'Close'
-                                            : 'Re-open'}
-                                    </Button>
-                                </>
+                                <Button
+                                    className=" bg-wri-gray border-2 rounded-md"
+                                    onClick={() => {
+                                        setOpenClose(true)
+                                    }}
+                                    id={issue.id.toString()}
+                                >
+                                    {issue.status === 'open'
+                                        ? 'Close'
+                                        : 'Re-open'}
+                                </Button>
                             ) : (
                                 ''
                             )}
@@ -349,53 +321,7 @@ function IssueCard({
                             </div>
                         )}
                     </form>
-                    <Modal
-                        open={isOpenDelete}
-                        setOpen={setOpenDelete}
-                        className="sm:w-full sm:max-w-lg"
-                    >
-                        <div className="sm:flex sm:items-start">
-                            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                <ExclamationTriangleIcon
-                                    className="h-6 w-6 text-red-600"
-                                    aria-hidden="true"
-                                />
-                            </div>
-                            <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                                <Dialog.Title
-                                    as="h3"
-                                    className="text-base font-semibold leading-6 text-gray-900"
-                                >
-                                    Delete Issue
-                                </Dialog.Title>
-                                <div className="mt-2">
-                                    <p className="text-sm text-gray-500">
-                                        Are you sure you want to delete this
-                                        Issue?
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
-                            <LoaderButton
-                                variant="destructive"
-                                loading={deleteIssueApi.isLoading}
-                                onClick={() => {
-                                    deleteIssueApi.mutate(formObj.getValues())
-                                }}
-                                id={issue.number.toString()}
-                            >
-                                Delete Issue
-                            </LoaderButton>
-                            <Button
-                                variant="outline"
-                                type="button"
-                                onClick={() => setOpenDelete(false)}
-                            >
-                                Cancel
-                            </Button>
-                        </div>
-                    </Modal>
+
                     <Modal
                         open={isOpenClose}
                         setOpen={setOpenClose}

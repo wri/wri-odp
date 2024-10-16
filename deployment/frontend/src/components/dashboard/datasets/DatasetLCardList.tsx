@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import DatasetHeader from './DatasetHeader'
 import DatasetRow from './DatasetRow'
 import { api } from '@/utils/api'
@@ -7,26 +7,26 @@ import type { SearchInput } from '@/schema/search.schema'
 import Pagination from '../_shared/Pagination'
 import type { WriDataset } from '@/schema/ckan.schema'
 import notify from '@/utils/notify'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
+import { useRouter } from 'next/router'
 
-export default function DatasetLCardList() {
-    const [query, setQuery] = useState<SearchInput>({
-        search: '',
-        page: { start: 0, rows: 10 },
-        _isUserSearch: true,
-        fq: {
-            is_approved: 'true',
-            draft: 'false',
-        },
+export default function DatasetLCardList({
+    setQuery,
+    query,
+}: {
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
+    query: SearchInput
+}) {
+    const { data, isLoading, refetch } = api.dataset.getAllDataset.useQuery({
+        ...query,
+        showPendingDataset: true,
     })
-    const { data, isLoading, refetch } =
-        api.dataset.getAllDataset.useQuery(query)
     const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
     const [open, setOpen] = useState(false)
     const datasetDelete = api.dataset.deleteDataset.useMutation({

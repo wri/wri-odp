@@ -72,6 +72,10 @@ export const updateFrequencyOptions: {
         label: 'As needed',
     },
     {
+        value: 'not_planned',
+        label: 'Not planned',
+    },
+    {
         value: 'monthly',
         label: 'Monthly',
     },

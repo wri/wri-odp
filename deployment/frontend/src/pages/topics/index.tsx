@@ -16,7 +16,13 @@ import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
 import { env } from '@/env.mjs'
 import dynamic from 'next/dynamic'
-const TopicsSearchResults = dynamic(() => import('@/components/topics/TopicsSearchResults'))
+import { Index } from 'flexsearch'
+import { Group as CkanGroup } from '@portaljs/ckan'
+type Group = CkanGroup & { numSubtopics: number }
+
+const TopicsSearchResults = dynamic(
+    () => import('@/components/topics/TopicsSearchResults')
+)
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
@@ -25,11 +31,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await helpers.topics.getGeneralTopics.prefetch({
-        search: '',
-        page: { start: 0, rows: 10000 },
-        allTree: true,
-    })
+    await Promise.all([
+        await helpers.topics.getGeneralTopics.prefetch({
+            search: '',
+            page: { start: 0, rows: 10000 },
+            allTree: true,
+        }),
+        await helpers.topics.list.prefetch(),
+        await helpers.topics.getNumberOfSubtopics.prefetch(),
+    ])
 
     return {
         props: {
@@ -45,33 +55,47 @@ export default function TopicsPage(
         search: '',
         page: { start: 0, rows: 10 },
     })
-    const [query, setQuery] = useState<SearchInput>({
+    const [query, setQuery] = useState<string>('')
+    const { data, isLoading } = api.topics.getGeneralTopics.useQuery({
         search: '',
         page: { start: 0, rows: 10000 },
         allTree: true,
     })
-    const { data, isLoading, refetch } =
-        api.topics.getGeneralTopics.useQuery(query)
+    const { data: allTopics } = api.topics.list.useQuery()
 
-    const ProcessedTopic = useQuery(
-        ['topicspage', data, pagination],
-        () => {
-            if (!data) return { topics: [], topicDetails: {}, count: 0 }
-            const topics = data?.topics.slice(
-                pagination.page.start,
-                pagination.page.start + pagination.page.rows
+    const indexTopics = new Index({
+        tokenize: 'full',
+    })
+    if (allTopics?.topics) {
+        allTopics?.topics.forEach((topic) => {
+            indexTopics.add(
+                topic.id,
+                JSON.stringify({
+                    title: topic.title,
+                    description: topic.description,
+                })
             )
-            const topicDetails = data?.topicDetails
-            return { topics, topicDetails, count: data?.count }
-        },
-        {
-            enabled: !!data,
-        }
-    )
+        })
+    }
 
-    useEffect(() => {
-        setPagination({ search: '', page: { start: 0, rows: 10 } })
-    }, [query.search])
+    function ProcessTopics() {
+        if (!data || !allTopics)
+            return { topics: [], topicDetails: {}, count: 0 }
+        const filteredTopics =
+            query !== ''
+                ? allTopics.topics.filter((t) =>
+                      indexTopics.search(query).includes(t.id)
+                  )
+                : data.topics
+        const topics = filteredTopics.slice(
+            pagination.page.start,
+            pagination.page.start + pagination.page.rows
+        ) as GroupTree[] | Group[]
+        const topicDetails = data.topicDetails
+        return { topics, topicDetails, count: filteredTopics.length }
+    }
+
+    const filteredTopics = ProcessTopics()
 
     return (
         <>
@@ -91,37 +115,42 @@ export default function TopicsPage(
                 setQuery={setQuery}
                 query={query}
             />
-            {isLoading || ProcessedTopic.isLoading ? (
-                <Spinner className="mx-auto" />
-            ) : (
-                <TopicsSearchResults
-                    count={data?.count as number}
-                    topics={ProcessedTopic?.data?.topics as GroupTree[]}
-                    topicDetails={
-                        ProcessedTopic?.data?.topicDetails as Record<
-                            string,
-                            GroupsmDetails
-                        >
-                    }
-                />
-            )}
-
-            {isLoading || ProcessedTopic.isLoading ? (
-                <Spinner className="mx-auto" />
-            ) : (
-                <div className="w-full px-8 xxl:px-0 max-w-8xl mx-auto">
-                    <Pagination
-                        setQuery={setPagination}
-                        query={pagination}
-                        data={data}
-                    />
+            <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
+                <div className="max-w-[705px] ml-2 2xl:ml-2">
+                    <div className="default-home-container w-full border-t-[4px] border-stone-900" />
+                    <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
+                        Explore reliable datasets filtered by the topic of your
+                        interest.
+                    </h3>
                 </div>
+            </section>
+            {isLoading ? (
+                <Spinner className="mx-auto" />
+            ) : (
+                <>
+                    <TopicsSearchResults
+                        filtered={
+                            query !== '' &&
+                            query !== null &&
+                            typeof query !== 'undefined'
+                        }
+                        count={filteredTopics.count}
+                        topics={filteredTopics.topics}
+                        topicDetails={filteredTopics.topicDetails}
+                    />
+                    <div className="w-full px-8 xxl:px-0 max-w-8xl mx-auto">
+                        <Pagination
+                            setQuery={setPagination}
+                            query={pagination}
+                            data={filteredTopics}
+                        />
+                    </div>
+                </>
             )}
-
             <Footer
                 links={{
                     primary: { title: 'Advanced Search', href: '#' },
-                    secondary: { title: 'Explore Teams', href: '#' },
+                    secondary: { title: 'Explore Topics', href: '#' },
                 }}
             />
         </>

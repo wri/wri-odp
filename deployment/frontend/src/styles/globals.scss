@@ -1,78 +1,75 @@
-@use "sass:math";
+@use 'sass:math';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "~vizzuality-components/dist/bundle";
+@import '~vizzuality-components/dist/bundle';
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
-  }
- 
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-  }
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 240 10% 3.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 240 10% 3.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 240 10% 3.9%;
+        --primary: 240 5.9% 10%;
+        --primary-foreground: 0 0% 98%;
+        --secondary: 240 4.8% 95.9%;
+        --secondary-foreground: 240 5.9% 10%;
+        --muted: 240 4.8% 95.9%;
+        --muted-foreground: 240 3.8% 46.1%;
+        --accent: 240 4.8% 95.9%;
+        --accent-foreground: 240 5.9% 10%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 5.9% 90%;
+        --input: 240 5.9% 90%;
+        --ring: 240 5.9% 10%;
+        --radius: 0.5rem;
+    }
+
+    .dark {
+        --background: 240 10% 3.9%;
+        --foreground: 0 0% 98%;
+        --card: 240 10% 3.9%;
+        --card-foreground: 0 0% 98%;
+        --popover: 240 10% 3.9%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 0 0% 98%;
+        --primary-foreground: 240 5.9% 10%;
+        --secondary: 240 3.7% 15.9%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: 240 5% 64.9%;
+        --accent: 240 3.7% 15.9%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 3.7% 15.9%;
+        --input: 240 3.7% 15.9%;
+        --ring: 240 4.9% 83.9%;
+    }
 }
 
-body, html {
-	letter-spacing: 0px;
-  accent-color: #32864B;
-}
-
-.mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-attrib{
-  display: none;
+body,
+html {
+    letter-spacing: 0px;
+    accent-color: #32864b;
 }
 
 .mapboxgl-ctrl-bottom-right {
-  width: 100%;
+    width: 100%;
 }
 
 .mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
-  width: 100%;
-  max-width: 95%;
-  margin: 10px auto;
-  float: none;
+    width: 100%;
+    max-width: 95%;
+    margin: 10px auto;
+    float: none;
 }
 
 .suggestions {
-  max-height: 220px;
+    max-height: 220px;
 }
 
 .mapboxgl-ctrl-geocoder .suggestions {
@@ -80,180 +77,179 @@ body, html {
 }
 
 @media screen and (min-width: 640px) {
-.mapboxgl-ctrl-geocoder--input {
-    height: 36px;
-    padding: 6px 35px !important;
-}
+    .mapboxgl-ctrl-geocoder--input {
+        height: 36px;
+        padding: 6px 35px !important;
+    }
 }
 
 .dataset-tabs .swiper-slide {
-  width: fit-content !important;
+    width: fit-content !important;
 }
 
 .default-home-container {
-  max-width: 90vw;
+    max-width: 90vw;
 }
 
 .auto-carousel .swiper-slide {
-  width: fit-content !important;
+    width: fit-content !important;
 }
 
-
-input[type="color"] {
-  -webkit-appearance: none;
-  border: none;
+input[type='color'] {
+    -webkit-appearance: none;
+    border: none;
 }
-input[type="color"]::-webkit-color-swatch-wrapper {
-  padding: 0;
+input[type='color']::-webkit-color-swatch-wrapper {
+    padding: 0;
 }
-input[type="color"]::-webkit-color-swatch {
-  border: none;
+input[type='color']::-webkit-color-swatch {
+    border: none;
 }
 
 .arrow-right {
-  clip-path: polygon(0 0, 0% 100%, 100% 50%);
+    clip-path: polygon(0 0, 0% 100%, 100% 50%);
 }
 
 .arrow-left {
-  clip-path: polygon(100% 0, 100% 50%, 100% 100%, 0% 100%, 61% 50%, 0% 0%);
+    clip-path: polygon(100% 0, 100% 50%, 100% 100%, 0% 100%, 61% 50%, 0% 0%);
 }
 
 .arrow-wrap {
-  filter: drop-shadow(0px 0px 20px rgba(221, 221, 221, 0.25));
+    filter: drop-shadow(0px 0px 20px rgba(221, 221, 221, 0.25));
 }
 
 $space: 5px;
 $black: #000;
 $white: #ffffff;
 $charcoal-grey: #393f44;
-$porcelain: #F4F6F7;
-$light-grey: #cAccd0;
-$ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1.000);
-$animation-time: .16s;
+$porcelain: #f4f6f7;
+$light-grey: #caccd0;
+$ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+$animation-time: 0.16s;
 $font-size-normal: 14px;
 $dark-pink: #c32d7b;
 
 .rw-legend-timeline {
-  margin: 4 0;
+    margin: 4 0;
 
-  .rc-slider {
-    .rc-slider-mark {
-      min-width: 100%;
-      margin-left: 0;
-      display: flex;
-      justify-content: space-between;
+    .rc-slider {
+        .rc-slider-mark {
+            min-width: 100%;
+            margin-left: 0;
+            display: flex;
+            justify-content: space-between;
 
-      .rc-slider-mark-text {
-        display: none;
+            .rc-slider-mark-text {
+                display: none;
 
-        &:last-child,
-        &:first-child {
-          display: block;
+                &:last-child,
+                &:first-child {
+                    display: block;
+                }
+            }
         }
-      }
     }
-  }
 }
 
 .c-legend-map {
-  position: absolute;
-  bottom: 35px;
-  right: 30px;
-  width: 80%; // Limit the width for mobile devices
-  max-width: 400px;
-  background: white;
-  z-index: 9;
-  border-radius: 4px;
-
-  .legend-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 0;
-    padding: 10px 15px;
-    text-transform: uppercase;
-    font-size: 11px;
-  }
-
-  .toggle-legend {
     position: absolute;
-    right: 0px;
-    width: 40px;
-    height: 32px;
-    top: -28px;
-    border: 0;
-    border-radius: 2px 2px 0 0;
-    background-color: rgba(white, 0.2);
-    cursor: pointer;
+    bottom: 35px;
+    right: 30px;
+    width: 80%; // Limit the width for mobile devices
+    max-width: 400px;
+    background: white;
+    z-index: 9;
+    border-radius: 4px;
 
-    &:focus {
-      outline: none;
-    }
-
-    svg {
-      margin-top: 4px;
-      fill: white;
-    }
-  }
-
-  .open-legend {
-    display: flex;
-    flex-flow: column;
-    max-height: 300px;
-    height: 0;
-    overflow: hidden;
-    opacity: 0;
-    // Without an auto height, the legend looks a bit 💩
-    // but we can't animate the height if max-height is
-    // used
-    // I've prefered to remove the animation than having
-    // a legend too tall - Clément
-
-    &.-active {
-      height: auto;
-      opacity: 1;
-      overflow: auto;
-    }
-
-    >.legend-list {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      overflow: auto;
-    }
-  }
-
-  .close-legend {
-    display: none;
-
-    &.-active {
-      display: inherit;
+    .legend-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0;
+        padding: 10px 15px;
+        text-transform: uppercase;
+        font-size: 11px;
     }
 
     .toggle-legend {
-      position: relative;
-      top: auto;
-      padding: 0;
-      width: auto;
-      height: auto;
-      padding: 0;
-      background-color: white;
+        position: absolute;
+        right: 0px;
+        width: 40px;
+        height: 32px;
+        top: -28px;
+        border: 0;
+        border-radius: 2px 2px 0 0;
+        background-color: rgba(white, 0.2);
+        cursor: pointer;
 
-      svg {
-        margin-top: 0;
-        fill: red;
-      }
+        &:focus {
+            outline: none;
+        }
+
+        svg {
+            margin-top: 4px;
+            fill: white;
+        }
     }
-  }
+
+    .open-legend {
+        display: flex;
+        flex-flow: column;
+        max-height: 300px;
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+        // Without an auto height, the legend looks a bit 💩
+        // but we can't animate the height if max-height is
+        // used
+        // I've prefered to remove the animation than having
+        // a legend too tall - Clément
+
+        &.-active {
+            height: auto;
+            opacity: 1;
+            overflow: auto;
+        }
+
+        > .legend-list {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow: auto;
+        }
+    }
+
+    .close-legend {
+        display: none;
+
+        &.-active {
+            display: inherit;
+        }
+
+        .toggle-legend {
+            position: relative;
+            top: auto;
+            padding: 0;
+            width: auto;
+            height: auto;
+            padding: 0;
+            background-color: white;
+
+            svg {
+                margin-top: 0;
+                fill: red;
+            }
+        }
+    }
 }
 
 /* Plotly */
 .js-plotly-plot svg {
-  display: inline;
+    display: inline;
 }
 
 .rdp-vhidden {
-  @apply hidden;
+    @apply hidden;
 }
 
 .vizzuality__toggle-legend {
@@ -264,83 +260,95 @@ $dark-pink: #c32d7b;
 
 /* nprogress CSS */
 #nprogress {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 #nprogress .bar {
-  background: #F3B229;
+    background: #f3b229;
 
-  position: fixed;
-  z-index: 1031;
-  top: 0;
-  left: 0;
+    position: fixed;
+    z-index: 1031;
+    top: 0;
+    left: 0;
 
-  width: 100%;
-  height: 3px;
+    width: 100%;
+    height: 3px;
 }
 
 #nprogress .peg {
-  display: block;
-  position: absolute;
-  right: 0px;
-  width: 100px;
-  height: 100%;
-  box-shadow: 0 0 10px #F3B229, 0 0 5px #1f356c;
-  opacity: 1;
+    display: block;
+    position: absolute;
+    right: 0px;
+    width: 100px;
+    height: 100%;
+    box-shadow:
+        0 0 10px #f3b229,
+        0 0 5px #1f356c;
+    opacity: 1;
 
-  -webkit-transform: rotate(3deg) translate(0px, -4px);
-  -ms-transform: rotate(3deg) translate(0px, -4px);
-  transform: rotate(3deg) translate(0px, -4px);
+    -webkit-transform: rotate(3deg) translate(0px, -4px);
+    -ms-transform: rotate(3deg) translate(0px, -4px);
+    transform: rotate(3deg) translate(0px, -4px);
 }
 
 #nprogress .spinner {
-  display: block;
-  position: fixed;
-  z-index: 1031;
-  top: 15px;
-  right: 15px;
+    display: block;
+    position: fixed;
+    z-index: 1031;
+    top: 15px;
+    right: 15px;
 }
 
 #nprogress .spinner-icon {
-  width: 18px;
-  height: 18px;
-  box-sizing: border-box;
+    width: 18px;
+    height: 18px;
+    box-sizing: border-box;
 
-  border: solid 2px transparent;
-  border-top-color: #F3B229;
-  border-left-color: #F3B229;
-  border-radius: 50%;
+    border: solid 2px transparent;
+    border-top-color: #f3b229;
+    border-left-color: #f3b229;
+    border-radius: 50%;
 
-  -webkit-animation: nprogress-spinner 400ms linear infinite;
-  animation: nprogress-spinner 400ms linear infinite;
+    -webkit-animation: nprogress-spinner 400ms linear infinite;
+    animation: nprogress-spinner 400ms linear infinite;
 }
 
 .nprogress-custom-parent {
-  overflow: hidden;
-  position: relative;
+    overflow: hidden;
+    position: relative;
 }
 
 .nprogress-custom-parent #nprogress .spinner,
 .nprogress-custom-parent #nprogress .bar {
-  position: absolute;
+    position: absolute;
 }
 
 @-webkit-keyframes nprogress-spinner {
-  0% {
-    -webkit-transform: rotate(0deg);
-  }
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
 
-  100% {
-    -webkit-transform: rotate(360deg);
-  }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
 }
 
 @keyframes nprogress-spinner {
-  0% {
-    transform: rotate(0deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
 
-  100% {
-    transform: rotate(360deg);
-  }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.osano-cm-powered-by {
+    display: none;
+}
+.osano-cm-widget {
+    display: none;
+}
+li.osano-cm-drawer-item:nth-child(5) {
+    display: none;
 }

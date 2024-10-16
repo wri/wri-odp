@@ -1,9 +1,9 @@
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { ErrorDisplay } from '@/components/_shared/InputGroup'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import {
     Popover,
     PopoverContent,
@@ -23,6 +23,8 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { z } from 'zod'
+import { useQuery } from 'react-query'
+import { env } from '@/env.mjs'
 
 export function DownloadButton({ datafile }: { datafile: Resource }) {
     const { dataset } = useDataset()
@@ -44,8 +46,8 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
         (datafile.format == 'Layer' &&
             // @ts-ignore
             datafile?.layerObj?.provider !=
-            // @ts-ignore
-            'cartodb' &&
+                // @ts-ignore
+                'cartodb' &&
             sql) ||
         (!datafile.key && !datafile.url)
     ) {
@@ -58,6 +60,9 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
 
     if (mode == 'RES_URL' && datafile.url) {
         originalResourceDownloadUrl = datafile.url
+        if (originalResourceDownloadUrl.includes('data-api')) {
+            originalResourceDownloadUrl += `&x-api-key=${env.NEXT_PUBLIC_GFW_API_KEY}`
+        }
     } else if (mode == 'SIGNED_URL' && signedUrl && !isLoading) {
         originalResourceDownloadUrl = signedUrl
     }
@@ -79,6 +84,26 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
     )
 
     const download = (url: string) => window.open(url, '_target')
+
+    if (!datafile.datastore_active)
+        return (
+            <button
+                onClick={() => download(originalResourceDownloadUrl)}
+                id="download"
+                data-resource={datafile.title ?? datafile.name!}
+                className="cursor-pointer download-datafile w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
+            >
+                <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                <div className="font-acumin text-xs sm:text-sm font-normal text-black">
+                    {isLoading && mode == 'SIGNED_URL' ? 'Loading' : 'Download'}
+                </div>
+                {size && (
+                    <div className="font-acumin text-xs sm:text-xs font-normal text-black">
+                        {convertBytes(size)}
+                    </div>
+                )}
+            </button>
+        )
 
     return (
         <>
@@ -102,8 +127,8 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                             <Button
                                 className="w-full"
                                 variant="ghost"
-                                id='download'
-                                data-resource={ datafile.title ??  datafile.name!}
+                                id="download"
+                                data-resource={datafile.title ?? datafile.name!}
                                 onClick={() =>
                                     download(originalResourceDownloadUrl)
                                 }
@@ -187,6 +212,19 @@ function DownloadModal({
     const formSchema = z.object({
         email: z.string().email(),
     })
+    const { data: layerObj, isLoading: layerObjLoading } = useQuery(
+        [datafile.rw_id],
+        async () => {
+            const res = await fetch(
+                `https://api.resourcewatch.org/v1/layer/${datafile.rw_id}`
+            )
+            const obj = await res.json()
+            return obj.data.attributes
+        },
+        {
+            enabled: datafile.format == 'Layer',
+        }
+    )
 
     type FormSchema = z.infer<typeof formSchema>
 
@@ -200,18 +238,16 @@ function DownloadModal({
         register,
     } = formObj
 
-    let isLoading = false
+    let isLoading = requestDatafileConversionMutation.isLoading
     let sql = `SELECT * FROM "${datafile.id}"`
-    let cartoAccount: string | undefined = "";
+    let cartoAccount: string | undefined = ''
     if (datafile.format == 'Layer') {
-        const layerObj = datafile.layerObj
         const layerCfg = layerObj?.layerConfig
         const layerSrc = layerCfg?.source
         const layerProvider = layerSrc?.provider
         sql = layerProvider?.layers?.at(0)?.options?.sql
-        cartoAccount = layerProvider?.account;
+        cartoAccount = layerProvider?.account
     }
-
     return (
         <Modal open={open} setOpen={setOpen} className="max-w-[48rem]">
             <div className="p-6">
@@ -224,13 +260,15 @@ function DownloadModal({
                         download link via email when it's ready.
                     </div>
                 </div>
-                {isLoading && (
+                {layerObjLoading && (
                     <div className="w-full flex items-center my-10 justify-center">
                         <Spinner />
                     </div>
                 )}
-                {!isLoading && (
-                    <form id="download"  data-resource={datafile.title ?? datafile.name!}
+                {!isLoading && !layerObjLoading && (
+                    <form
+                        id="download"
+                        data-resource={datafile.title ?? datafile.name!}
                         onSubmit={handleSubmit(
                             async (data) => {
                                 requestDatafileConversionMutation.mutate(
@@ -245,7 +283,7 @@ function DownloadModal({
                                             : 'datastore',
                                         sql: sql,
                                         resource_id: datafile.id,
-                                        carto_account: cartoAccount ?? ""
+                                        carto_account: cartoAccount ?? '',
                                     },
                                     {
                                         onSuccess: () => {
@@ -257,7 +295,7 @@ function DownloadModal({
                                             setOpen(false)
                                         },
                                         onError: (err) => {
-                                            console.log(err)
+                                            console.error(err)
 
                                             toast('Failed to request file', {
                                                 type: 'error',
@@ -267,7 +305,7 @@ function DownloadModal({
                                 )
                             },
                             (err) => {
-                                console.log(err)
+                                console.error(err)
                                 toast('Failed to request file', {
                                     type: 'error',
                                 })

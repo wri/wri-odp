@@ -27,7 +27,7 @@ export default function SortBy({
 
     const sortByOptions: Option[] = [
         {
-            value: 'relevance asc',
+            value: 'score desc',
             label: 'Relevance',
         },
         { value: 'name asc', label: 'Name ASC' },

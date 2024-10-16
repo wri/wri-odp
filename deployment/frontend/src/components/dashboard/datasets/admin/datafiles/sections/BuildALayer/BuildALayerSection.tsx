@@ -38,9 +38,11 @@ export function BuildALayer({
                       formObj.getValues(`resources.${index}.layerObj`)
                   ).success
                       ? formObj.getValues(`resources.${index}.layerObj`)
-                      : (layerSchema.safeParse(
-                            formObj.getValues(`resources.${index}.layerObj`)
-                        ) as SafeParseSuccess<any>).data
+                      : (
+                            layerSchema.safeParse(
+                                formObj.getValues(`resources.${index}.layerObj`)
+                            ) as SafeParseSuccess<any>
+                        ).data
               )
             : null
     )
@@ -236,7 +238,6 @@ export function PreviewMap({
     }) => {
         setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat })
         const layersInfo = []
-        console.log('LAYERS INSIDE ON CLICK', layers)
         for (let layer of layers) {
             const feature = features?.find(
                 //  @ts-ignore
@@ -244,7 +245,6 @@ export function PreviewMap({
             )
             const { interactionConfig } = layer
 
-            console.log('FOUND INTERACTION CONFIG', interactionConfig)
             const layerInfo = {
                 id: layer.id,
                 name: layer.name ?? 'sample-name',
@@ -288,7 +288,9 @@ export function PreviewMap({
                         mapRef.current = _map.getMap() as unknown as MapRef
                 }}
                 mapStyle="mapbox://styles/mapbox/light-v9"
-                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjajFlcXZhNzcwMDBqMzNzMTQ0bDN6Y3U4In0.FRcIP_yusVaAy0mwAX1B8w"
+                dragRotate={false}
+                touchZoomRotate={false}
+                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                 onMove={(evt) => setViewState(evt.viewState)}
                 onClick={onClickLayer}
                 interactiveLayerIds={interactiveLayerIds ?? []}

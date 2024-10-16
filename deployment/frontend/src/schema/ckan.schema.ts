@@ -78,6 +78,7 @@ export interface ActivityDisplay {
 export interface WriDataset extends Dataset {
     has_chart_views?: boolean
     methodology?: string
+    usecases?: string
     technical_notes?: string
     temporal_coverage_start: string
     temporal_coverage_end: string
@@ -89,6 +90,7 @@ export interface WriDataset extends Dataset {
         | 'weekly'
         | 'daily'
         | 'as_needed'
+        | 'not_planned'
         | 'hourly'
     visibility_type: 'public' | 'private' | 'internal' | 'draft'
     short_description?: string
@@ -123,6 +125,10 @@ export interface WriDataset extends Dataset {
     rw_dataset?: boolean
     is_approved?: boolean
     release_notes: string
+}
+
+export type WriDatasetWithoutDetails = Omit<WriDataset, 'resources'> & {
+    resources: { datastore_active?: boolean | null; format?: string }[]
 }
 
 export interface Extra {

@@ -84,7 +84,6 @@ export function useNumberOfRows({
     provider: string
     setPageCount: (updater: Updater<number>) => void
 }) {
-    console.log('TABLE NAME', tableName)
     if (provider === 'datastore') {
         return api.datastore.getNumberOfRows.useQuery(
             {

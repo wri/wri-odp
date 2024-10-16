@@ -3,7 +3,6 @@ import { Listbox, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import classNames from '@/utils/classnames'
 import type { SearchInput } from '@/schema/search.schema'
-import { filter } from 'lodash'
 
 interface Option {
     id: string
@@ -15,27 +14,40 @@ export default function SelectFilter({
     setQuery,
     query,
     filtername,
+    reset,
 }: {
     options: { id: string; label: string | undefined }[]
     filtername: string
     setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
     query: SearchInput
+    reset?: React.Dispatch<React.SetStateAction<SearchInput>>
 }) {
     const [selected, setSelected] = useState(
-        options[0] ? options[0] : { id: '0', label: '' }
+        query.fq && query.fq[filtername]
+            ? options.find(
+                  (o) =>
+                      o.id === (query.fq as Record<string, string>)[filtername]
+              )
+            : options[0]
+            ? options[0]
+            : { id: '0', label: '' }
     )
 
     const handleSelect = (option: Option) => {
         setSelected(option)
-        if (option.id === 'None' && filtername !== 'selectEntity') {
-            const { [filtername]: filterdata, ...remainingFilters } =
-                query.fq || {}
+        if (option.id === 'reset' && filtername == 'selectEntity') {
             const updateQuery: SearchInput = {
-                page: { ...query?.page, start: 0 },
-                search: query.search,
-                fq: remainingFilters,
+                search: '',
+                page: { start: 0, rows: 1000 },
+                fq: {},
             }
-            setQuery && setQuery(updateQuery)
+            reset && reset(updateQuery)
+            setQuery((prev) => {
+                return {
+                    ...prev,
+                    search: 'None',
+                }
+            })
         } else if (filtername === 'selectEntity') {
             if (option.id === 'None') {
                 setQuery((prev) => {
@@ -53,41 +65,58 @@ export default function SelectFilter({
                 })
             }
         } else {
-          let updateQuery: SearchInput;
-          if (["orgId", "packageId"].includes(filtername)) {
-            const action = query.fq?.action
-            const timestamp = query.fq?.timestamp
-            const prev: Record<string, string> = {}
-            if (action) {
-              prev["action"] = action
-            }
-            if (timestamp) {
-              prev["timestamp"] = timestamp
+            let updateQuery: SearchInput
+
+            if (['orgId', 'packageId', 'groupId'].includes(filtername)) {
+                const action = query.fq?.action
+                const timestamp = query.fq?.timestamp
+                const prev: Record<string, string> = {}
+                if (action) {
+                    prev['action'] = action
+                }
+                if (timestamp) {
+                    prev['timestamp'] = timestamp
+                }
+
+                if (
+                    option.id.toLowerCase() === 'none' ||
+                    option.id.toLowerCase() === 'all'
+                ) {
+                    updateQuery = {
+                        page: { ...query?.page, start: 0 },
+                        search: query.search,
+                    }
+                } else {
+                    updateQuery = {
+                        page: { ...query?.page, start: 0 },
+                        search: query.search,
+                        fq: {
+                            ...prev,
+                            [filtername]: option.id,
+                        },
+                    }
+                }
+            } else {
+                if (
+                    option.id.toLowerCase() === 'none' ||
+                    option.id.toLowerCase() === 'all'
+                ) {
+                    updateQuery = {
+                        page: { ...query?.page, start: 0 },
+                        search: query.search,
+                    }
+                } else {
+                    updateQuery = {
+                        page: { ...query?.page, start: 0 },
+                        search: query.search,
+                        fq: {
+                            ...query.fq,
+                            [filtername]: option.id,
+                        },
+                    }
+                }
             }
 
-
-            console.log("action", action)
-            console.log("timestamp", query.fq)
-            updateQuery = {
-                page: { ...query?.page, start: 0 },
-                search: query.search,
-                fq: {
-                  ...prev,
-                    [filtername]: option.label === 'All' ? '' : option.id,
-                },
-            }
-          }
-          else {
-               updateQuery= {
-                   page: { ...query?.page, start: 0 },
-                   search: query.search,
-                   fq: {
-                       ...query.fq,
-                       [filtername]: option.label === 'All' ? '' : option.id,
-                   },
-               }
-          }
-           
             setQuery && setQuery(updateQuery)
         }
     }
@@ -99,7 +128,7 @@ export default function SelectFilter({
                     <div className="relative w-32 sm:w-48 ">
                         <Listbox.Button className="relative w-full cursor-default rounded-sm bg-wri-gray py-2 pl-3 pr-8 text-left shadow-sm border-b-wri-gold border-b-2 focus:outline-none  sm:leading-6 text-black text-sm font-normal font-['Acumin Pro SemiCondensed']">
                             <span className="block truncate text-wri-black">
-                                {selected.label}
+                                {selected!.label}
                             </span>
                             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                 <ChevronDownIcon

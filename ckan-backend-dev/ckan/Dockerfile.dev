@@ -1,4 +1,4 @@
-FROM viderum/ckan:v2.10-dev-security-fix
+FROM viderum/ckan:v2.10.3-alpine-3.18
 
 # Set up environment variables
 ENV APP_DIR=/srv/app
@@ -21,7 +21,9 @@ ENV SRC_EXTENSIONS_DIR=${APP_DIR}/src_extensions
 # Clone the extension(s) your are writing for your own project in the `src` folder
 # to get them mounted in this image at runtime
 USER root
-RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
+RUN pip3 install --upgrade setuptools==70.0.0
+# Echo the version of setuptools to check if it is installed correctly
+RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@0983735ca163f906693c46f5315ee5abf68d2742#egg=ckanext-scheming' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
@@ -49,12 +51,22 @@ RUN pip install --disable-pip-version-check Shapely==2.0.1
 
 RUN apk del build-base python3-dev && \
     rm -rf /var/cache/apk/*
+
+RUN apk add proj proj-dev proj-util musl-dev python3-dev
+RUN pip3 install pyproj --no-binary pyproj
  
 # Update ckanext-s3filestore test.ini with minio credentials
-RUN sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \
-    sed -i "s|ckanext.s3filestore.aws_secret_access_key = test-secret-key|ckanext.s3filestore.aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}|g" src/ckanext-s3filestore/test.ini && \
-    sed -i "s|ckanext.s3filestore.aws_bucket_name = test-bucket|ckanext.s3filestore.aws_bucket_name = ${AWS_BUCKET_NAME}|g" src/ckanext-s3filestore/test.ini && \
-    sed -i "s|ckanext.s3filestore.host_name = http://127.0.0.1:9000|ckanext.s3filestore.host_name = ${HOST_NAME}|g" src/ckanext-s3filestore/test.ini
+USER root
+RUN chmod -R 777 src 
+RUN chmod -R 777 ${APP_DIR}/src/
+RUN chmod -R 777 ${APP_DIR}/src/*
+RUN sed --version
+RUN TMPDIR=/tmp sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \
+    TMPDIR=/tmp sed -i "s|ckanext.s3filestore.aws_secret_access_key = test-secret-key|ckanext.s3filestore.aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}|g" src/ckanext-s3filestore/test.ini && \
+    TMPDIR=/tmp sed -i "s|ckanext.s3filestore.aws_bucket_name = test-bucket|ckanext.s3filestore.aws_bucket_name = ${AWS_BUCKET_NAME}|g" src/ckanext-s3filestore/test.ini && \
+    TMPDIR=/tmp sed -i "s|ckanext.s3filestore.host_name = http://127.0.0.1:9000|ckanext.s3filestore.host_name = ${HOST_NAME}|g" src/ckanext-s3filestore/test.ini
+
+RUN chmod -R 777 src
 
 COPY scripts/run_unit_tests.sh ${APP_DIR}/run_unit_tests.sh
 RUN chmod +x ${APP_DIR}/run_unit_tests.sh

@@ -29,6 +29,8 @@ services:
       - ./src:/srv/app/src_extensions
     restart: unless-stopped
     image: ${CKAN_IMAGE}
+    #healthcheck:
+    #  test: ["CMD-SHELL", "wget -qO /dev/null http://localhost:5000 || (echo 'Health check failed' > /tmp/ckan-healthcheck.log && wget -O - http://localhost:5000 2>> /tmp/ckan-healthcheck.log && exit 1)"]
 
       #  frontend:
       #    container_name: wri-frontend
@@ -55,20 +57,10 @@ services:
       #      - SMTP_PASSWORD=${SMTP_PASSWORD}
       #      - SMTP_FROM=${SMTP_FROM}
       #      - PREFECT_INTERNAL_URL=http://prefect:4200
-      #    depends_on:
-      #      ckan-dev:
-      #        condition: service_healthy
       #    ports:
       #      - "0.0.0.0:3000:3000"
       #    healthcheck:
       #      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
-
-        #  datapusher:
-        #    container_name: ${DATAPUSHER_CONTAINER_NAME}
-        #    image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}
-        #    restart: unless-stopped
-        #    healthcheck:
-        #      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
 
   prefect:
     container_name: prefect-server
@@ -88,26 +80,24 @@ services:
       timeout: 30s
       retries: 3
       start_period: 60s
-    depends_on:
-      - ckan-dev
 
-          #  my-datapusher:
-          #    container_name: my-datapusher
-          #    build:
-          #      context: ../datapusher
-          #    restart: always
-          #    environment:
-          #      - PREFECT_API_URL=http://prefect:4200/api
-          #      - DEPLOYMENT_NAME=datapusher-dev
-          #      - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
-          #      - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
-          #      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
-          #      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
-          #      - S3_BUCKET_NAME=ckan
-          #      - S3_BUCKET_REGION=us-east-1
-          #    depends_on:
-          #      prefect:
-          #        condition: service_healthy
+  #my-datapusher:
+  #  container_name: my-datapusher
+  #  build:
+  #    context: ../datapusher
+  #  restart: always
+  #  environment:
+  #    - PREFECT_API_URL=http://prefect:4200/api
+  #    - DEPLOYMENT_NAME=datapusher-dev
+  #    - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+  #    - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+  #    - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+  #    - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+  #    - S3_BUCKET_NAME=ckan
+  #    - S3_BUCKET_REGION=us-east-1
+  #  depends_on:
+  #    prefect:
+  #      condition: service_healthy
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}

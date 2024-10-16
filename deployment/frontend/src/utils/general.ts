@@ -36,13 +36,13 @@ export function filterObjects<T>(
             const filterValue = filterObject[key]
             const itemValue = (item as Record<string, string>)[key]
 
-            if (key === 'groupId') {
-                const groupIds = (item as Record<string, string[] | undefined>)
-                    .packageGroup
-                if (groupIds !== undefined) {
-                    return groupIds.includes(filterValue as string)
-                }
-            }
+            // if (key === 'groupId') {
+            //     const groupIds = (item as Record<string, string[] | undefined>)
+            //         .packageGroup
+            //     if (groupIds !== undefined) {
+            //         return groupIds.includes(filterValue as string)
+            //     }
+            // }
             if (key === 'timestamp') {
                 return isWithinTimeframe(itemValue!, filterValue!)
             }
@@ -146,14 +146,19 @@ export const datasetFormFieldmap: Record<string, string> = {
     short_description: ' Short Description',
     notes: 'Description',
     author: 'author',
-    author_email: 'Author Emai',
+    author_email: 'Author Email',
     maintainer: 'Maintainer Name',
     maintainer_email: 'Maintainer Email',
+    authors: 'Authors',
+    author_emails: 'Author Emails',
+    maintainers: 'Maintainers',
+    maintainer_emails: 'Maintainer Emails',
     learn_more: 'Learn more',
     open_in: 'Open In',
     function: 'Function',
     cautions: 'Cautions',
     methodology: 'Methodology',
+    usecases: 'Advanced API Usage',
     restrictions: 'Restrictions',
     reason_for_adding: 'Reason for adding',
     owner_org: 'Team',
@@ -169,7 +174,22 @@ export function formatDiff(
     > = {}
     if (data) {
         for (const key in data) {
-            if (
+            if (key.startsWith('authors') || key.startsWith('maintainers')) {
+                const key_cleaned = key.includes('authors') ? 'authors' : 'maintainers'
+                const newKey = datasetFormFieldmap[key_cleaned]!
+
+                const old_value = data[key]?.old_value
+                const new_value = data[key]?.new_value
+
+                outputDiff[newKey] = {
+                    old_value: old_value && typeof old_value === 'string' && old_value.startsWith('[{')
+                        ? JSON.parse(old_value)
+                        : old_value || '',
+                    new_value: new_value && typeof new_value === 'string' && new_value.startsWith('[{')
+                        ? JSON.parse(new_value)
+                        : new_value || '',
+                }
+            } else if (
                 !key.startsWith('resource') &&
                 (key.match(/\[\d+\]\.\w+/) || key.match(/\[\d+\]/))
             ) {

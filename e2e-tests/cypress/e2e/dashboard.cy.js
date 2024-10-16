@@ -32,10 +32,8 @@ describe("Dashboard Test", () => {
         'short_description': 'test',
         "technical_notes": "https://source.com/stat",
         "visibility_type": "public",
-        "maintainer": "Stephen Oni",
-        "maintainer_email": "stephenoni2@gmail.com",
-        "author": "Stephen",
-        "author_email": "stephenoni2@gmail.com",
+        "authors": [{ name: "Stephen Oni", email: "stephenoni2@gmail.com" }],
+        "maintainers": [{ name: "Stephen", email: "stephenoni2@gmail.com" }],
         "update_frequency": "hourly",
         "is_approved": "false",
       });
@@ -77,10 +75,6 @@ describe("Dashboard Test", () => {
         });
       });
     });
-    cy.get("@dataset").then((dataset) => {
-      cy.createPendingDataset(dataset.id, dataset)
-    });
-
   });
 
   
@@ -254,11 +248,6 @@ describe("Dashboard Test", () => {
     cy.get("button").contains("Comment").click();
     cy.wait(15000)
     cy.contains("issue comment", { timeout: 15000 });
-
-    // delete issue
-    cy.get("button").contains("Delete").click();
-    cy.contains("Delete Issue");
-    cy.get("button").contains("Delete Issue").click();
 
    })
   

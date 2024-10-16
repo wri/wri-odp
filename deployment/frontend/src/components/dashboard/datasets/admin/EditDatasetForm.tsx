@@ -26,23 +26,17 @@ import {
 } from './formOptions'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
-import { Button, LoaderButton } from '@/components/_shared/Button'
+import { LoaderButton } from '@/components/_shared/Button'
 import Link from 'next/link'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { EditDataFilesSection } from './datafiles/EditDataFilesSection'
 import { useSession } from 'next-auth/react'
 import { match } from 'ts-pattern'
 import { Collaborators } from './metadata/Collaborators'
-import dynamic from 'next/dynamic';
-const Modal = dynamic(() => import('@/components/_shared/Modal'), {
-    ssr: false,
-});
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
 import { LocationForm } from './metadata/LocationForm'
 import { EditRwSection } from './datafiles/EditRwSection'
-import form from '@/components/vizzuality/1.3-components/form'
 import { VersioningForm } from './metadata/VersioningForm'
+import { ErrorMessage } from '@hookform/error-message'
 
 function getDiff<T>(dirtyObject: T, changedFields: string[]) {
     for (const key in dirtyObject) {
@@ -103,8 +97,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             id: dataset.name,
         })
 
-    console.log(dataset)
-
     const canEditCollaborators = match(session.data?.user.sysadmin ?? false)
         .with(true, () => true)
         .with(false, () => {
@@ -123,7 +115,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 : false
         })
         .otherwise(() => false)
-
 
     const resourceForm = dataset.resources.sort((a, b) => {
         const isLayer = (r: any) =>
@@ -148,7 +139,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
 
         return 0
     }) as unknown as ResourceFormType[]
-        console.log(resourceForm.map(r => r.type))
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
@@ -156,7 +146,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             ...dataset,
             id: dataset.id,
             rw_id: dataset.rw_id,
-            author_email: dataset?.author_email ? dataset.author_email : null,
+            //author_email: dataset?.author_email ? dataset.author_email : null,
             rw_dataset: dataset.rw_id ? !!dataset.rw_id : !!dataset.rw_dataset,
             tags: dataset.tags ? dataset.tags.map((tag) => tag.name) : [],
             temporal_coverage_start: dataset.temporal_coverage_start
@@ -205,14 +195,18 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 }
                 return {
                     ...resource,
+                    resourceId: resource.id as string,
                     schema: resource.schema ? schema.value : undefined,
                 }
             }),
-            spatial_type: dataset.spatial_address
-                ? 'address'
-                : dataset.spatial
-                ? 'geom'
-                : undefined,
+            spatial_type:
+                dataset.spatial_address === 'Global'
+                    ? 'global'
+                    : dataset.spatial_address
+                    ? 'address'
+                    : dataset.spatial
+                    ? 'geom'
+                    : undefined,
         },
     })
 
@@ -222,7 +216,8 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 `Successfully edited the "${title ?? name}" dataset`,
                 'success'
             )
-            window.location.href = '/dashboard/datasets'
+
+            router.push(`/datasets/${name}`)
         },
         onError: (error) => {
             setErrorMessage(error.message)
@@ -245,10 +240,10 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             <Tab.Group>
                 <div>
                     <Tab.List
-                        className="max-w-screen sm:max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
+                        className="max-w-screen md:max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
                         aria-label="Tabs"
                     >
-                        <div className="flex-col justify-start flex sm:flex-row gap-y-4 sm:gap-x-8 sm:border-b-2 border-gray-300 w-full">
+                        <div className="flex-col justify-start flex lg:flex-row gap-y-4 sm:gap-x-8 sm:border-b-2 border-gray-300 w-full">
                             {tabs
                                 .filter((tab) => tab.enabled)
                                 .map((tab) => (
@@ -282,7 +277,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         >
                             <form
                                 onSubmit={formObj.handleSubmit((data) => {
-                                    console.log('Data', data)
                                     editDataset.mutate(data)
                                 })}
                             >
@@ -341,11 +335,55 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         <ErrorAlert text={errorMessage} />
                     </div>
                 )}
+                {Object.keys(formObj.formState.errors).length > 0 && (
+                    <div className="py-4">
+                        <ErrorAlert
+                            text={
+                                <div>
+                                    The following fields have invalid
+                                    information
+                                    <ul>
+                                        {Object.entries(
+                                            formObj.formState.errors
+                                        ).map(([key, _value]) => {
+                                            return (
+                                                <li key={key}>
+                                                    {key}:{' '}
+                                                    <ErrorMessage
+                                                        errors={
+                                                            formObj.formState
+                                                                .errors
+                                                        }
+                                                        render={({
+                                                            message,
+                                                        }) => (
+                                                            <>
+                                                                {message ??
+                                                                    (
+                                                                        _value as any
+                                                                    )?.value
+                                                                        ?.message ??
+                                                                    'Invalid data'}
+                                                            </>
+                                                        )}
+                                                        name={key}
+                                                    />
+                                                </li>
+                                            )
+                                        })}
+                                    </ul>
+                                </div>
+                            }
+                        />
+                    </div>
+                )}
             </div>
             <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-6 xxl:px-0">
                 {/* <Button type="button" variant="outline"> */}
-                <Link href="/dashboard/datasets"
-                    className='inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold h-11 px-6 py-4 rounded-[3px] text-base'>
+                <Link
+                    href="/dashboard/datasets"
+                    className="inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-none hover:bg-amber-400 hover:text-black border-amber-400 font-semibold h-11 px-6 py-4 rounded-[3px] text-base"
+                >
                     Cancel
                 </Link>
                 {/* </Button> */}
@@ -369,6 +407,8 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             const changedFields: string[] = []
 
                             getDiff(newDirtyFields, changedFields)
+                            if (data.featured_image !== dataset.featured_image)
+                                changedFields.push('featured_dataset')
 
                             const toBeSavedData: Partial<DatasetFormType> = data
 
@@ -457,12 +497,12 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                         'No changes to the dataset',
                                         'success'
                                     )
-                                    router.push('/dashboard/datasets')
+                                    router.push(`/datasets/${dataset.name}`)
                                 }
                             }
                         },
                         (err) => {
-                            console.log(err)
+                            console.error(err)
                         }
                     )}
                 >

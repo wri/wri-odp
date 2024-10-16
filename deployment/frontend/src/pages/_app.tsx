@@ -9,18 +9,19 @@ import 'react-toastify/dist/ReactToastify.css'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+import '@/styles/highlight.css'
 import localFont from 'next/font/local'
 
 import { api } from '@/utils/api'
 
 import '@/styles/globals.scss'
-import '@/styles/rte.css'
+import '@/styles/rte.scss'
 import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
 import { LayerState } from '@/interfaces/state.interface'
 import { env } from '@/env.mjs'
-import NProgress from 'nprogress';
-import Router from 'next/router';
+import NProgress from 'nprogress'
+import Router from 'next/router'
 
 const acumin = localFont({
     src: [
@@ -57,20 +58,19 @@ const MyApp: AppType<{ session: Session | null }> = ({
     let { dataset, prevdataset } = pageProps
 
     useEffect(() => {
-        const handleRouteStart = () => NProgress.start();
-        const handleRouteDone = () => NProgress.done();
+        const handleRouteStart = () => NProgress.start()
+        const handleRouteDone = () => NProgress.done()
 
-        Router.events.on('routeChangeStart', handleRouteStart);
-        Router.events.on('routeChangeComplete', handleRouteDone);
-        Router.events.on('routeChangeError', handleRouteDone);
+        Router.events.on('routeChangeStart', handleRouteStart)
+        Router.events.on('routeChangeComplete', handleRouteDone)
+        Router.events.on('routeChangeError', handleRouteDone)
 
         return () => {
-            Router.events.off('routeChangeStart', handleRouteStart);
-            Router.events.off('routeChangeComplete', handleRouteDone);
-            Router.events.off('routeChangeError', handleRouteDone);
-        };
-    }, []);
-
+            Router.events.off('routeChangeStart', handleRouteStart)
+            Router.events.off('routeChangeComplete', handleRouteDone)
+            Router.events.off('routeChangeError', handleRouteDone)
+        }
+    }, [])
 
     if (typeof prevdataset == 'string') {
         prevdataset = JSON.parse(prevdataset)
@@ -93,7 +93,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     let activeLayerGroups =
         initialZustandState?.mapView?.activeLayerGroups || []
-    console.log('activeLayerGroups', activeLayerGroups)
 
     const layerAsLayerObj = new Map()
     const tempLayerAsLayerobj = new Map()
@@ -173,9 +172,18 @@ const MyApp: AppType<{ session: Session | null }> = ({
         tempLayerAsLayerobj: tempLayerAsLayerobj,
         mapView: {
             ...initialZustandState?.mapView,
-            basemap: initialZustandState?.mapView?.basemap ?? 'dark',
+            basemap: initialZustandState?.mapView?.basemap ?? 'light',
+            labels: initialZustandState?.mapView?.labels ?? 'dark',
             layers: newLayersState,
             activeLayerGroups,
+            viewState: {
+                ...initialZustandState?.mapView?.viewState,
+                latitude:
+                    initialZustandState?.mapView?.viewState?.latitude ?? 0,
+                longitude:
+                    initialZustandState?.mapView?.viewState?.longitude ?? 0,
+                zoom: initialZustandState?.mapView?.viewState?.zoom ?? 3,
+            },
         },
     })
 

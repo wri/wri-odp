@@ -16,15 +16,24 @@ import TemporalCoverageFacet from './TemporalCoverageFacet'
 import MetadataModifiedFacet from './MetadataModifiedFacet'
 import Spinner from '../_shared/Spinner'
 import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants'
+import Tags from './Tag'
 
 export default function FilteredSearchLayout({
     children,
     setFilters,
     filters,
+    facetSelectedCount,
+    setFacetSelectedCount,
+    value,
+    setValue,
 }: {
     children: React.ReactNode
     setFilters: Dispatch<SetStateAction<Filter[]>>
     filters: Filter[]
+    facetSelectedCount: Record<string, number>
+    setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>
+    value: string[]
+    setValue: Dispatch<SetStateAction<string[]>>
 }) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -35,7 +44,6 @@ export default function FilteredSearchLayout({
      *
      */
     const facetFields = [
-        { key: 'featured_dataset', title: 'Featured' },
         { key: 'application', title: 'Application' },
         { key: 'project', title: 'Project' },
         { key: 'organization', title: 'Team' },
@@ -179,13 +187,22 @@ export default function FilteredSearchLayout({
                                                 className="flex flex-1 flex-col gap-y-7"
                                             >
                                                 <li>
-                                                    <ul >
-                                                        <LocationSearch filters={filters} setFilters={setFilters} />
+                                                    <ul>
+                                                        <LocationSearch
+                                                            filters={filters}
+                                                            setFilters={
+                                                                setFilters
+                                                            }
+                                                        />
                                                         {!isLoadingFacets &&
                                                             facetFields.map(
                                                                 (ff) =>
-                                                                    ff.key === 'temporal_coverage' ? (
+                                                                    ff.key ===
+                                                                    'temporal_coverage' ? (
                                                                         <TemporalCoverageFacet
+                                                                            key={
+                                                                                ff.key
+                                                                            }
                                                                             filters={
                                                                                 filters
                                                                             }
@@ -193,19 +210,86 @@ export default function FilteredSearchLayout({
                                                                                 setFilters
                                                                             }
                                                                         />
-                                                                    ) : ff.key === 'metadata_modified' ? (
+                                                                    ) : ff.key ===
+                                                                      'metadata_modified' ? (
                                                                         <MetadataModifiedFacet
+                                                                            key={
+                                                                                ff.key
+                                                                            }
                                                                             filters={
                                                                                 filters
                                                                             }
                                                                             setFilters={
                                                                                 setFilters
+                                                                            }
+                                                                        />
+                                                                    ) : ff.key ===
+                                                                      'tags' ? (
+                                                                        <Tags
+                                                                            value={
+                                                                                value
+                                                                            }
+                                                                            setValue={
+                                                                                setValue
+                                                                            }
+                                                                            facetSelectedCount={
+                                                                                facetSelectedCount
+                                                                            }
+                                                                            setFacetSelectedCount={
+                                                                                setFacetSelectedCount
+                                                                            }
+                                                                            options={
+                                                                                searchFacets &&
+                                                                                searchFacets[
+                                                                                    ff
+                                                                                        .key
+                                                                                ]
+                                                                                    ? searchFacets[
+                                                                                          ff
+                                                                                              .key
+                                                                                      ]?.items
+                                                                                          .filter(
+                                                                                              (
+                                                                                                  o
+                                                                                              ) =>
+                                                                                                  o.name
+                                                                                          )
+                                                                                          .map(
+                                                                                              (
+                                                                                                  o
+                                                                                              ) => ({
+                                                                                                  label:
+                                                                                                      o.display_name ??
+                                                                                                      o.name,
+                                                                                                  value: o.name,
+                                                                                              })
+                                                                                          ) ||
+                                                                                      []
+                                                                                    : []
+                                                                            }
+                                                                            fqKey={
+                                                                                ff.key
+                                                                            }
+                                                                            setFilters={
+                                                                                setFilters
+                                                                            }
+                                                                            filters={
+                                                                                filters
                                                                             }
                                                                         />
                                                                     ) : (
                                                                         <Facet
                                                                             text={
                                                                                 ff.title
+                                                                            }
+                                                                            key={
+                                                                                ff.key
+                                                                            }
+                                                                            facetSelectedCount={
+                                                                                facetSelectedCount
+                                                                            }
+                                                                            setFacetSelectedCount={
+                                                                                setFacetSelectedCount
                                                                             }
                                                                             options={
                                                                                 searchFacets &&
@@ -263,7 +347,10 @@ export default function FilteredSearchLayout({
                 <Disclosure defaultOpen>
                     {({ open }) => (
                         <>
-                            <Disclosure.Button aria-label='collapse sidebar' className="absolute lg:block hidden left-[calc(25%-1.5rem)] top-[60vh] z-20">
+                            <Disclosure.Button
+                                aria-label="collapse sidebar"
+                                className="absolute lg:block hidden left-[calc(25%-1.5rem)] top-[60vh] z-20"
+                            >
                                 <div
                                     className={classNames(
                                         'flex h-12 w-12 items-center rounded-full bg-white shadow-lg transition',
@@ -299,10 +386,14 @@ export default function FilteredSearchLayout({
                                         >
                                             <li>
                                                 <ul role="list">
-                                                    <LocationSearch setFilters={setFilters} filters={filters} />
+                                                    <LocationSearch
+                                                        setFilters={setFilters}
+                                                        filters={filters}
+                                                    />
                                                     {!isLoadingFacets &&
                                                         facetFields.map((ff) =>
-                                                            ff.key === 'temporal_coverage' ? (
+                                                            ff.key ===
+                                                            'temporal_coverage' ? (
                                                                 <TemporalCoverageFacet
                                                                     filters={
                                                                         filters
@@ -311,7 +402,8 @@ export default function FilteredSearchLayout({
                                                                         setFilters
                                                                     }
                                                                 />
-                                                            ) : ff.key === 'metadata_modified' ? (
+                                                            ) : ff.key ===
+                                                              'metadata_modified' ? (
                                                                 <MetadataModifiedFacet
                                                                     filters={
                                                                         filters
@@ -320,10 +412,70 @@ export default function FilteredSearchLayout({
                                                                         setFilters
                                                                     }
                                                                 />
+                                                            ) : ff.key ===
+                                                              'tags' ? (
+                                                                <Tags
+                                                                    value={
+                                                                        value
+                                                                    }
+                                                                    setValue={
+                                                                        setValue
+                                                                    }
+                                                                    facetSelectedCount={
+                                                                        facetSelectedCount
+                                                                    }
+                                                                    setFacetSelectedCount={
+                                                                        setFacetSelectedCount
+                                                                    }
+                                                                    options={
+                                                                        searchFacets &&
+                                                                        searchFacets[
+                                                                            ff
+                                                                                .key
+                                                                        ]
+                                                                            ? searchFacets[
+                                                                                  ff
+                                                                                      .key
+                                                                              ]?.items
+                                                                                  .filter(
+                                                                                      (
+                                                                                          o
+                                                                                      ) =>
+                                                                                          o.name
+                                                                                  )
+                                                                                  .map(
+                                                                                      (
+                                                                                          o
+                                                                                      ) => ({
+                                                                                          label:
+                                                                                              o.display_name ??
+                                                                                              o.name,
+                                                                                          value: o.name,
+                                                                                      })
+                                                                                  ) ||
+                                                                              []
+                                                                            : []
+                                                                    }
+                                                                    fqKey={
+                                                                        ff.key
+                                                                    }
+                                                                    setFilters={
+                                                                        setFilters
+                                                                    }
+                                                                    filters={
+                                                                        filters
+                                                                    }
+                                                                />
                                                             ) : (
                                                                 <Facet
                                                                     text={
                                                                         ff.title
+                                                                    }
+                                                                    facetSelectedCount={
+                                                                        facetSelectedCount
+                                                                    }
+                                                                    setFacetSelectedCount={
+                                                                        setFacetSelectedCount
                                                                     }
                                                                     options={
                                                                         searchFacets &&

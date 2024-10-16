@@ -53,6 +53,7 @@ Cypress.Commands.add("login", (username, password) => {
 });
 
 Cypress.Commands.add("logout", () => {
+  cy.visit("/");
   cy.get("#nav-user-menu").click();
   cy.get(":nth-child(3) > .px-2").should("be.visible").as("menuItem");
   cy.get("@menuItem").click();
@@ -104,12 +105,12 @@ Cypress.Commands.add("createLinkedDataset", () => {
     cy.get("#field-name").clear().type(datasetName);
     cy.get("button.btn-primary[type=submit]").click({ force: true });
     cy.get(
-      '[title="Link to a URL on the internet (you can also link to an API)"]'
+      '[title="Link to a URL on the internet (you can also link to an API)"]',
     ).click();
     cy.get("#field-image-url")
       .clear()
       .type(
-        "https://raw.githubusercontent.com/datapackage-examples/sample-csv/master/sample.csv"
+        "https://raw.githubusercontent.com/datapackage-examples/sample-csv/master/sample.csv",
       );
     cy.get(".btn-primary").click();
     cy.get(".content_action > .btn");
@@ -217,26 +218,34 @@ Cypress.Commands.add("createOrganizationAPI", (name) => {
 });
 
 // Command for frontend test sepecific
-Cypress.Commands.add("createOrganizationMemberAPI", (org, member, role = 'editor') => {
-  cy.request({
-    method: "POST",
-    url: apiUrl("organization_member_create"),
-    headers: headers,
-    body: {
-      id: org,
-      username: member,
-      role,
-    },
-  });
-});
+Cypress.Commands.add(
+  "createOrganizationMemberAPI",
+  (org, member, role = "editor") => {
+    cy.request({
+      method: "POST",
+      url: apiUrl("organization_member_create"),
+      headers: headers,
+      body: {
+        id: org,
+        username: member,
+        role,
+      },
+    });
+  },
+);
 
 // Command for frontend test sepecific
-Cypress.Commands.add("createGroupAPI", (name) => {
+Cypress.Commands.add("createGroupAPI", (name, parent=null) => {
   cy.request({
     method: "POST",
     url: apiUrl("group_create"),
     headers: headers,
-    body: {
+    body: parent? {
+      name: name,
+      title: name,
+      description: "Some sub-topic description",
+      groups: [{name: parent}],
+    } :{
       name: name,
       title: name,
       description: "Some group description",
@@ -272,7 +281,8 @@ Cypress.Commands.add(
       body: {
         owner_org: organization,
         name: name,
-        author: "datopian",
+        authors: [{ name: "Datopian", email: "datopian@example.com" }],
+        maintainers: [{ name: "Datopian", email: "datopian@example.com" }],
         license_id: "notspecified",
         approval_status: "approved",
         is_approved: "true",
@@ -292,7 +302,7 @@ Cypress.Commands.add(
         });
       });
     }
-  }
+  },
 );
 
 Cypress.Commands.add("createResourceAPI", (datasetId, resource) => {
@@ -306,6 +316,26 @@ Cypress.Commands.add("createResourceAPI", (datasetId, resource) => {
       force: "True",
     },
   });
+});
+
+Cypress.Commands.add("approvePendingDatasetAPI", (datasetName) => {
+  cy.log(datasetName);
+  const request = cy
+    .request({
+      url: apiUrl("package_show" + "?id=" + datasetName),
+      headers: headers,
+    })
+    .then((response) => {
+      const datasetId = response.body.result.id;
+      const request2 = cy.request({
+        method: "POST",
+        url: apiUrl("approve_pending_dataset"),
+        headers: headers,
+        body: {
+          dataset_id: datasetId,
+        },
+      });
+    });
 });
 
 Cypress.Commands.add("datapusherSubmit", (resource_id) => {
@@ -401,7 +431,7 @@ Cypress.Commands.add("prepareFile", (dataset, file, format) => {
       data.append("format", `${format}`);
       data.append(
         "description",
-        "Lorem Ipsum is simply dummy text of the printing and type"
+        "Lorem Ipsum is simply dummy text of the printing and type",
       );
       data.append("upload", blob, `${file}`);
       var xhr = new XMLHttpRequest();
@@ -447,7 +477,7 @@ Cypress.Commands.add("iframe", { prevSubject: "element" }, ($iframe) => {
   const findBody = () => $iframeDoc.find("body");
   if ($iframeDoc.prop("readyState") === "complete") return findBody();
   return Cypress.Promise((resolve) =>
-    $iframe.on("load", () => resolve(findBody()))
+    $iframe.on("load", () => resolve(findBody())),
   );
 });
 
@@ -488,7 +518,7 @@ Cypress.Commands.add(
         capacity: capacity,
       },
     });
-  }
+  },
 );
 
 Cypress.Commands.add(
@@ -504,7 +534,7 @@ Cypress.Commands.add(
         description: issueDescription,
       },
     });
-  }
+  },
 );
 
 Cypress.Commands.add(
@@ -522,7 +552,7 @@ Cypress.Commands.add(
         object_type: "dataset",
       },
     });
-  }
+  },
 );
 
 Cypress.Commands.add("userMetadata", (name) => {
@@ -540,28 +570,26 @@ Cypress.Commands.add("userMetadata", (name) => {
     });
 });
 
-Cypress.Commands.add(
-  "createPendingDataset",
-  (package_id, dataset) => {
-    const request = cy.request({
-      method: "POST",
-      url: apiUrl("pending_dataset_create"),
-      headers: headers,
-      body: {
-        package_id: package_id,
-        package_data: dataset
-      },
-    });
-  }
-);
+Cypress.Commands.add("createPendingDataset", (package_id, dataset) => {
+  const request = cy.request({
+    method: "POST",
+    url: apiUrl("pending_dataset_create"),
+    headers: headers,
+    body: {
+      package_id: package_id,
+      package_data: dataset,
+    },
+  });
+});
 
 function printAccessibilityViolations(violations) {
   cy.task(
-    "table", violations.map(({ id, impact, description, nodes }) => ({
+    "table",
+    violations.map(({ id, impact, description, nodes }) => ({
       impact,
       description: `${description} (${id})`,
       nodes: nodes.map((el) => el.target).join(" / "),
-    }))
+    })),
   );
 }
 
@@ -573,9 +601,7 @@ Cypress.Commands.add(
   ({ skipFailures = false, context = null, options = null } = {}) => {
     //  By default, exclude CKAN debugger elements
     const defaultContext = {
-      exclude: [
-        
-      ],
+      exclude: [],
     };
 
     if (!context) {
@@ -583,20 +609,18 @@ Cypress.Commands.add(
     } else {
       context = { ...defaultContext, ...context };
     }
-    
+
     cy.checkA11y(
       context,
       {
         ...options,
         runOnly: {
           type: "tag",
-          values: [
-            "wcag2aa",
-          ],
+          values: ["wcag2aa"],
         },
       },
       printAccessibilityViolations,
-      skipFailures
+      skipFailures,
     );
-  }
+  },
 );

@@ -9,7 +9,9 @@ import type { SearchInput } from '@/schema/search.schema'
 import { NotificationType } from '@/schema/notification.schema'
 
 export default function NotificationList() {
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery({returnLength: true})
+    const { data, isLoading } = api.notification.getAllNotifications.useQuery({
+        returnLength: true,
+    })
     const [selected, setSelected] = useState<string[]>([])
     const [query, setQuery] = useState<SearchInput>({
         search: '',
@@ -35,7 +37,6 @@ export default function NotificationList() {
             })
 
             slicedData = (data as NotificationType[]).slice(start, start + rows)
-            console.log
             return slicedData
         },
         {

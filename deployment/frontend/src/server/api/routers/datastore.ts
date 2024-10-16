@@ -95,7 +95,6 @@ export const datastoreRouter = createTRPCRouter({
             })
             const tableData: DataResponse = await tableDataRes.json()
             if (!tableData.success && tableData.error) {
-                console.log(tableData.error)
                 if (tableData.error.message) {
                     throw Error(tableData.error.message)
                 }
@@ -160,7 +159,6 @@ export const datastoreRouter = createTRPCRouter({
                 ) {
                     return numRows.result.records[0].count as number
                 }
-                console.log(numRows)
                 throw new Error('Could not get number of rows')
             } catch (e) {
                 let error =
