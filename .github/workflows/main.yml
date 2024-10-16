@@ -87,7 +87,7 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
           SCRIPT_NAME: '/private-admin'
         run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d --env GITHUB_ACTIONS=true
+          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
       - name: Initialize the Extensions
         run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh

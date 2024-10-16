@@ -11,6 +11,8 @@ services:
   ckan-dev:
     container_name: ${CKAN_CONTAINER_NAME}
     image: ${CKAN_IMAGE}
+    environment:
+      - GITHUB_ACTIONS=true
     env_file:
       - ".env.example"
     depends_on:
