@@ -3,7 +3,6 @@ import z from 'zod'
 
 const capacitySchema = z.enum(['admin', 'editor', 'member'])
 
-
 export const MemberSchema = z.object({
     user: z.object({ value: z.string(), label: z.string() }),
     team_id: z.string(),
@@ -32,7 +31,18 @@ export const TeamSchema = z.object({
         })
         .optional(),
     members: z.array(MemberSchema).default([]),
-    users: z.array(z.object({ name: z.string(), capacity: z.string() })).default([]),
+    users: z
+        .array(z.object({ name: z.string(), capacity: z.string() }))
+        .default([]),
+    visibility: z
+        .object({
+            value: z.string(),
+            label: z.string(),
+        })
+        .default({
+            value: 'public',
+            label: 'Public',
+        }),
 })
 
 export type TeamFormType = z.infer<typeof TeamSchema>

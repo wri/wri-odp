@@ -24,7 +24,8 @@ describe("Create and edit team", () => {
     cy.get("input[name=name]").should("have.value", org);
     cy.get("textarea[name=description]").type("Test description");
     //get button with aria-haspopup=true
-    cy.get("button[aria-haspopup=listbox]").click();
+    cy.get("button[aria-haspopup=listbox]").contains('span', 'Select a parent').click();
+
     // get li element that contains the text "test-organization"
     cy.get("li").contains(parentOrg).click();
     //get button of type submit and click it
