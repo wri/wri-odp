@@ -41,7 +41,7 @@ export function Hero({
                             ? topicsDetails[topic.id]?.img_url
                             : '/images/placeholders/topics/topicsdefault.png'
                     }`}
-                    className="object-contain"
+                    className="object-cover"
                 />
                 <div className="absolute bottom-0 z-10 flex lg:h-[68px] lg:w-56 px-4 py-4 items-center justify-center rounded-t-[3px] bg-white">
                     <Link
