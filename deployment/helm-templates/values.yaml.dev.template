@@ -10,8 +10,8 @@ ckan:
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
       CKAN_SITE_ID: wri-dev 
-      CKAN_ROOT_PATH: /private-admin/{{LANG}}
-      CKAN__ROOT_PATH: /private-admin/{{LANG}}
+      CKAN_ROOT_PATH: /private-admin/{{ printf "{{LANG}}" }}
+      CKAN__ROOT_PATH: /private-admin/{{ printf "{{LANG}}" }}
       CKAN__SITE_URL: https://wri.dev.frontend.datopian.com
       CKAN_SITE_URL: https://wri.dev.frontend.datopian.com
       CKAN_HOMEPAGE_STYLE: "2"
