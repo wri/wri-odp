@@ -93,6 +93,7 @@ describe("Create dataset", () => {
     cy.get('input[name="extras.1.key"]').type("Test 2");
     cy.get('input[name="extras.1.value"]').type("Test 2");
     cy.contains("Next: Datafiles").click();
+    cy.get('.datafile-accordion-trigger').eq(0).click()
     cy.get("input[type=file]").selectFile("cypress/fixtures/logo.png", {
       force: true,
     });
@@ -195,7 +196,9 @@ describe("Create dataset", () => {
     cy.contains("Data Files").click();
     cy.wait(5000);
     cy.get("button").contains("Add another data file").click();
-    cy.get("input[type=file]").eq(1).selectFile("cypress/fixtures/logo_2.jpg", {
+    cy.wait(500)
+    cy.get('.datafile-accordion-trigger').eq(1).click()
+    cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/logo_2.jpg", {
       force: true,
     });
     cy.get('input[name="resources.1.title"]').clear().type("jpg image");

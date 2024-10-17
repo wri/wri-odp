@@ -111,4 +111,6 @@ COPY docker-entrypoint.d/* /docker-entrypoint.d/
 
 RUN ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"
 
+COPY setup/who.ini ${APP_DIR}/src/ckan/who.ini
+
 CMD ["sh", "-c", "${APP_DIR}/start_ckan_development.sh"]
