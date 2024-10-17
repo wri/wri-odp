@@ -64,7 +64,14 @@ export const teamRouter = createTRPCRouter({
                 })
             })
         )
-        return Array.from(teamsMap.values())
+        return Array.from(teamsMap.values()).sort((a, b) => {
+            const nameA = a.name.toLowerCase()
+            const nameB = b.name.toLowerCase()
+            return nameA.localeCompare(nameB, undefined, {
+                numeric: true,
+                sensitivity: 'base',
+            })
+        })
     }),
     editTeam: protectedProcedure
         .input(TeamSchema)

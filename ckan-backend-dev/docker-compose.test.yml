@@ -11,6 +11,8 @@ services:
   ckan-dev:
     container_name: ${CKAN_CONTAINER_NAME}
     image: ${CKAN_IMAGE}
+    environment:
+      - GITHUB_ACTIONS=true
     env_file:
       - ".env.example"
     depends_on:
@@ -27,24 +29,25 @@ services:
       - ./src:/srv/app/src_extensions
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://ckan-dev:5000"]
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://ckan-dev:5000/private-admin/en"]
 
   frontend:
     container_name: wri-frontend
     build:
       context: ../deployment/frontend/
       args:
-        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000
+        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000/private-admin/en
         - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
         - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
         - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
         - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
         - NEXT_PUBLIC_GFW_API_KEY="1111"
         - OSANO_URL="YOUR_OSANO_URL/osano.js"
+        - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
-      - CKAN_URL=http://ckan-dev:5000
+      - CKAN_URL=http://ckan-dev:5000/private-admin/en
       - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
       - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
       - S3_BUCKET_NAME=ckan
@@ -62,6 +65,7 @@ services:
       - PREFECT_INTERNAL_URL=http://prefect:4200
       - NEXT_PUBLIC_GFW_API_KEY="1111"
       - OSANO_URL="YOUR_OSANO_URL/osano.js"
+      - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
     depends_on:
       ckan-dev:
         condition: service_healthy

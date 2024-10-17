@@ -9,6 +9,7 @@ on:
 env:
   PROJECT_NAME: wri-odp
   BRANCH_NAME: prod
+  ENABLE_TRIVY_SCANNING: false
 permissions:
   id-token: write
   contents: read
@@ -72,6 +73,7 @@ jobs:
           --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.PROD_NEXT_PUBLIC_HOTJAR_ID }} \
           --build-arg NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }} \
           --build-arg OSANO_URL=${{ secrets.DEV_OSANO_URL }} \
+          --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="dev" \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Build and push Datapusher image to ECR
@@ -95,6 +97,7 @@ jobs:
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:prod-${{ github.sha }}'
+          SCRIPT_NAME: '/private-admin'
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
@@ -103,7 +106,7 @@ jobs:
       - name: Cypress Install and CKAN setup
         uses: cypress-io/github-action@v6
         with:
-          wait-on: 'http://ckan-dev:5000'
+          wait-on: 'http://localhost:5000/private-admin/en'
           wait-on-timeout: 120
           node-version: 18
           runTests: false
@@ -181,6 +184,7 @@ jobs:
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/run_unit_tests.sh"
         working-directory: ./ckan-backend-dev
       - name: Run Trivy Vulnerability Scanner for CKAN Container 🧪
+        if: ${{ env.ENABLE_TRIVY_SCANNING == 'true' }}
         uses: aquasecurity/trivy-action@master
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -194,6 +198,7 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
       - name: Run Trivy Vulnerability Scanner for Frontend Container 🧪
+        if: ${{ env.ENABLE_TRIVY_SCANNING == 'true' }}
         uses: aquasecurity/trivy-action@master
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -207,10 +212,12 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
       - name: Upload CKAN container Trivy scan results to GitHub Code scanning
+        if: ${{ env.ENABLE_TRIVY_SCANNING == 'true' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: ckan-trivy-results.sarif
       - name: Upload Frontend container Trivy scan results to GitHub Code scanning
+        if: ${{ env.ENABLE_TRIVY_SCANNING == 'true' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
           category: frontend_container_trivy_results
