@@ -117,6 +117,7 @@ export const DatasetSchemaObject = z.object({
         value: z.string(),
         label: z.string(),
         id: z.string(),
+        visibility: z.string(),
     }),
     project: z.string().optional().nullable().or(emptyStringToUndefined),
     application: z.string().optional().nullable(),
@@ -170,22 +171,34 @@ export const DatasetSchemaObject = z.object({
         .optional()
         .nullable()
         .or(emptyStringToUndefined),
-    authors: z.array(
-        z.object({
-            name: z.string().min(1, { message: 'Author Name is required' }),
-            email: z.string().email().min(1, {
-                message: 'Author Email is required',
-            }),
-        })
-    ).min(1, { message: 'At least one (1) Author Name and Author Email is required.' }),
-    maintainers: z.array(
-        z.object({
-            name: z.string().min(1, { message: 'Maintainer Name is required' }),
-            email: z.string().email().min(1, {
-                message: 'Maintainer Email is required',
-            }),
-        })
-    ).min(1, { message: 'At least one (1) Maintainer Name and Maintainer Email is required.' }),
+    authors: z
+        .array(
+            z.object({
+                name: z.string().min(1, { message: 'Author Name is required' }),
+                email: z.string().email().min(1, {
+                    message: 'Author Email is required',
+                }),
+            })
+        )
+        .min(1, {
+            message:
+                'At least one (1) Author Name and Author Email is required.',
+        }),
+    maintainers: z
+        .array(
+            z.object({
+                name: z
+                    .string()
+                    .min(1, { message: 'Maintainer Name is required' }),
+                email: z.string().email().min(1, {
+                    message: 'Maintainer Email is required',
+                }),
+            })
+        )
+        .min(1, {
+            message:
+                'At least one (1) Maintainer Name and Maintainer Email is required.',
+        }),
     function: z.string().optional().nullable(),
     restrictions: z.string().optional().nullable(),
     reason_for_adding: z.string().optional().nullable(),
@@ -298,7 +311,8 @@ export const DatasetSchema = DatasetSchemaObject.refine(
             return true
         },
         {
-            message: 'At least one (1) Author Name and Author Email is required.',
+            message:
+                'At least one (1) Author Name and Author Email is required.',
             path: ['authors'],
         }
     )
@@ -311,6 +325,21 @@ export const DatasetSchema = DatasetSchemaObject.refine(
             message:
                 'At least one (1) Maintainer Name and Maintainer Email is required.',
             path: ['maintainers'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (
+                (obj.visibility_type.value === 'public' ||
+                    obj.visibility_type.value === 'internal') &&
+                obj.team.visibility === 'private'
+            )
+                return false
+            return true
+        },
+        {
+            message: 'Public dataset cannot be assigned to private team',
+            path: ['visibility_type'],
         }
     )
 

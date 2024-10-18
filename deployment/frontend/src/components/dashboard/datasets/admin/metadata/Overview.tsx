@@ -129,11 +129,14 @@ export function OverviewForm({
                                                 label: 'No team',
                                                 value: '',
                                                 id: '',
+                                                visibility: '',
                                             },
                                             ...data.map((team) => ({
                                                 label: team.title ?? team.name,
                                                 value: team.name,
                                                 id: team.id,
+                                                visibility:
+                                                    team.visibility ?? 'public',
                                             })),
                                         ]}
                                         placeholder="Select a team"
@@ -308,7 +311,7 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup label="Citation" className="items-start">
                         <TextArea
-                            aria-label='Citation'
+                            aria-label="Citation"
                             placeholder=""
                             type="text"
                             {...register('citation')}
@@ -328,6 +331,7 @@ export function OverviewForm({
                             formObj={formObj}
                             options={visibilityOptions}
                         />
+                        <ErrorDisplay name="visibility_type" errors={errors} />
                     </InputGroup>
                     <InputGroup label="License">
                         {match(possibleLicenses)
@@ -372,7 +376,10 @@ export function OverviewForm({
                     <div
                         className={classNames(
                             'items-end flex-col justify-end space-y-5',
-                            watch('visibility_type') && watch('visibility_type')?.value === 'public' ? 'flex' : 'hidden'
+                            watch('visibility_type') &&
+                                watch('visibility_type')?.value === 'public'
+                                ? 'flex'
+                                : 'hidden'
                         )}
                     >
                         <div className="relative flex justify-end">

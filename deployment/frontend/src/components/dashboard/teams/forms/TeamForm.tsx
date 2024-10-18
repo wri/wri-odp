@@ -130,6 +130,24 @@ export default function TeamForm({
                         ))}
                     <ErrorDisplay name="parent" errors={errors} />
                 </InputGroup>
+                <InputGroup
+                    label="Visibility"
+                    labelClassName="pt-[0.9rem]"
+                    className="items-start"
+                >
+                    <SimpleSelect
+                        key={editing ? 'edit' : 'create'}
+                        id="visibility"
+                        formObj={formObj}
+                        name="visibility"
+                        options={[
+                            { label: 'Public', value: 'public' },
+                            { label: 'Private', value: 'private' },
+                        ]}
+                        placeholder="Select visibility"
+                    />
+                    <ErrorDisplay name="parent" errors={errors} />
+                </InputGroup>
             </div>
         </div>
     )
