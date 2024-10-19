@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cert-manager
+    kubernetes.io/ingress.class: nginx
+    meta.helm.sh/release-name: dx-helm-wri-staging-release
+    meta.helm.sh/release-namespace: wri-odp-staging
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "server: hide";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-Xss-Protection: 1";
+      more_set_headers "Referrer-Policy: origin";
+      more_set_headers "Expect-CT: max-age=86400, enforce, report-uri='[reportURL]'";
+      more_set_headers "X-Permitted-Cross-Domain-Policies: none";
+    nginx.ingress.kubernetes.io/limit-connections: "50"
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/proxy-body-size: 1000M
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/rewrite-target: /api/action/$1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: wri-staging-ingress-fe-internal-api
+  namespace: wri-odp-staging
+spec:
+  rules:
+  - host: wri.staging.frontend.datopian.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: wri-staging-ckan-svc
+            port:
+              number: 80
+        path: /api/action/(.*)
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - wri.staging.frontend.datopian.com
+    secretName: wri.staging.frontend.datopian.com
