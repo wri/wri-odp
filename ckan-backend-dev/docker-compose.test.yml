@@ -41,7 +41,7 @@ services:
         - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
         - NEXT_PUBLIC_GFW_API_KEY="1111"
         - OSANO_URL="YOUR_OSANO_URL/osano.js"
-        - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
+        - NEXT_PUBLIC_DEPLOYMENT_TYPE="production"
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
@@ -63,7 +63,7 @@ services:
       - PREFECT_INTERNAL_URL=http://prefect:4200
       - NEXT_PUBLIC_GFW_API_KEY="1111"
       - OSANO_URL="YOUR_OSANO_URL/osano.js"
-      - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
+      - NEXT_PUBLIC_DEPLOYMENT_TYPE="production"
     depends_on:
       ckan-dev:
         condition: service_healthy
