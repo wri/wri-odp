@@ -5,7 +5,7 @@ import {
 } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import { CkanResponse, Collaborator } from '@/schema/ckan.schema'
-import { Organization } from '@portaljs/ckan'
+import { Organization } from '@/schema/ckan.schema'
 import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
@@ -37,12 +37,12 @@ export const teamRouter = createTRPCRouter({
                     user.sysadmin
                         ? `${
                               env.CKAN_URL
-                          }/api/action/organization_list?all_fields=True&limit=${
+                          }/api/action/organization_list?all_fields=True&include_extras=true&limit=${
                               (i + 1) * 25
                           }&offset=${i * 25}`
                         : `${
                               env.CKAN_URL
-                          }/api/action/organization_list_for_user?all_fields=True&limit=${
+                          }/api/action/organization_list_for_user?all_fields=True&include_extras=true&limit=${
                               (i + 1) * 25
                           }&offset=${i * 25}`,
                     {
@@ -106,6 +106,7 @@ export const teamRouter = createTRPCRouter({
                         input.parent && input.parent.value !== ''
                             ? [{ name: input.parent.value }]
                             : [],
+                    visibility: input.visibility.value,
                 })
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_patch`,
@@ -137,7 +138,7 @@ export const teamRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const user = ctx.session.user
             const teamRes = await fetch(
-                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
+                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True&include_extras=true`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -146,7 +147,9 @@ export const teamRouter = createTRPCRouter({
                 }
             )
             const team: CkanResponse<
-                WriOrganization & { groups: Organization[] }
+                WriOrganization & {
+                    groups: Organization[]
+                }
             > = await teamRes.json()
             return {
                 ...team.result,
@@ -213,7 +216,9 @@ export const teamRouter = createTRPCRouter({
                         input.parent && input.parent.value !== ''
                             ? [{ name: input.parent.value }]
                             : [],
+                    visibility: input.visibility.value,
                 })
+
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_create`,
                     {

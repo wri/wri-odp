@@ -2,7 +2,7 @@ import { WriOrganization, WriUser } from '@/schema/ckan.schema'
 import React from 'react'
 import Link from 'next/link'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
-import { Organization } from '@portaljs/ckan'
+import { Organization } from '@/schema/ckan.schema'
 import Spinner from '../_shared/Spinner'
 
 export default function EditCard({

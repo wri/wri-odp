@@ -62,6 +62,10 @@ from ckanext.wri.logic.action.get import (
     issue_search_wri,
     package_collaborator_list_wri,
     resource_search,
+    organization_list_for_user,
+    organization_list,
+    organization_patch,
+    organization_show
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -233,7 +237,11 @@ class WriPlugin(plugins.SingletonPlugin):
             "old_package_patch": old_package_patch,
             "old_package_update": old_package_update,
             "resource_update": resource_update,
+            "organization_list_for_user": organization_list_for_user,
             "resource_create": resource_create,
+            'organization_list': organization_list,
+            'organization_patch': organization_patch,
+            'organization_show': organization_show
             # "package_delete": package_delete,
         }
 
@@ -439,6 +447,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def can_view(self):
         return True
+    
 
 
 class WriApiTracking(plugins.SingletonPlugin):
