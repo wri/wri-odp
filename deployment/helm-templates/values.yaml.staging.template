@@ -8,7 +8,7 @@ ckan:
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
       CKAN_SITE_ID: wri-staging
-      CKAN_SITE_URL: https://wri.staging.ckan.datopian.com
+      CKAN_SITE_URL: https://wri.staging.frontend.datopian.com
       CKAN_HOMEPAGE_STYLE: "2"
       CKAN__DATAPUSHER__URL: http://wri-staging-datapusher-svc:80/
       CKAN_SVC_PORT_80_TCP_PROTO: tcp

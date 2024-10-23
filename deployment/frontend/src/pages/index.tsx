@@ -7,12 +7,26 @@ import Head from 'next/head'
 import { env } from '@/env.mjs'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
+import { api } from '@/utils/api'
 import { useState } from 'react'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import superjson from 'superjson'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import { appRouter } from '@/server/api/root'
 import { getServerAuthSession } from '@/server/auth'
+import dynamic from 'next/dynamic'
+import Spinner from '@/components/_shared/Spinner'
+
+const ErrorAlert = dynamic<{ text: string; title?: string }>(
+    () =>
+        import('@/components/_shared/Alerts').then(
+            (module) => module.ErrorAlert
+        ),
+    {
+        ssr: false,
+    }
+)
+const Recent = dynamic(() => import('@/components/Recent'))
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
@@ -22,19 +36,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         transformer: superjson,
     })
 
-    await helpers.topics.getGeneralTopics.prefetch({
-        search: '',
-        page: { start: 0, rows: 50 },
-        allTree: true,
-    })
-
-    await helpers.dataset.getFeaturedDatasets.prefetch({
-        search: '',
-        page: { start: 0, rows: 8 },
-        sortBy: 'metadata_modified desc',
-        _isUserSearch: false,
-        removeUnecessaryDataInResources: true,
-    })
+    await Promise.all([
+        helpers.topics.getGeneralTopics.prefetch({
+            search: '',
+            page: { start: 0, rows: 50 },
+            allTree: true,
+        }),
+        helpers.dataset.getFeaturedDatasets.prefetch({
+            search: '',
+            page: { start: 0, rows: 8 },
+            sortBy: 'metadata_modified desc',
+            _isUserSearch: false,
+            removeUnecessaryDataInResources: true,
+        }),
+    ])
 
     return {
         props: {
@@ -47,6 +62,27 @@ export default function Home(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
     const [readmore, setReadmore] = useState(false)
+    const {
+        data: recentlyAdded,
+        isLoading: isLoadingRecentlyAdded,
+        error: errorRecentlyAdded,
+    } = api.dataset.getAllDataset.useQuery({
+        search: '',
+        page: { rows: 8, start: 0 },
+        sortBy: 'metadata_created desc',
+        removeUnecessaryDataInResources: true,
+    })
+
+    const {
+        data: recentlyUpdated,
+        isLoading: isLoadingRecentlyUpdated,
+        error: errorRecentlyUpdated,
+    } = api.dataset.getAllDataset.useQuery({
+        search: '',
+        page: { rows: 8, start: 0 },
+        sortBy: 'metadata_modified desc',
+        removeUnecessaryDataInResources: true,
+    })
     return (
         <>
             <Head>
@@ -118,6 +154,52 @@ export default function Home(
                         <HighlightsCarousel />
                     </div>
                 </div>
+                {isLoadingRecentlyAdded ? (
+                    <div className="w-full flex justify-center items-center h-10">
+                        <Spinner />
+                    </div>
+                ) : errorRecentlyAdded ? (
+                    <ErrorAlert
+                        title="Failed to load recently added datasets"
+                        text={errorRecentlyAdded.message}
+                    />
+                ) : (
+                    <div
+                        id="highlights"
+                        className="max-w-[90.5vw] mx-auto flex flex-col font-acumin gap-y-6 mt-16"
+                    >
+                        <h1 className="font-bold text-[2rem] ml-2">
+                            Recently Added
+                        </h1>
+                        <Recent
+                            datasets={recentlyAdded.datasets}
+                            title="Recently added"
+                        />
+                    </div>
+                )}
+                {isLoadingRecentlyUpdated ? (
+                    <div className="w-full flex justify-center items-center h-10">
+                        <Spinner />
+                    </div>
+                ) : errorRecentlyUpdated ? (
+                    <ErrorAlert
+                        title="Failed to load recently updated datasets"
+                        text={errorRecentlyUpdated.message}
+                    />
+                ) : (
+                    <div
+                        id="highlights"
+                        className="max-w-[90.8vw] mx-auto flex flex-col font-acumin gap-y-6 mt-16"
+                    >
+                        <h1 className="font-bold text-[2rem] ml-2">
+                            Recently Updated
+                        </h1>
+                    <Recent
+                        datasets={recentlyUpdated.datasets}
+                        title="Recently updated"
+                    />
+                    </div>
+                )}
             </main>
             <HomeFooter />
         </>

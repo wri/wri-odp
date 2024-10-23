@@ -27,6 +27,15 @@ UWSGI_OPTS="--socket /tmp/uwsgi.sock \
             -p 6 -L -b 32768 --vacuum \
             --harakiri $UWSGI_HARAKIRI"
 
+echo "From GitHub Actions: $GITHUB_ACTIONS"
+# Check if we are running in GitHub Actions
+if [ "$GITHUB_ACTIONS" = "true" ]; then
+  UWSGI_OPTS="$UWSGI_OPTS --single-interpreter --manage-script-name --mount /private-admin=/srv/app/wsgi.py"
+fi
+echo "Starting CKAN with the following uwsgi options: $UWSGI_OPTS"
+
+export SCRIPT_NAME="/private-admin"
+
 if [ $? -eq 0 ]
 then
     # Start supervisord

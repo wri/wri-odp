@@ -33,7 +33,7 @@ export default function TeamCard({
                     }`}
                     alt={`Team - ${team.title}`}
                     fill
-                    className="object-contain"
+                    className="object-cover"
                 />
             </div>
             <div className="bg-white w-[70%] pt-2 -ml-[1px] -mt-6 z-10 line-clamp-2 h-16 pb-1.5">
