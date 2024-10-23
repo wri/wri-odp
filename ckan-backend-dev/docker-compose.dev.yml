@@ -179,3 +179,16 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8025/"]
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-redirect
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./ckan/setup/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - ckan-dev
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
