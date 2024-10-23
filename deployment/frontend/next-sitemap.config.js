@@ -8,23 +8,16 @@ module.exports = {
       additionalSitemaps: [
           `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/server-sitemap.xml`,
       ],
-      policies:
-          process.env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
-              ? [
-                    {
-                        userAgent: '*',
-                        disallow: ['/dashboard/*'],
-                    },
-                    {
-                        userAgent: '*',
-                        allow: '/',
-                    },
-                ]
-              : [
-                    {
-                        userAgent: '*',
-                        disallow: ['/*'],
-                    },
-                ],
+      policies:[
+            {
+                userAgent: '*',
+                disallow: ['/dashboard/*'],
+            },
+            {
+                userAgent: '*',
+                allow: '/',
+            },
+        ]
+              
   },
 }
