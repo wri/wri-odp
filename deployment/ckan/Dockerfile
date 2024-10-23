@@ -68,4 +68,8 @@ RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
 
+USER root
+
+RUN chown -R ckan:ckan ${APP_DIR}/src/
+
 USER ckan
