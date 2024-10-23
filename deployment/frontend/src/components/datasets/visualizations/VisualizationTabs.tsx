@@ -20,7 +20,7 @@ export function VisualizationTabs({
                                     ? 'border-b-wri-dark-blue text-wri-dark-blue'
                                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 border-zinc-300',
                                 tab.enabled ? '' : 'hidden',
-                                singleTab ? 'cursor-default' : 'cursor-text'
+                                singleTab ? 'cursor-text' : 'cursor-pointer'
                             )}
                         >
                             {tab.name}
