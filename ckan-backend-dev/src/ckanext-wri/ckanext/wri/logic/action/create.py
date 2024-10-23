@@ -767,6 +767,8 @@ def resource_create(
     #  Run package show again to get out actual last_resource
     updated_pkg_dict = _get_action("package_show")(context, {"id": package_id})
     resource = updated_pkg_dict["resources"][-1]
+    if not resource.get('id'):
+        resource['id'] = data_dict['id']
 
     #  Add the default views to the new resource
     logic.get_action("resource_create_default_resource_views")(
