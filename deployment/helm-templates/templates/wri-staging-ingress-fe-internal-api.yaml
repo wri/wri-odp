@@ -36,6 +36,16 @@ spec:
               number: 80
         path: /api/action/(.*)
         pathType: ImplementationSpecific
+  - host: wri.staging.frontend.datopian.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: wri-staging-ckan-svc
+            port:
+              number: 80
+        path: /api/3/action/(.*)
+        pathType: ImplementationSpecific
   tls:
   - hosts:
     - wri.staging.frontend.datopian.com
