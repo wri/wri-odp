@@ -47,6 +47,7 @@ export default function CreateDatasetForm() {
                 value: '',
                 label: '',
                 id: '',
+                visibility: '',
             },
             update_frequency: {
                 value: 'monthly',

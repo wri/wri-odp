@@ -139,6 +139,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
 
         return 0
     }) as unknown as ResourceFormType[]
+
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
@@ -169,8 +170,9 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       value: dataset.organization.name,
                       label: dataset.organization.title,
                       id: dataset.organization.id,
+                      visibility: dataset.organization.visibility,
                   }
-                : { value: '', label: 'No Team', id: '' },
+                : { value: '', label: 'No Team', id: '', visibility: '' },
             license_id: license
                 ? { value: license.id, label: license.title }
                 : undefined,

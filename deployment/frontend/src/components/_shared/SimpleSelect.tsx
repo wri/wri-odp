@@ -113,7 +113,13 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                                         active
                                                             ? 'bg-blue-800 text-white'
                                                             : 'text-gray-900',
-                                                        'relative cursor-default select-none py-2 pl-3 pr-9'
+                                                        `relative cursor-default select-none py-2 pl-3 pr-9 ${
+                                                            option?.visibility &&
+                                                            option.visibility ===
+                                                                'private'
+                                                                ? 'opacity-50'
+                                                                : ''
+                                                        }`
                                                     )
                                                 }
                                                 value={option}

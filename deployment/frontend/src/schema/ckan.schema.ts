@@ -159,12 +159,14 @@ export interface Organization {
     activity_stream?: Array<CkanActivity>
     users?: Array<User>
     tags?: Array<Tag>
+    visibility?: 'public' | 'private'
 }
 
 export interface WriOrganization extends Organization {
     groups?: Group[]
     users?: WriUser[]
     capacity?: string
+    parent?: string | null
 }
 
 export interface WriUser extends CkanUser {

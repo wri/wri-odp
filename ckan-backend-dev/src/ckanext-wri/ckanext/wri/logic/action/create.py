@@ -14,6 +14,7 @@ from ckanext.wri.logic.action.send_group_notification import (
     send_group_notification,
 )
 import ckan.logic as logic
+from ckanext.wri.logic.action.get import validate_visibility
 
 from ckan.common import _, config
 import ckan.plugins.toolkit as tk
@@ -405,6 +406,8 @@ def migration_status(context: Context, data_dict: DataDict):
 
 
 def package_create(context: Context, data_dict: DataDict):
+
+    validate_visibility(context, data_dict)
     data_dict["is_pending"] = True
     data_dict["is_approved"] = False
     data_dict["approval_status"] = "pending"
