@@ -18,7 +18,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 1000M
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
-    nginx.ingress.kubernetes.io/rewrite-target: /api/action/$1
+    nginx.ingress.kubernetes.io/rewrite-target: /api/$1/action/$2
     nginx.ingress.kubernetes.io/use-regex: "true"
   labels:
     app.kubernetes.io/managed-by: Helm
@@ -34,7 +34,7 @@ spec:
             name: wri-dev-ckan-svc
             port:
               number: 80
-        path: /api/action/(.*)
+        path: /api(/(2|3))?/action/(.*)
         pathType: ImplementationSpecific
   tls:
   - hosts:
