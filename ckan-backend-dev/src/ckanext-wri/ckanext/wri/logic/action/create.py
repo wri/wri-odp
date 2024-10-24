@@ -28,6 +28,7 @@ import ckan.lib.plugins as lib_plugins
 import ckan.lib.dictization.model_save as model_save
 
 from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
+import uuid
 
 NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
@@ -716,6 +717,9 @@ def resource_create(
     if not data_dict.get("url"):
         data_dict["url"] = ""
 
+    if not data_dict.get('id'):
+        data_dict['id'] = str(uuid.uuid4())
+
     package_show_context: Union[Context, Any] = dict(context, for_update=True)
     pkg_dict = _get_action("package_show")(package_show_context, {"id": package_id})
 
@@ -756,13 +760,15 @@ def resource_create(
     # package_show until after commit
     package = context["package"]
     assert package
-    upload.upload(package.resources[-1].id, uploader.get_max_resource_size())
+    upload.upload(data_dict['id'], uploader.get_max_resource_size())
 
     model.repo.commit()
 
     #  Run package show again to get out actual last_resource
     updated_pkg_dict = _get_action("package_show")(context, {"id": package_id})
     resource = updated_pkg_dict["resources"][-1]
+    if not resource.get('id'):
+        resource['id'] = data_dict['id']
 
     #  Add the default views to the new resource
     logic.get_action("resource_create_default_resource_views")(
