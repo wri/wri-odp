@@ -6,6 +6,8 @@ const TooltipProvider = TooltipPrimitive.Provider
 
 const Tooltip = TooltipPrimitive.Root
 
+const TooltipPortal = TooltipPrimitive.Portal
+
 const TooltipTrigger = TooltipPrimitive.Trigger
 
 const TooltipContent = React.forwardRef<
@@ -60,5 +62,6 @@ export {
     TooltipTrigger,
     TooltipContent,
     TooltipProvider,
+    TooltipPortal,
 }
 export default DefaultTooltip
