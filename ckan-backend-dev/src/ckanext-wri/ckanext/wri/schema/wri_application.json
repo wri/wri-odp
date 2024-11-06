@@ -1,0 +1,56 @@
+{
+  "scheming_version": 1,
+  "group_type": "application",
+  "about_url": "http://github.com/ckan/ckanext-scheming",
+  "fields": [
+    {
+      "field_name": "title",
+      "label": "Title",
+      "validators": "not_empty unicode_safe",
+      "form_snippet": "large_text.html",
+      "form_attrs": { "data-module": "slug-preview-target" },
+      "form_placeholder": "My Organization"
+    },
+    {
+      "field_name": "name",
+      "label": "URL",
+      "validators": "not_empty unicode_safe name_validator group_name_validator",
+      "form_snippet": "slug.html",
+      "form_placeholder": "my-organization"
+    },
+    {
+      "field_name": "description",
+      "label": "Description",
+      "form_snippet": "markdown.html",
+      "form_placeholder": "A little information about my organization...",
+      "validators": "not_empty"
+    },
+    {
+      "field_name": "homepage_url",
+      "label": "Home Page URL",
+      "form_placeholder": "http://example.com/my-organization",
+      "output_validators": "ignore_missing",
+      "validators": "not_empty url_validator"
+    },
+    {
+      "field_name": "help_url",
+      "label": "Help URL",
+      "form_placeholder": "http://example.com/my-organization/help",
+      "output_validators": "ignore_missing",
+      "validators": "ignore_missing url_validator"
+    },
+    {
+      "field_name": "contact_url",
+      "label": "Contact URL",
+      "form_placeholder": "http://example.com/my-organization/contact",
+      "output_validators": "ignore_missing",
+      "validators": "ignore_missing url_validator"
+    },
+    {
+      "field_name": "image_url",
+      "label": "Image/Icon",
+      "preset": "organization_url_upload",
+      "form_placeholder": "http://example.com/my-organization/image.png"
+    }
+  ]
+}

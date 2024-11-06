@@ -15,7 +15,7 @@ from ckanext.wri.logic.action.datapusher_download_zip import (
 )
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
-from ckan.types import Action, AuthFunction, Context
+from ckan.types import Action, AuthFunction, Context, DataDict
 from ckan.lib.search import SearchError
 from ckanext.wri.logic.auth import auth as auth
 from ckanext.wri.logic.action.datapusher import (
@@ -62,6 +62,7 @@ from ckanext.wri.logic.action.get import (
     issue_search_wri,
     package_collaborator_list_wri,
     resource_search,
+    package_show,
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -170,7 +171,6 @@ class WriPlugin(plugins.SingletonPlugin):
     def dataset_facets(self, facets_dict, package_type):
         facets_dict["language"] = toolkit._("Language")
         facets_dict["project"] = toolkit._("Project")
-        facets_dict["application"] = toolkit._("Application")
         facets_dict["temporal_coverage_start"] = toolkit._("Temporal Coverage Start")
         facets_dict["temporal_coverage_end"] = toolkit._("Temporal Coverage End")
         facets_dict["update_frequency"] = toolkit._("Update Frequency")
@@ -235,6 +235,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "resource_update": resource_update,
             "resource_create": resource_create,
             # "package_delete": package_delete,
+            "package_show": package_show,
         }
 
     # IPermissionLabels

@@ -8,6 +8,7 @@ import json
 from typing import Any, cast
 import re
 from itertools import zip_longest
+import socket
 
 from ckan.common import config, asbool
 from ckan.model import Package
@@ -390,6 +391,14 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
 
         count = query.count
         facets = query.facets
+
+    results_with_group_types = []
+
+    for result in results:
+        result_dict = _add_group_types(context, result)
+        results_with_group_types.append(result_dict)
+
+    results = results_with_group_types
 
     search_results: dict[str, Any] = {
         "count": count,
@@ -1202,3 +1211,146 @@ def resource_search(context: Context, data_dict: DataDict):
 
 # TODO:  customize package_show to include spatial_geom
 # conditionally (optimization of the data file geo indexing)
+
+
+@logic.side_effect_free
+def package_show(context: Context, data_dict: DataDict) -> ActionResult.PackageShow:
+    """Return the metadata of a dataset (package) and its resources.
+
+    :param id: the id or name of the dataset
+    :type id: string
+    :param use_default_schema: use default package schema instead of
+        a custom schema defined with an IDatasetForm plugin (default: ``False``)
+    :type use_default_schema: bool
+    :param include_tracking: add tracking information to dataset and
+        resources (default: ``False``)
+    :type include_tracking: bool
+    :param include_plugin_data: Include the internal plugin data object
+        (sysadmin only, optional, default:``False``)
+    :type: include_plugin_data: bool
+    :rtype: dictionary
+
+    """
+    model = context["model"]
+    user_obj = context.get("auth_user_obj")
+    context["session"] = model.Session
+    name_or_id = data_dict.get("id") or _get_or_bust(data_dict, "name_or_id")
+
+    include_plugin_data = asbool(data_dict.get("include_plugin_data", False))
+    if user_obj and user_obj.is_authenticated:
+        include_plugin_data = user_obj.sysadmin and include_plugin_data
+
+        if include_plugin_data:
+            context["use_cache"] = False
+
+    pkg = model.Package.get(name_or_id, for_update=context.get("for_update", False))
+
+    if pkg is None:
+        raise NotFound
+
+    context["package"] = pkg
+    _check_access("package_show", context, data_dict)
+
+    if data_dict.get("use_default_schema", False):
+        context["schema"] = ckan.logic.schema.default_show_package_schema()
+
+    include_tracking = asbool(data_dict.get("include_tracking", False))
+
+    package_dict = None
+    use_cache = context.get("use_cache", True)
+    package_dict_validated = False
+
+    if use_cache:
+        try:
+            search_result = search.show(name_or_id)
+        except (search.SearchError, socket.error):
+            pass
+        else:
+            use_validated_cache = "schema" not in context
+            if use_validated_cache and "validated_data_dict" in search_result:
+                package_json = search_result["validated_data_dict"]
+                package_dict = json.loads(package_json)
+                package_dict_validated = True
+            else:
+                package_dict = json.loads(search_result["data_dict"])
+                package_dict_validated = False
+            metadata_modified = pkg.metadata_modified.isoformat()
+            search_metadata_modified = search_result["metadata_modified"]
+            # solr stores less precise datetime,
+            # truncate to 22 charactors to get good enough match
+            if metadata_modified[:22] != search_metadata_modified[:22]:
+                package_dict = None
+
+    if not package_dict:
+        package_dict = model_dictize.package_dictize(pkg, context, include_plugin_data)
+        package_dict_validated = False
+
+    if include_tracking:
+        # page-view tracking summary data
+        package_dict["tracking_summary"] = model.TrackingSummary.get_for_package(
+            package_dict["id"]
+        )
+
+        for resource_dict in package_dict["resources"]:
+            summary = model.TrackingSummary.get_for_resource(resource_dict["url"])
+            resource_dict["tracking_summary"] = summary
+
+    if context.get("for_view"):
+        for item in plugins.PluginImplementations(plugins.IPackageController):
+            package_dict = item.before_dataset_view(package_dict)
+
+    for item in plugins.PluginImplementations(plugins.IPackageController):
+        item.read(pkg)
+
+    for item in plugins.PluginImplementations(plugins.IResourceController):
+        for resource_dict in package_dict["resources"]:
+            item.before_resource_show(resource_dict)
+
+    if not package_dict_validated:
+        package_plugin = lib_plugins.lookup_package_plugin(package_dict["type"])
+        schema = context.get("schema") or package_plugin.show_package_schema()
+
+        if bool(schema) and context.get("validate", True):
+            package_dict, _errors = lib_plugins.plugin_validate(
+                package_plugin, context, package_dict, schema, "package_show"
+            )
+
+    for item in plugins.PluginImplementations(plugins.IPackageController):
+        item.after_dataset_show(context, package_dict)
+
+    package_dict = _add_group_types(context, package_dict)
+
+    return package_dict
+
+
+def _add_group_types(context: Context, data_dict: DataDict):
+    try:
+        package_groups = data_dict.get("groups", [])
+        updated_package_groups = []
+        package_applications = []
+
+        for group in package_groups:
+            group_dict = get_action("group_show")(context, {"id": group["id"]})
+            group_type = group_dict.get("type", "group")
+
+            if group_type == "application":
+                group_dict_updates = {
+                    "type": group_type,
+                    "contact_url": group_dict.get("contact_url"),
+                    "image_url": group_dict.get("image_url"),
+                    "help_url": group_dict.get("help_url"),
+                    "homepage_url": group_dict.get("homepage_url"),
+                }
+                group.update(group_dict_updates)
+                package_applications.append(group["name"])
+            else:
+                group.update({"type": group_type})
+
+            updated_package_groups.append(group)
+
+        data_dict["groups"] = updated_package_groups
+        data_dict["application"] = package_applications if package_applications else []
+    except Exception as e:
+        log.error(f"Error adding group types: {e}")
+
+    return data_dict
