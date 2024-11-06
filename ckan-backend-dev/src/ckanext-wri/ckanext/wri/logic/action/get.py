@@ -1342,14 +1342,13 @@ def _add_group_types(context: Context, data_dict: DataDict):
                     "homepage_url": group_dict.get("homepage_url"),
                 }
                 group.update(group_dict_updates)
-                package_applications.append(group["name"])
+                package_applications.append(group)
             else:
                 group.update({"type": group_type})
-
-            updated_package_groups.append(group)
+                updated_package_groups.append(group)
 
         data_dict["groups"] = updated_package_groups
-        data_dict["application"] = package_applications if package_applications else []
+        data_dict["applications"] = package_applications if package_applications else []
     except Exception as e:
         log.error(f"Error adding group types: {e}")
 
