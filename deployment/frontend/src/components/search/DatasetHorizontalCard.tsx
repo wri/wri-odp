@@ -14,6 +14,7 @@ import Link from 'next/link'
 import {
     Tooltip,
     TooltipContent,
+    TooltipPortal,
     TooltipProvider,
     TooltipTrigger,
 } from '../_shared/Tooltip'
@@ -71,7 +72,7 @@ export default function DatasetHorizontalCard({
                             {dataset.short_description ?? ''}
                         </p>
                         <div className="mt-[0.33rem] flex justify-start gap-x-3">
-                            <TooltipProvider>
+                            <TooltipProvider delayDuration={100}>
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <div className="flex flex-row items-center gap-x-1">
@@ -92,15 +93,17 @@ export default function DatasetHorizontalCard({
                                             </p>
                                         </div>
                                     </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Last modified</p>
-                                    </TooltipContent>
+                                    <TooltipPortal>
+                                        <TooltipContent>
+                                            <p>Last modified</p>
+                                        </TooltipContent>
+                                    </TooltipPortal>
                                 </Tooltip>
                             </TooltipProvider>
 
                             {(dataset.temporal_coverage_start ||
                                 dataset.temporal_coverage_end) && (
-                                <TooltipProvider>
+                                <TooltipProvider delayDuration={100}>
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <div className="flex items-center gap-x-1">
@@ -114,9 +117,11 @@ export default function DatasetHorizontalCard({
                                                 </p>
                                             </div>
                                         </TooltipTrigger>
-                                        <TooltipContent>
-                                            Temporal Coverage
-                                        </TooltipContent>
+                                        <TooltipPortal>
+                                            <TooltipContent>
+                                                Temporal Coverage
+                                            </TooltipContent>
+                                        </TooltipPortal>
                                     </Tooltip>
                                 </TooltipProvider>
                             )}
@@ -146,31 +151,32 @@ export default function DatasetHorizontalCard({
                         </div>
                         {dataset.cautions && (
                             <div className="rounded-full bg-stone-100 p-1 w-7 h-7">
-                                <TooltipProvider>
+                                <TooltipProvider delayDuration={100}>
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600" />
                                         </TooltipTrigger>
-                                        <TooltipContent className="bg-neutral-200">
-                                            <p>Dataset contains cautions</p>
-                                        </TooltipContent>
+                                        <TooltipPortal>
+                                            <TooltipContent className="bg-neutral-200">
+                                                <p>Dataset contains cautions</p>
+                                            </TooltipContent>
+                                        </TooltipPortal>
                                     </Tooltip>
                                 </TooltipProvider>
                             </div>
                         )}
                         {!dataset.technical_notes && (
                             <div className="rounded-full bg-stone-100 p-1 w-7 h-7">
-                                <TooltipProvider>
+                                <TooltipProvider delayDuration={100}>
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <ExclamationCircleIcon className="h-5 w-5 text-red-600" />
                                         </TooltipTrigger>
+                    <TooltipPortal>
                                         <TooltipContent className="bg-neutral-200 ">
-                                            <p>
-                                                Not approved by
-                                                RDI
-                                            </p>
+                                            <p>Not approved by RDI</p>
                                         </TooltipContent>
+                                        </TooltipPortal>
                                     </Tooltip>
                                 </TooltipProvider>
                             </div>
