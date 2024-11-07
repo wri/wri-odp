@@ -13,11 +13,11 @@ import { ApplicationSchema } from '@/schema/application.schema'
 import { replaceNames } from '@/utils/replaceNames'
 import { sendMemberNotifications } from '@/utils/apiUtils'
 
-export const ApplicationRouter = createTRPCRouter({
+export const applicationRouter = createTRPCRouter({
     getAllApplications: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.session.user
         const applicationRes = await fetch(
-            `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+            `${env.CKAN_URL}/api/action/group_list?all_fields=True&type=application`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export const ApplicationRouter = createTRPCRouter({
                 },
             }
         )
-        const applications: CkanResponse<Group[]> = await applicationRes.json()
+        const applications: CkanResponse<Application[]> = await applicationRes.json()
         if (!applications.success && applications.error)
             throw Error(replaceNames(applications.error.message))
         return applications.result.filter(
@@ -37,31 +37,9 @@ export const ApplicationRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const user = ctx.session.user
-                var newMembers = []
-                for (const member of input.members) {
-                    newMembers.push({
-                        name: member.user.value,
-                        capacity: member.capacity.value,
-                    })
-                }
-                try {
-                    sendMemberNotifications(
-                        user.id,
-                        newMembers,
-                        input.users,
-                        input.id,
-                        'application'
-                    )
-                } catch (e) {
-                    console.error(e)
-                }
-                input.users = newMembers
                 const body = JSON.stringify({
                     ...input,
-                    groups:
-                        input.parent && input.parent.value !== ''
-                            ? [{ name: input.parent.value }]
-                            : [],
+                    type: 'application'
                 })
                 const applicationRes = await fetch(
                     `${env.CKAN_URL}/api/action/group_patch`,
@@ -74,7 +52,7 @@ export const ApplicationRouter = createTRPCRouter({
                         body,
                     }
                 )
-                const application: CkanResponse<Group> =
+                const application: CkanResponse<Application> =
                     await applicationRes.json()
                 if (!application.success && application.error) {
                     if (application.error.message)
@@ -94,7 +72,7 @@ export const ApplicationRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const user = ctx.session.user
             const applicationRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
+                `${env.CKAN_URL}/api/action/group_show?id=${input.id}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -103,13 +81,12 @@ export const ApplicationRouter = createTRPCRouter({
                 }
             )
             const application: CkanResponse<
-                Application & { groups: Application[] }
+                Application
             > = await applicationRes.json()
             if (!application.success && application.error)
                 throw Error(replaceNames(application.error.message))
             return {
                 ...application.result,
-                parent: application.result.groups[0]?.name ?? null,
             }
         }),
     deleteApplication: protectedProcedure
@@ -145,10 +122,7 @@ export const ApplicationRouter = createTRPCRouter({
                 const user = ctx.session.user
                 const body = JSON.stringify({
                     ...input,
-                    groups:
-                        input.parent && input.parent.value !== ''
-                            ? [{ name: input.parent.value }]
-                            : [],
+                    type: 'application'
                 })
                 const applicationRes = await fetch(
                     `${env.CKAN_URL}/api/action/group_create`,
@@ -210,26 +184,5 @@ export const ApplicationRouter = createTRPCRouter({
         return {
             applications: application.result,
         }
-    }),
-    getFollowedApplications: protectedProcedure.query(async ({ ctx }) => {
-        const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${ctx.session.user.apikey}`,
-                },
-            }
-        )
-        const data = (await response.json()) as CkanResponse<FolloweeList[]>
-        if (!data.success && data.error) throw Error(data.error.message)
-        const result = data.result.reduce((acc, item) => {
-            if (item.type === 'group') {
-                const t = item.dict as Group
-                acc.push(t)
-            }
-            return acc
-        }, [] as Group[])
-        return result
     }),
 })

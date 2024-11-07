@@ -172,6 +172,7 @@ export interface Application {
   contact_url: string;
   packages?: Array<Dataset>;
   package_count: number
+  state: 'active'
 }
 
 export interface WriOrganization extends Organization {

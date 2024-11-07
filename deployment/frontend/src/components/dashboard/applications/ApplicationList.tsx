@@ -36,7 +36,7 @@ export default function ApplicationList() {
                         </Tab>
                     ))}
                     <Link
-                        href="/dashboard/application/new"
+                        href="/dashboard/applications/new"
                         className="font-normal  px-6 py-4 focus:outline-0  w-full" role='tab'
                     >
                         <div className="flex">

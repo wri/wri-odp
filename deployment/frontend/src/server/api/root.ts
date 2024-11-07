@@ -5,6 +5,7 @@ import { DatasetRouter } from "./routers/dataset";
 import { OrganizationRouter } from "./routers/organization";
 import { TopicRouter } from "./routers/topics";
 import { teamRouter } from './routers/teams'
+import { applicationRouter } from './routers/applications'
 import { uploadsRouter } from './routers/uploads'
 import { authRouter } from './routers/auth.router'
 import { tagsRouter } from "./routers/tags";
@@ -26,6 +27,7 @@ export const appRouter = createTRPCRouter({
   dataset: DatasetRouter,
   organization: OrganizationRouter,
   topics: TopicRouter,
+  applications: applicationRouter,
   uploads: uploadsRouter,
   teams: teamRouter,
   tags: tagsRouter,
