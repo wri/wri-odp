@@ -161,6 +161,19 @@ export interface Organization {
     tags?: Array<Tag>
 }
 
+export interface Application {
+  id: string
+  name: string;
+  title: string;
+  description: string;
+  image_url: string;
+  image_display_url: string;
+  help_url: string;
+  contact_url: string;
+  packages?: Array<Dataset>;
+  package_count: number
+}
+
 export interface WriOrganization extends Organization {
     groups?: Group[]
     users?: WriUser[]
