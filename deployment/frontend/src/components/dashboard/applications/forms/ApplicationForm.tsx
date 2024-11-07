@@ -1,21 +1,16 @@
 import { UseFormReturn } from 'react-hook-form'
-import { TopicFormType } from '@/schema/topic.schema'
+import { ApplicationFormType } from '@/schema/application.schema'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { ImageUploader } from '../../_shared/ImageUploader'
 import { UploadResult } from '@uppy/core'
-import { env } from '@/env.mjs'
-import { api } from '@/utils/api'
-import { P, match } from 'ts-pattern'
-import Spinner from '@/components/_shared/Spinner'
 
-export default function TopicForm({
+export default function ApplicationForm({
     formObj,
     editing = false,
 }: {
-    formObj: UseFormReturn<TopicFormType>
+    formObj: UseFormReturn<ApplicationFormType>
     editing?: boolean
 }) {
     const {
@@ -24,14 +19,13 @@ export default function TopicForm({
         watch,
         formState: { errors, isSubmitting },
     } = formObj
-    const possibleParents = api.topics.getAllTopics.useQuery()
     return (
         <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
             <div className="flex flex-col justify-start gap-y-4">
                 <InputGroup label="Title" required>
                     <Input
                         {...register('title')}
-                        placeholder="My topic"
+                        placeholder="My Application"
                         type="text"
                     />
                     <ErrorDisplay name="title" errors={errors} />
@@ -40,12 +34,12 @@ export default function TopicForm({
                     <Input
                         {...register('name')}
                         disabled={editing}
-                        placeholder="name-of-topic"
+                        placeholder="name-of-application"
                         type="text"
                         className="pl-[4.6rem] lg:pl-[4rem]"
                     >
                         <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
-                            /topics/
+                            /applications/
                         </span>
                     </Input>
                     <ErrorDisplay name="name" errors={errors} />
@@ -88,48 +82,27 @@ export default function TopicForm({
                     />
                     <ErrorDisplay name="description" errors={errors} />
                 </InputGroup>
+                <InputGroup label="Contact URL" required>
+                    <Input
+                        {...register('contact_url')}
+                        placeholder="https://wri.org"
+                        type="text"
+                    />
+                    <ErrorDisplay name="title" errors={errors} />
+                </InputGroup>
+            </div>
+            <div className="flex flex-col justify-start gap-y-4">
                 <InputGroup
-                    label="Parent"
+                    label="Help URL"
                     labelClassName="pt-[0.9rem]"
                     className="items-start"
                 >
-                    {match(possibleParents)
-                        .with({ isLoading: true }, () => (
-                            <span className="flex items-center text-sm gap-x-2">
-                                <Spinner />{' '}
-                                <span className="mt-1">Loading parents...</span>
-                            </span>
-                        ))
-                        .with({ isError: true, errors: P.select() }, (errors) => (
-                            <span className="flex items-center text-sm text-red-600">
-                                Error({JSON.stringify(errors)}) loading parents, please refresh the page
-                            </span>
-                        ))
-                        .with({ isSuccess: true, data: P.select() }, (data) => (
-                            <SimpleSelect
-                                formObj={formObj}
-                                name="parent"
-                                options={[
-                                    { label: 'No parent', value: '' },
-                                    ...data
-                                        .filter(
-                                            (topic) =>
-                                                topic.name !== watch('name')
-                                        )
-                                        .map((topic) => ({
-                                            label: topic.title ?? topic.name,
-                                            value: topic.name,
-                                        })),
-                                ]}
-                                placeholder="Select a parent"
-                            />
-                        ))
-                        .otherwise(() => (
-                            <span className="flex items-center text-sm text-red-600">
-                                Error loading parents, please refresh the page
-                            </span>
-                        ))}
-                    <ErrorDisplay name="parent" errors={errors} />
+                    <Input
+                        {...register('help_url')}
+                        placeholder="https://wri.org"
+                        type="text"
+                    />
+                    <ErrorDisplay name="title" errors={errors} />
                 </InputGroup>
             </div>
         </div>
