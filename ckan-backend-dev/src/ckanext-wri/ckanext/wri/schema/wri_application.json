@@ -44,13 +44,15 @@
       "label": "Contact URL",
       "form_placeholder": "http://example.com/my-organization/contact",
       "output_validators": "ignore_missing",
-      "validators": "ignore_missing url_validator"
+      "validators": "ignore_missing url_or_email_validator"
     },
     {
       "field_name": "image_url",
       "label": "Image/Icon",
       "preset": "organization_url_upload",
-      "form_placeholder": "http://example.com/my-organization/image.png"
+      "form_placeholder": "http://example.com/my-organization/image.png",
+      "output_validators": "ignore_missing",
+      "validators": "ignore_missing"
     }
   ]
 }

@@ -581,6 +581,7 @@ def pending_diff_show(context: Context, data_dict: DataDict):
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
         if pending_dataset is not None:
+            context["for_approval"] = True
             pending_dataset = pending_dataset.get("package_data")
             existing_dataset = get_action("package_show")(context, {"id": package_id})
             dataset_diff = _diff(existing_dataset, pending_dataset)
@@ -1213,6 +1214,8 @@ def resource_search(context: Context, data_dict: DataDict):
 # conditionally (optimization of the data file geo indexing)
 
 
+# IMPORTANT: This is almost a copy of the original package_show, but it calls the _add_group_types
+# function so that `applications` and `groups` are separated in the response.
 @logic.side_effect_free
 def package_show(context: Context, data_dict: DataDict) -> ActionResult.PackageShow:
     """Return the metadata of a dataset (package) and its resources.
@@ -1231,6 +1234,11 @@ def package_show(context: Context, data_dict: DataDict) -> ActionResult.PackageS
     :rtype: dictionary
 
     """
+    for_view = context.get("for_view", False)
+
+    if not for_view:
+        context["use_cache"] = False
+
     model = context["model"]
     user_obj = context.get("auth_user_obj")
     context["session"] = model.Session
@@ -1324,6 +1332,13 @@ def package_show(context: Context, data_dict: DataDict) -> ActionResult.PackageS
 
 
 def _add_group_types(context: Context, data_dict: DataDict):
+    for_view = context.get("for_view", False)
+    for_approval = context.get("for_approval", False)
+    for_update = context.get("for_update", False)
+    for_create = context.get("for_create", False)
+
+    if any([for_view, for_approval, for_update, for_create]):
+        return data_dict
     try:
         package_groups = data_dict.get("groups", [])
         updated_package_groups = []
@@ -1333,15 +1348,25 @@ def _add_group_types(context: Context, data_dict: DataDict):
             group_dict = get_action("group_show")(context, {"id": group["id"]})
             group_type = group_dict.get("type", "group")
 
+            new_group_dict = {
+                "contact_url": group_dict.get("contact_url"),
+                "url": group_dict.get("url"),
+                "help_url": group_dict.get("help_url"),
+                "homepage_url": group_dict.get("homepage_url"),
+            }
+
             if group_type == "application":
                 group_dict_updates = {
-                    "type": group_type,
-                    "contact_url": group_dict.get("contact_url"),
-                    "image_url": group_dict.get("image_url"),
-                    "help_url": group_dict.get("help_url"),
-                    "homepage_url": group_dict.get("homepage_url"),
+                    "type": group_type
                 }
                 group.update(group_dict_updates)
+
+                for key, value in new_group_dict.items():
+                    if value:
+                        group[key] = value
+                    else:
+                        group.pop(key, None)
+
                 package_applications.append(group)
             else:
                 group.update({"type": group_type})

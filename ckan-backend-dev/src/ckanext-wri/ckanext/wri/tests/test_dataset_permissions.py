@@ -6,11 +6,17 @@ import ckan.tests.factories as factories
 import unittest.mock as mock
 import uuid
 
+
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_package_create_public(mail_user):
     organization_dict = factories.Organization()
-    group_dict = factories.Group()
+    group_dict = factories.Group(
+        type="application",
+        homepage_url="http://example.com",
+        title="Test Group",
+        description="A description of the group",
+    )
 
     userobj_sysadmin = factories.Sysadmin()
     userobj_org_admin = factories.User()
@@ -94,7 +100,6 @@ def test_package_create_public(mail_user):
         "language": "en",
         "owner_org": organization_dict["id"],
         "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
-        "application": "rw",
         "technical_notes": "http://example.com/technical_notes.pdf",
         "tag_string": "economy,mental health,government",
         "temporal_coverage_start": "2007",
@@ -116,6 +121,7 @@ def test_package_create_public(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "groups": [{"id": group_dict["id"]}],
     }
 
     try:
@@ -186,6 +192,7 @@ def test_package_create_public(mail_user):
         )
     except NotFound:
         pass
+
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
@@ -275,7 +282,6 @@ def test_package_create_draft(mail_user):
         "language": "en",
         "owner_org": organization_dict["id"],
         "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
-        "application": "rw",
         "technical_notes": "http://example.com/technical_notes.pdf",
         "tag_string": "economy,mental health,government",
         "temporal_coverage_start": "2007",
@@ -309,7 +315,7 @@ def test_package_create_draft(mail_user):
         )
     except NotFound:
         pass
-    
+
     result_create_draft = get_action("package_create")(
         context=context_org_editor, data_dict=dataset_draft
     )
@@ -322,13 +328,13 @@ def test_package_create_draft(mail_user):
 
     assert result_sysadmin_get_draft["name"] == dataset_draft["name"]
 
-   # Org admin
+    # Org admin
 
     with pytest.raises(NotAuthorized) as excinfo:
         result_org_admin_get_draft = get_action("package_show")(
             context=context_org_admin, data_dict={"id": result_create_draft["name"]}
         )
-        __import__('pprint').pprint(result_org_admin_get_draft)
+        __import__("pprint").pprint(result_org_admin_get_draft)
     assert "not authorized" in str(excinfo.value)
 
     # Org editor
@@ -348,7 +354,7 @@ def test_package_create_draft(mail_user):
 
     assert "not authorized" in str(excinfo.value)
 
-   # General user
+    # General user
 
     with pytest.raises(NotAuthorized) as excinfo:
         result_general_get_draft = get_action("package_show")(
@@ -371,6 +377,7 @@ def test_package_create_draft(mail_user):
         )
     except NotFound:
         pass
+
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
@@ -460,7 +467,6 @@ def test_package_create_internal(mail_user):
         "language": "en",
         "owner_org": organization_dict["id"],
         "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
-        "application": "rw",
         "technical_notes": "http://example.com/technical_notes.pdf",
         "tag_string": "economy,mental health,government",
         "temporal_coverage_start": "2007",
@@ -494,7 +500,6 @@ def test_package_create_internal(mail_user):
         )
     except NotFound:
         pass
-
 
     result_create_internal = get_action("package_create")(
         context=context_sysadmin, data_dict=dataset_internal
@@ -558,6 +563,7 @@ def test_package_create_internal(mail_user):
         )
     except NotFound:
         pass
+
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
@@ -647,7 +653,6 @@ def test_package_create_private(mail_user):
         "language": "en",
         "owner_org": organization_dict["id"],
         "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
-        "application": "rw",
         "technical_notes": "http://example.com/technical_notes.pdf",
         "tag_string": "economy,mental health,government",
         "temporal_coverage_start": "2007",
@@ -685,7 +690,6 @@ def test_package_create_private(mail_user):
     result_create_private = get_action("package_create")(
         context=context_sysadmin, data_dict=dataset_private
     )
-
 
     # Sysadmin
 
