@@ -581,9 +581,13 @@ def pending_diff_show(context: Context, data_dict: DataDict):
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
         if pending_dataset is not None:
-            context["for_approval"] = True
+            #context["for_approval"] = True
             pending_dataset = pending_dataset.get("package_data")
+            sorted_groups = sorted(pending_dataset['groups'], key=lambda x: x['id'])
+            pending_dataset['groups'] = sorted_groups
             existing_dataset = get_action("package_show")(context, {"id": package_id})
+            sorted_groups = sorted(existing_dataset['groups'], key=lambda x: x['id'])
+            existing_dataset['groups'] = sorted_groups
             dataset_diff = _diff(existing_dataset, pending_dataset)
     except Exception as e:
         log.error(e)
@@ -1372,8 +1376,7 @@ def _add_group_types(context: Context, data_dict: DataDict):
                 group.update({"type": group_type})
                 updated_package_groups.append(group)
 
-        data_dict["groups"] = updated_package_groups
-        data_dict["applications"] = package_applications if package_applications else []
+        data_dict["groups"] = updated_package_groups + package_applications
     except Exception as e:
         log.error(f"Error adding group types: {e}")
 

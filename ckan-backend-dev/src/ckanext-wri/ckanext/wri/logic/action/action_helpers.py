@@ -163,6 +163,5 @@ def _fix_user_group_permission(data_dict):
 
 
 def _before_dataset_create_or_update(context, data_dict, is_update=False):
-    _data_dict = _fix_application_field(data_dict)
-    _data_dict = _fix_user_group_permission(_data_dict)
+    _data_dict = _fix_user_group_permission(data_dict)
     return _data_dict
