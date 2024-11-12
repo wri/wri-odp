@@ -309,6 +309,7 @@ export default function DatasetPage(
             retry: 0,
         }
     )
+  console.log('DIFF DATA', diffData)
     if (!datasetData && datasetError) {
         router.replace('/datasets/404')
     }

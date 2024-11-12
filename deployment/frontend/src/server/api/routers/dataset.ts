@@ -155,10 +155,12 @@ export const DatasetRouter = createTRPCRouter({
                         ? input.tags.map((tag) => ({ name: tag }))
                         : [],
                     groups: input.topics
-                        ? [...input.topics.map((topic) => ({ name: topic }))]
-                        : [],
-                    applications: input.applications
-                        ? input.applications.map((app) => ({ name: app }))
+                        ? [
+                              ...input.topics.map((topic) => ({ name: topic })),
+                              ...input.applications.map((app) => ({
+                                  name: app,
+                              })),
+                          ]
                         : [],
                     open_in: JSON.stringify(input.open_in) ?? '',
                     language: input.language?.value ?? '',
@@ -438,28 +440,26 @@ export const DatasetRouter = createTRPCRouter({
                                   }
                               })
                             : [],
-                        groups: input.topics
-                            ? input.topics.map((topic) => {
-                                  const pgroups = datasetDetails?.groups?.find(
-                                      (x) => x.name === topic
-                                  )
-                                  return {
-                                      ...pgroups,
-                                      name: topic,
-                                  }
-                              })
-                            : [],
-                        applications: input.applications
-                            ? input.applications?.map((app) => {
-                                  const pgroups = datasetDetails?.groups?.find(
-                                      (x) => x.name === app
-                                  )
-                                  return {
-                                      ...pgroups,
-                                      name: app,
-                                  }
-                              })
-                            : [],
+                        groups: [
+                            ...(input.topics?.map((topic) => {
+                                const pgroups = datasetDetails?.groups?.find(
+                                    (x) => x.name === topic
+                                )
+                                return {
+                                    ...pgroups,
+                                    name: topic,
+                                }
+                            }) ?? []),
+                            ...(input.applications?.map((app) => {
+                                const pgroups = datasetDetails?.groups?.find(
+                                    (x) => x.name === app
+                                )
+                                return {
+                                    ...pgroups,
+                                    name: app,
+                                }
+                            }) ?? []),
+                        ],
                         open_in: JSON.stringify(input.open_in) ?? '',
                         language: input.language?.value ?? '',
                         license_id: input.license_id?.value ?? '',
