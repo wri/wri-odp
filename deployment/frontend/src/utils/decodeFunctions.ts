@@ -153,7 +153,7 @@ export const getDecodeParams = {
     },
     'e969a15c-f06b-40f6-9a3e-f206277dc216': async () => {
         const endDateRes = await fetch(
-            'https://data-api.globalforestwatch.org/dataset/umd_glad_landstat_alerts/latest'
+            'https://data-api.globalforestwatch.org/dataset/umd_glad_landsat_alerts/latest'
         )
         const endDateJson = await endDateRes.json()
         const {
