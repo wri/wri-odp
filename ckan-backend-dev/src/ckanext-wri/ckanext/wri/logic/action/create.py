@@ -222,6 +222,7 @@ def notification_create(
 
 def pending_dataset_create(context: Context, data_dict: DataDict):
     """Create a Pending Dataset"""
+    context["for_approval"] = True
     package_id = data_dict.get("package_id")
     package_data = data_dict.get("package_data")
 
@@ -408,6 +409,8 @@ def package_create(context: Context, data_dict: DataDict):
     data_dict["is_pending"] = True
     data_dict["is_approved"] = False
     data_dict["approval_status"] = "pending"
+    context["for_create"] = True
+    context["for_approval"] = True
 
     data_dict = stringify_actor_objects(data_dict)
 
@@ -576,6 +579,7 @@ def old_package_create(context: Context, data_dict: DataDict) -> ActionResult.Pa
     """
     model = context["model"]
     user = context["user"]
+    context["for_create"] = True
 
     # Override for authors/maintainers validation/formatting
     data_dict = stringify_actor_objects(data_dict)
