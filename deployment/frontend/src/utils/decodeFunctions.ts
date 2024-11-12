@@ -196,7 +196,7 @@ export const getDecodeParams = {
         })
         return { ...dayRange, confirmedOnly: 0 }
     },
-    'ff8e8721-c66e-42eb-9738-f1ba6990b8c': async () => {
+    'ff8e8721-c66e-42eb-9738-f1ba6990b8cc': async () => {
         const endDateRes = await fetch(
             'https://data-api.globalforestwatch.org/dataset/umd_glad_sentinel2_alerts/latest'
         )
@@ -216,6 +216,7 @@ export const getDecodeParams = {
             startDateAbsolute: '2022-08-01',
             trimEndDate: 549,
         })
+        console.log('day range', dayRange)
         return { ...dayRange, confirmedOnly: 0 }
     },
     '512d9984-2965-484a-b72c-de0f4d24237e': async () => {
@@ -275,10 +276,24 @@ export function createDeckLayer(
 ) {
     // @ts-ignore
     let tileUrl = layer.source.tiles[0] ?? ''
-    const threshold = layer.params_config && (layer.params_config as unknown as Array<any>).find((p) => p.key === 'threshold' || p.key === 'thresh')
+    const threshold =
+        layer.params_config &&
+        (layer.params_config as unknown as Array<any>).find(
+            (p) => p.key === 'threshold' || p.key === 'thresh'
+        )
     tileUrl = tileUrl
-        .replace('{thresh}', layerState?.threshold ? layerState?.threshold : threshold?.default ?? 30)
-        .replace('{threshold}', layerState?.threshold ? layerState?.threshold : threshold?.default ?? 30)
+        .replace(
+            '{thresh}',
+            layerState?.threshold
+                ? layerState?.threshold
+                : threshold?.default ?? 30
+        )
+        .replace(
+            '{threshold}',
+            layerState?.threshold
+                ? layerState?.threshold
+                : threshold?.default ?? 30
+        )
     let obj = {
         ...layer,
         source: {
