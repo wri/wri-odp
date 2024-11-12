@@ -19,7 +19,6 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 import Link from 'next/link'
 import { RouterOutput } from '@/server/api/root'
 import { Fragment } from 'react'
-import { Members } from '../metadata/Members'
 import classNames from '@/utils/classnames'
 
 type ApplicationOutput = RouterOutput["applications"]["getApplication"];
@@ -186,15 +185,6 @@ export default function EditApplicationForm({ application }: { application: Appl
                                         </div>
                                     )}
                                 </form>
-                            </Tab.Panel>
-                            <Tab.Panel
-                                as="div"
-                                className="flex flex-col gap-y-12 mt-8"
-                            >
-                                <Members
-                                    application={application}
-                                    formObj={formObj}
-                                />
                             </Tab.Panel>
                         </Tab.Panels>
                     </div>

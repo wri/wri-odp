@@ -687,6 +687,7 @@ export async function getOnePendingDataset(
         throw Error(JSON.stringify(data.error))
     }
     const dataset = data.result.package_data
+    console.log('PENDING DATASET', dataset)
 
     // if (dataset.rw_id) {
     const resourceLayer = dataset.resources.filter(
@@ -2188,6 +2189,7 @@ export async function approvePendingDataset(
         }
     )
     const data = (await response.json()) as CkanResponse<PendingDataset>
+    console.log('PENDING DATASET', data)
     if (!data.success && data.error)
         throw Error(JSON.stringify(data.error).concat('pending_dataset_show'))
 
@@ -2349,6 +2351,13 @@ export async function approvePendingDataset(
         }
     }) as Resource[]
 
+    //Applications are actually just a different type of groups, that are separated only on package_show
+    submittedDataset.groups = [
+        ...(submittedDataset.groups ?? []),
+        ...(submittedDataset.applications ?? []),
+    ]
+    submittedDataset.applications = undefined
+    console.log('SUBMITTED DATASET', submittedDataset.groups)
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/old_package_update`,
         {
@@ -2455,7 +2464,7 @@ export async function approvePendingDataset(
 }
 
 export const datasetFields = [
-    'application',
+    'applications',
     'approval_status',
     'authors',
     'citation',

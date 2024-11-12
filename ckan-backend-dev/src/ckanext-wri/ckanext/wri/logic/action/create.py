@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing_extensions import TypeAlias, Any
 import logging
 import requests
@@ -5,6 +6,7 @@ from urllib.parse import urljoin
 import json
 from typing import Any, Union, cast
 import six
+from ckan.common import _, config, current_user
 
 from ckanext.wri.model.notification import Notification, notification_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
@@ -26,8 +28,7 @@ import ckan.plugins as plugins
 import ckan.lib.uploader as uploader
 import ckan.lib.plugins as lib_plugins
 import ckan.lib.dictization.model_save as model_save
-
-from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
+from ckanext.wri.logic.action.action_helpers import stringify_actor_objects, _before_dataset_create_or_update
 import uuid
 
 NotificationGetUserViewedActivity: TypeAlias = None
@@ -403,7 +404,6 @@ def migration_status(context: Context, data_dict: DataDict):
         }
         raise p.toolkit.ValidationError(error)
 
-
 def package_create(context: Context, data_dict: DataDict):
     data_dict["is_pending"] = True
     data_dict["is_approved"] = False
@@ -411,7 +411,17 @@ def package_create(context: Context, data_dict: DataDict):
 
     data_dict = stringify_actor_objects(data_dict)
 
+    data_dict = _before_dataset_create_or_update(context, data_dict)
+    print("DATA DICT", flush=True)
+    print(data_dict, flush=True)
     dataset = l.action.create.package_create(context, data_dict)
+    if dataset.get('groups'):
+        # This is necessary because the pending dataset doesnt have any of the logic that package_show has
+        groups = [tk.get_action("group_show")(context, {"id": group.get('name')}) for group in dataset.get('groups')]
+        topics = [group for group in groups if group.get('type') == 'group']
+        applications = [group for group in groups if group.get('type') == 'application']
+        dataset['groups'] = topics
+        dataset['applications'] = applications
     if data_dict.get("owner_org"):
         org = tk.get_action("organization_show")(
             context, {"id": data_dict.get("owner_org")}

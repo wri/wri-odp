@@ -18,270 +18,87 @@ import { useRouter } from 'next/router'
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
-import { useQuery } from 'react-query';
+import Image from 'next/image'
+import type { Application } from '@/schema/ckan.schema'
 
 
-function TopicProfile({ team, topic2Image }: { team: GroupTree, topic2Image: Record<string, string> }) {
-  const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
-  const TopicProfile = team as IRowProfile
-  TopicProfile.description = description
-  TopicProfile.image_display_url = topic2Image[team.id]
+function ApplicationProfile({ application }: { application: Application }) {
   return (
     <div className='flex py-5 pl-2' >
-      <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] ' isPad profile={team} defaultImg='/images/placeholders/topics/topicsdefault.png' />
-    </div>
-  )
-}
-
-function SubTopicProfile({ team, topic2Image }: { team: GroupTree, topic2Image: Record<string, string> }) {
-  const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
-  const TopicProfile = team as IRowProfile
-  TopicProfile.description = description
-  TopicProfile.image_display_url = topic2Image[team.id]
-  return (
-    <div className='flex py-5 pl-3 sm:pl-5' >
-      <RowProfile imgStyle='w-16 h-16 bg-[#F9F9F9] group-hover:bg-white' isPad profile={team} defaultImg='/images/placeholders/topics/topicsdefault.png' />
-    </div>
-  )
-}
-
-function SubCardProfile({ teams, highlighted, topic2Image }:
-  {
-    teams: IRowProfile[] | GroupTree[] | undefined,
-    highlighted?: boolean,
-    topic2Image: Record<string, string>
-  }) {
-  const utils = api.useUtils()
-  const [open, setOpen] = useState(false)
-  const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
-  const router = useRouter()
-  const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
-    onSuccess: async (data) => {
-      await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 10000 } })
-      setOpen(false)
-      notify(`Successfully deleted the ${selectedTopic?.name} topic`, 'error')
-    }
-  })
-
-  const handleOpenModal = (topic: GroupTree) => {
-    setSelectedTopic(topic)
-    setOpen(true)
-  }
-
-  const Topic = (team: GroupTree) => {
-    const TeamProfile = team as IRowProfile
-    TeamProfile.image_display_url = topic2Image[team.id]
-    return TeamProfile
-  }
-
-  if (!teams || teams.length === 0) return (<></>)
-  return (
-    <div className='flex flex-col pt-2 pl-4'>
-      {
-        teams.map((team, index) => {
-          return (<>
-
-            {
-              (team as GroupTree).children?.length ?
-                (
-                  <>
-                    <Row
-                      key={index}
-                      highlighted={highlighted}
-                      groupStyle="group/item group-hover/item:visible "
-                      className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
-                      rowMain={
-                        <SubTopicProfile team={team as GroupTree} topic2Image={topic2Image} />
-                      }
-                      linkButton={{
-                        label: "View topic",
-                        link: `../topics/${team.name}`,
-                      }}
-                      controlButtons={[
-                        {
-                          label: "Edit",
-                          color: 'bg-wri-gold hover:bg-yellow-500',
-                          icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
-                          tooltip: {
-                            id: `edit-tooltip-${team.name}`,
-                            content: "Edit topic"
-                          },
-                          onClick: () => {
-                            router.push(`/dashboard/topics/${team.name}/edit`)
-                          }
-                        },
-                        {
-                          label: "Delete",
-                          color: 'bg-red-600 hover:bg-red-500',
-                          icon: <TrashIcon className='w-4 h-4 text-white' />,
-                          tooltip: {
-                            id: `delete-tooltip-${team.name}`,
-                            content: "Delete topic"
-                          },
-                          onClick: () => handleOpenModal(team as GroupTree)
-                        },
-                      ]}
-                      isDropDown
-                      rowSub={<SubCardProfile teams={(team as GroupTree).children} topic2Image={topic2Image} />}
-                    />
-                  </>
-
-                )
-                : (
-                  <>
-                    <Row
-                      key={index}
-                      groupStyle="group/item group-hover/item:visible "
-                      className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
-                      rowMain={
-                        <div className='flex pl-4 sm:pl-6  '>
-                          <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={Topic(team as GroupTree)} defaultImg='/images/placeholders/topics/topicsdefault.png' />
-                        </div>
-                      }
-                      linkButton={{
-                        label: "View topic",
-                        link: `../topics/${team.name}`,
-                      }}
-                      controlButtons={[
-                        {
-                          label: "Edit",
-                          color: 'bg-wri-gold hover:bg-yellow-500',
-                          icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
-                          tooltip: {
-                            id: `edit-tooltip-${team.name}`,
-                            content: "Edit topic"
-                          },
-                          onClick: () => {
-                            router.push(`/dashboard/topics/${team.name}/edit`)
-                          }
-                        },
-                        {
-                          label: "Delete",
-                          color: 'bg-red-600 hover:bg-red-500',
-                          icon: <TrashIcon className='w-4 h-4 text-white' />,
-                          tooltip: {
-                            id: `delete-tooltip-${team.name}`,
-                            content: "Delete topic"
-                          },
-                          onClick: () => handleOpenModal(team as GroupTree)
-                        },
-                      ]}
-                    />
-                  </>
-
-                )
-            }
-          </>)
-        })
-      }
-      {
-        selectedTopic && (
-          <Modal
-            open={open}
-            setOpen={setOpen}
-            className="sm:w-full sm:max-w-lg"
-          >
-            <div className="sm:flex sm:items-start">
-              <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                <ExclamationTriangleIcon
-                  className="h-6 w-6 text-red-600"
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                <Dialog.Title
-                  as="h3"
-                  className="text-base font-semibold leading-6 text-gray-900"
+        <div className="flex flex-row gap-x-4 hover:bg-slate-100  rounded-md">
+            <div className="flex gap-x-4">
+                <div
+                    className="relative rounded-md w-16 h-16 bg-[#F9F9F9]"
                 >
-                  Delete Topic
-                </Dialog.Title>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">
-                    Are you sure you want to delete this topic?
-                  </p>
+                    <Image
+                        src={
+                            application?.image_display_url
+                                ? application.image_display_url
+                                : '/images/placeholders/applications/applicationsdefault.png'                        }
+                        alt=""
+                        className="rounded-md object-cover"
+                        fill
+                    />
                 </div>
-              </div>
             </div>
-            <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
-              <LoaderButton
-                variant="destructive"
-                loading={deleteTopic.isLoading}
-                onClick={() => deleteTopic.mutate(selectedTopic.id)}
-              >
-                Delete Topic
-              </LoaderButton>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => setOpen(false)}
-              >
-                Cancel
-              </Button>
+            <div className="flex flex-col py-3">
+                <p className="font-normal text-base">
+                    {application?.title || application.name}
+                </p>
+                {application?.description ? (
+                    <span className="text-[#666666] font-tight text-[12px] ">
+                        {application.description}
+                    </span>
+                ) : (
+                    ''
+                )}
             </div>
-          </Modal>
-        )
-      }
+        </div>
     </div>
   )
 }
-
-
-
 
 export default function ApplicationCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
-  const [pagination, setPagination] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
-  const { data, isLoading, refetch } = api.topics.getUsersTopics.useQuery(query)
+  const { data: applications , isLoading, refetch } = api.applications.getAllApplications.useQuery()
   const [open, setOpen] = useState(false)
   const router = useRouter()
-  const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
-  const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
+  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null)
+  const deleteApplication = api.applications.deleteDashBoardApplication.useMutation({
     onSuccess: async (data) => {
       await refetch();
       setOpen(false)
-      notify(`Successfully deleted the ${selectedTopic?.name} topic`, 'error')
+      notify(`Successfully deleted the ${selectedApplication?.name} application`, 'error')
     }
   })
 
-  const handleOpenModal = (topic: GroupTree) => {
-    setSelectedTopic(topic)
+  const handleOpenModal = (application: Application) => {
+    setSelectedApplication(application)
     setOpen(true)
   }
 
-  const ProcessedTopic = useQuery(['paginatedTopics', data, pagination], () => {
-    if (!data) return { topics: [], topic2Image: {}, count: 0 };
-    const topics = data?.topics.slice(pagination.page.start, pagination.page.start + pagination.page.rows)
-    const topic2Image = data?.topic2Image
-    return { topics, topic2Image, count: data?.count }
-  }, {
-    enabled: !!data
+  const filteredApplications = applications?.filter((application) => {
+    return application.name.toLowerCase().includes(query.search.toLowerCase())
   })
-
-
-  useEffect(() => {
-    setPagination({ search: '', page: { start: 0, rows: 10 } })
-
-  }, [query.search])
-
-
+  const paginatedApplications = filteredApplications?.slice(query.page.start, query.page.start + query.page.rows)
 
   return (
     <section className='w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0'>
-      <SearchHeader leftStyle=' sm:pr-2 sm:pl-12' rightStyle=' px-2 sm:pr-6' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setPagination} query={pagination} isLoading={ProcessedTopic.isLoading} count={ProcessedTopic.data?.count} />} />
+      <SearchHeader leftStyle=' sm:pr-2 sm:pl-12' rightStyle=' px-2 sm:pr-6' setQuery={setQuery} query={query} Pagination={<Pagination setQuery={setQuery} query={query} isLoading={isLoading} count={filteredApplications?.length ?? 0} />} />
       <div className='w-full'>
         {
-          ProcessedTopic.isLoading ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
-            ProcessedTopic.data?.topics.map((topic, index) => {
+          (isLoading || !paginatedApplications) ? <div className='flex justify-center items-center h-screen'><Spinner className="mx-auto my-2" /></div> : (
+            paginatedApplications.map((application, index) => {
               return (
-                <div key={topic.name}>
+                <div key={application.name}>
                   <Row
                     key={index}
                     className={`pr-6`}
-                    highlighted={topic?.highlighted}
-                    rowMain={<TopicProfile team={topic} topic2Image={data?.topic2Image as Record<string, string>} />}
+                    highlighted={false}
+                    rowMain={<ApplicationProfile application={application} />}
                     linkButton={{
-                      label: "View topic",
-                      link: `../topics/${topic.name}`,
+                      label: "View application",
+                      link: `../applications/${application.name}`,
                     }}
                     controlButtons={[
                       {
@@ -289,11 +106,11 @@ export default function ApplicationCard() {
                         color: 'bg-wri-gold hover:bg-yellow-400',
                         icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
                         tooltip: {
-                          id: `edit-tooltip-${topic.name}`,
-                          content: "Edit topic"
+                          id: `edit-tooltip-${application.name}`,
+                          content: "Edit application"
                         },
                         onClick: () => {
-                          router.push(`/dashboard/topics/${topic.name}/edit`)
+                          router.push(`/dashboard/applications/${application.name}/edit`)
                         }
                       },
                       {
@@ -301,14 +118,14 @@ export default function ApplicationCard() {
                         color: 'bg-red-600 hover:bg-red-500',
                         icon: <TrashIcon className='w-4 h-4 text-white' />,
                         tooltip: {
-                          id: `delete-tooltip-${topic.name}`,
-                          content: "Delete topic"
+                          id: `delete-tooltip-${application.name}`,
+                          content: "Delete application"
                         },
-                        onClick: () => handleOpenModal(topic)
+                        onClick: () => handleOpenModal(application)
                       },
                     ]}
-                    rowSub={<SubCardProfile teams={topic.children} highlighted={topic?.highlighted} topic2Image={data?.topic2Image as Record<string, string>} />}
-                    isDropDown
+                    rowSub={null}
+                    isDropDown={false}
                   />
                 </div>
 
@@ -318,7 +135,7 @@ export default function ApplicationCard() {
         }
 
         {
-          selectedTopic && (
+          selectedApplication && (
             <Modal
               open={open}
               setOpen={setOpen}
@@ -336,11 +153,11 @@ export default function ApplicationCard() {
                     as="h3"
                     className="text-base font-semibold leading-6 text-gray-900"
                   >
-                    Delete Topic
+                    Delete Application
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      Are you sure you want to delete this topic?
+                      Are you sure you want to delete this application?
                     </p>
                   </div>
                 </div>
@@ -348,11 +165,11 @@ export default function ApplicationCard() {
               <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
                 <LoaderButton
                   variant="destructive"
-                  loading={deleteTopic.isLoading}
-                  onClick={() => deleteTopic.mutate(selectedTopic.id)}
-                  id={selectedTopic.name}
+                  loading={deleteApplication.isLoading}
+                  onClick={() => deleteApplication.mutate(selectedApplication.id)}
+                  id={selectedApplication.name}
                 >
-                  Delete Topic
+                  Delete Application
                 </LoaderButton>
                 <Button
                   variant="outline"

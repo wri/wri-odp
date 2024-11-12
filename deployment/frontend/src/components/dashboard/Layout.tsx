@@ -328,6 +328,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                             <UserProfile />
                                         </li>
                                         {navigation.map((item) => {
+                                                    if (
+                                                        item.isSysAdmin &&
+                                                        !session?.user.sysadmin
+                                                    ) {
+                                                        return <></>
+                                                    }
                                             return (
                                                 <Fragment key={item.name}>
                                                     {item.name ==

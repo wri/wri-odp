@@ -252,6 +252,8 @@ export default function DatasetPage(
     let { dataset, prevdataset } = props
     if (typeof dataset == 'string') dataset = JSON.parse(dataset)
     if (typeof prevdataset == 'string') prevdataset = JSON.parse(prevdataset)
+    console.log('DATASET', dataset)
+    console.log('PREV DATASET', prevdataset)
 
     const [isCurrentVersion, setIsCurrentVersion] = useState<boolean>(false)
     const [selectedIndex, setSelectedIndex] = useState(0)

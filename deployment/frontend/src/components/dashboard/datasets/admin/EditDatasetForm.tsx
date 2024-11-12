@@ -164,6 +164,9 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             topics: dataset.groups
                 ? dataset.groups.map((group) => group.name)
                 : [],
+            applications: dataset.applications
+                ? dataset.applications.map((group) => group.name)
+                : [],
             team: dataset.organization
                 ? {
                       value: dataset.organization.name,

@@ -101,7 +101,7 @@ export interface WriDataset extends Dataset {
     creator_user_id: string
     language?: string
     featured_image?: string
-    application?: string
+    applications?: Application[]
     cautions?: string
     citation?: string
     function?: string
@@ -161,18 +161,22 @@ export interface Organization {
     tags?: Array<Tag>
 }
 
-export interface Application {
-  id: string
-  name: string;
-  title: string;
-  description: string;
-  image_url: string;
-  image_display_url: string;
-  help_url: string;
-  contact_url: string;
-  packages?: Array<Dataset>;
-  package_count: number
-  state: 'active'
+export type Application = Group & {
+    approval_status?: 'approved'
+    type?: string
+    display_name?: string
+    is_organization: boolean
+    id: string
+    name: string
+    title: string
+    description: string
+    image_url: string
+    image_display_url: string
+    help_url: string
+    contact_url: string
+    packages?: Array<Dataset>
+    package_count: number
+    state: 'active'
 }
 
 export interface WriOrganization extends Organization {

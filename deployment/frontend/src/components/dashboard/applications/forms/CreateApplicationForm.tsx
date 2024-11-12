@@ -13,8 +13,8 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import { useRouter } from 'next/router'
 
 const links = [
-    { label: 'Applications', url: '/dashboard/teams', current: false },
-    { label: 'Create a application', url: '/dashboard/teams/new', current: true },
+    { label: 'Applications', url: '/dashboard/applications', current: false },
+    { label: 'Create a application', url: '/dashboard/applications/new', current: true },
 ]
 
 export default function CreateApplicationForm() {

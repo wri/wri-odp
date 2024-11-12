@@ -155,7 +155,10 @@ export const DatasetRouter = createTRPCRouter({
                         ? input.tags.map((tag) => ({ name: tag }))
                         : [],
                     groups: input.topics
-                        ? input.topics.map((topic) => ({ name: topic }))
+                        ? [...input.topics.map((topic) => ({ name: topic }))]
+                        : [],
+                    applications: input.applications
+                        ? input.applications.map((app) => ({ name: app }))
                         : [],
                     open_in: JSON.stringify(input.open_in) ?? '',
                     language: input.language?.value ?? '',
@@ -288,6 +291,7 @@ export const DatasetRouter = createTRPCRouter({
                         : null,
                 }
 
+                console.log(`BODY`, body)
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
                     {
@@ -414,6 +418,7 @@ export const DatasetRouter = createTRPCRouter({
                 }
             }
 
+            console.log('INPUT APPLICATIONS', input.applications)
             try {
                 if (isUpdate) {
                     const user = ctx.session.user
@@ -441,6 +446,17 @@ export const DatasetRouter = createTRPCRouter({
                                   return {
                                       ...pgroups,
                                       name: topic,
+                                  }
+                              })
+                            : [],
+                        applications: input.applications
+                            ? input.applications?.map((app) => {
+                                  const pgroups = datasetDetails?.groups?.find(
+                                      (x) => x.name === app
+                                  )
+                                  return {
+                                      ...pgroups,
+                                      name: app,
                                   }
                               })
                             : [],
@@ -621,6 +637,7 @@ export const DatasetRouter = createTRPCRouter({
                             : null,
                     }
 
+                    console.log('body data applications', body.applications)
                     const newBodyDataset = filterDatasetFields(
                         body
                     ) as WriDataset
@@ -632,6 +649,14 @@ export const DatasetRouter = createTRPCRouter({
                         ...prevDataset,
                         ...newBodyDataset,
                     }
+                    console.log(
+                        'new body data applications',
+                        newBodyDataset.applications
+                    )
+                    console.log(
+                        'reponse data applications',
+                        responseData.applications
+                    )
 
                     // update main data to pending also
                     await patchDataset({
