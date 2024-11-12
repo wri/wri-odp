@@ -84,10 +84,6 @@ dataset_fields:
   label: Project
   form_placeholder: eg. Project Name
 
-- field_name: application
-  label: Application
-  form_placeholder: eg. Application Name
-
 - field_name: technical_notes
   label: Technical Notes
   form_placeholder: eg. https://example.com/technical_notes.pdf

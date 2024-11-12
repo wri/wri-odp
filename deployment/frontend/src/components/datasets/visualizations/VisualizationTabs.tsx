@@ -7,6 +7,7 @@ export function VisualizationTabs({
 }: {
     tabs: { name: string; enabled: boolean }[]
 }) {
+    const singleTab = tabs.filter((tab) => tab.enabled).length === 1
     return (
         <>
             {tabs.map((tab, i) => (
@@ -18,7 +19,8 @@ export function VisualizationTabs({
                                 selected
                                     ? 'border-b-wri-dark-blue text-wri-dark-blue'
                                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 border-zinc-300',
-                                tab.enabled ? '' : 'hidden'
+                                tab.enabled ? '' : 'hidden',
+                                singleTab ? 'cursor-text' : 'cursor-pointer'
                             )}
                         >
                             {tab.name}

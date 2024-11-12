@@ -21,6 +21,26 @@ def test_package_create(mail_user):
 
     organization_dict = factories.Organization()
     group_dict = factories.Group()
+    application_group_name = "test-application-group-schema"
+
+    try:
+        get_action("group_purge")(
+            context={"ignore_auth": True},
+            data_dict={"id": application_group_name}
+        )
+    except NotFound:
+        pass
+
+    application_group_dict = get_action("group_create")(
+        context=context,
+        data_dict={
+            "name": application_group_name,
+            "title": "Test Application Group Schema",
+            "description": "A description of the application group",
+            "homepage_url": "http://example.com",
+            "type": "application"
+        }
+    )
 
     dataset = {
         "type": "dataset",
@@ -30,8 +50,10 @@ def test_package_create(mail_user):
         "language": "en",
         "owner_org": organization_dict["id"],
         "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
-        "application": "rw",
-        "groups": [{"id": group_dict["id"]}],
+        "groups": [
+            {"id": application_group_dict["id"]},
+            {"id": group_dict["id"]}
+        ],
         "technical_notes": "http://example.com/technical_notes.pdf",
         "tag_string": "economy,mental health,government",
         "temporal_coverage_start": "2007",
@@ -53,11 +75,11 @@ def test_package_create(mail_user):
         "reason_for_adding": "This data is being added because...",
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
-        "methodology": "A short methodology of the dataset"
+        "methodology": "A short methodology of the dataset",
     }
 
     try:
-        get_action("package_delete")(
+        get_action("dataset_purge")(
             context={"ignore_auth": True},
             data_dict={"id": dataset["name"]}
         )
@@ -71,13 +93,20 @@ def test_package_create(mail_user):
 
     tag_string = dataset["tag_string"].split(",")
 
+    context.pop("for_create", None)
+    context.pop("for_approval", None)
+
+    result = get_action("package_show")(
+        context=context,
+        data_dict={"id": dataset["name"]}
+    )
+
     assert result["title"] == dataset["title"]
     assert result["name"] == dataset["name"]
     assert result["url"] == dataset["url"]
     assert result["language"] == dataset["language"]
     assert result["owner_org"] == organization_dict["id"]
     assert result["project"] == dataset["project"]
-    assert result["application"] == dataset["application"]
     assert result["groups"][0]["name"] == group_dict["name"]
     assert result["technical_notes"] == dataset["technical_notes"]
     assert all(
@@ -103,6 +132,11 @@ def test_package_create(mail_user):
     assert result["learn_more"] == dataset["learn_more"]
     assert result["cautions"] == dataset["cautions"]
     assert result["methodology"] == dataset["methodology"]
+    assert application_group_dict["id"] in [group["id"] for group in result["applications"]]
+    assert application_group_dict["name"] in [group["name"] for group in result["applications"]]
+    assert application_group_dict["title"] in [group["title"] for group in result["applications"]]
+    assert application_group_dict["type"] in [group["type"] for group in result["applications"]]
+    assert application_group_dict["homepage_url"] in [group["homepage_url"] for group in result["applications"]]
 
     invalid_urls = ["invalid_url_1", "invalid_url_2", "invalid_url_3"]
 
@@ -132,9 +166,17 @@ def test_package_create(mail_user):
     assert "Value must be a valid ISO 639-1 language code" in str(excinfo.value)
 
     try:
-        get_action("package_delete")(
+        get_action("dataset_purge")(
             context={"ignore_auth": True},
             data_dict={"id": dataset["name"]}
+        )
+    except NotFound:
+        pass
+
+    try:
+        get_action("group_purge")(
+            context={"ignore_auth": True},
+            data_dict={"id": application_group_dict["name"]}
         )
     except NotFound:
         pass
