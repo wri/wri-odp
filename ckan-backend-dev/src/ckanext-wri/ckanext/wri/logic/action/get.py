@@ -583,9 +583,19 @@ def pending_dataset_show(context: Context, data_dict: DataDict):
                         "name": group.get("name"),
                         "title": group.get("title"),
                         "type": group.get("type"),
+                        "homepage_url": group.get("homepage_url", None) if 'homepage_url' in group else None,
+                        "contact_url": group.get("contact_url", None) if 'contact_url' in group else None,
+                        "help_url": group.get("help_url", None) if 'help_url' in group else None,
                     }
                     for group in _groups
                 ]
+                for group in groups:
+                    if group.get('help_url') is None:
+                        del group['help_url']
+                    if group.get('contact_url') is None:
+                        del group['contact_url']
+                    if group.get('homepage_url') is None:
+                        del group['homepage_url']
                 pending_dataset['package_data']["groups"] = groups
     except Exception as e:
         log.error(e)

@@ -11,13 +11,13 @@ import uuid
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_package_create_public(mail_user):
     organization_dict = factories.Organization()
-    #group_dict = factories.Group(
-    #    type="application",
-    #    homepage_url="http://example.com",
-    #    title="Test Group",
-    #    description="A description of the group",
-    #)
-    #group_dict = factories.Group()
+    group_dict = factories.Group(
+        type="application",
+        homepage_url="http://example.com",
+        title="Test Group",
+        description="A description of the group",
+    )
+    group_dict = factories.Group()
 
     userobj_sysadmin = factories.Sysadmin()
     userobj_org_admin = factories.User()
@@ -122,7 +122,7 @@ def test_package_create_public(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
-        #"groups": [{"id": group_dict["id"]}],
+        "groups": [{"id": group_dict["id"]}],
     }
 
     try:

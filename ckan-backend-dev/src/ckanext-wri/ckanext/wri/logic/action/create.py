@@ -420,7 +420,7 @@ def package_create(context: Context, data_dict: DataDict):
 
     data_dict = stringify_actor_objects(data_dict)
 
-    data_dict = _before_dataset_create_or_update(context, data_dict)
+    _before_dataset_create_or_update(context, data_dict)
     dataset = l.action.create.package_create(context, data_dict)
     if dataset.get("groups"):
         # This is necessary because the pending dataset doesnt have any of the logic that package_show has
