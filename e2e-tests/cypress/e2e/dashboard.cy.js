@@ -14,7 +14,7 @@ const org2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName2 = `${uuid()}pdssfppp${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 const group = `${uuid()}${Cypress.env("GROUP_SUFFIX")}`;
-const application = `${uuid()}_APPLICATION`;
+const application = `${uuid()}_application`;
 const user = `${uuid()}-user`;
 const email = `${uuid()}@gmail.com`;
 const userfullname = `${uuid()}-fullname`;
