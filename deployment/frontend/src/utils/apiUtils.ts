@@ -2081,6 +2081,7 @@ export async function patchDataset({
         if (datasetObj.error.message) throw Error(datasetObj.error.message)
         throw Error(JSON.stringify(datasetObj.error))
     }
+    return datasetObj
 }
 
 export async function updateDatasetHasChartsFlag({

@@ -460,6 +460,8 @@ export const DatasetRouter = createTRPCRouter({
                                 }
                             }) ?? []),
                         ],
+                        topics: undefined,
+                        applications: undefined,
                         open_in: JSON.stringify(input.open_in) ?? '',
                         language: input.language?.value ?? '',
                         license_id: input.license_id?.value ?? '',
@@ -649,17 +651,9 @@ export const DatasetRouter = createTRPCRouter({
                         ...prevDataset,
                         ...newBodyDataset,
                     }
-                    console.log(
-                        'new body data applications',
-                        newBodyDataset.applications
-                    )
-                    console.log(
-                        'reponse data applications',
-                        responseData.applications
-                    )
 
                     // update main data to pending also
-                    await patchDataset({
+                    const result = await patchDataset({
                         dataset: {
                             id: responseData.id,
                             approval_status: 'pending',
@@ -668,6 +662,7 @@ export const DatasetRouter = createTRPCRouter({
                         },
                         session: ctx.session,
                     })
+                    console.log('result', result)
 
                     const response = await fetch(
                         `${env.CKAN_URL}/api/3/action/pending_dataset_update`,
@@ -686,6 +681,7 @@ export const DatasetRouter = createTRPCRouter({
 
                     let data =
                         (await response.json()) as CkanResponse<PendingDataset>
+                    console.log('DATA', data)
                     if (!data.success && data.error) {
                         const error = JSON.stringify(data.error).toLowerCase()
                         if (!error.includes('not found')) {

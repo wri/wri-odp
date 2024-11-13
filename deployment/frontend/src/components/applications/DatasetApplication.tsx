@@ -10,7 +10,7 @@ export default function DatasetApplication({ application }: { application: Appli
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         fq: {
-            applications: application.name,
+            groups: application.name,
         },
         page: {
             start: 0,
