@@ -37,7 +37,6 @@ export function About({
             ? highlighted(`tags[${index}].name`)
             : highlighted(`tags[${index}]`)
     }
-    console.log('GROUPS', dataset.groups)
     const topics = dataset.groups?.filter((group) => group.type === 'group') ?? []
     const applications = dataset.groups?.filter((group) => group.type === 'application') ?? []
     return (

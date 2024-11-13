@@ -2352,13 +2352,6 @@ export async function approvePendingDataset(
         }
     }) as Resource[]
 
-    //Applications are actually just a different type of groups, that are separated only on package_show
-    submittedDataset.groups = [
-        ...(submittedDataset.groups ?? []),
-        ...(submittedDataset.applications ?? []),
-    ]
-    submittedDataset.applications = undefined
-    console.log('SUBMITTED DATASET', submittedDataset.groups)
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/old_package_update`,
         {
