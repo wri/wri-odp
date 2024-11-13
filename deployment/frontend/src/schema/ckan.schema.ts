@@ -1,10 +1,31 @@
 import { Dataset, Resource } from '@/interfaces/dataset.interface'
 import type {
-    Group,
     Tag,
     Activity as CkanActivity,
     User as CkanUser,
 } from '@portaljs/ckan'
+
+export interface Group {
+    display_name: string;
+    description: string;
+    image_display_url: string;
+    package_count: number;
+    created: string;
+    name: string;
+    is_organization: false;
+    state: 'active' | 'deleted' | 'inactive';
+    image_url: string;
+    type: 'group' | 'application';
+    title: string;
+    revision_id: string;
+    num_followers: number;
+    id: string;
+    approval_status: string;
+    packages?: Array<Dataset>;
+    activity_stream?: Array<Activity>;
+    tags?: Array<Tag>;
+    users?: Array<User>;
+}
 
 type Only<T, U> = {
     [P in keyof T]: T[P]
