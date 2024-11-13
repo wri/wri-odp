@@ -38,6 +38,7 @@ export function About({
             : highlighted(`tags[${index}]`)
     }
     const topics = dataset.groups?.filter((group) => group.type === 'group') ?? []
+    //@ts-ignore
     const applications = dataset.groups?.filter((group) => group.type === 'application') ?? []
     return (
         <div className="flex flex-col gap-y-4 py-2">
