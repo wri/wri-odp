@@ -85,22 +85,20 @@ export const TopicRouter = createTRPCRouter({
             }
         )
         let userTopics = null
-        if (!user.sysadmin) {
-            const userTopicsRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_list_authz`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            )
-            const _userTopics: CkanResponse<Group[]> =
-                await userTopicsRes.json()
-            if (!_userTopics.success && _userTopics.error)
-                throw Error(replaceNames(_userTopics.error.message))
-            userTopics = _userTopics.result.map((topic) => topic.name)
-        }
+        const userTopicsRes = await fetch(
+            `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `${user.apikey}`,
+                },
+            }
+        )
+        const _userTopics: CkanResponse<Group[]> = await userTopicsRes.json()
+    console.log('USER TOPICS', _userTopics)
+        if (!_userTopics.success && _userTopics.error)
+            throw Error(replaceNames(_userTopics.error.message))
+        userTopics = _userTopics.result.map((topic) => topic.name)
         const tree: CkanResponse<TopicHierarchy[]> =
             await topicHierarchyRes.json()
         if (!tree.success && tree.error)
@@ -110,9 +108,7 @@ export const TopicRouter = createTRPCRouter({
     getAllTopics: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.session.user
         const topicRes = await fetch(
-            user.sysadmin
-                ? `${env.CKAN_URL}/api/action/group_list?all_fields=True`
-                : `${env.CKAN_URL}/api/action/group_list_authz?all_fields=True`,
+            `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
             {
                 headers: {
                     'Content-Type': 'application/json',

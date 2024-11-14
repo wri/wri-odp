@@ -132,11 +132,10 @@ def test_package_create(mail_user):
     assert result["learn_more"] == dataset["learn_more"]
     assert result["cautions"] == dataset["cautions"]
     assert result["methodology"] == dataset["methodology"]
-    assert application_group_dict["id"] in [group["id"] for group in result["applications"]]
-    assert application_group_dict["name"] in [group["name"] for group in result["applications"]]
-    assert application_group_dict["title"] in [group["title"] for group in result["applications"]]
-    assert application_group_dict["type"] in [group["type"] for group in result["applications"]]
-    assert application_group_dict["homepage_url"] in [group["homepage_url"] for group in result["applications"]]
+    assert application_group_dict["id"] in [group["id"] for group in result["groups"]]
+    assert application_group_dict["name"] in [group["name"] for group in result["groups"]]
+    assert application_group_dict["title"] in [group["title"] for group in result["groups"]]
+    assert application_group_dict["type"] in [group["type"] for group in result["groups"]]
 
     invalid_urls = ["invalid_url_1", "invalid_url_2", "invalid_url_3"]
 

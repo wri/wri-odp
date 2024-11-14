@@ -414,13 +414,21 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
         group_names.extend(facets.get(field_name, {}).keys())
 
     groups = (
-        session.query(model.Group.name, model.Group.title)
+            session.query(model.Group.name, model.Group.title)
+        # type_ignore_reason: incomplete SQLAlchemy types
+        .filter(model.Group.name.in_(group_names)).all()  # type: ignore
+        if group_names
+        else []
+    )
+    _groups = (
+            session.query(model.Group.name, model.Group.type)
         # type_ignore_reason: incomplete SQLAlchemy types
         .filter(model.Group.name.in_(group_names)).all()  # type: ignore
         if group_names
         else []
     )
     group_titles_by_name = dict(groups)
+    group_types_by_name = dict(_groups)
 
     # Transform facets into a more useful data structure.
     restructured_facets: dict[str, Any] = {}
@@ -431,9 +439,14 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
             new_facet_dict["name"] = key_
             if key in ("groups", "organization"):
                 display_name = group_titles_by_name.get(key_, key_)
+                group_type = group_types_by_name.get(key_, key_)
                 display_name = (
                     display_name if display_name and display_name.strip() else key_
                 )
+                group_type = (
+                    group_type if group_type and group_type.strip() else key_
+                )
+                new_facet_dict["type"] = group_type
                 new_facet_dict["display_name"] = display_name
             elif key == "license_id":
                 license = model.Package.get_license_register().get(key_)
@@ -554,6 +567,36 @@ def pending_dataset_show(context: Context, data_dict: DataDict):
 
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
+        if pending_dataset and pending_dataset.get('package_data'):
+            package_data = pending_dataset['package_data']
+            if package_data.get("groups", None) is not None:
+                _groups = [
+                    tk.get_action("group_show")(context, {"id": group.get('name')})
+                    for group in package_data.get("groups")
+                ]
+                groups = [
+                    {
+                        "description": group.get("description"),
+                        "display_name": group.get("display_name"),
+                        "id": group.get("id"),
+                        "image_display_url": group.get("image_display_url"),
+                        "name": group.get("name"),
+                        "title": group.get("title"),
+                        "type": group.get("type"),
+                        "homepage_url": group.get("homepage_url", None) if 'homepage_url' in group else None,
+                        "contact_url": group.get("contact_url", None) if 'contact_url' in group else None,
+                        "help_url": group.get("help_url", None) if 'help_url' in group else None,
+                    }
+                    for group in _groups
+                ]
+                for group in groups:
+                    if group.get('help_url') is None:
+                        del group['help_url']
+                    if group.get('contact_url') is None:
+                        del group['contact_url']
+                    if group.get('homepage_url') is None:
+                        del group['homepage_url']
+                pending_dataset['package_data']["groups"] = groups
     except Exception as e:
         log.error(e)
         raise tk.ValidationError(e)
@@ -581,8 +624,9 @@ def pending_diff_show(context: Context, data_dict: DataDict):
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
         if pending_dataset is not None:
-            context["for_approval"] = True
-            pending_dataset = pending_dataset.get("package_data")
+            # context["for_approval"] = True
+            pending_dataset = get_action('pending_dataset_show')(context, { "package_id": package_id})
+            pending_dataset = pending_dataset['package_data']
             existing_dataset = get_action("package_show")(context, {"id": package_id})
             dataset_diff = _diff(existing_dataset, pending_dataset)
     except Exception as e:
@@ -1356,9 +1400,7 @@ def _add_group_types(context: Context, data_dict: DataDict):
             }
 
             if group_type == "application":
-                group_dict_updates = {
-                    "type": group_type
-                }
+                group_dict_updates = {"type": group_type}
                 group.update(group_dict_updates)
 
                 for key, value in new_group_dict.items():
@@ -1372,8 +1414,7 @@ def _add_group_types(context: Context, data_dict: DataDict):
                 group.update({"type": group_type})
                 updated_package_groups.append(group)
 
-        data_dict["groups"] = updated_package_groups
-        data_dict["applications"] = package_applications if package_applications else []
+        data_dict["groups"] = updated_package_groups + package_applications
     except Exception as e:
         log.error(f"Error adding group types: {e}")
 

@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing_extensions import TypeAlias, Any
 import logging
 import requests
@@ -5,6 +6,7 @@ from urllib.parse import urljoin
 import json
 from typing import Any, Union, cast
 import six
+from ckan.common import _, config, current_user
 
 from ckanext.wri.model.notification import Notification, notification_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
@@ -26,8 +28,10 @@ import ckan.plugins as plugins
 import ckan.lib.uploader as uploader
 import ckan.lib.plugins as lib_plugins
 import ckan.lib.dictization.model_save as model_save
-
-from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
+from ckanext.wri.logic.action.action_helpers import (
+    stringify_actor_objects,
+    _before_dataset_create_or_update,
+)
 import uuid
 
 NotificationGetUserViewedActivity: TypeAlias = None
@@ -204,7 +208,7 @@ def notification_create(
 
     user_notifications = Notification(
         recipient_id=recipient_id,
-        sender_id=sender_id if sender_id else '',
+        sender_id=sender_id if sender_id else "",
         activity_type=activity_type,
         object_type=object_type,
         object_id=object_id,
@@ -285,7 +289,9 @@ def migrate_dataset(context: Context, data_dict: DataDict):
 
     if not dataset_id:
         if not gfw_dataset:
-            raise tk.ValidationError(_("Dataset 'rw_dataset_id' or 'gfw_dataset' is required"))
+            raise tk.ValidationError(
+                _("Dataset 'rw_dataset_id' or 'gfw_dataset' is required")
+            )
         else:
             data_dict["gfw_only"] = True
 
@@ -414,7 +420,27 @@ def package_create(context: Context, data_dict: DataDict):
 
     data_dict = stringify_actor_objects(data_dict)
 
+    _before_dataset_create_or_update(context, data_dict)
     dataset = l.action.create.package_create(context, data_dict)
+    if dataset.get("groups"):
+        # This is necessary because the pending dataset doesnt have any of the logic that package_show has
+        groups = [
+            tk.get_action("group_show")(context, {"id": group.get("name")})
+            for group in dataset.get("groups")
+        ]
+        groups = [
+            {
+                "id": group.get("id"),
+                "name": group.get("name"),
+                "display_name": group.get("display_name"),
+                "title": group.get("title"),
+                "description": group.get("description"),
+                "image_display_url": group.get("image_display_url"),
+                "type": group.get("type"),
+            }
+            for group in groups
+        ]
+        dataset["groups"] = groups
     if data_dict.get("owner_org"):
         org = tk.get_action("organization_show")(
             context, {"id": data_dict.get("owner_org")}
@@ -458,16 +484,18 @@ def package_create(context: Context, data_dict: DataDict):
             context, {"dataset_id": dataset.get("id")}
         )
 
-    if (dataset.get("visibility_type") == "internal"):
+    if dataset.get("visibility_type") == "internal":
         print("INTERNAL PENDING DATASET")
 
-        __import__('pprint').pprint(pending_dataset)
+        __import__("pprint").pprint(pending_dataset)
     return dataset
 
 
 # IMPORTANT: This function includes an override/change for authors/maintainers (the call to stringify_actor_objects).
 # This is not a 1:1 match with the original function, though all other logic is the same.
-def old_package_create(context: Context, data_dict: DataDict) -> ActionResult.PackageCreate:
+def old_package_create(
+    context: Context, data_dict: DataDict
+) -> ActionResult.PackageCreate:
     """Create a new dataset (package).
 
     You must be authorized to create new datasets. If you specify any groups
@@ -721,8 +749,8 @@ def resource_create(
     if not data_dict.get("url"):
         data_dict["url"] = ""
 
-    if not data_dict.get('id'):
-        data_dict['id'] = str(uuid.uuid4())
+    if not data_dict.get("id"):
+        data_dict["id"] = str(uuid.uuid4())
 
     package_show_context: Union[Context, Any] = dict(context, for_update=True)
     pkg_dict = _get_action("package_show")(package_show_context, {"id": package_id})
@@ -764,15 +792,15 @@ def resource_create(
     # package_show until after commit
     package = context["package"]
     assert package
-    upload.upload(data_dict['id'], uploader.get_max_resource_size())
+    upload.upload(data_dict["id"], uploader.get_max_resource_size())
 
     model.repo.commit()
 
     #  Run package show again to get out actual last_resource
     updated_pkg_dict = _get_action("package_show")(context, {"id": package_id})
     resource = updated_pkg_dict["resources"][-1]
-    if not resource.get('id'):
-        resource['id'] = data_dict['id']
+    if not resource.get("id"):
+        resource["id"] = data_dict["id"]
 
     #  Add the default views to the new resource
     logic.get_action("resource_create_default_resource_views")(
