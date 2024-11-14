@@ -17,8 +17,9 @@ export function Hero({ application }: { application: Application }) {
                     alt="Application name"
                     fill={true}
                     src={`${
-                        application?.image_url ??
-                        '/images/placeholders/topics/topicsdefault.png'
+                        application.image_display_url !== ''
+                            ? application?.image_display_url
+                            : '/images/placeholders/applications/applicationsdefault.png'
                     }`}
                     className="object-cover"
                 />
