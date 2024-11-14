@@ -177,13 +177,13 @@ export function About({
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
                                 {applications.map((application, applicationIdx) => (
-                                    <Link href={`/applications/${application.name}`}>
+                                    <span>
                                         {application.display_name ?? application.name}
                                         {applications &&
                                         applicationIdx !== applications.length - 1
                                             ? ', '
                                             : ''}
-                                    </Link>
+                                    </span>
                                 ))}
                             </dd>
                         </>
