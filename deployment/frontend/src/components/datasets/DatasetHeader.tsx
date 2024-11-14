@@ -864,22 +864,22 @@ export function DatasetHeader({
                     </div>
                 </div>
                 {dataset?.cautions && (
-                    <div className="flex flex-col lg:flex-row rounded-sm bg-cyan-700 bg-opacity-10 p-[11px] gap-y-2 lg:gap-x-2 lg:gap-y-0 leading-[1.125rem]">
+                    <div className="flex flex-col lg:flex-row rounded-sm bg-cyan-700 bg-opacity-10 p-[11px] pr-[30px] gap-y-2 lg:gap-x-2 lg:gap-y-0 leading-[1.125rem]">
                         <ExclamationTriangleIcon className=" grow max-h-8 max-w-8 text-[#F3B229] sm:h-12 sm:w-12 stroke-black" />
-                        <div className=" pt-1 ">
+                        <div className=" pt-2 ">
                             <div
-                                className={`text-justify prose max-w-none prose-sm  prose-a:text-wri-green
+                                className={`text-justify prose max-w-none   leading-[1.125rem] text-[14px]  prose-a:text-wri-green
                                     ${expanded ? '' : 'line-clamp-4 '}
                                     ${highlighted('cautions')}   `}
                                 dangerouslySetInnerHTML={{
                                     __html: (dataset?.cautions ?? '')
                                         .replace(
                                             /^<p>/,
-                                            `<p><span class="font-acumin text-sm font-semibold leading-none text-black">Caution: ${' '}</span>`
+                                            `<p><span class="font-acumin font-semibold text-black">Caution: ${' '}</span>`
                                         )
                                         .replace(
                                             /^(?!<p>)/,
-                                            `<span class="font-acumin text-sm font-semibold leading-none text-black">Caution: ${' '}</span>`
+                                            `<span class="font-acumin font-semibold text-black">Caution: ${' '}</span>`
                                         ),
                                 }}
                             ></div>
