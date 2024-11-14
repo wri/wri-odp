@@ -102,7 +102,6 @@ export default function SearchPage(
     const [facetSelectedCount, setFacetSelectedCount] = useState<
         Record<string, number>
     >({
-        application: filterCount('application', filters) || 0,
         project: filterCount('project', filters) || 0,
         organization: filterCount('organization', filters) || 0,
         groups: filterCount('groups', filters) || 0,

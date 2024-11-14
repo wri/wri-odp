@@ -19,7 +19,7 @@ from ckanext.wri.logic.action.send_group_notification import (
     GroupNotificationParams,
     send_group_notification,
 )
-from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
+from ckanext.wri.logic.action.action_helpers import stringify_actor_objects, _before_dataset_create_or_update
 import ckan.plugins.toolkit as tk
 import ckan.logic as logic
 from ckan.common import _
@@ -166,8 +166,6 @@ def pending_dataset_update(context: Context, data_dict: DataDict):
 
     if not package_data:
         raise tk.ValidationError(_("package_data is required"))
-
-    tk.check_access("package_create", context, package_data)
 
     pending_dataset = None
 
@@ -468,6 +466,7 @@ def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.Pac
     You must be authorized to edit the dataset and the groups that it belongs
     to.
     """
+    _before_dataset_create_or_update(context, data_dict)
     _check_access("package_patch", context, data_dict)
 
     show_context: Context = {

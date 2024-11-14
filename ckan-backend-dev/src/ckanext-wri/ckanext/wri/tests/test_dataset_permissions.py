@@ -17,6 +17,7 @@ def test_package_create_public(mail_user):
         title="Test Group",
         description="A description of the group",
     )
+    group_dict = factories.Group()
 
     userobj_sysadmin = factories.Sysadmin()
     userobj_org_admin = factories.User()
