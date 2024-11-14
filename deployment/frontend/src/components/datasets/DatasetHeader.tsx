@@ -869,7 +869,7 @@ export function DatasetHeader({
                         <div className=" pt-1 ">
                             <div
                                 className={`text-justify prose max-w-none prose-sm  prose-a:text-wri-green
-                                    ${expanded ? '' : 'line-clamp-2 '}
+                                    ${expanded ? '' : 'line-clamp-4 '}
                                     ${highlighted('cautions')}   `}
                                 dangerouslySetInnerHTML={{
                                     __html: (dataset?.cautions ?? '')
