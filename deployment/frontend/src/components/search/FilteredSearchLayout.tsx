@@ -44,7 +44,6 @@ export default function FilteredSearchLayout({
      *
      */
     const facetFields = [
-        { key: 'applications', title: 'Applications' },
         { key: 'project', title: 'Project' },
         { key: 'organization', title: 'Team' },
         { key: 'groups', title: 'Topics' },
