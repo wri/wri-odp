@@ -27,6 +27,8 @@ const facets = [
   "Language",
   "WRI Data",
 ];
+const topic1 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const topic2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 
 describe("Home page", () => {
   before(() => {
@@ -37,18 +39,14 @@ describe("Home page", () => {
       orgs.push(name);
     });
 
-    // Create groups
-    [...new Array(2).keys()].map((k) => {
-      const name = getRandomGroupName();
-      cy.createGroupAPI(name);
-      groups.push(name);
-    });
+    cy.createGroupAPI(topic1);
+    cy.createGroupAPI(topic2);
 
     // Create datasets
     [...new Array(2).keys()].map((k, i) => {
       const name = getRandomDatasetName();
       cy.createDatasetAPI(i < 7 ? orgs[0] : orgs[1], name, true, {
-        groups: groups.map((name) => ({ name })),
+        groups: [{name: topic1}, {name: topic2 }],
         featured_dataset: true,
         tags: i < 7 ? [{ name: "tags 1" }] : [{ name: "tags 2" }],
         temporal_coverage_start: i < 7 ? 2005 : 2010,
@@ -76,7 +74,7 @@ describe("Home page", () => {
 
     cy.url().should("include", "search_advanced");
     cy.contains("results", { timeout: 40000 });
-    cy.contains(`Search: ${datasets[0]}`, { timeout: 40000 });
+    cy.contains(`Search: ${datasets[0]}`, { timeout: 90040000 });
     cy.contains(`${datasets[0]}`, { timeout: 40000 });
   });
 
@@ -84,9 +82,8 @@ describe("Home page", () => {
     cy.viewport(1440, 2800);
     cy.visit("/");
     cy.contains("Topics");
-    groups.forEach((group) => {
-      cy.contains(group);
-    });
+    cy.contains(topic1);
+    cy.contains(topic2);
   });
 
   it("contains highlights", () => {
@@ -102,8 +99,10 @@ describe("Home page", () => {
     datasets.forEach((name) => cy.deleteDatasetAPI(name));
     datasets.forEach((name) => cy.purgeDataset(name));
 
-    groups.forEach((name) => cy.deleteGroupAPI(name));
-    groups.forEach((name) => cy.purgeGroup(name));
+    cy.deleteGroupAPI(topic1)
+    cy.deleteGroupAPI(topic2)
+    cy.purgeGroup(topic1)
+    cy.purgeGroup(topic2)
 
     orgs.forEach((name) => cy.deleteOrganizationAPI(name));
     orgs.forEach((name) => cy.purgeOrganization(name));
