@@ -81,7 +81,7 @@ describe("Home page", () => {
   });
 
   it("contains topics", () => {
-    cy.viewport(1440, 900);
+    cy.viewport(1440, 2800);
     cy.visit("/");
     cy.contains("Topics");
     groups.forEach((group) => {
