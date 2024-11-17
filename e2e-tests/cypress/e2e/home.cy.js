@@ -48,9 +48,8 @@ describe("Home page", () => {
     [...new Array(2).keys()].map((k, i) => {
       const name = getRandomDatasetName();
       cy.createDatasetAPI(i < 7 ? orgs[0] : orgs[1], name, true, {
-        groups: [{ name: groups[0] }, { name: groups[1] }],
+        groups: groups.map((name) => ({ name })),
         featured_dataset: true,
-        application: i < 7 ? "Application 1" : "Application 2",
         tags: i < 7 ? [{ name: "tags 1" }] : [{ name: "tags 2" }],
         temporal_coverage_start: i < 7 ? 2005 : 2010,
         temporal_coverage_end: i < 7 ? 2010 : 2012,
@@ -82,6 +81,7 @@ describe("Home page", () => {
   });
 
   it("contains topics", () => {
+    cy.viewport(1440, 900);
     cy.visit("/");
     cy.contains("Topics");
     groups.forEach((group) => {
