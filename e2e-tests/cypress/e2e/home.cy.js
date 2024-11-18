@@ -41,14 +41,21 @@ describe("Home page", () => {
       orgs.push(name);
     });
 
-    cy.createGroupAPI(topic1);
-    cy.createGroupAPI(topic2);
+    cy.createGroupAPI(topic1).then((response) => {
+      cy.log(response.body);
+    });
+    cy.createGroupAPI(topic2).then((response) => {
+      cy.log(response.body);
+    });
 
     // Create datasets
     [...new Array(2).keys()].map((k, i) => {
       const name = getRandomDatasetName();
       cy.createDatasetAPI(i < 7 ? orgs[0] : orgs[1], name, true, {
-        groups: [{name: topic1}, {name: topic2 }],
+        groups: [
+          { id: topic1, name: topic1 },
+          { id: topic2, name: topic2 },
+        ],
         featured_dataset: true,
         tags: i < 7 ? [{ name: "tags 1" }] : [{ name: "tags 2" }],
         temporal_coverage_start: i < 7 ? 2005 : 2010,
@@ -101,10 +108,10 @@ describe("Home page", () => {
     datasets.forEach((name) => cy.deleteDatasetAPI(name));
     datasets.forEach((name) => cy.purgeDataset(name));
 
-    cy.deleteGroupAPI(topic1)
-    cy.deleteGroupAPI(topic2)
-    cy.purgeGroup(topic1)
-    cy.purgeGroup(topic2)
+    cy.deleteGroupAPI(topic1);
+    cy.deleteGroupAPI(topic2);
+    cy.purgeGroup(topic1);
+    cy.purgeGroup(topic2);
 
     orgs.forEach((name) => cy.deleteOrganizationAPI(name));
     orgs.forEach((name) => cy.purgeOrganization(name));
