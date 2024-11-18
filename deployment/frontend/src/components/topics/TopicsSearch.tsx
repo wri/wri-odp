@@ -15,15 +15,20 @@ export default function TopicsSearch({
     return (
         <section
             id="search"
-            className="bg-cover bg-center bg-no-repeat w-full flex flex-col justify-center font-acumin h-[245px]"
+            className="bg-cover bg-center bg-no-repeat w-full flex flex-col justify-center font-acumin h-[245px] "
             style={{
                 backgroundImage: 'url(/images/bg.png)',
             }}
         >
             <form
                 onSubmit={(e) => console.log(e)}
-                className="w-full px-8 xxl:px-0 max-w-8xl mx-auto"
+                className="w-full px-8 xxl:px-0 max-w-8xl mx-auto -mt-[37px] "
             >
+                <div className="w-full max-w-[819px] xxl:pl-8 2xl:px-0 ">
+                    <h1 className="text-[40px]  leading-[48px] font-['Acumin Pro SemiCondensed'] font-semibold text-white mb-[31px]">
+                        Topics
+                    </h1>
+                </div>
                 <div className="relative flex w-full max-w-[819px] items-start justify-start gap-x-6 xxl:pl-8 2xl:px-0">
                     <input
                         onChange={(e) => setQuery(e.target.value)}

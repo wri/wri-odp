@@ -236,7 +236,7 @@ export async function getServerSideProps(
             },
         }
     } catch (e) {
-    console.log('E', e)
+        console.log('E', e)
         return {
             props: {
                 redirect: {
@@ -388,7 +388,7 @@ export default function DatasetPage(
     }, [issues.data, query.tab])
 
     const links = [
-        { label: 'Explore Data', url: '/search', current: false },
+        { label: 'Datasets', url: '/search', current: false },
         {
             label: datasetData?.title ?? datasetData?.name ?? '',
             url: `/datasets/${datasetData?.name ?? '404'}`,

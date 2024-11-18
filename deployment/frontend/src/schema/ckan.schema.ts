@@ -219,6 +219,7 @@ export interface GroupTree {
     children: GroupTree[]
     title?: string
     image_display_url?: string
+    parent_name?: string
 }
 
 export interface Collaborator {
