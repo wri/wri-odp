@@ -67,6 +67,7 @@ describe("Home page", () => {
         private: false,
         visibility_type: "public",
       });
+      cy.approvePendingDatasetAPI(name);
       datasets.push(name);
     });
   });
