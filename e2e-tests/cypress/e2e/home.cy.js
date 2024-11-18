@@ -53,8 +53,8 @@ describe("Home page", () => {
           const name = getRandomDatasetName();
           cy.createDatasetAPI(i < 7 ? orgs[0] : orgs[1], name, true, {
             groups: [
-              { id: topic1, name: topic1 },
-              { id: topic2, name: topic2 },
+              { name: topic1 },
+              { name: topic2 },
             ],
             featured_dataset: true,
             tags: i < 7 ? [{ name: "tags 1" }] : [{ name: "tags 2" }],
