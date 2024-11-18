@@ -63,7 +63,6 @@ describe("Home page", () => {
         update_frequency: i < 7 ? "annually" : "daily",
         language: i < 7 ? "en" : "pt",
         wri_data: i < 7 ? true : false,
-        featured_dataset: true,
         private: false,
         visibility_type: "public",
       });
@@ -106,15 +105,15 @@ describe("Home page", () => {
 
   after(() => {
     // Delete and purge datasets
-    datasets.forEach((name) => cy.deleteDatasetAPI(name));
-    datasets.forEach((name) => cy.purgeDataset(name));
+    //datasets.forEach((name) => cy.deleteDatasetAPI(name));
+    //datasets.forEach((name) => cy.purgeDataset(name));
 
-    cy.deleteGroupAPI(topic1);
-    cy.deleteGroupAPI(topic2);
-    cy.purgeGroup(topic1);
-    cy.purgeGroup(topic2);
+    //cy.deleteGroupAPI(topic1);
+    //cy.deleteGroupAPI(topic2);
+    //cy.purgeGroup(topic1);
+    //cy.purgeGroup(topic2);
 
-    orgs.forEach((name) => cy.deleteOrganizationAPI(name));
-    orgs.forEach((name) => cy.purgeOrganization(name));
+    //orgs.forEach((name) => cy.deleteOrganizationAPI(name));
+    //orgs.forEach((name) => cy.purgeOrganization(name));
   });
 });
