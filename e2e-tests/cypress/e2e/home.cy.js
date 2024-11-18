@@ -1,6 +1,8 @@
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 
+const uuid = () => Math.random().toString(36).slice(2) + "-test";
+
 const getRandomDatasetName = () =>
   Math.random().toString(36).slice(2) + Cypress.env("DATASET_NAME_SUFFIX");
 const getRandomOrganizationName = () =>
@@ -27,8 +29,8 @@ const facets = [
   "Language",
   "WRI Data",
 ];
-const topic1 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const topic2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const topic1 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}_topic_1`;
+const topic2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}_topic_2`;
 
 describe("Home page", () => {
   before(() => {
