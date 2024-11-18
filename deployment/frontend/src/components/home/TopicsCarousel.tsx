@@ -77,16 +77,22 @@ export function TopicsCarousel() {
                         </div>
                     )}
 
-                    {data?.topics.map((topic, index) => (
-                        <SwiperSlide key={index} className="">
-                            <div className=" w-80 pr-6">
-                                <TopicCard
-                                    topic={topic}
-                                    topicDetails={data.topicDetails}
-                                />
-                            </div>
-                        </SwiperSlide>
-                    ))}
+                    {data?.topics
+                        .filter((topic) => {
+                            const datasetCount =
+                                data.topicDetails[topic.id]?.package_count ?? 0
+                            return datasetCount > 0
+                        })
+                        .map((topic, index) => (
+                            <SwiperSlide key={index} className="">
+                                <div className=" w-80 pr-6">
+                                    <TopicCard
+                                        topic={topic}
+                                        topicDetails={data.topicDetails}
+                                    />
+                                </div>
+                            </SwiperSlide>
+                        ))}
                 </AutoCarousel>
             </div>
         </div>
