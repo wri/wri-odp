@@ -43,6 +43,7 @@ export function OverviewForm({
 
     const possibleOwners = api.teams.getAllTeams.useQuery()
     const possibleTags = api.tags.getAllTags.useQuery()
+    const possibleApplications = api.applications.getAllApplications.useQuery()
     const topicHierarchy = api.topics.getTopicsHierarchy.useQuery()
     const possibleLicenses = api.dataset.getLicenses.useQuery()
 
@@ -155,12 +156,44 @@ export function OverviewForm({
                             type="text"
                         />
                     </InputGroup>
-                    <InputGroup label="Application">
-                        <Input
-                            {...register('application')}
-                            placeholder="ex. Global Forest Watch"
-                            type="text"
-                        />
+                    <InputGroup label="Applications">
+                        {match(possibleApplications)
+                            .with({ isLoading: true }, () => (
+                                <span className="flex items-center text-sm gap-x-2">
+                                    <Spinner />{' '}
+                                    <span className="mt-1">
+                                        Loading applications...
+                                    </span>
+                                </span>
+                            ))
+                            .with({ isError: true }, () => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading applications, please refresh
+                                    the page
+                                </span>
+                            ))
+                            .with(
+                                { isSuccess: true, data: P.select() },
+                                (data) => (
+                                    <MulText
+                                        name="applications"
+                                        formObj={formObj}
+                                        options={data.map((app) => ({
+                                            label: app.title,
+                                            value: app.name,
+                                        }))}
+                                        title="Applications"
+                                        tooltip="Remove application"
+                                        aria-label="Remove application"
+                                    />
+                                )
+                            )
+                            .otherwise(() => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading applications, please refresh
+                                    the page
+                                </span>
+                            ))}
                     </InputGroup>
                     <InputGroup label="Topics">
                         {match(topicHierarchy)
@@ -237,6 +270,7 @@ export function OverviewForm({
                                         title="Tags"
                                         tooltip="Remove tag"
                                         aria-label="Remove tag"
+                                        allowsCreationOfItems
                                     />
                                 )
                             )
@@ -308,7 +342,7 @@ export function OverviewForm({
                     </InputGroup>
                     <InputGroup label="Citation" className="items-start">
                         <TextArea
-                            aria-label='Citation'
+                            aria-label="Citation"
                             placeholder=""
                             type="text"
                             {...register('citation')}
@@ -372,7 +406,10 @@ export function OverviewForm({
                     <div
                         className={classNames(
                             'items-end flex-col justify-end space-y-5',
-                            watch('visibility_type') && watch('visibility_type')?.value === 'public' ? 'flex' : 'hidden'
+                            watch('visibility_type') &&
+                                watch('visibility_type')?.value === 'public'
+                                ? 'flex'
+                                : 'hidden'
                         )}
                     >
                         <div className="relative flex justify-end">

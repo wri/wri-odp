@@ -369,7 +369,7 @@ export function DatasetHeader({
     is_approved?: boolean
 }) {
     const router = useRouter()
-
+    const [expanded, setExpanded] = useState(false)
     const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
         useToggleLayergroups()
     const { activeCharts, addCharts, removeCharts } = useActiveCharts()
@@ -864,22 +864,32 @@ export function DatasetHeader({
                     </div>
                 </div>
                 {dataset?.cautions && (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-x-3 rounded-sm bg-cyan-700 bg-opacity-10 p-3">
-                        <ExclamationCircleIcon className="col-span-1 grow max-h-8 max-w-8 text-wri-gold sm:h-12 sm:w-12" />
-                        <div className="col-span-11">
-                            <span
-                                className={`font-acumin text-sm font-semibold leading-none text-black ${highlighted(
-                                    'cautions'
-                                )}`}
-                            >
-                                Caution:{' '}
-                            </span>
+                    <div className="flex flex-col lg:flex-row rounded-sm bg-cyan-700 bg-opacity-10 p-[11px] pr-[30px] gap-y-2 lg:gap-x-2 lg:gap-y-0 leading-[1.125rem]">
+                        <ExclamationTriangleIcon className=" grow max-h-8 max-w-8 text-[#F3B229] sm:h-12 sm:w-12 stroke-black" />
+                        <div className=" pt-2 ">
                             <div
-                                className="prose max-w-none prose-sm pr-8 text-justify prose-a:text-wri-green"
+                                className={`text-justify prose max-w-none   leading-[1.125rem] text-[14px]  prose-a:text-wri-green
+                                    ${expanded ? '' : 'line-clamp-4 '}
+                                    ${highlighted('cautions')}   `}
                                 dangerouslySetInnerHTML={{
-                                    __html: dataset?.cautions ?? '',
+                                    __html: (dataset?.cautions ?? '')
+                                        .replace(
+                                            /^<p>/,
+                                            `<p><span class="font-acumin font-semibold text-black">Caution: ${' '}</span>`
+                                        )
+                                        .replace(
+                                            /^(?!<p>)/,
+                                            `<span class="font-acumin font-semibold text-black">Caution: ${' '}</span>`
+                                        ),
                                 }}
                             ></div>
+
+                            <button
+                                className=" inline p-0 m-0 bg-transparent border-none  text-[#32864B] underline font-normal text-[0.875rem] leading-[0.75rem]"
+                                onClick={() => setExpanded(!expanded)}
+                            >
+                                {expanded ? 'Read Less' : 'Read More'}
+                            </button>
                         </div>
                     </div>
                 )}
