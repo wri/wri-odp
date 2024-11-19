@@ -4,7 +4,7 @@ import json
 import requests
 from requests.exceptions import HTTPError, RequestException
 import datetime
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 import sqlalchemy as sa
 import os
 import requests
@@ -57,7 +57,6 @@ class WRIHarvesterBase(HarvesterBase):
             file_url = resource.get("url")
             file_name = file_url.split("/")[-1]
             resource["package_id"] = package_dict["id"]
-            log.error(f"File URL: {file_url}")
 
             if file_url:
                 if harvest_object.job.source.url.strip("/") in file_url:
@@ -94,10 +93,7 @@ class WRIHarvesterBase(HarvesterBase):
                             resource["url_type"] = "upload"
                             resource["url"] = file_name
 
-                            log.error(f"Uploading resource with file: {temp_file.name}")
-                            log.error(
-                                p.toolkit.get_action("resource_update")(context, resource)
-                            )
+                            p.toolkit.get_action("resource_update")(context, resource)
 
                         os.remove(temp_file.name)
 
@@ -618,14 +614,14 @@ class CKANHarvesterWRI(WRIHarvesterBase):
         #   and remove any duplicates.
         params["sort"] = "id asc"
         if fq_terms:
-            params["fq"] = " ".join(fq_terms)
+            params["fq"] = f"({' OR '.join(fq_terms)})"
 
         pkg_dicts = []
         pkg_ids = set()
         previous_content = None
         while True:
-            url = base_search_url + "?" + urlencode(params)
-            log.debug("Searching for CKAN datasets: %s", url)
+            url = base_search_url + "?" + urlencode(params, quote_via=quote)
+
             try:
                 content = self._get_content(url)
             except ContentFetchError as e:
@@ -766,9 +762,13 @@ class CKANHarvesterWRI(WRIHarvesterBase):
                                 "groups",
                                 "tags",
                                 "extras",
-                                "display_name",
                             ]:
                                 group.pop(key, None)
+
+                            image_display_url = group.get("image_display_url")
+
+                            if image_display_url:
+                                group["image_url"] = image_display_url
 
                             get_action("group_create")(base_context.copy(), group)
                             log.info("Group %s has been newly created", group_)
@@ -826,10 +826,14 @@ class CKANHarvesterWRI(WRIHarvesterBase):
                                     "groups",
                                     "tags",
                                     "extras",
-                                    "display_name",
-                                    "type",
                                 ]:
                                     org.pop(key, None)
+
+                                image_display_url = org.get("image_display_url")
+
+                                if image_display_url:
+                                    org["image_url"] = image_display_url
+
                                 get_action("organization_create")(
                                     base_context.copy(), org
                                 )
