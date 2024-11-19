@@ -246,7 +246,7 @@ def normalize_value(value):
     return value.strip()
 
 
-def check_dataset_exists(dataset_id, rw_id=None, application=None):
+def check_dataset_exists(dataset_id, dx_application, rw_application, rw_id):
     """
     Check if dataset exists in CKAN.
     """
@@ -255,9 +255,9 @@ def check_dataset_exists(dataset_id, rw_id=None, application=None):
         dataset = ckan.action.package_show(id=dataset_id)
         return True, dataset
     except ckanapi.errors.NotFound:
-        if rw_id and application:
+        if rw_id and dx_application and rw_application:
             dataset = ckan.action.package_search(
-                fq=f"+rw_id:{rw_id} +application:{application}"
+                fq=f"+rw_id:{rw_id} +(groups:{dx_application} OR application:{rw_application})"
             )
 
             dataset_count = dataset.get("count")
@@ -273,6 +273,8 @@ def check_dataset_exists(dataset_id, rw_id=None, application=None):
                 log.warning("Using the first dataset found.")
 
             return dataset_count > 0, dataset_results[0] if dataset_count > 0 else None
+        else:
+            log.error(f"Missing required parameters: rw_id, dx_application, rw_application: {rw_id}, {dx_application}, {rw_application}")
 
         return False, None
 
@@ -291,7 +293,8 @@ def get_datasets_from_csv(file_name):
             dataset = {}
             dataset_id = row.get("rw_dataset_id")
             gfw_dataset = row.get("gfw_dataset")
-            application = row.get("application")
+            rw_application = row.get("rw_application")
+            dx_application = row.get("dx_application")
             gfw_only = row.get("gfw_only") or False
 
             if not dataset_id:
@@ -300,10 +303,10 @@ def get_datasets_from_csv(file_name):
                 else:
                     dataset_id = gfw_dataset
                     gfw_only = True
-                    application = "gfw"
+                    rw_application = "gfw"
 
-            if not application:
-                raise ValueError("'application' required")
+            if not rw_application and not dx_application:
+                raise ValueError("Both 'rw_application' and 'dx_application' required")
 
             team = row.get("team")
             topics = row.get("topics")
@@ -325,7 +328,8 @@ def get_datasets_from_csv(file_name):
                 "rw_dataset_id": dataset_id,
                 "gfw_dataset": gfw_dataset,
                 "gfw_only": gfw_only,
-                "application": application,
+                "rw_application": rw_application,
+                "dx_application": dx_application,
                 "team": team,
                 "topics": topics,
                 "authors": authors,
@@ -347,7 +351,8 @@ def send_migration_dataset(data_dict):
 
     dataset_id = data_dict.get("rw_dataset_id")
     gfw_dataset = data_dict.get("gfw_dataset")
-    application = data_dict.get("application")
+    rw_application = data_dict.get("rw_application")
+    dx_application = data_dict.get("dx_application")
     gfw_only = data_dict.get("gfw_only")
     gfw_version = data_dict.get("gfw_version")
     dataset_slug = data_dict.get("dataset_slug")
@@ -361,8 +366,8 @@ def send_migration_dataset(data_dict):
             gfw_only = True
             application = "gfw"
 
-    if not application:
-        raise ValueError("'application' required")
+    if not rw_application and not dx_application:
+        raise ValueError("Both 'rw_application' and 'dx_application' required")
 
     dataset = get_dataset_from_api(
         dataset_id, application, gfw_dataset, gfw_only, gfw_version
@@ -471,7 +476,7 @@ def migrate_dataset(data_dict):
 
     dataset_name = data_dict.get("name")
     dataset_exists, dataset = check_dataset_exists(
-        dataset_name, data_dict.get("rw_id"), data_dict.get("application")
+        dataset_name, data_dict.get("dx_application"), data_dict.get("rw_application"), data_dict.get("rw_id")
     )
 
     log_name = f'{dataset_name if dataset_name else "Unknown dataset"} -'
@@ -938,7 +943,8 @@ def stringify_agents(data_dict):
 def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
     log = get_run_logger()
 
-    application = original_data_dict.get("application")
+    rw_application = original_data_dict.get("rw_application")
+    dx_application = original_data_dict.get("dx_application")
     team = original_data_dict.get("team")
     topics = original_data_dict.get("topics")
     whitelist = original_data_dict.get("whitelist")
@@ -979,31 +985,12 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
 
     base_name = dataset_slug or f'{get_value("name", data_object="dataset")}'
 
-    dataset_application = get_value("application")
-    requested_application = application
-
     warnings = []
 
-    if not requested_application:
-        warnings.append(
-            f"Requested application not found, using application: {application}"
-        )
-        requested_application = dataset_application
-
-    if dataset_application and type(dataset_application) == list:
-        application = [a.lower() for a in dataset_application]
-
-        if requested_application not in application:
-            warnings.append(
-                f"Requested application not found in dataset applications: {application}"
-            )
-            warnings.append(f"Requested application: {requested_application}")
-
-    application = requested_application
     gfw_title = None
 
-    if gfw_only or application == "gfw":
-        application = "gfw"
+    if gfw_only or rw_application == "gfw":
+        rw_application = "gfw"
         gfw_title = get_value("title", data_object="metadata")
 
         if not gfw_title and layer_names:
@@ -1012,7 +999,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
             if len(layer_name) == 1:
                 gfw_title = layer_name[0]
 
-    name = munge_title_to_name(f"{base_name} {application}")
+    name = dataset_slug or munge_title_to_name(f"{base_name} {rw_application}")
 
     log_name = f'{name if name else "Unknown dataset"} -'
 
@@ -1090,7 +1077,6 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
         "approval_status": approval_status,
         "is_approved": is_approved,
         "draft": is_draft,
-        "application": application,
         "visibility_type": visibility_type,
     }
 
@@ -1156,9 +1142,16 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
         if valid_topics:
             required_dataset_values["groups"] = valid_topics
 
+    try:
+        application_dict = ckan.action.group_show(id=dx_application)
+        required_dataset_values["groups"].append({"name": application_dict["name"]})
+    except ckanapi.errors.NotFound:
+        log.error(f"{log_name} Application not found: {dx_application}")
+        log.error(f"{log_name} The process will continue, but the dataset will not be associated with the desired application")
+
     resources = []
 
-    if application not in ["aqueduct", "aqueduct-water-risk"] and not gfw_only:
+    if rw_application not in ["aqueduct", "aqueduct-water-risk"] and not gfw_only:
         required_dataset_values["rw_id"] = resource["dataset_id"]
 
         for layer in layers:
