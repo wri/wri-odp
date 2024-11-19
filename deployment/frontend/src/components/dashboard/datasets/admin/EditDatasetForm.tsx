@@ -162,7 +162,12 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 (option) => option.value === dataset.language
             ),
             topics: dataset.groups
-                ? dataset.groups.map((group) => group.name)
+                //@ts-ignore
+                ? dataset.groups.filter(g => g.type === 'group').map((group) => group.name)
+                : [],
+            applications: dataset.groups
+                //@ts-ignore
+                ? dataset.groups.filter(g => g.type === 'application').map((group) => group.name)
                 : [],
             team: dataset.organization
                 ? {

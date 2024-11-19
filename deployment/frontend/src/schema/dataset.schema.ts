@@ -119,7 +119,7 @@ export const DatasetSchemaObject = z.object({
         id: z.string(),
     }),
     project: z.string().optional().nullable().or(emptyStringToUndefined),
-    application: z.string().optional().nullable(),
+    applications: z.array(z.string()).default([]),
     technical_notes: z
         .string()
         .url({

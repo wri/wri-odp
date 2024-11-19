@@ -236,6 +236,7 @@ export async function getServerSideProps(
             },
         }
     } catch (e) {
+    console.log('E', e)
         return {
             props: {
                 redirect: {
