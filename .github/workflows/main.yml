@@ -9,7 +9,7 @@ on:
 env:
   PROJECT_NAME: wri-odp
   BRANCH_NAME: dev
-  ENABLE_TRIVY_SCANNING: false
+  ENABLE_TRIVY_SCANNING: true
 permissions:
   id-token: write
   contents: read
