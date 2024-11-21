@@ -28,7 +28,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@next/mdx": "^14.2.3",
     "@portaljs/ckan": "^0.1.0",
-    "semver": "^7.3.5",
+    "moment": "^2.29.2",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-popover": "^1.1.2",
     "@radix-ui/react-scroll-area": "^1.0.5",
