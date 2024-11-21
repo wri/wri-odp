@@ -875,6 +875,7 @@ export function findNameInTree(
     // Recursive case: search through children
     if (tree.children && tree.children.length > 0) {
         for (const child of tree.children) {
+            child.parent_name = tree.name
             const result = findNameInTree(child, targetName)
             if (result) {
                 return result // If found in child, return the result

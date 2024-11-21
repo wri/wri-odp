@@ -19,6 +19,7 @@ import { env } from '@/env.mjs'
 import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
 import { Organization as CkanOrg } from '@portaljs/ckan'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
 
 const TeamsSearchResults = dynamic(
     () => import('@/components/team/TeamsSearchResults')
@@ -98,6 +99,7 @@ export default function TeamsPage(
     }
 
     const filteredTeams = ProcessTeams()
+    const links = [{ label: 'Teams', url: '/teams', current: true }]
 
     return (
         <>
@@ -112,6 +114,7 @@ export default function TeamsPage(
                 }}
             />
             <Header />
+            <Breadcrumbs links={links} />
             <TeamsSearch
                 isLoading={isLoading}
                 setQuery={setQuery}
