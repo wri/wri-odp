@@ -110,7 +110,7 @@ export default function Home(
                 </div>
                 <div className="col-span-3 flex flex-col gap-y-4">
                     <div
-                        className={`w-full font-['Acumin Pro SemiCondensed'] text-[23px] font-light leading-[30px] text-neutral-700  md:overflow-hidden md:max-h-[100vh] transition duration-300 ease-in-out h-auto`}
+                        className={`w-full font-acumin text-[23px] font-light leading-[30px] text-[#3F3F3F]  md:overflow-hidden md:max-h-[100vh] transition duration-300 ease-in-out h-auto`}
                     >
                         <p>
                             WRI believes that good data is the foundation of

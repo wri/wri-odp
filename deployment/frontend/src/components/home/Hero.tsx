@@ -53,7 +53,7 @@ export function Hero() {
     return (
         <div className="bg-gray-900">
             <header className="absolute inset-x-0 top-0 z-50">
-                <div className=" w-full bg-wri-green  py-2 text-center  text-white font-['Acumin Pro SemiCondensed'] text-lg leading-normal">
+                <div className=" w-full bg-wri-green  py-2 text-center  text-white font-acumin text-lg leading-normal">
                     This site updates WRI’s Open Data Portal. If you cannot find
                     what you’re looking for, you can access the former Open Data
                     Portal{' '}
@@ -215,7 +215,7 @@ export function Hero() {
                         <h1 className="max-w-[592px] pr-5 font-acumin text-4xl font-semibold text-white">
                             Data Explorer - Beta
                         </h1>
-                        <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] font-light text-neutral-200 leading-[30px] text-[23px]">
+                        <p className="font-acumin max-w-[705px] font-light text-[#DFDFDF] leading-[30px] text-[23px]">
                             WRI produces and curates hundreds of datasets as
                             part of our commitment to turn information into
                             action. These products are based on our research and
@@ -232,7 +232,7 @@ export function Hero() {
                             including objectivity and rigor.
                         </p>
                         <br />
-                        <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
+                        <p className="font-acumin max-w-[705px] leading-[30px] text-[23px] font-light text-[#DFDFDF]">
                             Explore using the search bar or use more advanced
                             filters.
                         </p>
