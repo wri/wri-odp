@@ -53,7 +53,7 @@ export function Hero() {
     return (
         <div className="bg-gray-900">
             <header className="absolute inset-x-0 top-0 z-50">
-                <div className=" w-full bg-wri-green  py-2 text-center  text-white font-acumin text-lg leading-normal">
+                <div className=" w-full bg-wri-green  py-2 text-center  text-white font-['Acumin Pro SemiCondensed'] text-lg leading-normal">
                     This site updates WRI’s Open Data Portal. If you cannot find
                     what you’re looking for, you can access the former Open Data
                     Portal{' '}
