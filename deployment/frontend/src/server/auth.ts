@@ -181,6 +181,9 @@ export const authOptions: NextAuthOptions = {
             clientId: env.AZURE_AD_CLIENT_ID ?? '',
             clientSecret: env.AZURE_AD_CLIENT_SECRET?.toString() ?? '',
             tenantId: env.AZURE_AD_TENANT_ID ?? '',
+            httpOptions: {
+                timeout: 30000,
+            },
         }),
     ],
 }

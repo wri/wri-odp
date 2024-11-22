@@ -24,6 +24,8 @@
     "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@mapbox/mapbox-gl-geocoder": "^5.0.1",
     "@mapbox/mapbox-sdk": "^0.15.5",
+    "@mdx-js/loader": "^3.0.1",
+    "@mdx-js/react": "^3.0.1",
     "@math.gl/web-mercator": "3.5.7",
     "@monaco-editor/react": "^4.6.0",
     "@next/mdx": "^14.2.3",

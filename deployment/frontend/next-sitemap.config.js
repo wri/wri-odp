@@ -8,7 +8,7 @@ module.exports = {
       additionalSitemaps: [
           `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/server-sitemap.xml`,
       ],
-      policies: [
+      policies:[
             {
                 userAgent: '*',
                 disallow: ['/dashboard/*'],

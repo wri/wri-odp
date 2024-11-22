@@ -73,4 +73,3 @@ USER root
 RUN chown -R ckan:ckan ${APP_DIR}/src/
 
 USER ckan
-

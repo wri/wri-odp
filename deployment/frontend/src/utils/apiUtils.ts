@@ -351,6 +351,7 @@ export async function getAllDatasetFq({
             url += `&user=true`
         }
 
+        console.log('URL', url)
         const response = await fetch(
             `${url}&start=${query.page?.start}&rows=${query.page?.rows}`,
             {
@@ -591,7 +592,7 @@ export async function getOneDataset(
             console.error(e)
         }
     }
-
+   
     const resources = await Promise.all(
         dataset.result.resources.map(async (r) => {
             if (r.url_type === 'upload' || r.url_type === 'link') {
@@ -2747,3 +2748,4 @@ export async function getTokenList(session: Session) {
 
     return json
 }
+
