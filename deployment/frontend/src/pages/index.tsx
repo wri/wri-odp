@@ -37,11 +37,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     })
 
     await Promise.all([
-        helpers.topics.getGeneralTopics.prefetch({
-            search: '',
-            page: { start: 0, rows: 50 },
-            allTree: true,
-        }),
+        helpers.topics.getTopicsHomePage.prefetch(),
         helpers.dataset.getFeaturedDatasets.prefetch({
             search: '',
             page: { start: 0, rows: 8 },

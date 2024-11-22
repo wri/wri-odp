@@ -51,11 +51,7 @@ function TopicCard({
 }
 
 export function TopicsCarousel() {
-    const { data, isLoading, error } = api.topics.getGeneralTopics.useQuery({
-        search: '',
-        page: { start: 0, rows: 50 },
-        allTree: true,
-    })
+    const { data, isLoading, error } = api.topics.getTopicsHomePage.useQuery()
     return (
         <div className="relative">
             <div className="peer">
