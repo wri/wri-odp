@@ -58,6 +58,13 @@ This is the WRI Open Data Portal extension for CKAN. It contains CKAN backend cu
 
 For information on the Prefect variables/blocks required for migrations, see the [migration README](../../../migration/README.md).
 
+## Plugins
+
+This extension includes the following plugins:
+- `wri` - The main plugin that loads ckanext-wri.
+- `wri_api_tracking` - A plugin that tracks API usage with Google Analytics.
+- `wri_harvester` - A custom harvester for ingesting datasets between WRI CKAN portals.
+
 ## Notifications Feature
 
 This extension includes a notification feature that utilizes its own database, action endpoints, and custom validators.
@@ -647,6 +654,38 @@ Most fields that are not mapped directly to CKAN are stored in a custom field ca
     "dataset.attributesPath": "None"
   },
   ... (other CKAN dataset fields) ...
+}
+```
+
+## WRI Harvester
+
+This extension includes a custom harvester for the ingesting datasets from other instances of this project (e.g., harvesting datasets from Production to Staging). Most of the customizations are behind-the-scenes, but a new config option was added, and it will need to be set if you want to create new resources within the datasets instead of using links to the original resources.
+
+In the harvest source configuration section, you can add the following option:
+
+```
+{
+    "create_resources": true
+}
+```
+
+Along with the new config option, all of [the existing harvest options](https://github.com/ckan/ckanext-harvest/tree/v1.6.0?tab=readme-ov-file#the-ckan-harvester) should still work as expected, such as specifying organizations to include or exclude, using an API key/token, etc.
+
+For example, let's assume that you want to:
+- Create new resources (full resources, instead of merely metadata pointing to the URL of the original data)
+- Create new organizations to match the source instance (if they don't exist already)
+- Only harvest datasets from two source organizations (`global-forest-watch` and `land-carbon-lab`), and
+- a single source group (`forests`)
+
+Your harvest source configuration would look something like this:
+
+```
+{
+    "remote_orgs": "create",
+    "remote_groups": "create",
+    "create_resources": true,
+    "organizations_filter_include": ["global-forest-watch", "land-carbon-lab"],
+    "groups_filter_include": ["forests"]
 }
 ```
 

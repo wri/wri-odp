@@ -187,6 +187,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_CKAN_REPO }}
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:staging-${{ github.sha }}'
           format: 'sarif'
@@ -201,6 +202,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.ECR_FRONTEND_REPO }}
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:staging-${{ github.sha }}'
           format: 'sarif'
