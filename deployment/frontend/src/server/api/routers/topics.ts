@@ -403,7 +403,7 @@ export const TopicRouter = createTRPCRouter({
                 const packagedetails = (await getAllDatasetFq({
                     apiKey: ctx?.session?.user.apikey ?? '',
                     fq: `groups:${topic.name}+is_approved:true`,
-                    query: { search: '', page: { start: 0, rows: 10000 } },
+                    query: { search: '', page: { start: 0, rows: 1 } },
                 }))!
                 topic.package_count = packagedetails.count
             }
