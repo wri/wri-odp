@@ -424,6 +424,9 @@ def migration_status(context: Context, data_dict: DataDict):
 
 
 def package_create(context: Context, data_dict: DataDict):
+    if data_dict.get("type") == "harvest":
+        return old_package_create(context, data_dict)
+
     data_dict["is_pending"] = True
     data_dict["is_approved"] = False
     data_dict["approval_status"] = "pending"
@@ -434,6 +437,11 @@ def package_create(context: Context, data_dict: DataDict):
 
     _before_dataset_create_or_update(context, data_dict)
     dataset = l.action.create.package_create(context, data_dict)
+    # `l.action.create.package_create` is not returning all of the fields (e.g., `url_type` in resources is missing/none)
+    # `package_show` seems to be working as expected
+    # TODO: Check if `old_package_create` can handle this (and that the changes there won't cause issues)
+    dataset = _get_action("package_show")(context, {"id": dataset.get("id")})
+
     if dataset.get("groups"):
         # This is necessary because the pending dataset doesnt have any of the logic that package_show has
         groups = [

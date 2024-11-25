@@ -137,6 +137,22 @@ export async function getGroups({
     }
 }
 
+export async function groupList({ apiKey }: { apiKey: string | null }) {
+    const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${apiKey ?? ''}`,
+            },
+        }
+    )
+    const topics: CkanResponse<Group[]> = await topicRes.json()
+    if (!topics.success && topics.error)
+        throw Error(replaceNames(topics.error.message))
+    return topics.result.filter((topic) => topic.state === 'active')
+}
+
 export async function getGroup({
     apiKey,
     id,

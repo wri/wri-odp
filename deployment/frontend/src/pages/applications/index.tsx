@@ -1,13 +1,11 @@
 import Header from '@/components/_shared/Header'
 import Footer from '@/components/_shared/Footer'
-import TopicsSearch from '@/components/topics/TopicsSearch'
+import ApplicationSearch from '@/components/applications/ApplicationSearch'
 import { NextSeo } from 'next-seo'
 import { api } from '@/utils/api'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Spinner from '@/components/_shared/Spinner'
 import type { SearchInput } from '@/schema/search.schema'
-import { useQuery } from 'react-query'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import Pagination from '@/components/datasets/Pagination'
 import { getServerAuthSession } from '@/server/auth'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
@@ -17,11 +15,9 @@ import superjson from 'superjson'
 import { env } from '@/env.mjs'
 import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
-import { Group as CkanGroup } from '@portaljs/ckan'
-type Group = CkanGroup & { numSubtopics: number }
 
-const TopicsSearchResults = dynamic(
-    () => import('@/components/topics/TopicsSearchResults')
+const ApplicationSearchResult = dynamic(
+    () => import('@/components/applications/ApplicationSearchResults')
 )
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -31,15 +27,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await Promise.all([
-        await helpers.topics.getGeneralTopics.prefetch({
-            search: '',
-            page: { start: 0, rows: 10000 },
-            allTree: true,
-        }),
-        await helpers.topics.list.prefetch(),
-        await helpers.topics.getNumberOfSubtopics.prefetch(),
-    ])
+    await Promise.all([await helpers.applications.list.prefetch()])
 
     return {
         props: {
@@ -48,7 +36,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
 }
 
-export default function TopicsPage(
+export default function ApplicationsPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
     const [pagination, setPagination] = useState<SearchInput>({
@@ -56,61 +44,68 @@ export default function TopicsPage(
         page: { start: 0, rows: 10 },
     })
     const [query, setQuery] = useState<string>('')
-    const { data, isLoading } = api.topics.getGeneralTopics.useQuery({
-        search: '',
-        page: { start: 0, rows: 10000 },
-        allTree: true,
-    })
-    const { data: allTopics } = api.topics.list.useQuery()
+    const { data: applications, isLoading } =
+        api.applications.getAllApplications.useQuery()
 
-    const indexTopics = new Index({
+    const indexApplications = new Index({
         tokenize: 'full',
     })
-    if (allTopics?.topics) {
-        allTopics?.topics.forEach((topic) => {
-            indexTopics.add(
-                topic.id,
+    if (applications) {
+        applications.forEach((application) => {
+            indexApplications.add(
+                application.id,
                 JSON.stringify({
-                    title: topic.title,
-                    description: topic.description,
+                    title: application.title,
+                    description: application.description,
                 })
             )
         })
     }
 
-    function ProcessTopics() {
-        if (!data || !allTopics)
-            return { topics: [], topicDetails: {}, count: 0 }
-        const filteredTopics =
+    function ProcessApplications() {
+        if (!applications) return { applications: [], count: 0 }
+        const filteredApplications =
             query !== ''
-                ? allTopics.topics.filter((t) =>
-                      indexTopics.search(query).includes(t.id)
+                ? applications.filter((t) =>
+                      indexApplications.search(query).includes(t.id)
                   )
-                : data.topics
-        const topics = filteredTopics.slice(
+                : applications
+        const _applications = filteredApplications.slice(
             pagination.page.start,
             pagination.page.start + pagination.page.rows
-        ) as GroupTree[] | Group[]
-        const topicDetails = data.topicDetails
-        return { topics, topicDetails, count: filteredTopics.length }
+        )
+        return {
+            applications: _applications,
+            count: filteredApplications.length,
+        }
     }
 
-    const filteredTopics = ProcessTopics()
+    const filteredApplications = ProcessApplications()
+    const maxStart = Math.max(
+        0,
+        filteredApplications.count - pagination.page.rows
+    )
+    if (pagination.page.start > maxStart) {
+        setPagination((prev) => ({
+            ...prev,
+            page: { ...prev.page, start: maxStart },
+        }))
+    }
 
     return (
         <>
             <NextSeo
-                title="Topics"
-                description="WRI Open Data Catalog Topics"
+                title="Applications"
+                description="WRI Open Data Catalog Applications"
                 openGraph={{
-                    title: 'Topics',
-                    description: 'WRI Open Data Catalog Topics',
+                    title: 'Applications',
+                    description: 'WRI Open Data Catalog Applications',
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/topics`,
                     type: 'website',
                 }}
             />
             <Header />
-            <TopicsSearch
+            <ApplicationSearch
                 isLoading={isLoading}
                 setQuery={setQuery}
                 query={query}
@@ -128,21 +123,20 @@ export default function TopicsPage(
                 <Spinner className="mx-auto" />
             ) : (
                 <>
-                    <TopicsSearchResults
+                    <ApplicationSearchResult
                         filtered={
                             query !== '' &&
                             query !== null &&
                             typeof query !== 'undefined'
                         }
-                        count={filteredTopics.count}
-                        topics={filteredTopics.topics}
-                        topicDetails={filteredTopics.topicDetails}
+                        count={filteredApplications.count}
+                        applications={filteredApplications.applications}
                     />
                     <div className="w-full px-8 xxl:px-0 max-w-8xl mx-auto">
                         <Pagination
                             setQuery={setPagination}
                             query={pagination}
-                            data={filteredTopics}
+                            data={filteredApplications}
                         />
                     </div>
                 </>
@@ -150,7 +144,7 @@ export default function TopicsPage(
             <Footer
                 links={{
                     primary: { title: 'Advanced Search', href: '#' },
-                    secondary: { title: 'Explore Topics', href: '#' },
+                    secondary: { title: 'Explore Applications', href: '#' },
                 }}
             />
         </>

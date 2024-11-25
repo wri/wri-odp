@@ -14,14 +14,14 @@ import { replaceNames } from '@/utils/replaceNames'
 import { sendMemberNotifications } from '@/utils/apiUtils'
 
 export const applicationRouter = createTRPCRouter({
-    getAllApplications: protectedProcedure.query(async ({ ctx }) => {
-        const user = ctx.session.user
+    getAllApplications: publicProcedure.query(async ({ ctx }) => {
+        const apikey = ctx.session?.user.apikey ?? ''
         const applicationRes = await fetch(
             `${env.CKAN_URL}/api/action/group_list?all_fields=True&type=application`,
             {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `${user.apikey}`,
+                    Authorization: `${apikey}`,
                 },
             }
         )
@@ -67,22 +67,23 @@ export const applicationRouter = createTRPCRouter({
                 throw Error(replaceNames(error))
             }
         }),
-    getApplication: protectedProcedure
+    getApplication: publicProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
+            const apikey = ctx.session?.user.apikey ?? ''
             const applicationRes = await fetch(
                 `${env.CKAN_URL}/api/action/group_show?id=${input.id}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
+                        Authorization: `${apikey}`,
                     },
                 }
             )
             const application: CkanResponse<
                 Application
             > = await applicationRes.json()
+            if (!application.result) throw Error('Application not found')
             if (!application.success && application.error)
                 throw Error(replaceNames(application.error.message))
             return {
