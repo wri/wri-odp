@@ -37,6 +37,10 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@098373
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
 
+# Fixing security vulnerabilities
+RUN apk --update add git
+RUN pip install --force-reinstall -v "Pillow==11.0.0"
+
 RUN apk add --virtual .build-deps \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
