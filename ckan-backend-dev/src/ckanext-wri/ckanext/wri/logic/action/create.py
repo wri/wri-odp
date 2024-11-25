@@ -306,7 +306,7 @@ def migrate_dataset(context: Context, data_dict: DataDict):
 
     try:
         tk.get_action("group_show")(
-            {"ignore_auth": True}, {"id": dx_application}
+            {"ignore_auth": True}, {"id": dx_application, "type": "application"}
         )
     except logic.NotFound:
         raise tk.ValidationError(_("'dx_application' not found: ") + dx_application)

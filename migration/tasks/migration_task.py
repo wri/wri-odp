@@ -274,7 +274,9 @@ def check_dataset_exists(dataset_id, dx_application, rw_application, rw_id):
 
             return dataset_count > 0, dataset_results[0] if dataset_count > 0 else None
         else:
-            log.error(f"Missing required parameters: rw_id, dx_application, rw_application: {rw_id}, {dx_application}, {rw_application}")
+            log.error(
+                f"Missing required parameters: rw_id, dx_application, rw_application: {rw_id}, {dx_application}, {rw_application}"
+            )
 
         return False, None
 
@@ -364,13 +366,13 @@ def send_migration_dataset(data_dict):
         else:
             dataset_id = gfw_dataset
             gfw_only = True
-            application = "gfw"
+            rw_application = "gfw"
 
     if not rw_application and not dx_application:
         raise ValueError("Both 'rw_application' and 'dx_application' required")
 
     dataset = get_dataset_from_api(
-        dataset_id, application, gfw_dataset, gfw_only, gfw_version
+        dataset_id, rw_application, gfw_dataset, gfw_only, gfw_version
     )
     external_dataset_slug = (
         dataset.get("dataset", {}).get("slug") if not gfw_only else dataset_id
@@ -476,7 +478,10 @@ def migrate_dataset(data_dict):
 
     dataset_name = data_dict.get("name")
     dataset_exists, dataset = check_dataset_exists(
-        dataset_name, data_dict.get("dx_application"), data_dict.get("rw_application"), data_dict.get("rw_id")
+        dataset_name,
+        data_dict.get("dx_application"),
+        data_dict.get("rw_application"),
+        data_dict.get("rw_id"),
     )
 
     log_name = f'{dataset_name if dataset_name else "Unknown dataset"} -'
@@ -884,7 +889,11 @@ def unstringify_agents(agents, agent_type, log, log_name):
 
                 name, email = agent.split(":")
                 name = name.strip() if name else None
-                email = email.strip() if email and email_validator(email, agent_type, log, log_name) else None
+                email = (
+                    email.strip()
+                    if email and email_validator(email, agent_type, log, log_name)
+                    else None
+                )
 
                 if not name or not email:
                     log.error(
@@ -905,7 +914,11 @@ def unstringify_agents(agents, agent_type, log, log_name):
                 name = agent.get("name")
                 email = agent.get("email")
                 name = name.strip() if name else None
-                email = email.strip() if email and email_validator(email, agent_type, log, log_name) else None
+                email = (
+                    email.strip()
+                    if email and email_validator(email, agent_type, log, log_name)
+                    else None
+                )
 
                 if not name or not email:
                     log.error(
@@ -1144,10 +1157,14 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
 
     try:
         application_dict = ckan.action.group_show(id=dx_application)
-        required_dataset_values["groups"].append({"name": application_dict["name"]})
+        required_dataset_values["groups"] = required_dataset_values.get(
+            "groups", []
+        ) + [{"name": application_dict["name"]}]
     except ckanapi.errors.NotFound:
         log.error(f"{log_name} Application not found: {dx_application}")
-        log.error(f"{log_name} The process will continue, but the dataset will not be associated with the desired application")
+        log.error(
+            f"{log_name} The process will continue, but the dataset will not be associated with the desired application"
+        )
 
     resources = []
 
