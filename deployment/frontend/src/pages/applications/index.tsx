@@ -100,7 +100,7 @@ export default function ApplicationsPage(
                 openGraph={{
                     title: 'Applications',
                     description: 'WRI Open Data Catalog Applications',
-                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/topics`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/applications`,
                     type: 'website',
                 }}
             />
@@ -114,7 +114,7 @@ export default function ApplicationsPage(
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
                     <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
-                        Explore reliable datasets filtered by the topic of your
+                        Explore reliable datasets filtered by the application of your
                         interest.
                     </h3>
                 </div>
