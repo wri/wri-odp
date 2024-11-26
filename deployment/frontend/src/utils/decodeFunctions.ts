@@ -151,9 +151,77 @@ export const getDecodeParams = {
         })
         return { ...dayRange, confirmedOnly: 0 }
     },
+    'e969a15c-f06b-40f6-9a3e-f206277dc216': async () => {
+        const endDateRes = await fetch(
+            'https://data-api.globalforestwatch.org/dataset/umd_glad_landsat_alerts/latest'
+        )
+        const endDateJson = await endDateRes.json()
+        const {
+            metadata: {
+                content_date_range: { end_date },
+            },
+        } = endDateJson.data
+        const dayRange = getDayRange({
+            endDate: end_date,
+            endDateAbsolute: end_date,
+            maxDate: end_date,
+            minDate: '2022-02-11',
+            minDateAbsolut: '2014-12-31',
+            raddOnly: 0,
+            startDate: '2022-08-01',
+            startDateAbsolute: '2022-08-01',
+            trimEndDate: 549,
+        })
+        return { ...dayRange, confirmedOnly: 0 }
+    },
     'cb184858-4501-4e18-bdf4-8fc4150b9f6e': async () => {
         const endDateRes = await fetch(
             'https://data-api.globalforestwatch.org/dataset/umd_glad_sentinel2_alerts/latest'
+        )
+        const endDateJson = await endDateRes.json()
+        const {
+            metadata: {
+                content_date_range: { end_date },
+            },
+        } = endDateJson.data
+        const dayRange = getDayRange({
+            endDate: end_date,
+            maxDate: end_date,
+            minDate: '2022-02-11',
+            minDateAbsolut: '2014-12-31',
+            raddOnly: 0,
+            startDate: '2022-08-01',
+            startDateAbsolute: '2022-08-01',
+            trimEndDate: 549,
+        })
+        return { ...dayRange, confirmedOnly: 0 }
+    },
+    'ff8e8721-c66e-42eb-9738-f1ba6990b8cc': async () => {
+        const endDateRes = await fetch(
+            'https://data-api.globalforestwatch.org/dataset/umd_glad_sentinel2_alerts/latest'
+        )
+        const endDateJson = await endDateRes.json()
+        const {
+            metadata: {
+                content_date_range: { end_date },
+            },
+        } = endDateJson.data
+        const dayRange = getDayRange({
+            endDate: end_date,
+            maxDate: end_date,
+            minDate: '2022-02-11',
+            minDateAbsolut: '2014-12-31',
+            raddOnly: 0,
+            startDate: '2022-08-01',
+            startDateAbsolute: '2022-08-01',
+            trimEndDate: 549,
+        })
+        console.log('day range', dayRange)
+        return { ...dayRange, confirmedOnly: 0 }
+    },
+    '512d9984-2965-484a-b72c-de0f4d24237e': async () => {
+        const endDateRes = await fetch(
+            'https://data-api.globalforestwatch.org/dataset/wur_radd_alerts/latest'
         )
         const endDateJson = await endDateRes.json()
         const {
@@ -208,10 +276,24 @@ export function createDeckLayer(
 ) {
     // @ts-ignore
     let tileUrl = layer.source.tiles[0] ?? ''
-    const threshold = layer.params_config && (layer.params_config as unknown as Array<any>).find((p) => p.key === 'threshold' || p.key === 'thresh')
+    const threshold =
+        layer.params_config &&
+        (layer.params_config as unknown as Array<any>).find(
+            (p) => p.key === 'threshold' || p.key === 'thresh'
+        )
     tileUrl = tileUrl
-        .replace('{thresh}', layerState?.threshold ? layerState?.threshold : threshold?.default ?? 30)
-        .replace('{threshold}', layerState?.threshold ? layerState?.threshold : threshold?.default ?? 30)
+        .replace(
+            '{thresh}',
+            layerState?.threshold
+                ? layerState?.threshold
+                : threshold?.default ?? 30
+        )
+        .replace(
+            '{threshold}',
+            layerState?.threshold
+                ? layerState?.threshold
+                : threshold?.default ?? 30
+        )
     let obj = {
         ...layer,
         source: {

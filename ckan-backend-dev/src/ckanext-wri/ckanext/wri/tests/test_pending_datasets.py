@@ -7,7 +7,9 @@ import unittest.mock as mock
 
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
-@pytest.mark.usefixtures("with_plugins", "test_request_context")
+@pytest.mark.usefixtures(
+    "with_plugins", "test_request_context"
+)
 def test_pending_dataset_create(mail_user):
     user = factories.Sysadmin()
     dataset = factories.Dataset(
@@ -36,7 +38,9 @@ def test_pending_dataset_create(mail_user):
 
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
-@pytest.mark.usefixtures("with_plugins", "test_request_context")
+@pytest.mark.usefixtures(
+    "with_plugins", "test_request_context"
+)
 def test_pending_dataset_show(mail_user):
     user = factories.Sysadmin()
     dataset = factories.Dataset(
@@ -67,7 +71,9 @@ def test_pending_dataset_show(mail_user):
 
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
-@pytest.mark.usefixtures("with_plugins", "test_request_context")
+@pytest.mark.usefixtures(
+    "with_plugins", "test_request_context"
+)
 def test_pending_dataset_update(mail_user):
     user = factories.Sysadmin()
     dataset = factories.Dataset(
@@ -111,7 +117,9 @@ def test_pending_dataset_update(mail_user):
 
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
-@pytest.mark.usefixtures("with_plugins", "test_request_context")
+@pytest.mark.usefixtures(
+    "with_plugins", "test_request_context"
+)
 def test_pending_dataset_delete(mail_user):
     user = factories.Sysadmin()
     dataset = factories.Dataset(
@@ -149,7 +157,9 @@ def test_pending_dataset_delete(mail_user):
 
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
-@pytest.mark.usefixtures("with_plugins", "test_request_context")
+@pytest.mark.usefixtures(
+    "with_plugins", "test_request_context"
+)
 def test_pending_diff_show(mail_user):
     userobj_sysadmin = factories.Sysadmin()
     session = model.Session
@@ -162,11 +172,10 @@ def test_pending_diff_show(mail_user):
     dataset_public = {
         "type": "dataset",
         "title": "Test Dataset Schema",
-        "name": f"public-dataset",
+        "name": "public-dataset",
         "url": "http://example.com/dataset.json",
         "language": "en",
         "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
-        "application": "rw",
         "technical_notes": "http://example.com/technical_notes.pdf",
         "tag_string": "economy,mental health,government",
         "temporal_coverage_start": "2007",
@@ -190,6 +199,13 @@ def test_pending_diff_show(mail_user):
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
     }
+    try:
+        get_action("dataset_purge")(
+            context={"ignore_auth": True}, data_dict={"id": dataset_public["name"]}
+        )
+    except Exception:
+        pass
+
     result_create_public = get_action("package_create")(
         context=context_sysadmin, data_dict=dataset_public
     )
@@ -220,3 +236,7 @@ def test_pending_diff_show(mail_user):
     assert result["title"]["new_value"] == "New Title"
     assert result["notes"]["new_value"] == "New description"
     assert result["wri_data"]["new_value"] is True
+
+    get_action("dataset_purge")(
+        context={"ignore_auth": True}, data_dict={"id": result_sysadmin_get_public["name"]}
+    )

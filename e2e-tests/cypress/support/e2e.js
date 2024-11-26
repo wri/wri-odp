@@ -253,6 +253,24 @@ Cypress.Commands.add("createGroupAPI", (name, parent=null) => {
   });
 });
 
+// Command for frontend test sepecific
+Cypress.Commands.add("createApplicationAPI", (name) => {
+  cy.request({
+    method: "POST",
+    url: apiUrl("group_create"),
+    headers: headers,
+    body: {
+      name: name,
+      title: name,
+      description: "Some group description",
+      contact_url: "https://contact.com",
+      homepage_url: "https://homepage.com",
+      help_url: "https://help.com",
+      type: "application",
+    },
+  });
+});
+
 Cypress.Commands.add("deleteGroupAPI", (name) => {
   cy.request({
     method: "POST",

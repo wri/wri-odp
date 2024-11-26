@@ -155,7 +155,12 @@ export const DatasetRouter = createTRPCRouter({
                         ? input.tags.map((tag) => ({ name: tag }))
                         : [],
                     groups: input.topics
-                        ? input.topics.map((topic) => ({ name: topic }))
+                        ? [
+                              ...input.topics.map((topic) => ({ name: topic })),
+                              ...input.applications.map((app) => ({
+                                  name: app,
+                              })),
+                          ]
                         : [],
                     open_in: JSON.stringify(input.open_in) ?? '',
                     language: input.language?.value ?? '',
@@ -288,6 +293,7 @@ export const DatasetRouter = createTRPCRouter({
                         : null,
                 }
 
+                console.log(`BODY`, body)
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
                     {
@@ -414,6 +420,7 @@ export const DatasetRouter = createTRPCRouter({
                 }
             }
 
+            console.log('INPUT APPLICATIONS', input.applications)
             try {
                 if (isUpdate) {
                     const user = ctx.session.user
@@ -433,17 +440,28 @@ export const DatasetRouter = createTRPCRouter({
                                   }
                               })
                             : [],
-                        groups: input.topics
-                            ? input.topics.map((topic) => {
-                                  const pgroups = datasetDetails?.groups?.find(
-                                      (x) => x.name === topic
-                                  )
-                                  return {
-                                      ...pgroups,
-                                      name: topic,
-                                  }
-                              })
-                            : [],
+                        groups: [
+                            ...(input.topics?.map((topic) => {
+                                const pgroups = datasetDetails?.groups?.find(
+                                    (x) => x.name === topic
+                                )
+                                return {
+                                    ...pgroups,
+                                    name: topic,
+                                }
+                            }) ?? []),
+                            ...(input.applications?.map((app) => {
+                                const pgroups = datasetDetails?.groups?.find(
+                                    (x) => x.name === app
+                                )
+                                return {
+                                    ...pgroups,
+                                    name: app,
+                                }
+                            }) ?? []),
+                        ],
+                        topics: undefined,
+                        applications: undefined,
                         open_in: JSON.stringify(input.open_in) ?? '',
                         language: input.language?.value ?? '',
                         license_id: input.license_id?.value ?? '',
@@ -621,6 +639,7 @@ export const DatasetRouter = createTRPCRouter({
                             : null,
                     }
 
+                    console.log('body data applications', body.applications)
                     const newBodyDataset = filterDatasetFields(
                         body
                     ) as WriDataset
@@ -634,7 +653,7 @@ export const DatasetRouter = createTRPCRouter({
                     }
 
                     // update main data to pending also
-                    await patchDataset({
+                    const result = await patchDataset({
                         dataset: {
                             id: responseData.id,
                             approval_status: 'pending',
@@ -643,6 +662,7 @@ export const DatasetRouter = createTRPCRouter({
                         },
                         session: ctx.session,
                     })
+                    console.log('result', result)
 
                     const response = await fetch(
                         `${env.CKAN_URL}/api/3/action/pending_dataset_update`,
@@ -661,6 +681,7 @@ export const DatasetRouter = createTRPCRouter({
 
                     let data =
                         (await response.json()) as CkanResponse<PendingDataset>
+                    console.log('DATA', data)
                     if (!data.success && data.error) {
                         const error = JSON.stringify(data.error).toLowerCase()
                         if (!error.includes('not found')) {

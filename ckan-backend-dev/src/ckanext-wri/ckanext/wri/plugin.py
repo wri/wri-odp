@@ -15,7 +15,7 @@ from ckanext.wri.logic.action.datapusher_download_zip import (
 )
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
-from ckan.types import Action, AuthFunction, Context
+from ckan.types import Action, AuthFunction, Context, DataDict
 from ckan.lib.search import SearchError
 from ckanext.wri.logic.auth import auth as auth
 from ckanext.wri.logic.action.datapusher import (
@@ -42,6 +42,7 @@ from ckanext.wri.logic.action.update import (
     resource_update,
     old_package_patch,
     old_package_update,
+    package_update
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -62,6 +63,7 @@ from ckanext.wri.logic.action.get import (
     issue_search_wri,
     package_collaborator_list_wri,
     resource_search,
+    package_show,
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -162,7 +164,8 @@ class WriPlugin(plugins.SingletonPlugin):
         return {
             "iso_language_code": wri_validators.iso_language_code,
             "year_validator": wri_validators.year_validator,
-            "agents_json_object": wri_validators.agents_json_object
+            "agents_json_object": wri_validators.agents_json_object,
+            "url_or_email_validator": wri_validators.url_or_email_validator,
         }
 
     # IFacets
@@ -170,7 +173,6 @@ class WriPlugin(plugins.SingletonPlugin):
     def dataset_facets(self, facets_dict, package_type):
         facets_dict["language"] = toolkit._("Language")
         facets_dict["project"] = toolkit._("Project")
-        facets_dict["application"] = toolkit._("Application")
         facets_dict["temporal_coverage_start"] = toolkit._("Temporal Coverage Start")
         facets_dict["temporal_coverage_end"] = toolkit._("Temporal Coverage End")
         facets_dict["update_frequency"] = toolkit._("Update Frequency")
@@ -235,6 +237,8 @@ class WriPlugin(plugins.SingletonPlugin):
             "resource_update": resource_update,
             "resource_create": resource_create,
             # "package_delete": package_delete,
+            "package_show": package_show,
+            "package_update": package_update,
         }
 
     # IPermissionLabels
@@ -361,6 +365,13 @@ class WriPlugin(plugins.SingletonPlugin):
     def after_dataset_show(self, context, pkg_dict):
         authors = pkg_dict.get("authors")
         maintainers = pkg_dict.get("maintainers")
+        applications = pkg_dict.get("applications")
+
+        if applications:
+            context.pop("for_create", None)
+            context.pop("for_approval", None)
+            context.pop("for_update", None)
+            context.pop("for_view", None)
 
         if isinstance(authors, str):
             try:
@@ -385,6 +396,16 @@ class WriPlugin(plugins.SingletonPlugin):
         return self.before_dataset_search(search_params)
 
     def before_dataset_index(self, pkg_dict):
+        # Move the application group objects back to groups before indexing to avoid SOLR errors
+        applications = pkg_dict.get("applications")
+
+        if applications:
+            if isinstance(applications, list):
+                application_names = [app.get("name", app.get("id")) for app in applications if app.get("name", app.get("id"))]
+                pkg_dict["groups"] = pkg_dict.get("groups", []) + application_names
+
+        pkg_dict.pop("applications", None)
+
         if any(key in pkg_dict for key in ("authors", "maintainers")):
             pkg_dict = stringify_actor_objects(pkg_dict)
 

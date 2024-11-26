@@ -137,6 +137,22 @@ export async function getGroups({
     }
 }
 
+export async function groupList({ apiKey }: { apiKey: string | null }) {
+    const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${apiKey ?? ''}`,
+            },
+        }
+    )
+    const topics: CkanResponse<Group[]> = await topicRes.json()
+    if (!topics.success && topics.error)
+        throw Error(replaceNames(topics.error.message))
+    return topics.result.filter((topic) => topic.state === 'active')
+}
+
 export async function getGroup({
     apiKey,
     id,
@@ -688,6 +704,7 @@ export async function getOnePendingDataset(
         throw Error(JSON.stringify(data.error))
     }
     const dataset = data.result.package_data
+    console.log('PENDING DATASET', dataset)
 
     // if (dataset.rw_id) {
     const resourceLayer = dataset.resources.filter(
@@ -875,6 +892,7 @@ export function findNameInTree(
     // Recursive case: search through children
     if (tree.children && tree.children.length > 0) {
         for (const child of tree.children) {
+            child.parent_name = tree.name
             const result = findNameInTree(child, targetName)
             if (result) {
                 return result // If found in child, return the result
@@ -2081,6 +2099,7 @@ export async function patchDataset({
         if (datasetObj.error.message) throw Error(datasetObj.error.message)
         throw Error(JSON.stringify(datasetObj.error))
     }
+    return datasetObj
 }
 
 export async function updateDatasetHasChartsFlag({
@@ -2189,6 +2208,7 @@ export async function approvePendingDataset(
         }
     )
     const data = (await response.json()) as CkanResponse<PendingDataset>
+    console.log('PENDING DATASET', data)
     if (!data.success && data.error)
         throw Error(JSON.stringify(data.error).concat('pending_dataset_show'))
 
@@ -2456,7 +2476,7 @@ export async function approvePendingDataset(
 }
 
 export const datasetFields = [
-    'application',
+    'applications',
     'approval_status',
     'authors',
     'citation',
