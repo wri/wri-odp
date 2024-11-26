@@ -105,7 +105,7 @@ const QueryInstructions = () => {
         : publicCkanUrl
 
     const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
-    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.id}`
+    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`
 
     const rwBaseUrl = `https://api.resourcewatch.org/v1`
     const rwDatasetGetUrl = `${rwBaseUrl}/dataset/${dataset.rw_id}`
@@ -165,7 +165,7 @@ const UseCases = ({ usecases }: { usecases: string }) => {
         : publicCkanUrl
 
     const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
-    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.id}`
+    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`
 
     useEffect(() => {
         if (!highlighted && divRef.current) {
@@ -210,7 +210,7 @@ const SnippetInstructions = ({
         : publicCkanUrl
     const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
 
-    const ckanPackageShowUrl = `${ckanBaseUrl}/package_show?id=${dataset.id}`
+    const ckanPackageShowUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`
     const ckanPackageShowSnippet = getSnippetFn(ckanPackageShowUrl)
 
     const rwBaseUrl = `https://api.resourcewatch.org/v1`

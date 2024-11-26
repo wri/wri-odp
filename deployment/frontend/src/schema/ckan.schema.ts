@@ -1,10 +1,31 @@
 import { Dataset, Resource } from '@/interfaces/dataset.interface'
 import type {
-    Group,
     Tag,
     Activity as CkanActivity,
     User as CkanUser,
 } from '@portaljs/ckan'
+
+export interface Group {
+    display_name: string;
+    description: string;
+    image_display_url: string;
+    package_count: number;
+    created: string;
+    name: string;
+    is_organization: false;
+    state: 'active' | 'deleted' | 'inactive';
+    image_url: string;
+    type: 'group' | 'application';
+    title: string;
+    revision_id: string;
+    num_followers: number;
+    id: string;
+    approval_status: string;
+    packages?: Array<Dataset>;
+    activity_stream?: Array<Activity>;
+    tags?: Array<Tag>;
+    users?: Array<User>;
+}
 
 type Only<T, U> = {
     [P in keyof T]: T[P]
@@ -101,7 +122,7 @@ export interface WriDataset extends Dataset {
     creator_user_id: string
     language?: string
     featured_image?: string
-    application?: string
+    applications?: Application[]
     cautions?: string
     citation?: string
     function?: string
@@ -161,6 +182,24 @@ export interface Organization {
     tags?: Array<Tag>
 }
 
+export type Application = Group & {
+    approval_status?: 'approved'
+    type?: string
+    display_name?: string
+    is_organization: boolean
+    id: string
+    name: string
+    title: string
+    description: string
+    image_url: string
+    image_display_url: string
+    help_url: string
+    contact_url: string
+    packages?: Array<Dataset>
+    package_count: number
+    state: 'active'
+}
+
 export interface WriOrganization extends Organization {
     groups?: Group[]
     users?: WriUser[]
@@ -180,6 +219,7 @@ export interface GroupTree {
     children: GroupTree[]
     title?: string
     image_display_url?: string
+    parent_name?: string
 }
 
 export interface Collaborator {

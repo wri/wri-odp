@@ -3,6 +3,9 @@ from typing import Any
 import pycountry
 import logging
 import json
+import re
+from urllib.parse import urlparse
+import string
 
 from ckan.types import Context
 from ckan.plugins.toolkit import ValidationError
@@ -230,3 +233,64 @@ def agents_json_object(value: Any, context: Context):
             _validate_agent(agent, context)
 
     return value
+
+
+def _url_validator(value: str) -> bool:
+    """Checks that the provided value is a valid URL"""
+    try:
+        pieces = urlparse(value)
+        if all([pieces.scheme, pieces.netloc]) and pieces.scheme in [
+            "http",
+            "https",
+        ]:
+            hostname, port = (
+                pieces.netloc.split(":")
+                if ":" in pieces.netloc
+                else (pieces.netloc, None)
+            )
+            if set(hostname) <= set(string.ascii_letters + string.digits + "-.") and (
+                port is None or port.isdigit()
+            ):
+                return True
+    except ValueError:
+        # url is invalid
+        pass
+    return False
+
+
+# pattern from https://html.spec.whatwg.org/#e-mail-state-(type=email)
+email_pattern = re.compile(
+    # additional pattern to reject malformed dots usage
+    r"^(?!\.)(?!.*\.$)(?!.*?\.\.)"
+    r"[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9]"
+    r"(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9]"
+    r"(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+)
+
+
+def _email_validator(value: str) -> bool:
+    """Check that the value is a valid email address."""
+    if 'mailto:' in value:
+        value = value.split('mailto:')[1]
+        return bool(email_pattern.match(value))
+    else:
+        return False
+
+
+def url_or_email_validator(value: Any, context: Context):
+    """
+    Check that the value is a valid URL or email address.
+
+    e.g. "http://example.com" or "example.user@example.com"
+    """
+    if not value:
+        return
+
+    if not isinstance(value, str):
+        log.error("Value must be a string")
+        raise Invalid("Value must be a string")
+
+    if _email_validator(value) or _url_validator(value):
+        return value
+
+    raise Invalid(_("Invalid URL"))

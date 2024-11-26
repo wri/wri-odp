@@ -37,11 +37,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     })
 
     await Promise.all([
-        helpers.topics.getGeneralTopics.prefetch({
-            search: '',
-            page: { start: 0, rows: 50 },
-            allTree: true,
-        }),
+        helpers.topics.getTopicsHomePage.prefetch(),
         helpers.dataset.getFeaturedDatasets.prefetch({
             search: '',
             page: { start: 0, rows: 8 },
@@ -110,7 +106,7 @@ export default function Home(
                 </div>
                 <div className="col-span-3 flex flex-col gap-y-4">
                     <div
-                        className={`w-full font-acumin text-xl font-light leading-loose text-neutral-700  md:overflow-hidden md:max-h-[100vh] transition duration-300 ease-in-out h-auto`}
+                        className={`w-full font-acumin text-[23px] font-light leading-[30px] text-[#3F3F3F]  md:overflow-hidden md:max-h-[100vh] transition duration-300 ease-in-out h-auto`}
                     >
                         <p>
                             WRI believes that good data is the foundation of
