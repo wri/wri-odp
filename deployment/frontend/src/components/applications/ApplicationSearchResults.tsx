@@ -1,4 +1,3 @@
-import Topic from '@/interfaces/topic.interface'
 import CardsGrid from '../_shared/CardsGrid'
 import Container from '../_shared/Container'
 import ApplicationCard from './ApplicationCard'
@@ -16,7 +15,7 @@ export default function ApplicationSearchResults({
     return (
         <Container className="mb-28">
             <span className="font-semibold text-xl">
-                {count} {!filtered ? 'top level topics' : 'topics'}
+                {count} {!filtered ? 'top level applications' : 'applications'}
             </span>
             <CardsGrid<Application>
                 className="mt-5"

@@ -23,6 +23,8 @@ RUN chmod 777 ${APP_DIR}/src/ckanext-s3filestore
 
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
+RUN apk add git=2.40.3-r0
+RUN pip install --force-reinstall -v "Pillow==11.0.0"
 
 RUN apk add --virtual .build-deps \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
