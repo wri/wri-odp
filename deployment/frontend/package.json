@@ -76,7 +76,7 @@
     "@vizzuality/layer-manager-provider-carto": "^2.0.3",
     "@xstate/react": "^3.2.2",
     "apng-js": "^1.1.1",
-    "axios": "^1.7.7",
+    "axios": "^1.7.8",
     "circle-to-polygon": "^2.2.0",
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.2.6",
