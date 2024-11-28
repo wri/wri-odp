@@ -14,6 +14,7 @@ const org2 = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName2 = `${uuid()}pdssfppp${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 const group = `${uuid()}${Cypress.env("GROUP_SUFFIX")}`;
+const application = `${uuid()}_application`;
 const user = `${uuid()}-user`;
 const email = `${uuid()}@gmail.com`;
 const userfullname = `${uuid()}-fullname`;
@@ -43,6 +44,7 @@ describe("Dashboard Test", () => {
     
 
     cy.createGroupAPI(group);
+    cy.createApplicationAPI(application);
     cy.createUserApi(user, email, "test1234");
 
     cy.userMetadata(user).as("sender");
@@ -150,6 +152,16 @@ describe("Dashboard Test", () => {
       .click({ force: true });
     cy.get(`button#${parentOrg2}`).click();
     cy.contains(`Successfully deleted the ${parentOrg2} team`);
+  });
+
+  it("should delete application", () => {
+    cy.visit("/dashboard/applications");
+    cy.contains(application).should("exist", { timeout: 15000 });
+    cy.get(`button#delete-tooltip-${application}`)
+      .first()
+      .click({ force: true });
+    cy.get(`button#${application}`).click();
+    cy.contains(`Successfully deleted the ${application} application`);
   });
 
   it("should delete topic", () => {

@@ -30,7 +30,7 @@ export default function Subteamcard({
                     }`}
                     alt="higlight"
                     fill
-                    className="object-contain"
+                    className="object-cover"
                 />
             </div>
             <div className="text-black text-lg font-normal line-clamp-1">

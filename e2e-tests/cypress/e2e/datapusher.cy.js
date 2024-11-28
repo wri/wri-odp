@@ -36,6 +36,7 @@ describe("Upload file and create dataset", () => {
     cy.get('input[name="maintainers.1.email"]').type("test-maintainer-2@example.com");
 
     cy.contains("Next: Datafiles").click();
+    cy.get('.datafile-accordion-trigger').eq(0).click()
     cy.get("input[type=file]").selectFile("cypress/fixtures/cities.csv", {
       force: true,
     });
@@ -71,6 +72,7 @@ describe("Upload file and create dataset", () => {
     () => {
       cy.visit("/dashboard/datasets/" + dataset + "/edit");
       cy.contains("Data Files").click();
+      cy.get('.datafile-accordion-trigger').eq(0).click()
       cy.contains("Datapusher").click();
       cy.contains("Submit to Datapusher").click();
       cy.contains(`Successfully submited datafile to the datapusher`, {

@@ -35,7 +35,7 @@ function TopicCard({
                     }`}
                     alt={`Topic - ${topic.title}`}
                     fill
-                    className="object-contain"
+                    className="object-cover"
                 />
             </div>
             <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pl-4 ">
@@ -51,11 +51,7 @@ function TopicCard({
 }
 
 export function TopicsCarousel() {
-    const { data, isLoading, error } = api.topics.getGeneralTopics.useQuery({
-        search: '',
-        page: { start: 0, rows: 50 },
-        allTree: true,
-    })
+    const { data, isLoading, error } = api.topics.getTopicsHomePage.useQuery()
     return (
         <div className="relative">
             <div className="peer">
@@ -77,16 +73,22 @@ export function TopicsCarousel() {
                         </div>
                     )}
 
-                    {data?.topics.map((topic, index) => (
-                        <SwiperSlide key={index} className="">
-                            <div className=" w-80 pr-6">
-                                <TopicCard
-                                    topic={topic}
-                                    topicDetails={data.topicDetails}
-                                />
-                            </div>
-                        </SwiperSlide>
-                    ))}
+                    {data?.topics
+                        .filter((topic) => {
+                            const datasetCount =
+                                data.topicDetails[topic.id]?.package_count ?? 0
+                            return datasetCount > 0
+                        })
+                        .map((topic, index) => (
+                            <SwiperSlide key={index} className="">
+                                <div className=" w-80 pr-6">
+                                    <TopicCard
+                                        topic={topic}
+                                        topicDetails={data.topicDetails}
+                                    />
+                                </div>
+                            </SwiperSlide>
+                        ))}
                 </AutoCarousel>
             </div>
         </div>

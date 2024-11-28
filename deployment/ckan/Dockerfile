@@ -13,7 +13,9 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@fd7113f076336c13b9952d6b2161c0f4339e5cc6#egg=ckanext-auth' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues' && \
+    pip3 install -e 'git+https://github.com/ckan/ckanext-harvest.git@v1.6.0#egg=ckanext-harvest' && \
+    pip3 install -r 'https://raw.githubusercontent.com/ckan/ckanext-harvest/refs/tags/v1.6.0/requirements.txt'
 
 USER root
 
@@ -21,6 +23,10 @@ RUN chmod 777 ${APP_DIR}/src/ckanext-s3filestore
 
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
+RUN apk add git=2.40.3-r0
+RUN apk add postgresql15-client=15.9-r0
+RUN apk add libpq=15.9-r0
+RUN pip install --force-reinstall -v "Pillow==11.0.0"
 
 RUN apk add --virtual .build-deps \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
@@ -66,6 +72,11 @@ ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_vi
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
+
+USER root
+
+RUN chown -R ckan:ckan ${APP_DIR}/src/
 
 USER ckan
 

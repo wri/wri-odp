@@ -18,6 +18,7 @@ import { env } from '@/env.mjs'
 import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
 import { Group as CkanGroup } from '@portaljs/ckan'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
 type Group = CkanGroup & { numSubtopics: number }
 
 const TopicsSearchResults = dynamic(
@@ -96,6 +97,7 @@ export default function TopicsPage(
     }
 
     const filteredTopics = ProcessTopics()
+    const links = [{ label: 'Topics', url: '/topics', current: true }]
 
     return (
         <>
@@ -110,6 +112,7 @@ export default function TopicsPage(
                 }}
             />
             <Header />
+            <Breadcrumbs links={links} />
             <TopicsSearch
                 isLoading={isLoading}
                 setQuery={setQuery}

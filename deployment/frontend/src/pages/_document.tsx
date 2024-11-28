@@ -86,6 +86,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                         }}
                     />
                     }
+                    <meta name="msvalidate.01" content="8951A137F58082BF155A0C8F03C9B207" />
                 </Head>
                 <body className="font-acumin">
                     <noscript

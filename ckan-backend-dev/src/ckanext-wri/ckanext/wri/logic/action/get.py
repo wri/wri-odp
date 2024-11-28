@@ -8,6 +8,7 @@ import json
 from typing import Any, cast
 import re
 from itertools import zip_longest
+import socket
 
 from ckan.common import config, asbool
 from ckan.model import Package
@@ -391,6 +392,14 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
         count = query.count
         facets = query.facets
 
+    results_with_group_types = []
+
+    for result in results:
+        result_dict = _add_group_types(context, result)
+        results_with_group_types.append(result_dict)
+
+    results = results_with_group_types
+
     search_results: dict[str, Any] = {
         "count": count,
         "facets": facets,
@@ -405,13 +414,21 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
         group_names.extend(facets.get(field_name, {}).keys())
 
     groups = (
-        session.query(model.Group.name, model.Group.title)
+            session.query(model.Group.name, model.Group.title)
+        # type_ignore_reason: incomplete SQLAlchemy types
+        .filter(model.Group.name.in_(group_names)).all()  # type: ignore
+        if group_names
+        else []
+    )
+    _groups = (
+            session.query(model.Group.name, model.Group.type)
         # type_ignore_reason: incomplete SQLAlchemy types
         .filter(model.Group.name.in_(group_names)).all()  # type: ignore
         if group_names
         else []
     )
     group_titles_by_name = dict(groups)
+    group_types_by_name = dict(_groups)
 
     # Transform facets into a more useful data structure.
     restructured_facets: dict[str, Any] = {}
@@ -422,9 +439,14 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
             new_facet_dict["name"] = key_
             if key in ("groups", "organization"):
                 display_name = group_titles_by_name.get(key_, key_)
+                group_type = group_types_by_name.get(key_, key_)
                 display_name = (
                     display_name if display_name and display_name.strip() else key_
                 )
+                group_type = (
+                    group_type if group_type and group_type.strip() else key_
+                )
+                new_facet_dict["type"] = group_type
                 new_facet_dict["display_name"] = display_name
             elif key == "license_id":
                 license = model.Package.get_license_register().get(key_)
@@ -545,6 +567,36 @@ def pending_dataset_show(context: Context, data_dict: DataDict):
 
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
+        if pending_dataset and pending_dataset.get('package_data'):
+            package_data = pending_dataset['package_data']
+            if package_data.get("groups", None) is not None:
+                _groups = [
+                    tk.get_action("group_show")(context, {"id": group.get('name')})
+                    for group in package_data.get("groups")
+                ]
+                groups = [
+                    {
+                        "description": group.get("description"),
+                        "display_name": group.get("display_name"),
+                        "id": group.get("id"),
+                        "image_display_url": group.get("image_display_url"),
+                        "name": group.get("name"),
+                        "title": group.get("title"),
+                        "type": group.get("type"),
+                        "homepage_url": group.get("homepage_url", None) if 'homepage_url' in group else None,
+                        "contact_url": group.get("contact_url", None) if 'contact_url' in group else None,
+                        "help_url": group.get("help_url", None) if 'help_url' in group else None,
+                    }
+                    for group in _groups
+                ]
+                for group in groups:
+                    if group.get('help_url') is None:
+                        del group['help_url']
+                    if group.get('contact_url') is None:
+                        del group['contact_url']
+                    if group.get('homepage_url') is None:
+                        del group['homepage_url']
+                pending_dataset['package_data']["groups"] = groups
     except Exception as e:
         log.error(e)
         raise tk.ValidationError(e)
@@ -572,7 +624,9 @@ def pending_diff_show(context: Context, data_dict: DataDict):
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
         if pending_dataset is not None:
-            pending_dataset = pending_dataset.get("package_data")
+            # context["for_approval"] = True
+            pending_dataset = get_action('pending_dataset_show')(context, { "package_id": package_id})
+            pending_dataset = pending_dataset['package_data']
             existing_dataset = get_action("package_show")(context, {"id": package_id})
             dataset_diff = _diff(existing_dataset, pending_dataset)
     except Exception as e:
@@ -1202,3 +1256,166 @@ def resource_search(context: Context, data_dict: DataDict):
 
 # TODO:  customize package_show to include spatial_geom
 # conditionally (optimization of the data file geo indexing)
+
+
+# IMPORTANT: This is almost a copy of the original package_show, but it calls the _add_group_types
+# function so that `applications` and `groups` are separated in the response.
+@logic.side_effect_free
+def package_show(context: Context, data_dict: DataDict) -> ActionResult.PackageShow:
+    """Return the metadata of a dataset (package) and its resources.
+
+    :param id: the id or name of the dataset
+    :type id: string
+    :param use_default_schema: use default package schema instead of
+        a custom schema defined with an IDatasetForm plugin (default: ``False``)
+    :type use_default_schema: bool
+    :param include_tracking: add tracking information to dataset and
+        resources (default: ``False``)
+    :type include_tracking: bool
+    :param include_plugin_data: Include the internal plugin data object
+        (sysadmin only, optional, default:``False``)
+    :type: include_plugin_data: bool
+    :rtype: dictionary
+
+    """
+    for_view = context.get("for_view", False)
+
+    if not for_view:
+        context["use_cache"] = False
+
+    model = context["model"]
+    user_obj = context.get("auth_user_obj")
+    context["session"] = model.Session
+    name_or_id = data_dict.get("id") or _get_or_bust(data_dict, "name_or_id")
+
+    include_plugin_data = asbool(data_dict.get("include_plugin_data", False))
+    if user_obj and user_obj.is_authenticated:
+        include_plugin_data = user_obj.sysadmin and include_plugin_data
+
+        if include_plugin_data:
+            context["use_cache"] = False
+
+    pkg = model.Package.get(name_or_id, for_update=context.get("for_update", False))
+
+    if pkg is None:
+        raise NotFound
+
+    context["package"] = pkg
+    _check_access("package_show", context, data_dict)
+
+    if data_dict.get("use_default_schema", False):
+        context["schema"] = ckan.logic.schema.default_show_package_schema()
+
+    include_tracking = asbool(data_dict.get("include_tracking", False))
+
+    package_dict = None
+    use_cache = context.get("use_cache", True)
+    package_dict_validated = False
+
+    if use_cache:
+        try:
+            search_result = search.show(name_or_id)
+        except (search.SearchError, socket.error):
+            pass
+        else:
+            use_validated_cache = "schema" not in context
+            if use_validated_cache and "validated_data_dict" in search_result:
+                package_json = search_result["validated_data_dict"]
+                package_dict = json.loads(package_json)
+                package_dict_validated = True
+            else:
+                package_dict = json.loads(search_result["data_dict"])
+                package_dict_validated = False
+            metadata_modified = pkg.metadata_modified.isoformat()
+            search_metadata_modified = search_result["metadata_modified"]
+            # solr stores less precise datetime,
+            # truncate to 22 charactors to get good enough match
+            if metadata_modified[:22] != search_metadata_modified[:22]:
+                package_dict = None
+
+    if not package_dict:
+        package_dict = model_dictize.package_dictize(pkg, context, include_plugin_data)
+        package_dict_validated = False
+
+    if include_tracking:
+        # page-view tracking summary data
+        package_dict["tracking_summary"] = model.TrackingSummary.get_for_package(
+            package_dict["id"]
+        )
+
+        for resource_dict in package_dict["resources"]:
+            summary = model.TrackingSummary.get_for_resource(resource_dict["url"])
+            resource_dict["tracking_summary"] = summary
+
+    if context.get("for_view"):
+        for item in plugins.PluginImplementations(plugins.IPackageController):
+            package_dict = item.before_dataset_view(package_dict)
+
+    for item in plugins.PluginImplementations(plugins.IPackageController):
+        item.read(pkg)
+
+    for item in plugins.PluginImplementations(plugins.IResourceController):
+        for resource_dict in package_dict["resources"]:
+            item.before_resource_show(resource_dict)
+
+    if not package_dict_validated:
+        package_plugin = lib_plugins.lookup_package_plugin(package_dict["type"])
+        schema = context.get("schema") or package_plugin.show_package_schema()
+
+        if bool(schema) and context.get("validate", True):
+            package_dict, _errors = lib_plugins.plugin_validate(
+                package_plugin, context, package_dict, schema, "package_show"
+            )
+
+    for item in plugins.PluginImplementations(plugins.IPackageController):
+        item.after_dataset_show(context, package_dict)
+
+    package_dict = _add_group_types(context, package_dict)
+
+    return package_dict
+
+
+def _add_group_types(context: Context, data_dict: DataDict):
+    for_view = context.get("for_view", False)
+    for_approval = context.get("for_approval", False)
+    for_update = context.get("for_update", False)
+    for_create = context.get("for_create", False)
+
+    if any([for_view, for_approval, for_update, for_create]):
+        return data_dict
+    try:
+        package_groups = data_dict.get("groups", [])
+        updated_package_groups = []
+        package_applications = []
+
+        for group in package_groups:
+            group_dict = get_action("group_show")(context, {"id": group["id"]})
+            group_type = group_dict.get("type", "group")
+
+            new_group_dict = {
+                "contact_url": group_dict.get("contact_url"),
+                "url": group_dict.get("url"),
+                "help_url": group_dict.get("help_url"),
+                "homepage_url": group_dict.get("homepage_url"),
+            }
+
+            if group_type == "application":
+                group_dict_updates = {"type": group_type}
+                group.update(group_dict_updates)
+
+                for key, value in new_group_dict.items():
+                    if value:
+                        group[key] = value
+                    else:
+                        group.pop(key, None)
+
+                package_applications.append(group)
+            else:
+                group.update({"type": group_type})
+                updated_package_groups.append(group)
+
+        data_dict["groups"] = updated_package_groups + package_applications
+    except Exception as e:
+        log.error(f"Error adding group types: {e}")
+
+    return data_dict

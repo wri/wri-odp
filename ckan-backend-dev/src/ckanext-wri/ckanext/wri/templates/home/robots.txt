@@ -1,0 +1,7 @@
+User-agent: *
+{% block all_user_agents -%}
+Disallow: /
+{%- endblock %}
+
+{% block additional_user_agents -%}
+{%- endblock %}

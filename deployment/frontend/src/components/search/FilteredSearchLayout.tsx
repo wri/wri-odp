@@ -44,7 +44,6 @@ export default function FilteredSearchLayout({
      *
      */
     const facetFields = [
-        { key: 'application', title: 'Application' },
         { key: 'project', title: 'Project' },
         { key: 'organization', title: 'Team' },
         { key: 'groups', title: 'Topics' },
@@ -277,6 +276,135 @@ export default function FilteredSearchLayout({
                                                                                 filters
                                                                             }
                                                                         />
+                                                                    ) : ff.key ===
+                                                                      'groups' ? (
+                                                                        <>
+                                                                            <Facet
+                                                                                text={
+                                                                                    'Topics'
+                                                                                }
+                                                                                facetSelectedCount={{
+                                                                                    //This is a horrible hack to get the count of selected applications, but i cant think of anything better that doesnt involve rewriting this enire page
+                                                                                    groups: filters.filter(
+                                                                                        (
+                                                                                            f
+                                                                                        ) =>
+                                                                                            f.title ===
+                                                                                            'Topics'
+                                                                                    )
+                                                                                        .length,
+                                                                                }}
+                                                                                setFacetSelectedCount={
+                                                                                    setFacetSelectedCount
+                                                                                }
+                                                                                options={
+                                                                                    searchFacets &&
+                                                                                    searchFacets[
+                                                                                        ff
+                                                                                            .key
+                                                                                    ]
+                                                                                        ? searchFacets[
+                                                                                              ff
+                                                                                                  .key
+                                                                                          ]?.items
+                                                                                              .filter(
+                                                                                                  (
+                                                                                                      o
+                                                                                                  ) =>
+                                                                                                      o.type ==
+                                                                                                      'group'
+                                                                                              )
+                                                                                              .filter(
+                                                                                                  (
+                                                                                                      o
+                                                                                                  ) =>
+                                                                                                      o.name
+                                                                                              )
+                                                                                              .map(
+                                                                                                  (
+                                                                                                      o
+                                                                                                  ) => ({
+                                                                                                      label:
+                                                                                                          o.display_name ??
+                                                                                                          o.name,
+                                                                                                      value: o.name,
+                                                                                                  })
+                                                                                              ) ||
+                                                                                          []
+                                                                                        : []
+                                                                                }
+                                                                                fqKey={
+                                                                                    ff.key
+                                                                                }
+                                                                                setFilters={
+                                                                                    setFilters
+                                                                                }
+                                                                                filters={
+                                                                                    filters
+                                                                                }
+                                                                            />
+                                                                            <Facet
+                                                                                text={
+                                                                                    'Applications'
+                                                                                }
+                                                                                //This is a horrible hack to get the count of selected applications, but i cant think of anything better that doesnt involve rewriting this enire page
+                                                                                facetSelectedCount={{
+                                                                                    groups: filters.filter(
+                                                                                        (
+                                                                                            f
+                                                                                        ) =>
+                                                                                            f.title ===
+                                                                                            'Applications'
+                                                                                    )
+                                                                                        .length,
+                                                                                }}
+                                                                                options={
+                                                                                    searchFacets &&
+                                                                                    searchFacets[
+                                                                                        ff
+                                                                                            .key
+                                                                                    ]
+                                                                                        ? searchFacets[
+                                                                                              ff
+                                                                                                  .key
+                                                                                          ]?.items
+                                                                                              .filter(
+                                                                                                  (
+                                                                                                      o
+                                                                                                  ) =>
+                                                                                                      o.name
+                                                                                              )
+                                                                                              .filter(
+                                                                                                  (
+                                                                                                      o
+                                                                                                  ) =>
+                                                                                                      o.type ==
+                                                                                                      'application'
+                                                                                              )
+                                                                                              .map(
+                                                                                                  (
+                                                                                                      o
+                                                                                                  ) => ({
+                                                                                                      label:
+                                                                                                          o.display_name ??
+                                                                                                          o.name,
+                                                                                                      value: o.name,
+                                                                                                  })
+                                                                                              ) ||
+                                                                                          []
+                                                                                        : []
+                                                                                }
+                                                                                fqKey={
+                                                                                    ff.key
+                                                                                }
+                                                                                setFilters={
+                                                                                    setFilters
+                                                                                }
+                                                                                filters={
+                                                                                    filters
+                                                                                }
+                                                                            />
+                                                                        </>
                                                                     ) : (
                                                                         <Facet
                                                                             text={
@@ -466,6 +594,135 @@ export default function FilteredSearchLayout({
                                                                         filters
                                                                     }
                                                                 />
+                                                            ) : ff.key ===
+                                                              'groups' ? (
+                                                                <>
+                                                                    <Facet
+                                                                        text={
+                                                                            'Topics'
+                                                                        }
+                                                                        facetSelectedCount={{
+                                                                            //This is a horrible hack to get the count of selected applications, but i cant think of anything better that doesnt involve rewriting this enire page
+                                                                            groups: filters.filter(
+                                                                                (
+                                                                                    f
+                                                                                ) =>
+                                                                                    f.title ===
+                                                                                    'Topics'
+                                                                            )
+                                                                                .length,
+                                                                        }}
+                                                                        setFacetSelectedCount={
+                                                                            setFacetSelectedCount
+                                                                        }
+                                                                        options={
+                                                                            searchFacets &&
+                                                                            searchFacets[
+                                                                                ff
+                                                                                    .key
+                                                                            ]
+                                                                                ? searchFacets[
+                                                                                      ff
+                                                                                          .key
+                                                                                  ]?.items
+                                                                                      .filter(
+                                                                                          (
+                                                                                              o
+                                                                                          ) =>
+                                                                                              o.type ==
+                                                                                              'group'
+                                                                                      )
+                                                                                      .filter(
+                                                                                          (
+                                                                                              o
+                                                                                          ) =>
+                                                                                              o.name
+                                                                                      )
+                                                                                      .map(
+                                                                                          (
+                                                                                              o
+                                                                                          ) => ({
+                                                                                              label:
+                                                                                                  o.display_name ??
+                                                                                                  o.name,
+                                                                                              value: o.name,
+                                                                                          })
+                                                                                      ) ||
+                                                                                  []
+                                                                                : []
+                                                                        }
+                                                                        fqKey={
+                                                                            ff.key
+                                                                        }
+                                                                        setFilters={
+                                                                            setFilters
+                                                                        }
+                                                                        filters={
+                                                                            filters
+                                                                        }
+                                                                    />
+                                                                    <Facet
+                                                                        text={
+                                                                            'Applications'
+                                                                        }
+                                                                        //This is a horrible hack to get the count of selected applications, but i cant think of anything better that doesnt involve rewriting this enire page
+                                                                        facetSelectedCount={{
+                                                                            groups: filters.filter(
+                                                                                (
+                                                                                    f
+                                                                                ) =>
+                                                                                    f.title ===
+                                                                                    'Applications'
+                                                                            )
+                                                                                .length,
+                                                                        }}
+                                                                        options={
+                                                                            searchFacets &&
+                                                                            searchFacets[
+                                                                                ff
+                                                                                    .key
+                                                                            ]
+                                                                                ? searchFacets[
+                                                                                      ff
+                                                                                          .key
+                                                                                  ]?.items
+                                                                                      .filter(
+                                                                                          (
+                                                                                              o
+                                                                                          ) =>
+                                                                                              o.name
+                                                                                      )
+                                                                                      .filter(
+                                                                                          (
+                                                                                              o
+                                                                                          ) =>
+                                                                                              o.type ==
+                                                                                              'application'
+                                                                                      )
+                                                                                      .map(
+                                                                                          (
+                                                                                              o
+                                                                                          ) => ({
+                                                                                              label:
+                                                                                                  o.display_name ??
+                                                                                                  o.name,
+                                                                                              value: o.name,
+                                                                                          })
+                                                                                      ) ||
+                                                                                  []
+                                                                                : []
+                                                                        }
+                                                                        fqKey={
+                                                                            ff.key
+                                                                        }
+                                                                        setFilters={
+                                                                            setFilters
+                                                                        }
+                                                                        filters={
+                                                                            filters
+                                                                        }
+                                                                    />
+                                                                </>
                                                             ) : (
                                                                 <Facet
                                                                     text={

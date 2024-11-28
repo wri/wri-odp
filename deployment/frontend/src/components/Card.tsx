@@ -10,7 +10,7 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
     return (
         <Link
             href={`datasets/${dataset.name}`}
-            className="flex flex-col w-full font-acumin p-4 pb-6 border-b-2 border-b-wri-green shadow-wri mb-2"
+            className="bg-white flex flex-col w-full font-acumin p-4 pb-6 border-b-2 border-b-wri-green shadow-wri mb-2"
         >
             <div className="bg-white text-wri-green font-bold text-[0.938rem] leading-[1.125rem] w-full pt-4 pb-2 line-clamp-1 h-[2.5em]">
                 {dataset?.organization?.title ?? dataset?.organization?.name}

@@ -115,10 +115,18 @@ export default function SearchPage(
                     text={errorRecentlyAdded.message}
                 />
             ) : (
-                <Recent
-                    datasets={recentlyAdded.datasets}
-                    title="Recently added"
-                />
+                <div
+                    id="highlights"
+                    className="max-w-8xl mx-auto flex flex-col font-acumin gap-y-6 mt-16"
+                >
+                    <h1 className="font-bold text-[2rem] ml-2">
+                        Recently added
+                    </h1>
+                    <Recent
+                        datasets={recentlyAdded.datasets}
+                        title="Recently added"
+                    />
+                </div>
             )}
             {isLoadingRecentlyUpdated ? (
                 <div className="w-full flex justify-center items-center h-10">
@@ -130,10 +138,18 @@ export default function SearchPage(
                     text={errorRecentlyUpdated.message}
                 />
             ) : (
-                <Recent
-                    datasets={recentlyUpdated.datasets}
-                    title="Recently updated"
-                />
+                <div
+                    id="highlights"
+                    className="max-w-8xl mx-auto flex flex-col font-acumin gap-y-6 mt-16"
+                >
+                    <h1 className="font-bold text-[2rem] ml-2">
+                        Recently updated
+                    </h1>
+                    <Recent
+                        datasets={recentlyUpdated.datasets}
+                        title="Recently updated"
+                    />
+                </div>
             )}
             <Footer
                 links={{

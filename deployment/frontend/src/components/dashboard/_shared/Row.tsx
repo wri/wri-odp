@@ -38,7 +38,7 @@ export default function Row({ rowMain, rowSub, isDropDown, controlButtons, linkB
   const { data: session } = useSession()
   // state event to change hover effect on desktop to click effect on mobile
   // const [isHover, setIsHover] = useState(false)
-  const enableControlDiv = (isDropDown ?? controlButtons ?? linkButton) ? true : false
+  const enableControlDiv = (isDropDown || controlButtons || linkButton) ? true : false
   return (
     <div className={`flex flex-col hover:bg-wri-slate ${isShowSubRow ? "bg-wri-slate" : " "}  `}>
       <div

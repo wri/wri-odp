@@ -215,7 +215,7 @@ export function Hero() {
                         <h1 className="max-w-[592px] pr-5 font-acumin text-4xl font-semibold text-white">
                             Data Explorer - Beta
                         </h1>
-                        <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
+                        <p className="font-acumin max-w-[705px] font-light text-[#DFDFDF] leading-[30px] text-[23px]">
                             WRI produces and curates hundreds of datasets as
                             part of our commitment to turn information into
                             action. These products are based on our research and
@@ -232,7 +232,7 @@ export function Hero() {
                             including objectivity and rigor.
                         </p>
                         <br />
-                        <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
+                        <p className="font-acumin max-w-[705px] leading-[30px] text-[23px] font-light text-[#DFDFDF]">
                             Explore using the search bar or use more advanced
                             filters.
                         </p>
