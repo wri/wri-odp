@@ -16,7 +16,7 @@ import { LayerState } from '@/interfaces/state.interface'
 import { useMemo } from 'react'
 import { createDeckLayer } from '@/utils/decodeFunctions'
 
-export const parseLayers = (
+const parseLayers = (
     layers: APILayerSpec[],
     layerStates: Map<string, LayerState>
 ): any[] => {

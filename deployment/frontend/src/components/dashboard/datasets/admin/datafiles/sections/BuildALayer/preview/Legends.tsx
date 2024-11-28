@@ -54,7 +54,7 @@ export function Legends({ layerObj }: { layerObj: any }) {
     )
 }
 
-export const LEGEND_TIMELINE_PROPERTIES = {
+const LEGEND_TIMELINE_PROPERTIES = {
     trackStyle: [
         { backgroundColor: '#caccd0' },
         { backgroundColor: '#caccd0' },

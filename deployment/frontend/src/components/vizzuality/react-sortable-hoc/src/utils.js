@@ -3,7 +3,7 @@
 /* global process */
 import invariant from 'invariant';
 
-export function arrayMove(array, from, to) {
+function arrayMove(array, from, to) {
   // Will be deprecated soon. Consumers should install 'array-move' instead
   // https://www.npmjs.com/package/array-move
 
@@ -38,7 +38,7 @@ export const events = {
   start: ['touchstart', 'mousedown'],
 };
 
-export const vendorPrefix = (function() {
+const vendorPrefix = (function() {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     // Server environment
     return '';
@@ -184,7 +184,7 @@ export function getTargetIndex(newIndex, prevIndex, oldIndex) {
   }
 }
 
-export function getLockPixelOffset({lockOffset, width, height}) {
+function getLockPixelOffset({lockOffset, width, height}) {
   let offsetX = lockOffset;
   let offsetY = lockOffset;
   let unit = 'px';

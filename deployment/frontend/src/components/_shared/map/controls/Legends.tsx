@@ -227,7 +227,7 @@ export function Legends() {
     )
 }
 
-export const LEGEND_TIMELINE_PROPERTIES = {
+const LEGEND_TIMELINE_PROPERTIES = {
     trackStyle: [
         { backgroundColor: '#caccd0' },
         { backgroundColor: '#caccd0' },

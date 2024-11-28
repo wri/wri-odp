@@ -177,7 +177,7 @@ export const useBounds = () => {
     return { bounds, setBounds }
 }
 
-export const useStoreDirtyFields = () => {
+const useStoreDirtyFields = () => {
     const { storeDirtyFields, setStoreDirtyFields } = useStore((store) => ({
         storeDirtyFields: store.storeDirtyFields,
         setStoreDirtyFields: store.setStoreDirtyFields,

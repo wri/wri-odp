@@ -224,7 +224,7 @@ const interactionConfigSchema = z.object({
     ),
 })
 
-export const rawLayerSchema = z.object({
+const rawLayerSchema = z.object({
     id: z.string().uuid().optional().nullable().or(emptyStringToUndefined),
     generalConfig: z.any().optional().nullable(),
     layerConfig: z.any().optional().nullable(),

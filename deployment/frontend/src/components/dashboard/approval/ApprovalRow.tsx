@@ -28,7 +28,7 @@ import {
 } from '@/components/_shared/Popover'
 import { ScrollArea } from '@/components/_shared/ScrollArea'
 
-export type IApprovalRow = {
+type IApprovalRow = {
     dataset: string
     rowId: string
     user: IRowProfile

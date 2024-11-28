@@ -1243,7 +1243,7 @@ export function generateInviteEmail(
     `
 }
 
-export async function generateMemberEmail(
+async function generateMemberEmail(
     senderUser: User,
     recipientUser: User,
     notification: NotificationType
@@ -1490,7 +1490,7 @@ function findUpdatedMembers(
     })
 }
 
-export async function createNotification(
+async function createNotification(
     recipient_id: string,
     sender_id: string,
     activity_type: string,
@@ -1530,7 +1530,7 @@ export async function createNotification(
     }
 }
 
-export async function getTeamDetails({
+async function getTeamDetails({
     id,
     session,
 }: {
@@ -1555,7 +1555,7 @@ export async function getTeamDetails({
     return team.result
 }
 
-export async function getTopicDetails({
+async function getTopicDetails({
     id,
     session,
 }: {
@@ -2007,7 +2007,7 @@ export async function sendGroupNotification({
     }
 }
 
-export async function getPackageDiff({
+async function getPackageDiff({
     id,
     session,
 }: {
@@ -2474,7 +2474,7 @@ export async function approvePendingDataset(
     return dataset.result
 }
 
-export const datasetFields = [
+const datasetFields = [
     'applications',
     'approval_status',
     'authors',

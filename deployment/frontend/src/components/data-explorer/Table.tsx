@@ -100,7 +100,7 @@ export function TopBar({
     )
 }
 
-export function ToggleColumns({ table }: { table: TableType<any> }) {
+function ToggleColumns({ table }: { table: TableType<any> }) {
     const [q, setQ] = useState('')
 
     const filteredItems =
@@ -445,7 +445,7 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
     )
 }
 
-export default function Filters({
+function Filters({
     datePicker = false,
 }: {
     datePicker?: boolean

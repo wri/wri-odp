@@ -95,7 +95,7 @@ export async function getLayerRw(layerUrl: string) {
     return { ...layerRw.data.attributes, id: layerRw.data.id }
 }
 
-export async function fetchDatasetCollaborators(
+async function fetchDatasetCollaborators(
     datasetId: string,
     userApiKey: string,
     sysAdminApiKey: string
