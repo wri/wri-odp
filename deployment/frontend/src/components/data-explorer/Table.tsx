@@ -1,7 +1,7 @@
 import {
     flexRender,
     Table as TableType,
-    Column,
+    type Column,
     Header,
     Updater,
     VisibilityState,

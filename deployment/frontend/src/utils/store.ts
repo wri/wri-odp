@@ -71,7 +71,7 @@ const zustandContext = createContext<UseStoreState>()
 export const Provider = zustandContext.Provider
 export const useStore = zustandContext.useStore
 
-const initializeStore = (preloadedState: any = {}) => {
+export const initializeStore = (preloadedState: any = {}) => {
     return create(
         combine(
             {
