@@ -10,6 +10,7 @@ import { Map, MapLayerMouseEvent } from 'mapbox-gl'
 import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
 import { Popup } from 'react-map-gl'
 import { useLayersFromRW } from '@/utils/queryHooks'
+import numeral from 'numeral';
 
 export interface TooltipRef {
     onClickLayer: (e: MapLayerMouseEvent) => void | undefined
@@ -102,6 +103,7 @@ export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
                         </h1>
                         <div>
                             {info.properties?.map((prop: any, j: number) => {
+                                const value = prop.config.format && prop.config.type === 'number' ? numeral(prop.value).format(prop.config.format) : prop.value 
                                 return (
                                     <p
                                         key={`tooltip-layer-${i}-prop-${j}`}
@@ -114,7 +116,7 @@ export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
                                         </span>{' '}
                                         {/* TODO: format value according to prop.config.format */}
                                         {prop.config.prefix}
-                                        {prop.value}
+                                        {value}
                                         {prop.config.suffix}
                                     </p>
                                 )
