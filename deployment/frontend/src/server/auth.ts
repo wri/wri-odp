@@ -155,6 +155,7 @@ export const authOptions: NextAuthOptions = {
                     const user: CkanResponse<
                         User & { frontend_token: string }
                     > = await userRes.json()
+                    console.log('USER', user)
 
                     if ((user.result as any).errors) {
                         // TODO: error from the response should be sent to the client, but it's not working
