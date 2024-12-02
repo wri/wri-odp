@@ -241,8 +241,7 @@ Migrates an RW dataset/metadata to CKAN. It maps all supported RW fields to CKAN
 
 **Parameters:**
 - **rw_dataset_id** (string) – The RW UUID of the dataset to migrate (required—unless `gfw_dataset` is provided). Example: `c0b5f4b1-4f3b-4f1e-8f1e-3f4b1f3b4f1e`.
-- **rw_application** (string) – The RW application of the dataset to migrate (required). Example: `rw`.
-- **dx_application** (string) – The destination DX application name (group name) to associate the dataset with (required). Example: `land-carbon-lab`.
+- **application** (string) – The RW application of the dataset to migrate (required). Example: `rw`.
 - **dataset_slug** (string) – The desired slug of the dataset to migrate (optional). If you use this option, you will need to include this parameter each time you call `migrate_dataset` for this dataset. This value will override the `slug` value from the RW/GFW APIs. Example: `my-dataset`.
 - **dataset_title** (string) – The desired title of the dataset to migrate (optional). If you use this option, you will need to include this parameter each time you call `migrate_dataset` for this dataset. This value will override the `name` value from the RW API or the `title` value from the GFW API. Example: `My Dataset`.
 - **gfw_dataset** (string) – The GFW dataset to migrate (optional). If this dataset also has metadata in the RW API, you should also include `rw_dataset_id`. Example: `gfw_forest_data`.
@@ -261,7 +260,7 @@ A successful request will return the Prefect status of the new migration job.
 ##### Usage Example
 
 ```
-% curl -H "Authorization: YOUR_API_TOKEN" "https://wri.dev.ckan.datopian.com/api/3/action/migrate_dataset?rw_dataset_id=c12446ce-174f-4ffb-b2f7-77ecb0116aba&rw_application=rw&dx_application=land-carbon-lab&team=migration-test&topics=lucas-topic,nov-16-topic"
+% curl -H "Authorization: YOUR_API_TOKEN" "https://wri.dev.ckan.datopian.com/api/3/action/migrate_dataset?rw_dataset_id=c12446ce-174f-4ffb-b2f7-77ecb0116aba&application=rw&team=migration-test&topics=lucas-topic,nov-16-topic"
 {
   "help": "https://wri.dev.ckan.datopian.com/api/3/action/help_show?name=migration_status",
   "success": true,
@@ -284,8 +283,7 @@ A successful request will return the Prefect status of the new migration job.
           "lucas-topic",
           "nov-16-topic"
         ],
-        "rw_application": "rw",
-        "dx_application": "land-carbon-lab"
+        "application": "rw"
       }
     },
     "idempotency_key": null,
@@ -445,8 +443,7 @@ You'll need this ID: `"id": "7cd8a09e-1834-4ab5-8b72-bd638e9392ae"` (`result.id`
 Add a custom file to the `migration/files` directory and commit it to the repo. Once deployed, you can use the `file_name` parameter to specify it. The file should be a CSV with the following columns:
 
 - `rw_dataset_id` (required—unless `gfw_dataset` is provided)
-- `rw_application` (required)
-- `dx_application` (required)
+- `application` (required)
 - `team` (optional)
 - `topics` (optional)
 - `geographic_coverage` (optional)
@@ -464,13 +461,14 @@ Add a custom file to the `migration/files` directory and commit it to the repo. 
 Example:
 
 ```csv
-rw_dataset_id,gfw_dataset,rw_application,team,topics,geographic_coverage,authors,maintainers,layer_ids,dataset_title,dataset_slug,dx_application
-d491f094-ad6e-4015-b248-1d1cd83667fa,,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,,John Smith:john.smith@example.com;Jane Smith:jane.smith@example.com,,An Aqueduct Dataset,an-aqueduct-dataset,aqueduct
-b318381e-485d-46c9-8958-c9a9d75d7e91,,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,John Smith:john.smith@example.com;Jane Smith:jane.smith@example.com,,,Another Aqueduct Dataset,another-aqueduct-dataset,aqueduct
-,gfw_forest_flux_forest_age_category,gfw,global-forest-watch,"land,ghg-emissions,forest",,,John Smith:john.smith@example.com,,,,global-forest-watch
-,gfw_forest_flux_removal_forest_type,gfw,global-forest-watch,"land,ghg-emissions,forest",,Jane Smith:jane.smith@example.com,John Smith:john.smith@example.com,,Another Title Example,,global-forest-watch
-47a8e6cc-ea40-44a8-b1fc-6cf4fcc7d868,nasa_viirs_fire_alerts,gfw,global-forest-watch,"land,natural-hazards,forest",Global,,,2462cceb-41de-4bd2-8251-a6f75fe4e3d5,,another-slug-example,global-forest-watch
-c92b6411-f0e5-4606-bbd9-138e40e50eb8,,gfw,global-forest-watch,"land,forest",,Jane Smith:jane.smith@example.com,,"0cba3c4f-2d3b-4fb1-8c93-c951dc1da84b,2351399c-ef2c-48da-9485-20698190acb0",,,global-forest-watch
+rw_dataset_id,gfw_dataset,application,team,topics,geographic_coverage,authors,maintainers,layer_ids,dataset_title,dataset_slug
+d491f094-ad6e-4015-b248-1d1cd83667fa,,aqueduct-water-risk,aqueduct,"freshwater,surface-water-bodies",Global,,John Smith:john.smith@example.com;Jane Smith:jane.smith@example.com,,An Aqueduct Dataset,an-aqueduct-dataset
+b318381e-485d-46c9-8958-c9a9d75d7e91,,aqueduct-water-risk,aqueduct,"freshwater,water-risks",Global,John Smith:john.smith@example.com;Jane Smith:jane.smith@example.com,,,Another Aqueduct Dataset,another-aqueduct-dataset
+faf79d2c-5e54-4591-9d70-4bd1029c18e6,,crt,agriadapt,atmosphere,Global,John Smith:john.smith@example.com,Jane Smith:jane.smith@example.com,,,
+,gfw_forest_flux_forest_age_category,gfw,global-forest-watch,"land,ghg-emissions,forest",,,John Smith:john.smith@example.com,,,
+,gfw_forest_flux_removal_forest_type,gfw,global-forest-watch,"land,ghg-emissions,forest",,Jane Smith:jane.smith@example.com,John Smith:john.smith@example.com,,Another Title Example,
+47a8e6cc-ea40-44a8-b1fc-6cf4fcc7d868,nasa_viirs_fire_alerts,gfw,global-forest-watch,"land,natural-hazards,forest",Global,,,2462cceb-41de-4bd2-8251-a6f75fe4e3d5,,another-slug-example
+c92b6411-f0e5-4606-bbd9-138e40e50eb8,,gfw,global-forest-watch,"land,forest",,Jane Smith:jane.smith@example.com,,"0cba3c4f-2d3b-4fb1-8c93-c951dc1da84b,2351399c-ef2c-48da-9485-20698190acb0",,
 ```
 
 #### POST /api/3/action/migration_status
@@ -510,8 +508,7 @@ The following uses the flow run ID from the `/migrate_dataset` endpoint example 
           "lucas-topic",
           "nov-16-topic"
         ],
-        "rw_application": "rw",
-        "dx_application": "land-carbon-lab"
+        "application": "rw"
       }
     },
     "idempotency_key": null,
