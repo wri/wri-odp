@@ -46,7 +46,7 @@ export default function Search({
         }
     }, [])
 
-    const debouncedOnMapViewportChange = useDebouncedCallback((v) => {
+    const debouncedOnMapViewportChange = useDebouncedCallback((v: any) => {
         setViewState(v)
     }, 250)
 
