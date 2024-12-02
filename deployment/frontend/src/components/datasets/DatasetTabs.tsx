@@ -9,6 +9,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { slugify } from "@/utils/slugify";
 
 export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number, highlighted?: boolean }[] }) {
   const prevEl = `.nav-prev-button--tabs`;
@@ -31,6 +32,7 @@ export function DatasetTabs({ tabs }: { tabs: { name: string, count?: number, hi
               {({ selected }: { selected: boolean }) => (
                 <div
                   aria-label={tab.name}
+                  id={slugify(tab.name)}
                   className={classNames(
                     selected
                       ? "border-wri-green text-wri-green"
