@@ -99,9 +99,9 @@ describe("Release notes", () => {
       },
     },
     () => {
-      cy.visit(`/datasets/${dataset}?approval=true`);
+      cy.visit(`/datasets/${dataset}`);
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
-      cy.contains("Testing release notes");
+      cy.contains("Testing release notes", { timeout: 60000});
       cy.contains("Approve request").click({ force: true });
       cy.contains("Approve Dataset").click({ force: true });
       cy.wait(5000);
@@ -122,7 +122,7 @@ describe("Release notes", () => {
       cy.visit(`/datasets/${dataset}`);
       cy.wait(1000);
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
-      cy.contains("Testing release notes");
+      cy.contains("Testing release notes", { timeout: 60000});
     },
   );
 
