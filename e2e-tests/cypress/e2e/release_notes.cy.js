@@ -71,7 +71,7 @@ describe("Release notes", () => {
   );
 
   it(
-    "can be set when dataset has pending approval",
+    "can be set when dataset has pending approval 1",
     {
       retries: {
         runMode: 5,
@@ -85,19 +85,25 @@ describe("Release notes", () => {
         force: true,
       });
       cy.get('[type="submit"]').click({ force: true });
+     cy.contains(`Successfully edited the "${dataset}" dataset`, {
+       timeout: 30000,
+     });
+    })
 
-      cy.wait(5000);
-
+  it(
+    "can be set when dataset has pending approval 2",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
       cy.visit(`/datasets/${dataset}?approval=true`);
-      cy.wait(1000);
-      cy.visit(`/datasets/${dataset}?approval=true`);
-      cy.wait(1000);
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
       cy.contains("Testing release notes");
-
       cy.contains("Approve request").click({ force: true });
       cy.contains("Approve Dataset").click({ force: true });
-
       cy.wait(5000);
     },
   );
