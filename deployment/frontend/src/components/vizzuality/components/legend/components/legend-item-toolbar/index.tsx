@@ -89,13 +89,5 @@ class LegendItemToolbar extends PureComponent {
     );
   }
 }
-export default LegendItemToolbar;
 
-export {
-  LegendItemButtonBBox,
-  LegendItemButtonLayers,
-  LegendItemButtonOpacity,
-  LegendItemButtonVisibility,
-  LegendItemButtonInfo,
-  LegendItemButtonRemove
-};
+;

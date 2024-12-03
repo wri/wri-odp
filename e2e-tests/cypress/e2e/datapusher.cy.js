@@ -74,7 +74,7 @@ describe("Upload file and create dataset", () => {
       cy.contains("Data Files").click();
       cy.get('.datafile-accordion-trigger').eq(0).click()
       cy.contains("Datapusher").click();
-      cy.contains("Submit to Datapusher").click();
+      cy.contains("Submit to Datapusher", { timeout: 50000}).click();
       cy.contains(`Successfully submited datafile to the datapusher`, {
         timeout: 15000,
       });

@@ -1,4 +1,4 @@
-export type LegendTypeLegendConfigType = 'proportional' | 'gradient' | 'choropleth' | 'basic';
+type LegendTypeLegendConfigType = 'proportional' | 'gradient' | 'choropleth' | 'basic';
 
 export interface LegendTypeProps {
 	activeLayer: {
@@ -9,7 +9,7 @@ export interface LegendTypeProps {
 	};
 }
 
-export interface LegendTypeLegendConfigItem { 
+interface LegendTypeLegendConfigItem { 
 	name: string; 
 	color: string; 
 	styles?: string, 
