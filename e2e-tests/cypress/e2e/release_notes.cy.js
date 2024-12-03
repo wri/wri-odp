@@ -65,7 +65,9 @@ describe("Release notes", () => {
       cy.contains(dataset);
 
       cy.visit(`/datasets/${dataset}`);
-      cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
+      cy.contains('Related Datasets', { timeout: 10000 })
+      cy.contains('Collaborators', { timeout: 50000 })
+      cy.get("#release-notes", { timeout: 10000 }).click({ force: true });
       cy.contains("This dataset is at its initial version");
     },
   );
@@ -100,6 +102,8 @@ describe("Release notes", () => {
     },
     () => {
       cy.visit(`/datasets/${dataset}`);
+      cy.contains('Related Datasets', { timeout: 10000 })
+      cy.contains('Collaborators', { timeout: 50000 })
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
       cy.contains("Testing release notes", { timeout: 60000});
       cy.contains("Approve request").click({ force: true });
@@ -118,9 +122,9 @@ describe("Release notes", () => {
     },
     () => {
       cy.visit(`/datasets/${dataset}`);
-      cy.wait(1000);
       cy.visit(`/datasets/${dataset}`);
-      cy.wait(1000);
+      cy.contains('Related Datasets', { timeout: 10000 })
+      cy.contains('Collaborators', { timeout: 50000 })
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
       cy.contains("Testing release notes", { timeout: 60000});
     },
