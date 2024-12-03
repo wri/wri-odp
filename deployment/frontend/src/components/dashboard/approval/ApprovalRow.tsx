@@ -28,7 +28,7 @@ import {
 } from '@/components/_shared/Popover'
 import { ScrollArea } from '@/components/_shared/ScrollArea'
 
-export type IApprovalRow = {
+type IApprovalRow = {
     dataset: string
     rowId: string
     user: IRowProfile
@@ -297,11 +297,11 @@ function SubCardProfile({
             Authors: {
                 old_value:
                     oldAuthors?.map(
-                        (a: any) => `${a.name} (${a.email})` ?? ''
+                        (a: any) => `${a.name} (${a.email})`
                     ) ?? [],
                 new_value:
                     newAuthors?.map(
-                        (a: any) => `${a.name} (${a.email})` ?? ''
+                        (a: any) => `${a.name} (${a.email})`
                     ) ?? [],
             },
         }
@@ -328,11 +328,11 @@ function SubCardProfile({
             Maintainers: {
                 old_value:
                     oldMaintainers?.map(
-                        (a: any) => `${a.name} (${a.email})` ?? ''
+                        (a: any) => `${a.name} (${a.email})`
                     ) ?? [],
                 new_value:
                     newMaintainers?.map(
-                        (a: any) => `${a.name} (${a.email})` ?? ''
+                        (a: any) => `${a.name} (${a.email})`
                     ) ?? [],
             },
         }

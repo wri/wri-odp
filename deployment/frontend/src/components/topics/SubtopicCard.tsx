@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 
-export interface SubtopicProps {
+interface SubtopicProps {
     title: string
     numOfDatasets: number
     img: string

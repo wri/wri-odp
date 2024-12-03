@@ -3,7 +3,7 @@ import { InteractionFormType } from '@/components/dashboard/datasets/admin/dataf
 import { TileLayer } from '@deck.gl/geo-layers'
 import type { Source, LayerType } from '@vizzuality/layer-manager'
 
-export interface DeckProps {
+interface DeckProps {
     type: 'deck'
     params?: Record<string, unknown>
     data: string
@@ -16,15 +16,15 @@ export interface DeckLayerSpec {
     deck: TileLayer<any, any>[]
 }
 
-export interface layerConfigBodySpec {
+interface layerConfigBodySpec {
     attribution?: string
 }
 
-export interface Render {
+interface Render {
     layers?: Record<string, string | number | boolean | unknown>[]
 }
 
-export type Provider = {
+type Provider = {
     type: 'carto' | string
     account?: string
     options: Record<string, unknown>

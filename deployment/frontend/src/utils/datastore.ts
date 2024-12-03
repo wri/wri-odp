@@ -2,7 +2,7 @@ import { env } from '@/env.mjs'
 import { DataResponse } from '@/server/api/routers/datastore'
 import { Session } from 'next-auth'
 
-export async function sqlQueryDatastore(sql: string, session: Session | null) {
+async function sqlQueryDatastore(sql: string, session: Session | null) {
     const url = `${env.NEXT_PUBLIC_CKAN_URL}/api/action/datastore_search_sql?sql=${sql}`
 
     const tableDataRes = await fetch('/api/proxy', {

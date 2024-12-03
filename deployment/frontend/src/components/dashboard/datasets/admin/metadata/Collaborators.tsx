@@ -82,7 +82,7 @@ export function Collaborators({
     )
 }
 
-export function CollaboratorForm({
+function CollaboratorForm({
     formObj,
     index,
     remove,

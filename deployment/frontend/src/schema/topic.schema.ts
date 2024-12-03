@@ -4,7 +4,7 @@ import z from 'zod'
 const capacitySchema = z.enum(['admin', 'editor', 'member'])
 
 
-export const MemberSchema = z.object({
+const MemberSchema = z.object({
     user: z.object({ value: z.string(), label: z.string() }),
     topic_id: z.string(),
     capacity: z.object({
@@ -36,4 +36,4 @@ export const TopicSchema = z.object({
 })
 
 export type TopicFormType = z.infer<typeof TopicSchema>
-export type MemberFormType = z.infer<typeof MemberSchema>
+type MemberFormType = z.infer<typeof MemberSchema>

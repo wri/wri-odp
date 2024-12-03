@@ -62,7 +62,7 @@ function customDataLayer(data: { event: string; resource_name: string }) {
     }
 }
 
-export function LocationSearch({
+function LocationSearch({
     geojsons,
     formObj,
     open,

@@ -113,8 +113,7 @@ MIGRATE_DATASET_PARAMS = [
     "gfw_dataset",
     "gfw_only",
     "gfw_version",
-    "rw_application",
-    "dx_application",
+    "application",
     "team",
     "topics",
     "layer_ids",
@@ -279,8 +278,7 @@ def trigger_migration(context: Context, data_dict: DataDict):
 @logic.side_effect_free
 def migrate_dataset(context: Context, data_dict: DataDict):
     dataset_id = data_dict.get("rw_dataset_id")
-    dx_application = data_dict.get("dx_application")
-    rw_application = data_dict.get("rw_application")
+    application = data_dict.get("application")
     gfw_dataset = data_dict.get("gfw_dataset")
 
     data_dict = _black_white_list("whitelist", data_dict)
@@ -297,19 +295,9 @@ def migrate_dataset(context: Context, data_dict: DataDict):
         else:
             data_dict["gfw_only"] = True
 
-    if not rw_application:
+    if not application:
         if not gfw_dataset:
-            raise tk.ValidationError(_("'rw_application' is required when no 'gfw_dataset' is provided"))
-
-    if not dx_application:
-        raise tk.ValidationError(_("'dx_application' is required to associate the dataset with a DX application"))
-
-    try:
-        tk.get_action("group_show")(
-            {"ignore_auth": True}, {"id": dx_application, "type": "application"}
-        )
-    except logic.NotFound:
-        raise tk.ValidationError(_("'dx_application' not found: ") + dx_application)
+            raise tk.ValidationError(_("Application is required"))
 
     team = data_dict.get("team")
     topics = data_dict.get("topics")

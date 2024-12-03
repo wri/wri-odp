@@ -106,11 +106,11 @@ function verifyAuthorizationError(response: any) {
  *
  * @example type HelloInput = RouterInputs['example']['hello']
  */
-export type RouterInputs = inferRouterInputs<AppRouter>
+type RouterInputs = inferRouterInputs<AppRouter>
 
 /**
  * Inference helper for outputs.
  *
  * @example type HelloOutput = RouterOutputs['example']['hello']
  */
-export type RouterOutputs = inferRouterOutputs<AppRouter>
+type RouterOutputs = inferRouterOutputs<AppRouter>

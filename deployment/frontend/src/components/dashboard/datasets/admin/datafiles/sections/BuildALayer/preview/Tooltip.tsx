@@ -1,6 +1,6 @@
 import { Popup } from 'react-map-gl'
 
-export function Tooltip({ layersInfo, coordinates, close }: any) {
+function Tooltip({ layersInfo, coordinates, close }: any) {
     if (layersInfo.length === 0) return <></>
     if (!coordinates) return <></>
     return (

@@ -34,7 +34,7 @@ const sortedArray = (a: WriDataset, b: WriDataset) => {
     }
 }
 
-export function ApprovalSelect({
+function ApprovalSelect({
     setQuery,
     query,
 }: {
