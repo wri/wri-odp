@@ -344,7 +344,7 @@ export function BuildALayerRaw({
     )
 }
 
-export function PreviewMap({
+function PreviewMap({
     layerFormObj,
     updatePreview,
 }: {

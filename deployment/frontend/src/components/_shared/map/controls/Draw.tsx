@@ -13,7 +13,7 @@ import { type LineLayer } from "mapbox-gl";
 import { useIsDrawing } from "@/utils/storeHooks";
 import IconButton from "./IconButton";
 
-export interface DrawProps {
+interface DrawProps {
     mapRef: MutableRefObject<MapRef | null>;
     onDraw?: (feature: DrawFeature) => void;
 }

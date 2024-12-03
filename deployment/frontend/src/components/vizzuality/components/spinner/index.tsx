@@ -16,7 +16,7 @@ const STYLES = {
   }
 };
 
-export class Spinner extends PureComponent {
+class Spinner extends PureComponent {
   static propTypes = {
     position: PropTypes.oneOf(['relative', 'absolute', 'fixed']),
     className: PropTypes.string,
@@ -69,4 +69,3 @@ export class Spinner extends PureComponent {
   }
 }
 
-export default Spinner;

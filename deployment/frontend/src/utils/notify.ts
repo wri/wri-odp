@@ -1,7 +1,7 @@
-import { toast, ToastContent, ToastOptions } from "react-toastify";
+import { toast, type ToastContent, ToastOptions } from "react-toastify";
 
 export default function notify(
-  text: ToastContent,
+  text: any,
   severity: "success" | "error" = "success"
 ) {
   /*

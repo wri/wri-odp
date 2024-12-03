@@ -2,13 +2,13 @@ import Papa from 'papaparse'
 import { useQuery } from 'react-query'
 import { Schema as SchemaFn } from 'tableschema'
 
-export interface Field {
+interface Field {
     name: string
     type: string
     format: string
 }
 
-export interface Descriptor {
+interface Descriptor {
     fields?: Field[]
     missingValues: string[]
 }
@@ -36,7 +36,7 @@ export const useDataDictionary = (
     )
 }
 
-export async function parseCsv(file: File): Promise<any> {
+async function parseCsv(file: File): Promise<any> {
     return new Promise((resolve, reject) => {
         Papa.parse(file, {
             download: false,

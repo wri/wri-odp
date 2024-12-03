@@ -20,7 +20,7 @@ const visibilityTypeSchema = z.enum(['public', 'private', 'draft', 'internal'])
 
 const capacitySchema = z.enum(['admin', 'editor', 'member'])
 
-export const DataDictionarySchema = z.array(
+const DataDictionarySchema = z.array(
     z.object({
         id: z.string(),
         info: z.object({
@@ -31,7 +31,7 @@ export const DataDictionarySchema = z.array(
     })
 )
 
-export const CollaboratorSchema = z.object({
+const CollaboratorSchema = z.object({
     user: z.object({ value: z.string(), label: z.string() }),
     package_id: z.string(),
     capacity: z.object({
@@ -96,7 +96,7 @@ export const ResourceSchema = z
         }
     )
 
-export const DatasetSchemaObject = z.object({
+const DatasetSchemaObject = z.object({
     id: z.string().uuid().optional().nullable(),
     rw_id: z.string().optional().nullable(),
     title: z.string().min(1, { message: 'Title is required' }),

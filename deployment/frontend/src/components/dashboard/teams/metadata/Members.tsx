@@ -82,7 +82,7 @@ export function Members({
     )
 }
 
-export function MemberForm({
+function MemberForm({
     formObj,
     index,
     remove,

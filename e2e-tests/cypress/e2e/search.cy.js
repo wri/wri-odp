@@ -113,8 +113,7 @@ describe("Search page", () => {
 
   it("allows faceting by last updated since and before dates", () => {
     cy.visit("/search_advanced");
-    cy.contains("Open sidebar").click();
-    cy.get("#facets-list");
+    cy.viewport(1440, 900)
     cy.contains("Last Updated").focus().click({ force: true });
 
     const today = new Date();

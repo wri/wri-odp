@@ -4,7 +4,7 @@ import type {
   LayerModel, LayerSpec, Source, ProviderMaker,
 } from '@vizzuality/layer-manager';
 
-export type CartoData = {
+type CartoData = {
   'cdn_url': {
     templates: {
       https: {
@@ -15,12 +15,12 @@ export type CartoData = {
   layergroupid: string
 };
 
-export type CartoLayer = {
+type CartoLayer = {
   options: Record<string, unknown>
   interactivity: unknown
 };
 
-export type CartoProviderType = {
+type CartoProviderType = {
   account: string
   'api_key': string
   layers: CartoLayer[]
@@ -28,7 +28,7 @@ export type CartoProviderType = {
   type: 'carto'
 };
 
-export type CartoParams = {
+type CartoParams = {
   'stat_tag': 'API'
   config: string
   'api_key'?: string
