@@ -703,7 +703,6 @@ export async function getOnePendingDataset(
         throw Error(JSON.stringify(data.error))
     }
     const dataset = data.result.package_data
-    console.log('PENDING DATASET', dataset)
 
     // if (dataset.rw_id) {
     const resourceLayer = dataset.resources.filter(
@@ -2207,7 +2206,6 @@ export async function approvePendingDataset(
         }
     )
     const data = (await response.json()) as CkanResponse<PendingDataset>
-    console.log('PENDING DATASET', data)
     if (!data.success && data.error)
         throw Error(JSON.stringify(data.error).concat('pending_dataset_show'))
 
