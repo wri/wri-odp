@@ -17,7 +17,7 @@ RUN apt-get install -y \
 # Install QSVDP
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
-RUN cargo install qsv --locked --bin qsvdp -F datapusher_plus,luau
+RUN cargo install --version 0.108.0 qsv --locked --bin qsvdp -F datapusher_plus,luau
 RUN mkdir /app/files
 
 CMD [ "python", "main.py" ]
