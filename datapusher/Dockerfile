@@ -17,6 +17,8 @@ RUN apt-get install -y \
 # Install QSVDP
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
+RUN rustup install 1.75.0
+RUN rustup default 1.75.0
 RUN cargo install --version 0.108.0 qsv --locked --bin qsvdp -F datapusher_plus,luau
 RUN mkdir /app/files
 
