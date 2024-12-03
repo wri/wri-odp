@@ -101,7 +101,7 @@ describe("Release notes", () => {
       },
     },
     () => {
-      cy.visit(`/datasets/${dataset}`);
+      cy.visit(`/datasets/${dataset}?approval=true`);
       cy.contains('Related Datasets', { timeout: 10000 })
       cy.contains('Collaborators', { timeout: 50000 })
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
