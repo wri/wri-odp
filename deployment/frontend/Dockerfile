@@ -3,6 +3,7 @@ RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
+COPY tableschema-1.12.6.tgz ./
 
 RUN npm ci -f
 
