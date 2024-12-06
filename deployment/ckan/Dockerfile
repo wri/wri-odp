@@ -81,5 +81,11 @@ USER root
 
 RUN chown -R ckan:ckan ${APP_DIR}/src/
 
+COPY setup/supervisord.conf /etc/supervisord.d/supervisord.conf
+COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
+COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
+
+RUN chown -R ckan:ckan /etc/supervisord.d
+
 USER ckan
 
