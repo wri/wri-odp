@@ -15,7 +15,7 @@ import { GeeProvider } from '@/utils/providers/geeProvider'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import { useMemo } from 'react'
 
-export const parseLayers = (layers: APILayerSpec[]): LayerSpec[] => {
+const parseLayers = (layers: APILayerSpec[]): LayerSpec[] => {
     return layers.map((layer): LayerSpec => {
         const { id, layerConfig } = layer
         let layerProps: any = pick(layerConfig, [

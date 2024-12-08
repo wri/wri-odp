@@ -11,7 +11,7 @@ export const viewFormSchema = z.object({
     }),
 })
 
-export type ViewFormSchema = z.infer<typeof viewFormSchema>
+type ViewFormSchema = z.infer<typeof viewFormSchema>
 
 export const createViewFormSchema = viewFormSchema.and(
     z.object({ resource_id: z.string() })

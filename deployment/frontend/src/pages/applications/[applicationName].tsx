@@ -24,26 +24,29 @@ export async function getServerSideProps(
     })
     try {
         const applicationName = context.params?.applicationName as string
-        await helpers.dataset.getAllDataset.prefetch({
-            search: '',
-            fq: {
-                groups: applicationName,
-            },
-            page: {
-                start: 0,
-                rows: 100,
-            },
-        })
-        await helpers.applications.getApplication.prefetch({
-            id: applicationName,
-        })
+        const [_datasets, _application] = await Promise.all([
+            await helpers.dataset.getAllDataset.fetch({
+                search: '',
+                fq: {
+                    groups: applicationName,
+                },
+                page: {
+                    start: 0,
+                    rows: 100,
+                },
+            }),
+            await helpers.applications.getApplication.fetch({
+                id: applicationName,
+            }),
+        ])
         return {
             props: {
                 trpcState: helpers.dehydrate(),
                 applicationName,
             },
         }
-    } catch {
+    } catch (e) {
+    console.log('FAILED TO GET APP', e)
         return {
             props: {},
             redirect: {

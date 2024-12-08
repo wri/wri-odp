@@ -267,7 +267,7 @@ const SnippetInstructions = ({
     )
 }
 
-export function APITabs({
+function APITabs({
     tabs,
 }: {
     tabs: { name: string; count?: number; highlighted?: boolean }[]

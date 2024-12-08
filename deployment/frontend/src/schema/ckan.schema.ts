@@ -5,7 +5,7 @@ import type {
     User as CkanUser,
 } from '@portaljs/ckan'
 
-export interface Group {
+interface Group {
     display_name: string;
     description: string;
     image_display_url: string;
@@ -152,7 +152,7 @@ export type WriDatasetWithoutDetails = Omit<WriDataset, 'resources'> & {
     resources: { datastore_active?: boolean | null; format?: string }[]
 }
 
-export interface Extra {
+interface Extra {
     key: string
     value: string
 }
@@ -162,7 +162,7 @@ export interface OpenIn {
     url: string
 }
 
-export interface Organization {
+interface Organization {
     id: string
     name: string
     title: string
@@ -247,7 +247,7 @@ export interface Issue {
     comments: Comment[]
 }
 
-export interface Comment {
+interface Comment {
     id: number
     comment: string
     user_id: string
@@ -271,7 +271,7 @@ export interface GroupsmDetails {
     name: string
 }
 
-export interface Member {
+interface Member {
     id: string
     name: string
     email: string

@@ -11,7 +11,7 @@ import { api } from '@/utils/api'
 import { ErrorAlert } from '../_shared/Alerts'
 import Spinner from '../_shared/Spinner'
 
-export interface TopicProps {
+interface TopicProps {
     title: string
     numOfDatasets: number
     img: string

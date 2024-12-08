@@ -17,8 +17,9 @@ export default function ApplicationCard({
             <div className="relative w-full h-56 2xl:h-64">
                 <Image
                     src={`${
-                        application.image_display_url ??
-                        '/images/placeholders/applications/applicationsdefault.png'
+                        application.image_display_url !== ''
+                            ? application?.image_display_url
+                            : '/images/placeholders/applications/applicationsdefault.png'
                     }`}
                     alt={`Application - ${application.title}`}
                     fill
@@ -36,7 +37,7 @@ export default function ApplicationCard({
             <div className="flex font-light text-sm text-wri-black mt-1 leading-[1.375rem] items-center">
                 <span className="mr-2">
                     {application.package_count}
-                    datasets
+                    {" "}datasets
                 </span>
             </div>
         </Link>

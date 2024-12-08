@@ -1,4 +1,4 @@
-import { Labels } from '@/interfaces/state.interface'
+import { type Labels } from '@/interfaces/state.interface'
 import { MutableRefObject, useCallback, useEffect } from 'react'
 import { MapRef } from 'react-map-gl'
 import mapboxgl, { Map as MapType } from 'mapbox-gl'

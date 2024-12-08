@@ -3,7 +3,7 @@ import { User, WriDataset, WriOrganization } from "./ckan.schema";
 import Team from "@/interfaces/team.interface";
 import Topic from "@/interfaces/topic.interface";
 
-export const NotificationSchema = z.object({
+const NotificationSchema = z.object({
   id: z.string(),
   recipient_id: z.string(),
   sender_id: z.string(),
@@ -24,7 +24,7 @@ export const NotificationSchema = z.object({
 
 })
 
-export type Notification = z.infer<typeof NotificationSchema>;
+type Notification = z.infer<typeof NotificationSchema>;
 
 export interface NotificationType extends Notification {
   sender_obj?: User;
@@ -37,9 +37,9 @@ export const NotificationInput = z.object({
   is_unread: z.boolean().optional(),
 })
 
-export type NotificationInputType = z.infer<typeof NotificationInput>;
+type NotificationInputType = z.infer<typeof NotificationInput>;
 
-export const NewNotificationInput = z.object({
+const NewNotificationInput = z.object({
   recipient_id: z.string(),
   sender_id: z.string(),
   activity_type: z.string(),

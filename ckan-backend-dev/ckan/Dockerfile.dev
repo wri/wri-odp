@@ -28,12 +28,21 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@098373
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@fd7113f076336c13b9952d6b2161c0f4339e5cc6#egg=ckanext-auth' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@okta#egg=ckanext-auth' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues' && \
+    pip3 install -e 'git+https://github.com/ckan/ckanext-harvest.git@v1.6.0#egg=ckanext-harvest' && \
+    pip3 install -r 'https://raw.githubusercontent.com/ckan/ckanext-harvest/refs/tags/v1.6.0/requirements.txt'
 
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
+
+# Fixing security vulnerabilities
+RUN apk --update add git
+RUN apk add postgresql15-client=15.10-r0
+RUN apk add libpq=15.10-r0
+RUN pip install --force-reinstall -v "Pillow==11.0.0"
 
 RUN apk add --virtual .build-deps \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \

@@ -1,8 +1,6 @@
-//import VizzLayerManager from './VizzLayerManager'
 //@ts-ignore
 import { PluginMapboxGl } from 'layer-manager'
 import { useMap } from 'react-map-gl'
-import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
 import {
     Layer,
     LayerManager as VizzLayerManager,
@@ -18,7 +16,7 @@ import { LayerState } from '@/interfaces/state.interface'
 import { useMemo } from 'react'
 import { createDeckLayer } from '@/utils/decodeFunctions'
 
-export const parseLayers = (
+const parseLayers = (
     layers: APILayerSpec[],
     layerStates: Map<string, LayerState>
 ): any[] => {
@@ -62,7 +60,7 @@ export const parseLayers = (
 const geeProvider = new GeeProvider()
 const cartoProvider = new CartoProvider()
 const tileProvider = new TileProvider()
-const providers: Record<string, ProviderMaker['handleData']> = {
+const providers: Record<string, any['handleData']> = {
     [geeProvider.name]: geeProvider.handleData,
     [cartoProvider.name]: cartoProvider.handleData,
     [tileProvider.name]: tileProvider.handleData,

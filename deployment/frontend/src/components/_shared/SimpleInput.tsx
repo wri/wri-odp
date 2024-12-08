@@ -1,7 +1,7 @@
 import classNames from '@/utils/classnames'
 import * as React from 'react'
 
-export interface InputProps
+interface InputProps
     extends React.InputHTMLAttributes<HTMLInputElement> {
     name?: string
     type?: string
