@@ -38,7 +38,7 @@ export default function Header() {
 
     const navigation = [
         {
-            title: 'Explore',
+            title: 'Search',
             href: '/search',
             active: false,
         },
