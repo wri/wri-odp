@@ -8,7 +8,7 @@ import { NextSeo } from 'next-seo'
 import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner'
 import UserForm from '@/components/dashboard/users/UserForm'
-import { User } from '@portaljs/ckan'
+import { type User } from '@portaljs/ckan'
 import { Tab } from '@headlessui/react'
 import { SettingsTabs } from '@/components/dashboard/users/SettingsTabs'
 import { ApiKeys } from '@/components/dashboard/users/ApiKeys'
@@ -71,7 +71,7 @@ export default function User(
             </Layout>
             <Footer
                 links={{
-                    primary: { title: 'Advanced Search', href: '/search' },
+                    primary: { title: 'Search', href: '/search' },
                     secondary: { title: 'Explore Topics', href: '/topics' },
                 }}
                 style="mt-0"

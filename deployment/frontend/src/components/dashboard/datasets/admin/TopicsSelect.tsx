@@ -54,7 +54,7 @@ export function TopicsSelect({
         />
     )
 }
-export function TopicsInner({
+function TopicsInner({
     topicHierarchy,
     onChange,
     value,

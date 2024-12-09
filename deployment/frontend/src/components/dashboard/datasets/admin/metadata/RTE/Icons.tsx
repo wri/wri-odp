@@ -133,7 +133,7 @@ export const RotateRight = ({ size = 16, color = 'currentColor' }) => (
     </svg>
 )
 
-export const X = ({ size = 16, color = 'currentColor' }) => (
+const X = ({ size = 16, color = 'currentColor' }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         width={size}

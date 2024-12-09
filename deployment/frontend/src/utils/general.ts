@@ -125,7 +125,7 @@ export function matchesAnyPattern(item: string): boolean {
     return !patterns.some((pattern) => pattern.test(item))
 }
 
-export const datasetFormFieldmap: Record<string, string> = {
+const datasetFormFieldmap: Record<string, string> = {
     title: 'Title',
     url: 'Source',
     language: 'Language',

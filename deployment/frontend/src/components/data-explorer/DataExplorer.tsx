@@ -23,7 +23,7 @@ interface DataExplorerProps {
     tabularResource: TabularResource
 }
 
-export interface Filter {
+interface Filter {
     operation: '=' | '!=' | '>' | '<' | 'contains'
     value: string
 }
@@ -56,7 +56,7 @@ export function DataExplorer({ tabularResource }: DataExplorerProps) {
     )
 }
 
-export interface DataExplorerInnerProps {
+interface DataExplorerInnerProps {
     tableName: string
     tabularResource: TabularResource
     columns: { key: string; name: string; type: string; default?: string }[]

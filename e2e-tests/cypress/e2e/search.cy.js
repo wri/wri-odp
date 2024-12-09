@@ -75,7 +75,7 @@ describe("Search page", () => {
       },
     },
     () => {
-      cy.visit("/search_advanced");
+      cy.visit("/search");
       cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
 
       for (let facet of facets) {
@@ -93,7 +93,7 @@ describe("Search page", () => {
       },
     },
     () => {
-      cy.visit("/search_advanced");
+      cy.visit("/search");
       cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
 
       cy.get("@facets-list").contains("Team").click({ force: true });
@@ -105,16 +105,15 @@ describe("Search page", () => {
   );
 
   it("allows filtering by search query", () => {
-    cy.visit("/search_advanced");
+    cy.visit("/search");
     cy.get('[name="search"]').type(datasets[0] ?? "test");
 
     cy.contains("results", { timeout: 10000 });
   });
 
   it("allows faceting by last updated since and before dates", () => {
-    cy.visit("/search_advanced");
-    cy.contains("Open sidebar").click();
-    cy.get("#facets-list");
+    cy.visit("/search");
+    cy.viewport(1440, 900)
     cy.contains("Last Updated").focus().click({ force: true });
 
     const today = new Date();

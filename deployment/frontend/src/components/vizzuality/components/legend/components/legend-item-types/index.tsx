@@ -12,7 +12,7 @@ import LegendItemTypeChoropleth from './legend-item-type-choropleth';
 import LegendItemTypeGradient from './legend-item-type-gradient';
 import LegendItemTypeProportional from './legend-item-type-proportional';
 
-export const substitution = (originalStr: string, params: any = {}): string => {
+const substitution = (originalStr: string, params: any = {}): string => {
   let str = originalStr;
 
   Object.keys(params).forEach((key) => {
@@ -54,7 +54,7 @@ export const substitution = (originalStr: string, params: any = {}): string => {
  * @param {String} originalStr
  * @param {Object} params
  */
-export const concatenation = (originalStr: string, params: any = {}): string => {
+const concatenation = (originalStr: string, params: any = {}): string => {
   let result = originalStr;
 
   Object.keys(params).forEach((key) => {
@@ -86,7 +86,7 @@ export const concatenation = (originalStr: string, params: any = {}): string => 
   return result;
 };
 
-export const replace = (
+const replace = (
   originalStr: string,
   params: any = {},
   sqlParams: any = {},
@@ -213,9 +213,4 @@ class LegendItemTypes extends PureComponent {
 
 export default LegendItemTypes;
 
-export {
-  LegendItemTypeBasic,
-  LegendItemTypeChoropleth,
-  LegendItemTypeGradient,
-  LegendItemTypeProportional
-};
+;
