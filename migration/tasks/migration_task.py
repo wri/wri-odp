@@ -1127,6 +1127,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
         "learn_more": learn_more_link,
         "update_frequency": "",
         "spatial_address": geographic_coverage,
+        "spatial_type": "derived_from_resources",
         "authors": authors,
         "maintainers": maintainers,
         "tags": tags,

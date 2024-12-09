@@ -78,6 +78,7 @@ import ckanext.wri.views.api as api_blueprint
 import ckanext.issues.logic.action as issue_action
 import queue
 import logging
+import shapely
 
 log = logging.getLogger(__name__)
 
@@ -409,8 +410,22 @@ class WriPlugin(plugins.SingletonPlugin):
         if any(key in pkg_dict for key in ("authors", "maintainers")):
             pkg_dict = stringify_actor_objects(pkg_dict)
 
-        if not pkg_dict.get("spatial"):
+        if not pkg_dict.get("spatial") and pkg_dict.get('spatial_type') != 'derived_from_resources':
             return pkg_dict
+
+        if pkg_dict.get("spatial_type") == "derived_from_resources":
+            dataset = logic.get_action("package_show")(
+                {"ignore_auth": True}, {"id": pkg_dict.get('id')}
+            )
+            print("Derived from resources", flush=True)
+            print(f"{len(dataset.get('resources'))} Resources", flush=True)
+            geometries = [shapely.geometry.shape(resource["spatial_geom"]["geometry"]) for resource in dataset.get("resources", []) if resource.get("spatial_geom") and resource.get("spatial_geom").get("geometry")]
+            print(geometries, flush=True)
+            if len(geometries) == 0:
+                return pkg_dict
+            merged_geom = shapely.unary_union(geometries)
+            merged_geojson = shapely.to_geojson(merged_geom)
+            pkg_dict["spatial"] = merged_geojson
 
         pkg_dict = SolrSpatialFieldSearchBackend().index_dataset(pkg_dict)
 
