@@ -114,8 +114,8 @@ export default function ApplicationsPage(
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
                     <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
-                        Explore reliable datasets filtered by the application of your
-                        interest.
+                        Explore reliable datasets filtered by the application of
+                        your interest.
                     </h3>
                 </div>
             </section>
@@ -143,7 +143,7 @@ export default function ApplicationsPage(
             )}
             <Footer
                 links={{
-                    primary: { title: 'Advanced Search', href: '#' },
+                    primary: { title: 'Search', href: '/search' },
                     secondary: { title: 'Explore Applications', href: '#' },
                 }}
             />

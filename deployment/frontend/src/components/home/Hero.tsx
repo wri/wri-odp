@@ -31,7 +31,7 @@ export function Hero() {
     const router = useRouter()
     const navigation = [
         {
-            title: 'Explore',
+            title: 'Search',
             href: '/search',
             active: false,
         },
@@ -239,7 +239,7 @@ export function Hero() {
                         <form
                             onSubmit={handleSubmit((data) => {
                                 router.push({
-                                    pathname: '/search_advanced',
+                                    pathname: '/search',
                                     query: `search=%5B%7B%22title%22%3A%22Search%22%2C%22key%22%3A%22search%22%2C%22label%22%3A%22${encodeURIComponent(
                                         data.search
                                     )}%22%2C%22value%22%3A%22${encodeURIComponent(

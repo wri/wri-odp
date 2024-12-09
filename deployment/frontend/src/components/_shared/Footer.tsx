@@ -10,12 +10,12 @@ import osanoListeners from './OsanoListeners'
 export default function Footer({
     links = {
         primary: { title: 'Explore Topics', href: '#' },
-        secondary: { title: 'Advanced Search', href: '#' },
+        secondary: { title: 'Search', href: '/search' },
     },
     style = 'mt-16',
     isHome = false,
 }) {
-    osanoListeners();
+    osanoListeners()
 
     return (
         <section
@@ -70,7 +70,13 @@ export default function Footer({
                         >
                             Our Approach
                         </a>
-                        <Link href={env.NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL || "https://www.wri.org/about/privacy-policy?sitename=WRI%20Data%20Explorer&osanoid=c2a89d08-4931-4ad0-99cb-8d3aa022aaec"} className=" font-normal">
+                        <Link
+                            href={
+                                env.NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL ||
+                                'https://www.wri.org/about/privacy-policy?sitename=WRI%20Data%20Explorer&osanoid=c2a89d08-4931-4ad0-99cb-8d3aa022aaec'
+                            }
+                            className=" font-normal"
+                        >
                             Privacy Policy
                         </Link>
                     </div>
@@ -94,7 +100,12 @@ export default function Footer({
                         <Link href="/user-guide" className=" font-normal">
                             User Guide
                         </Link>
-                        <a className="osano-cookie-preference-link font-normal cursor-pointer" title="Manage privacy and cookie preferences">Cookie Preferences</a>
+                        <a
+                            className="osano-cookie-preference-link font-normal cursor-pointer"
+                            title="Manage privacy and cookie preferences"
+                        >
+                            Cookie Preferences
+                        </a>
                     </div>
                     <div className="ml-auto mt-10 lg:col-span-2 lg:w-[90%] flex w-full shrink flex-col items-center gap-y-4 sm:mt-0 sm:items-start xl:min-w-[420px]">
                         <div className="font-acumin text-xl font-bold text-gray-800">
@@ -105,21 +116,21 @@ export default function Footer({
                             <a
                                 href="https://facebook.com/worldresources"
                                 className="relative h-5 w-5 "
-                                aria-label='Facebook'
+                                aria-label="Facebook"
                             >
                                 <Image src="/icons/fb.svg" alt="" fill />
                             </a>
                             <a
                                 href="https://twitter.com/WorldResources"
                                 className="relative h-5 w-5 "
-                                aria-label='Twitter'
+                                aria-label="Twitter"
                             >
                                 <Image src="/icons/x.svg" alt={''} fill />
                             </a>
                             <a
                                 href="https://www.linkedin.com/company/world-resources-institute"
                                 className="relative h-5 w-5 "
-                                aria-label='LinkedIn'
+                                aria-label="LinkedIn"
                             >
                                 <Image
                                     src="/icons/linkedin.svg"
