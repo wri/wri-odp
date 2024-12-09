@@ -79,6 +79,10 @@ import ckanext.issues.logic.action as issue_action
 import queue
 import logging
 import shapely
+from shapely.geometry import mapping
+import shapely.geometry
+import shapely.ops
+import json
 
 log = logging.getLogger(__name__)
 
@@ -422,11 +426,10 @@ class WriPlugin(plugins.SingletonPlugin):
             geometries = [shapely.geometry.shape(resource["spatial_geom"]["geometry"]) for resource in dataset.get("resources", []) if resource.get("spatial_geom") and resource.get("spatial_geom").get("geometry")]
             if len(geometries) == 0:
                 return pkg_dict
-            merged_geom = shapely.unary_union(geometries)
-            merged_geojson = shapely.to_geojson(merged_geom)
-            pkg_dict["spatial"] = merged_geojson
-
-        pkg_dict = SolrSpatialFieldSearchBackend().index_dataset(pkg_dict)
+            merged_geom = shapely.ops.unary_union(geometries)
+            pkg_dict["spatial_geom"] = merged_geom
+        else:
+            pkg_dict = SolrSpatialFieldSearchBackend().index_dataset(pkg_dict)
 
         # Coupled resources are URL -> uuid links, they are not needed in SOLR
         # and might be huge if there are lot of coupled resources

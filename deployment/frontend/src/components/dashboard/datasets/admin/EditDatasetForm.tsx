@@ -200,6 +200,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 }
                 return {
                     ...resource,
+                    type: resource.url_type as any,
                     resourceId: resource.id as string,
                     schema: resource.schema ? schema.value : undefined,
                 }
@@ -214,6 +215,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     : undefined,
         },
     })
+    console.log('ERRORS', formObj.formState.errors)
 
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {

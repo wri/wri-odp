@@ -1,6 +1,7 @@
 import {
     ArrowUpTrayIcon,
     Bars4Icon,
+    FolderArrowDownIcon,
     GlobeEuropeAfricaIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline'
@@ -117,12 +118,13 @@ export function LocationForm({
                         .with('geom', () => 0)
                         .with('address', () => 1)
                         .with('global', () => 2)
+                        .with('derived_from_resources', () => 3)
                         .otherwise(() => undefined)}
                 >
                     <Tab.List
                         as="div"
                         className={classNames(
-                            'grid max-w-[35rem] grid-cols-2 sm:grid-cols-3 gap-3 py-4'
+                            'grid max-w-[45rem] grid-cols-2 lg:grid-cols-4 gap-3 py-4'
                         )}
                     >
                         <Tab
@@ -197,6 +199,36 @@ export function LocationForm({
                                         )}
                                     >
                                         Global Dataset
+                                    </div>
+                                </span>
+                            )}
+                        </Tab>
+                        <Tab
+                            id="tabLink"
+                            onClick={() => {
+                                setValue(
+                                    `spatial_type`,
+                                    'derived_from_resources'
+                                )
+                                setValue(`spatial`, undefined)
+                                setValue(`spatial_address`, undefined)
+                            }}
+                        >
+                            {({ selected }) => (
+                                <span
+                                    className={classNames(
+                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                        selected ? 'bg-amber-400' : ''
+                                    )}
+                                >
+                                    <FolderArrowDownIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                    <div
+                                        className={classNames(
+                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                            selected ? 'font-bold' : ''
+                                        )}
+                                    >
+                                        Derived from Datafiles
                                     </div>
                                 </span>
                             )}

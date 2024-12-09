@@ -79,7 +79,7 @@ export const ResourceSchema = z
         layerObj: layerSchema.optional().nullable(),
         datastore_active: z.boolean().optional().nullable(),
         layerObjRaw: z.any().optional().nullable(),
-        spatial_address: z.string().optional(),
+        spatial_address: z.string().optional().nullable(),
         spatial_geom: z.any().optional(),
         spatial_coordinates: z.any().optional(),
         spatial_type: z.enum(['address', 'geom', 'global']).optional(),
@@ -218,7 +218,7 @@ const DatasetSchemaObject = z.object({
     collaborators: z.array(CollaboratorSchema).default([]),
     spatial_address: z.string().optional(),
     spatial: z.any().optional(),
-    spatial_type: z.enum(['address', 'geom', 'global']).optional(),
+    spatial_type: z.enum(['address', 'geom', 'global', 'derived_from_resources']).optional(),
     release_notes: z.string().optional(),
 })
 
