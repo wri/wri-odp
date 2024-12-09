@@ -420,7 +420,6 @@ class WriPlugin(plugins.SingletonPlugin):
             print("Derived from resources", flush=True)
             print(f"{len(dataset.get('resources'))} Resources", flush=True)
             geometries = [shapely.geometry.shape(resource["spatial_geom"]["geometry"]) for resource in dataset.get("resources", []) if resource.get("spatial_geom") and resource.get("spatial_geom").get("geometry")]
-            print(geometries, flush=True)
             if len(geometries) == 0:
                 return pkg_dict
             merged_geom = shapely.unary_union(geometries)
