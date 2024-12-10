@@ -136,7 +136,7 @@ services:
 
   solr:
     container_name: ${SOLR_CONTAINER_NAME}
-      #image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
+    image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
     build:
       context: solr/
     volumes:

@@ -1158,6 +1158,9 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
 
     resources = []
 
+    if rw_id:
+        required_dataset_values["rw_id"] = rw_id
+
     if application not in ["aqueduct", "aqueduct-water-risk"] and not gfw_only:
         required_dataset_values["rw_id"] = resource["dataset_id"]
 

@@ -2280,7 +2280,8 @@ export async function approvePendingDataset(
         rw_id = datasetRw.data.id
     }
 
-    const resourcesToEditLayer = submittedDataset.rw_id
+    const hasLayersToEdit = submittedDataset.resources.some(l => l.rw_id && l.url)
+    const resourcesToEditLayer = hasLayersToEdit
         ? await Promise.all(
               submittedDataset.resources
                   .filter(
