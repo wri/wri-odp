@@ -1133,6 +1133,9 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
         "methodology": methodology,
     }
 
+    if geographic_coverage in ["Global", "derived_from_resources", "address", "geom"]:
+        dataset_values["spatial_type"] = geographic_coverage.lower()
+
     dataset_dict = {key: value for key, value in dataset_values.items()}
 
     if team:
