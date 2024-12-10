@@ -1,4 +1,4 @@
-FROM postgres:13-alpine
+FROM postgres:13-alpine3.20
 
 ENV POSTGIS_VERSION 3.4.2
 ENV POSTGIS_SHA256 17aa8760a5c4fcb9a1fdc750c1c9aca0198a35dd1e320628064c43f178eefed2
