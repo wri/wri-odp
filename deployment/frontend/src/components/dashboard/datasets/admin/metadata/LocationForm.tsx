@@ -292,7 +292,7 @@ export function LocationForm({
                                     onClear={(e) => {
                                         setValue('spatial_address', '')
                                     }}
-                                    initialValue={watch('spatial_address')}
+                                    initialValue={watch('spatial_address') ?? undefined}
                                 />
                             </Map>
                         </Tab.Panel>
