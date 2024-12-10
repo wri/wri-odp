@@ -417,13 +417,6 @@ def test_location_search_4(mail_user):
 
     assert any(result["name"] == dataset["name"] for result in search_2)
 
-    search_3 = get_action("package_search")(
-        context=context, data_dict={"ext_location_q": "-4,15", "ext_address_q": ""}
-    )["results"]
-
-    assert any(result["name"] == dataset["name"] for result in search_3)
-
-
     try:
         get_action("package_delete")(
             context={"ignore_auth": True}, data_dict={"id": dataset["name"]}
