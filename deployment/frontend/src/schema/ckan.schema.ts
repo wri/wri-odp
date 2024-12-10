@@ -134,6 +134,7 @@ export interface WriDataset extends Dataset {
     extras?: Extra[]
     spatial?: any
     spatial_address?: string
+    spatial_type?: string
     connectorUrl?: string
     connectorType?: string
     provider?: string

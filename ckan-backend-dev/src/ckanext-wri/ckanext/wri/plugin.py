@@ -427,7 +427,7 @@ class WriPlugin(plugins.SingletonPlugin):
             if len(geometries) == 0:
                 return pkg_dict
             merged_geom = shapely.ops.unary_union(geometries)
-            pkg_dict["spatial_geom"] = merged_geom
+            pkg_dict["spatial_geom"] = merged_geom.wkt
         else:
             pkg_dict = SolrSpatialFieldSearchBackend().index_dataset(pkg_dict)
 
@@ -440,6 +440,8 @@ class WriPlugin(plugins.SingletonPlugin):
         pkg_dict.pop("extras_spatial", None)
         pkg_dict.pop("spatial", None)
 
+        print("PACKAGE DICT", flush=True)
+        print(pkg_dict, flush=True)
         return pkg_dict
 
     def before_dataset_search(self, search_params):

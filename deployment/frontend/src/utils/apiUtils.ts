@@ -2269,7 +2269,6 @@ export async function approvePendingDataset(
     const layer = layerFilter[0]!
 
     if (!submittedDataset.rw_id && isLayer && layer) {
-        console.log('FAILED HERE 4')
         const rwDataset = {
             title: submittedDataset.title! ?? '',
             connectorType: layer.connectorType!,
@@ -2383,6 +2382,7 @@ export async function approvePendingDataset(
         }
     )
     const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
+    console.log('DATASET UPDATED', dataset)
     if (!dataset.success && dataset.error) {
         if (dataset.error.message)
             throw Error(

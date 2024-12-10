@@ -134,7 +134,7 @@ export function LocationForm({
                                     : setValue('spatial', undefined)
 
                                 setValue('spatial_type', 'geom')
-                                setValue('spatial_address', undefined)
+                                setValue('spatial_address', null)
                             }}
                             id="tabUpload"
                             className={classNames(
@@ -211,7 +211,7 @@ export function LocationForm({
                                     'derived_from_resources'
                                 )
                                 setValue(`spatial`, undefined)
-                                setValue(`spatial_address`, undefined)
+                                setValue(`spatial_address`, null)
                             }}
                         >
                             {({ selected }) => (
