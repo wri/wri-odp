@@ -79,7 +79,7 @@
     "highlight.js": "^11.9.0",
     "js-deep-equals": "^2.1.1",
     "jwks-rsa": "^3.1.0",
-    "layer-manager": "3.1.0-wri-gfw",
+    "layer-manager": "file:layer-manager-v3.1.0-wri-gfw.tgz",
     "lodash": "^4.17.21",
     "lowlight": "^3.1.0",
     "luma.gl": "^7.3.2",

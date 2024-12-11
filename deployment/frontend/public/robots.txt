@@ -7,8 +7,8 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://914cd9a92f77278b038276c9b9e5da79.serveo.net
+Host: http://localhost:3000
 
 # Sitemaps
-Sitemap: https://914cd9a92f77278b038276c9b9e5da79.serveo.net/sitemap.xml
-Sitemap: https://914cd9a92f77278b038276c9b9e5da79.serveo.net/server-sitemap.xml
+Sitemap: http://localhost:3000/sitemap.xml
+Sitemap: http://localhost:3000/server-sitemap.xml
