@@ -310,7 +310,7 @@ export function DatafileLocation({
                                     }}
                                     initialValue={watch(
                                         `resources.${index}.spatial_address`
-                                    )}
+                                    ) ?? undefined}
                                 />
                             </Map>
                         </Tab.Panel>

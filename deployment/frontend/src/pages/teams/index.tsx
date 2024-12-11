@@ -164,7 +164,7 @@ export default function TeamsPage(
 
             <Footer
                 links={{
-                    primary: { title: 'Advanced Search', href: '/search' },
+                    primary: { title: 'Search', href: '/search' },
                     secondary: { title: 'Explore Topics', href: '/topics' },
                 }}
             />

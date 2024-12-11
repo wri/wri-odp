@@ -145,18 +145,27 @@ export function HomeFooter() {
                         <div className="flex gap-x-1">
                             <span>
                                 Powered by{' '}
-                                <a href="#" className=" text-wri-green">
+                                <a
+                                    href="https://www.portaljs.com/"
+                                    target="_blank"
+                                    className=" text-wri-green"
+                                >
                                     Portal.js
                                 </a>{' '}
                                 from
                             </span>
                             <div className=" relative h-6 w-24">
-                                <Image
-                                    src="/images/datopian.png"
-                                    alt=""
-                                    fill
-                                    sizes="96px"
-                                ></Image>
+                                <a
+                                    href="https://www.datopian.com/"
+                                    target="_blank"
+                                >
+                                    <Image
+                                        src="/images/datopian.png"
+                                        alt=""
+                                        sizes="96px"
+                                        fill
+                                    ></Image>
+                                </a>
                             </div>
                         </div>
                     </div>

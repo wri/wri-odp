@@ -82,23 +82,35 @@ services:
       retries: 3
       start_period: 60s
 
-  #my-datapusher:
-  #  container_name: my-datapusher
-  #  build:
-  #    context: ../datapusher
-  #  restart: always
-  #  environment:
-  #    - PREFECT_API_URL=http://prefect:4200/api
-  #    - DEPLOYMENT_NAME=datapusher-dev
-  #    - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
-  #    - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
-  #    - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
-  #    - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
-  #    - S3_BUCKET_NAME=ckan
-  #    - S3_BUCKET_REGION=us-east-1
-  #  depends_on:
-  #    prefect:
-  #      condition: service_healthy
+  my-datapusher:
+    container_name: my-datapusher
+    build:
+      context: ../datapusher
+    restart: always
+    environment:
+      - PREFECT_API_URL=http://prefect:4200/api
+      - DEPLOYMENT_NAME=datapusher-dev
+      - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+      - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+      - S3_BUCKET_NAME=ckan
+      - S3_BUCKET_REGION=us-east-1
+    depends_on:
+      prefect:
+        condition: service_healthy
+
+  my-migration:
+    container_name: my-migration
+    build:
+      context: ../migration
+    restart: always
+    environment:
+      - FLOW_DEPLOYMENT_ENV=dev
+      - PREFECT_API_URL=http://prefect:4200/api
+    depends_on:
+      prefect:
+        condition: service_healthy
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}
@@ -125,6 +137,8 @@ services:
   solr:
     container_name: ${SOLR_CONTAINER_NAME}
     image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
+    build:
+      context: solr/
     volumes:
       - solr_data:/var/solr
       - ./ckan/setup/schema.xml:/opt/solr/server/solr/configsets/ckan/conf/managed-schema

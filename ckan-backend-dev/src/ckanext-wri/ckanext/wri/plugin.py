@@ -78,6 +78,11 @@ import ckanext.wri.views.api as api_blueprint
 import ckanext.issues.logic.action as issue_action
 import queue
 import logging
+import shapely
+from shapely.geometry import mapping
+import shapely.geometry
+import shapely.ops
+import json
 
 log = logging.getLogger(__name__)
 
@@ -409,10 +414,22 @@ class WriPlugin(plugins.SingletonPlugin):
         if any(key in pkg_dict for key in ("authors", "maintainers")):
             pkg_dict = stringify_actor_objects(pkg_dict)
 
-        if not pkg_dict.get("spatial"):
+        if not pkg_dict.get("spatial") and pkg_dict.get('spatial_type') != 'derived_from_resources':
             return pkg_dict
 
-        pkg_dict = SolrSpatialFieldSearchBackend().index_dataset(pkg_dict)
+        if pkg_dict.get("spatial_type") == "derived_from_resources":
+            dataset = logic.get_action("package_show")(
+                {"ignore_auth": True}, {"id": pkg_dict.get('id')}
+            )
+            print("Derived from resources", flush=True)
+            print(f"{len(dataset.get('resources'))} Resources", flush=True)
+            geometries = [shapely.geometry.shape(resource["spatial_geom"]["geometry"]) for resource in dataset.get("resources", []) if resource.get("spatial_geom") and resource.get("spatial_geom").get("geometry")]
+            if len(geometries) == 0:
+                return pkg_dict
+            merged_geom = shapely.ops.unary_union(geometries)
+            pkg_dict["spatial_geom"] = merged_geom.wkt
+        else:
+            pkg_dict = SolrSpatialFieldSearchBackend().index_dataset(pkg_dict)
 
         # Coupled resources are URL -> uuid links, they are not needed in SOLR
         # and might be huge if there are lot of coupled resources
@@ -423,6 +440,8 @@ class WriPlugin(plugins.SingletonPlugin):
         pkg_dict.pop("extras_spatial", None)
         pkg_dict.pop("spatial", None)
 
+        print("PACKAGE DICT", flush=True)
+        print(pkg_dict, flush=True)
         return pkg_dict
 
     def before_dataset_search(self, search_params):
