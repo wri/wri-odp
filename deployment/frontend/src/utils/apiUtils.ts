@@ -565,6 +565,7 @@ export async function getOneDataset(
                     datasetRw.errors
                 )})`
             )
+        console.log('FAILED HERE')
         dataset.result.connectorType = datasetRw.data.attributes.connectorType
         dataset.result.connectorUrl = datasetRw.data.attributes.connectorUrl
         dataset.result.provider = datasetRw.data.attributes.provider
@@ -576,6 +577,7 @@ export async function getOneDataset(
 
         if (resource.length) {
             const layer = resource[0]!
+            console.log('FAILED HERE 2')
             dataset.result.connectorType = layer.connectorType
             dataset.result.connectorUrl = layer.connectorUrl
             dataset.result.provider = layer.provider
@@ -710,6 +712,7 @@ export async function getOnePendingDataset(
     )
     if (resourceLayer.length) {
         const layer = resourceLayer[0]!
+        console.log('FAILED HERE 3')
         dataset.connectorType = layer.connectorType
         dataset.connectorUrl = layer.connectorUrl
         dataset.provider = layer.provider
@@ -2265,7 +2268,7 @@ export async function approvePendingDataset(
     const layerFilter = submittedDataset.resources.filter((x) => x.connectorUrl)
     const layer = layerFilter[0]!
 
-    if (!submittedDataset.rw_id && isLayer) {
+    if (!submittedDataset.rw_id && isLayer && layer) {
         const rwDataset = {
             title: submittedDataset.title! ?? '',
             connectorType: layer.connectorType!,
@@ -2277,7 +2280,8 @@ export async function approvePendingDataset(
         rw_id = datasetRw.data.id
     }
 
-    const resourcesToEditLayer = submittedDataset.rw_id
+    const hasLayersToEdit = submittedDataset.resources.some(l => l.rw_id && l.url)
+    const resourcesToEditLayer = hasLayersToEdit
         ? await Promise.all(
               submittedDataset.resources
                   .filter(
@@ -2379,6 +2383,7 @@ export async function approvePendingDataset(
         }
     )
     const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
+    console.log('DATASET UPDATED', dataset)
     if (!dataset.success && dataset.error) {
         if (dataset.error.message)
             throw Error(
