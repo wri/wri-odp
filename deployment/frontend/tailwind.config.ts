@@ -14,6 +14,7 @@ export default {
                 wri: '0px 4px 4px 0px rgba(147, 147, 147, 0.25)',
                 'wri-small':
                     'box-shadow: 0px 1px 2px 0px rgba(105, 81, 255, 0.05)',
+                'wri-dcard': 'box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);',
             },
             animation: {
                 'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;',
@@ -65,6 +66,10 @@ export default {
                 'wri-dark-gray': '#666666',
                 'wri-row-gray': '#F9F9F9',
                 'wri-slate': '#EFF5F7',
+                'wri-tif': '#D3EED1',
+                'wri-csv': '#FFE4AA',
+                'wri-geojson': '#B5D6E8',
+
                 muted: {
                     DEFAULT: 'hsl(210 40% 96.1%)',
                     foreground: 'hsl(var(--muted-foreground))',
