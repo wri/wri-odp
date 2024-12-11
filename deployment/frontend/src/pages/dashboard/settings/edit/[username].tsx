@@ -71,7 +71,7 @@ export default function User(
             </Layout>
             <Footer
                 links={{
-                    primary: { title: 'Advanced Search', href: '/search' },
+                    primary: { title: 'Search', href: '/search' },
                     secondary: { title: 'Explore Topics', href: '/topics' },
                 }}
                 style="mt-0"

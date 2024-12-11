@@ -1,7 +1,6 @@
 [
     "/",
     "/search",
-    "/search_advanced",
     "/teams",
     "/topics",
     "/teams/<name>",

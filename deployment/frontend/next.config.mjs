@@ -53,6 +53,8 @@ const config = {
             'ckan',
             'gravatar.com',
             's3.amazonaws.com',
+            'picsum.photos',
+            'placeimg.com',
         ],
     },
     pageExtensions: ['tsx', 'mdx', 'ts', 'md'],
