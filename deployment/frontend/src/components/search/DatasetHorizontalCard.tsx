@@ -84,7 +84,7 @@ export default function DatasetHorizontalCard({
                 </div>
             </div>
 
-            <p className="font-acumin text-[1rem] leading-[22px] font-light text-[#1A1919] line-clamp-4 mt-[12px] w-full  h-[88px] lg:w-[733.783px]  ">
+            <p className="font-acumin text-[1rem] leading-[22px] font-light text-[#1A1919] line-clamp-4 mt-[12px] w-full  h-[88px] lg:w-[733.783px] mb-[21px] ">
                 {dataset.short_description ?? ''}
             </p>
 
@@ -145,9 +145,9 @@ export default function DatasetHorizontalCard({
                         <TooltipProvider delayDuration={100}>
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <div className="h-3 w-3 text-wri-green">
+                                    <div className="flex flex-row items-center gap-x-1">
                                         <ClockIcon className="h-3 w-3 text-blue-800" />
-                                        <p className="font-acumin text-[14px] leading-[14px] font-normal text-[#4F4E4E] ">
+                                        <p className="font-acumin flex text-[14px] leading-[14px] font-normal text-[#4F4E4E]">
                                             {dataset.temporal_coverage_start ||
                                                 '?'}
                                             {' - '}

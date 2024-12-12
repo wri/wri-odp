@@ -1,14 +1,15 @@
 export const formatColors = {
-    tiff: 'bg-wri-tif',
-    tif: 'bg-wri-tif',
+    tiff: 'bg-wri-tif border border-[#D3EED1]',
+    tif: 'bg-wri-tif border border-[#D3EED1]',
     geojson: 'bg-wri-geojson',
+    json: 'bg-wri-geojson',
     csv: 'bg-wri-csv',
     html: 'bg-wri-gold',
     pdf: 'bg-red-400',
-    xls: 'wri-green',
-    xlsx: 'bg-blue-200',
+    xls: 'bg-wri-xlsx',
+    xlsx: 'bg-wri-xlsx',
     api: 'wri-gray',
-    zip: 'wri-slate',
+    zip: 'bg-wri-zip text-white',
     layer: 'bg-wri-green text-white',
 }
 

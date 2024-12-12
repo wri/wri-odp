@@ -69,6 +69,8 @@ export default {
                 'wri-tif': '#D3EED1',
                 'wri-csv': '#FFE4AA',
                 'wri-geojson': '#B5D6E8',
+                'wri-zip': '#1B808D',
+                'wri-xlsx': '#E8E8E7',
 
                 muted: {
                     DEFAULT: 'hsl(210 40% 96.1%)',
