@@ -149,6 +149,7 @@ export function HomeFooter() {
                                     href="https://www.portaljs.com/"
                                     target="_blank"
                                     className=" text-wri-green"
+                                    aria-label="Portal.js website"
                                 >
                                     Portal.js
                                 </a>{' '}
@@ -158,6 +159,7 @@ export function HomeFooter() {
                                 <a
                                     href="https://www.datopian.com/"
                                     target="_blank"
+                                    aria-label="Datopian website"
                                 >
                                     <Image
                                         src="/images/datopian.png"
