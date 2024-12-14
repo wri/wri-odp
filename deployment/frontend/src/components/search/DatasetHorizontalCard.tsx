@@ -52,7 +52,6 @@ export default function DatasetHorizontalCard({
                     <div className="flex items-center grow shrink ">
                         <h3
                             className="font-acumin text-[18px] font-bold leading-[28px] text-stone-900 line-clamp-1 group-hover:text-wri-green"
-                            tabIndex={0}
                         >
                             {dataset.title}
                         </h3>
