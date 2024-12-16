@@ -52,6 +52,7 @@ export default function DatasetHorizontalCard({
                     <div className="flex items-center grow shrink ">
                         <h3
                             className="font-acumin text-[18px] font-bold leading-[28px] text-stone-900 line-clamp-1 group-hover:text-wri-green"
+                            tabIndex={0}
                         >
                             {dataset.title}
                         </h3>
@@ -172,16 +173,14 @@ export default function DatasetHorizontalCard({
                         )}
                     </div>
 
-                    <Link href={`/datasets/${dataset.name}`}>
-                        <div className="flex justify-end lg:justify-start lg:ml-auto shrink-0 group-hover:text-wri-green">
-                            <div className="text-base  leading-[24px] font-bold">
-                                View dataset
-                            </div>
-                            <div className="pt-0.5">
-                                <ChevronRightIcon className="h-4 w-4 stroke-current stroke-[3] " />
-                            </div>
+                    <button className="flex justify-end lg:justify-start lg:ml-auto shrink-0 group-hover:text-wri-green">
+                        <div className="text-base  leading-[24px] font-bold">
+                            View dataset
                         </div>
-                    </Link>
+                        <div className="pt-0.5">
+                            <ChevronRightIcon className="h-4 w-4 stroke-current stroke-[3] " />
+                        </div>
+                    </button>
                 </div>
             </div>
         </Link>
