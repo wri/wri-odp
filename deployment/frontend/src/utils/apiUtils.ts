@@ -566,6 +566,7 @@ export async function getOneDataset(
                     datasetRw.errors
                 )})`
             )
+        console.log('FAILED HERE')
         dataset.result.connectorType = datasetRw.data.attributes.connectorType
         dataset.result.connectorUrl = datasetRw.data.attributes.connectorUrl
         dataset.result.provider = datasetRw.data.attributes.provider
@@ -577,6 +578,7 @@ export async function getOneDataset(
 
         if (resource.length) {
             const layer = resource[0]!
+            console.log('FAILED HERE 2')
             dataset.result.connectorType = layer.connectorType
             dataset.result.connectorUrl = layer.connectorUrl
             dataset.result.provider = layer.provider
@@ -592,7 +594,7 @@ export async function getOneDataset(
             console.error(e)
         }
     }
-
+   
     const resources = await Promise.all(
         dataset.result.resources.map(async (r) => {
             if (r.url_type === 'upload' || r.url_type === 'link') {
@@ -704,7 +706,6 @@ export async function getOnePendingDataset(
         throw Error(JSON.stringify(data.error))
     }
     const dataset = data.result.package_data
-    console.log('PENDING DATASET', dataset)
 
     // if (dataset.rw_id) {
     const resourceLayer = dataset.resources.filter(
@@ -712,6 +713,7 @@ export async function getOnePendingDataset(
     )
     if (resourceLayer.length) {
         const layer = resourceLayer[0]!
+        console.log('FAILED HERE 3')
         dataset.connectorType = layer.connectorType
         dataset.connectorUrl = layer.connectorUrl
         dataset.provider = layer.provider
@@ -1244,7 +1246,7 @@ export function generateInviteEmail(
     `
 }
 
-export async function generateMemberEmail(
+async function generateMemberEmail(
     senderUser: User,
     recipientUser: User,
     notification: NotificationType
@@ -1491,7 +1493,7 @@ function findUpdatedMembers(
     })
 }
 
-export async function createNotification(
+async function createNotification(
     recipient_id: string,
     sender_id: string,
     activity_type: string,
@@ -1531,7 +1533,7 @@ export async function createNotification(
     }
 }
 
-export async function getTeamDetails({
+async function getTeamDetails({
     id,
     session,
 }: {
@@ -1556,7 +1558,7 @@ export async function getTeamDetails({
     return team.result
 }
 
-export async function getTopicDetails({
+async function getTopicDetails({
     id,
     session,
 }: {
@@ -2008,7 +2010,7 @@ export async function sendGroupNotification({
     }
 }
 
-export async function getPackageDiff({
+async function getPackageDiff({
     id,
     session,
 }: {
@@ -2208,7 +2210,6 @@ export async function approvePendingDataset(
         }
     )
     const data = (await response.json()) as CkanResponse<PendingDataset>
-    console.log('PENDING DATASET', data)
     if (!data.success && data.error)
         throw Error(JSON.stringify(data.error).concat('pending_dataset_show'))
 
@@ -2268,7 +2269,7 @@ export async function approvePendingDataset(
     const layerFilter = submittedDataset.resources.filter((x) => x.connectorUrl)
     const layer = layerFilter[0]!
 
-    if (!submittedDataset.rw_id && isLayer) {
+    if (!submittedDataset.rw_id && isLayer && layer) {
         const rwDataset = {
             title: submittedDataset.title! ?? '',
             connectorType: layer.connectorType!,
@@ -2280,7 +2281,8 @@ export async function approvePendingDataset(
         rw_id = datasetRw.data.id
     }
 
-    const resourcesToEditLayer = submittedDataset.rw_id
+    const hasLayersToEdit = submittedDataset.resources.some(l => l.rw_id && l.url)
+    const resourcesToEditLayer = hasLayersToEdit
         ? await Promise.all(
               submittedDataset.resources
                   .filter(
@@ -2382,6 +2384,7 @@ export async function approvePendingDataset(
         }
     )
     const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
+    console.log('DATASET UPDATED', dataset)
     if (!dataset.success && dataset.error) {
         if (dataset.error.message)
             throw Error(
@@ -2475,7 +2478,7 @@ export async function approvePendingDataset(
     return dataset.result
 }
 
-export const datasetFields = [
+const datasetFields = [
     'applications',
     'approval_status',
     'authors',
@@ -2748,3 +2751,4 @@ export async function getTokenList(session: Session) {
 
     return json
 }
+

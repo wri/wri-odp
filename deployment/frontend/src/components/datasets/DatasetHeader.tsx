@@ -227,7 +227,7 @@ function OpenInButton({
     )
 }
 
-export function ExternalService({ rw_id }: { rw_id: string }) {
+function ExternalService({ rw_id }: { rw_id: string }) {
     const { data } = useQuery([rw_id], async () => {
         const datasetRes = await fetch(
             `https://api.resourcewatch.org/v1/dataset/${rw_id}`

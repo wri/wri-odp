@@ -1,7 +1,7 @@
 import classNames from "@/utils/classnames";
 import * as React from "react";
 
-export interface TextAreaProps
+interface TextAreaProps
   extends React.InputHTMLAttributes<HTMLTextAreaElement> {
   placeholder?: string;
   name?: string;

@@ -23,7 +23,7 @@ import { convertFormToLayerObj } from '@/components/dashboard/datasets/admin/dat
 import { Resource } from '@/interfaces/dataset.interface'
 import { getDecodeParams } from './decodeFunctions'
 
-export async function packageSearch() {
+async function packageSearch() {
     const ckan = new CKAN('https://ckan.x.demo.datopian.com')
     return await ckan.packageSearch({
         query: '',
@@ -35,14 +35,14 @@ export async function packageSearch() {
     })
 }
 
-export const useDatasetsQuery = () => {
+const useDatasetsQuery = () => {
     return useQuery({
         queryKey: ['datasets'],
         queryFn: packageSearch,
     })
 }
 
-export async function getLayersFromRW(
+async function getLayersFromRW(
     queryKey: any,
     currentLayers: Map<string, LayerState>,
     layerAsLayerObj: Map<string, string>,

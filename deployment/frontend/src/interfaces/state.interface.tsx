@@ -40,7 +40,7 @@ export type Basemap =
     | 'aqueduct'
     | 'none'
 
-export interface DatasetState {
+interface DatasetState {
     id: string
     layers: LayerState[]
 }

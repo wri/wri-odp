@@ -33,9 +33,6 @@ ckan:
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
       CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri wri_api_tracking auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
-      CKAN__SITE_TITLE: WRI Open Data Platform
-      CKAN__STORAGE_PATH: /tmp
-      CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
       CKAN__AUTH__CREATE_UNOWNED_DATASET: "True"
       CKAN__GROUP_AND_ORGANIZATIONS_LIST_ALL_FIELDS_MAX: "150"
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: "True"
@@ -266,11 +263,11 @@ solr:
   nodeSelector: {}
   image:
     repository: ckan/ckan-solr
-    tag: 2.10-solr8-spatial
+    tag: 2.10-solr9-spatial
   resources:
     limits:
+      memory: 4G
+      cpu: 0.8
+    requests:
       memory: 3G
       cpu: 0.6
-    requests:
-      memory: 2.8G
-      cpu: 0.4
