@@ -7,10 +7,12 @@ export default function TopicsSearch({
     setQuery,
     query,
     isLoading,
+    groupType
 }: {
     setQuery: React.Dispatch<React.SetStateAction<string>>
     query: string
     isLoading: boolean
+    groupType: string
 }) {
     return (
         <section
@@ -26,29 +28,32 @@ export default function TopicsSearch({
             >
                 <div className="w-full max-w-[819px] xxl:pl-8 2xl:px-0 ">
                     <h1 className="text-[40px]  leading-[48px] font-['Acumin Pro SemiCondensed'] font-semibold text-white mb-[31px]">
-                        Topics
+                        {groupType}
                     </h1>
                 </div>
-                <div className="relative flex w-full max-w-[819px] items-start justify-start gap-x-6 xxl:pl-8 2xl:px-0">
+                <div className="relative flex w-full max-w-[819px] items-start justify-start gap-x-6 xxl:pl-8 2xl:px-0 h-[54.393px] ">
                     <input
                         onChange={(e) => setQuery(e.target.value)}
                         value={query}
                         name="search"
-                        placeholder="Search topics"
+                        placeholder={`Search ${groupType === "Teams" ? "teams" : "topics"}`}
                         aria-label="search"
-                        className="h-14 rounded-sm block w-full border-0 px-5 py-2 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-gray-900 placeholder:text-base border-b-2 border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
+                        className="h-full  block w-full border-0 px-5 py-2 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-[#000000] placeholder:font-light focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 rounded-tl-[3px] rounded-bl-[3px] "
                     />
-                    {isLoading ? (
-                        <Spinner className="absolute right-8 top-[1rem] h-5 w-5 text-wri-black" />
-                    ) : (
-                        <button
-                            type="submit"
-                            aria-label="submit"
-                            className=" my-auto"
-                        >
-                            <MagnifyingGlassIcon className="absolute right-8 top-[1rem] h-5 w-5 text-wri-black" />
-                        </button>
-                    )}
+                    <div className="absolute flex h-[54.393px] px-8  right-0  leading-[29.25px] text-white bg-wri-gold rounded-tr-[3px] rounded-br-[3px]">
+                        {isLoading ? (
+                            <Spinner className="h-5 w-5 text-wri-black" />
+                        ) : (
+                            <button
+                                type="submit"
+                                aria-label="submit"
+                                className='text-[21px] font-semibold  font-acumin '
+                            >
+                                Search
+                            </button>
+                        )}
+                    </div>
+                    
                 </div>
             </form>
         </section>

@@ -20,6 +20,7 @@ import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
 import { Organization as CkanOrg } from '@portaljs/ckan'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
+import TopicsSearch from '@/components/topics/TopicsSearch'
 
 const TeamsSearchResults = dynamic(
     () => import('@/components/team/TeamsSearchResults')
@@ -115,10 +116,11 @@ export default function TeamsPage(
             />
             <Header />
             <Breadcrumbs links={links} />
-            <TeamsSearch
+            <TopicsSearch
                 isLoading={isLoading}
                 setQuery={setQuery}
                 query={query}
+                groupType="Teams"
             />
 
             <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
