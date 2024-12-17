@@ -159,6 +159,7 @@ export default function Footer({
                                     href="https://www.portaljs.com/"
                                     target="_blank"
                                     className=" text-wri-green"
+                                    aria-label="Portal.js website"
                                 >
                                     Portal.js
                                 </a>{' '}
@@ -168,6 +169,7 @@ export default function Footer({
                                 <a
                                     href="https://www.datopian.com/"
                                     target="_blank"
+                                    aria-label="Datopian website"
                                 >
                                     <Image
                                         src="/images/datopian.png"
