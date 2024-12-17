@@ -1,10 +1,14 @@
-import {Basemap} from "@/interfaces/state.interface"
-import {useBasemap} from "@/utils/storeHooks"
-import {MutableRefObject, useCallback, useEffect} from "react"
+import { type Basemap } from '@/interfaces/state.interface'
+import { useBasemap } from '@/utils/storeHooks'
+import { MutableRefObject, useCallback, useEffect } from 'react'
 import { type Map as MapType } from 'mapbox-gl'
-import {MapRef} from "react-map-gl"
+import { MapRef } from 'react-map-gl'
 
-export default function Basemap({mapRef}: {mapRef: MutableRefObject<MapRef | null>}) {
+export default function Basemap({
+    mapRef,
+}: {
+    mapRef: MutableRefObject<MapRef | null>
+}) {
     const { selectedBasemap } = useBasemap()
 
     const handleBasemap = useCallback(
@@ -81,8 +85,6 @@ export default function Basemap({mapRef}: {mapRef: MutableRefObject<MapRef | nul
     useEffect(() => {
         handleBasemap(selectedBasemap as Basemap)
     }, [selectedBasemap, handleBasemap])
-
-
 
     return null
 }

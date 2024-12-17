@@ -51,7 +51,7 @@ import { differenceInDays } from 'date-fns'
 //  }, {});
 //};
 //
-export const getDayRange = (params: any) => {
+const getDayRange = (params: any) => {
     const {
         startDate,
         endDate,
@@ -1366,27 +1366,3 @@ const decodes = {
   `,
 }
 
-export default {
-    treeCover: decodes.treeCover,
-    treeCoverLoss: decodes.treeCoverLoss,
-    treeCoverLossFire: decodes.treeCoverLossFire,
-    treeLossByDriver: decodes.treeLossByDriver,
-    integratedAlerts8Bit: decodes.integratedAlerts8Bit,
-    integratedAlerts16Bit: decodes.integratedAlerts16Bit,
-    GLADs: decodes.GLADs,
-    RADDs: decodes.RADDs,
-    RADDs2yearsTimeline: decodes.RADDs2yearsTimeline,
-    RADDsCoverage: decodes.RADDsCoverage,
-    staticRemap: decodes.staticRemap,
-    staticRemapAlpha: decodes.staticRemapAlpha,
-    forestHeight: decodes.forestHeight,
-    biomassLoss: decodes.biomassLoss,
-    woodyBiomass: decodes.woodyBiomass,
-    terrai: decodes.terrai,
-    braLandCover: decodes.braLandCover,
-    grossCarbonEmissions: decodes.grossCarbonEmissions,
-    cumulativeCarbonGain: decodes.cumulativeCarbonGain,
-    netGHGFlux: decodes.netCarbonFlux,
-    formaAlerts: decodes.forma,
-    treeGain: decodes.treeGain,
-}

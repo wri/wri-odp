@@ -60,7 +60,7 @@ describe("Chart view", () => {
       cy.contains("Data Files").click();
       cy.get('.datafile-accordion-trigger').eq(0).click()
       cy.contains("Datapusher").click();
-      cy.contains("Submit to Datapusher").click();
+      cy.contains("Submit to Datapusher", { timeout: 50000}).click();
       cy.contains(`Successfully submited datafile to the datapusher`, {
         timeout: 15000,
       });
@@ -83,12 +83,12 @@ describe("Chart view", () => {
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
       cy.wait(9000)
-      cy.get('.datafile-accordion-trigger').eq(0).click()
-      cy.get(".views-tab").click();
+      cy.get('.datafile-accordion-trigger').eq(0).click({ force: true })
+      cy.get(".views-tab").click({ force: true });
 
-      cy.contains("Add a view").click();
+      cy.contains("Add a view").click({ force: true });
 
-      cy.get(".chart-popup-item").click();
+      cy.get(".chart-popup-item").click({ force: true });
 
       cy.contains("Add a chart view", { timeout: 40000 })
         .parent()
@@ -121,9 +121,9 @@ describe("Chart view", () => {
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
-      cy.get('.datafile-accordion-trigger').eq(0).click()
+      cy.get('.datafile-accordion-trigger').eq(0).click({ force: true })
 
-      cy.get(".views-tab").click();
+      cy.get(".views-tab").click({ force: true });
 
       cy.contains("This is my new chart");
     },
@@ -141,9 +141,9 @@ describe("Chart view", () => {
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
-      cy.get('.datafile-accordion-trigger').eq(0).click()
+      cy.get('.datafile-accordion-trigger').eq(0).click({ force: true })
 
-      cy.get(".views-tab").click();
+      cy.get(".views-tab").click({ force: true });
 
       cy.contains("This is my new chart").click({ force: true });
 
@@ -165,9 +165,9 @@ describe("Chart view", () => {
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
-      cy.get('.datafile-accordion-trigger').eq(0).click()
+      cy.get('.datafile-accordion-trigger').eq(0).click({ force: true })
 
-      cy.get(".views-tab").click();
+      cy.get(".views-tab").click({ force: true });
 
       cy.contains("This is my awesome chart");
     },

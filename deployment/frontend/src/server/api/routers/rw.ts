@@ -15,11 +15,11 @@ import {
 } from '@/utils/apiUtils'
 import { z } from 'zod'
 
-export interface NumOfRowsResponse {
+interface NumOfRowsResponse {
     data: Array<{ count: number } | number>
 }
 
-export interface DataResponse {
+interface DataResponse {
     data: Array<Record<string, any>>
 }
 

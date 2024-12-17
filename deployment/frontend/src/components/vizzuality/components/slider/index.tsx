@@ -8,7 +8,7 @@ import fill from 'lodash/fill';
 // components
 import Tooltip from '../../components/tooltip';
 
-export class Slider extends PureComponent {
+class Slider extends PureComponent {
   static propTypes = {
     customClass: PropTypes.string,
     settings: PropTypes.shape({}),

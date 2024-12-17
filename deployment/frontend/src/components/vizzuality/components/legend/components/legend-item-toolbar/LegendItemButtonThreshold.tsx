@@ -15,7 +15,7 @@ import {
 } from 'react-hook-form'
 import { DefaultTooltip, Tooltip } from '@/components/_shared/Tooltip'
 
-export interface Option<V> {
+interface Option<V> {
     label: string
     value: V
     default?: boolean

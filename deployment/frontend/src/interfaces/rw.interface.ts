@@ -32,7 +32,7 @@ export interface RwErrorResponse {
     errors: any
 }
 
-export interface RwDataset {
+interface RwDataset {
     name: string
     slug: string
     type: string

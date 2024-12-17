@@ -5,26 +5,26 @@ import type {
     User as CkanUser,
 } from '@portaljs/ckan'
 
-export interface Group {
-    display_name: string;
-    description: string;
-    image_display_url: string;
-    package_count: number;
-    created: string;
-    name: string;
-    is_organization: false;
-    state: 'active' | 'deleted' | 'inactive';
-    image_url: string;
-    type: 'group' | 'application';
-    title: string;
-    revision_id: string;
-    num_followers: number;
-    id: string;
-    approval_status: string;
-    packages?: Array<Dataset>;
-    activity_stream?: Array<Activity>;
-    tags?: Array<Tag>;
-    users?: Array<User>;
+interface Group {
+    display_name: string
+    description: string
+    image_display_url: string
+    package_count: number
+    created: string
+    name: string
+    is_organization: false
+    state: 'active' | 'deleted' | 'inactive'
+    image_url: string
+    type: 'group' | 'application'
+    title: string
+    revision_id: string
+    num_followers: number
+    id: string
+    approval_status: string
+    packages?: Array<Dataset>
+    activity_stream?: Array<Activity>
+    tags?: Array<Tag>
+    users?: Array<User>
 }
 
 type Only<T, U> = {
@@ -96,7 +96,7 @@ export interface ActivityDisplay {
     packageGroup?: string[]
 }
 
-export interface WriDataset extends Dataset {
+export interface WriDataset extends Omit<Dataset, 'groups'> {
     has_chart_views?: boolean
     methodology?: string
     usecases?: string
@@ -134,6 +134,7 @@ export interface WriDataset extends Dataset {
     extras?: Extra[]
     spatial?: any
     spatial_address?: string
+    spatial_type?: string
     connectorUrl?: string
     connectorType?: string
     provider?: string
@@ -146,13 +147,14 @@ export interface WriDataset extends Dataset {
     rw_dataset?: boolean
     is_approved?: boolean
     release_notes: string
+    groups?: Array<Group | Application>
 }
 
 export type WriDatasetWithoutDetails = Omit<WriDataset, 'resources'> & {
     resources: { datastore_active?: boolean | null; format?: string }[]
 }
 
-export interface Extra {
+interface Extra {
     key: string
     value: string
 }
@@ -162,7 +164,7 @@ export interface OpenIn {
     url: string
 }
 
-export interface Organization {
+interface Organization {
     id: string
     name: string
     title: string
@@ -247,7 +249,7 @@ export interface Issue {
     comments: Comment[]
 }
 
-export interface Comment {
+interface Comment {
     id: number
     comment: string
     user_id: string
@@ -271,7 +273,7 @@ export interface GroupsmDetails {
     name: string
 }
 
-export interface Member {
+interface Member {
     id: string
     name: string
     email: string

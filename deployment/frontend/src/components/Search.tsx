@@ -49,84 +49,59 @@ export default function Search({
     return (
         <section
             id="search"
-            className="flex h-[245px] w-full flex-col bg-cover bg-center bg-no-repeat font-acumin"
+            className="flex h-[245px] w-full flex-col bg-cover bg-center justify-center  bg-no-repeat font-acumin"
             style={{
                 backgroundImage: 'url(/images/bg.png)',
             }}
         >
-            <div className="w-full bg-wri-green">
-                <div className="mx-auto flex max-w-8xl gap-x-2 px-8  text-[1.063rem] font-semibold text-white xxl:px-0">
-                    <div
-                        className={classNames(
-                            'p-4',
-                            pathname === '/search'
-                                ? 'bg-wri-dark-green'
-                                : 'bg-wri-green'
-                        )}
-                    >
-                        <Link href="/search">Explore data</Link>
-                    </div>
-                    <div
-                        className={classNames(
-                            'p-4',
-                            pathname === '/search_advanced'
-                                ? 'bg-wri-dark-green'
-                                : 'bg-wri-green'
-                        )}
-                    >
-                        <Link href="/search_advanced">Advanced search</Link>
-                    </div>
-                </div>
-            </div>
-            <div className="mx-auto my-auto flex flex-col w-full max-w-[1380px] space-x-4 px-4 font-acumin sm:px-6 xxl:px-0">
-                <div className="w-full max-w-[819px] pl-12  ">
-                    <h1 className="text-[40px]  leading-[48px] font-['Acumin Pro SemiCondensed'] font-semibold text-white mb-[20px]">
+            <form
+                onSubmit={handleSubmit((data) => {
+                    if (
+                        watch('search') !=
+                        filters.find((f) => f.key == 'search')?.value
+                    ) {
+                        setFilters((prev) => {
+                            const newFilters = [...prev]
+                            const searchFilter = newFilters.find(
+                                (filter) => filter.key == 'search'
+                            )
+
+                            if (searchFilter) {
+                                if (data.search) {
+                                    searchFilter.value = data.search
+                                    searchFilter.label = data.search
+                                    setIsSearch(true)
+                                } else {
+                                    newFilters.splice(
+                                        newFilters.findIndex(
+                                            (filter) => filter.key == 'search'
+                                        ),
+                                        1
+                                    )
+                                    setIsSearch(false)
+                                }
+                            } else if (data.search) {
+                                newFilters.push({
+                                    title: 'Search',
+                                    key: 'search',
+                                    label: data.search,
+                                    value: data.search,
+                                })
+                                setIsSearch(true)
+                            }
+
+                            return newFilters
+                        })
+                    }
+                })}
+                className="w-full px-8 xxl:px-0 max-w-8xl mx-auto -mt-[37px] "
+            >
+                <div className="w-full max-w-[819px] xxl:pl-8 2xl:px-0 ">
+                    <h1 className="text-[40px]  leading-[48px] font-['Acumin Pro SemiCondensed'] font-semibold text-white mb-[25px]">
                         Search datasets
                     </h1>
                 </div>
-                <form
-                    onSubmit={handleSubmit((data) => {
-                        if (
-                            watch('search') !=
-                            filters.find((f) => f.key == 'search')?.value
-                        ) {
-                            setFilters((prev) => {
-                                const newFilters = [...prev]
-                                const searchFilter = newFilters.find(
-                                    (filter) => filter.key == 'search'
-                                )
-
-                                if (searchFilter) {
-                                    if (data.search) {
-                                        searchFilter.value = data.search
-                                        searchFilter.label = data.search
-                                        setIsSearch(true)
-                                    } else {
-                                        newFilters.splice(
-                                            newFilters.findIndex(
-                                                (filter) =>
-                                                    filter.key == 'search'
-                                            ),
-                                            1
-                                        )
-                                        setIsSearch(false)
-                                    }
-                                } else if (data.search) {
-                                    newFilters.push({
-                                        title: 'Search',
-                                        key: 'search',
-                                        label: data.search,
-                                        value: data.search,
-                                    })
-                                    setIsSearch(true)
-                                }
-
-                                return newFilters
-                            })
-                        }
-                    })}
-                    className="relative flex w-full max-w-[819px] items-start justify-start gap-x-6 pl-8 px-4"
-                >
+                <div className="relative flex w-full max-w-[819px] items-start justify-start gap-x-6 xxl:pl-8 2xl:px-0">
                     <input
                         placeholder="Search data"
                         aria-label="search"
@@ -164,8 +139,8 @@ export default function Search({
                             </button>
                         )}
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </section>
     )
 }

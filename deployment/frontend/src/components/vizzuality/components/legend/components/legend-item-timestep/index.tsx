@@ -15,7 +15,7 @@ import {
 	getTicks,
 } from './utils';
 
-export class TimestepContainer extends PureComponent {
+class TimestepContainer extends PureComponent {
 	timelineParams = null;
 
 	static propTypes = {
@@ -157,4 +157,3 @@ export class TimestepContainer extends PureComponent {
 	}
 }
 
-export default TimestepContainer;

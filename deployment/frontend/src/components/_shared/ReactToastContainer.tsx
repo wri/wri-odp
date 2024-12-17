@@ -1,3 +1,4 @@
+//@ts-ignore
 import { ToastContainer } from "react-toastify";
 
 export default function ReactToastContainer() {

@@ -7,7 +7,7 @@ import AddUserForm from './AddUserForm'
 import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner'
 
-export function empty({ username }: { username: string }) {
+function empty({ username }: { username: string }) {
     return <div></div>
 }
 const tabs = [

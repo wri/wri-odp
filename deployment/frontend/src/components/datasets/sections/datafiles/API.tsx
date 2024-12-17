@@ -26,7 +26,7 @@ hljs.registerLanguage('python', python)
 hljs.registerLanguage('javascript', js)
 hljs.registerLanguage('r', r)
 
-export function MoreInfo({ gfwapiurl }: { gfwapiurl?: boolean }) {
+function MoreInfo({ gfwapiurl }: { gfwapiurl?: boolean }) {
     return (
         <div>
             <div className="font-acumin text-base font-normal text-zinc-800">
