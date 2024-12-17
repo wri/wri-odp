@@ -153,11 +153,8 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
-      - name: Print Error Logs After Unit Tests
-        if: failure()
-        env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
-        run: docker compose -f docker-compose.test.yml --env-file .env.example logs
+      - name: Copy run_unit_tests.sh
+        run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
         working-directory: ./ckan-backend-dev
       - name: Copy s3filestore test.ini fix script for minio
         run: |
@@ -175,10 +172,13 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/run_unit_tests.sh"
         working-directory: ./ckan-backend-dev
-      - name: Copy run_unit_tests.sh
-        run: docker cp ./ckan/scripts/run_unit_tests.sh ckan-wri:/srv/app/run_unit_tests.sh
-        working-directory: ./ckan-backend-dev
         timeout-minutes: 10
+      - name: Print Error Logs After Unit Tests
+        if: failure()
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example logs
+        working-directory: ./ckan-backend-dev
       - name: Run Trivy Vulnerability Scanner for CKAN Container 🧪
         if: ${{ env.ENABLE_TRIVY_SCANNING == 'true' }}
         uses: aquasecurity/trivy-action@master
