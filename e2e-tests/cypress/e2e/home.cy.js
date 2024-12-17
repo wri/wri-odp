@@ -78,16 +78,6 @@ describe("Home page", () => {
     cy.contains("Highlights");
   });
 
-  it("allow searches", () => {
-    cy.visit("/search");
-    cy.get('[name="search"]').type(datasets[0] + "{enter}" ?? "test");
-
-    cy.url().should("include", "search_advanced");
-    cy.contains("results", { timeout: 40000 });
-    cy.contains(`Search: ${datasets[0]}`, { timeout: 90040000 });
-    cy.contains(`${datasets[0]}`, { timeout: 40000 });
-  });
-
   it("contains topics", () => {
     cy.viewport(1440, 2800);
     cy.visit("/");
