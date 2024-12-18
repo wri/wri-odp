@@ -24,7 +24,7 @@ function TopicCard({
     return (
         <Link
             href={`/topics/${topic.name}`}
-            className="flex w-full flex-col gap-1 font-acumin shadow-wri pb-6"
+            className="flex w-full flex-col gap-1 font-acumin pb-6"
         >
             <div className="relative aspect-square h-72 w-full bg-white">
                 <Image
@@ -38,10 +38,10 @@ function TopicCard({
                     className="object-cover"
                 />
             </div>
-            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pl-4 ">
+            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pt-2">
                 {topic.title}
             </p>
-            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700 pl-4  ">
+            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700">
                 {datasetCount && datasetCount > 1
                     ? `${datasetCount} datasets`
                     : `${datasetCount} dataset`}
