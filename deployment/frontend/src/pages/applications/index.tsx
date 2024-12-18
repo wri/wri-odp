@@ -27,7 +27,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await Promise.all([await helpers.applications.list.prefetch()])
+    await Promise.all([await helpers.applications.getAllApplications.prefetch()])
 
     return {
         props: {
