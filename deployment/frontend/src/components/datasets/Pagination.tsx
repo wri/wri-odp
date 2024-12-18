@@ -67,6 +67,11 @@ export default function Pagination({
         }))
     }, [currentPage, query.page.rows])
 
+    // always scroll to top when page changes
+    if(window) {
+        window.scrollTo({top: 0, behavior: 'smooth'})
+    }
+
     return (
         <div className="flex items-center justify-between bg-white py-3">
             <div className="flex sm:flex-1 sm:items-center sm:justify-between mx-auto">
