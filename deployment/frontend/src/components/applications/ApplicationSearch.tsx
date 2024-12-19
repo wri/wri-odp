@@ -24,6 +24,11 @@ export default function ApplicationSearch({
                 onSubmit={(e) => console.log(e)}
                 className="w-full px-8 xxl:px-0 max-w-8xl mx-auto"
             >
+                <div className="w-full max-w-[819px] xxl:pl-8 2xl:px-0 ">
+                    <h1 className="text-[40px]  leading-[48px] font-acumin font-semibold text-white mb-[25px]">
+                        Applications
+                    </h1>
+                </div>
                 <div className="relative flex w-full max-w-[819px] items-start justify-start gap-x-6 xxl:pl-8 2xl:px-0">
                     <input
                         onChange={(e) => setQuery(e.target.value)}

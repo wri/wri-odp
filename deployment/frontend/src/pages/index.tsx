@@ -173,7 +173,7 @@ export default function Home(
                             {({ selected }) => (
                                 <div
                                     className={classNames(
-                                        'text-black text-2xl font-medium font-acumin',
+                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
                                         selected
                                             ? 'text-[#32864b] underline underline-offset-8'
                                             : ''
@@ -188,7 +188,7 @@ export default function Home(
                                 {({ selected }) => (
                                     <div
                                         className={classNames(
-                                            'text-black text-2xl font-medium font-acumin',
+                                            'text-black text-2xl font-medium font-acumin cursor-pointer',
                                             selected
                                                 ? 'text-[#32864b] underline underline-offset-8'
                                                 : ''
@@ -229,7 +229,7 @@ export default function Home(
                             {({ selected }) => (
                                 <div
                                     className={classNames(
-                                        'text-black text-2xl font-medium font-acumin',
+                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
                                         selected
                                             ? 'text-[#32864b] underline underline-offset-8'
                                             : ''
@@ -243,7 +243,7 @@ export default function Home(
                             {({ selected }) => (
                                 <div
                                     className={classNames(
-                                        'text-black text-2xl font-medium font-acumin',
+                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
                                         selected
                                             ? 'text-[#32864b] underline underline-offset-8'
                                             : ''
@@ -257,7 +257,7 @@ export default function Home(
                             {({ selected }) => (
                                 <div
                                     className={classNames(
-                                        'text-black text-2xl font-medium font-acumin',
+                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
                                         selected
                                             ? 'text-[#32864b] underline underline-offset-8'
                                             : ''
