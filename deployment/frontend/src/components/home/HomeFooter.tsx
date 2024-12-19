@@ -81,6 +81,9 @@ export function HomeFooter() {
                         <Link href="/topics" className=" font-normal">
                             Topics
                         </Link>
+                        <Link href="/applications" className=" font-normal">
+                            Applications
+                        </Link>
                     </div>
                     <div className="flex w-full flex-col items-center gap-y-4 sm:items-start">
                         <p className="text-base font-bold">GET STARTED</p>
