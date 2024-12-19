@@ -13,7 +13,7 @@ import Spinner from '../_shared/Spinner'
 import { Application, GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { Group } from '@portaljs/ckan'
 
-function ApplicationCard({
+export function ApplicationCard({
     application,
 }: {
     application: Application
@@ -22,7 +22,7 @@ function ApplicationCard({
     return (
         <Link
             href={`/applications/${application.name}`}
-            className="flex w-full flex-col gap-1 font-acumin shadow-wri pb-6"
+            className="flex w-full flex-col gap-2 font-acumin pb-6"
         >
             <div className="relative aspect-square h-72 w-full bg-white">
                 <Image
@@ -36,10 +36,10 @@ function ApplicationCard({
                     className="object-cover"
                 />
             </div>
-            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pl-4 ">
+            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pt-2">
                 {application.title}
             </p>
-            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700 pl-4  ">
+            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700">
                 {datasetCount && datasetCount > 1
                     ? `${datasetCount} datasets`
                     : `${datasetCount} dataset`}

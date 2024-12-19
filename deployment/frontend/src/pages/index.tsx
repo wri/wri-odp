@@ -21,6 +21,7 @@ import { Fragment } from 'react'
 import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/20/solid'
 import classNames from '@/utils/classnames'
 import { ApplicationsCarousel } from '@/components/home/ApplicationCarousel'
+import { ArrowRightIcon } from '@heroicons/react/24/solid'
 
 const ErrorAlert = dynamic<{ text: string; title?: string }>(
     () =>
@@ -165,7 +166,7 @@ export default function Home(
                 </div>
             </main>
 
-            <main className="flex min-h-screen flex-col gap-y-8 bg-neutral-50 py-20">
+            <main className="flex min-h-screen flex-col bg-neutral-50 py-20">
                 <Tab.Group>
                     <Tab.List className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full">
                         <Tab as={Fragment}>
@@ -201,15 +202,29 @@ export default function Home(
                     </Tab.List>
                     <Tab.Panels>
                         <Tab.Panel className="topics-carousel relative !ml-auto w-full max-w-[94.5vw]">
+                            <Link
+                                href="/topics"
+                                className="flex justify-end pr-5 text-lg font-semibold pb-3 items-center gap-x-2"
+                            >
+                                See all{' '}
+                                <ArrowRightIcon className="h-4 w-4 inline-block" />
+                            </Link>
                             <TopicsCarousel />
                         </Tab.Panel>
                         <Tab.Panel className="highlights-carousel relative !ml-auto w-full max-w-[94.5vw]">
+                            <Link
+                                href="/applications"
+                                className="flex justify-end pr-5 text-lg font-semibold pb-3 items-center gap-x-2"
+                            >
+                                See all{' '}
+                                <ArrowRightIcon className="h-4 w-4 inline-block" />
+                            </Link>
                             <ApplicationsCarousel />
                         </Tab.Panel>
                     </Tab.Panels>
                 </Tab.Group>
                 <Tab.Group>
-                    <Tab.List className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full pt-20">
+                    <Tab.List className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full pt-20 pb-8">
                         <Tab as={Fragment}>
                             {({ selected }) => (
                                 <div

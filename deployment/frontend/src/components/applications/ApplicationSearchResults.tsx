@@ -15,7 +15,7 @@ export default function ApplicationSearchResults({
     return (
         <Container className="mb-28">
             <span className="font-semibold text-xl">
-                {count} {!filtered ? 'top level applications' : 'applications'}
+                {count} Applications
             </span>
             <CardsGrid<Application>
                 className="mt-5"
