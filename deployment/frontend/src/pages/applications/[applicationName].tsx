@@ -46,7 +46,6 @@ export async function getServerSideProps(
             },
         }
     } catch (e) {
-    console.log('FAILED TO GET APP', e)
         return {
             props: {},
             redirect: {
