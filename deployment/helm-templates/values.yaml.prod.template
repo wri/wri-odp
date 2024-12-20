@@ -8,7 +8,7 @@ ckan:
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
       CKAN_SITE_ID: wri-prod
-      CKAN_SITE_URL: https://wri.prod.ckan.datopian.com
+      CKAN_SITE_URL: https://datasets.wri.org
       CKAN_HOMEPAGE_STYLE: "2"
       CKAN__DATAPUSHER__URL: http://wri-prod-datapusher-svc:80/
       CKAN_SITE_ID: wri-prod
