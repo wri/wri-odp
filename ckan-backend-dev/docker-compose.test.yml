@@ -11,6 +11,10 @@ services:
   ckan-dev:
     container_name: ${CKAN_CONTAINER_NAME}
     image: ${CKAN_IMAGE}
+    build:
+      context: .
+      args:
+        GITHUB_ACTIONS: "true"
     environment:
       - GITHUB_ACTIONS=true
     env_file:
