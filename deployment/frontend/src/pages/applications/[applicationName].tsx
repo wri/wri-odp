@@ -102,7 +102,12 @@ export default function ApplicationPage(
                 </>
             )}
 
-            <Footer />
+            <Footer
+                links={{
+                    primary: { title: 'Explore Topics', href: '/topics' },
+                    secondary: { title: 'Explore Teams', href: '/teams' },
+                }}
+            />
         </>
     )
 }

@@ -7,14 +7,33 @@ import { SubscribeForm } from './SubscribeForm'
 import { env } from '@/env.mjs'
 import osanoListeners from './OsanoListeners'
 
+type ctalink = { title: string; href: string }
+type ctaLinks = {
+    primary: ctalink | ctalink[]
+    secondary?: ctalink
+}
+
+interface FooterProps {
+    links?: ctaLinks
+    style?: string
+    isHome?: boolean
+}
+
 export default function Footer({
     links = {
-        primary: { title: 'Explore Topics', href: '#' },
-        secondary: { title: 'Search', href: '/search' },
+        primary: [
+            { title: 'Explore Topics', href: '/topics' },
+            { title: 'Explore Teams', href: '/teams' },
+
+            {
+                title: 'Explore Applications',
+                href: '/applications',
+            },
+        ],
     },
     style = 'mt-16',
     isHome = false,
-}) {
+}: FooterProps) {
     osanoListeners()
 
     return (
@@ -28,20 +47,36 @@ export default function Footer({
                         Didn&apos;t find what you were looking for?{' '}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-y-4 sm:gap-x-4 font-bold">
-                        <a
-                            href={links.primary.href}
-                            className=" bg-wri-gold text-wri-black text-center px-8 py-4 rounded-sm text-base"
-                        >
-                            {' '}
-                            {links.primary.title}
-                        </a>
-                        <a
-                            href={links.secondary.href}
-                            className=" bg-white text-wri-black text-center px-8 py-4 rounded-sm text-base border-2 border-wri-gold"
-                        >
-                            {' '}
-                            {links.secondary.title}
-                        </a>
+                        {Array.isArray(links.primary) ? (
+                            links.primary.map((link, index) => (
+                                <Link
+                                    key={index}
+                                    href={link.href}
+                                    className=" bg-wri-gold text-wri-black text-center px-8 py-4 rounded-sm text-base"
+                                >
+                                    {' '}
+                                    {link.title}
+                                </Link>
+                            ))
+                        ) : (
+                            <Link
+                                href={links.primary.href}
+                                className=" bg-wri-gold text-wri-black text-center px-8 py-4 rounded-sm text-base"
+                            >
+                                {' '}
+                                {links.primary.title}
+                            </Link>
+                        )}
+
+                        {links.secondary && (
+                            <Link
+                                href={links.secondary.href}
+                                className=" bg-white text-wri-black text-center px-8 py-4 rounded-sm text-base border-2 border-wri-gold"
+                            >
+                                {' '}
+                                {links.secondary.title}
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
