@@ -249,8 +249,8 @@ export default function SearchPage(
                 shallow: true,
             }
         )
-        if(window) {
-            window.scrollTo({top: 0, behavior: 'smooth'})
+        if (window) {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
         }
     }, [filters, query.page, query.sortBy])
     const links = [{ label: 'Search', url: '/search', current: true }]
@@ -318,8 +318,15 @@ export default function SearchPage(
             )}
             <Footer
                 links={{
-                    primary: { title: 'Explore Teams', href: '/teams' },
-                    secondary: { title: 'Explore Topics', href: '/topics' },
+                    primary: [
+                        { title: 'Explore Topics', href: '/topics' },
+                        { title: 'Explore Teams', href: '/teams' },
+
+                        {
+                            title: 'Explore Applications',
+                            href: '/applications',
+                        },
+                    ],
                 }}
             />
         </>
