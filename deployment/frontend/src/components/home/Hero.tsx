@@ -257,13 +257,13 @@ export function Hero() {
                                 <input
                                     placeholder="Search datasets - try “energy”, “Global Forest Watch”, or “food”"
                                     aria-label="search"
-                                    className="placeholder:text-white flex-shrink flex-grow  placeholder:italic placeholder:font-light placeholder:leading-tight placeholder:sm:font-normal placeholder:sm:leading-normal text-white text-xs md:text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white bg-opacity-[0.24]  rounded-tl-[3px] rounded-bl-[3px] "
+                                    className="placeholder:text-[#9D9D9D] flex-shrink flex-grow  placeholder:italic placeholder:font-light placeholder:leading-tight placeholder:sm:font-normal placeholder:sm:leading-normal text-[#9D9D9D] text-xs md:text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white rounded-tl-[3px] rounded-bl-[3px] border-r-0"
                                     {...register('search')}
                                 />
                                 
                                 <button
                                     type="submit"
-                                    className="px-8 py-4 text-[26px] font-semibold  font-acumin leading-[29.25px] text-white bg-wri-gold rounded-tr-[3px] rounded-br-[3px] h-[66px] w-full max-w-[149px]"
+                                    className="px-8 py-4 text-[26px] font-semibold  font-acumin leading-[29.25px] text-black bg-wri-gold rounded-tr-[3px] rounded-br-[3px] h-[65px] w-full max-w-[149px] border-l-0"
                                 >Search</button>
                             </div>
                         </form>

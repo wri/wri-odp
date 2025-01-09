@@ -38,9 +38,9 @@ export default function TopicsSearch({
                         name="search"
                         placeholder={`Search ${groupType === "Teams" ? "teams" : "topics"}`}
                         aria-label="search"
-                        className="h-full  block w-full border-0 px-5 py-2 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-[#000000] placeholder:font-light focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 rounded-tl-[3px] rounded-bl-[3px] "
+                        className="h-full  block w-full border-0 px-5 py-2 text-[#9D9D9D] shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-[#9D9D9D] placeholder:font-light focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 rounded-tl-[3px] rounded-bl-[3px] border-r-0"
                     />
-                    <div className="absolute flex h-[54.393px] px-8  right-0  leading-[29.25px] text-white bg-wri-gold rounded-tr-[3px] rounded-br-[3px]">
+                    <div className="absolute flex h-[54.393px] px-8  right-0  leading-[29.25px] text-black bg-wri-gold rounded-tr-[3px] rounded-br-[3px]">
                         {isLoading ? (
                             <Spinner className="h-5 w-5 text-wri-black" />
                         ) : (
