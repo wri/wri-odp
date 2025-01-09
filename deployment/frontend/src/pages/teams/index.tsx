@@ -132,7 +132,7 @@ export default function TeamsPage(
                         <br />
                         If you have questions about a project&apos;s data reach
                         out to the point of contact in the dataset or to{' '}
-                        <a href="mailto:data@wri.org" className="text-blue-700">
+                        <a href="mailto:data@wri.org" className="text-blue-700 underline">
                             {' '}
                             data@wri.org
                         </a>
