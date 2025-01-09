@@ -46,7 +46,6 @@ export async function getServerSideProps(
             },
         }
     } catch (e) {
-    console.log('FAILED TO GET APP', e)
         return {
             props: {},
             redirect: {
@@ -103,7 +102,12 @@ export default function ApplicationPage(
                 </>
             )}
 
-            <Footer />
+            <Footer
+                links={{
+                    primary: { title: 'Explore Topics', href: '/topics' },
+                    secondary: { title: 'Explore Teams', href: '/teams' },
+                }}
+            />
         </>
     )
 }

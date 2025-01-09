@@ -36,13 +36,18 @@ export function Hero() {
             active: false,
         },
         {
+            title: 'Topics',
+            href: '/topics',
+            active: false,
+        },
+        {
             title: 'Teams',
             href: '/teams',
             active: false,
         },
         {
-            title: 'Topics',
-            href: '/topics',
+            title: 'Applications',
+            href: '/applications',
             active: false,
         },
     ]

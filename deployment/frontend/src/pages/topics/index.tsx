@@ -153,8 +153,8 @@ export default function TopicsPage(
             )}
             <Footer
                 links={{
-                    primary: { title: 'Search', href: '/search' },
-                    secondary: { title: 'Explore Topics', href: '#' },
+                    primary: { title: 'Explore Teams', href: '/teams' },
+                    secondary: { title: 'Explore Applications', href: '/applications' },
                 }}
             />
         </>

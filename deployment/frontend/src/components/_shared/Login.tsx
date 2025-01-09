@@ -198,7 +198,7 @@ function SignInForm({
                 <div className="text-wri-black ">or</div>
                 <div className="font-light text-[0.875rem] border border-1 border-wri-gray w-20 h-0" />
             </div>
-            {/*<button
+            <button
                 type="button"
                 className="flex  mt-8 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 cursor-pointer"
                 onClick={handleAzureSignIn}
@@ -212,8 +212,8 @@ function SignInForm({
                         ? 'Sign In with your WRI Credentials'
                         : 'Signing in...'}
                 </div>
-            </button>*/}
-            <button
+            </button>
+            {/*<button
                 type="button"
                 className="flex  mt-8 outline outline-1 outline-wri-gold rounded-sm justify-center py-4 cursor-pointer"
                 onClick={handleOktaSignIn}
@@ -227,7 +227,7 @@ function SignInForm({
                         ? 'Sign In with your WRI Credentials'
                         : 'Signing in...'}
                 </div>
-            </button>
+            </button>*/}
         </>
     )
 }

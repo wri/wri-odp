@@ -14,25 +14,26 @@ export function HomeFooter() {
             <section className="bg-green-700">
                 <div className="default-home-container mx-auto md:flex justify-between py-12">
                     <div className="flex flex-col gap-y-1">
-                        <h4 className="font-acumin text-[1.625rem] leading-[1.875rem] font-bold text-white">
-                            Explore datasets by Team and Topic
-                        </h4>
-                        <h5 className="font-acumin text-xl font-normal text-gray-100 leading-[1.875rem]">
-                            Discover datasets associated with WRI Teams or
-                            relevant Topics
-                        </h5>
-                    </div>
-                    <div className="flex gap-x-4">
-                        <Link href="/teams">
-                            <Button className="mt-10 md:mt-0">
-                                Explore Teams
-                            </Button>
-                        </Link>
-                        <Link href="/topics">
-                            <Button className="mt-10 md:mt-0">
-                                Explore Topics
-                            </Button>
-                        </Link>
+                        <p className="text-white mb-4 font-bold text-[1.5rem] text-center sm:text-start">
+                            Didn&apos;t find what you were looking for?{' '}
+                        </p>
+                        <div className="flex gap-x-4">
+                            <Link href="/topics">
+                                <Button className="mt-10 md:mt-0">
+                                    Explore Topics
+                                </Button>
+                            </Link>
+                            <Link href="/teams">
+                                <Button className="mt-10 md:mt-0">
+                                    Explore Teams
+                                </Button>
+                            </Link>
+                            <Link href="/applications">
+                                <Button className="mt-10 md:mt-0">
+                                    Explore Applications
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -80,6 +81,9 @@ export function HomeFooter() {
                         </Link>
                         <Link href="/topics" className=" font-normal">
                             Topics
+                        </Link>
+                        <Link href="/applications" className=" font-normal">
+                            Applications
                         </Link>
                     </div>
                     <div className="flex w-full flex-col items-center gap-y-4 sm:items-start">

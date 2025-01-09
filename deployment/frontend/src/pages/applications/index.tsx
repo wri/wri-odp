@@ -15,6 +15,7 @@ import superjson from 'superjson'
 import { env } from '@/env.mjs'
 import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
 
 const ApplicationSearchResult = dynamic(
     () => import('@/components/applications/ApplicationSearchResults')
@@ -27,7 +28,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await Promise.all([await helpers.applications.list.prefetch()])
+    await Promise.all([await helpers.applications.getAllApplications.prefetch()])
 
     return {
         props: {
@@ -92,6 +93,7 @@ export default function ApplicationsPage(
         }))
     }
 
+    const links = [{ label: 'Applications', url: '/applications', current: true }]
     return (
         <>
             <NextSeo
@@ -105,20 +107,12 @@ export default function ApplicationsPage(
                 }}
             />
             <Header />
+            <Breadcrumbs links={links} />
             <ApplicationSearch
                 isLoading={isLoading}
                 setQuery={setQuery}
                 query={query}
             />
-            <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
-                <div className="max-w-[705px] ml-2 2xl:ml-2">
-                    <div className="default-home-container w-full border-t-[4px] border-stone-900" />
-                    <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
-                        Explore reliable datasets filtered by the application of
-                        your interest.
-                    </h3>
-                </div>
-            </section>
             {isLoading ? (
                 <Spinner className="mx-auto" />
             ) : (
@@ -143,8 +137,8 @@ export default function ApplicationsPage(
             )}
             <Footer
                 links={{
-                    primary: { title: 'Search', href: '/search' },
-                    secondary: { title: 'Explore Applications', href: '#' },
+                    primary: { title: 'Explore Topics', href: '/topics' },
+                    secondary: { title: 'Explore Teams', href: '/teams' },
                 }}
             />
         </>
