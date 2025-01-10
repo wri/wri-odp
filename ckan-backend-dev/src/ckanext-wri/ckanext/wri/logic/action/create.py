@@ -844,13 +844,11 @@ def download_event_create(context: Context, data_dict: DataDict):
     affiliation = data_dict.get("affiliation")
     organization = data_dict.get("organization")
     job_title = data_dict.get("job_title")
+    country = data_dict.get("country")
     interests = data_dict.get("interests")
 
     if interests:
         interests = ', '.join(interests) 
-
-    if affiliation:
-        affiliation = affiliation['value']
 
     for item in [
         ["package_id", package_id],
@@ -863,7 +861,7 @@ def download_event_create(context: Context, data_dict: DataDict):
 
     events = []
     for resource_id in resources:
-        event = DownloadEvent.create(email, first_name, last_name, affiliation, organization, job_title, interests, package_id, resource_id)
+        event = DownloadEvent.create(email, first_name, last_name, affiliation, organization, job_title, country, interests, package_id, resource_id)
         events.append(event)
 
     return download_event_list_dictize(events, context)

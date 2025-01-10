@@ -328,12 +328,10 @@ export function DataFiles({
                     toast("You'll receive an email when the file is ready", {
                         type: 'success',
                     })
-
                     setOpen(false)
                 },
                 onError: (err) => {
                     console.error(err)
-
                     toast('Failed to request file', {
                         type: 'error',
                     })
@@ -600,6 +598,7 @@ export function DataFiles({
                 subtitle="Please enter your information so that you receive the download link via email"
                 isOpen={open}
                 onClose={() => setOpen(false)}
+                dataset={dataset}
                 onSubmit={handleFormSubmit}
                 downloadButton={
                     <LoaderButton
@@ -1143,7 +1142,10 @@ function DatafileCard({
                                 {datafile.url_type === 'link' ||
                                 datafile.url_type === 'upload' ? (
                                     <>
-                                        <DownloadButton datafile={datafile} />
+                                        <DownloadButton
+                                            datafile={datafile}
+                                            dataset={dataset}
+                                        />
                                     </>
                                 ) : (
                                     <></>
@@ -1158,65 +1160,3 @@ function DatafileCard({
         </Disclosure>
     )
 }
-
-//function DownloadModal({
-//  open,
-//  setOpen,
-//  dataset_id,
-//  keys,
-//  resource_name,
-//}: {
-//  open: boolean
-//  setOpen: (open: boolean) => void
-//  dataset_id: string
-//  keys: string[]
-//  resource_name: string
-//}) {
-//
-//
-//  const formObj = useForm<FormSchema>({ resolver: zodResolver(formSchema) })
-//  const {
-//    handleSubmit,
-//    formState: { errors },
-//    register,
-//  } = formObj
-//
-//  let isLoading = false
-//  return (
-//    <Modal open={open} setOpen={setOpen} className="max-w-[48rem]">
-//      <div className="p-6">
-//        <div className="border-b border-zinc-100 pb-5">
-//          <div className="font-acumin text-3xl font-normal text-black">
-//            The selected datafiles are being prepared for download
-//          </div>
-//          <div className="font-acumin text-base font-light text-neutral-600">
-//            Please enter your email address so that you receive the
-//            download link via email when it's ready.
-//          </div>
-//        </div>
-//        {isLoading && (
-//          <div className="w-full flex items-center my-10 justify-center">
-//            <Spinner />
-//          </div>
-//        )}
-//        {!isLoading && (
-//          <form
-//            id="download"
-//            data-resource={resource_name}
-//            onSubmit={handleSubmit(
-//            )}
-//            className="flex flex-col sm:flex-row gap-5 pt-6"
-//          >
-//            <input
-//              type="email"
-//              id="email"
-//              className="block w-full rounded-md border-b border-wri-green py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
-//              placeholder="you@example.com"
-//              {...register('email')}
-//            />
-//                )}
-//            <ErrorDisplay errors={errors} name="email" />
-//          </div>
-//        </Modal>
-//  )
-//}

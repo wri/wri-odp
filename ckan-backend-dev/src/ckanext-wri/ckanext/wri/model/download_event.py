@@ -29,6 +29,8 @@ download_event = sqlalchemy.Table('download_event', meta.metadata,
         nullable=True),
     sqlalchemy.Column('job_title', sqlalchemy.types.UnicodeText,
         nullable=True),
+    sqlalchemy.Column('country', sqlalchemy.types.UnicodeText,
+        nullable=True),
     sqlalchemy.Column('interests', sqlalchemy.types.UnicodeText,
         nullable=True),
     sqlalchemy.Column('package', sqlalchemy.types.UnicodeText,
@@ -54,17 +56,19 @@ class DownloadEvent(object):
     affiliation: str
     organization: str
     job_title: str
+    country: str
     interests: str
     package: str
     resource_id: str
 
-    def __init__(self, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, interests: str, package: str, resource_id: str):
+    def __init__(self, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str):
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
         self.affiliation = affiliation
         self.organization = organization
         self.job_title = job_title
+        self.country = country
         self.interests = interests
         self.package = package
         self.resource_id = resource_id
@@ -90,14 +94,14 @@ class DownloadEvent(object):
             return session.query(cls).filter(cls.resource_id == resource_id).all()
 
     @classmethod
-    def create(cls: Type[Self], email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, interests: str, package: str, resource_id: str) -> Self:
-        download_event = cls(email=email, first_name=first_name, last_name=last_name, affiliation=affiliation, organization=organization, job_title=job_title, interests=interests, package=package, resource_id=resource_id)
+    def create(cls: Type[Self], email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str) -> Self:
+        download_event = cls(email=email, first_name=first_name, last_name=last_name, affiliation=affiliation, organization=organization, job_title=job_title, country=country, interests=interests, package=package, resource_id=resource_id)
         with sql_session_scope() as session:
             session.add(download_event)
         return download_event
 
     @classmethod
-    def update(cls: Type[Self], id: str, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, interests: str, package: str, resource_id: str) -> Self:
+    def update(cls: Type[Self], id: str, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str) -> Self:
         with sql_session_scope() as session:
             download_event = session.query(cls).filter(cls.id == id).first()
             download_event.email = email
@@ -106,6 +110,7 @@ class DownloadEvent(object):
             download_event.affiliation = affiliation
             download_event.organization = organization
             download_event.job_title = job_title
+            download_event.country = country
             download_event.interests = interests
             download_event.package = package
             download_event.resource_id = resource_id
@@ -142,6 +147,7 @@ class DownloadEvent(object):
             'affiliation': self.affiliation,
             'organization': self.organization,
             'job_title': self.job_title,
+            'country': self.country,
             'interests': self.interests,
             'package': self.package,
             'resource_id': self.resource_id,
