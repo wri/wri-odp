@@ -9,6 +9,7 @@ from typing_extensions import Self
 from ckan.types import Context
 from typing import Iterable, Optional, Type
 from ckan.model.package import Package
+from ckan.model.resource import Resource
 import logging
 log = logging.getLogger(__name__)
 
@@ -62,6 +63,8 @@ class DownloadEvent(object):
     resource_id: str
 
     def __init__(self, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str):
+        self.package_name: Optional[str] = None
+        self.resource_name: Optional[str] = None
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
@@ -133,10 +136,23 @@ class DownloadEvent(object):
             List of download events for that organization's datasets
         """
         with sql_session_scope() as session:
-            return session.query(cls)\
-                .join(Package, cls.package == Package.id)\
-                .filter(Package.owner_org == owner_org)\
-                .all()
+            query = session.query(
+                cls,
+                Package.name.label('package_name'),
+                Resource.name.label('resource_name')
+            )\
+                .join(Package, download_event.c.package == Package.id)\
+                .join(Resource, download_event.c.resource_id == Resource.id)\
+                .filter(Package.owner_org == owner_org)
+            
+            results = query.all()
+            
+            # Attach the package_name and resource_name to each DownloadEvent instance
+            for result in results:
+                result[0].package_name = result[1]
+                result[0].resource_name = result[2]
+            
+            return [result[0] for result in results]
 
     def as_dict(self) -> dict:
         return {
@@ -150,7 +166,9 @@ class DownloadEvent(object):
             'country': self.country,
             'interests': self.interests,
             'package': self.package,
+            'package_name': self.package_name,
             'resource_id': self.resource_id,
+            'resource_name': self.resource_name,
         }
     
 def download_event_dictize(download_event: DownloadEvent, context: Context) -> dict:

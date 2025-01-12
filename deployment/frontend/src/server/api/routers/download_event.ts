@@ -16,18 +16,23 @@ export const downloadEventRouter = createTRPCRouter({
                 ownerOrg: z.string().optional(),
             })
         )
-        .query(async ({ input, ctx }) => {
+        .mutation(async ({ input, ctx }) => {
             const user = ctx.session.user
             const url = input.ownerOrg
-                ? `${env.CKAN_URL}/api/action/download_event_list?owner_org=${input.ownerOrg}`
-                : `${env.CKAN_URL}/api/action/download_event_list`
+                ? `${env.CKAN_URL}/api/action/download_event_list?owner_org=${input.ownerOrg}&format=csv`
+                : `${env.CKAN_URL}/api/action/download_event_list?&format=csv`
             const downloadEventRes = await fetch(url, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `${user.apikey}`,
                 },
+                body: JSON.stringify({
+                    owner_org: input.ownerOrg,
+                    format: 'csv',
+                }),
             })
-            const downloadEvents: CkanResponse<DownloadEvent[]> =
+            const downloadEvents: CkanResponse<string> =
                 await downloadEventRes.json()
             return downloadEvents.result
         }),

@@ -1443,13 +1443,10 @@ def get_download_events(context: Context, data_dict: DataDict):
     # Check if the user has access to the organization
     tk.check_access("organization_member_create", context, {"id": owner_org})
     
-    # Check if the user is a sysadmin, if not make sure that owner_org is not None
-    if not tk.c.is_sysadmin(context) and not owner_org:
-        raise tk.ValidationError("owner_org is required")
-
     # Get download events
     if owner_org:
-        download_events = DownloadEvent.get_by_owner_org(owner_org)
+        org = tk.get_action("organization_show")(context, {"id": owner_org})
+        download_events = DownloadEvent.get_by_owner_org(org.get('id', None))
     else:
         download_events = DownloadEvent.get_all()
 
