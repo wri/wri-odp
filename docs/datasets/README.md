@@ -20,6 +20,17 @@ Obs: Fields that have a red * are required
 
 Where the main metadata fields are defined
 
+Here you can define things like
+
+- The title of the dataset
+- The name of the dataset, which will be used in the url
+- You can attach tags, topics, applications to the dataset
+- You can define the team to which that dataset will belong
+- Define the visibility
+- Technical notes, caution, citation, update frequency and other fields
+
+![overview](./overview.png)
+
 If you select the `featured dataset` checkbox an image uploader will appear where you can define a thumbnail for your dataset
 
 ![Featured dataset](./featured_dataset.png)

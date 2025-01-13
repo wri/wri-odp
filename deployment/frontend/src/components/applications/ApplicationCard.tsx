@@ -9,12 +9,13 @@ export default function ApplicationCard({
 }: {
     application: Application
 }) {
+    const datasetCount = application.package_count
     return (
         <Link
             href={`/applications/${application.name}`}
-            className="text-wri-black flex flex-col w-full font-acumin max-w-[400px] ml-auto mr-auto"
+            className="flex w-full flex-col gap-2 font-acumin pb-6"
         >
-            <div className="relative w-full h-56 2xl:h-64">
+            <div className="relative aspect-square h-72 w-full bg-white">
                 <Image
                     src={`${
                         application.image_display_url !== ''
@@ -26,20 +27,14 @@ export default function ApplicationCard({
                     className="object-cover"
                 />
             </div>
-            <div className="bg-white w-[70%] pt-2 -ml-[1px] -mt-6 z-10 line-clamp-2 h-16 pb-1.5">
-                <h2 className="text-2xl font-bold w-[80%]">
-                    {application.title}
-                </h2>
-            </div>
-            <article className=" w-[88%] font-light text-base mt-2 leading-[1.375rem] line-clamp-3 h-16">
-                application.description
-            </article>
-            <div className="flex font-light text-sm text-wri-black mt-1 leading-[1.375rem] items-center">
-                <span className="mr-2">
-                    {application.package_count}
-                    {" "}datasets
-                </span>
-            </div>
+            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pt-2">
+                {application.title}
+            </p>
+            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700">
+                {datasetCount && datasetCount > 1
+                    ? `${datasetCount} datasets`
+                    : `${datasetCount} dataset`}
+            </p>
         </Link>
     )
 }

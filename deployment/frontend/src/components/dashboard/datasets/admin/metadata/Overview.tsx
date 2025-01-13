@@ -73,10 +73,10 @@ export function OverviewForm({
                             disabled={editing}
                             placeholder="name-of-dataset"
                             type="text"
-                            className="pl-[5.2rem] sm:pl-[5rem] md:pl-[4.9rem] lg:pl-[4.8rem]"
+                            className="pl-[5.9rem] sm:pl-[5.6rem] md:pl-[5.2rem] lg:pl-[5.4rem]"
                         >
                             <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
-                                /dataset/
+                                /datasets/
                             </span>
                         </Input>
                         <ErrorDisplay name="name" errors={errors} />

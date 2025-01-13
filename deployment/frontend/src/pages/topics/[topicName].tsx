@@ -123,7 +123,15 @@ export default function TopicPage(
                 <DatasetTopic topics={data?.topics!} key={router.asPath} />
             </div>
 
-            <Footer />
+            <Footer
+                links={{
+                    primary: { title: 'Explore Teams', href: '/teams' },
+                    secondary: {
+                        title: 'Explore Applications',
+                        href: '/applications',
+                    },
+                }}
+            />
         </>
     )
 }
