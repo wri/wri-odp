@@ -61,6 +61,8 @@ class DownloadEvent(object):
     interests: str
     package: str
     resource_id: str
+    package_name: Optional[str]
+    resource_name: Optional[str]
 
     def __init__(self, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str):
         self.package_name: Optional[str] = None
@@ -141,16 +143,22 @@ class DownloadEvent(object):
                 Package.name.label('package_name'),
                 Resource.name.label('resource_name')
             )\
-                .join(Package, download_event.c.package == Package.id)\
-                .join(Resource, download_event.c.resource_id == Resource.id)\
+                .outerjoin(Package, download_event.c.package == Package.id)\
+                .outerjoin(Resource, download_event.c.resource_id == Resource.id)\
                 .filter(Package.owner_org == owner_org)
             
             results = query.all()
             
-            # Attach the package_name and resource_name to each DownloadEvent instance
+            # Safely attach the package_name and resource_name to each DownloadEvent instance
             for result in results:
-                result[0].package_name = result[1]
-                result[0].resource_name = result[2]
+                download_event_obj = result[0]
+                try:
+                    download_event_obj.package_name = result[1] if result[1] is not None else "Unknown"
+                    download_event_obj.resource_name = result[2] if result[2] is not None else "Unknown"
+                except Exception as e:
+                    log.warning(f"Error attaching names to download event: {e}")
+                    download_event_obj.package_name = "Unknown"
+                    download_event_obj.resource_name = "Unknown"
             
             return [result[0] for result in results]
 
@@ -166,9 +174,9 @@ class DownloadEvent(object):
             'country': self.country,
             'interests': self.interests,
             'package': self.package,
-            'package_name': self.package_name,
+            'package_name': self.package_name if hasattr(self, 'package_name') else 'Not specified',
             'resource_id': self.resource_id,
-            'resource_name': self.resource_name,
+            'resource_name': self.resource_name if hasattr(self, 'resource_name') else 'Not specified',
         }
     
 def download_event_dictize(download_event: DownloadEvent, context: Context) -> dict:
