@@ -52,7 +52,7 @@ export default function Footer({
                                 <Link
                                     key={index}
                                     href={link.href}
-                                    className=" bg-wri-gold text-wri-black text-center px-8 py-4 rounded-sm text-base"
+                                    className=" bg-wri-gold text-wri-black text-center px-8 py-4 rounded-sm text-base border-2 border-wri-gold"
                                 >
                                     {' '}
                                     {link.title}
@@ -61,7 +61,7 @@ export default function Footer({
                         ) : (
                             <Link
                                 href={links.primary.href}
-                                className=" bg-wri-gold text-wri-black text-center px-8 py-4 rounded-sm text-base"
+                                className=" bg-wri-gold text-wri-black text-center px-8 py-4 rounded-sm text-base border-2 border-wri-gold"
                             >
                                 {' '}
                                 {links.primary.title}
