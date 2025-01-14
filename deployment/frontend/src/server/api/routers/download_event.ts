@@ -8,6 +8,7 @@ import { CkanResponse } from '@/schema/ckan.schema'
 import { z } from 'zod'
 import { DownloadEvent } from '@/interfaces/downloadEvent.interface'
 import { downloadEventSchema } from '@/components/_shared/DownloadPopup'
+import qs from 'query-string'
 
 export const downloadEventRouter = createTRPCRouter({
     getAllEvents: protectedProcedure
@@ -50,6 +51,37 @@ export const downloadEventRouter = createTRPCRouter({
                 country: input.country?.value,
                 first_name: input.firstName,
                 last_name: input.lastName,
+            }
+            const body = {
+                website: 'https://datasets.wri.org/',
+                'form-name': 'Footer Sign-up Form',
+                list: 'DATA - Data Explorer - NEWSL - LIST',
+                email: input.email,
+                job_title: input.jobTitle,
+                organization: input.organization,
+                affiliation:
+                    input.affiliation.value == 'Other'
+                        ? input.otherAffiliation
+                        : input.affiliation.value,
+                country: input.country?.value,
+                first_name: input.firstName,
+                last_name: input.lastName,
+                interests: input.interests?.join(',') ?? '',
+            }
+            try {
+                const response = await fetch(
+                    'https://ortto.wri.org/custom-forms/',
+                    {
+                        method: 'POST',
+                        body: qs.stringify(body),
+                        headers: {
+                            'content-type': 'application/x-www-form-urlencoded',
+                        },
+                    }
+                )
+                console.log('ORTTO RESPONSE', response)
+            } catch (e) {
+                console.log(e)
             }
             const downloadEventRes = await fetch(
                 `${env.CKAN_URL}/api/action/download_event_create`,

@@ -408,20 +408,12 @@ export function DownloadPopup({
                                                         <SimpleSelect
                                                             name="country"
                                                             formObj={formObj}
-                                                            options={[
-                                                                {
-                                                                    label: 'United States',
-                                                                    value: 'US',
-                                                                },
-                                                                {
-                                                                    label: 'Canada',
-                                                                    value: 'CA',
-                                                                },
-                                                                {
-                                                                    label: 'Mexico',
-                                                                    value: 'MX',
-                                                                },
-                                                            ]}
+                                                            options={countries.map(
+                                                                (c) => ({
+                                                                    label: c.name,
+                                                                    value: c.iso,
+                                                                })
+                                                            )}
                                                             placeholder="Ex: USA"
                                                             maxWidth="w-full"
                                                         />
@@ -651,20 +643,12 @@ export function DirectDownloadPopup({
                                                 <SimpleSelect
                                                     name="country"
                                                     formObj={formObj}
-                                                    options={[
-                                                        {
-                                                            label: 'United States',
-                                                            value: 'US',
-                                                        },
-                                                        {
-                                                            label: 'Canada',
-                                                            value: 'CA',
-                                                        },
-                                                        {
-                                                            label: 'Mexico',
-                                                            value: 'MX',
-                                                        },
-                                                    ]}
+                                                    options={countries.map(
+                                                        (c) => ({
+                                                            label: c.name,
+                                                            value: c.iso,
+                                                        })
+                                                    )}
                                                     placeholder="Ex: USA"
                                                     maxWidth="w-full"
                                                 />

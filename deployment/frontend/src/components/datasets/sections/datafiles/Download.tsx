@@ -1,14 +1,10 @@
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import dynamic from 'next/dynamic'
-const Modal = dynamic(() => import('@/components/_shared/Modal'), {
-    ssr: false,
-})
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from '@/components/_shared/Popover'
-import Spinner from '@/components/_shared/Spinner'
 import { Resource } from '@/interfaces/dataset.interface'
 import { api } from '@/utils/api'
 import { convertBytes } from '@/utils/convertBytes'
@@ -16,13 +12,8 @@ import {
     ArrowDownTrayIcon,
     PaperAirplaneIcon,
 } from '@heroicons/react/24/outline'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { useQuery } from 'react-query'
 import { env } from '@/env.mjs'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import { toast } from 'react-toastify'
 import {
     DirectDownloadPopup,
@@ -105,6 +96,8 @@ export function DownloadButton({
     const tabularConversionOptions = conversibleTabularFormats.filter(
         (f) => f != format.toUpperCase()
     )
+    const requestDatafileConversionMutation =
+        api.dataset.requestDatafileConversion.useMutation()
 
     const [showDownloadForm, setShowDownloadForm] = useState(false)
     const [pendingDownloadUrl, setPendingDownloadUrl] = useState<string>('')
@@ -125,6 +118,43 @@ export function DownloadButton({
             package_id: datafile.package_id ?? '',
         }
         createDownloadEvent.mutate(_data)
+    }
+
+    const handleFormSubmitConvertion = (data: DownloadEventForm) => {
+        const _data = {
+            ...data,
+            resources: [datafile.id],
+            package_id: datafile.package_id ?? '',
+        }
+        requestDatafileConversionMutation.mutate(
+            {
+                email: data.email,
+                format: convertTo ?? 'CSV',
+                // @ts-ignore
+                rw_id: datafile?.layerObj?.dataset ?? '',
+                provider: datafile.rw_id ? 'rw' : 'datastore',
+                sql: sql,
+                resource_id: datafile.id,
+                carto_account: '',
+            },
+            {
+                onSuccess: () => {
+                    toast("You'll receive an email when the file is ready", {
+                        type: 'success',
+                    })
+                    createDownloadEvent.mutate(_data)
+
+                    setOpen(false)
+                },
+                onError: (err) => {
+                    console.error(err)
+
+                    toast('Failed to request file', {
+                        type: 'error',
+                    })
+                },
+            }
+        )
     }
 
     const handleSkip = () => {
@@ -288,139 +318,14 @@ export function DownloadButton({
                 </PopoverContent>
             </Popover>
             {convertTo && (
-                <DownloadModal
-                    format={convertTo}
-                    open={open}
-                    setOpen={setOpen}
-                    datafile={datafile}
-                />
-            )}
-        </>
-    )
-}
-
-function DownloadModal({
-    open,
-    setOpen,
-    format,
-    datafile,
-}: {
-    open: boolean
-    setOpen: (open: boolean) => void
-    format: 'XLSX' | 'CSV' | 'TSV' | 'XML'
-    datafile: Resource
-}) {
-    const formSchema = z.object({
-        email: z.string().email(),
-    })
-    const { data: layerObj, isLoading: layerObjLoading } = useQuery(
-        [datafile.rw_id],
-        async () => {
-            const res = await fetch(
-                `https://api.resourcewatch.org/v1/layer/${datafile.rw_id}`
-            )
-            const obj = await res.json()
-            return obj.data.attributes
-        },
-        {
-            enabled: datafile.format == 'Layer',
-        }
-    )
-
-    type FormSchema = z.infer<typeof formSchema>
-
-    const requestDatafileConversionMutation =
-        api.dataset.requestDatafileConversion.useMutation()
-
-    const formObj = useForm<FormSchema>({ resolver: zodResolver(formSchema) })
-    const {
-        handleSubmit,
-        formState: { errors },
-        register,
-    } = formObj
-
-    let isLoading = requestDatafileConversionMutation.isLoading
-    let sql = `SELECT * FROM "${datafile.id}"`
-    let cartoAccount: string | undefined = ''
-    if (datafile.format == 'Layer') {
-        const layerCfg = layerObj?.layerConfig
-        const layerSrc = layerCfg?.source
-        const layerProvider = layerSrc?.provider
-        sql = layerProvider?.layers?.at(0)?.options?.sql
-        cartoAccount = layerProvider?.account
-    }
-    return (
-        <Modal open={open} setOpen={setOpen} className="max-w-[48rem]">
-            <div className="p-6">
-                <div className="border-b border-zinc-100 pb-5">
-                    <div className="font-acumin text-3xl font-normal text-black">
-                        This {format} file is being prepared for download
-                    </div>
-                    <div className="font-acumin text-base font-light text-neutral-600">
-                        Please enter your email address so that you receive the
-                        download link via email when it's ready.
-                    </div>
-                </div>
-                {layerObjLoading && (
-                    <div className="w-full flex items-center my-10 justify-center">
-                        <Spinner />
-                    </div>
-                )}
-                {!isLoading && !layerObjLoading && (
-                    <form
-                        id="download"
-                        data-resource={datafile.title ?? datafile.name!}
-                        onSubmit={handleSubmit(
-                            async (data) => {
-                                requestDatafileConversionMutation.mutate(
-                                    {
-                                        email: data.email,
-                                        format: format,
-                                        // @ts-ignore
-                                        rw_id:
-                                            datafile?.layerObj?.dataset ?? '',
-                                        provider: datafile.rw_id
-                                            ? 'rw'
-                                            : 'datastore',
-                                        sql: sql,
-                                        resource_id: datafile.id,
-                                        carto_account: cartoAccount ?? '',
-                                    },
-                                    {
-                                        onSuccess: () => {
-                                            toast(
-                                                "You'll receive an email when the file is ready",
-                                                { type: 'success' }
-                                            )
-
-                                            setOpen(false)
-                                        },
-                                        onError: (err) => {
-                                            console.error(err)
-
-                                            toast('Failed to request file', {
-                                                type: 'error',
-                                            })
-                                        },
-                                    }
-                                )
-                            },
-                            (err) => {
-                                console.error(err)
-                                toast('Failed to request file', {
-                                    type: 'error',
-                                })
-                            }
-                        )}
-                        className="flex flex-col sm:flex-row gap-5 pt-6"
-                    >
-                        <input
-                            type="email"
-                            id="email"
-                            className="block w-full rounded-md border-b border-wri-green py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
-                            placeholder="you@example.com"
-                            {...register('email')}
-                        />
+                <DownloadPopup
+                    title="The selected datafiles are being prepared for download"
+                    subtitle="Please enter your information so that you receive the download link via email"
+                    isOpen={open}
+                    onClose={() => setOpen(false)}
+                    dataset={dataset}
+                    onSubmit={handleFormSubmitConvertion}
+                    downloadButton={
                         <LoaderButton
                             className="whitespace-nowrap"
                             type="submit"
@@ -431,10 +336,9 @@ function DownloadModal({
                             <PaperAirplaneIcon className="mr-2 h-5 w-5" />
                             Get via email
                         </LoaderButton>
-                    </form>
-                )}
-                <ErrorDisplay errors={errors} name="email" />
-            </div>
-        </Modal>
+                    }
+                />
+            )}
+        </>
     )
 }
