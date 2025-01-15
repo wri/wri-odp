@@ -99,6 +99,7 @@ export function DownloadButton({
             ...data,
             resources: [datafile.id],
             package_id: datafile.package_id ?? '',
+            acceptTerms: true,
         }
         createDownloadEvent.mutate(_data)
     }
@@ -126,9 +127,7 @@ export function DownloadButton({
                     toast("You'll receive an email when the file is ready", {
                         type: 'success',
                     })
-                    if (data.acceptTerms === true) {
-                        createDownloadEvent.mutate(_data)
-                    }
+                    createDownloadEvent.mutate(_data)
 
                     setOpen(false)
                 },

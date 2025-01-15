@@ -341,9 +341,7 @@ export function DataFiles({
                         resources: keys,
                         package_id: dataset.id ?? '',
                     }
-                    if (data.acceptTerms === true) {
-                        createDownloadEvent.mutate(_data)
-                    }
+                    createDownloadEvent.mutate(_data)
                     setOpen(false)
                 },
                 onError: (err) => {

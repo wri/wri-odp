@@ -42,6 +42,7 @@ export const downloadEventRouter = createTRPCRouter({
             downloadEventSchema.extend({
                 resources: z.array(z.string()),
                 package_id: z.string(),
+                acceptTerms: z.boolean(),
             })
         )
         .mutation(async ({ input, ctx }) => {
@@ -68,21 +69,25 @@ export const downloadEventRouter = createTRPCRouter({
                 last_name: input.lastName,
                 interests: input.interests?.join(',') ?? '',
             }
-            try {
-                const response = await fetch(
-                    'https://ortto.wri.org/custom-forms/',
-                    {
-                        method: 'POST',
-                        body: qs.stringify(body),
-                        headers: {
-                            'content-type': 'application/x-www-form-urlencoded',
-                        },
-                    }
-                )
-                console.log('ORTTO RESPONSE', response)
-            } catch (e) {
-                console.log(e)
+            if (input.acceptTerms) {
+                try {
+                    const response = await fetch(
+                        'https://ortto.wri.org/custom-forms/',
+                        {
+                            method: 'POST',
+                            body: qs.stringify(body),
+                            headers: {
+                                'content-type':
+                                    'application/x-www-form-urlencoded',
+                            },
+                        }
+                    )
+                    console.log('ORTTO RESPONSE', response)
+                } catch (e) {
+                    console.log(e)
+                }
             }
+
             const downloadEventRes = await fetch(
                 `${env.CKAN_URL}/api/action/download_event_create`,
                 {
