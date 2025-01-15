@@ -9,6 +9,7 @@ import six
 from ckan.common import _, config, current_user
 
 from ckanext.wri.model.notification import Notification, notification_dictize
+from ckanext.wri.model.download_event import DownloadEvent, download_event_dictize, download_event_list_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
 from ckanext.wri.logic.auth import schema
 from ckanext.wri.logic.action.send_group_notification import (
@@ -832,3 +833,35 @@ def resource_create(
         plugin.after_resource_create(context, resource)
 
     return resource
+
+def download_event_create(context: Context, data_dict: DataDict):
+    """Create a download event for each resource in the data_dict"""
+    package_id = data_dict.get("package_id")
+    resources = data_dict.get("resources")
+    email = data_dict.get("email")
+    first_name = data_dict.get("first_name")
+    last_name = data_dict.get("last_name")
+    affiliation = data_dict.get("affiliation")
+    organization = data_dict.get("organization")
+    job_title = data_dict.get("job_title")
+    country = data_dict.get("country")
+    interests = data_dict.get("interests")
+
+    if interests:
+        interests = ', '.join(interests) 
+
+    for item in [
+        ["package_id", package_id],
+        ["resources", resources],
+        ["email", email],
+        ["affiliation", affiliation],
+    ]:
+        if not item[1]:
+            raise tk.ValidationError("Missing required field " + item[0])
+
+    events = []
+    for resource_id in resources:
+        event = DownloadEvent.create(email, first_name, last_name, affiliation, organization, job_title, country, interests, package_id, resource_id)
+        events.append(event)
+
+    return download_event_list_dictize(events, context)
