@@ -72,7 +72,9 @@ export function DownloadButton({
                         resources: [tabularResource.id],
                         package_id: tabularResource.datasetId ?? '',
                     }
-                    createDownloadEvent.mutate(_data)
+                    if (data.acceptTerms === true) {
+                        createDownloadEvent.mutate(_data)
+                    }
 
                     setOpen(false)
                 },

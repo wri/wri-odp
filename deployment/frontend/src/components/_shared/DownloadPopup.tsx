@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import MulText from '@/components/dashboard/datasets/admin/MulText'
 import { WriDataset } from '@/schema/ckan.schema'
+import { countries } from '@/utils/listOfCountries'
 
 type DownloadFormData = {
     email: string

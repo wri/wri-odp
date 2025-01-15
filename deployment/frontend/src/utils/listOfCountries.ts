@@ -1,4 +1,4 @@
-const countries = [
+export const countries = [
     {
         iso: 'AFG',
         name: 'Afghanistan',

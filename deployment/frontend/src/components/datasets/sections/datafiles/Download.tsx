@@ -51,23 +51,6 @@ export function DownloadButton({
         },
     })
 
-    const layerObj = datafile.layerObj
-    const layerCfg = layerObj?.layerConfig
-    const layerSrc = layerCfg?.source
-    const layerProvider = layerSrc?.provider
-    const sql = layerProvider?.layers?.at(0)?.options?.sql
-    if (
-        (datafile.format == 'Layer' &&
-            // @ts-ignore
-            datafile?.layerObj?.provider !=
-                // @ts-ignore
-                'cartodb' &&
-            sql) ||
-        (!datafile.key && !datafile.url)
-    ) {
-        return null
-    }
-
     const size = datafile.size
     const mode = datafile.key ? 'SIGNED_URL' : 'RES_URL'
     let originalResourceDownloadUrl: string
@@ -120,7 +103,8 @@ export function DownloadButton({
         createDownloadEvent.mutate(_data)
     }
 
-    const handleFormSubmitConvertion = (data: DownloadEventForm) => {
+    let sql = `SELECT * FROM "${datafile.id}"`
+    const handleFormSubmitConvertion = (data: any) => {
         const _data = {
             ...data,
             resources: [datafile.id],
@@ -142,7 +126,9 @@ export function DownloadButton({
                     toast("You'll receive an email when the file is ready", {
                         type: 'success',
                     })
-                    createDownloadEvent.mutate(_data)
+                    if (data.acceptTerms === true) {
+                        createDownloadEvent.mutate(_data)
+                    }
 
                     setOpen(false)
                 },
