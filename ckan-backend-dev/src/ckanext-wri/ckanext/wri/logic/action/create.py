@@ -852,9 +852,7 @@ def download_event_create(context: Context, data_dict: DataDict):
 
     for item in [
         ["package_id", package_id],
-        ["resources", resources],
         ["email", email],
-        ["affiliation", affiliation],
     ]:
         if not item[1]:
             raise tk.ValidationError("Missing required field " + item[0])

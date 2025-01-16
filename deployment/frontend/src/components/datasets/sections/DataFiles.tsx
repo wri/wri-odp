@@ -316,8 +316,8 @@ export function DataFiles({
         onError: (err) => {
             toast('Failed to send your information', {
                 type: 'error',
-            }),
-                setOpen(false)
+            })
+            setOpen(false)
         },
     })
 
@@ -333,15 +333,16 @@ export function DataFiles({
             },
             {
                 onSuccess: () => {
-                    toast("You'll receive an email when the file is ready", {
-                        type: 'success',
-                    })
                     const _data = {
                         ...data,
                         resources: keys,
                         package_id: dataset.id ?? '',
                     }
+                    console.log('Creating download event with data:', _data)
                     createDownloadEvent.mutate(_data)
+                    toast("You'll receive an email when the file is ready", {
+                        type: 'success',
+                    })
                     setOpen(false)
                 },
                 onError: (err) => {
