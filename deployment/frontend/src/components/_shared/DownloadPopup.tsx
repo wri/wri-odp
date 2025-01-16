@@ -673,7 +673,7 @@ export function DirectDownloadPopup({
                                                 />
                                             </div>
 
-                                            {affiliation?.value === 'other' && (
+                                            {affiliation?.value === 'Other' && (
                                                 <>
                                                     <label className="block text-sm font-medium text-gray-700">
                                                         Please describe your

@@ -335,7 +335,7 @@ export function DataFiles({
                 onSuccess: () => {
                     const _data = {
                         ...data,
-                        resources: keys,
+                        resources: datafilesToDownload.map((r) => r.id),
                         package_id: dataset.id ?? '',
                     }
                     console.log('Creating download event with data:', _data)

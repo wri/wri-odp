@@ -52,6 +52,7 @@ export const downloadEventRouter = createTRPCRouter({
                 country: input.country?.value,
                 first_name: input.firstName,
                 last_name: input.lastName,
+                job_title: input.jobTitle,
             }
             const body = {
                 website: 'https://datasets.wri.org/',
