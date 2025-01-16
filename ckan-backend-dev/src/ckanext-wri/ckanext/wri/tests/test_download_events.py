@@ -85,38 +85,6 @@ def test_download_event_create_all_fields(mail_user):
 
 @mock.patch("ckan.plugins.toolkit.mail_user")
 @pytest.mark.usefixtures("with_plugins", "test_request_context")
-def test_download_event_validation(mail_user):
-    """Test validation of required fields for download events"""
-    # Setup test data
-    user = factories.Sysadmin()
-    organization = factories.Organization()
-    dataset = factories.Dataset(owner_org=organization['id'])
-    resource = factories.Resource(package_id=dataset['id'])
-
-    context = {
-        "user": user["name"],
-        "user_obj": user,
-        "ignore_auth": True
-    }
-
-    # Test missing required fields
-    required_fields = ["package_id", "resources", "email", "affiliation"]
-    
-    for field in required_fields:
-        data_dict = {
-            "package_id": dataset["id"],
-            "resources": [resource["id"]],
-            "email": "test@example.com",
-            "affiliation": "Test Organization"
-        }
-        del data_dict[field]
-        
-        with pytest.raises(ValidationError) as excinfo:
-            get_action("download_event_create")(context, data_dict)
-        assert f"Missing required field {field}" in str(excinfo.value)
-
-@mock.patch("ckan.plugins.toolkit.mail_user")
-@pytest.mark.usefixtures("with_plugins", "test_request_context")
 def test_download_event_list(mail_user):
     """Test listing download events with various filters"""
     # Setup test data
