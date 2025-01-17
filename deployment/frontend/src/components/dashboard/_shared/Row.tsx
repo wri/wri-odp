@@ -54,7 +54,6 @@ export default function Row({
     // const [isHover, setIsHover] = useState(false)
     const enableControlDiv =
         isDropDown || controlButtons || linkButton ? true : false
-    console.log('CONTROL BUTTONS', controlButtons)
     return (
         <div
             className={`flex flex-col hover:bg-wri-slate ${isShowSubRow ? 'bg-wri-slate' : ' '}  `}
