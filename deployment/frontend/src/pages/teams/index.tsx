@@ -144,7 +144,7 @@ export default function TeamsPage(
             </section>
 
             {isLoading ? (
-                <div className="mx-auto lg:h-[2406px]">
+                <div className="mx-auto h-[2898px] lg:h-[2406px]">
                     <Spinner className="mx-auto" />
                 </div>
             ) : (

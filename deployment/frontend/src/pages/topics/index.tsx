@@ -117,7 +117,7 @@ export default function TopicsPage(
                 isLoading={isLoading}
                 setQuery={setQuery}
                 query={query}
-                groupType='Topics'
+                groupType="Topics"
             />
             <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
@@ -129,10 +129,9 @@ export default function TopicsPage(
                 </div>
             </section>
             {isLoading ? (
-                <div className="mx-auto lg:h-[2406px]">
-                     <Spinner className="mx-auto" />
+                <div className="mx-auto h-[2898px] lg:h-[2406px]">
+                    <Spinner className="mx-auto" />
                 </div>
-               
             ) : (
                 <>
                     <TopicsSearchResults
@@ -157,7 +156,10 @@ export default function TopicsPage(
             <Footer
                 links={{
                     primary: { title: 'Explore Teams', href: '/teams' },
-                    secondary: { title: 'Explore Applications', href: '/applications' },
+                    secondary: {
+                        title: 'Explore Applications',
+                        href: '/applications',
+                    },
                 }}
             />
         </>
