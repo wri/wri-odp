@@ -133,7 +133,7 @@ export function DownloadButton({
                         loading={downloadSubset.isLoading}
                     >
                         <PaperAirplaneIcon className="mr-2 h-5 w-5" />
-                        Get via email
+                        Submit
                     </LoaderButton>
                 }
             />

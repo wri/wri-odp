@@ -162,7 +162,7 @@ export function DownloadButton({
                             className="whitespace-nowrap"
                             type="submit"
                         >
-                            Sign up
+                            Submit
                         </LoaderButton>
                     }
                     skipButton={
@@ -319,7 +319,7 @@ export function DownloadButton({
                             }
                         >
                             <PaperAirplaneIcon className="mr-2 h-5 w-5" />
-                            Get via email
+                            Submit
                         </LoaderButton>
                     }
                 />

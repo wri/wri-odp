@@ -9,7 +9,7 @@ const dataset = `${uuid()}-test-datasettytytyty`;
 
 describe("Upload file and create dataset", () => {
   beforeEach(function () {
-    cy.login('ckan_admin', 'test1234');
+    cy.login("ckan_admin", "test1234");
   });
 
   it("Should create dataset", () => {
@@ -30,20 +30,24 @@ describe("Upload file and create dataset", () => {
 
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
-    cy.get('input[name="maintainers.0.email"]').type("test-maintainer-1@example.com");
+    cy.get('input[name="maintainers.0.email"]').type(
+      "test-maintainer-1@example.com",
+    );
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
-    cy.get('input[name="maintainers.1.email"]').type("test-maintainer-2@example.com");
+    cy.get('input[name="maintainers.1.email"]').type(
+      "test-maintainer-2@example.com",
+    );
 
     cy.contains("Next: Datafiles").click();
-    cy.get('.datafile-accordion-trigger').eq(0).click()
+    cy.get(".datafile-accordion-trigger").eq(0).click();
     cy.get("input[type=file]").selectFile("cypress/fixtures/cities.csv", {
       force: true,
     });
     cy.wait(5000);
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
-    //FOR SOME REASON THIS SEEM NOT TO WORK 
+    //FOR SOME REASON THIS SEEM NOT TO WORK
     // IN CI/CD BUT WORKS LOCALLY
     //get button of type submit
     // cy.get('button[type="submit"]').click();
@@ -53,9 +57,9 @@ describe("Upload file and create dataset", () => {
     cy.get('button[type="submit"]').click();
     cy.wait(40000);
     cy.visit("/dashboard/datasets");
-    cy.wait(15000)
+    cy.wait(15000);
     cy.contains("Awaiting Approval").click({ timeout: 15000 });
-    cy.wait(20000)
+    cy.wait(20000);
     cy.get('input[type="search"]').type(dataset).type("{enter}");
 
     cy.contains("div", dataset).should("exist", { timeout: 15000 });
@@ -72,9 +76,9 @@ describe("Upload file and create dataset", () => {
     () => {
       cy.visit("/dashboard/datasets/" + dataset + "/edit");
       cy.contains("Data Files").click();
-      cy.get('.datafile-accordion-trigger').eq(0).click()
+      cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.contains("Datapusher").click();
-      cy.contains("Submit to Datapusher", { timeout: 50000}).click();
+      cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
       cy.contains(`Successfully submited datafile to the datapusher`, {
         timeout: 15000,
       });
@@ -89,9 +93,9 @@ describe("Upload file and create dataset", () => {
       .clear()
       .type(dataset + " EDITED");
     cy.get("textarea[name=short_description]").clear().type("test234");
-    cy.get("button").contains("Update Dataset").click({force: true,});
-     cy.wait(20000);
-    });
+    cy.get("button").contains("Update Dataset").click({ force: true });
+    cy.wait(20000);
+  });
 
   it(
     "Should show the tabular preview",
@@ -106,13 +110,13 @@ describe("Upload file and create dataset", () => {
       cy.wait(15000);
       cy.visit("/datasets/" + dataset);
       cy.get("#toggle-version").click();
-      cy.wait(10000)
+      cy.wait(10000);
       // cy.contains("View Table Preview", { timeout: 30000 }).click();
       cy.contains("01D2539e270CEbd", { timeout: 15000 });
       cy.contains("Download Data").click();
       cy.get("#download-subset-csv").click();
-      cy.wait(5000)
-      cy.contains("Get via email")
+      cy.wait(5000);
+      cy.contains("Submit");
     },
   );
 
