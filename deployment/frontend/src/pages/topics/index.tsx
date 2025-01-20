@@ -129,7 +129,10 @@ export default function TopicsPage(
                 </div>
             </section>
             {isLoading ? (
-                <Spinner className="mx-auto" />
+                <div className="mx-auto lg:h-[2406px]">
+                     <Spinner className="mx-auto" />
+                </div>
+               
             ) : (
                 <>
                     <TopicsSearchResults

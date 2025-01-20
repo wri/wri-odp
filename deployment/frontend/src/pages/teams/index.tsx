@@ -132,7 +132,10 @@ export default function TeamsPage(
                         <br />
                         If you have questions about a project&apos;s data reach
                         out to the point of contact in the dataset or to{' '}
-                        <a href="mailto:data@wri.org" className="text-blue-700 underline">
+                        <a
+                            href="mailto:data@wri.org"
+                            className="text-blue-700 underline"
+                        >
                             {' '}
                             data@wri.org
                         </a>
@@ -141,7 +144,9 @@ export default function TeamsPage(
             </section>
 
             {isLoading ? (
-                <Spinner className="mx-auto" />
+                <div className="mx-auto lg:h-[2406px]">
+                    <Spinner className="mx-auto" />
+                </div>
             ) : (
                 <>
                     <TeamsSearchResults
@@ -167,7 +172,10 @@ export default function TeamsPage(
             <Footer
                 links={{
                     primary: { title: 'Explore Topics', href: '/topics' },
-                    secondary: { title: 'Explore Applications', href: '/applications' },
+                    secondary: {
+                        title: 'Explore Applications',
+                        href: '/applications',
+                    },
                 }}
             />
         </>

@@ -302,7 +302,7 @@ export default function SearchPage(
                             />
                         ))}
                         {isLoading && (
-                            <div className="mx-auto">
+                            <div className="mx-auto lg:h-[2406px]">
                                 <Spinner />
                             </div>
                         )}
