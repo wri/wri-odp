@@ -1,5 +1,6 @@
 FROM --platform=linux/amd64 node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
+RUN npm install -g cross-spawn@7.0.5 --save-exact
 WORKDIR /app
 
 COPY package.json package-lock.json* ./

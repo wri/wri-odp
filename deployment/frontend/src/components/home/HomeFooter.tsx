@@ -153,9 +153,9 @@ export function HomeFooter() {
                                     href="https://www.portaljs.com/"
                                     target="_blank"
                                     className=" text-wri-green"
-                                    aria-label="Portal.js website"
+                                    aria-label="PortalJS website"
                                 >
-                                    Portal.js
+                                    PortalJS
                                 </a>{' '}
                                 from
                             </span>
@@ -168,7 +168,7 @@ export function HomeFooter() {
                                     <Image
                                         src="/images/datopian.png"
                                         alt=""
-                                        sizes="96px"
+                                        sizes="160px"
                                         fill
                                     ></Image>
                                 </a>
