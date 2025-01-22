@@ -224,21 +224,21 @@ export const DatasetRouter = createTRPCRouter({
                                     format: resource.format
                                         ? resource.format
                                         : resource.layerObj ||
-                                          resource.layerObjRaw
-                                        ? 'Layer'
-                                        : '',
+                                            resource.layerObjRaw
+                                          ? 'Layer'
+                                          : '',
                                     layer: resource.layerObj
                                         ? convertFormToLayerObj(
                                               resource.layerObj
                                           )
                                         : resource.layerObjRaw
-                                        ? getApiSpecFromRawObj(
-                                              resource.layerObjRaw as Record<
-                                                  string,
-                                                  any
-                                              >
-                                          )
-                                        : null,
+                                          ? getApiSpecFromRawObj(
+                                                resource.layerObjRaw as Record<
+                                                    string,
+                                                    any
+                                                >
+                                            )
+                                          : null,
                                     layerObj: resource.layerObj
                                         ? convertFormToLayerObj(
                                               resource.layerObj
@@ -285,8 +285,8 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                            ? JSON.stringify(input.spatial)
-                            : null,
+                              ? JSON.stringify(input.spatial)
+                              : null,
 
                     spatial_address: input.spatial_address
                         ? input.spatial_address
@@ -546,20 +546,20 @@ export const DatasetRouter = createTRPCRouter({
                                                   resource.layerObj
                                               )
                                             : resource.layerObjRaw
-                                            ? getApiSpecFromRawObj(
-                                                  resource.layerObjRaw as Record<
-                                                      string,
-                                                      any
-                                                  >
-                                              )
-                                            : null,
+                                              ? getApiSpecFromRawObj(
+                                                    resource.layerObjRaw as Record<
+                                                        string,
+                                                        any
+                                                    >
+                                                )
+                                              : null,
                                         package_id: input.id ?? '',
                                         format: resource.format
                                             ? resource.format
                                             : resource.layerObj ||
-                                              resource.layerObjRaw
-                                            ? 'Layer'
-                                            : '',
+                                                resource.layerObjRaw
+                                              ? 'Layer'
+                                              : '',
                                         id: resource.resourceId,
                                         datastore_active:
                                             resource.datastore_active === true
@@ -582,13 +582,14 @@ export const DatasetRouter = createTRPCRouter({
                                         description:
                                             resource.type === 'layer-raw'
                                                 ? description
-                                                : resource.layerObj
-                                                      ?.description ?? '',
+                                                : (resource.layerObj
+                                                      ?.description ?? ''),
                                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                                         title:
                                             resource.type === 'layer-raw'
                                                 ? title
-                                                : resource.layerObj?.name ?? '',
+                                                : (resource.layerObj?.name ??
+                                                  ''),
                                         url_type: resource.type,
                                         // schema: resource.schema
                                         //     ? { value: resource.schema }
@@ -631,8 +632,8 @@ export const DatasetRouter = createTRPCRouter({
                             input.spatial && input.spatial_address
                                 ? null
                                 : JSON.stringify(input.spatial)
-                                ? JSON.stringify(input.spatial)
-                                : null,
+                                  ? JSON.stringify(input.spatial)
+                                  : null,
                         spatial_address: input.spatial_address
                             ? input.spatial_address
                             : null,
@@ -955,6 +956,9 @@ export const DatasetRouter = createTRPCRouter({
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
             const user = ctx.session?.user
+            if (env.SYS_ADMIN_API_KEY == ' ') {
+                return []
+            }
             return fetchDatasetCollaborators(
                 input.id,
                 user?.apikey ?? '',

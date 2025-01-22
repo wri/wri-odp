@@ -1,5 +1,6 @@
 FROM --platform=linux/amd64 node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
+RUN npm install -g npm@latest
 WORKDIR /app
 
 COPY package.json package-lock.json* ./

@@ -180,3 +180,7 @@ def pending_dataset_delete(context: Context, data_dict: DataDict) -> AuthResult:
 
 def package_collaborator_list(context: Context, data_dict: DataDict) -> AuthResult:
     return tk.check_access("package_show", context, data_dict)
+
+def download_event_create(context: Context, data_dict: DataDict):
+    """ Only sysadmins can create download events """
+    return tk.check_access("vocabulary_create", context, data_dict)

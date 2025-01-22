@@ -1,6 +1,7 @@
 from .notification import Notification, notification
 from .pending_datasets import pending_datasets
 from .resource_location import resource_location
+from .download_event import download_event
 import logging
 
 log = logging.getLogger(__name__)
@@ -36,3 +37,10 @@ def setup_resource_location():
         log.info("Resource location table created")
     else:
         log.info("Resource location table already exists")
+
+def setup_download_event():
+    if not download_event.exists():
+        download_event.create(checkfirst=True)
+        log.info("Download event table created")
+    else:
+        log.info("Download event table already exists")
