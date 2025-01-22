@@ -1774,7 +1774,6 @@ def organization_show(context, data_dict):
     raise NotFound("Organization not found")
 
 
-
 # IMPORTANT: This is almost a copy of the original package_show, but it calls the _add_group_types
 # function so that `applications` and `groups` are separated in the response.
 @logic.side_effect_free
