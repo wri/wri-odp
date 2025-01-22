@@ -63,6 +63,8 @@ class DownloadEvent(object):
     resource_id: str
     package_name: Optional[str]
     resource_name: Optional[str]
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
     def __init__(self, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str):
         self.package_name: Optional[str] = None
@@ -177,6 +179,7 @@ class DownloadEvent(object):
             'package_name': self.package_name if hasattr(self, 'package_name') else 'Not specified',
             'resource_id': self.resource_id,
             'resource_name': self.resource_name if hasattr(self, 'resource_name') else 'Not specified',
+            'datetime': self.created_at.isoformat() if self.created_at else None,
         }
     
 def download_event_dictize(download_event: DownloadEvent, context: Context) -> dict:
