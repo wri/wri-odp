@@ -3,8 +3,7 @@ import z from 'zod'
 
 const capacitySchema = z.enum(['admin', 'editor', 'member'])
 
-
-const MemberSchema = z.object({
+export const MemberSchema = z.object({
     user: z.object({ value: z.string(), label: z.string() }),
     team_id: z.string(),
     capacity: z.object({

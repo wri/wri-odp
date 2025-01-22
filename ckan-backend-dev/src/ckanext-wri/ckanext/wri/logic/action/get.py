@@ -1530,7 +1530,7 @@ def _group_or_org_list(
         except ValueError:
             max_limit = 1000
 
-    if limit is None or int(limit) > max_limit:
+    if limit is None or int(limit) > int(max_limit):
         limit = max_limit
 
     order_by = data_dict.get('order_by', '')
@@ -1704,7 +1704,25 @@ def get_private_organizations(context: Context):
 def organization_patch(context, data_dict):
 
     visibility = data_dict.get('visibility', "public")
+    user = context.get("user")
+    isSysadmin = authz.is_sysadmin(user)
 
+    if not isSysadmin:
+        old_org = get_action("organization_show")(context, data_dict)
+        if old_org.get("visibility", "public") == "private":
+            raise ValidationError({"message": 
+                                   _("Organization has private visibility and cannot be updated; Only sysadmin can update private organizations")
+                                   })
+
+
+    if visibility == "public":
+        parent_org = data_dict.get("parent")
+        parent_org = parent_org.get("value") if parent_org else None
+        if parent_org:
+            parent_org = get_action("organization_show")(context, {"id": parent_org})
+            if parent_org.get("visibility", "public") == "private":
+                raise ValidationError({"message": _("Parent Organization has private visibility and cannot create public organizations")})
+            
     if visibility == "private":
         rdata_dict = {
             "q": "", 
@@ -1743,6 +1761,8 @@ def validate_visibility(context, data_dict):
 def organization_show(context, data_dict):
     data_dict = old_organization_show(context, data_dict)
     user = context.get("user")
+
+
     if data_dict.get("visibility", "public") in ["public", "internal"] or authz.is_sysadmin(user):
         return data_dict
     

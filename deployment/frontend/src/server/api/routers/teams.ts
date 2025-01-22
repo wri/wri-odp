@@ -53,7 +53,7 @@ export const teamRouter = createTRPCRouter({
                         },
                     }
                 )
-                const teams: CkanResponse<Organization[]> = await teamRes.json()
+                const teams: CkanResponse<WriOrganization[]> = await teamRes.json()
                 if (!teams.success && teams.error) {
                     if (teams.error.message)
                         throw Error(replaceNames(teams.error.message, true))

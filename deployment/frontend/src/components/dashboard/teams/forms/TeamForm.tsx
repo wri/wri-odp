@@ -140,10 +140,25 @@ export default function TeamForm({
                         id="visibility"
                         formObj={formObj}
                         name="visibility"
-                        options={[
-                            { label: 'Public', value: 'public' },
-                            { label: 'Private', value: 'private' },
-                        ]}
+                        options={
+                            watch('parent')?.value !== '' &&
+                            possibleParents.data?.find(
+                                (a) =>
+                                    a.name === watch('parent')?.value &&
+                                    a.visibility === 'private'
+                            )
+                                ? [
+                                      {
+                                          label: 'Private',
+                                          value: 'private',
+                                          default: true,
+                                      },
+                                  ]
+                                : [
+                                      { label: 'Public', value: 'public' },
+                                      { label: 'Private', value: 'private' },
+                                  ]
+                        }
                         placeholder="Select visibility"
                     />
                     <ErrorDisplay name="parent" errors={errors} />
