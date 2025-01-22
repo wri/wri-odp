@@ -19,7 +19,7 @@ from ckanext.wri.logic.action.send_group_notification import (
     GroupNotificationParams,
     send_group_notification,
 )
-from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
+from ckanext.wri.logic.action.action_helpers import stringify_actor_objects, _before_dataset_create_or_update
 import ckan.plugins.toolkit as tk
 import ckan.logic as logic
 from ckan.common import _
@@ -158,6 +158,7 @@ def notification_bulk_update(
 
 def pending_dataset_update(context: Context, data_dict: DataDict):
     """Update a Pending Dataset"""
+    context["for_approval"] = True
     package_id = data_dict.get("package_id")
     package_data = data_dict.get("package_data")
 
@@ -166,8 +167,6 @@ def pending_dataset_update(context: Context, data_dict: DataDict):
 
     if not package_data:
         raise tk.ValidationError(_("package_data is required"))
-
-    tk.check_access("package_create", context, package_data)
 
     pending_dataset = None
 
@@ -192,6 +191,7 @@ def issue_delete(context: Context, data_dict: DataDict):
 
 def package_patch(context: Context, data_dict: DataDict):
     validate_visibility(context, data_dict)
+    context["for_update"] = True
     dataset_id = data_dict.get("id")
     try:
         pending_dataset_dict = tk.get_action("pending_dataset_show")(
@@ -320,6 +320,7 @@ def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.Pa
     :rtype: dictionary
 
     """
+    context["for_update"] = True
     model = context["model"]
     name_or_id = data_dict.get("id") or data_dict.get("name")
     if name_or_id is None:
@@ -467,6 +468,7 @@ def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.Pac
     You must be authorized to edit the dataset and the groups that it belongs
     to.
     """
+    _before_dataset_create_or_update(context, data_dict)
     _check_access("package_patch", context, data_dict)
 
     show_context: Context = {
@@ -494,6 +496,7 @@ def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.Pac
 
 def approve_pending_dataset(context: Context, data_dict: DataDict):
     dataset_id = data_dict.get("dataset_id")
+    context["for_approval"] = True
     # Fetch Pending Dataset Information
     try:
         pending_dataset_dict = tk.get_action("pending_dataset_show")(
@@ -652,6 +655,7 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
 
 
 # IMPORTANT: This function includes an override/change for authors/maintainers (using old_package_update instead of package_update).
+# It also includes an override/change for multiple application support (adds "for_update": True to the context).
 # This is not a 1:1 match with the original function, though all other logic is the same.
 def resource_update(
     context: Context, data_dict: DataDict
@@ -675,6 +679,7 @@ def resource_update(
     :rtype: string
 
     """
+    context["for_update"] = True
     model = context["model"]
     id: str = _get_or_bust(data_dict, "id")
 
@@ -738,3 +743,21 @@ def resource_update(
         plugin.after_resource_update(context, resource)
 
     return resource
+
+
+# IMPORTANT: This function includes an override/change to support multiple applications
+# We need to move the applications back to the groups field before calling the original package_update function
+def package_update(context: Context, data_dict: DataDict) -> ActionResult.PackageUpdate:
+    applications = data_dict.get("applications", [])
+
+    if applications:
+        if isinstance(applications, list) and all(
+            isinstance(app, dict) for app in applications
+        ):
+            data_dict["groups"] = data_dict.get("groups", []) + applications
+        else:
+            raise ValidationError(
+                {"applications": _("Applications must be a list of dictionaries")}
+            )
+
+    return old_package_update(context, data_dict)

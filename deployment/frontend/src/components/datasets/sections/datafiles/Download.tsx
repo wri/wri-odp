@@ -1,33 +1,34 @@
 import { Button, LoaderButton } from '@/components/_shared/Button'
-import { ErrorDisplay } from '@/components/_shared/InputGroup'
 import dynamic from 'next/dynamic'
-const Modal = dynamic(() => import('@/components/_shared/Modal'), {
-    ssr: false,
-})
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from '@/components/_shared/Popover'
-import Spinner from '@/components/_shared/Spinner'
 import { Resource } from '@/interfaces/dataset.interface'
 import { api } from '@/utils/api'
 import { convertBytes } from '@/utils/convertBytes'
-import { useDataset } from '@/utils/storeHooks'
 import {
     ArrowDownTrayIcon,
     PaperAirplaneIcon,
 } from '@heroicons/react/24/outline'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import { z } from 'zod'
-import { useQuery } from 'react-query'
 import { env } from '@/env.mjs'
+import { useState } from 'react'
+import { toast } from 'react-toastify'
+import {
+    DirectDownloadPopup,
+    DownloadEventForm,
+    DownloadPopup,
+} from '@/components/_shared/DownloadPopup'
+import { WriDataset } from '@/schema/ckan.schema'
 
-export function DownloadButton({ datafile }: { datafile: Resource }) {
-    const { dataset } = useDataset()
+export function DownloadButton({
+    datafile,
+    dataset,
+}: {
+    datafile: Resource
+    dataset: WriDataset
+}) {
     const [convertTo, setConvertTo] = useState<'CSV' | 'XLSX' | 'TSV' | 'XML'>()
     const [open, setOpen] = useState(false)
     const { data: signedUrl, isLoading } = api.uploads.getPresignedUrl.useQuery(
@@ -36,23 +37,19 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
         },
         { enabled: !!datafile.key }
     )
-
-    const layerObj = datafile.layerObj
-    const layerCfg = layerObj?.layerConfig
-    const layerSrc = layerCfg?.source
-    const layerProvider = layerSrc?.provider
-    const sql = layerProvider?.layers?.at(0)?.options?.sql
-    if (
-        (datafile.format == 'Layer' &&
-            // @ts-ignore
-            datafile?.layerObj?.provider !=
-                // @ts-ignore
-                'cartodb' &&
-            sql) ||
-        (!datafile.key && !datafile.url)
-    ) {
-        return null
-    }
+    const createDownloadEvent = api.downloadEvents.createEvents.useMutation({
+        onSuccess: () => {
+            window.open(pendingDownloadUrl, '_target')
+            setShowDownloadForm(false)
+        },
+        onError: (err) => {
+            toast('Failed to send your information', {
+                type: 'error',
+            }),
+                window.open(pendingDownloadUrl, '_target')
+            setShowDownloadForm(false)
+        },
+    })
 
     const size = datafile.size
     const mode = datafile.key ? 'SIGNED_URL' : 'RES_URL'
@@ -82,31 +79,150 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
     const tabularConversionOptions = conversibleTabularFormats.filter(
         (f) => f != format.toUpperCase()
     )
+    const requestDatafileConversionMutation =
+        api.dataset.requestDatafileConversion.useMutation()
 
-    const download = (url: string) => window.open(url, '_target')
+    const [showDownloadForm, setShowDownloadForm] = useState(false)
+    const [pendingDownloadUrl, setPendingDownloadUrl] = useState<string>('')
+
+    const download = (url: string, isOriginalFormat = false) => {
+        if (isOriginalFormat) {
+            setPendingDownloadUrl(url)
+            setShowDownloadForm(true)
+        } else {
+            window.open(url, '_target')
+        }
+    }
+
+    const handleFormSubmit = (data: DownloadEventForm) => {
+        const _data = {
+            ...data,
+            resources: [datafile.id],
+            package_id: datafile.package_id ?? '',
+            acceptTerms: true,
+        }
+        createDownloadEvent.mutate(_data)
+    }
+
+    let sql = `SELECT * FROM "${datafile.id}"`
+    const handleFormSubmitConvertion = (data: any) => {
+        const _data = {
+            ...data,
+            resources: [datafile.id],
+            package_id: datafile.package_id ?? '',
+        }
+        requestDatafileConversionMutation.mutate(
+            {
+                email: data.email,
+                format: convertTo ?? 'CSV',
+                // @ts-ignore
+                rw_id: datafile?.layerObj?.dataset ?? '',
+                provider: datafile.rw_id ? 'rw' : 'datastore',
+                sql: sql,
+                resource_id: datafile.id,
+                carto_account: '',
+            },
+            {
+                onSuccess: () => {
+                    toast("You'll receive an email when the file is ready", {
+                        type: 'success',
+                    })
+                    createDownloadEvent.mutate(_data)
+
+                    setOpen(false)
+                },
+                onError: (err) => {
+                    console.error(err)
+
+                    toast('Failed to request file', {
+                        type: 'error',
+                    })
+                },
+            }
+        )
+    }
+
+    const handleSkip = () => {
+        window.open(pendingDownloadUrl, '_target')
+        setShowDownloadForm(false)
+    }
 
     if (!datafile.datastore_active)
         return (
-            <button
-                onClick={() => download(originalResourceDownloadUrl)}
-                id="download"
-                data-resource={datafile.title ?? datafile.name!}
-                className="cursor-pointer download-datafile w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
-            >
-                <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
-                <div className="font-acumin text-xs sm:text-sm font-normal text-black">
-                    {isLoading && mode == 'SIGNED_URL' ? 'Loading' : 'Download'}
-                </div>
-                {size && (
-                    <div className="font-acumin text-xs sm:text-xs font-normal text-black">
-                        {convertBytes(size)}
+            <>
+                <DirectDownloadPopup
+                    title="Download Data"
+                    isOpen={showDownloadForm}
+                    onClose={() => setShowDownloadForm(false)}
+                    dataset={dataset}
+                    onSubmit={handleFormSubmit}
+                    downloadButton={
+                        <LoaderButton
+                            loading={createDownloadEvent.isLoading}
+                            className="whitespace-nowrap"
+                            type="submit"
+                        >
+                            Submit
+                        </LoaderButton>
+                    }
+                    skipButton={
+                        <button
+                            type="button"
+                            onClick={handleSkip}
+                            className="whitespace-nowrap underline"
+                        >
+                            No thanks, proceed to download
+                        </button>
+                    }
+                />
+                <button
+                    onClick={() => download(originalResourceDownloadUrl, true)}
+                    id="download"
+                    data-resource={datafile.title ?? datafile.name!}
+                    className="cursor-pointer download-datafile w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
+                >
+                    <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                    <div className="font-acumin text-xs sm:text-sm font-normal text-black">
+                        {isLoading && mode == 'SIGNED_URL'
+                            ? 'Loading'
+                            : 'Download'}
                     </div>
-                )}
-            </button>
+                    {size && (
+                        <div className="font-acumin text-xs sm:text-xs font-normal text-black">
+                            {convertBytes(size)}
+                        </div>
+                    )}
+                </button>
+            </>
         )
 
     return (
         <>
+            <DirectDownloadPopup
+                title="Download Data"
+                isOpen={showDownloadForm}
+                onClose={() => setShowDownloadForm(false)}
+                onSubmit={handleFormSubmit}
+                dataset={dataset}
+                downloadButton={
+                    <LoaderButton
+                        loading={createDownloadEvent.isLoading}
+                        className="whitespace-nowrap"
+                        type="submit"
+                    >
+                        Sign up
+                    </LoaderButton>
+                }
+                skipButton={
+                    <button
+                        onClick={handleSkip}
+                        type="button"
+                        className="whitespace-nowrap underline"
+                    >
+                        No thanks, proceed to download
+                    </button>
+                }
+            />
             <Popover>
                 <Component className="download-datafile w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400">
                     <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
@@ -130,7 +246,7 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                                 id="download"
                                 data-resource={datafile.title ?? datafile.name!}
                                 onClick={() =>
-                                    download(originalResourceDownloadUrl)
+                                    download(originalResourceDownloadUrl, true)
                                 }
                             >
                                 Original Format{' '}
@@ -187,139 +303,14 @@ export function DownloadButton({ datafile }: { datafile: Resource }) {
                 </PopoverContent>
             </Popover>
             {convertTo && (
-                <DownloadModal
-                    format={convertTo}
-                    open={open}
-                    setOpen={setOpen}
-                    datafile={datafile}
-                />
-            )}
-        </>
-    )
-}
-
-function DownloadModal({
-    open,
-    setOpen,
-    format,
-    datafile,
-}: {
-    open: boolean
-    setOpen: (open: boolean) => void
-    format: 'XLSX' | 'CSV' | 'TSV' | 'XML'
-    datafile: Resource
-}) {
-    const formSchema = z.object({
-        email: z.string().email(),
-    })
-    const { data: layerObj, isLoading: layerObjLoading } = useQuery(
-        [datafile.rw_id],
-        async () => {
-            const res = await fetch(
-                `https://api.resourcewatch.org/v1/layer/${datafile.rw_id}`
-            )
-            const obj = await res.json()
-            return obj.data.attributes
-        },
-        {
-            enabled: datafile.format == 'Layer',
-        }
-    )
-
-    type FormSchema = z.infer<typeof formSchema>
-
-    const requestDatafileConversionMutation =
-        api.dataset.requestDatafileConversion.useMutation()
-
-    const formObj = useForm<FormSchema>({ resolver: zodResolver(formSchema) })
-    const {
-        handleSubmit,
-        formState: { errors },
-        register,
-    } = formObj
-
-    let isLoading = requestDatafileConversionMutation.isLoading
-    let sql = `SELECT * FROM "${datafile.id}"`
-    let cartoAccount: string | undefined = ''
-    if (datafile.format == 'Layer') {
-        const layerCfg = layerObj?.layerConfig
-        const layerSrc = layerCfg?.source
-        const layerProvider = layerSrc?.provider
-        sql = layerProvider?.layers?.at(0)?.options?.sql
-        cartoAccount = layerProvider?.account
-    }
-    return (
-        <Modal open={open} setOpen={setOpen} className="max-w-[48rem]">
-            <div className="p-6">
-                <div className="border-b border-zinc-100 pb-5">
-                    <div className="font-acumin text-3xl font-normal text-black">
-                        This {format} file is being prepared for download
-                    </div>
-                    <div className="font-acumin text-base font-light text-neutral-600">
-                        Please enter your email address so that you receive the
-                        download link via email when it's ready.
-                    </div>
-                </div>
-                {layerObjLoading && (
-                    <div className="w-full flex items-center my-10 justify-center">
-                        <Spinner />
-                    </div>
-                )}
-                {!isLoading && !layerObjLoading && (
-                    <form
-                        id="download"
-                        data-resource={datafile.title ?? datafile.name!}
-                        onSubmit={handleSubmit(
-                            async (data) => {
-                                requestDatafileConversionMutation.mutate(
-                                    {
-                                        email: data.email,
-                                        format: format,
-                                        // @ts-ignore
-                                        rw_id:
-                                            datafile?.layerObj?.dataset ?? '',
-                                        provider: datafile.rw_id
-                                            ? 'rw'
-                                            : 'datastore',
-                                        sql: sql,
-                                        resource_id: datafile.id,
-                                        carto_account: cartoAccount ?? '',
-                                    },
-                                    {
-                                        onSuccess: () => {
-                                            toast(
-                                                "You'll receive an email when the file is ready",
-                                                { type: 'success' }
-                                            )
-
-                                            setOpen(false)
-                                        },
-                                        onError: (err) => {
-                                            console.error(err)
-
-                                            toast('Failed to request file', {
-                                                type: 'error',
-                                            })
-                                        },
-                                    }
-                                )
-                            },
-                            (err) => {
-                                console.error(err)
-                                toast('Failed to request file', {
-                                    type: 'error',
-                                })
-                            }
-                        )}
-                        className="flex flex-col sm:flex-row gap-5 pt-6"
-                    >
-                        <input
-                            type="email"
-                            id="email"
-                            className="block w-full rounded-md border-b border-wri-green py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
-                            placeholder="you@example.com"
-                            {...register('email')}
-                        />
+                <DownloadPopup
+                    title="The selected datafiles are being prepared for download"
+                    subtitle="Please enter your information so that you receive the download link via email"
+                    isOpen={open}
+                    onClose={() => setOpen(false)}
+                    dataset={dataset}
+                    onSubmit={handleFormSubmitConvertion}
+                    downloadButton={
                         <LoaderButton
                             className="whitespace-nowrap"
                             type="submit"
@@ -328,12 +319,11 @@ function DownloadModal({
                             }
                         >
                             <PaperAirplaneIcon className="mr-2 h-5 w-5" />
-                            Get via email
+                            Submit
                         </LoaderButton>
-                    </form>
-                )}
-                <ErrorDisplay errors={errors} name="email" />
-            </div>
-        </Modal>
+                    }
+                />
+            )}
+        </>
     )
 }

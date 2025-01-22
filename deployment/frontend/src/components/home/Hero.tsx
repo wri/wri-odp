@@ -31,8 +31,13 @@ export function Hero() {
     const router = useRouter()
     const navigation = [
         {
-            title: 'Explore',
+            title: 'Search',
             href: '/search',
+            active: false,
+        },
+        {
+            title: 'Topics',
+            href: '/topics',
             active: false,
         },
         {
@@ -41,8 +46,8 @@ export function Hero() {
             active: false,
         },
         {
-            title: 'Topics',
-            href: '/topics',
+            title: 'Applications',
+            href: '/applications',
             active: false,
         },
     ]
@@ -215,7 +220,7 @@ export function Hero() {
                         <h1 className="max-w-[592px] pr-5 font-acumin text-4xl font-semibold text-white">
                             Data Explorer - Beta
                         </h1>
-                        <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
+                        <p className="font-acumin max-w-[705px] font-light text-[#DFDFDF] leading-[30px] text-[23px]">
                             WRI produces and curates hundreds of datasets as
                             part of our commitment to turn information into
                             action. These products are based on our research and
@@ -232,14 +237,14 @@ export function Hero() {
                             including objectivity and rigor.
                         </p>
                         <br />
-                        <p className="font-['Acumin Pro SemiCondensed'] max-w-[705px] text-2xl font-light text-neutral-200">
+                        <p className="font-acumin max-w-[705px] leading-[30px] text-[23px] font-light text-[#DFDFDF]">
                             Explore using the search bar or use more advanced
                             filters.
                         </p>
                         <form
                             onSubmit={handleSubmit((data) => {
                                 router.push({
-                                    pathname: '/search_advanced',
+                                    pathname: '/search',
                                     query: `search=%5B%7B%22title%22%3A%22Search%22%2C%22key%22%3A%22search%22%2C%22label%22%3A%22${encodeURIComponent(
                                         data.search
                                     )}%22%2C%22value%22%3A%22${encodeURIComponent(
@@ -248,14 +253,18 @@ export function Hero() {
                                 })
                             })}
                         >
-                            <div className="mt-10 flex relative items-start justify-start gap-x-6 w-full max-w-[932px]">
+                            <div className="mt-10 flex relative items-start justify-start  w-full max-w-[876px]">
                                 <input
-                                    placeholder="Search data"
+                                    placeholder="Search datasets - try “energy”, “Global Forest Watch”, or “food”"
                                     aria-label="search"
-                                    className="placeholder:text-white text-white text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white bg-opacity-25 rounded-[3px] border-b-2 border-amber-400"
+                                    className="placeholder:text-[#5f5e5e]  flex-shrink flex-grow  placeholder:italic placeholder:font-light placeholder:leading-tight placeholder:sm:font-normal placeholder:sm:leading-normal text-[#4f4e4e]  text-xs md:text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white rounded-tl-[3px] rounded-bl-[3px] border-r-0"
                                     {...register('search')}
                                 />
-                                <MagnifyingGlassIcon className="w-7 h-7 text-white absolute top-[18px] right-4" />
+                                
+                                <button
+                                    type="submit"
+                                    className="px-8 py-4 text-[26px] font-semibold  font-acumin leading-[29.25px] text-black bg-wri-gold rounded-tr-[3px] rounded-br-[3px] h-[65px] w-full max-w-[149px] border-l-0"
+                                >Search</button>
                             </div>
                         </form>
                     </div>

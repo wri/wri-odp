@@ -15,7 +15,7 @@ import {
     useForm,
 } from 'react-hook-form'
 
-export interface Option<V> {
+interface Option<V> {
     label: string
     value: V
     default?: boolean

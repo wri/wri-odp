@@ -1,12 +1,15 @@
-FROM --platform=linux/amd64 node:16-alpine3.17 AS deps
-RUN apk add --no-cache libc6-compat openssl1.1-compat
+FROM --platform=linux/amd64 node:20-alpine AS deps
+RUN apk add --no-cache libc6-compat openssl
+RUN npm install -g cross-spawn@7.0.5 --save-exact
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
+COPY tableschema-1.12.6.tgz ./
+COPY layer-manager-v3.1.0-wri-gfw.tgz ./
 
 RUN npm ci -f
 
-FROM --platform=linux/amd64 node:16-alpine3.17 AS builder
+FROM --platform=linux/amd64 node:20-alpine AS builder
 ARG NEXTAUTH_SECRET
 ARG NEXTAUTH_URL
 ARG CKAN_URL
@@ -20,14 +23,18 @@ ARG RW_API_KEY
 ARG NEXT_PUBLIC_DISABLE_HOTJAR
 ARG NEXT_PUBLIC_HOTJAR_ID
 ARG NEXT_PUBLIC_GFW_API_KEY
+ARG NEXT_PUBLIC_DEPLOYMENT_TYPE
 ARG OSANO_URL
+ARG OKTA_CLIENT_ID
+ARG OKTA_ISSUER
+ARG OKTA_CLIENT_SECRET
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 RUN SKIP_ENV_VALIDATION=1 npm run build
 
-FROM --platform=linux/amd64 node:16-alpine3.17 AS runner
+FROM --platform=linux/amd64 node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production

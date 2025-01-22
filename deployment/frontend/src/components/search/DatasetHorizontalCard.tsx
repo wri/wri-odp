@@ -9,11 +9,15 @@ import {
     ArrowPathIcon,
     ClockIcon,
     MapPinIcon,
+    UserGroupIcon,
 } from '@heroicons/react/24/outline'
+
+import { ChevronRightIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import {
     Tooltip,
     TooltipContent,
+    TooltipPortal,
     TooltipProvider,
     TooltipTrigger,
 } from '../_shared/Tooltip'
@@ -43,149 +47,38 @@ export default function DatasetHorizontalCard({
 
     return (
         <Link href={`/datasets/${dataset.name}`}>
-            <div className="grid gap-y-3 border-b-2 border-wri-green bg-white p-5 mb-2 shadow-wri transition hover:bg-slate-100 lg:grid-cols-5">
-                <div className="col-span-full lg:col-span-4">
-                    <div className="pr-4">
-                        <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green line-clamp-1 h-3">
-                            {dataset.organization?.title.toUpperCase()}
-                        </p>
-
-                        <div className="flex items-center">
-                            <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900 line-clamp-1">
-                                {dataset.title}
-                            </h3>
-                            {dataset.visibility_type &&
-                                session.status == 'authenticated' &&
-                                dataset.visibility_type != 'public' && (
-                                    <Chip
-                                        text={
-                                            visibilityTypeLabels[
-                                                dataset.visibility_type
-                                            ] ?? ''
-                                        }
-                                    />
-                                )}
-                        </div>
-
-                        <p className="font-['Acumin Pro SemiCondensed'] text-base font-light text-stone-900 h-[4.5em] line-clamp-3">
-                            {dataset.short_description ?? ''}
-                        </p>
-                        <div className="mt-[0.33rem] flex justify-start gap-x-3">
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <div className="flex flex-row items-center gap-x-1">
-                                            <ArrowPathIcon className="h-3 w-3 text-blue-800" />
-                                            <p className="font-['Acumin Pro SemiCondensed'] text-xs font-light leading-snug text-stone-900 sm:text-sm">
-                                                {dataset.metadata_modified
-                                                    ? new Date(
-                                                          dataset.metadata_modified
-                                                      ).toLocaleDateString(
-                                                          'en-US',
-                                                          {
-                                                              day: 'numeric',
-                                                              month: 'short',
-                                                              year: 'numeric',
-                                                          }
-                                                      )
-                                                    : ''}
-                                            </p>
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Last modified</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-
-                            {(dataset.temporal_coverage_start ||
-                                dataset.temporal_coverage_end) && (
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <div className="flex items-center gap-x-1">
-                                                <ClockIcon className="h-3 w-3 text-blue-800" />
-                                                <p className="font-['Acumin Pro SemiCondensed'] text-xs font-light leading-snug text-stone-900 sm:text-sm">
-                                                    {dataset.temporal_coverage_start ||
-                                                        '?'}
-                                                    {' - '}
-                                                    {dataset.temporal_coverage_end ||
-                                                        '?'}
-                                                </p>
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            Temporal Coverage
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            )}
-                            {dataset.spatial_address && (
-                                <div className="flex items-center gap-x-1">
-                                    <MapPinIcon className="h-3 w-3 text-blue-800" />
-                                    <p className="font-['Acumin Pro SemiCondensed'] text-xs font-light leading-snug text-stone-900 sm:text-sm">
-                                        {dataset.spatial_address}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <div className="mt-4 flex justify-start gap-x-3 h-7">
-                        <div
-                            className={`flex justify-start gap-x-3 ${
-                                (dataset.cautions ||
-                                    !dataset.technical_notes) &&
-                                (hasMapView || hasTabularView)
-                                    ? 'border-r border-black'
-                                    : ''
-                            } pr-3`}
+            <div className="flex flex-col border border-[#C9C9C9] hover:border-wri-green bg-white p-5 mb-2 shadow-wri-dcard transition hover:bg-[#EFF5F7] group rounded-[4px]">
+                <div className="flex flex-col lg:flex-row gap-y-2">
+                    <div className="flex items-center grow shrink ">
+                        <h3
+                            className="font-acumin text-[18px] font-bold leading-[28px] text-stone-900 line-clamp-1 group-hover:text-wri-green"
+                            tabIndex={0}
                         >
-                            <ChartViewIcon dataset={dataset} />
-                            <MapViewIcon dataset={dataset} />
-                            <TabularViewIcon dataset={dataset} />
-                        </div>
-                        {dataset.cautions && (
-                            <div className="rounded-full bg-stone-100 p-1 w-7 h-7">
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600" />
-                                        </TooltipTrigger>
-                                        <TooltipContent className="bg-neutral-200">
-                                            <p>Dataset contains cautions</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            </div>
-                        )}
-                        {!dataset.technical_notes && (
-                            <div className="rounded-full bg-stone-100 p-1 w-7 h-7">
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <ExclamationCircleIcon className="h-5 w-5 text-red-600" />
-                                        </TooltipTrigger>
-                                        <TooltipContent className="bg-neutral-200 ">
-                                            <p>
-                                                Not approved by
-                                                RDI
-                                            </p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            </div>
-                        )}
+                            {dataset.title}
+                        </h3>
+                        {dataset.visibility_type &&
+                            session.status == 'authenticated' &&
+                            dataset.visibility_type != 'public' && (
+                                <Chip
+                                    text={
+                                        visibilityTypeLabels[
+                                            dataset.visibility_type
+                                        ] ?? ''
+                                    }
+                                />
+                            )}
                     </div>
-                </div>
-                <div className="col-span-full w-full border-t border-stone-200 lg:col-span-1 lg:border-l lg:border-t-0">
-                    <div className="flex gap-[5px] pt-3 lg:flex-col lg:pl-5 lg:pt-0">
+
+                    <div className="flex lg:ml-auto gap-x-[12px]  shrink-0">
                         {formats.slice(0, 4).map((format) => (
                             <span
                                 key={`dataset-${dataset.name}-format-${format}`}
-                                className={`flex h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black ${
+                                className={` font-acumin inline-flex  w-fit items-center justify-center rounded-[9999px]  px-[12px] py-[4px] text-center text-[12px] font-bold leading-[16px] ${
                                     format &&
-                                    format in Object.keys(formatColors)
-                                        ? getFormatColor(format)
+                                    Object.keys(formatColors).includes(
+                                        format.toLowerCase()
+                                    )
+                                        ? getFormatColor(format.toLowerCase())
                                         : 'bg-wri-light-green'
                                 }`}
                             >
@@ -193,6 +86,101 @@ export default function DatasetHorizontalCard({
                             </span>
                         ))}
                     </div>
+                </div>
+
+                <p className="font-acumin text-[1rem] leading-[22px] font-light text-[#1A1919] line-clamp-4 mt-[12px] w-full  h-[88px] lg:w-[733.783px] mb-[21px] ">
+                    {dataset.short_description ?? ''}
+                </p>
+
+                <div className="flex flex-col lg:flex-row gap-x-1.5 gap-y-2">
+                    <div className="flex items-center grow shrink gap-x-[16px] gap-y-[4px] flex-wrap">
+                        {dataset.organization?.title && (
+                            <TooltipProvider delayDuration={100}>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <div className="flex flex-row items-center gap-x-1">
+                                            <UserGroupIcon className="h-3 w-3 text-wri-green" />
+                                            <p className="font-acumin text-[14px] leading-[14px] font-normal text-[#4F4E4E] ">
+                                                {dataset.organization?.title}
+                                            </p>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipPortal>
+                                        <TooltipContent>
+                                            <p>Team</p>
+                                        </TooltipContent>
+                                    </TooltipPortal>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                        <TooltipProvider delayDuration={100}>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <div className="flex flex-row items-center gap-x-1">
+                                        <ArrowPathIcon className="h-3 w-3 text-wri-green" />
+                                        <p className="font-acumin text-[14px] leading-[14px] font-normal text-[#4F4E4E] ">
+                                            {dataset.metadata_modified
+                                                ? 'Last Updated ' +
+                                                  new Date(
+                                                      dataset.metadata_modified
+                                                  )
+                                                      .toLocaleDateString(
+                                                          'en-US',
+                                                          {
+                                                              day: 'numeric',
+                                                              month: 'short',
+                                                              year: 'numeric',
+                                                          }
+                                                      )
+                                                      .replace(
+                                                          /^([a-zA-Z]+) (\d+), (\d+)$/,
+                                                          '$2 $1 $3'
+                                                      )
+                                                : ''}
+                                        </p>
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipPortal>
+                                    <TooltipContent>
+                                        <p>Last modified</p>
+                                    </TooltipContent>
+                                </TooltipPortal>
+                            </Tooltip>
+                        </TooltipProvider>
+                        {(dataset.temporal_coverage_start ||
+                            dataset.temporal_coverage_end) && (
+                            <TooltipProvider delayDuration={100}>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <div className="flex flex-row items-center gap-x-1">
+                                            <ClockIcon className="h-3 w-3 text-blue-800" />
+                                            <p className="font-acumin flex text-[14px] leading-[14px] font-normal text-[#4F4E4E]">
+                                                {dataset.temporal_coverage_start ||
+                                                    '?'}
+                                                {' - '}
+                                                {dataset.temporal_coverage_end ||
+                                                    '?'}
+                                            </p>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipPortal>
+                                        <TooltipContent>
+                                            Temporal Coverage
+                                        </TooltipContent>
+                                    </TooltipPortal>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                    </div>
+
+                    <button className="flex justify-end lg:justify-start lg:ml-auto shrink-0 group-hover:text-wri-green">
+                        <div className="text-base  leading-[24px] font-bold">
+                            View dataset
+                        </div>
+                        <div className="pt-0.5">
+                            <ChevronRightIcon className="h-4 w-4 stroke-current stroke-[3] " />
+                        </div>
+                    </button>
                 </div>
             </div>
         </Link>

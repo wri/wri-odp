@@ -117,7 +117,6 @@ def package_update(up_func, context, data_dict):
                 # (ie if user is a collaborator)
                 if user_obj:
                     if user_obj.id == package.creator_user_id:
-                        print("CREATOR ID")
                         return {"success": True}
                     if (
                         authz.user_is_collaborator_on_dataset(
@@ -173,13 +172,15 @@ def pending_dataset_show(context: Context, data_dict: DataDict) -> AuthResult:
 
 
 def pending_dataset_update(context: Context, data_dict: DataDict) -> AuthResult:
-    #print("PENDING DATASET UPDATE", flush=True)
-    #print(data_dict, flush=True)
+    print("CHECKING PENDING DATASET UPDATE AUTH", flush=True)
     return tk.check_access("package_update", context, data_dict)
-
 
 def pending_dataset_delete(context: Context, data_dict: DataDict) -> AuthResult:
     return tk.check_access("package_delete", context, data_dict)
 
 def package_collaborator_list(context: Context, data_dict: DataDict) -> AuthResult:
     return tk.check_access("package_show", context, data_dict)
+
+def download_event_create(context: Context, data_dict: DataDict):
+    """ Only sysadmins can create download events """
+    return tk.check_access("vocabulary_create", context, data_dict)

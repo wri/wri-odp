@@ -37,6 +37,9 @@ export function About({
             ? highlighted(`tags[${index}].name`)
             : highlighted(`tags[${index}]`)
     }
+    const topics = dataset.groups?.filter((group) => group.type === 'group') ?? []
+    //@ts-ignore
+    const applications = dataset.groups?.filter((group) => group.type === 'application') ?? []
     return (
         <div className="flex flex-col gap-y-4 py-2">
             <div className="font-acumin text-base font-normal text-black">
@@ -136,7 +139,7 @@ export function About({
                         </>
                     </div>
                 )}
-                {dataset.groups && dataset.groups.length > 0 && (
+                {topics.length > 0 && (
                     <div className="flex items-center gap-x-1">
                         <>
                             <dt
@@ -148,14 +151,39 @@ export function About({
                                 Topics:{' '}
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
-                                {dataset.groups.map((topic, topicIdx) => (
+                                {topics.map((topic, topicIdx) => (
                                     <Link href={`/topics/${topic.name}`}>
                                         {topic.display_name ?? topic.name}
-                                        {dataset.groups &&
-                                        topicIdx !== dataset.groups?.length - 1
+                                        {topics &&
+                                        topicIdx !== topics.length - 1
                                             ? ', '
                                             : ''}
                                     </Link>
+                                ))}
+                            </dd>
+                        </>
+                    </div>
+                )}
+                {applications.length > 0 && (
+                    <div className="flex items-center gap-x-1">
+                        <>
+                            <dt
+                                className={`font-acumin text-sm font-semibold text-neutral-700 ${highlighted(
+                                    'groups'
+                                )}`}
+                            >
+                                {' '}
+                                Applications:{' '}
+                            </dt>
+                            <dd className="mb-1 text-sm font-light text-stone-900">
+                                {applications.map((application, applicationIdx) => (
+                                    <span>
+                                        {application.display_name ?? application.name}
+                                        {applications &&
+                                        applicationIdx !== applications.length - 1
+                                            ? ', '
+                                            : ''}
+                                    </span>
                                 ))}
                             </dd>
                         </>

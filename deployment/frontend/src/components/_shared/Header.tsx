@@ -38,8 +38,13 @@ export default function Header() {
 
     const navigation = [
         {
-            title: 'Explore',
+            title: 'Search',
             href: '/search',
+            active: false,
+        },
+        {
+            title: 'Topics',
+            href: '/topics',
             active: false,
         },
         {
@@ -48,8 +53,8 @@ export default function Header() {
             active: false,
         },
         {
-            title: 'Topics',
-            href: '/topics',
+            title: 'Applications',
+            href: '/applications',
             active: false,
         },
     ]

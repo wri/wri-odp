@@ -53,7 +53,13 @@ export default function RedirectedSearchInput() {
                     </div>
                 </div>
             </div>
-            <div className="mx-auto my-auto flex w-full max-w-[1380px] space-x-4 px-4 font-acumin sm:px-6 xxl:px-0">
+
+            <div className="mx-auto my-auto flex flex-col w-full max-w-[1380px] space-x-4 px-4 font-acumin sm:px-6 xxl:px-0">
+                <div className="w-full max-w-[819px] pl-12  ">
+                    <h1 className="text-[40px]  leading-[48px] font-['Acumin Pro SemiCondensed'] font-semibold text-white mb-[20px]">
+                        Search datasets
+                    </h1>
+                </div>
                 <form
                     onSubmit={handleSubmit((data) => {
                         router.push({
@@ -69,12 +75,12 @@ export default function RedirectedSearchInput() {
                 >
                     <input
                         placeholder="Search data"
-                        aria-label='search'
+                        aria-label="search"
                         className="h-14 rounded-sm block w-full border-0 px-5 py-2 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 border-b-2 border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
                         {...register('search')}
                     />
                     <div className="absolute right-8 top-[1rem]">
-                        <button type="submit" aria-label='submit search query'>
+                        <button type="submit" aria-label="submit search query">
                             <MagnifyingGlassIcon className="h-5 w-5 text-wri-black" />
                         </button>
                     </div>

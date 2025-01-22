@@ -9,8 +9,9 @@ ckan:
       CKANEXT__DCAT__ENABLE_CONTENT_NEGOTIATION: "True"
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
-      CKAN_SITE_ID: wri-dev
-      CKAN_SITE_URL: https://wri.dev.ckan.datopian.com
+      CKAN_SITE_ID: wri-dev 
+      CKAN__SITE_URL: https://wri.dev.frontend.datopian.com
+      CKAN_SITE_URL: https://wri.dev.frontend.datopian.com
       CKAN_HOMEPAGE_STYLE: "2"
       CKAN__DATAPUSHER__URL: http://wri-dev-datapusher-svc:80/
       CKAN_SVC_PORT_80_TCP_PROTO: tcp
@@ -21,7 +22,7 @@ ckan:
       CKAN__AUTH__USER_DELETE_GROUPS: "True"
       CKAN__AUTH__USER_DELETE_ORGANIZATIONS: "True"
       CKAN__AUTH__PUBLIC_USER_DETAILS: "False"
-      CKAN__GROUP_AND_ORGANIZATIONS_LIST_ALL_FIELDS_MAX: "150"
+      CKAN__GROUP_AND_ORGANIZATION_LIST_ALL_FIELDS_MAX: "150"
       CKAN__CORS_ORIGIN_ALLOW_ALL: "True"
       CKAN__CORS__ORIGIN_ALLOW_ALL: "True"
       CKAN__HARVEST__MQ__TYPE: redis
@@ -30,14 +31,14 @@ ckan:
       CKAN__SITE_TITLE: WRI OpenData Platform Dev
       CKAN__STORAGE_PATH: /tmp
       CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
-      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri wri_api_tracking auth hierarchy_display issues envvars
+      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_api_tracking wri_harvester auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
       CKAN__AUTH__CREATE_UNOWNED_DATASET: "True"
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_ADMIN_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_COLLABORATORS_TO_CHANGE_OWNER_ORG: "True"
       CKAN___SCHEMING__DATASET_SCHEMAS: ckanext.wri.schema:ckan_dataset.yaml
-      CKAN___SCHEMING__ORGANIZATION_SCHEMAS: ckanext.wri.schema:custom_org_with_address.json
-      CKAN___SCHEMING__GROUP_SCHEMAS: ckanext.scheming:custom_group_with_status.json
+      CKAN___SCHEMING__ORGANIZATION_SCHEMAS: ckanext.scheming:custom_org_with_address.json
+      CKAN___SCHEMING__GROUP_SCHEMAS: ckanext.wri.schema:wri_application.json
       CKAN___SCHEMING__PRESETS: ckanext.wri.schema:presets.json
       CKANEXT__AUTH__INCLUDE_FRONTEND_LOGIN_TOKEN: "True"
       CKAN__DATASTORE__SQLSEARCH__ENABLED: "True"
@@ -256,11 +257,11 @@ solr:
   nodeSelector: {}
   image:
     repository: ckan/ckan-solr
-    tag: 2.10-solr8-spatial
+    tag: 2.10-solr9-spatial
   resources:
     limits:
+      memory: 4G
+      cpu: 0.8
+    requests:
       memory: 3G
       cpu: 0.6
-    requests:
-      memory: 2.8G
-      cpu: 0.4

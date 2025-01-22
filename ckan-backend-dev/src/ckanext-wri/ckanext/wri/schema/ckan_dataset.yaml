@@ -38,6 +38,19 @@ dataset_fields:
   label: Spatial address
   validators: ignore_missing
 
+- field_name: spatial_type
+  label: Spatial type
+  preset: select
+  choices:
+  - value: address
+    label: Address
+  - value: geom
+    label: Geom
+  - value: global
+    label: Global
+  - value: derived_from_resources
+    label: Derived From Resources
+
 - field_name: spatial
   label: Spatial
   validators: ignore_missing
@@ -83,10 +96,6 @@ dataset_fields:
 - field_name: project
   label: Project
   form_placeholder: eg. Project Name
-
-- field_name: application
-  label: Application
-  form_placeholder: eg. Application Name
 
 - field_name: technical_notes
   label: Technical Notes

@@ -16,7 +16,7 @@ import type {
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
-import { Facets, Filter } from '@/interfaces/search.interface'
+import { Facets, FacetsCount, Filter } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
 import nodemailer from 'nodemailer'
@@ -134,6 +134,22 @@ export async function getGroups({
         console.error(e)
         return []
     }
+}
+
+export async function groupList({ apiKey }: { apiKey: string | null }) {
+    const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${apiKey ?? ''}`,
+            },
+        }
+    )
+    const topics: CkanResponse<Group[]> = await topicRes.json()
+    if (!topics.success && topics.error)
+        throw Error(replaceNames(topics.error.message))
+    return topics.result.filter((topic) => topic.state === 'active')
 }
 
 export async function getGroup({
@@ -299,7 +315,7 @@ export async function getAllDatasetFq({
     extAddressQ?: string
     extGlobalQ?: string
     user?: boolean | null
-}): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets }> {
+}): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets; facets: FacetsCount }> {
     try {
         let url = `${env.CKAN_URL}/api/3/action/package_search?q=${query.search}`
 
@@ -347,6 +363,7 @@ export async function getAllDatasetFq({
             results: WriDataset[]
             count: number
             search_facets: Facets
+            facets: FacetsCount
         }>
 
         if (data.error) {
@@ -356,10 +373,11 @@ export async function getAllDatasetFq({
         const datasets = data.success === true ? data.result.results : []
 
         const count = data.success === true ? data.result.count : 0
+        const facets = data.success === true ? data.result.facets : {}
         const searchFacets =
             data.success === true ? data.result?.search_facets : {}
 
-        return { datasets, count, searchFacets }
+        return { datasets, count, searchFacets, facets }
     } catch (e) {
         console.error(e)
         throw new Error('Failed to fetch datasets')
@@ -562,6 +580,7 @@ export async function getOneDataset(
                     datasetRw.errors
                 )})`
             )
+        console.log('FAILED HERE')
         dataset.result.connectorType = datasetRw.data.attributes.connectorType
         dataset.result.connectorUrl = datasetRw.data.attributes.connectorUrl
         dataset.result.provider = datasetRw.data.attributes.provider
@@ -573,6 +592,7 @@ export async function getOneDataset(
 
         if (resource.length) {
             const layer = resource[0]!
+            console.log('FAILED HERE 2')
             dataset.result.connectorType = layer.connectorType
             dataset.result.connectorUrl = layer.connectorUrl
             dataset.result.provider = layer.provider
@@ -593,13 +613,15 @@ export async function getOneDataset(
         dataset.result.resources.map(async (r) => {
             if (r.url_type === 'upload' || r.url_type === 'link') {
                 let _views: View[] = []
-                try {
-                    _views = await getResourceViews({
-                        id: r.id,
-                        session: session,
-                    })
-                } catch (e) {
-                    _views = []
+                if (r.datastore_active) {
+                    try {
+                        _views = await getResourceViews({
+                            id: r.id,
+                            session: session,
+                        })
+                    } catch (e) {
+                        _views = []
+                    }
                 }
                 const resourceHasChartView =
                     r.datastore_active &&
@@ -718,6 +740,7 @@ export async function getOnePendingDataset(
     )
     if (resourceLayer.length) {
         const layer = resourceLayer[0]!
+        console.log('FAILED HERE 3')
         dataset.connectorType = layer.connectorType
         dataset.connectorUrl = layer.connectorUrl
         dataset.provider = layer.provider
@@ -898,6 +921,7 @@ export function findNameInTree(
     // Recursive case: search through children
     if (tree.children && tree.children.length > 0) {
         for (const child of tree.children) {
+            child.parent_name = tree.name
             const result = findNameInTree(child, targetName)
             if (result) {
                 return result // If found in child, return the result
@@ -989,15 +1013,11 @@ export async function getOrganizationTreeDetails({
         },
         {} as Record<string, GroupsmDetails>
     )
-
+    
+    const facets = await fetchFacets(teamDetails, 'organization', session?.user.apikey ?? '');
     for (const group in teamDetails) {
-        const team = teamDetails[group]!
-        const packagedetails = (await getAllDatasetFq({
-            apiKey: session?.user.apikey ?? '',
-            fq: `organization:${team.name}+is_approved:true`,
-            query: { search: '', page: { start: 0, rows: 10000 } },
-        }))!
-        team.package_count = packagedetails.count
+        const team = teamDetails[group]!;
+        team.package_count = facets[team.name] ?? 0;
     }
 
     const result = groupTree
@@ -1006,6 +1026,23 @@ export async function getOrganizationTreeDetails({
         teamsDetails: teamDetails,
         count: result.length,
     }
+}
+
+export async function fetchFacets(
+    teamDetails: Record<string, { name: string }>,
+    groupType: 'organization' | 'groups',
+    apiKey: string
+): Promise<Record<string, number>> {
+    const fq = `(${Object.values(teamDetails).map(item => item.name).join(' OR ')})`;
+
+    const facetsQuery = await getAllDatasetFq({
+        apiKey: apiKey,
+        fq: `${groupType}:${fq}+is_approved:true`,
+        facetFields: [groupType],
+        query: { search: '', page: { start: 0, rows: 0 } },
+    });
+
+    return facetsQuery.facets[groupType] ?? {};
 }
 
 export async function getTopicTreeDetails({
@@ -1067,14 +1104,11 @@ export async function getTopicTreeDetails({
         {} as Record<string, GroupsmDetails>
     )
 
+    const facets = await fetchFacets(topicDetails, 'groups', session?.user.apikey ?? '');
+
     for (const group in topicDetails) {
-        const topic = topicDetails[group]!
-        const packagedetails = (await getAllDatasetFq({
-            apiKey: session?.user.apikey ?? '',
-            fq: `groups:${topic.name}+is_approved:true`,
-            query: { search: '', page: { start: 0, rows: 10000 } },
-        }))!
-        topic.package_count = packagedetails.count
+        const topic = topicDetails[group]!;
+        topic.package_count = facets[topic.name] ?? 0;
     }
 
     const result = groupTree
@@ -1249,7 +1283,7 @@ export function generateInviteEmail(
     `
 }
 
-export async function generateMemberEmail(
+async function generateMemberEmail(
     senderUser: User,
     recipientUser: User,
     notification: NotificationType
@@ -1496,7 +1530,7 @@ function findUpdatedMembers(
     })
 }
 
-export async function createNotification(
+async function createNotification(
     recipient_id: string,
     sender_id: string,
     activity_type: string,
@@ -1536,7 +1570,7 @@ export async function createNotification(
     }
 }
 
-export async function getTeamDetails({
+async function getTeamDetails({
     id,
     session,
 }: {
@@ -1561,7 +1595,7 @@ export async function getTeamDetails({
     return team.result
 }
 
-export async function getTopicDetails({
+async function getTopicDetails({
     id,
     session,
 }: {
@@ -2013,7 +2047,7 @@ export async function sendGroupNotification({
     }
 }
 
-export async function getPackageDiff({
+async function getPackageDiff({
     id,
     session,
 }: {
@@ -2104,6 +2138,7 @@ export async function patchDataset({
         if (datasetObj.error.message) throw Error(datasetObj.error.message)
         throw Error(JSON.stringify(datasetObj.error))
     }
+    return datasetObj
 }
 
 export async function updateDatasetHasChartsFlag({
@@ -2271,7 +2306,7 @@ export async function approvePendingDataset(
     const layerFilter = submittedDataset.resources.filter((x) => x.connectorUrl)
     const layer = layerFilter[0]!
 
-    if (!submittedDataset.rw_id && isLayer) {
+    if (!submittedDataset.rw_id && isLayer && layer) {
         const rwDataset = {
             title: submittedDataset.title! ?? '',
             connectorType: layer.connectorType!,
@@ -2283,7 +2318,10 @@ export async function approvePendingDataset(
         rw_id = datasetRw.data.id
     }
 
-    const resourcesToEditLayer = submittedDataset.rw_id
+    const hasLayersToEdit = submittedDataset.resources.some(
+        (l) => l.rw_id && l.url
+    )
+    const resourcesToEditLayer = hasLayersToEdit
         ? await Promise.all(
               submittedDataset.resources
                   .filter(
@@ -2385,6 +2423,7 @@ export async function approvePendingDataset(
         }
     )
     const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
+    console.log('DATASET UPDATED', dataset)
     if (!dataset.success && dataset.error) {
         if (dataset.error.message)
             throw Error(
@@ -2478,8 +2517,8 @@ export async function approvePendingDataset(
     return dataset.result
 }
 
-export const datasetFields = [
-    'application',
+const datasetFields = [
+    'applications',
     'approval_status',
     'authors',
     'citation',
@@ -2706,9 +2745,8 @@ export function advance_search_query(filters: Filter[]) {
                 ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
                 : '*'
 
-            fq[
-                'metadata_modified'
-            ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+            fq['metadata_modified'] =
+                `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
         } else if (key == 'spatial') {
             const coordinates = keyFilters[0]?.value
             const address = keyFilters[0]?.label

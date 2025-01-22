@@ -31,13 +31,7 @@ export default function index(
             <Layout>
                 <Dashboard />
             </Layout>
-            <Footer
-                links={{
-                    primary: { title: 'Advanced Search', href: '/search' },
-                    secondary: { title: 'Explore Topics', href: '/topics' },
-                }}
-                style="mt-0"
-            />
+            <Footer style="mt-0" />
         </>
     )
 }

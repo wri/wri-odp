@@ -37,14 +37,14 @@ const paginationSchema = z.object({
     offset: z.number(),
 })
 
-export const querySchema = z.object({
+const querySchema = z.object({
     filters: filterSchema,
     sort: z.array(sortSchema),
     pagination: paginationSchema,
     tableName: z.string(),
 })
 
-export type QueryFormType = z.infer<typeof querySchema>
-export type PaginationType = z.infer<typeof paginationSchema>
+type QueryFormType = z.infer<typeof querySchema>
+type PaginationType = z.infer<typeof paginationSchema>
 export type FilterFormType = z.infer<typeof filterSchema>
 export type FilterObjType = z.infer<typeof filterObj>

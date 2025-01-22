@@ -18,6 +18,7 @@ import { env } from '@/env.mjs'
 import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
 import { Group as CkanGroup } from '@portaljs/ckan'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
 type Group = CkanGroup & { numSubtopics: number }
 
 const TopicsSearchResults = dynamic(
@@ -96,6 +97,7 @@ export default function TopicsPage(
     }
 
     const filteredTopics = ProcessTopics()
+    const links = [{ label: 'Topics', url: '/topics', current: true }]
 
     return (
         <>
@@ -110,10 +112,12 @@ export default function TopicsPage(
                 }}
             />
             <Header />
+            <Breadcrumbs links={links} />
             <TopicsSearch
                 isLoading={isLoading}
                 setQuery={setQuery}
                 query={query}
+                groupType="Topics"
             />
             <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
@@ -125,7 +129,9 @@ export default function TopicsPage(
                 </div>
             </section>
             {isLoading ? (
-                <Spinner className="mx-auto" />
+                <div className="mx-auto h-[2898px] lg:h-[2406px]">
+                    <Spinner className="mx-auto" />
+                </div>
             ) : (
                 <>
                     <TopicsSearchResults
@@ -149,8 +155,11 @@ export default function TopicsPage(
             )}
             <Footer
                 links={{
-                    primary: { title: 'Advanced Search', href: '#' },
-                    secondary: { title: 'Explore Topics', href: '#' },
+                    primary: { title: 'Explore Teams', href: '/teams' },
+                    secondary: {
+                        title: 'Explore Applications',
+                        href: '/applications',
+                    },
                 }}
             />
         </>

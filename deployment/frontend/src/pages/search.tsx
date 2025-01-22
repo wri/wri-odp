@@ -1,55 +1,78 @@
-import Header from '@/components/_shared/Header'
-import Highlights from '@/components/Highlights'
+import Search from '@/components/Search'
 import Footer from '@/components/_shared/Footer'
-import { api } from '@/utils/api'
+import Header from '@/components/_shared/Header'
+import Pagination from '@/components/datasets/Pagination'
 import Spinner from '@/components/_shared/Spinner'
-import RedirectedSearchInput from '@/components/search/RedirectedSearchInput'
+import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard'
+import FilteredSearchLayout from '@/components/search/FilteredSearchLayout'
+import FiltersSelected from '@/components/search/FiltersSelected'
+import SortBy from '@/components/search/SortBy'
+import { Filter } from '@/interfaces/search.interface'
+import { SearchInput } from '@/schema/search.schema'
+import { api } from '@/utils/api'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 import { NextSeo } from 'next-seo'
 import { env } from '@/env.mjs'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import superjson from 'superjson'
-import { createServerSideHelpers } from '@trpc/react-query/server'
 import { appRouter } from '@/server/api/root'
+import { createServerSideHelpers } from '@trpc/react-query/server'
+import superjson from 'superjson'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerAuthSession } from '@/server/auth'
-import dynamic from 'next/dynamic'
+import { advance_search_query } from '@/utils/apiUtils'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
 
-const ErrorAlert = dynamic<{ text: string; title?: string }>(
-    () =>
-        import('@/components/_shared/Alerts').then(
-            (module) => module.ErrorAlert
-        ),
-    {
-        ssr: false,
-    }
-)
+interface Option {
+    value: string
+    label: string
+}
 
-const Recent = dynamic(() => import('@/components/Recent'))
+function filterCount(key: string, filters: Filter[]): number {
+    return filters.filter((f) => f.key === key).length
+}
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
+function defaultSelectedTagOptions(filters: Filter[]): string[] {
+    const f = filters.filter((f) => f.key === 'tags').map((f) => f.label)
+    return f
+}
+
+export async function getServerSideProps(
+    context: GetServerSidePropsContext<{ query: any }>
+) {
+    const { query } = context
+    const initialFilters = query.search
+        ? JSON.parse(query.search as string)
+        : []
+    const initialPage = query.page
+        ? JSON.parse(query.page as string)
+        : { start: 0, rows: 10 }
+    const initialSortBy = query.sort_by
+        ? JSON.parse(query.sort_by as string)
+        : 'score desc'
+
     const session = await getServerAuthSession(context)
     const helpers = createServerSideHelpers({
         router: appRouter,
         ctx: { session },
         transformer: superjson,
     })
-    await Promise.all([
-        helpers.dataset.getFeaturedDatasets.prefetch({
-            search: '',
-            page: { start: 0, rows: 8 },
-            sortBy: 'metadata_modified desc',
-            _isUserSearch: false,
-            removeUnecessaryDataInResources: true,
-        }),
-        helpers.dataset.getAllDataset.prefetch({
-            search: '',
-            page: { start: 0, rows: 8 },
-            sortBy: 'metadata_created desc',
-            removeUnecessaryDataInResources: true,
-        }),
-    ])
+
+    const searchQuery = advance_search_query(initialFilters as Filter[])
+
+    await helpers.dataset.getAllDataset.prefetch({
+        ...searchQuery,
+        page: initialPage,
+        sortBy: initialSortBy,
+        removeUnecessaryDataInResources: true,
+    })
+
     return {
         props: {
             trpcState: helpers.dehydrate(),
+            initialFilters,
+            initialPage,
+            initialSortBy,
         },
     }
 }
@@ -57,91 +80,253 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 export default function SearchPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const {
-        data: recentlyAdded,
-        isLoading: isLoadingRecentlyAdded,
-        error: errorRecentlyAdded,
-    } = api.dataset.getAllDataset.useQuery({
-        search: '',
-        page: { rows: 8, start: 0 },
-        sortBy: 'metadata_created desc',
-        removeUnecessaryDataInResources: true,
-    })
+    const { initialFilters, initialPage, initialSortBy } = props
+    const router = useRouter()
+    const session = useSession()
 
-    const {
-        data: recentlyUpdated,
-        isLoading: isLoadingRecentlyUpdated,
-        error: errorRecentlyUpdated,
-    } = api.dataset.getAllDataset.useQuery({
+    /**
+     * Query used to show results
+     *
+     */
+    const [query, setQuery] = useState<SearchInput>({
         search: '',
-        page: { rows: 8, start: 0 },
-        sortBy: 'metadata_modified desc',
+        extLocationQ: '',
+        extAddressQ: '',
+        extGlobalQ: 'include',
+        fq: {},
+        page: initialPage,
+        sortBy: initialSortBy,
         removeUnecessaryDataInResources: true,
     })
+    const [filters, setFilters] = useState<Filter[]>(initialFilters)
+
+    const [facetSelectedCount, setFacetSelectedCount] = useState<
+        Record<string, number>
+    >({
+        project: filterCount('project', filters) || 0,
+        organization: filterCount('organization', filters) || 0,
+        groups: filterCount('groups', filters) || 0,
+        tags: filterCount('tags', filters) || 0,
+        update_frequency: filterCount('update_frequency', filters) || 0,
+        res_format: filterCount('res_format', filters) || 0,
+        license_id: filterCount('license_id', filters) || 0,
+        language: filterCount('language', filters) || 0,
+        wri_data: filterCount('wri_data', filters) || 0,
+        visibility_type: filterCount('visibility_type', filters) || 0,
+    })
+    const [value, setValue] = useState<string[]>(
+        defaultSelectedTagOptions(filters) || []
+    )
+
+    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
+
+    /*
+     * Whenever filters is updated, update the query's fq
+     *
+     */
+    useEffect(() => {
+        const keys = [...new Set(filters.map((f) => f.key))].filter(
+            (key) => key != 'search'
+        )
+
+        const fq: any = {}
+        let extLocationQ = ''
+        let extAddressQ = ''
+        let extGlobalQ = 'include'
+
+        keys.forEach((key) => {
+            let keyFq
+
+            const keyFilters = filters.filter((f) => f.key == key)
+
+            if ((key as string) == 'temporal_coverage_start') {
+                if (keyFilters.length > 0) {
+                    const temporalCoverageStart = keyFilters[0]
+                    const temporalCoverageEnd = filters.find(
+                        (f) => f.key == 'temporal_coverage_end'
+                    )?.value
+
+                    keyFq = `[${temporalCoverageStart?.value} TO *]`
+
+                    // if (temporalCoverageEnd) {
+                    //     keyFq = `[* TO ${temporalCoverageEnd}]`
+                    // }
+                }
+            } else if ((key as string) == 'temporal_coverage_end') {
+                if (keyFilters.length > 0) {
+                    const temporalCoverageEnd = keyFilters[0]
+                    const temporalCoverageStart = filters.find(
+                        (f) => f.key == 'temporal_coverage_start'
+                    )?.value
+
+                    keyFq = `[* TO ${temporalCoverageEnd?.value}]`
+
+                    // if (temporalCoverageStart) {
+                    //     keyFq = `[${temporalCoverageStart} TO *]`
+                    // }
+                }
+            } else if (
+                key === 'metadata_modified_since' ||
+                key === 'metadata_modified_before'
+            ) {
+                const metadataModifiedSinceFilter = filters.find(
+                    (f) => f.key === 'metadata_modified_since'
+                )
+                const metadataModifiedSince = metadataModifiedSinceFilter
+                    ? metadataModifiedSinceFilter.value + 'T00:00:00Z'
+                    : '*'
+
+                const metadataModifiedBeforeFilter = filters.find(
+                    (f) => f.key === 'metadata_modified_before'
+                )
+                const metadataModifiedBefore = metadataModifiedBeforeFilter
+                    ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
+                    : '*'
+
+                fq['metadata_modified'] =
+                    `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+            } else if (key == 'spatial') {
+                const coordinates = keyFilters[0]?.value
+                const address = keyFilters[0]?.label
+
+                // @ts-ignore
+                if (coordinates) extLocationQ = coordinates.join(',')
+                if (address) extAddressQ = address
+            } else if (key == 'extGlobalQ') {
+                const extGlobalQFilter = filters.find(
+                    (f) => f.key == 'extGlobalQ'
+                )
+                if (extGlobalQFilter && extGlobalQFilter.value === 'exclude') {
+                    fq['!spatial_address'] = 'Global'
+                }
+                if (extGlobalQFilter && extGlobalQFilter.value === 'only') {
+                    fq['spatial_address'] = 'Global'
+                }
+            } else {
+                keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
+            }
+
+            if (keyFq) fq[key as string] = keyFq
+        })
+
+        delete fq.metadata_modified_since
+        delete fq.metadata_modified_before
+        delete fq.spatial
+        delete fq.extGlobalQ
+
+        setQuery((prev) => {
+            return {
+                ...prev,
+                fq,
+                search: filters.find((e) => e?.key == 'search')?.value ?? '',
+                extLocationQ,
+                extAddressQ,
+                extGlobalQ:
+                    (filters.find((e) => e?.key == 'extGlobalQ')?.value as
+                        | 'only'
+                        | 'exclude'
+                        | 'include') ?? 'include',
+            }
+        })
+    }, [filters])
+
+    /*
+     * Update URL query params when page or filters change
+     *
+     */
+    useEffect(() => {
+        router.push(
+            {
+                pathname: router.pathname,
+                query: {
+                    search: JSON.stringify(filters),
+                    page: JSON.stringify(query.page),
+                    sort_by: JSON.stringify(query.sortBy),
+                },
+            },
+            undefined,
+            {
+                shallow: true,
+            }
+        )
+        if (window) {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }, [filters, query.page, query.sortBy])
+    const links = [{ label: 'Search', url: '/search', current: true }]
 
     return (
         <>
+            <Header />
             <NextSeo
-                title="Explore Data"
+                title="Search"
                 description={`Explore WRI Open Data Catalog`}
                 openGraph={{
-                    title: `Explore Data`,
+                    title: `Search`,
                     description: `Explore WRI Open Data Catalog`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/search`,
                 }}
             />
-            <Header />
-            <RedirectedSearchInput />
-            <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
-                <div className="max-w-[705px] ml-2 2xl:ml-2">
-                    <div className="default-home-container w-full border-t-[4px] border-stone-900" />
-                    <h3 className="pt-1 font-bold font-acumin text-xl font-light leading-loose text-neutral-700 ">
-                        Explore our data catalog by searching for specific
-                        keywords, such as “tree cover,” “water,” “power plants,”
-                        “roads,” “biodiversity” or “climate models.” Use the
-                        Advanced Search option to filter results by topic,
-                        format, language and more.
-                    </h3>
-                </div>
-            </section>
-            <Highlights />
-            {isLoadingRecentlyAdded ? (
-                <div className="w-full flex justify-center items-center h-10">
+            <Breadcrumbs links={links} />
+            <Search filters={filters} setFilters={setFilters} />
+            {session.status == 'loading' && (
+                <div className="flex w-full justify-center mt-20">
                     <Spinner />
                 </div>
-            ) : errorRecentlyAdded ? (
-                <ErrorAlert
-                    title="Failed to load recently added datasets"
-                    text={errorRecentlyAdded.message}
-                />
-            ) : (
-                <Recent
-                    datasets={recentlyAdded.datasets}
-                    title="Recently added"
-                />
             )}
-            {isLoadingRecentlyUpdated ? (
-                <div className="w-full flex justify-center items-center h-10">
-                    <Spinner />
-                </div>
-            ) : errorRecentlyUpdated ? (
-                <ErrorAlert
-                    title="Failed to load recently updated datasets"
-                    text={errorRecentlyUpdated.message}
-                />
-            ) : (
-                <Recent
-                    datasets={recentlyUpdated.datasets}
-                    title="Recently updated"
-                />
+            {session.status != 'loading' && (
+                <FilteredSearchLayout
+                    setFilters={setFilters}
+                    filters={filters}
+                    facetSelectedCount={facetSelectedCount}
+                    setFacetSelectedCount={setFacetSelectedCount}
+                    value={value}
+                    setValue={setValue}
+                >
+                    <SortBy
+                        count={data?.count ?? 0}
+                        setQuery={setQuery}
+                        query={query}
+                    />
+                    <FiltersSelected
+                        filters={filters}
+                        setFilters={setFilters}
+                        setFacetSelectedCount={setFacetSelectedCount}
+                        setValue={setValue}
+                    />
+                    <div className="grid grid-cols-1 @7xl:grid-cols-2 gap-4 py-4">
+                        {data?.datasets.map((dataset, number) => (
+                            <DatasetHorizontalCard
+                                key={`dataset-card-${dataset.name}`}
+                                dataset={dataset}
+                            />
+                        ))}
+                        {isLoading && (
+                            <div className="mx-auto h-[2898px] lg:h-[2406px]">
+                                <Spinner />
+                            </div>
+                        )}
+                    </div>
+                    {
+                        <Pagination
+                            setQuery={setQuery}
+                            query={query}
+                            data={data}
+                        />
+                    }
+                </FilteredSearchLayout>
             )}
             <Footer
                 links={{
-                    primary: { title: 'Explore Topics', href: '/topics' },
-                    secondary: {
-                        title: 'Advanced Search',
-                        href: '/search_advanced',
-                    },
+                    primary: [
+                        { title: 'Explore Topics', href: '/topics' },
+                        { title: 'Explore Teams', href: '/teams' },
+
+                        {
+                            title: 'Explore Applications',
+                            href: '/applications',
+                        },
+                    ],
                 }}
             />
         </>

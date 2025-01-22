@@ -43,6 +43,7 @@ export function OverviewForm({
 
     const possibleOwners = api.teams.getAllTeams.useQuery()
     const possibleTags = api.tags.getAllTags.useQuery()
+    const possibleApplications = api.applications.getAllApplications.useQuery()
     const topicHierarchy = api.topics.getTopicsHierarchy.useQuery()
     const possibleLicenses = api.dataset.getLicenses.useQuery()
 
@@ -72,10 +73,10 @@ export function OverviewForm({
                             disabled={editing}
                             placeholder="name-of-dataset"
                             type="text"
-                            className="pl-[5.2rem] sm:pl-[5rem] md:pl-[4.9rem] lg:pl-[4.8rem]"
+                            className="pl-[5.9rem] sm:pl-[5.6rem] md:pl-[5.2rem] lg:pl-[5.4rem]"
                         >
                             <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
-                                /dataset/
+                                /datasets/
                             </span>
                         </Input>
                         <ErrorDisplay name="name" errors={errors} />
@@ -158,12 +159,44 @@ export function OverviewForm({
                             type="text"
                         />
                     </InputGroup>
-                    <InputGroup label="Application">
-                        <Input
-                            {...register('application')}
-                            placeholder="ex. Global Forest Watch"
-                            type="text"
-                        />
+                    <InputGroup label="Applications">
+                        {match(possibleApplications)
+                            .with({ isLoading: true }, () => (
+                                <span className="flex items-center text-sm gap-x-2">
+                                    <Spinner />{' '}
+                                    <span className="mt-1">
+                                        Loading applications...
+                                    </span>
+                                </span>
+                            ))
+                            .with({ isError: true }, () => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading applications, please refresh
+                                    the page
+                                </span>
+                            ))
+                            .with(
+                                { isSuccess: true, data: P.select() },
+                                (data) => (
+                                    <MulText
+                                        name="applications"
+                                        formObj={formObj}
+                                        options={data.map((app) => ({
+                                            label: app.title,
+                                            value: app.name,
+                                        }))}
+                                        title="Applications"
+                                        tooltip="Remove application"
+                                        aria-label="Remove application"
+                                    />
+                                )
+                            )
+                            .otherwise(() => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error loading applications, please refresh
+                                    the page
+                                </span>
+                            ))}
                     </InputGroup>
                     <InputGroup label="Topics">
                         {match(topicHierarchy)
@@ -240,6 +273,7 @@ export function OverviewForm({
                                         title="Tags"
                                         tooltip="Remove tag"
                                         aria-label="Remove tag"
+                                        allowsCreationOfItems
                                     />
                                 )
                             )

@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing_extensions import TypeAlias, Any
 import logging
 import requests
@@ -5,8 +6,10 @@ from urllib.parse import urljoin
 import json
 from typing import Any, Union, cast
 import six
+from ckan.common import _, config, current_user
 
 from ckanext.wri.model.notification import Notification, notification_dictize
+from ckanext.wri.model.download_event import DownloadEvent, download_event_dictize, download_event_list_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
 from ckanext.wri.logic.auth import schema
 from ckanext.wri.logic.action.send_group_notification import (
@@ -27,8 +30,11 @@ import ckan.plugins as plugins
 import ckan.lib.uploader as uploader
 import ckan.lib.plugins as lib_plugins
 import ckan.lib.dictization.model_save as model_save
-
-from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
+from ckanext.wri.logic.action.action_helpers import (
+    stringify_actor_objects,
+    _before_dataset_create_or_update,
+)
+import uuid
 
 NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
@@ -109,7 +115,8 @@ MIGRATE_DATASET_PARAMS = [
     "gfw_dataset",
     "gfw_only",
     "gfw_version",
-    "application",
+    "rw_application",
+    "dx_application",
     "team",
     "topics",
     "layer_ids",
@@ -204,7 +211,7 @@ def notification_create(
 
     user_notifications = Notification(
         recipient_id=recipient_id,
-        sender_id=sender_id if sender_id else '',
+        sender_id=sender_id if sender_id else "",
         activity_type=activity_type,
         object_type=object_type,
         object_id=object_id,
@@ -221,6 +228,7 @@ def notification_create(
 
 def pending_dataset_create(context: Context, data_dict: DataDict):
     """Create a Pending Dataset"""
+    context["for_approval"] = True
     package_id = data_dict.get("package_id")
     package_data = data_dict.get("package_data")
 
@@ -273,7 +281,8 @@ def trigger_migration(context: Context, data_dict: DataDict):
 @logic.side_effect_free
 def migrate_dataset(context: Context, data_dict: DataDict):
     dataset_id = data_dict.get("rw_dataset_id")
-    application = data_dict.get("application")
+    dx_application = data_dict.get("dx_application")
+    rw_application = data_dict.get("rw_application")
     gfw_dataset = data_dict.get("gfw_dataset")
 
     data_dict = _black_white_list("whitelist", data_dict)
@@ -284,13 +293,25 @@ def migrate_dataset(context: Context, data_dict: DataDict):
 
     if not dataset_id:
         if not gfw_dataset:
-            raise tk.ValidationError(_("Dataset 'rw_dataset_id' or 'gfw_dataset' is required"))
+            raise tk.ValidationError(
+                _("Dataset 'rw_dataset_id' or 'gfw_dataset' is required")
+            )
         else:
             data_dict["gfw_only"] = True
 
-    if not application:
+    if not rw_application:
         if not gfw_dataset:
-            raise tk.ValidationError(_("Application is required"))
+            raise tk.ValidationError(_("'rw_application' is required when no 'gfw_dataset' is provided"))
+
+    if not dx_application:
+        raise tk.ValidationError(_("'dx_application' is required to associate the dataset with a DX application"))
+
+    try:
+        tk.get_action("group_show")(
+            {"ignore_auth": True}, {"id": dx_application, "type": "application"}
+        )
+    except logic.NotFound:
+        raise tk.ValidationError(_("'dx_application' not found: ") + dx_application)
 
     team = data_dict.get("team")
     topics = data_dict.get("topics")
@@ -407,13 +428,43 @@ def migration_status(context: Context, data_dict: DataDict):
 def package_create(context: Context, data_dict: DataDict):
 
     validate_visibility(context, data_dict)
+    if data_dict.get("type") == "harvest":
+        return old_package_create(context, data_dict)
+
     data_dict["is_pending"] = True
     data_dict["is_approved"] = False
     data_dict["approval_status"] = "pending"
+    context["for_create"] = True
+    context["for_approval"] = True
 
     data_dict = stringify_actor_objects(data_dict)
 
+    _before_dataset_create_or_update(context, data_dict)
     dataset = l.action.create.package_create(context, data_dict)
+    # `l.action.create.package_create` is not returning all of the fields (e.g., `url_type` in resources is missing/none)
+    # `package_show` seems to be working as expected
+    # TODO: Check if `old_package_create` can handle this (and that the changes there won't cause issues)
+    dataset = _get_action("package_show")(context, {"id": dataset.get("id")})
+
+    if dataset.get("groups"):
+        # This is necessary because the pending dataset doesnt have any of the logic that package_show has
+        groups = [
+            tk.get_action("group_show")(context, {"id": group.get("name")})
+            for group in dataset.get("groups")
+        ]
+        groups = [
+            {
+                "id": group.get("id"),
+                "name": group.get("name"),
+                "display_name": group.get("display_name"),
+                "title": group.get("title"),
+                "description": group.get("description"),
+                "image_display_url": group.get("image_display_url"),
+                "type": group.get("type"),
+            }
+            for group in groups
+        ]
+        dataset["groups"] = groups
     if data_dict.get("owner_org"):
         org = tk.get_action("organization_show")(
             context, {"id": data_dict.get("owner_org")}
@@ -457,16 +508,18 @@ def package_create(context: Context, data_dict: DataDict):
             context, {"dataset_id": dataset.get("id")}
         )
 
-    if (dataset.get("visibility_type") == "internal"):
+    if dataset.get("visibility_type") == "internal":
         print("INTERNAL PENDING DATASET")
 
-        __import__('pprint').pprint(pending_dataset)
+        __import__("pprint").pprint(pending_dataset)
     return dataset
 
 
 # IMPORTANT: This function includes an override/change for authors/maintainers (the call to stringify_actor_objects).
 # This is not a 1:1 match with the original function, though all other logic is the same.
-def old_package_create(context: Context, data_dict: DataDict) -> ActionResult.PackageCreate:
+def old_package_create(
+    context: Context, data_dict: DataDict
+) -> ActionResult.PackageCreate:
     """Create a new dataset (package).
 
     You must be authorized to create new datasets. If you specify any groups
@@ -568,6 +621,7 @@ def old_package_create(context: Context, data_dict: DataDict) -> ActionResult.Pa
     """
     model = context["model"]
     user = context["user"]
+    context["for_create"] = True
 
     # Override for authors/maintainers validation/formatting
     data_dict = stringify_actor_objects(data_dict)
@@ -719,6 +773,9 @@ def resource_create(
     if not data_dict.get("url"):
         data_dict["url"] = ""
 
+    if not data_dict.get("id"):
+        data_dict["id"] = str(uuid.uuid4())
+
     package_show_context: Union[Context, Any] = dict(context, for_update=True)
     pkg_dict = _get_action("package_show")(package_show_context, {"id": package_id})
 
@@ -759,13 +816,15 @@ def resource_create(
     # package_show until after commit
     package = context["package"]
     assert package
-    upload.upload(package.resources[-1].id, uploader.get_max_resource_size())
+    upload.upload(data_dict["id"], uploader.get_max_resource_size())
 
     model.repo.commit()
 
     #  Run package show again to get out actual last_resource
     updated_pkg_dict = _get_action("package_show")(context, {"id": package_id})
     resource = updated_pkg_dict["resources"][-1]
+    if not resource.get("id"):
+        resource["id"] = data_dict["id"]
 
     #  Add the default views to the new resource
     logic.get_action("resource_create_default_resource_views")(
@@ -777,3 +836,33 @@ def resource_create(
         plugin.after_resource_create(context, resource)
 
     return resource
+
+def download_event_create(context: Context, data_dict: DataDict):
+    """Create a download event for each resource in the data_dict"""
+    package_id = data_dict.get("package_id")
+    resources = data_dict.get("resources")
+    email = data_dict.get("email")
+    first_name = data_dict.get("first_name")
+    last_name = data_dict.get("last_name")
+    affiliation = data_dict.get("affiliation")
+    organization = data_dict.get("organization")
+    job_title = data_dict.get("job_title")
+    country = data_dict.get("country")
+    interests = data_dict.get("interests")
+
+    if interests:
+        interests = ', '.join(interests) 
+
+    for item in [
+        ["package_id", package_id],
+        ["email", email],
+    ]:
+        if not item[1]:
+            raise tk.ValidationError("Missing required field " + item[0])
+
+    events = []
+    for resource_id in resources:
+        event = DownloadEvent.create(email, first_name, last_name, affiliation, organization, job_title, country, interests, package_id, resource_id)
+        events.append(event)
+
+    return download_event_list_dictize(events, context)

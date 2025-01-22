@@ -11,9 +11,12 @@ RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@fd7113f076336c13b9952d6b2161c0f4339e5cc6#egg=ckanext-auth' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@okta#egg=ckanext-auth' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues' && \
+    pip3 install -e 'git+https://github.com/ckan/ckanext-harvest.git@v1.6.0#egg=ckanext-harvest' && \
+    pip3 install -r 'https://raw.githubusercontent.com/ckan/ckanext-harvest/refs/tags/v1.6.0/requirements.txt'
 
 USER root
 
@@ -21,6 +24,12 @@ RUN chmod 777 ${APP_DIR}/src/ckanext-s3filestore
 
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
+RUN apk update
+RUN apk add postgresql15-client=15.10-r0
+RUN apk add libpq=15.10-r0
+RUN apk add git=2.40.1-r0
+
+RUN pip install --force-reinstall -v "Pillow==11.0.0"
 
 RUN apk add --virtual .build-deps \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
@@ -62,10 +71,22 @@ RUN for d in $APP_DIR/patches/*; do \
 USER ckan
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
-ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display issues envvars
+ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
+
+USER root
+
+RUN chown -R ckan:ckan ${APP_DIR}/src/
+
+COPY setup/supervisord.conf /etc/supervisord.conf
+COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
+COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
+
+RUN chown -R ckan:ckan /etc/supervisord.d
+RUN chown -R ckan:ckan /etc/supervisord.conf
 
 USER ckan
 

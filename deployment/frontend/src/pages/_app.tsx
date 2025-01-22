@@ -206,6 +206,16 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
                     cardType: 'summary_large_image',
                 }}
+                dangerouslySetAllPagesToNoIndex={
+                    env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
+                        ? false
+                        : true
+                }
+                dangerouslySetAllPagesToNoFollow={
+                    env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
+                        ? false
+                        : true
+                }
             />
             <Hydrate
                 /* @ts-ignore */

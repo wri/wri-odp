@@ -80,11 +80,11 @@ export interface Resource {
     spatial_type?: string
 }
 
-export interface DatasetListQueryOptions {
+interface DatasetListQueryOptions {
     offset: number
     limit: number
 }
-export interface PackageSearchOptions {
+interface PackageSearchOptions {
     offset: number
     limit: number
     groups: Array<string>
@@ -96,7 +96,7 @@ export interface PackageSearchOptions {
     include_private?: boolean
 }
 
-export interface Tag {
+interface Tag {
     display_name?: string
     id: string
     name: string
@@ -112,9 +112,9 @@ export interface View {
     config_obj: ViewConfig
 }
 
-export type ViewType = 'chart'
+type ViewType = 'chart'
 
-export type ViewConfig = {
+type ViewConfig = {
     type: ViewType
     config: ChartViewConfig
     form_state: any /* | OtherViewConfig ... */

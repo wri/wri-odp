@@ -9,6 +9,7 @@ import { DatasetTabs } from '../../DatasetTabs'
 import {
     Tooltip,
     TooltipContent,
+    TooltipPortal,
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/_shared/Tooltip'
@@ -93,9 +94,11 @@ function OpenInModal({
                                             <TooltipTrigger>
                                                 <ClipboardIcon className="h-5 w-5 text-blue-800" />
                                             </TooltipTrigger>
-                                            <TooltipContent className="bg-neutral-200">
-                                                <p>Copy to clipboard</p>
-                                            </TooltipContent>
+                                            <TooltipPortal>
+                                                <TooltipContent className="bg-neutral-200">
+                                                    <p>Copy to clipboard</p>
+                                                </TooltipContent>
+                                            </TooltipPortal>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </div>

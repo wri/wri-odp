@@ -12,6 +12,15 @@ Note that this also applies to layers:
 
 ![](./layer-geoindexing.png)
 
+### Creating a resource with resource location thru the API
+
+The following fields are required if you want to create a resource thru the API that contains location information
+
+- spatial_geom: Use this if you want the location to be a polygon, should be a geojson, not required if you are setting up the others
+- spatial_address: Use this if you want the location to be a simple address, not required if you are setting up the others
+- spatial_coordinates: Use this if you want the location to be a point on a map, needs to be in [X, Y] format, not required if you are setting up the others
+- spatial_type: can be either `global` `address` or `geom` always required
+
 ### Custom datafile location search action
 
 A custom action was created so that files can be geospatially searched.

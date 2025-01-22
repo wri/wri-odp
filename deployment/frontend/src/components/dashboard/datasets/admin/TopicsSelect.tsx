@@ -54,7 +54,7 @@ export function TopicsSelect({
         />
     )
 }
-export function TopicsInner({
+function TopicsInner({
     topicHierarchy,
     onChange,
     value,
@@ -286,7 +286,7 @@ export function TopicsInner({
                     <CommandInput
                         value={query}
                         onValueChange={setQuery}
-                        placeholder="Search framework..."
+                        placeholder="Search topics..."
                     />
                     <CommandEmpty>No framework found.</CommandEmpty>
                     <div className="pr-3">

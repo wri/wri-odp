@@ -22,6 +22,7 @@ import {
     searchHierarchy,
     findAllNameInTree,
     getAllDatasetFq,
+    fetchFacets
 } from '@/utils/apiUtils'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
 import { json } from 'stream/consumers'
@@ -64,7 +65,14 @@ export const teamRouter = createTRPCRouter({
                 })
             })
         )
-        return Array.from(teamsMap.values())
+        return Array.from(teamsMap.values()).sort((a, b) => {
+            const nameA = a.name.toLowerCase()
+            const nameB = b.name.toLowerCase()
+            return nameA.localeCompare(nameB, undefined, {
+                numeric: true,
+                sensitivity: 'base',
+            })
+        })
     }),
     editTeam: protectedProcedure
         .input(TeamSchema)
@@ -325,15 +333,12 @@ export const teamRouter = createTRPCRouter({
                 },
                 {} as Record<string, GroupsmDetails>
             )
+        
+            const facets = await fetchFacets(teamDetails, "organization", ctx?.session?.user.apikey ?? '')
 
             for (const group in teamDetails) {
-                const team = teamDetails[group]!
-                const packagedetails = (await getAllDatasetFq({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    fq: `organization:${team.name}+is_approved:true`,
-                    query: { search: '', page: { start: 0, rows: 10000 } },
-                }))!
-                team.package_count = packagedetails.count
+                const team = teamDetails[group]!;
+                team.package_count = facets[team.name] ?? 0;
             }
 
             const result = groupTree

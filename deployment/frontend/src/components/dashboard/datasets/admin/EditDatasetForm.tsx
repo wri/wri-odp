@@ -163,7 +163,16 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 (option) => option.value === dataset.language
             ),
             topics: dataset.groups
-                ? dataset.groups.map((group) => group.name)
+                ? //@ts-ignore
+                  dataset.groups
+                      .filter((g) => g.type === 'group')
+                      .map((group) => group.name)
+                : [],
+            applications: dataset.groups
+                ? //@ts-ignore
+                  dataset.groups
+                      .filter((g) => g.type === 'application')
+                      .map((group) => group.name)
                 : [],
             team: dataset.organization
                 ? {
@@ -197,18 +206,20 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 }
                 return {
                     ...resource,
+                    type: resource.url_type as any,
                     resourceId: resource.id as string,
                     schema: resource.schema ? schema.value : undefined,
                 }
             }),
-            spatial_type:
-                dataset.spatial_address === 'Global'
-                    ? 'global'
-                    : dataset.spatial_address
+            spatial_type: dataset.spatial_type
+                ? dataset.spatial_type as "address" | "geom" | "global" | "derived_from_resources"
+                : dataset.spatial_address === 'Global'
+                  ? 'global'
+                  : dataset.spatial_address
                     ? 'address'
                     : dataset.spatial
-                    ? 'geom'
-                    : undefined,
+                      ? 'geom'
+                      : undefined,
         },
     })
 

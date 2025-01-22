@@ -94,7 +94,7 @@ then
 fi
 
 # Start supervisord
-supervisord --configuration /etc/supervisord.conf &
+supervisord --configuration /etc/supervisord.d/supervisord.conf &
 
 # Start the development server with automatic reload
-ckan -c $CKAN_INI run -H 0.0.0.0
+ckan -c $CKAN_INI run -H 0.0.0.0 --prefix /private-admin
