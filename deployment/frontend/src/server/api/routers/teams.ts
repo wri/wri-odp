@@ -5,7 +5,7 @@ import {
 } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import { CkanResponse, Collaborator } from '@/schema/ckan.schema'
-import { Organization } from '@/schema/ckan.schema'
+import { Organization } from '@portaljs/ckan'
 import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
@@ -22,7 +22,7 @@ import {
     searchHierarchy,
     findAllNameInTree,
     getAllDatasetFq,
-    fetchFacets
+    fetchFacets,
 } from '@/utils/apiUtils'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
 import { json } from 'stream/consumers'
@@ -53,7 +53,8 @@ export const teamRouter = createTRPCRouter({
                         },
                     }
                 )
-                const teams: CkanResponse<WriOrganization[]> = await teamRes.json()
+                const teams: CkanResponse<WriOrganization[]> =
+                    await teamRes.json()
                 if (!teams.success && teams.error) {
                     if (teams.error.message)
                         throw Error(replaceNames(teams.error.message, true))
@@ -333,12 +334,16 @@ export const teamRouter = createTRPCRouter({
                 },
                 {} as Record<string, GroupsmDetails>
             )
-        
-            const facets = await fetchFacets(teamDetails, "organization", ctx?.session?.user.apikey ?? '')
+
+            const facets = await fetchFacets(
+                teamDetails,
+                'organization',
+                ctx?.session?.user.apikey ?? ''
+            )
 
             for (const group in teamDetails) {
-                const team = teamDetails[group]!;
-                team.package_count = facets[team.name] ?? 0;
+                const team = teamDetails[group]!
+                team.package_count = facets[team.name] ?? 0
             }
 
             const result = groupTree
