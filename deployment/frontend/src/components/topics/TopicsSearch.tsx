@@ -40,7 +40,7 @@ export default function TopicsSearch({
                             groupType === 'Teams' ? 'teams' : 'topics'
                         }`}
                         aria-label="search"
-                        className="h-full  block w-full border-0 px-5 py-2 text-[#4f4e4e] shadow-wri-small rounded-tr-[3px] rounded-br-[3px]  placeholder:text-[#4f4e4e] placeholder:font-light focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 rounded-tl-[3px] rounded-bl-[3px] border-r-0"
+                        className="h-full  block w-full border-0 px-5 py-2 text-[#000000] shadow-wri-small rounded-tr-[3px] rounded-br-[3px]  placeholder:text-gray-900 placeholder:text-base focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 leading-[19.2px] rounded-tl-[3px] rounded-bl-[3px] border-r-0"
                     />
                     <div className="absolute flex h-[54.393px] px-8  right-0  leading-[29.25px] text-black bg-wri-gold rounded-tr-[3px] rounded-br-[3px]">
                         {isLoading ? (
