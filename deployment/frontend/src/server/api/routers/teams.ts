@@ -5,7 +5,7 @@ import {
 } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import { CkanResponse, Collaborator } from '@/schema/ckan.schema'
-import { Organization } from '@portaljs/ckan'
+import { Organization } from '@/schema/ckan.schema'
 import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
