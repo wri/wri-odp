@@ -1708,12 +1708,23 @@ def organization_patch(context, data_dict):
     isSysadmin = authz.is_sysadmin(user)
 
     if not isSysadmin:
+        
         old_org = get_action("organization_show")(context, data_dict)
-        if old_org.get("visibility", "public") == "private":
+        old_parent = old_org.get("groups", [])
+        if len(old_parent) == 0 or data_dict.get("parent") is None:
+            raise ValidationError({"message": _("You can't edit or create a Parent Team")})
+        if old_org.get("visibility", "public") == "private" and visibility == "public":
             raise ValidationError({"message": 
-                                   _("Organization has private visibility and cannot be updated; Only sysadmin can update private organizations")
+                                   _("Team has private visibility and cannot be updated; Only sysadmin can update private team")
                                    })
 
+        if visibility == "private":
+            users = old_org.get("users", [])
+            if users:
+                user_capacity = [user.get("capacity") for user in users if user.get("name") == user]
+                if "admin" not in user_capacity:
+                    raise ValidationError({"message": _("You can't update visibility of a team")})
+        
 
     if visibility == "public":
         parent_org = data_dict.get("parent")
@@ -1721,7 +1732,7 @@ def organization_patch(context, data_dict):
         if parent_org:
             parent_org = get_action("organization_show")(context, {"id": parent_org})
             if parent_org.get("visibility", "public") == "private":
-                raise ValidationError({"message": _("Parent Organization has private visibility and cannot create public organizations")})
+                raise ValidationError({"message": _("Parent Team has private visibility and cannot create public teams")})
             
     if visibility == "private":
         rdata_dict = {
@@ -1731,7 +1742,7 @@ def organization_patch(context, data_dict):
         }
         public_package = get_action("package_search")(context, rdata_dict)
         if public_package.get("count") > 0:
-            raise ValidationError({"message": _("Organization has public datasets and cannot be made private")})
+            raise ValidationError({"message": _("Team has public datasets and cannot be made private")})
     return old_organization_patch(context, data_dict)
 
 def validate_visibility(context, data_dict):

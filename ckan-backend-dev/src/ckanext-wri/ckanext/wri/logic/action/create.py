@@ -38,6 +38,8 @@ import uuid
 from ckan.logic.action.create import (
     organization_create as old_organization_create)
 
+import ckan.authz as authz
+
 NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
 
@@ -879,8 +881,18 @@ def organization_create(context, data_dict):
         parent_org = parent_org.get("value") if parent_org else None
         if parent_org:
             parent_org = logic.get_action("organization_show")(context, {"id": parent_org})
+            users = parent_org.get("users", [])
+            username = context.get("user")
+            if users:
+                user_capacity = [user.get("capacity") for user in users if user.get("name") == username]
+                if "admin" not in user_capacity:
+                    raise ValidationError({"message": _("User does not have admin access to create a sub team")})
             if parent_org.get("visibility", "public") == "private":
-                raise ValidationError({"message": _("Parent Organization has private visibility and cannot create public organizations")})
+                raise ValidationError({"message": _("Parent Organization has private visibility and cannot create public teams")})
+            
+        else:
+            if not authz.is_sysadmin(context.get("user")):
+                raise ValidationError({"message": _("Only sysadmins can create public teams without a parent")})
     
     result = old_organization_create(context, data_dict)
     return result
