@@ -257,14 +257,16 @@ export function Hero() {
                                 <input
                                     placeholder="Search datasets - try “energy”, “Global Forest Watch”, or “food”"
                                     aria-label="search"
-                                    className="placeholder:text-[#5f5e5e]  flex-shrink flex-grow  placeholder:italic placeholder:font-light placeholder:leading-tight placeholder:sm:font-normal placeholder:sm:leading-normal text-[#4f4e4e]  text-xs md:text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white rounded-tl-[3px] rounded-bl-[3px] border-r-0"
+                                    className="placeholder:text-[#5f5e5e]  flex-shrink flex-grow  placeholder:italic placeholder:font-light placeholder:leading-tight placeholder:sm:font-normal placeholder:sm:leading-normal text-[#4f4e4e]  text-xs md:text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white rounded-tl-[3px] rounded-bl-[3px] border-y-0 border-r-0"
                                     {...register('search')}
                                 />
-                                
+
                                 <button
                                     type="submit"
-                                    className="px-8 py-4 text-[26px] font-semibold  font-acumin leading-[29.25px] text-black bg-wri-gold rounded-tr-[3px] rounded-br-[3px] h-[65px] w-full max-w-[149px] border-l-0"
-                                >Search</button>
+                                    className="px-8 py-4 text-[26px] font-semibold  font-acumin leading-[29.25px] text-black bg-wri-gold rounded-tr-[3px] rounded-br-[3px] h-[66px] w-full max-w-[149px] border-l-0 border-y-0"
+                                >
+                                    Search
+                                </button>
                             </div>
                         </form>
                     </div>
