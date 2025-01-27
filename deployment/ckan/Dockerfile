@@ -1,4 +1,4 @@
-FROM viderum/ckan:v2.11
+FROM viderum/ckan:v2.11.0
 
 ENV CKAN_INI /srv/app/production.ini
 ENV APP_DIR=/srv/app
@@ -6,11 +6,17 @@ ENV APP_DIR=/srv/app
 USER root
 RUN pip3 install --upgrade setuptools==70.0.0
 # Install any extensions needed by your CKAN instance
-RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
+RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf2856aee97fa7b49de46847f8119dad355#egg=ckanext-scheming' && \
+    pip3 install -r 'https://raw.githubusercontent.com/ckan/ckanext-scheming/5ce30cf2856aee97fa7b49de46847f8119dad355/test-requirements.txt' && \
+    #pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
+    #pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
+    #pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
+    # Use latest versions for now due to build errors. TODO: Update to specific newer versions (hopefully these are compatible)
+    pip3 install moto && \
+    pip3 install ckanapi && \
+    pip3 install httpretty && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@okta#egg=ckanext-auth' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
@@ -68,6 +74,9 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
+RUN apk --no-cache add openssl
+RUN pip3 install -r /srv/app/src/ckan/requirements.txt
+
 USER ckan
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
@@ -76,6 +85,7 @@ ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_vi
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
+RUN ckan config-tool ${CKAN_INI} -s app:main "ckan.datapusher.api_token = xxxx-xxxx-xxxx-xxxx"
 
 USER root
 
