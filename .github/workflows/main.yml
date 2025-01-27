@@ -123,7 +123,7 @@ jobs:
       - name: Initialize the Extensions
         run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Print Logs
-        if: ${{ env.ENABLE_DEBUG_LOGS = 'true' }}
+        if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-ac59f1a53209f2c1f03230ad4bff20c3264a23a3'
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
