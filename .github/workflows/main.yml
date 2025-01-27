@@ -10,6 +10,13 @@ env:
   PROJECT_NAME: wri-odp
   BRANCH_NAME: dev
   ENABLE_TRIVY_SCANNING: true
+  ENABLE_BUILD_CKAN: false
+  ENABLE_BUILD_FRONTEND: false
+  ENABLE_BUILD_DATAPUSHER: false
+  ENABLE_BUILD_MIGRATION: false
+  ENABLE_INT_TESTS: false
+  ENABLE_UNIT_TESTS: true
+  ENABLE_FRONTEND_TESTS: false
 permissions:
   id-token: write
   contents: read
@@ -38,6 +45,7 @@ jobs:
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
       - name: Build and push CKAN image to ECR
+        if: ${{ env.ENABLE_BUILD_CKAN == 'true' }}
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
@@ -47,6 +55,7 @@ jobs:
           docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
       - name: Build and push Frontend image to ECR
+        if: ${{ env.ENABLE_BUILD_FRONTEND == 'true' }}
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
@@ -66,6 +75,7 @@ jobs:
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
       - name: Build and push Datapusher image to ECR
+        if: ${{ env.ENABLE_BUILD_DATAPUSHER == 'true' }}
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
@@ -75,6 +85,7 @@ jobs:
           datapusher
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
       - name: Build and push Migration image to ECR
+        if: ${{ env.ENABLE_BUILD_MIGRATION == 'true' }}
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
@@ -85,7 +96,7 @@ jobs:
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
       - name: Set up Docker Containers
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-ac59f1a53209f2c1f03230ad4bff20c3264a23a3'
           SCRIPT_NAME: '/private-admin'
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
@@ -93,6 +104,7 @@ jobs:
       - name: Initialize the Extensions
         run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Cypress Install and CKAN setup
+        if: ${{ env.ENABLE_INT_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
         with:
           wait-on: 'http://localhost:5000/private-admin/en'
@@ -104,17 +116,19 @@ jobs:
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Set up Frontend Docker Container
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-ac59f1a53209f2c1f03230ad4bff20c3264a23a3'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
       - name: Initialize the Extensions
         run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Print Logs
+        if: ${{ env.ENABLE_DEBUG_LOGS = 'true' }}
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-ac59f1a53209f2c1f03230ad4bff20c3264a23a3'
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and Frontend setup
+        if: ${{ env.ENABLE_INT_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
         with:
           wait-on: 'http://localhost:3000'
@@ -123,6 +137,7 @@ jobs:
           runTests: false
           working-directory: ./e2e-tests
       - name: Run Integration tests 🧪
+        if: ${{ env.ENABLE_INT_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
         with:
           command: node test.js
@@ -137,20 +152,21 @@ jobs:
           # Fail this action after this many failed attempts
           max-attempts: 3 # Optional, defaults to 1
       - name: Run frontend tests 🧪
+        if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
         with:
           command: npm run test
           working-directory: ./e2e-tests
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: ${{ failure() && eq(env.ENABLE_FRONTEND_TESTS, 'true') }}
         with:
           name: cypress-screenshots
           path: /home/runner/work/wri-odp/wri-odp/e2e-tests/cypress/screenshots
           if-no-files-found: ignore
       - name: Print Error Logs
-        if: failure()
+        if: ${{ failure() && eq(env.ENABLE_FRONTEND_TESTS, 'true') }}
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-ac59f1a53209f2c1f03230ad4bff20c3264a23a3'
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Copy run_unit_tests.sh
