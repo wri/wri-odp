@@ -957,7 +957,7 @@ def user_list_wri(context: Context, data_dict: DataDict):
     return results
 
 
-def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any, private_orgs: Any = None):
+def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any, private_orgs: Any = None, user_orgs: Any = None):
     def recurcive_tree_ids(org, group_hierarchy_ids=[],):
         group_hierarchy_ids.append(org["name"])
 
@@ -965,6 +965,13 @@ def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any, 
             org["children"] = [
                 child for child in org["children"] if child["name"] not in private_orgs
             ]
+
+        if user_orgs:
+            if org["name"] not in user_orgs:
+                org["private"] = True
+            else:
+                org["private"] = False
+
         
         for child in org["children"]:
             recurcive_tree_ids(child, group_hierarchy_ids)
@@ -978,11 +985,15 @@ def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any, 
         group_tree = get_action("group_tree_section")(
             context, {"id": group, "type": group_type}
         )
+
         if q:
             group_tree["highlighted"] = True
         else:
             group_tree["highlighted"] = False
+
         group_hierarchy_ids += recurcive_tree_ids(group_tree)
+        if not context['user'] and group_tree["name"] in private_orgs:
+            continue
         results.append(group_tree)
     return results
 
@@ -991,12 +1002,17 @@ def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any, 
 def organization_list_wri(context: Context, data_dict: DataDict):
     orgs = get_action("organization_list")(context, data_dict)
     user = context['user']
-    is_sysadmin = authz.is_sysadmin(user)
     q = data_dict.get("q", False)
     private_orgs = None
-    if not is_sysadmin:
+    user_orgs = None
+    if not user:
        private_orgs = get_private_organizations(context)
-    results = get_hierarchy_group(context, orgs, "organization", q, private_orgs)
+       log.warning(f"Private orgs: {private_orgs} \n\n {orgs}")
+
+    if user:
+        user_orgs = orgs
+        log.warning(f"User orgs: {user_orgs} \n\n {orgs}")
+    results = get_hierarchy_group(context, orgs, "organization", q, private_orgs, user_orgs)
     return results
 
 
@@ -1029,7 +1045,10 @@ def organization_list_for_user_wri(context: Context, data_dict: DataDict):
         orgs = [org["name"] for org in orgs if q in org["name"]]
     else:
         orgs = [org["name"] for org in orgs]
-    results = get_hierarchy_group(context, orgs, "organization", q)
+    user = context['user']
+    if user:
+        user_orgs = orgs
+    results = get_hierarchy_group(context, orgs, "organization", q, user_orgs=user_orgs)
     return results
 
 
@@ -1569,37 +1588,66 @@ def _group_or_org_list(
     # Use aliased() to refer to the group_extra table
     group_extra_alias = aliased(model.GroupExtra)
 
-    query = query.outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
+    # query = query.outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
 
     if not is_sysadmin:
         # User is logged in
         if user:
-            user_id = authz.get_user_id_for_username(user, allow_none=True)
+            permission = data_dict.get('permission', 'manage_group')
 
-            # Correct filtering logic
+            roles = authz.get_roles_with_permission(permission)
+
+            if not roles:
+                return []
+           
+            user_id = authz.get_user_id_for_username(user, allow_none=True)
+            if not user_id:
+                return []
+
+            qmodel = model.Session.query(model.Member, model.Group) \
+                .filter(model.Member.table_name == 'user') \
+                .filter(
+                    model.Member.capacity.in_(roles)
+                ) \
+                .filter(model.Member.table_id == user_id) \
+                .filter(model.Member.state == 'active') \
+                .join(model.Group)
+
+            group_ids: set[str] = set()
+            roles_that_cascade = cast(
+                "list[str]",
+                authz.check_config_permission('roles_that_cascade_to_sub_groups')
+            )
+            group_ids_to_capacities: dict[str, str] = {}
+            for member, group in qmodel.all():
+                if member.capacity in roles_that_cascade:
+                    children_group_ids = [
+                        grp_tuple[0] for grp_tuple
+                        in group.get_children_group_hierarchy(type='organization')
+                    ]
+                    for group_id in children_group_ids:
+                        group_ids_to_capacities[group_id] = member.capacity
+                    group_ids |= set(children_group_ids)
+
+                group_ids_to_capacities[group.id] = member.capacity
+                group_ids.add(group.id)
+            if not group_ids:
+                return []
+
+            query = query.outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
             query = query.filter(sqlalchemy.or_(
-                # Organization with visibility set to public
-                sqlalchemy.and_(
+                model.Group.id.in_(group_ids),  # Groups accessible to the user
+                sqlalchemy.and_(                 # Public groups
                     group_extra_alias.key == 'visibility',
                     group_extra_alias.value == 'public'
                 ),
-                # Organization with no visibility entry
-                group_extra_alias.key == None,
-                # Organization with visibility set to private if the user is a member
-                sqlalchemy.and_(
-                    group_extra_alias.key == 'visibility',
-                    group_extra_alias.value == 'private',
-                    model.Session.query(model.Member)
-                        .filter(model.Member.group_id == model.Group.id)  # Correlate with the main query
-                        .filter(model.Member.capacity == 'member')  # User must have 'member' capacity
-                        .filter(model.Member.table_name == 'user')  # Member should be a user
-                        .filter(model.Member.table_id == user_id) # User ID matches
-                        .filter(model.Member.state == 'active')
-                        .exists()  # Only include if user is a member
-                )
+                group_extra_alias.key == None    # Groups with no visibility entry
             ))
+            
+            # log.warn("Query: {}".format(query))
         # User is anonymous
         else:
+            query = query.outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
             query = query.filter(sqlalchemy.or_(
                 # Organizations with visibility set to public
                 sqlalchemy.and_(
@@ -1679,20 +1727,20 @@ def get_private_organizations(context: Context):
     query = query.outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
     query = query.filter(group_extra_alias.key == 'visibility', group_extra_alias.value == 'private')
 
-    # Check if the user is logged in
-    if user:
-        user_id = authz.get_user_id_for_username(user, allow_none=True)
+    # # Check if the user is logged in
+    # if user:
+    #     user_id = authz.get_user_id_for_username(user, allow_none=True)
         
         
-        # Exclude private organizations the user belongs to
-        subquery = model.Session.query(model.Member.group_id).filter(
-            model.Member.table_name == 'user',
-            model.Member.table_id == user_id,
-            model.Member.capacity == 'member',  # Ensure user is a 'member'
-            model.Member.state == 'active'
-        ).subquery()
+    #     # Exclude private organizations the user belongs to
+    #     subquery = model.Session.query(model.Member.group_id).filter(
+    #         model.Member.table_name == 'user',
+    #         model.Member.table_id == user_id,
+    #         model.Member.capacity.in_(["member", "admin", "editor"]),  # Ensure user is a 'member'
+    #         model.Member.state == 'active'
+    #     ).subquery()
 
-        query = query.filter(~model.Group.id.in_(subquery))
+    #     query = query.filter(~model.Group.id.in_(subquery))
     
     # Fetch the final result
     private_orgs = query.all()
@@ -1774,15 +1822,16 @@ def organization_show(context, data_dict):
     user = context.get("user")
 
 
-    if data_dict.get("visibility", "public") in ["public", "internal"] or authz.is_sysadmin(user):
-        return data_dict
+    # if data_dict.get("visibility", "public") in ["public", "internal"] or authz.is_sysadmin(user):
+    #     return data_dict
     
-    if user:
-        users = data_dict.get("users", [])
-        user_exists = any(userorg["name"] == user for userorg in users)
-        if user_exists:
-            return data_dict
-    raise NotFound("Organization not found")
+    # if user:
+    #     users = data_dict.get("users", [])
+    #     user_exists = any(userorg["name"] == user for userorg in users)
+    #     if user_exists:
+    #         return data_dict
+    # raise NotFound("Organization not found")
+    return data_dict
 
 
 # IMPORTANT: This is almost a copy of the original package_show, but it calls the _add_group_types
