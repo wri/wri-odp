@@ -28,7 +28,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session },
         transformer: superjson,
     })
-    await Promise.all([await helpers.applications.getAllApplications.prefetch()])
+    await Promise.all([
+        await helpers.applications.getAllApplications.prefetch(),
+    ])
 
     return {
         props: {
@@ -93,7 +95,9 @@ export default function ApplicationsPage(
         }))
     }
 
-    const links = [{ label: 'Applications', url: '/applications', current: true }]
+    const links = [
+        { label: 'Applications', url: '/applications', current: true },
+    ]
     return (
         <>
             <NextSeo
@@ -113,6 +117,15 @@ export default function ApplicationsPage(
                 setQuery={setQuery}
                 query={query}
             />
+            <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
+                <div className="max-w-[705px] ml-2 2xl:ml-2">
+                    <div className="default-home-container w-full border-t-[4px] border-stone-900" />
+                    <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
+                        This page lets you explore all the data associated with
+                        a specific WRI application or data product.
+                    </h3>
+                </div>
+            </section>
             {isLoading ? (
                 <Spinner className="mx-auto" />
             ) : (
