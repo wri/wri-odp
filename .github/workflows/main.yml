@@ -97,7 +97,7 @@ jobs:
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
       - name: Set up Docker Containers
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-ac59f1a53209f2c1f03230ad4bff20c3264a23a3'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-a7d388e34c17306e59659f94d9a65450b27a75a9'
           SCRIPT_NAME: '/private-admin'
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
@@ -117,7 +117,7 @@ jobs:
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Set up Frontend Docker Container
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-ac59f1a53209f2c1f03230ad4bff20c3264a23a3'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-a7d388e34c17306e59659f94d9a65450b27a75a9'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
       - name: Initialize the Extensions
@@ -125,7 +125,7 @@ jobs:
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-ac59f1a53209f2c1f03230ad4bff20c3264a23a3'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-a7d388e34c17306e59659f94d9a65450b27a75a9'
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and Frontend setup
@@ -167,7 +167,7 @@ jobs:
       - name: Print Error Logs
         if: failure()
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-ac59f1a53209f2c1f03230ad4bff20c3264a23a3'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-a7d388e34c17306e59659f94d9a65450b27a75a9'
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Copy run_unit_tests.sh
