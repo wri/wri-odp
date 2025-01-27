@@ -4,6 +4,7 @@
 echo "Looking for local extensions to install..."
 echo "Extension dir contents:"
 ls -la $SRC_EXTENSIONS_DIR
+
 for i in $SRC_EXTENSIONS_DIR/*
 do
     if [ -d $i ];
@@ -46,7 +47,7 @@ echo "Enabling debug mode"
 ckan config-tool $CKAN_INI -s DEFAULT "debug = true"
 
 # Add ckan.datapusher.api_token to the CKAN config file (updated with corrected value later)
-ckan config-tool $CKAN_INI ckan.datapusher.api_token=xxx
+#ckan config-tool $CKAN_INI ckan.datapusher.api_token=xxx
 
 # Set up the Secret key used by Beaker and Flask
 # This can be overriden using a CKAN___BEAKER__SESSION__SECRET env var
@@ -60,10 +61,6 @@ then
     ckan config-tool $CKAN_INI "api_token.jwt.decode.secret=${JWT_SECRET}"
 fi
 
-# Update the plugins setting in the ini file with the values defined in the env var
-echo "Loading the following plugins: $CKAN__PLUGINS"
-ckan config-tool $CKAN_INI "ckan.plugins = $CKAN__PLUGINS"
-
 # Update test-core.ini DB, SOLR & Redis settings
 echo "Loading test settings into test-core.ini"
 ckan config-tool $SRC_DIR/ckan/test-core.ini \
@@ -73,12 +70,28 @@ ckan config-tool $SRC_DIR/ckan/test-core.ini \
     "solr_url = $TEST_CKAN_SOLR_URL" \
     "ckan.redis.url = $TEST_CKAN_REDIS_URL"
 
+ckan config-tool $CKAN_INI "ckan.plugins = datastore envvars"
+ckan config-tool $CKAN_INI "ckan.views.default_views ="
+
+DEFAULT_VIEWS=$CKAN__VIEWS__DEFAULT_VIEWS
+PLUGINS=$CKAN__PLUGINS
+
+unset CKAN__PLUGINS
+unset CKAN__VIEWS__DEFAULT_VIEWS
+
 # Run the prerun script to init CKAN and create the default admin user
 python3 prerun.py
+
+export CKAN__VIEWS__DEFAULT_VIEWS="$DEFAULT_VIEWS"
+export CKAN__PLUGINS="$PLUGINS"
 
 unset CKAN__DATAPUSHER__API_TOKEN
 echo "Set up ckan.datapusher.api_token in the CKAN config file"
 ckan config-tool $CKAN_INI "ckan.datapusher.api_token=$(ckan -c $CKAN_INI user token add ckan_admin datapusher | tail -n 1 | tr -d '\t')"
+
+# Update the plugins setting in the ini file with the values defined in the env var
+echo "Loading the following plugins: $CKAN__PLUGINS"
+ckan config-tool $CKAN_INI "ckan.plugins = $CKAN__PLUGINS"
 
 # Run any startup scripts provided by images extending this one
 if [[ -d "/docker-entrypoint.d" ]]

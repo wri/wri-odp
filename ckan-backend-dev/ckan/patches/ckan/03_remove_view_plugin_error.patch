@@ -1,0 +1,15 @@
+diff --git a/ckan/lib/datapreview.py b/ckan/lib/datapreview.py
+index 9dbd9e562..93e16dd26 100644
+--- a/ckan/lib/datapreview.py
++++ b/ckan/lib/datapreview.py
+@@ -132,8 +132,8 @@ def get_default_view_plugins(
+         view_plugin = get_view_plugin(view_type)
+ 
+         if not view_plugin:
+-            log.warning(
+-                'Plugin for view {0} could not be found'.format(view_type))
++            #log.warning(
++            #    'Plugin for view {0} could not be found'.format(view_type))
+             # We should probably check on startup if the default
+             # view types exist
+             continue

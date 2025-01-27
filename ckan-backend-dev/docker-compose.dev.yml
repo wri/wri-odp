@@ -100,17 +100,17 @@ services:
       prefect:
         condition: service_healthy
 
-  my-migration:
-    container_name: my-migration
-    build:
-      context: ../migration
-    restart: always
-    environment:
-      - FLOW_DEPLOYMENT_ENV=dev
-      - PREFECT_API_URL=http://prefect:4200/api
-    depends_on:
-      prefect:
-        condition: service_healthy
+  #my-migration:
+  #  container_name: my-migration
+  #  build:
+  #    context: ../migration
+  #  restart: always
+  #  environment:
+  #    - FLOW_DEPLOYMENT_ENV=dev
+  #    - PREFECT_API_URL=http://prefect:4200/api
+  #  depends_on:
+  #    prefect:
+  #      condition: service_healthy
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}
