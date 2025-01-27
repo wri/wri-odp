@@ -29,7 +29,7 @@ export function Hero({ application }: { application: Application }) {
                 />
                 <div className="absolute bottom-0 z-10 flex lg:h-[68px] lg:w-60 px-4 py-4 items-center justify-center rounded-t-[3px] bg-white">
                     <Link
-                        href="/application"
+                        href="/applications"
                         className="whitespace-nowrap inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-400 text-stone-900 font-bold font-acumin hover:bg-yellow-500 h-11 px-6 py-4 rounded-[3px] text-base"
                     >
                         <ChevronLeftIcon className="mb-1 lg:mr-1 h-6 w-6" />
