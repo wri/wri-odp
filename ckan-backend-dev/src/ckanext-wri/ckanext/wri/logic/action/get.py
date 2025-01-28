@@ -1593,6 +1593,7 @@ def _group_or_org_list(
     if not is_sysadmin:
         # User is logged in
         if user:
+            
             permission = data_dict.get('permission', 'manage_group')
 
             roles = authz.get_roles_with_permission(permission)
@@ -1604,14 +1605,30 @@ def _group_or_org_list(
             if not user_id:
                 return []
 
+
+            group_visibility_filter = sqlalchemy.or_(
+                # Organizations with visibility set to public
+                sqlalchemy.and_(
+                    group_extra_alias.key == 'visibility',
+                    group_extra_alias.value == 'public'
+                ),
+                # Organizations with no visibility entry (group_extra is None)
+                group_extra_alias.key == None
+            )
+
             qmodel = model.Session.query(model.Member, model.Group) \
-                .filter(model.Member.table_name == 'user') \
-                .filter(
-                    model.Member.capacity.in_(roles)
-                ) \
-                .filter(model.Member.table_id == user_id) \
-                .filter(model.Member.state == 'active') \
-                .join(model.Group)
+                    .outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id) \
+                    .filter(sqlalchemy.or_(
+                        # User's groups
+                        sqlalchemy.and_(
+                            model.Member.table_name == 'user',
+                            model.Member.capacity.in_(roles),
+                            model.Member.table_id == user_id,
+                            model.Member.state == 'active',
+                        ),
+                        # Public visibility groups
+                        group_visibility_filter
+                    ))
 
             group_ids: set[str] = set()
             roles_that_cascade = cast(
@@ -1631,20 +1648,13 @@ def _group_or_org_list(
 
                 group_ids_to_capacities[group.id] = member.capacity
                 group_ids.add(group.id)
+           
             if not group_ids:
                 return []
 
-            query = query.outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
-            query = query.filter(sqlalchemy.or_(
-                model.Group.id.in_(group_ids),  # Groups accessible to the user
-                sqlalchemy.and_(                 # Public groups
-                    group_extra_alias.key == 'visibility',
-                    group_extra_alias.value == 'public'
-                ),
-                group_extra_alias.key == None    # Groups with no visibility entry
-            ))
+           
+            query = query.filter(model.Group.id.in_(group_ids))
             
-            # log.warn("Query: {}".format(query))
         # User is anonymous
         else:
             query = query.outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
@@ -1658,6 +1668,7 @@ def _group_or_org_list(
                 group_extra_alias.key == None
             ))
 
+    
     if groups:
         groups = aslist(groups, sep=",")
         query = query.filter(model.Group.name.in_(groups))
