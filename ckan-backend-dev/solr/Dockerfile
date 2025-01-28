@@ -2,7 +2,7 @@ FROM solr:8
 
 EXPOSE 8983
 
-ARG CKAN_BRANCH="dev-v2.11"
+ARG CKAN_BRANCH="ckan-v2.11.0"
 
 ENV SOLR_INSTALL="/opt/solr"
 ENV SOLR_CONFIG_DIR="$SOLR_INSTALL/server/solr/configsets"
