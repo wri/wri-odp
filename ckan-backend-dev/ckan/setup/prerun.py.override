@@ -148,13 +148,13 @@ def init_datastore_db():
         print(str(e))
 
     except subprocess.CalledProcessError as e:
-        if "OperationalError" in e.output:
-            print(e.output)
+        if "OperationalError" in e.output.decode("utf-8"):
+            print(e.output.decode("utf-8"))
             print("[prerun] Database not ready, waiting a bit before exit...")
             time.sleep(5)
             sys.exit(1)
         else:
-            print(e.output)
+            print(e.output.decode("utf-8"))
             raise e
     finally:
         cursor.close()
