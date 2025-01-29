@@ -243,6 +243,9 @@ export function Hero() {
                         </p>
                         <form
                             onSubmit={handleSubmit((data) => {
+                                if (data.search === '') {
+                                    return router.push('/search')
+                                }
                                 router.push({
                                     pathname: '/search',
                                     query: `search=%5B%7B%22title%22%3A%22Search%22%2C%22key%22%3A%22search%22%2C%22label%22%3A%22${encodeURIComponent(
