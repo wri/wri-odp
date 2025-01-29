@@ -18,6 +18,7 @@ env:
   ENABLE_UNIT_TESTS: true
   ENABLE_FRONTEND_TESTS: false
   ENABLE_DEBUG_LOGS: false
+  ENABLE_FRONTEND_DOCKER: false
 permissions:
   id-token: write
   contents: read
@@ -116,6 +117,7 @@ jobs:
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Set up Frontend Docker Container
+        if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-680fae2f68e4e68e283617c1036b730572ffece8'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
