@@ -1814,7 +1814,7 @@ def organization_patch(context, data_dict):
         }
         public_package = get_action("package_search")(context, rdata_dict)
         if public_package.get("count") > 0:
-            raise ValidationError({"message": _(f"Team has public {public_package.get('count')} dataset(s) and cannot be made private")})
+            raise ValidationError({"message": _(f"Team has {public_package.get('count')} public dataset(s) and cannot be made private")})
     return old_organization_patch(context, data_dict)
 
 def validate_visibility(context, data_dict):
