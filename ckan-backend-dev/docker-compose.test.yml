@@ -162,6 +162,10 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "-e", "QUIT"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
 
   minio:
     container_name: ${MINIO_CONTAINER_NAME}
