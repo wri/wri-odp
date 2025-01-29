@@ -225,6 +225,7 @@ export interface GroupTree {
     title?: string
     image_display_url?: string
     parent_name?: string
+    private?: boolean
 }
 
 export interface Collaborator {

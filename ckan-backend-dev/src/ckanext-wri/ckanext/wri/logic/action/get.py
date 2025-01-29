@@ -1617,7 +1617,6 @@ def _group_or_org_list(
             )
 
             qmodel = model.Session.query(model.Member, model.Group) \
-                    .outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id) \
                     .filter(sqlalchemy.or_(
                         # User's groups
                         sqlalchemy.and_(
@@ -1625,10 +1624,8 @@ def _group_or_org_list(
                             model.Member.capacity.in_(roles),
                             model.Member.table_id == user_id,
                             model.Member.state == 'active',
-                        ),
-                        # Public visibility groups
-                        group_visibility_filter
-                    ))
+                        )
+                    )).join(model.Group)
 
             group_ids: set[str] = set()
             roles_that_cascade = cast(
@@ -1648,10 +1645,26 @@ def _group_or_org_list(
 
                 group_ids_to_capacities[group.id] = member.capacity
                 group_ids.add(group.id)
+
+
+            public_groups_query = model.Session.query(model.Group.id).outerjoin(
+                group_extra_alias, model.Group.id == group_extra_alias.group_id
+            ).filter(sqlalchemy.or_(
+                sqlalchemy.and_(
+                    group_extra_alias.key == 'visibility',
+                    group_extra_alias.value == 'public'
+                ),
+               
+                group_extra_alias.key == None
+            ))
+
+            public_group_ids = {group_id for group_id, in public_groups_query.all()}
+
            
-            if not group_ids:
+            if not group_ids and not public_group_ids:
                 return []
 
+            group_ids |= public_group_ids
            
             query = query.filter(model.Group.id.in_(group_ids))
             
@@ -1801,7 +1814,7 @@ def organization_patch(context, data_dict):
         }
         public_package = get_action("package_search")(context, rdata_dict)
         if public_package.get("count") > 0:
-            raise ValidationError({"message": _("Team has public datasets and cannot be made private")})
+            raise ValidationError({"message": _(f"Team has public {public_package.get('count')} dataset(s) and cannot be made private")})
     return old_organization_patch(context, data_dict)
 
 def validate_visibility(context, data_dict):
@@ -1833,15 +1846,10 @@ def organization_show(context, data_dict):
     user = context.get("user")
 
 
-    # if data_dict.get("visibility", "public") in ["public", "internal"] or authz.is_sysadmin(user):
-    #     return data_dict
-    
-    # if user:
-    #     users = data_dict.get("users", [])
-    #     user_exists = any(userorg["name"] == user for userorg in users)
-    #     if user_exists:
-    #         return data_dict
-    # raise NotFound("Organization not found")
+    if not authz.is_sysadmin(user):
+        is_authorized = get_action("organization_list")(context, {"q": data_dict.get("name")})
+        if not is_authorized:
+            raise NotAuthorized
     return data_dict
 
 

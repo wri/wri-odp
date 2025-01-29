@@ -80,6 +80,14 @@ export const teamRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const user = ctx.session.user
+
+                // only sysadmin is allowed to create Parent teams
+                if (
+                    !user.sysadmin &&
+                    (!input.parent || input.parent.value === '')
+                )
+                    throw Error('Only sysadmin can create parent teams')
+
                 var newMembers = []
                 for (const member of input.members) {
                     newMembers.push({
@@ -209,6 +217,14 @@ export const teamRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const user = ctx.session.user
+
+                // only sysadmin is allowed to create Parent teams
+                if (
+                    !user.sysadmin &&
+                    (!input.parent || input.parent.value === '')
+                )
+                    throw Error('Only sysadmin can create parent teams')
+
                 const body = JSON.stringify({
                     ...input,
                     image_display_url: input.image_url
@@ -430,6 +446,7 @@ export const teamRouter = createTRPCRouter({
                 },
             }
         )
+
         const team: CkanResponse<Organization[]> = await teamRes.json()
         if (!team.success && team.error)
             throw Error(replaceNames(team.error.message))
@@ -439,10 +456,11 @@ export const teamRouter = createTRPCRouter({
     }),
     getNumberOfSubTeams: publicProcedure.query(async ({ ctx, input }) => {
         const teamRes = await fetch(
-            `${env.CKAN_URL}/api/action/organization_list_wri?q=`,
+            `${env.CKAN_URL}/api/3/action/organization_list_wri`,
             {
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `${ctx?.session?.user.apikey}`,
                 },
             }
         )
