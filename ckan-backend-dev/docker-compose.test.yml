@@ -158,7 +158,7 @@ services:
 
   redis:
     container_name: ${REDIS_CONTAINER_NAME}
-    image: redis:${REDIS_VERSION}
+    image: redis:3
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "-e", "QUIT"]
