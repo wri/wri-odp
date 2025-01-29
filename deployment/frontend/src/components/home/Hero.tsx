@@ -100,7 +100,7 @@ export function Hero() {
                             ) : (
                                 <button
                                     onClick={() => setIsOpen(true)}
-                                    className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
+                                    className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline font-semibold leading-6 text-white"
                                     id="nav-login-button"
                                 >
                                     Login
@@ -121,7 +121,7 @@ export function Hero() {
                             <Link
                                 key={item.title}
                                 href={item.href}
-                                className="text-sm font-semibold leading-6 text-white"
+                                className="font-semibold leading-6 text-white"
                             >
                                 {item.title}
                             </Link>
@@ -132,7 +132,7 @@ export function Hero() {
                             ) : (
                                 <button
                                     onClick={() => setIsOpen(true)}
-                                    className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
+                                    className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline font-semibold leading-6 text-white"
                                 >
                                     Login
                                 </button>
