@@ -16,6 +16,12 @@ import { appRouter } from '@/server/api/root'
 import { getServerAuthSession } from '@/server/auth'
 import dynamic from 'next/dynamic'
 import Spinner from '@/components/_shared/Spinner'
+import { Tab } from '@headlessui/react'
+import { Fragment } from 'react'
+import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/20/solid'
+import classNames from '@/utils/classnames'
+import { ApplicationsCarousel } from '@/components/home/ApplicationCarousel'
+import { ArrowRightIcon } from '@heroicons/react/24/solid'
 
 const ErrorAlert = dynamic<{ text: string; title?: string }>(
     () =>
@@ -79,6 +85,18 @@ export default function Home(
         sortBy: 'metadata_modified desc',
         removeUnecessaryDataInResources: true,
     })
+    const {
+        data: featuredDatasets,
+        isLoading: isLoadingFeaturedDatasets,
+        error: errorFeaturedDatasets,
+    } = api.dataset.getFeaturedDatasets.useQuery({
+        removeUnecessaryDataInResources: true,
+    })
+    const {
+        data: application,
+        isLoading,
+        error,
+    } = api.applications.getAllApplications.useQuery()
     return (
         <>
             <Head>
@@ -148,70 +166,174 @@ export default function Home(
                 </div>
             </main>
 
-            <main className="flex min-h-screen flex-col items-center justify-center gap-y-8 bg-neutral-50 py-20">
-                <div className="topics-carousel relative !ml-auto w-full max-w-[94.5vw] py-10">
-                    <h3 className="font-acumin text-2xl font-bold leading-loose text-stone-900">
-                        Explore Topic
-                    </h3>
-                    <div className="py-4">
-                        <TopicsCarousel />
-                    </div>
-                </div>
-                <div className="highlights-carousel relative !ml-auto w-full max-w-[94.5vw]">
-                    <div className="default-home-container w-full border-t-[4px] border-stone-900" />
-                    <h3 className="pt-1 font-acumin text-2xl font-bold leading-loose text-stone-900">
-                        Highlights
-                    </h3>
-                    <div className="py-4">
-                        <HighlightsCarousel />
-                    </div>
-                </div>
-                {isLoadingRecentlyAdded ? (
-                    <div className="w-full flex justify-center items-center h-10">
-                        <Spinner />
-                    </div>
-                ) : errorRecentlyAdded ? (
-                    <ErrorAlert
-                        title="Failed to load recently added datasets"
-                        text={errorRecentlyAdded.message}
-                    />
-                ) : (
-                    <div
-                        id="highlights"
-                        className="max-w-[90.5vw] mx-auto flex flex-col font-acumin gap-y-6 mt-16"
-                    >
-                        <h1 className="font-bold text-[2rem] ml-2">
-                            Recently Added
-                        </h1>
-                        <Recent
-                            datasets={recentlyAdded.datasets}
-                            title="Recently added"
-                        />
-                    </div>
-                )}
-                {isLoadingRecentlyUpdated ? (
-                    <div className="w-full flex justify-center items-center h-10">
-                        <Spinner />
-                    </div>
-                ) : errorRecentlyUpdated ? (
-                    <ErrorAlert
-                        title="Failed to load recently updated datasets"
-                        text={errorRecentlyUpdated.message}
-                    />
-                ) : (
-                    <div
-                        id="highlights"
-                        className="max-w-[90.8vw] mx-auto flex flex-col font-acumin gap-y-6 mt-16"
-                    >
-                        <h1 className="font-bold text-[2rem] ml-2">
-                            Recently Updated
-                        </h1>
-                        <Recent
-                            datasets={recentlyUpdated.datasets}
-                            title="Recently updated"
-                        />
-                    </div>
-                )}
+            <main className="flex min-h-screen flex-col bg-neutral-50 py-20">
+                <Tab.Group>
+                    <Tab.List className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full">
+                        <Tab as={Fragment}>
+                            {({ selected }) => (
+                                <div
+                                    className={classNames(
+                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
+                                        selected
+                                            ? 'text-[#32864b] underline underline-offset-8'
+                                            : ''
+                                    )}
+                                >
+                                    Explore by Topic
+                                </div>
+                            )}
+                        </Tab>
+                        {application && application.length > 0 && (
+                            <Tab as={Fragment}>
+                                {({ selected }) => (
+                                    <div
+                                        className={classNames(
+                                            'text-black text-2xl font-medium font-acumin cursor-pointer',
+                                            selected
+                                                ? 'text-[#32864b] underline underline-offset-8'
+                                                : ''
+                                        )}
+                                    >
+                                        Explore by application
+                                    </div>
+                                )}
+                            </Tab>
+                        )}
+                    </Tab.List>
+                    <Tab.Panels>
+                        <Tab.Panel className="topics-carousel relative !ml-auto w-full max-w-[94.5vw]">
+                            <Link
+                                href="/topics"
+                                className="flex justify-end pr-5 text-lg font-semibold pb-3 items-center gap-x-2"
+                            >
+                                See all{' '}
+                                <ArrowRightIcon className="h-4 w-4 inline-block" />
+                            </Link>
+                            <TopicsCarousel />
+                        </Tab.Panel>
+                        <Tab.Panel className="highlights-carousel relative !ml-auto w-full max-w-[94.5vw]">
+                            <Link
+                                href="/applications"
+                                className="flex justify-end pr-5 text-lg font-semibold pb-3 items-center gap-x-2"
+                            >
+                                See all{' '}
+                                <ArrowRightIcon className="h-4 w-4 inline-block" />
+                            </Link>
+                            <ApplicationsCarousel />
+                        </Tab.Panel>
+                    </Tab.Panels>
+                </Tab.Group>
+                <Tab.Group>
+                    <Tab.List className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full pt-20 pb-8">
+                        <Tab as={Fragment}>
+                            {({ selected }) => (
+                                <div
+                                    className={classNames(
+                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
+                                        selected
+                                            ? 'text-[#32864b] underline underline-offset-8'
+                                            : ''
+                                    )}
+                                >
+                                    Dataset Highlights
+                                </div>
+                            )}
+                        </Tab>
+                        <Tab as={Fragment}>
+                            {({ selected }) => (
+                                <div
+                                    className={classNames(
+                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
+                                        selected
+                                            ? 'text-[#32864b] underline underline-offset-8'
+                                            : ''
+                                    )}
+                                >
+                                    Recently added
+                                </div>
+                            )}
+                        </Tab>
+                        <Tab as={Fragment}>
+                            {({ selected }) => (
+                                <div
+                                    className={classNames(
+                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
+                                        selected
+                                            ? 'text-[#32864b] underline underline-offset-8'
+                                            : ''
+                                    )}
+                                >
+                                    Recently updated
+                                </div>
+                            )}
+                        </Tab>
+                    </Tab.List>
+                    <Tab.Panels>
+                        <Tab.Panel>
+                            {isLoadingFeaturedDatasets ? (
+                                <div className="w-full flex justify-center items-center h-10">
+                                    <Spinner />
+                                </div>
+                            ) : errorFeaturedDatasets ? (
+                                <ErrorAlert
+                                    title="Failed to load highlights"
+                                    text={errorFeaturedDatasets.message}
+                                />
+                            ) : (
+                                <div
+                                    id="highlights"
+                                    className="max-w-[90.5vw] mx-auto flex flex-col font-acumin gap-y-6"
+                                >
+                                    <HighlightsCarousel />
+                                </div>
+                            )}
+                        </Tab.Panel>
+                        <Tab.Panel>
+                            {isLoadingRecentlyAdded ? (
+                                <div className="w-full flex justify-center items-center h-10">
+                                    <Spinner />
+                                </div>
+                            ) : errorRecentlyAdded ? (
+                                <ErrorAlert
+                                    title="Failed to load recently added datasets"
+                                    text={errorRecentlyAdded.message}
+                                />
+                            ) : (
+                                <div
+                                    id="highlights"
+                                    className="max-w-[90.5vw] mx-auto flex flex-col font-acumin gap-y-6"
+                                >
+                                    <Recent
+                                        datasets={recentlyAdded.datasets}
+                                        title="Recently added"
+                                    />
+                                </div>
+                            )}
+                        </Tab.Panel>
+                        <Tab.Panel>
+                            {isLoadingRecentlyUpdated ? (
+                                <div className="w-full flex justify-center items-center h-10">
+                                    <Spinner />
+                                </div>
+                            ) : errorRecentlyUpdated ? (
+                                <ErrorAlert
+                                    title="Failed to load recently updated datasets"
+                                    text={errorRecentlyUpdated.message}
+                                />
+                            ) : (
+                                <div
+                                    id="highlights"
+                                    className="max-w-[90.5vw] mx-auto flex flex-col font-acumin gap-y-6"
+                                >
+                                    <Recent
+                                        datasets={recentlyUpdated.datasets}
+                                        title="Recently updated"
+                                    />
+                                </div>
+                            )}
+                        </Tab.Panel>
+                    </Tab.Panels>
+                </Tab.Group>
             </main>
             <HomeFooter />
         </>

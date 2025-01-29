@@ -131,7 +131,15 @@ export default function teams(
                 <DatasetTeams teams={data?.teams!} key={router.asPath} />
             </div>
 
-            <Footer />
+            <Footer
+                links={{
+                    primary: { title: 'Explore Topics', href: '/topics' },
+                    secondary: {
+                        title: 'Explore Applications',
+                        href: '/applications',
+                    },
+                }}
+            />
         </>
     )
 }

@@ -20,6 +20,7 @@ import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
 import { Organization as CkanOrg } from '@portaljs/ckan'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
+import TopicsSearch from '@/components/topics/TopicsSearch'
 
 const TeamsSearchResults = dynamic(
     () => import('@/components/team/TeamsSearchResults')
@@ -115,10 +116,11 @@ export default function TeamsPage(
             />
             <Header />
             <Breadcrumbs links={links} />
-            <TeamsSearch
+            <TopicsSearch
                 isLoading={isLoading}
                 setQuery={setQuery}
                 query={query}
+                groupType="Teams"
             />
 
             <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
@@ -130,7 +132,10 @@ export default function TeamsPage(
                         <br />
                         If you have questions about a project&apos;s data reach
                         out to the point of contact in the dataset or to{' '}
-                        <a href="mailto:data@wri.org" className="text-blue-700">
+                        <a
+                            href="mailto:data@wri.org"
+                            className="text-blue-700 underline"
+                        >
                             {' '}
                             data@wri.org
                         </a>
@@ -139,7 +144,9 @@ export default function TeamsPage(
             </section>
 
             {isLoading ? (
-                <Spinner className="mx-auto" />
+                <div className="mx-auto h-[2898px] lg:h-[2406px]">
+                    <Spinner className="mx-auto" />
+                </div>
             ) : (
                 <>
                     <TeamsSearchResults
@@ -164,8 +171,11 @@ export default function TeamsPage(
 
             <Footer
                 links={{
-                    primary: { title: 'Search', href: '/search' },
-                    secondary: { title: 'Explore Topics', href: '/topics' },
+                    primary: { title: 'Explore Topics', href: '/topics' },
+                    secondary: {
+                        title: 'Explore Applications',
+                        href: '/applications',
+                    },
                 }}
             />
         </>

@@ -36,13 +36,18 @@ export function Hero() {
             active: false,
         },
         {
+            title: 'Topics',
+            href: '/topics',
+            active: false,
+        },
+        {
             title: 'Teams',
             href: '/teams',
             active: false,
         },
         {
-            title: 'Topics',
-            href: '/topics',
+            title: 'Applications',
+            href: '/applications',
             active: false,
         },
     ]
@@ -248,14 +253,20 @@ export function Hero() {
                                 })
                             })}
                         >
-                            <div className="mt-10 flex relative items-start justify-start gap-x-6 w-full max-w-[932px]">
+                            <div className="mt-10 flex relative items-start justify-start  w-full max-w-[876px]">
                                 <input
-                                    placeholder="Search data"
+                                    placeholder="Search datasets - try “energy”, “Global Forest Watch”, or “food”"
                                     aria-label="search"
-                                    className="placeholder:text-white text-white text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white bg-opacity-25 rounded-[3px] border-b-2 border-amber-400"
+                                    className="placeholder:text-[#5f5e5e]  flex-shrink flex-grow  placeholder:italic placeholder:font-light placeholder:leading-tight placeholder:sm:font-normal placeholder:sm:leading-normal text-[#4f4e4e]  text-xs md:text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white rounded-tl-[3px] rounded-bl-[3px] border-y-0 border-r-0"
                                     {...register('search')}
                                 />
-                                <MagnifyingGlassIcon className="w-7 h-7 text-white absolute top-[18px] right-4" />
+
+                                <button
+                                    type="submit"
+                                    className="px-8 py-4 text-[26px] font-semibold  font-acumin leading-[29.25px] text-black bg-wri-gold rounded-tr-[3px] rounded-br-[3px] h-[66px] w-full max-w-[149px] border-l-0 border-y-0"
+                                >
+                                    Search
+                                </button>
                             </div>
                         </form>
                     </div>
