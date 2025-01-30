@@ -323,7 +323,7 @@ export default function Home(
                             ) : (
                                 <div
                                     id="highlights"
-                                    className="max-w-[90.8vw] mx-auto flex flex-col font-acumin gap-y-6"
+                                    className="max-w-[90.5vw] mx-auto flex flex-col font-acumin gap-y-6"
                                 >
                                     <Recent
                                         datasets={recentlyUpdated.datasets}
