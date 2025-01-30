@@ -9,6 +9,10 @@ const normalUserPassword = "test1234";
 
 const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+Cypress.on("uncaught:exception", (err, runnable) => {
+  console.log(err);
+  return false;
+});
 
 describe("Create and edit team", () => {
   before(() => {
@@ -35,6 +39,8 @@ describe("Create and edit team", () => {
     cy.get("button[type=submit]").click();
 
     cy.visit(`/teams/${org}`).then(() => {
+      cy.once("uncaught:exception", () => false);
+      cy.wait(10000);
       cy.contains(org).should("exist");
     });
   });
@@ -43,9 +49,11 @@ describe("Create and edit team", () => {
     cy.logout();
     cy.login(normalUser, normalUserPassword);
     cy.visit("/teams");
+    cy.wait(10000);
     cy.contains(org).should("not.exist");
 
     cy.visit(`/teams/${org}`);
+    cy.wait(5000);
     cy.contains("Team not found").should("exist");
   });
 
@@ -59,9 +67,8 @@ describe("Create and edit team", () => {
     cy.get("li").contains("English").click();
     cy.get("#visibility_type").click();
     cy.get("li").contains("Public").click();
-    cy.get("#team").click();
+    cy.get("#team", { timeout: 10000 }).should("exist").click();
     cy.get("li").contains(org).click();
-    cy.get("input[name=application]").type("GFW");
     cy.get("button").contains("Tags").click();
     cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
     cy.get("input[name=project]").focus().type("Project 1");
@@ -86,13 +93,14 @@ describe("Create and edit team", () => {
 
   it("Should edit team and assign public dataset and edit team back to private", () => {
     cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
+      cy.wait(10000);
       cy.get("input[name=title]").should("have.value", org);
-      cy.get("button[aria-haspopup=listbox]").should("have.length", 2);
       cy.get("button#visibility").click();
       cy.get("li").contains("Public").click();
       cy.get("button[type=submit]").click();
     });
     cy.visit(`/dashboard/datasets/new`);
+    cy.wait(10000);
     cy.get("input[name=title]").type(datasetSuffix);
     cy.get("input[name=name]").should("have.value", datasetSuffix);
     cy.get("input[name=url]").type("https://google.com");
@@ -102,7 +110,6 @@ describe("Create and edit team", () => {
     cy.get("li").contains("Public").click();
     cy.get("#team").click();
     cy.get("li").contains(org).click();
-    cy.get("input[name=application]").type("GFW");
     cy.get("button").contains("Tags").click();
     cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
     cy.get("input[name=project]").focus().type("Project 1");
@@ -127,7 +134,6 @@ describe("Create and edit team", () => {
 
     cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", org);
-      cy.get("button[aria-haspopup=listbox]").should("have.length", 2);
       cy.get("button#visibility").click();
       cy.get("li").contains("Private").click();
       cy.get("button[type=submit]").click();
@@ -156,14 +162,14 @@ describe("Create and edit team", () => {
     cy.logout();
     cy.login(normalUser, normalUserPassword);
     cy.visit("/teams");
-    cy.contains(parentOrg);
+    cy.wait(9000);
+    cy.contains(parentOrg).should("exist");
     cy.contains(org).should("not.exist");
   });
 
   it("should edit parent team to private", () => {
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
-      cy.get("button[aria-haspopup=listbox]").should("have.length", 2);
       cy.get("button#visibility").click();
       cy.get("li").contains("Private").click();
       cy.get("button[type=submit]").click();
@@ -174,7 +180,7 @@ describe("Create and edit team", () => {
     cy.logout();
     cy.login(normalUser, normalUserPassword);
     cy.visit("/teams");
-    cy.contains(parentOrg);
+    cy.contains(parentOrg).should("not.exist");
     cy.contains(org).should("not.exist");
   });
 

@@ -992,7 +992,7 @@ def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any, 
             group_tree["highlighted"] = False
 
         group_hierarchy_ids += recurcive_tree_ids(group_tree)
-        if not context['user'] and group_tree["name"] in private_orgs:
+        if not context['user'] and (private_orgs and group_tree["name"] in private_orgs):
             continue
         results.append(group_tree)
     return results
