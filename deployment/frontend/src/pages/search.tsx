@@ -249,9 +249,7 @@ export default function SearchPage(
                 shallow: true,
             }
         )
-        if (window) {
-            window.scrollTo({ top: 0, behavior: 'smooth' })
-        }
+        
     }, [filters, query.page, query.sortBy])
     const links = [{ label: 'Search', url: '/search', current: true }]
 
