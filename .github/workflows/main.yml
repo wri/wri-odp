@@ -14,11 +14,11 @@ env:
   ENABLE_BUILD_FRONTEND: true
   ENABLE_BUILD_DATAPUSHER: true
   ENABLE_BUILD_MIGRATION: true
-  ENABLE_INT_TESTS: false
+  ENABLE_INT_TESTS: true
   ENABLE_UNIT_TESTS: true
-  ENABLE_FRONTEND_TESTS: false
+  ENABLE_FRONTEND_TESTS: true
   ENABLE_DEBUG_LOGS: false
-  ENABLE_FRONTEND_DOCKER: false
+  ENABLE_FRONTEND_DOCKER: true
 permissions:
   id-token: write
   contents: read
