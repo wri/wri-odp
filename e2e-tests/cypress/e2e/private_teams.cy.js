@@ -109,9 +109,11 @@ describe("Create and edit team", () => {
     cy.get("li").contains("English").click();
     cy.get("#visibility_type").click();
     cy.get("li").contains("Public").click();
+    cy.get("button#visibility_type span").should("contain.text", "Public");
     cy.wait(5000);
     cy.get("#team", { timeout: 10000 }).should("exist").click();
     cy.get("li").contains(parentOrg).click();
+    cy.get("button#team span").should("contain.text", parentOrg);
     cy.get("button").contains("Tags").click();
     cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
     cy.get("input[name=project]").focus().type("Project 1");
