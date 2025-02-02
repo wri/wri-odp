@@ -7,8 +7,8 @@ const normalUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const normalUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_member`;
 const normalUserPassword = "test1234";
 
-const parentOrg = `${uuid()}-${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const org = `${uuid()}-${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const parentOrg = `parentparent-testtest${Cypress.env("ORG_NAME_SUFFIX")}`;
+const org = `childchild-tttest${Cypress.env("ORG_NAME_SUFFIX")}`;
 Cypress.on("uncaught:exception", (err, runnable) => {
   console.log(err);
   return false;
@@ -36,7 +36,9 @@ describe("Create and edit team", () => {
 
     cy.get("button#visibility").click();
     cy.get("li").contains("Private").click();
+    cy.wait(5000);
     cy.get("button[type=submit]").click();
+    cy.wait(90000);
 
     cy.visit(`/teams/${org}`).then(() => {
       cy.once("uncaught:exception", () => false);
