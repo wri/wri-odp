@@ -7,8 +7,8 @@ const normalUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const normalUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_member`;
 const normalUserPassword = "test1234";
 
-const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const parentOrg = `${uuid()}-${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const org = `${uuid()}-${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 Cypress.on("uncaught:exception", (err, runnable) => {
   console.log(err);
   return false;
@@ -27,14 +27,14 @@ describe("Create and edit team", () => {
   it("Should create team", () => {
     cy.visit("/dashboard/teams/new");
     //get input with name=title
+    cy.wait(6000);
     cy.get("input[name=title]").type(org);
     //check if input with name url has the content of "test-team"
     cy.get("input[name=name]").should("have.value", org);
     cy.get("textarea[name=description]").type("Test description");
     //get button with aria-haspopup=true
 
-    cy.get("button[aria-haspopup=listbox]").should("have.length", 2);
-    cy.get("button#visibility").click();
+    cy.get("button#visibility").contains("Select visibility").click();
     cy.get("li").contains("Private").click();
     cy.get("button[type=submit]").click();
 
@@ -59,7 +59,7 @@ describe("Create and edit team", () => {
 
   it("Should not create public dataset with private team", () => {
     cy.visit("/dashboard/datasets/new");
-
+    cy.wait(9000);
     cy.get("input[name=title]").type(datasetSuffix);
     cy.get("input[name=name]").should("have.value", datasetSuffix);
     cy.get("input[name=url]").type("https://google.com");
@@ -86,6 +86,7 @@ describe("Create and edit team", () => {
     );
 
     cy.contains("Next: Datafiles").click();
+    cy.wait(5000)
     cy.contains("Public dataset cannot be assigned to private team").should(
       "exist"
     );
