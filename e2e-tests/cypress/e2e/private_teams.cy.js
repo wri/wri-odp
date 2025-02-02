@@ -34,7 +34,7 @@ describe("Create and edit team", () => {
     cy.get("textarea[name=description]").type("Test description");
     //get button with aria-haspopup=true
 
-    cy.get("button#visibility").contains("Select visibility").click();
+    cy.get("button#visibility").click();
     cy.get("li").contains("Private").click();
     cy.get("button[type=submit]").click();
 
@@ -86,7 +86,7 @@ describe("Create and edit team", () => {
     );
 
     cy.contains("Next: Datafiles").click();
-    cy.wait(5000)
+    cy.wait(5000);
     cy.contains("Public dataset cannot be assigned to private team").should(
       "exist"
     );
