@@ -978,6 +978,9 @@ export function DatasetHeader({
                                                 provider:
                                                     dataset.provider as any,
                                                 datasetId: dataset.id,
+                                                datasetName:
+                                                    dataset.title ??
+                                                    dataset.name,
                                                 id: dataset.rw_id as string,
                                                 connectorUrl:
                                                     dataset.connectorUrl as string,
