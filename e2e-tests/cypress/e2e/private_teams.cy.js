@@ -100,6 +100,13 @@ describe("Create and edit team", () => {
   });
 
   it("Should not create public dataset with private team", () => {
+    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
+      cy.get("input[name=title]").should("have.value", parentOrg);
+      cy.get("button#visibility").click();
+      cy.get("li").contains("Private").click();
+      cy.get("button[type=submit]").click();
+    });
+    cy.wait(10000);
     cy.visit("/dashboard/datasets/new");
     cy.wait(9000);
     cy.get("input[name=title]").type(datasetSuffix);
