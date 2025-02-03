@@ -45,9 +45,9 @@ download_event = sqlalchemy.Table('download_event', meta.metadata,
             ondelete='CASCADE'),
         nullable=False),
     sqlalchemy.Column('created_at', sqlalchemy.types.DateTime(timezone=True),
-        nullable=False, default=datetime.datetime.now(datetime.timezone.utc)),
+        nullable=False, server_default=sqlalchemy.func.now()),
     sqlalchemy.Column('updated_at', sqlalchemy.types.DateTime(timezone=True),
-        nullable=False, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
+        nullable=False, server_default=sqlalchemy.func.now(), onupdate=sqlalchemy.func.now()
 )
 
 class DownloadEvent(object):
