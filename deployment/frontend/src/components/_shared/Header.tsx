@@ -90,7 +90,7 @@ export default function Header() {
                     />
                 </Link>
                 <div className=" ml-auto flex mt-auto gap-x-6 ">
-                    <div className=" hidden sm:flex gap-x-6 font-semibold text-[1.0625rem] text-wri-black">
+                    <div className=" hidden sm:flex gap-x-6 font-semibold text-wri-black">
                         {navigation.map((item) => {
                             return (
                                 <Link
