@@ -68,6 +68,7 @@ def update_download_event():
     
     if new_columns:
         connection = meta.engine.connect()
+        trans = connection.begin()
         try:
             for column_name in new_columns:
                 column = download_event.c[column_name]
@@ -79,11 +80,11 @@ def update_download_event():
                 connection.execute(sql)
                 log.info(f"Added new column {column_name} to download_event table")
                 
-            connection.commit()
+            trans.commit()
             log.info("Successfully updated download_event table schema")
         except Exception as e:
             log.error(f"Error updating download_event table schema: {str(e)}")
-            connection.rollback()
+            trans.rollback()
             raise
         finally:
             connection.close()
