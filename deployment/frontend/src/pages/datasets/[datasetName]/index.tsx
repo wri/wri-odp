@@ -218,8 +218,8 @@ export async function getServerSideProps(
                     : null,
                 pendingExist: pendingExist,
                 is_approved: pendingExist
-                    ? prevdataset.is_approved ?? null
-                    : dataset.is_approved ?? null,
+                    ? (prevdataset.is_approved ?? null)
+                    : (dataset.is_approved ?? null),
                 generalAuthorized: generalAuthorized,
                 isPendingState: pendingExist
                     ? dataset.approval_status === 'pending'
@@ -541,6 +541,7 @@ export default function DatasetPage(
                 setDisplayNoPreview(false)
                 setTabularResource({
                     provider: dataset.provider as string,
+                    datasetName: dataset.title ?? dataset.name,
                     id: dataset.rw_id as string,
                     name: dataset.name as string,
                 })
@@ -557,6 +558,7 @@ export default function DatasetPage(
                     provider: 'datastore',
                     id: resource?.id as string,
                     apiKey: apikey,
+                    datasetName: dataset.title ?? dataset.name,
                     name: resource?.title ?? (resource?.name as string),
                 })
                 customDataLayer({
