@@ -7,8 +7,8 @@ const normalUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const normalUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_member`;
 const normalUserPassword = "test1234";
 
-const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
-const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`.toLowerCase();
+const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`.toLowerCase();
 Cypress.on("uncaught:exception", (err, runnable) => {
   console.log(err);
   return false;
