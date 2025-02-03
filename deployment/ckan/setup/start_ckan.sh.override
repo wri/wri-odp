@@ -39,7 +39,11 @@ export SCRIPT_NAME="/private-admin"
 if [ $? -eq 0 ]
 then
     # Start supervisord
-    export ENV_SUPERVISOR_USER=$(whoami)
+    SUPERVISOR_USER=$(whoami)
+
+    sed -i "s|SUPERVISOR_USER|$SUPERVISOR_USER|g" /etc/supervisord.d/harvest.conf
+    sed -i "s|SUPERVISOR_USER|$SUPERVISOR_USER|g" /etc/supervisord.d/worker.conf
+
     supervisord --configuration /etc/supervisord.conf &
     # Start uwsgi
     uwsgi $UWSGI_OPTS
