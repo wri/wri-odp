@@ -40,6 +40,9 @@ if [ $? -eq 0 ]
 then
     # Start supervisord
     SUPERVISOR_USER=$(whoami)
+    echo "\n\n===================================\n"
+    echo "SUPERVISOR_USER: $SUPERVISOR_USER"
+    echo "\n===================================\n\n"
 
     sed -i "s|SUPERVISOR_USER|$SUPERVISOR_USER|g" /etc/supervisord.d/harvest.conf
     sed -i "s|SUPERVISOR_USER|$SUPERVISOR_USER|g" /etc/supervisord.d/worker.conf
