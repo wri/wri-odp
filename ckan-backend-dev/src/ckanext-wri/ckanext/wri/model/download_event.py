@@ -44,10 +44,10 @@ download_event = sqlalchemy.Table('download_event', meta.metadata,
         sqlalchemy.ForeignKey('resource.id', onupdate='CASCADE',
             ondelete='CASCADE'),
         nullable=False),
-    sqlalchemy.Column('created_at', sqlalchemy.types.DateTime,
-        nullable=False, default=datetime.datetime.now(datetime.timezone.utc)),
-    sqlalchemy.Column('updated_at', sqlalchemy.types.DateTime,
-        nullable=False, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
+    sqlalchemy.Column('created_at', sqlalchemy.types.DateTime(timezone=True),
+        nullable=False, server_default=sqlalchemy.func.now()),
+    sqlalchemy.Column('updated_at', sqlalchemy.types.DateTime(timezone=True),
+        nullable=False, server_default=sqlalchemy.func.now(), onupdate=sqlalchemy.func.now())
 )
 
 class DownloadEvent(object):
