@@ -155,7 +155,14 @@ class WriPlugin(plugins.SingletonPlugin):
 
             setup_download_event()
 
-        return [notificationdb, pendingdatasetsdb, resourcelocationdb, downloadeventdb]
+        @click.command()
+        def downloadeventdbupdate():
+            """Updates download event table"""
+            from ckanext.wri.model import update_download_event
+
+            update_download_event()
+
+        return [notificationdb, pendingdatasetsdb, resourcelocationdb, downloadeventdb, downloadeventdbupdate]
 
     # IAuth
 
