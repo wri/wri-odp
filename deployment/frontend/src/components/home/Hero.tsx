@@ -121,7 +121,7 @@ export function Hero() {
                             <Link
                                 key={item.title}
                                 href={item.href}
-                                className="font-semibold leading-6 text-white"
+                                className="font-semibold leading-6 text-white font-acumin"
                             >
                                 {item.title}
                             </Link>

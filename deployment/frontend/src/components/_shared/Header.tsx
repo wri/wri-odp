@@ -98,7 +98,7 @@ export default function Header() {
                                     href={item.href}
                                     className={
                                         item.active
-                                            ? 'border-b-2 border-b-wri-gold'
+                                            ? 'border-b-2 border-b-wri-gold font-acumin'
                                             : ''
                                     }
                                 >

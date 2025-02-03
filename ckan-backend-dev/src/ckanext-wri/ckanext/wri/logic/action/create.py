@@ -858,8 +858,9 @@ def download_event_create(context: Context, data_dict: DataDict):
             raise tk.ValidationError("Missing required field " + item[0])
 
     events = []
+    download_id = str(uuid.uuid4())  # Generate a unique UUID for this group of downloads
     for resource_id in resources:
-        event = DownloadEvent.create(email, first_name, last_name, affiliation, organization, job_title, country, interests, package_id, resource_id)
+        event = DownloadEvent.create(email, first_name, last_name, affiliation, organization, job_title, country, interests, package_id, resource_id, download_id)
         events.append(event)
 
     return download_event_list_dictize(events, context)
