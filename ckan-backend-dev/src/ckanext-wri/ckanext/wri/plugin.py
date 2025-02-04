@@ -31,6 +31,7 @@ from ckanext.wri.logic.action.create import (
     package_create,
     resource_create,
     old_package_create,
+    download_event_create,
 )
 from ckanext.wri.logic.action.update import (
     notification_update,
@@ -64,6 +65,7 @@ from ckanext.wri.logic.action.get import (
     package_collaborator_list_wri,
     resource_search,
     package_show,
+    get_download_events,
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -146,7 +148,21 @@ class WriPlugin(plugins.SingletonPlugin):
 
             setup_resource_location()
 
-        return [notificationdb, pendingdatasetsdb, resourcelocationdb]
+        @click.command()
+        def downloadeventdb():
+            """Creates download event table"""
+            from ckanext.wri.model import setup_download_event
+
+            setup_download_event()
+
+        @click.command()
+        def downloadeventdbupdate():
+            """Updates download event table"""
+            from ckanext.wri.model import update_download_event
+
+            update_download_event()
+
+        return [notificationdb, pendingdatasetsdb, resourcelocationdb, downloadeventdb, downloadeventdbupdate]
 
     # IAuth
 
@@ -161,6 +177,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "package_update": auth.package_update,
             "package_collaborator_list": auth.package_collaborator_list,
             "package_create": auth.package_create,
+            "download_event_create": auth.download_event_create,
         }
 
     # IValidators
@@ -244,6 +261,8 @@ class WriPlugin(plugins.SingletonPlugin):
             # "package_delete": package_delete,
             "package_show": package_show,
             "package_update": package_update,
+            "download_event_create": download_event_create,
+            "download_event_list": get_download_events
         }
 
     # IPermissionLabels

@@ -6,6 +6,10 @@ export type Facets = Record<
     }
 >
 
+export type FacetsCount = Record<
+    string, Record<string, number>
+>
+
 export interface Filter {
     title: string // E.g. Team
     key: String // E.g. organization

@@ -43,13 +43,18 @@ export default function Header() {
             active: false,
         },
         {
+            title: 'Topics',
+            href: '/topics',
+            active: false,
+        },
+        {
             title: 'Teams',
             href: '/teams',
             active: false,
         },
         {
-            title: 'Topics',
-            href: '/topics',
+            title: 'Applications',
+            href: '/applications',
             active: false,
         },
     ]
@@ -85,7 +90,7 @@ export default function Header() {
                     />
                 </Link>
                 <div className=" ml-auto flex mt-auto gap-x-6 ">
-                    <div className=" hidden sm:flex gap-x-6 font-semibold text-[1.0625rem] text-wri-black">
+                    <div className=" hidden sm:flex gap-x-6 font-semibold text-wri-black">
                         {navigation.map((item) => {
                             return (
                                 <Link
@@ -93,7 +98,7 @@ export default function Header() {
                                     href={item.href}
                                     className={
                                         item.active
-                                            ? 'border-b-2 border-b-wri-gold'
+                                            ? 'border-b-2 border-b-wri-gold font-acumin'
                                             : ''
                                     }
                                 >

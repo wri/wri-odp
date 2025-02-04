@@ -27,7 +27,7 @@ RUN apk --update add build-base libxslt-dev python3-dev
 RUN apk update
 RUN apk add postgresql15-client=15.10-r0
 RUN apk add libpq=15.10-r0
-RUN apk add git=2.40.3-r0
+RUN apk add git=2.40.1-r0
 
 RUN pip install --force-reinstall -v "Pillow==11.0.0"
 
@@ -71,18 +71,30 @@ RUN for d in $APP_DIR/patches/*; do \
 USER ckan
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
-ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
+ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
 
+RUN if [ "$GITHUB_ACTIONS" = "true" ]; then \
+      ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"; \
+    fi
+
 USER root
 
 RUN chown -R ckan:ckan ${APP_DIR}/src/
 
+<<<<<<< HEAD
 USER root
 
 RUN chown -R ckan:ckan ${APP_DIR}/src/
+
+COPY setup/supervisord.conf /etc/supervisord.conf
+COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
+COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
+
+RUN chown -R ckan:ckan /etc/supervisord.d
+RUN chown -R ckan:ckan /etc/supervisord.conf
 
 USER ckan

@@ -38,6 +38,7 @@ export function OverviewForm({
         register,
         setValue,
         watch,
+        getValues,
         formState: { errors, defaultValues },
     } = formObj
 
@@ -73,11 +74,19 @@ export function OverviewForm({
                             disabled={editing}
                             placeholder="name-of-dataset"
                             type="text"
-                            className="pl-[5.2rem] sm:pl-[5rem] md:pl-[4.9rem] lg:pl-[4.8rem]"
+                            className={`pl-[5.9rem] sm:pl-[5.6rem] md:pl-[5.2rem] lg:pl-[5.4rem] ${editing ? 'hidden' : ''} `}
                         >
-                            <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
-                                /dataset/
-                            </span>
+                            {editing ? (
+                                <input
+                                    disabled
+                                    value={`/datasets/${getValues('name') || ''}`}
+                                    className=" shadow-wri-small block w-full rounded-md border-0 px-5 py-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 disabled:bg-gray-100 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 min-w-0 overflow-x-auto"
+                                ></input>
+                            ) : (
+                                <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
+                                    /datasets/
+                                </span>
+                            )}
                         </Input>
                         <ErrorDisplay name="name" errors={errors} />
                     </InputGroup>

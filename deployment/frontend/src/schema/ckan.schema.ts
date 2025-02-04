@@ -196,6 +196,7 @@ export type Application = Group & {
     image_url: string
     image_display_url: string
     help_url: string
+    homepage_url: string
     contact_url: string
     packages?: Array<Dataset>
     package_count: number

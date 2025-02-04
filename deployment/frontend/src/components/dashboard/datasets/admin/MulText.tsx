@@ -11,31 +11,37 @@ import {
 import { Button } from '@/components/_shared/Button'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { DatasetFormType } from '@/schema/dataset.schema'
-import { Controller, Path, UseFormReturn } from 'react-hook-form'
+import {
+    Controller,
+    FieldValues,
+    Path,
+    PathValue,
+    UseFormReturn,
+} from 'react-hook-form'
 
-interface MulTextProps {
+interface MulTextProps<T extends FieldValues> {
     options?: Option[]
-    formObj: UseFormReturn<DatasetFormType>
-    name: Path<DatasetFormType>
+    formObj: UseFormReturn<T>
+    name: Path<T>
     title: string
     tooltip?: string
-  allowsCreationOfItems?: boolean
+    allowsCreationOfItems?: boolean
 }
 
-type Option = string | { label: string, value: string}
+type Option = string | { label: string; value: string }
 
 function isString(option: Option): option is string {
     return typeof option === 'string'
 }
 
-export default function MulText({
+export default function MulText<T extends FieldValues>({
     options = [],
     formObj,
     name,
     title,
     tooltip = 'Remove item',
     allowsCreationOfItems = false,
-}: MulTextProps) {
+}: MulTextProps<T>) {
     const { control } = formObj
     const [open, setOpen] = useState(false)
     const ref = useRef<HTMLButtonElement>(null)
@@ -53,13 +59,13 @@ export default function MulText({
     return (
         <Controller
             control={control}
-            name={name}
-            defaultValue={[]}
+            name={name as any}
+            defaultValue={[] as PathValue<T, Path<T>>}
             render={({ field: { onChange, value } }) => (
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                         <Button
-                            aria-label='Open dropdown'
+                            aria-label="Open dropdown"
                             variant="outline"
                             role="combobox"
                             ref={ref}
@@ -79,7 +85,20 @@ export default function MulText({
                                                     className="flex items-center gap-x-2 rounded-[3px] border border-blue-800 hover:bg-neutral-50 transition bg-white px-2 py-0.5"
                                                 >
                                                     <span className="font-['Acumin Pro SemiCondensed'] text-[15px] font-normal text-zinc-800">
-                                                        {isString(item) ? item : (options.find((option) => !isString(option) && option.value === item) as any)?.label}
+                                                        {isString(item)
+                                                            ? item
+                                                            : (
+                                                                  options.find(
+                                                                      (
+                                                                          option
+                                                                      ) =>
+                                                                          !isString(
+                                                                              option
+                                                                          ) &&
+                                                                          option.value ===
+                                                                              item
+                                                                  ) as any
+                                                              )?.label}
                                                     </span>
                                                     <DefaultTooltip
                                                         content={tooltip}
@@ -153,7 +172,11 @@ export default function MulText({
                                 )}
                                 {filteredOptions.map((option: Option) => (
                                     <Combobox.Option
-                                        key={isString(option) ? option : option.value}
+                                        key={
+                                            isString(option)
+                                                ? option
+                                                : option.value
+                                        }
                                         className={({ active }) =>
                                             classNames(
                                                 active
@@ -162,7 +185,11 @@ export default function MulText({
                                                 'relative group cursor-default select-none py-2 pl-3 pr-9'
                                             )
                                         }
-                                        value={isString(option) ? option : option.value}
+                                        value={
+                                            isString(option)
+                                                ? option
+                                                : option.value
+                                        }
                                     >
                                         {({ selected }) => (
                                             <>
@@ -175,7 +202,9 @@ export default function MulText({
                                                                 : 'opacity-0'
                                                         )}
                                                     />
-                                                    {isString(option) ? option : option.label}
+                                                    {isString(option)
+                                                        ? option
+                                                        : option.label}
                                                 </span>
                                             </>
                                         )}

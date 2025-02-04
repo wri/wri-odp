@@ -13,6 +13,7 @@ import {
     findAllNameInTree,
     getAllDatasetFq,
     groupList,
+    fetchFacets,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -130,15 +131,10 @@ export const TopicRouter = createTRPCRouter({
             {} as Record<string, GroupsmDetails>
         )
         if (user) {
+            const facets = await fetchFacets(topicDetails, "groups", ctx?.session?.user.apikey ?? '')
             for (const group in topicDetails) {
                 const topic = topicDetails[group]!
-                if (topic.package_count === 0) continue;
-                const packagedetails = (await getAllDatasetFq({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    fq: `groups:${topic.name}+is_approved:true`,
-                    query: { search: '', page: { start: 0, rows: 1 } },
-                }))!
-                topic.package_count = packagedetails.count
+                topic.package_count = facets[topic.name] ?? 0;
             }
         }
         return {
@@ -397,14 +393,11 @@ export const TopicRouter = createTRPCRouter({
                 {} as Record<string, GroupsmDetails>
             )
 
+            const facets = await fetchFacets(topicDetails, "groups", ctx?.session?.user.apikey ?? '')
+
             for (const group in topicDetails) {
-                const topic = topicDetails[group]!
-                const packagedetails = (await getAllDatasetFq({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    fq: `groups:${topic.name}+is_approved:true`,
-                    query: { search: '', page: { start: 0, rows: 1 } },
-                }))!
-                topic.package_count = packagedetails.count
+                const topic = topicDetails[group]!;
+                topic.package_count = facets[topic.name] ?? 0;
             }
 
             const result = groupTree
