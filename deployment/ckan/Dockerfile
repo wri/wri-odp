@@ -85,7 +85,6 @@ USER root
 
 RUN chown -R ckan:ckan ${APP_DIR}/src/
 
-<<<<<<< HEAD
 USER root
 
 RUN chown -R ckan:ckan ${APP_DIR}/src/
