@@ -123,4 +123,11 @@ RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
 
 COPY setup/who.ini ${APP_DIR}/src/ckan/who.ini
 
+COPY setup/supervisord.conf /etc/supervisord.conf
+COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
+COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
+
+RUN chown -R ckan:ckan /etc/supervisord.d
+RUN chown -R ckan:ckan /etc/supervisord.conf
+
 CMD ["sh", "-c", "${APP_DIR}/start_ckan_development.sh"]

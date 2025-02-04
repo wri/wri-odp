@@ -170,20 +170,4 @@ export const applicationRouter = createTRPCRouter({
                 throw Error(replaceNames(data.error.message))
             return data
         }),
-    list: publicProcedure.query(async ({ ctx, input }) => {
-        const applicationRes = await fetch(
-            `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }
-        )
-        const application: CkanResponse<Group[]> = await applicationRes.json()
-        if (!application.success && application.error)
-            throw Error(replaceNames(application.error.message))
-        return {
-            applications: application.result,
-        }
-    }),
 })

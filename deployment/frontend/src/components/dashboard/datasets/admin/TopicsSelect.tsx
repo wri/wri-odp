@@ -114,6 +114,10 @@ function TopicsInner({
                   })
                   .flat()
 
+    function getTopicByName(topicName: string) {
+        return flattenedTopicHierarchy.find((topic) => topic.name === topicName)
+    }
+
     function BuildHierarchy(
         topic: TopicHierarchy,
         level: number
@@ -188,7 +192,7 @@ function TopicsInner({
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
-                    aria-label='topics button'
+                    aria-label="topics button"
                     variant="outline"
                     role="combobox"
                     id="topicsButton"
@@ -207,7 +211,8 @@ function TopicsInner({
                                             className="flex items-center gap-x-2 rounded-[3px] border border-blue-800 hover:bg-neutral-50 transition bg-white px-2 py-0.5"
                                         >
                                             <span className="font-['Acumin Pro SemiCondensed'] text-[15px] font-normal text-zinc-800">
-                                                {item}
+                                                {getTopicByName(item)?.title ??
+                                                    item}
                                             </span>
                                             <DefaultTooltip content="Remove topic">
                                                 <XMarkIcon

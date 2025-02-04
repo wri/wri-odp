@@ -9,6 +9,7 @@ import six
 from ckan.common import _, config, current_user
 
 from ckanext.wri.model.notification import Notification, notification_dictize
+from ckanext.wri.model.download_event import DownloadEvent, download_event_dictize, download_event_list_dictize
 from ckanext.wri.model.pending_datasets import PendingDatasets
 from ckanext.wri.logic.auth import schema
 from ckanext.wri.logic.action.send_group_notification import (
@@ -113,7 +114,8 @@ MIGRATE_DATASET_PARAMS = [
     "gfw_dataset",
     "gfw_only",
     "gfw_version",
-    "application",
+    "rw_application",
+    "dx_application",
     "team",
     "topics",
     "layer_ids",
@@ -278,7 +280,8 @@ def trigger_migration(context: Context, data_dict: DataDict):
 @logic.side_effect_free
 def migrate_dataset(context: Context, data_dict: DataDict):
     dataset_id = data_dict.get("rw_dataset_id")
-    application = data_dict.get("application")
+    dx_application = data_dict.get("dx_application")
+    rw_application = data_dict.get("rw_application")
     gfw_dataset = data_dict.get("gfw_dataset")
 
     data_dict = _black_white_list("whitelist", data_dict)
@@ -295,9 +298,19 @@ def migrate_dataset(context: Context, data_dict: DataDict):
         else:
             data_dict["gfw_only"] = True
 
-    if not application:
+    if not rw_application:
         if not gfw_dataset:
-            raise tk.ValidationError(_("Application is required"))
+            raise tk.ValidationError(_("'rw_application' is required when no 'gfw_dataset' is provided"))
+
+    if not dx_application:
+        raise tk.ValidationError(_("'dx_application' is required to associate the dataset with a DX application"))
+
+    try:
+        tk.get_action("group_show")(
+            {"ignore_auth": True}, {"id": dx_application, "type": "application"}
+        )
+    except logic.NotFound:
+        raise tk.ValidationError(_("'dx_application' not found: ") + dx_application)
 
     team = data_dict.get("team")
     topics = data_dict.get("topics")
@@ -820,3 +833,34 @@ def resource_create(
         plugin.after_resource_create(context, resource)
 
     return resource
+
+def download_event_create(context: Context, data_dict: DataDict):
+    """Create a download event for each resource in the data_dict"""
+    package_id = data_dict.get("package_id")
+    resources = data_dict.get("resources")
+    email = data_dict.get("email")
+    first_name = data_dict.get("first_name")
+    last_name = data_dict.get("last_name")
+    affiliation = data_dict.get("affiliation")
+    organization = data_dict.get("organization")
+    job_title = data_dict.get("job_title")
+    country = data_dict.get("country")
+    interests = data_dict.get("interests")
+
+    if interests:
+        interests = ', '.join(interests) 
+
+    for item in [
+        ["package_id", package_id],
+        ["email", email],
+    ]:
+        if not item[1]:
+            raise tk.ValidationError("Missing required field " + item[0])
+
+    events = []
+    download_id = str(uuid.uuid4())  # Generate a unique UUID for this group of downloads
+    for resource_id in resources:
+        event = DownloadEvent.create(email, first_name, last_name, affiliation, organization, job_title, country, interests, package_id, resource_id, download_id)
+        events.append(event)
+
+    return download_event_list_dictize(events, context)

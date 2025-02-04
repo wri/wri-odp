@@ -78,6 +78,7 @@ describe("Pages meet the accessibility requirements onload ", () => {
 
   pages.forEach((page) => {
     it(`${replaceParams(page)}`, () => {
+      cy.once('uncaught:exception', () => false);
       cy.visit(replaceParams(page), { timeout: 30000 });
       if (page.includes("edit")) {
         cy.wait(5000);

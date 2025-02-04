@@ -35,6 +35,11 @@ from ckan.common import _
 from ckan.types import ActionResult, Context, DataDict
 from typing_extensions import TypeAlias
 from ckanext.wri.helpers.data_api import get_shape_from_dataapi
+from ckanext.wri.model.download_event import (
+    DownloadEvent,
+    download_event_dictize,
+    download_event_list_dictize
+)
 from ckanext.wri.model.notification import (
     Notification,
     notification_dictize,
@@ -1425,3 +1430,56 @@ def _add_group_types(context: Context, data_dict: DataDict):
         log.error(f"Error adding group types: {e}")
 
     return data_dict
+
+def get_download_events(context: Context, data_dict: DataDict):
+    """Get download events, optionally as CSV.
+    
+    Args:
+        context: The context dict
+        data_dict: Dictionary containing:
+            - owner_org: Organization ID (required for non-sysadmins)
+            - format: 'json' (default) or 'csv' 
+    """
+    import csv
+    from io import StringIO
+    
+    owner_org = data_dict.get("owner_org")
+    output_format = data_dict.get("format", "json").lower()
+    
+    # Check if the user has access to the organization
+    tk.check_access("organization_member_create", context, {"id": owner_org})
+    
+    # Get download events
+    if owner_org:
+        org = tk.get_action("organization_show")(context, {"id": owner_org})
+        download_events = DownloadEvent.get_by_owner_org(org.get('id', None))
+    else:
+        download_events = DownloadEvent.get_all()
+
+    # Convert to dictionaries
+    events_dicts = download_event_list_dictize(download_events, context)
+
+    # Return JSON if requested (default)
+    if output_format == "json":
+        return events_dicts
+        
+    # Return CSV if requested
+    elif output_format == "csv":
+        if not events_dicts:
+            return ""
+            
+        output = StringIO()
+        writer = csv.DictWriter(
+            output,
+            fieldnames=events_dicts[0].keys(),
+            quoting=csv.QUOTE_NONNUMERIC
+        )
+        
+        writer.writeheader()
+        for event in events_dicts:
+            writer.writerow(event)
+            
+        return output.getvalue()
+        
+    else:
+        raise tk.ValidationError(f"Invalid format: {output_format}. Must be 'json' or 'csv'")

@@ -7,6 +7,10 @@ import { Application, GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { api } from '@/utils/api'
+import {
+    ArrowTurnLeftUpIcon,
+    ArrowUpRightIcon,
+} from '@heroicons/react/24/solid'
 
 export function Hero({ application }: { application: Application }) {
     const { data: session } = useSession()
@@ -23,71 +27,61 @@ export function Hero({ application }: { application: Application }) {
                     }`}
                     className="object-cover"
                 />
-                <div className="absolute bottom-0 z-10 flex lg:h-[68px] lg:w-56 px-4 py-4 items-center justify-center rounded-t-[3px] bg-white">
+                <div className="absolute bottom-0 z-10 flex lg:h-[68px] lg:w-60 px-4 py-4 items-center justify-center rounded-t-[3px] bg-white">
                     <Link
-                        href="/application"
-                        className="inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-400 text-stone-900 font-bold font-acumin hover:bg-yellow-500 h-11 px-6 py-4 rounded-[3px] text-base"
+                        href="/applications"
+                        className="whitespace-nowrap inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-400 text-stone-900 font-bold font-acumin hover:bg-yellow-500 h-11 px-6 py-4 rounded-[3px] text-base"
                     >
                         <ChevronLeftIcon className="mb-1 lg:mr-1 h-6 w-6" />
                         <span>See all applications</span>
                     </Link>
                 </div>
             </div>
-            <div className="flex flex-col gap-y-1 px-4 py-6 lg:col-span-3">
+            <div className="flex flex-col justify-center gap-y-1 px-4 py-6 lg:col-span-3">
                 <div className="text-[33px] font-bold text-black">
                     {application.title}
                 </div>
-                <div className="max-w-[578.85px] text-lg font-light text-black">
-                    {application?.description}
-                </div>
+                <p className="max-w-[578.85px] text-lg font-light text-black">
+                    {application?.description}{' '}
+                    <a
+                        href={application.contact_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline "
+                    >
+                        Contact the {application.title ?? application.name} Team
+                    </a>
+                </p>
                 <div className="flex items-center gap-3">
                     <div className="text-base font-light text-black">
-                        {application.package_count} Dataset(s)
+                        {application.package_count} associated dataset
+                        {application.package_count > 1 ? 's' : ''}
                     </div>
                 </div>
-                <CopyLink />
+                <div className="flex items-center gap-3">
+                    <Button className="mt-3">
+                        <a
+                            href={application.homepage_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1"
+                        >
+                            Open Application{' '}
+                            <ArrowUpRightIcon className="h-5 w-5" />
+                        </a>
+                    </Button>
+                    <Button className="mt-3" variant="outline">
+                        <a
+                            href={application.help_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1"
+                        >
+                            Visit Guide <ArrowUpRightIcon className="h-5 w-5" />
+                        </a>
+                    </Button>
+                </div>
             </div>
         </div>
-    )
-}
-
-function CopyLink() {
-    const [clicked, setClicked] = useState(false)
-    return (
-        <>
-            {!clicked ? (
-                <Button
-                    onClick={async () => {
-                        await navigator.clipboard.writeText(
-                            window.location.href
-                        )
-                        setClicked(!clicked)
-                        setTimeout(() => {
-                            setClicked(false)
-                        }, 3000)
-                    }}
-                    variant="outline"
-                    className="mr-auto mt-3"
-                >
-                    Share application
-                </Button>
-            ) : (
-                <button
-                    onClick={() => setClicked(!clicked)}
-                    className="mt-3 flex h-auto max-w-[578px] gap-2 rounded-sm border border-amber-400 px-5 py-3"
-                >
-                    <ClipboardDocumentIcon className="h-6 w-6 text-gray-800" />
-                    <div className="max-w-[30rem]">
-                        <p className="text-start text-sm font-semibold text-black">
-                            Link copied to clipboard
-                        </p>
-                        <p className="text-start text-sm font-light">
-                            Make sure that the users who you are sharing the
-                            collection with, have permissions to see it.
-                        </p>
-                    </div>
-                </button>
-            )}
-        </>
     )
 }

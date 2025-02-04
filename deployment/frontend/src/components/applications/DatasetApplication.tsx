@@ -21,7 +21,7 @@ export default function DatasetApplication({ application }: { application: Appli
 
     return (
         <section>
-            <div className="font-['Acumin Pro SemiCondensed'] text-2xl font-semibold text-black truncate whitespace-normal">
+            <div className="font-['Acumin Pro SemiCondensed'] text-2xl font-semibold text-black truncate whitespace-normal mb-6">
                 Datasets associated with {application.title ?? application.name}{' '}
                 {isLoading ? <Spinner /> : `(${data?.count})`}
             </div>
