@@ -10,6 +10,7 @@ export type TabularResource = {
     provider: string
     connectorUrl?: string
     datasetId?: string
+    datasetName?: string
     id: string
     apiKey?: string
     name?: string

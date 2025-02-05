@@ -39,7 +39,8 @@ export SCRIPT_NAME="/private-admin"
 if [ $? -eq 0 ]
 then
     # Start supervisord
-    supervisord --configuration /etc/supervisord.d/supervisord.conf &
+    export ENV_SUPERVISOR_USER=$(whoami)
+    supervisord --configuration /etc/supervisord.conf &
     # Start uwsgi
     uwsgi $UWSGI_OPTS
 else

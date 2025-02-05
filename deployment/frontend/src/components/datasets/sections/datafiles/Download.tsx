@@ -100,6 +100,8 @@ export function DownloadButton({
             resources: [datafile.id],
             package_id: datafile.package_id ?? '',
             acceptTerms: true,
+            typeOfForm: 'direct-download' as any,
+            package_name: datafile.title ?? datafile.name!,
         }
         createDownloadEvent.mutate(_data)
     }
@@ -110,6 +112,8 @@ export function DownloadButton({
             ...data,
             resources: [datafile.id],
             package_id: datafile.package_id ?? '',
+            package_name: datafile.title ?? datafile.name!,
+            typeOfForm: 'email-download' as any,
         }
         requestDatafileConversionMutation.mutate(
             {

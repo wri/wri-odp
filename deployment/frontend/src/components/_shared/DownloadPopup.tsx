@@ -305,8 +305,8 @@ export function DownloadPopup({
                                                 />
                                                 <label className="ml-2 text-sm text-gray-500">
                                                     Do you want to subscribe to
-                                                    news and updates on the data
-                                                    explorer? By checking this
+                                                    news and updates on the Data
+                                                    Explorer? By checking this
                                                     box you agree to receive
                                                     updates from WRI. You can
                                                     change your email
@@ -415,7 +415,6 @@ export function DownloadPopup({
                                                                     value: c.iso,
                                                                 })
                                                             )}
-                                                            placeholder="Ex: USA"
                                                             maxWidth="w-full"
                                                         />
                                                         <ErrorDisplay
@@ -650,7 +649,6 @@ export function DirectDownloadPopup({
                                                             value: c.iso,
                                                         })
                                                     )}
-                                                    placeholder="Ex: USA"
                                                     maxWidth="w-full"
                                                 />
                                             </div>

@@ -477,7 +477,7 @@ export default function FilteredSearchLayout({
                         <>
                             <Disclosure.Button
                                 aria-label="collapse sidebar"
-                                className="absolute lg:block hidden left-[calc(25%-1.5rem)] top-[60vh] z-20"
+                                className="absolute lg:block hidden left-[calc(25%-1.5rem)] md:top-[80vh] lg:top-[75vh] z-20"
                             >
                                 <div
                                     className={classNames(

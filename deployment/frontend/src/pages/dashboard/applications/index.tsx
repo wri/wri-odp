@@ -12,49 +12,48 @@ import superjson from 'superjson'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import { appRouter } from '@/server/api/root'
 
-
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const session = await getServerAuthSession(context)
-    const helpers = createServerSideHelpers({
-        router: appRouter,
-        ctx: { session },
-        transformer: superjson,
-    })
+  const session = await getServerAuthSession(context)
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: { session, ip: undefined },
+    transformer: superjson,
+  })
 
-    if (!session) {
-        return {
-            redirect: {
-                destination: '/auth/signin',
-                permanent: false,
-            },
-        }
-    }
-
+  if (!session) {
     return {
-        props: {
-            trpcState: helpers.dehydrate(),
-            session,
-        },
+      redirect: {
+        destination: '/auth/signin',
+        permanent: false,
+      },
     }
+  }
+
+  return {
+    props: {
+      trpcState: helpers.dehydrate(),
+      session,
+    },
+  }
 }
 
 export default function applications() {
-    return (
-        <>
-            <NextSeo
-                title={`Applications - Dashboard`}
-                description={`Applications - Dashboard -- WRI Open Data Catalog`}
-                openGraph={{
-                    title: `Applications - Dashboard`,
-                    description: `Applications - Dashboard -- WRI Open Data Catalog`,
-                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/applications`,
-                }}
-            />
-            <Header />
-            <Layout>
-                <ApplicationList />
-            </Layout>
-            <Footer style="mt-0" />
-        </>
-    )
+  return (
+    <>
+      <NextSeo
+        title={`Applications - Dashboard`}
+        description={`Applications - Dashboard -- WRI Open Data Catalog`}
+        openGraph={{
+          title: `Applications - Dashboard`,
+          description: `Applications - Dashboard -- WRI Open Data Catalog`,
+          url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/applications`,
+        }}
+      />
+      <Header />
+      <Layout>
+        <ApplicationList />
+      </Layout>
+      <Footer style="mt-0" />
+    </>
+  )
 }

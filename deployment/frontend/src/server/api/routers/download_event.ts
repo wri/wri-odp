@@ -42,7 +42,13 @@ export const downloadEventRouter = createTRPCRouter({
             downloadEventSchema.extend({
                 resources: z.array(z.string()),
                 package_id: z.string(),
+                package_name: z.string().optional(),
                 acceptTerms: z.boolean(),
+                typeOfForm: z.enum([
+                    'email-download',
+                    'direct-download',
+                    'footer',
+                ]),
             })
         )
         .mutation(async ({ input, ctx }) => {
@@ -56,12 +62,17 @@ export const downloadEventRouter = createTRPCRouter({
             }
             const body = {
                 website: 'https://datasets.wri.org/',
-                'form-name': 'Footer Sign-up Form',
+                'form-name':
+                    input.typeOfForm == 'email-download'
+                        ? 'Email Download Form'
+                        : 'Direct Download Form',
                 list: 'DATA - Data Explorer - NEWSL - LIST',
                 email: input.email,
+                'dataset-name': input.package_name,
+                remote_addr: ctx.ip,
                 job_title: input.jobTitle,
                 organization: input.organization,
-                affiliation:
+                sector:
                     input.affiliation.value == 'Other'
                         ? input.otherAffiliation
                         : input.affiliation.value,

@@ -2,6 +2,7 @@
 
 import datetime
 import sqlalchemy
+from sqlalchemy.sql import func
 import ckan.model.meta as meta
 import ckan.model.types as _types
 from typing import Optional
@@ -18,6 +19,8 @@ from .sql_context import sql_session_scope
 download_event = sqlalchemy.Table('download_event', meta.metadata,
     sqlalchemy.Column('id', sqlalchemy.types.UnicodeText,
         primary_key=True, default=_types.make_uuid),
+    sqlalchemy.Column('download_id', sqlalchemy.types.UnicodeText,
+        nullable=True),
     sqlalchemy.Column('email', sqlalchemy.types.UnicodeText,
         nullable=True),
     sqlalchemy.Column('first_name', sqlalchemy.types.UnicodeText,
@@ -42,16 +45,17 @@ download_event = sqlalchemy.Table('download_event', meta.metadata,
         sqlalchemy.ForeignKey('resource.id', onupdate='CASCADE',
             ondelete='CASCADE'),
         nullable=False),
-    sqlalchemy.Column('created_at', sqlalchemy.types.DateTime,
-        nullable=False, default=datetime.datetime.now(datetime.timezone.utc)),
-    sqlalchemy.Column('updated_at', sqlalchemy.types.DateTime,
-        nullable=False, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
+    sqlalchemy.Column('created_at', sqlalchemy.types.DateTime(timezone=True),
+        nullable=False, default=datetime.datetime.utcnow),
+    sqlalchemy.Column('updated_at', sqlalchemy.types.DateTime(timezone=True),
+        nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 )
 
 class DownloadEvent(object):
     '''Saved data used for the user's download events.'''
     id: str
     email: str
+    download_id: str
     first_name: str
     last_name: str
     affiliation: str
@@ -63,8 +67,10 @@ class DownloadEvent(object):
     resource_id: str
     package_name: Optional[str]
     resource_name: Optional[str]
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
-    def __init__(self, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str):
+    def __init__(self, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str, download_id: str):
         self.package_name: Optional[str] = None
         self.resource_name: Optional[str] = None
         self.email = email
@@ -77,6 +83,7 @@ class DownloadEvent(object):
         self.interests = interests
         self.package = package
         self.resource_id = resource_id
+        self.download_id = download_id
 
     @classmethod
     def get(cls: Type[Self], id: str) -> Optional[Self]:
@@ -99,14 +106,14 @@ class DownloadEvent(object):
             return session.query(cls).filter(cls.resource_id == resource_id).all()
 
     @classmethod
-    def create(cls: Type[Self], email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str) -> Self:
-        download_event = cls(email=email, first_name=first_name, last_name=last_name, affiliation=affiliation, organization=organization, job_title=job_title, country=country, interests=interests, package=package, resource_id=resource_id)
+    def create(cls: Type[Self], email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str, download_id: str) -> Self:
+        download_event = cls(email=email, first_name=first_name, last_name=last_name, affiliation=affiliation, organization=organization, job_title=job_title, country=country, interests=interests, package=package, resource_id=resource_id, download_id=download_id)
         with sql_session_scope() as session:
             session.add(download_event)
         return download_event
 
     @classmethod
-    def update(cls: Type[Self], id: str, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str) -> Self:
+    def update(cls: Type[Self], id: str, email: str, first_name: str, last_name: str, affiliation: str, organization: str, job_title: str, country: str, interests: str, package: str, resource_id: str, download_id: str) -> Self:
         with sql_session_scope() as session:
             download_event = session.query(cls).filter(cls.id == id).first()
             download_event.email = email
@@ -119,6 +126,7 @@ class DownloadEvent(object):
             download_event.interests = interests
             download_event.package = package
             download_event.resource_id = resource_id
+            download_event.download_id = download_id
         return download_event
 
     @classmethod
@@ -164,7 +172,6 @@ class DownloadEvent(object):
 
     def as_dict(self) -> dict:
         return {
-            'id': self.id,
             'email': self.email,
             'first_name': self.first_name,
             'last_name': self.last_name,
@@ -177,6 +184,8 @@ class DownloadEvent(object):
             'package_name': self.package_name if hasattr(self, 'package_name') else 'Not specified',
             'resource_id': self.resource_id,
             'resource_name': self.resource_name if hasattr(self, 'resource_name') else 'Not specified',
+            'download_id': self.download_id,
+            'datetime': self.created_at.replace(tzinfo=datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC') if self.created_at else None,
         }
     
 def download_event_dictize(download_event: DownloadEvent, context: Context) -> dict:
