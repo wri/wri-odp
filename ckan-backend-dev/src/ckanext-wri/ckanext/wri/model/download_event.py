@@ -2,6 +2,7 @@
 
 import datetime
 import sqlalchemy
+from sqlalchemy.sql import func
 import ckan.model.meta as meta
 import ckan.model.types as _types
 from typing import Optional
@@ -45,10 +46,9 @@ download_event = sqlalchemy.Table('download_event', meta.metadata,
             ondelete='CASCADE'),
         nullable=False),
     sqlalchemy.Column('created_at', sqlalchemy.types.DateTime(timezone=True),
-        nullable=False, server_default=sqlalchemy.func.now()),
+        nullable=False, default=datetime.datetime.utcnow),
     sqlalchemy.Column('updated_at', sqlalchemy.types.DateTime(timezone=True),
-        nullable=False, server_default=sqlalchemy.func.now(), onupdate=sqlalchemy.func.now()
-        nullable=False, server_default=sqlalchemy.func.now(), onupdate=sqlalchemy.func.now())
+        nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 )
 
 class DownloadEvent(object):
