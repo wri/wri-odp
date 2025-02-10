@@ -13,8 +13,7 @@ import socket
 from ckan.common import config, asbool, aslist
 from ckan.model import Package
 from sqlalchemy import text, engine
-from shapely import MultiPolygon, Polygon, wkb, wkt
-from shapely import make_valid
+from shapely import wkb, wkt
 import ckan.model as model
 from ckan.logic.action.get import (
     _unpick_search, 
