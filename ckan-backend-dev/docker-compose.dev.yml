@@ -33,35 +33,51 @@ services:
     #  test: ["CMD-SHELL", "wget -qO /dev/null http://localhost:5000 || (echo 'Health check failed' > /tmp/ckan-healthcheck.log && wget -O - http://localhost:5000 2>> /tmp/ckan-healthcheck.log && exit 1)"]
 
 
-      #  frontend:
-      #    container_name: wri-frontend
-      #    build:
-      #      context: ../deployment/frontend/
-      #      args:
-      #        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000
-      #    environment:
-      #      - NEXTAUTH_SECRET=secret
-      #      - NEXTAUTH_URL=http://localhost:3000
-      #      - CKAN_URL=http://ckan-dev:5000
-      #      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
-      #      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
-      #      - S3_BUCKET_NAME=ckan
-      #      - S3_BUCKET_REGION=us-east-1
-      #      - RW_API_KEY=${RW_API_KEY}
-      #      - AZURE_AD_TENANT_ID=${AZURE_AD_TENANT_ID}
-      #      - AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}
-      #      - AZURE_AD_CLIENT_SECRET=${AZURE_AD_CLIENT_SECRET}
-      #      - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
-      #      - SMTP_SERVER=${SMTP_SERVER}
-      #      - SMTP_PORT=${SMTP_PORT}
-      #      - SMTP_USER=${SMTP_USER}
-      #      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      #      - SMTP_FROM=${SMTP_FROM}
-      #      - PREFECT_INTERNAL_URL=http://prefect:4200
-      #    ports:
-      #      - "0.0.0.0:3000:3000"
-      #    healthcheck:
-      #      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
+  frontend:
+    container_name: wri-frontend
+    build:
+      context: ../deployment/frontend/
+      args:
+        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000/private-admin/en
+        - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
+        - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
+        - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
+        - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
+        - NEXT_PUBLIC_GFW_API_KEY="1111"
+        - OSANO_URL="YOUR_OSANO_URL/osano.js"
+        - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
+        - OKTA_ISSUER=https://dev-000000.okta.com/oauth2/default
+        - OKTA_CLIENT_SECRET=ffffffffffffffffffffffffffffffff
+        - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
+    environment:
+      - NEXTAUTH_SECRET=secret
+      - NEXTAUTH_URL=http://localhost:3000
+      - CKAN_URL=http://ckan-dev:5000
+      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+      - S3_BUCKET_NAME=ckan
+      - S3_BUCKET_REGION=us-east-1
+      - RW_API_KEY=${RW_API_KEY}
+      - AZURE_AD_TENANT_ID=${AZURE_AD_TENANT_ID}
+      - AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}
+      - AZURE_AD_CLIENT_SECRET=${AZURE_AD_CLIENT_SECRET}
+      - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM}
+      - PREFECT_INTERNAL_URL=http://prefect:4200
+      - NEXT_PUBLIC_GFW_API_KEY="1111"
+      - OSANO_URL="YOUR_OSANO_URL/osano.js"
+      - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
+      - OKTA_ISSUER=https://dev-000000.okta.com/oauth2/default
+      - OKTA_CLIENT_SECRET=ffffffffffffffffffffffffffffffff
+      - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
+    ports:
+      - "0.0.0.0:3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
 
   prefect:
     container_name: prefect-server
