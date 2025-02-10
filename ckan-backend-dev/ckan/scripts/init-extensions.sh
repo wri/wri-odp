@@ -1,11 +1,11 @@
 
 # Initialize Issues and Notification DB
-docker exec ckan-wri sh -c "ckan -c ckan.ini issuesdb"
-docker exec ckan-wri sh -c "ckan -c ckan.ini downloadeventdb"
-docker exec ckan-wri sh -c "ckan -c ckan.ini notificationdb"
-docker exec ckan-wri sh -c "ckan -c ckan.ini pendingdatasetsdb"
-docker exec ckan-wri sh -c "ckan -c ckan.ini resourcelocationdb"
-docker exec ckan-wri sh -c "ckan -c ckan.ini db upgrade -p harvest"
+docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
+docker exec ckan-wri sh -c "ckan -c production.ini downloadeventdb"
+docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
+docker exec ckan-wri sh -c "ckan -c production.ini pendingdatasetsdb"
+docker exec ckan-wri sh -c "ckan -c production.ini resourcelocationdb"
+docker exec ckan-wri sh -c "ckan -c production.ini db upgrade -p harvest"
 docker exec ckan-wri sh -c "unset CKAN__DATAPUSHER__API_TOKEN"
 docker cp ./ckan-backend-dev/ckan/scripts/datapusher.sh ckan-wri:/srv/app/datapusher.sh
 echo "Adding +x permissions"
