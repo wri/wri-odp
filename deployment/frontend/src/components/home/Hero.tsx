@@ -100,7 +100,7 @@ export function Hero() {
                             ) : (
                                 <button
                                     onClick={() => setIsOpen(true)}
-                                    className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
+                                    className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline font-semibold leading-6 text-white"
                                     id="nav-login-button"
                                 >
                                     Login
@@ -121,7 +121,7 @@ export function Hero() {
                             <Link
                                 key={item.title}
                                 href={item.href}
-                                className="text-sm font-semibold leading-6 text-white"
+                                className="font-semibold leading-6 text-white font-acumin"
                             >
                                 {item.title}
                             </Link>
@@ -132,7 +132,7 @@ export function Hero() {
                             ) : (
                                 <button
                                     onClick={() => setIsOpen(true)}
-                                    className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline text-sm font-semibold leading-6 text-white"
+                                    className="px-3 py-2 tracking-wide rounded outline-wri-gold outline-1 outline font-semibold leading-6 text-white"
                                 >
                                     Login
                                 </button>
@@ -243,6 +243,9 @@ export function Hero() {
                         </p>
                         <form
                             onSubmit={handleSubmit((data) => {
+                                if (data.search === '') {
+                                    return router.push('/search')
+                                }
                                 router.push({
                                     pathname: '/search',
                                     query: `search=%5B%7B%22title%22%3A%22Search%22%2C%22key%22%3A%22search%22%2C%22label%22%3A%22${encodeURIComponent(
@@ -257,14 +260,16 @@ export function Hero() {
                                 <input
                                     placeholder="Search datasets - try “energy”, “Global Forest Watch”, or “food”"
                                     aria-label="search"
-                                    className="placeholder:text-[#5f5e5e]  flex-shrink flex-grow  placeholder:italic placeholder:font-light placeholder:leading-tight placeholder:sm:font-normal placeholder:sm:leading-normal text-[#4f4e4e]  text-xs md:text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white rounded-tl-[3px] rounded-bl-[3px] border-r-0"
+                                    className="placeholder:text-[#5f5e5e]  flex-shrink flex-grow  placeholder:italic placeholder:font-light placeholder:leading-tight placeholder:sm:font-normal placeholder:sm:leading-normal text-[#4f4e4e]  text-xs md:text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white rounded-tl-[3px] rounded-bl-[3px] border-y-0 border-r-0"
                                     {...register('search')}
                                 />
-                                
+
                                 <button
                                     type="submit"
-                                    className="px-8 py-4 text-[26px] font-semibold  font-acumin leading-[29.25px] text-black bg-wri-gold rounded-tr-[3px] rounded-br-[3px] h-[65px] w-full max-w-[149px] border-l-0"
-                                >Search</button>
+                                    className="px-8 py-4 text-[26px] font-semibold  font-acumin leading-[29.25px] text-black bg-wri-gold rounded-tr-[3px] rounded-br-[3px] h-[66px] w-full max-w-[149px] border-l-0 border-y-0"
+                                >
+                                    Search
+                                </button>
                             </div>
                         </form>
                     </div>

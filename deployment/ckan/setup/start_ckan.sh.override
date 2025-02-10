@@ -31,6 +31,11 @@ echo "From GitHub Actions: $GITHUB_ACTIONS"
 # Check if we are running in GitHub Actions
 if [ "$GITHUB_ACTIONS" = "true" ]; then
   UWSGI_OPTS="$UWSGI_OPTS --single-interpreter --manage-script-name --mount /private-admin=/srv/app/wsgi.py"
+  SUPERVISOR_USER='root'
+  SUPERVISOR_HOME='/tmp'
+else
+  SUPERVISOR_USER='ckan'
+  SUPERVISOR_HOME='/srv/app'
 fi
 echo "Starting CKAN with the following uwsgi options: $UWSGI_OPTS"
 
@@ -39,7 +44,18 @@ export SCRIPT_NAME="/private-admin"
 if [ $? -eq 0 ]
 then
     # Start supervisord
-    supervisord --configuration /etc/supervisord.d/supervisord.conf &
+    echo "==================================="
+    echo "SUPERVISOR_USER: $SUPERVISOR_USER"
+    echo "SUPERVISOR_HOME: $SUPERVISOR_HOME"
+    echo "==================================="
+
+    sed -i "s|SUPERVISOR_USER|$SUPERVISOR_USER|g" /etc/supervisord.d/harvest.conf
+    sed -i "s|SUPERVISOR_HOME|$SUPERVISOR_HOME|g" /etc/supervisord.d/harvest.conf
+    sed -i "s|SUPERVISOR_USER|$SUPERVISOR_USER|g" /etc/supervisord.d/worker.conf
+    sed -i "s|SUPERVISOR_HOME|$SUPERVISOR_HOME|g" /etc/supervisord.d/worker.conf
+    sed -i "s|SUPERVISOR_HOME|$SUPERVISOR_HOME|g" /etc/supervisord.conf
+
+    supervisord --configuration /etc/supervisord.conf &
     # Start uwsgi
     uwsgi $UWSGI_OPTS
 else

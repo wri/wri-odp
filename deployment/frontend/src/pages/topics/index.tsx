@@ -22,146 +22,146 @@ import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
 type Group = CkanGroup & { numSubtopics: number }
 
 const TopicsSearchResults = dynamic(
-    () => import('@/components/topics/TopicsSearchResults')
+  () => import('@/components/topics/TopicsSearchResults')
 )
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const session = await getServerAuthSession(context)
-    const helpers = createServerSideHelpers({
-        router: appRouter,
-        ctx: { session },
-        transformer: superjson,
-    })
-    await Promise.all([
-        await helpers.topics.getGeneralTopics.prefetch({
-            search: '',
-            page: { start: 0, rows: 10000 },
-            allTree: true,
-        }),
-        await helpers.topics.list.prefetch(),
-        await helpers.topics.getNumberOfSubtopics.prefetch(),
-    ])
+  const session = await getServerAuthSession(context)
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: { session, ip: undefined },
+    transformer: superjson,
+  })
+  await Promise.all([
+    await helpers.topics.getGeneralTopics.prefetch({
+      search: '',
+      page: { start: 0, rows: 10000 },
+      allTree: true,
+    }),
+    await helpers.topics.list.prefetch(),
+    await helpers.topics.getNumberOfSubtopics.prefetch(),
+  ])
 
-    return {
-        props: {
-            trpcState: helpers.dehydrate(),
-        },
-    }
+  return {
+    props: {
+      trpcState: helpers.dehydrate(),
+    },
+  }
 }
 
 export default function TopicsPage(
-    props: InferGetServerSidePropsType<typeof getServerSideProps>
+  props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const [pagination, setPagination] = useState<SearchInput>({
-        search: '',
-        page: { start: 0, rows: 10 },
-    })
-    const [query, setQuery] = useState<string>('')
-    const { data, isLoading } = api.topics.getGeneralTopics.useQuery({
-        search: '',
-        page: { start: 0, rows: 10000 },
-        allTree: true,
-    })
-    const { data: allTopics } = api.topics.list.useQuery()
+  const [pagination, setPagination] = useState<SearchInput>({
+    search: '',
+    page: { start: 0, rows: 10 },
+  })
+  const [query, setQuery] = useState<string>('')
+  const { data, isLoading } = api.topics.getGeneralTopics.useQuery({
+    search: '',
+    page: { start: 0, rows: 10000 },
+    allTree: true,
+  })
+  const { data: allTopics } = api.topics.list.useQuery()
 
-    const indexTopics = new Index({
-        tokenize: 'full',
-    })
-    if (allTopics?.topics) {
-        allTopics?.topics.forEach((topic) => {
-            indexTopics.add(
-                topic.id,
-                JSON.stringify({
-                    title: topic.title,
-                    description: topic.description,
-                })
-            )
+  const indexTopics = new Index({
+    tokenize: 'full',
+  })
+  if (allTopics?.topics) {
+    allTopics?.topics.forEach((topic) => {
+      indexTopics.add(
+        topic.id,
+        JSON.stringify({
+          title: topic.title,
+          description: topic.description,
         })
-    }
+      )
+    })
+  }
 
-    function ProcessTopics() {
-        if (!data || !allTopics)
-            return { topics: [], topicDetails: {}, count: 0 }
-        const filteredTopics =
-            query !== ''
-                ? allTopics.topics.filter((t) =>
-                      indexTopics.search(query).includes(t.id)
-                  )
-                : data.topics
-        const topics = filteredTopics.slice(
-            pagination.page.start,
-            pagination.page.start + pagination.page.rows
-        ) as GroupTree[] | Group[]
-        const topicDetails = data.topicDetails
-        return { topics, topicDetails, count: filteredTopics.length }
-    }
+  function ProcessTopics() {
+    if (!data || !allTopics)
+      return { topics: [], topicDetails: {}, count: 0 }
+    const filteredTopics =
+      query !== ''
+        ? allTopics.topics.filter((t) =>
+          indexTopics.search(query).includes(t.id)
+        )
+        : data.topics
+    const topics = filteredTopics.slice(
+      pagination.page.start,
+      pagination.page.start + pagination.page.rows
+    ) as GroupTree[] | Group[]
+    const topicDetails = data.topicDetails
+    return { topics, topicDetails, count: filteredTopics.length }
+  }
 
-    const filteredTopics = ProcessTopics()
-    const links = [{ label: 'Topics', url: '/topics', current: true }]
+  const filteredTopics = ProcessTopics()
+  const links = [{ label: 'Topics', url: '/topics', current: true }]
 
-    return (
+  return (
+    <>
+      <NextSeo
+        title="Topics"
+        description="WRI Open Data Catalog Topics"
+        openGraph={{
+          title: 'Topics',
+          description: 'WRI Open Data Catalog Topics',
+          url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/topics`,
+          type: 'website',
+        }}
+      />
+      <Header />
+      <Breadcrumbs links={links} />
+      <TopicsSearch
+        isLoading={isLoading}
+        setQuery={setQuery}
+        query={query}
+        groupType="Topics"
+      />
+      <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
+        <div className="max-w-[705px] ml-2 2xl:ml-2">
+          <div className="default-home-container w-full border-t-[4px] border-stone-900" />
+          <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
+            Explore reliable datasets filtered by the topic of your
+            interest.
+          </h3>
+        </div>
+      </section>
+      {isLoading ? (
+        <div className="mx-auto h-[2898px] lg:h-[2406px]">
+          <Spinner className="mx-auto" />
+        </div>
+      ) : (
         <>
-            <NextSeo
-                title="Topics"
-                description="WRI Open Data Catalog Topics"
-                openGraph={{
-                    title: 'Topics',
-                    description: 'WRI Open Data Catalog Topics',
-                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/topics`,
-                    type: 'website',
-                }}
+          <TopicsSearchResults
+            filtered={
+              query !== '' &&
+              query !== null &&
+              typeof query !== 'undefined'
+            }
+            count={filteredTopics.count}
+            topics={filteredTopics.topics}
+            topicDetails={filteredTopics.topicDetails}
+          />
+          <div className="w-full px-8 xxl:px-0 max-w-8xl mx-auto">
+            <Pagination
+              setQuery={setPagination}
+              query={pagination}
+              data={filteredTopics}
             />
-            <Header />
-            <Breadcrumbs links={links} />
-            <TopicsSearch
-                isLoading={isLoading}
-                setQuery={setQuery}
-                query={query}
-                groupType="Topics"
-            />
-            <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
-                <div className="max-w-[705px] ml-2 2xl:ml-2">
-                    <div className="default-home-container w-full border-t-[4px] border-stone-900" />
-                    <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
-                        Explore reliable datasets filtered by the topic of your
-                        interest.
-                    </h3>
-                </div>
-            </section>
-            {isLoading ? (
-                <div className="mx-auto h-[2898px] lg:h-[2406px]">
-                    <Spinner className="mx-auto" />
-                </div>
-            ) : (
-                <>
-                    <TopicsSearchResults
-                        filtered={
-                            query !== '' &&
-                            query !== null &&
-                            typeof query !== 'undefined'
-                        }
-                        count={filteredTopics.count}
-                        topics={filteredTopics.topics}
-                        topicDetails={filteredTopics.topicDetails}
-                    />
-                    <div className="w-full px-8 xxl:px-0 max-w-8xl mx-auto">
-                        <Pagination
-                            setQuery={setPagination}
-                            query={pagination}
-                            data={filteredTopics}
-                        />
-                    </div>
-                </>
-            )}
-            <Footer
-                links={{
-                    primary: { title: 'Explore Teams', href: '/teams' },
-                    secondary: {
-                        title: 'Explore Applications',
-                        href: '/applications',
-                    },
-                }}
-            />
+          </div>
         </>
-    )
+      )}
+      <Footer
+        links={{
+          primary: { title: 'Explore Teams', href: '/teams' },
+          secondary: {
+            title: 'Explore Applications',
+            href: '/applications',
+          },
+        }}
+      />
+    </>
+  )
 }

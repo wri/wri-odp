@@ -12,59 +12,61 @@ import { appRouter } from '@/server/api/root'
 import { getServerAuthSession } from '../../../server/auth'
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const session = await getServerAuthSession(context)
-    const helpers = createServerSideHelpers({
-        router: appRouter,
-        ctx: { session },
-        transformer: superjson,
-    })
+  const session = await getServerAuthSession(context)
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: { session, ip: undefined },
+    transformer: superjson,
+  })
 
-    await helpers.notification.getAllNotifications.prefetch({})
-    await helpers.user.getUserCapacity.prefetch()
-    await helpers.dataset.getAllDataset.prefetch({
-        search: '',
-        page: { start: 0, rows: 10 },
-        _isUserSearch: true,
-        fq: {
-            is_approved: 'true',
-            draft: 'false',
-        },
-    })
-   
-    if (!session) {
-        return {
-            redirect: {
-                destination: '/auth/signin',
-                permanent: false,
-            },
-        }
-    }
+  await helpers.notification.getAllNotifications.prefetch({})
+  await helpers.user.getUserCapacity.prefetch()
+  await helpers.dataset.getAllDataset.prefetch({
+    search: '',
+    page: { start: 0, rows: 10 },
+    _isUserSearch: true,
+    fq: {
+      is_approved: 'true',
+      draft: 'false',
+    },
+  })
 
+  if (!session) {
     return {
-        props: {
-            trpcState: helpers.dehydrate(),
-            session,
-        },
+      redirect: {
+        destination: '/auth/signin',
+        permanent: false,
+      },
     }
+  }
+
+  return {
+    props: {
+      trpcState: helpers.dehydrate(),
+      session,
+    },
+  }
 }
 
-export default function DatasetListPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    return (
-        <>
-            <NextSeo
-                title={`Datasets - Dashboard`}
-                description={`Datasets - Dashboard -- WRI Open Data Catalog`}
-                openGraph={{
-                    title: `Datasets - Dashboard`,
-                    description: `Datasets - Dashboard -- WRI Open Data Catalog`,
-                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/datasets`,
-                }}
-            />
-            <Header />
-            <Layout>
-                <DatasetList />
-            </Layout>
-            <Footer style="mt-0" />
-        </>
-    )
+export default function DatasetListPage(
+  props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
+  return (
+    <>
+      <NextSeo
+        title={`Datasets - Dashboard`}
+        description={`Datasets - Dashboard -- WRI Open Data Catalog`}
+        openGraph={{
+          title: `Datasets - Dashboard`,
+          description: `Datasets - Dashboard -- WRI Open Data Catalog`,
+          url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/datasets`,
+        }}
+      />
+      <Header />
+      <Layout>
+        <DatasetList />
+      </Layout>
+      <Footer style="mt-0" />
+    </>
+  )
 }

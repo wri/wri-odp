@@ -71,6 +71,8 @@ export function DownloadButton({
                         ...data,
                         resources: [tabularResource.id],
                         package_id: tabularResource.datasetId ?? '',
+                        typeOfForm: 'email-download',
+                        package_name: tabularResource.datasetName,
                     }
                     createDownloadEvent.mutate(_data)
 
