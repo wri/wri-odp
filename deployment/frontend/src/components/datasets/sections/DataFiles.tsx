@@ -337,6 +337,8 @@ export function DataFiles({
                         ...data,
                         resources: datafilesToDownload.map((r) => r.id),
                         package_id: dataset.id ?? '',
+                        typeOfForm: 'email-download',
+                        package_name: dataset.title ?? dataset.name,
                     }
                     console.log('Creating download event with data:', _data)
                     createDownloadEvent.mutate(_data)
@@ -859,6 +861,9 @@ function DatafileCard({
                                             onClick={() => {
                                                 setTabularResource({
                                                     provider: 'datastore',
+                                                    datasetName:
+                                                        dataset.title ??
+                                                        dataset.name,
                                                     id: datafile.id as string,
                                                     name:
                                                         datafile?.title ??
@@ -1037,6 +1042,9 @@ function DatafileCard({
                                                 onClick={() => {
                                                     setTabularResource({
                                                         provider: 'datastore',
+                                                        datasetName:
+                                                            dataset.title ??
+                                                            dataset.name,
                                                         id: datafile.id as string,
                                                         name:
                                                             datafile?.title ??

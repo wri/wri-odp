@@ -13,44 +13,44 @@ import { env } from '@/env.mjs'
 import { NextSeo } from 'next-seo'
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const session = await getServerAuthSession(context)
-    const helpers = createServerSideHelpers({
-        router: appRouter,
-        ctx: { session },
-        transformer: superjson,
-    })
-    await helpers.user.getAllUsers.prefetch({
-        search: '',
-        page: { start: 0, rows: 100 },
-    })
-    await helpers.user.getUserCapacity.prefetch()
+  const session = await getServerAuthSession(context)
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: { session, ip: undefined },
+    transformer: superjson,
+  })
+  await helpers.user.getAllUsers.prefetch({
+    search: '',
+    page: { start: 0, rows: 100 },
+  })
+  await helpers.user.getUserCapacity.prefetch()
 
-    return {
-        props: {
-            trpcState: helpers.dehydrate(),
-        },
-    }
+  return {
+    props: {
+      trpcState: helpers.dehydrate(),
+    },
+  }
 }
 
 export default function topics(
-    props: InferGetServerSidePropsType<typeof getServerSideProps>
+  props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    return (
-        <>
-            <NextSeo
-                title={`Users - Dashboard`}
-                description={`Users - Dashboard -- WRI Open Data Catalog`}
-                openGraph={{
-                    title: `Users - Dashboard`,
-                    description: `Users - Dashboard -- WRI Open Data Catalog`,
-                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/users`,
-                }}
-            />
-            <Header />
-            <Layout>
-                <UserList />
-            </Layout>
-            <Footer style="mt-0" />
-        </>
-    )
+  return (
+    <>
+      <NextSeo
+        title={`Users - Dashboard`}
+        description={`Users - Dashboard -- WRI Open Data Catalog`}
+        openGraph={{
+          title: `Users - Dashboard`,
+          description: `Users - Dashboard -- WRI Open Data Catalog`,
+          url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/users`,
+        }}
+      />
+      <Header />
+      <Layout>
+        <UserList />
+      </Layout>
+      <Footer style="mt-0" />
+    </>
+  )
 }

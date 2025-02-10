@@ -1,11 +1,11 @@
 //@ts-ignore
-import { PluginMapboxGl } from 'layer-manager'
+import { PluginMapboxGl } from 'wri-layer-manager'
 import { useMap } from 'react-map-gl'
 import {
     Layer,
     LayerManager as VizzLayerManager,
     //@ts-ignore
-} from 'layer-manager/dist/components'
+} from 'wri-layer-manager/dist/components'
 import pick from 'lodash/pick'
 import { CartoProvider } from '@/utils/providers/cartoProvider'
 import { TileProvider } from '@/utils/providers/tileProvider'
