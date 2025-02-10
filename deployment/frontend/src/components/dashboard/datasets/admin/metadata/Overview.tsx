@@ -139,11 +139,14 @@ export function OverviewForm({
                                                 label: 'No team',
                                                 value: '',
                                                 id: '',
+                                                visibility: '',
                                             },
                                             ...data.map((team) => ({
                                                 label: team.title ?? team.name,
                                                 value: team.name,
                                                 id: team.id,
+                                                visibility:
+                                                    team.visibility ?? 'public',
                                             })),
                                         ]}
                                         placeholder="Select a team"
@@ -371,6 +374,7 @@ export function OverviewForm({
                             formObj={formObj}
                             options={visibilityOptions}
                         />
+                        <ErrorDisplay name="visibility_type" errors={errors} />
                     </InputGroup>
                     <InputGroup label="License">
                         {match(possibleLicenses)

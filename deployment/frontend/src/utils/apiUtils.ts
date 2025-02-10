@@ -78,6 +78,7 @@ export async function searchHierarchy({
                         : 'organization_list_wri'
                 }`
             }
+
             response = await fetch(urLink, {
                 headers: {
                     Authorization: apiKey,
@@ -316,7 +317,12 @@ export async function getAllDatasetFq({
     extAddressQ?: string
     extGlobalQ?: string
     user?: boolean | null
-}): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets; facets: FacetsCount }> {
+}): Promise<{
+    datasets: WriDataset[]
+    count: number
+    searchFacets: Facets
+    facets: FacetsCount
+}> {
     try {
         let url = `${env.CKAN_URL}/api/3/action/package_search?q=${query.search}`
 
@@ -551,6 +557,19 @@ export async function getOneDataset(
         throw Error(JSON.stringify(dataset.error))
     }
 
+    if (dataset.result.owner_org) {
+        const org = await getOrgDetails({
+            orgId: dataset.result.owner_org,
+            apiKey: session?.user.apikey ?? '',
+        })
+
+        const visibility = org?.visibility || 'public'
+
+        const organization = dataset.result.organization!
+        organization.visibility = visibility
+        dataset.result = { ...dataset.result, organization }
+    }
+
     if (dataset.result.rw_id && dataset.result.approval_status !== 'pending') {
         const rwRes = await fetch(
             `https://api.resourcewatch.org/v1/dataset/${dataset.result.rw_id}`,
@@ -706,7 +725,20 @@ export async function getOnePendingDataset(
         }
         throw Error(JSON.stringify(data.error))
     }
-    const dataset = data.result.package_data
+    let dataset = data.result.package_data
+
+    if (dataset.owner_org) {
+        const org = await getOrgDetails({
+            orgId: dataset.owner_org,
+            apiKey: session?.user.apikey ?? '',
+        })
+
+        const visibility = org?.visibility || 'public'
+
+        const organization = dataset.organization!
+        organization.visibility = visibility
+        dataset = { ...dataset, organization }
+    }
 
     // if (dataset.rw_id) {
     const resourceLayer = dataset.resources.filter(
@@ -930,6 +962,7 @@ export function findAllNameInTree(
 
     return result
 }
+
 export async function getOrganizationTreeDetails({
     input,
     session,
@@ -946,10 +979,15 @@ export async function getOrganizationTreeDetails({
             q: input.search,
             group_type: 'organization',
         })
+
         if (input.tree) {
             for (const gtree of groupTree) {
                 const findtree = findNameInTree(gtree, input.search)
                 if (findtree) {
+                    if (findtree.private) {
+                        groupTree = []
+                        break
+                    }
                     groupTree = [findtree]
                     break
                 }
@@ -987,11 +1025,15 @@ export async function getOrganizationTreeDetails({
         },
         {} as Record<string, GroupsmDetails>
     )
-    
-    const facets = await fetchFacets(teamDetails, 'organization', session?.user.apikey ?? '');
+
+    const facets = await fetchFacets(
+        teamDetails,
+        'organization',
+        session?.user.apikey ?? ''
+    )
     for (const group in teamDetails) {
-        const team = teamDetails[group]!;
-        team.package_count = facets[team.name] ?? 0;
+        const team = teamDetails[group]!
+        team.package_count = facets[team.name] ?? 0
     }
 
     const result = groupTree
@@ -1007,16 +1049,18 @@ export async function fetchFacets(
     groupType: 'organization' | 'groups',
     apiKey: string
 ): Promise<Record<string, number>> {
-    const fq = `(${Object.values(teamDetails).map(item => item.name).join(' OR ')})`;
+    const fq = `(${Object.values(teamDetails)
+        .map((item) => item.name)
+        .join(' OR ')})`
 
     const facetsQuery = await getAllDatasetFq({
         apiKey: apiKey,
         fq: `${groupType}:${fq}+is_approved:true`,
         facetFields: [groupType],
         query: { search: '', page: { start: 0, rows: 0 } },
-    });
+    })
 
-    return facetsQuery.facets[groupType] ?? {};
+    return facetsQuery.facets[groupType] ?? {}
 }
 
 export async function getTopicTreeDetails({
@@ -1078,11 +1122,15 @@ export async function getTopicTreeDetails({
         {} as Record<string, GroupsmDetails>
     )
 
-    const facets = await fetchFacets(topicDetails, 'groups', session?.user.apikey ?? '');
+    const facets = await fetchFacets(
+        topicDetails,
+        'groups',
+        session?.user.apikey ?? ''
+    )
 
     for (const group in topicDetails) {
-        const topic = topicDetails[group]!;
-        topic.package_count = facets[topic.name] ?? 0;
+        const topic = topicDetails[group]!
+        topic.package_count = facets[topic.name] ?? 0
     }
 
     const result = groupTree
@@ -2719,8 +2767,9 @@ export function advance_search_query(filters: Filter[]) {
                 ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
                 : '*'
 
-            fq['metadata_modified'] =
-                `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+            fq[
+                'metadata_modified'
+            ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
         } else if (key == 'spatial') {
             const coordinates = keyFilters[0]?.value
             const address = keyFilters[0]?.label
