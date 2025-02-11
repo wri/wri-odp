@@ -44,6 +44,8 @@ RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf285
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
 
+RUN pip uninstall -y ckanext-issues
+
 # Fixing security vulnerabilities
 RUN apk --update add git
 RUN apk add postgresql15-client=15.10-r0
