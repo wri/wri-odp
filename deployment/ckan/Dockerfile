@@ -90,10 +90,10 @@ COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
 ENV SUPERVISOR_USER=ckan
 ENV SUPERVISOR_HOME=/srv/app
 
-RUN sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/harvest.conf \
-  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/harvest.conf \
-  sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/worker.conf \
-  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/worker.conf \
+RUN sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/harvest.conf && \
+  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/harvest.conf && \
+  sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/worker.conf && \
+  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/worker.conf && \
   sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.conf
 
 RUN chown -R ckan:ckan /etc/supervisord.d
