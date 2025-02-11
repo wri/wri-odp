@@ -87,7 +87,7 @@ COPY setup/supervisord.conf /etc/supervisord.conf
 COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
 COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
 
-ENV SUPERVISOR_USER=ckan
+ENV SUPERVISOR_USER=root
 ENV SUPERVISOR_HOME=/srv/app
 
 RUN sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/harvest.conf && \
