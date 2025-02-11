@@ -1,50 +1,28 @@
 #!/bin/bash
 
-# Run the prerun script to init CKAN and create the default admin user
-python3 prerun.py
+if [ "$GITHUB_ACTIONS" = "true" ]; then \
+      echo "Running in GitHub Actions"; \
+      SUPERVISOR_USER="root"; \
+      SUPERVISOR_HOME="/tmp"; \
+    else \
+      echo "Running in deployment"; \
+      SUPERVISOR_USER="ckan"; \
+      SUPERVISOR_HOME="/srv/app"; \
+    fi && \
 
-# Run any startup scripts provided by images extending this one
-if [[ -d "/docker-entrypoint.d" ]]
-then
-    for f in /docker-entrypoint.d/*; do
-        case "$f" in
-            *.sh)     echo "$0: Running init file $f"; . "$f" ;;
-            *.py)     echo "$0: Running init file $f"; python3 "$f"; echo ;;
-            *)        echo "$0: Ignoring $f (not an sh or py file)" ;;
-        esac
-        echo
-    done
-fi
+echo "==================================="
+echo "WHOAMI: $(whoami)"
+echo "SUPERVISOR_USER: $SUPERVISOR_USER"
+echo "SUPERVISOR_HOME: $SUPERVISOR_HOME"
+sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/harvest.conf
+sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/harvest.conf
+sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/worker.conf
+sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/worker.conf
+sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.conf
 
-# Set the common uwsgi options
-UWSGI_OPTS="--socket /tmp/uwsgi.sock \
-            --wsgi-file /srv/app/wsgi.py \
-            --module wsgi:application \
-            --uid 92 --gid 92 \
-            --http 0.0.0.0:5000 \
-            --master --enable-threads \
-            --lazy-apps \
-            -p 6 -L -b 32768 --vacuum \
-            --harakiri $UWSGI_HARAKIRI"
+# Make sure user ckan has access to these files
+chown -R ckan:ckan /etc/supervisord.d
+chown -R ckan:ckan /etc/supervisord.conf
 
-echo "From GitHub Actions: $GITHUB_ACTIONS"
-# Check if we are running in GitHub Actions
-if [ "$GITHUB_ACTIONS" = "true" ]; then
-  UWSGI_OPTS="$UWSGI_OPTS --single-interpreter --manage-script-name --mount /private-admin=/srv/app/wsgi.py"
-fi
-echo "Starting CKAN with the following uwsgi options: $UWSGI_OPTS"
-
-export SCRIPT_NAME="/private-admin"
-
-if [ $? -eq 0 ]
-then
-    # Start supervisord
-    echo "==================================="
-    echo "WHOAMI: $(whoami)"
-
-    supervisord --configuration /etc/supervisord.conf &
-    # Start uwsgi
-    uwsgi $UWSGI_OPTS
-else
-  echo "[prerun] failed...not starting CKAN."
-fi
+# Switch back to the ckan user
+exec su-exec ckan env GITHUB_ACTIONS=$GITHUB_ACTIONS CKAN_INI=$CKAN_INI UWSGI_HARAKIRI=$UWSGI_HARAKIRI /srv/app/start_ckan_original.sh
