@@ -54,11 +54,9 @@ RUN pip3 install pyproj --no-binary pyproj
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 COPY setup/start_ckan.sh.override ${APP_DIR}/start_ckan.sh
-COPY setup/start_ckan_original.sh ${APP_DIR}/start_ckan_original.sh
 RUN chown -R ckan:ckan ${APP_DIR}/src/ckanext-wri
 RUN chmod +x ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/start_ckan.sh
-RUN chmod +x ${APP_DIR}/start_ckan_original.sh
 
 COPY patches ${APP_DIR}/patches
 RUN apk --no-cache add patch
@@ -89,5 +87,16 @@ COPY setup/supervisord.conf /etc/supervisord.conf
 COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
 COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
 
+ENV SUPERVISOR_USER=ckan
+ENV SUPERVISOR_HOME=/srv/app
+
+RUN sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/harvest.conf \
+  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/harvest.conf \
+  sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/worker.conf \
+  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/worker.conf \
+  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.conf
+
 RUN chown -R ckan:ckan /etc/supervisord.d
 RUN chown -R ckan:ckan /etc/supervisord.conf
+
+USER ckan
