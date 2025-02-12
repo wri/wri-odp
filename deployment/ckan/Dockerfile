@@ -83,20 +83,13 @@ USER root
 
 RUN chown -R ckan:ckan ${APP_DIR}/src/
 
-COPY setup/supervisord.conf /etc/supervisord.conf
-COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
-COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
+RUN mkdir -p ${APP_DIR}/supervisor/supervisord.d
 
-ENV SUPERVISOR_USER=root
-ENV SUPERVISOR_HOME=/srv/app
+COPY setup/supervisord.conf ${APP_DIR}/supervisor/supervisord.conf
+COPY setup/supervisor.worker.conf ${APP_DIR}/supervisor/supervisord.d/worker.conf
+COPY setup/supervisor.harvest.conf ${APP_DIR}/supervisor/supervisord.d/harvest.conf
 
-RUN sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/harvest.conf && \
-  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/harvest.conf && \
-  sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/worker.conf && \
-  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/worker.conf && \
-  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.conf
-
-RUN chown -R ckan:ckan /etc/supervisord.d
-RUN chown -R ckan:ckan /etc/supervisord.conf
+RUN chown -R ckan:ckan ${APP_DIR}/supervisor
+RUN chmod -R u+w ${APP_DIR}/supervisor
 
 USER ckan
