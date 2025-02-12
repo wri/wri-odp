@@ -92,22 +92,36 @@ def check_solr_connection(retry=None):
             print('[prerun] Succesfully connected to solr, but CKAN schema not found')
 
 
+#def init_db():
+#
+#    db_command = ["ckan", "-c", ckan_ini, "db", "init"]
+#    print("[prerun] Initializing or upgrading db - start")
+#    try:
+#        subprocess.check_output(db_command, stderr=subprocess.STDOUT)
+#        print("[prerun] Initializing or upgrading db - end")
+#    except subprocess.CalledProcessError as e:
+#        if "OperationalError" in e.output.decode("utf-8"):
+#            print(e.output.decode("utf-8"))
+#            print("[prerun] Database not ready, waiting a bit before exit...")
+#            time.sleep(5)
+#            sys.exit(1)
+#        else:
+#            print(e.output.decode("utf-8"))
+#            raise e
+#
 def init_db():
-
-    db_command = ["ckan", "-c", ckan_ini, "db", "init"]
+    db_command = ['ckan', '-c', '/srv/app/production.ini', 'db', 'init']
     print("[prerun] Initializing or upgrading db - start")
     try:
-        subprocess.check_output(db_command, stderr=subprocess.STDOUT)
-        print("[prerun] Initializing or upgrading db - end")
+        output = subprocess.check_output(db_command, stderr=subprocess.STDOUT)
+        print(output.decode('utf-8'))  # Print the output if successful
     except subprocess.CalledProcessError as e:
-        if "OperationalError" in e.output.decode("utf-8"):
-            print(e.output.decode("utf-8"))
-            print("[prerun] Database not ready, waiting a bit before exit...")
-            time.sleep(5)
-            sys.exit(1)
-        else:
-            print(e.output.decode("utf-8"))
-            raise e
+        print(f"Error running ckan db init: {e}")
+        print(f"Command output:\n{e.output.decode('utf-8')}")  # Print the output if there's an error
+        raise e
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        raise e
 
 
 def init_datastore_db():
