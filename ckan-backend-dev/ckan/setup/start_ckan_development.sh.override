@@ -93,7 +93,27 @@ then
     done
 fi
 
+# Check if we are running in GitHub Actions
+if [ "$GITHUB_ACTIONS" = "true" ]; then
+  SUPERVISOR_USER='root'
+  SUPERVISOR_HOME='/tmp'
+else
+  SUPERVISOR_USER='ckan'
+  SUPERVISOR_HOME='/srv/app'
+fi
+
 # Start supervisord
+echo "==================================="
+echo "SUPERVISOR_USER: $SUPERVISOR_USER"
+echo "SUPERVISOR_HOME: $SUPERVISOR_HOME"
+echo "==================================="
+
+sed -i "s|SUPERVISOR_USER|$SUPERVISOR_USER|g" /etc/supervisord.d/harvest.conf
+sed -i "s|SUPERVISOR_HOME|$SUPERVISOR_HOME|g" /etc/supervisord.d/harvest.conf
+sed -i "s|SUPERVISOR_USER|$SUPERVISOR_USER|g" /etc/supervisord.d/worker.conf
+sed -i "s|SUPERVISOR_HOME|$SUPERVISOR_HOME|g" /etc/supervisord.d/worker.conf
+sed -i "s|SUPERVISOR_HOME|$SUPERVISOR_HOME|g" /etc/supervisord.conf
+
 supervisord --configuration /etc/supervisord.conf &
 
 # Start the development server with automatic reload
