@@ -81,7 +81,9 @@ RUN pip3 install -r /srv/app/src/ckan/requirements.txt
 USER ckan
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
-RUN ckan config-tool ${CKAN_INI} "ckan.plugins = image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars"
+ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display issues envvars
+
+RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
 RUN ckan config-tool ${CKAN_INI} -s app:main "ckan.datapusher.api_token = xxxx-xxxx-xxxx-xxxx"
@@ -98,16 +100,8 @@ COPY setup/supervisord.conf /etc/supervisord.conf
 COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
 COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
 
-ENV SUPERVISOR_USER=root
-ENV SUPERVISOR_HOME=/srv/app
-
-RUN sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/harvest.conf && \
-  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/harvest.conf && \
-  sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/worker.conf && \
-  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/worker.conf && \
-  sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.conf
-
 RUN chown -R ckan:ckan /etc/supervisord.d
 RUN chown -R ckan:ckan /etc/supervisord.conf
 
 USER ckan
+
