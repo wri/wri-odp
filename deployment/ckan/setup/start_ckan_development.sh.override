@@ -50,7 +50,7 @@ ckan config-tool $CKAN_INI ckan.datapusher.api_token=xxx
 
 # Set up the Secret key used by Beaker and Flask
 # This can be overriden using a CKAN___BEAKER__SESSION__SECRET env var
-if grep -E "beaker.session.secret ?= ?$" ckan.ini
+if grep -E "beaker.session.secret ?= ?$" production.ini
 then
     echo "Setting beaker.session.secret in ini file"
     ckan config-tool $CKAN_INI "beaker.session.secret=$(python3 -c 'import secrets; print(secrets.token_urlsafe())')"
