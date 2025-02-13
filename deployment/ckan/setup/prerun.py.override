@@ -17,6 +17,24 @@ ckan_ini = os.environ.get("CKAN_INI", "/srv/app/production.ini")
 
 RETRY = 5
 
+def is_postgres_running(db_url):
+    """
+    Checks if the PostgreSQL server is running and accepting connections.
+
+    Args:
+        db_url (str): The PostgreSQL connection URL.
+
+    Returns:
+        bool: True if PostgreSQL is running, False otherwise.
+    """
+    try:
+        # Attempt to connect to the database
+        conn = psycopg2.connect(db_url)
+        conn.close()
+        return True
+    except psycopg2.Error as e:
+        print(f"PostgreSQL connection error: {e}")
+        return False
 
 def update_plugins():
 
@@ -91,24 +109,48 @@ def check_solr_connection(retry=None):
         else:                                                                                                                                                          
             print('[prerun] Succesfully connected to solr, but CKAN schema not found')
 
-
 def init_db():
+    db_command = ['ckan', '-c', '/srv/app/production.ini', 'db', 'init']
 
-    db_command = ["ckan", "-c", ckan_ini, "db", "init"]
-    print("[prerun] Initializing or upgrading db - start")
+    # Extract the database URL from the production.ini file
     try:
-        subprocess.check_output(db_command, stderr=subprocess.STDOUT)
-        print("[prerun] Initializing or upgrading db - end")
-    except subprocess.CalledProcessError as e:
-        if "OperationalError" in e.output:
-            print(e.output)
-            print("[prerun] Database not ready, waiting a bit before exit...")
-            time.sleep(5)
-            sys.exit(1)
+        with open('/srv/app/production.ini', 'r') as f:
+            for line in f:
+                if line.startswith('sqlalchemy.url'):
+                    db_url = line.split('=')[1].strip()
+                    break
         else:
-            print(e.output)
-            raise e
+            print("Error: sqlalchemy.url not found in production.ini")
+            sys.exit(1)
+    except FileNotFoundError:
+        print("Error: production.ini not found")
+        sys.exit(1)
 
+    # Check if PostgreSQL is running before proceeding
+    max_attempts = 10
+    attempt = 0
+    while attempt < max_attempts:
+        if is_postgres_running(db_url):
+            print("PostgreSQL is running. Proceeding with CKAN database initialization.")
+            break
+        else:
+            attempt += 1
+            print(f"PostgreSQL is not yet running.  Attempt {attempt}/{max_attempts}.  Waiting...")
+            time.sleep(5)  # Wait for 5 seconds before retrying
+    else:
+        print("Error: PostgreSQL did not become available after multiple attempts.")
+        sys.exit(1)
+
+    try:
+        output = subprocess.check_output(db_command, stderr=subprocess.STDOUT)
+        print(output.decode('utf-8'))  # Print the output if successful
+    except subprocess.CalledProcessError as e:
+        print(f"Error running ckan db init: {e}")
+        print(f"Command output:\n{e.output.decode('utf-8')}")  # Print the output if there's an error
+        raise e
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        raise e
 
 def init_datastore_db():
 
