@@ -30,6 +30,9 @@ echo "From GitHub Actions: $GITHUB_ACTIONS"
 # Check if we are running in GitHub Actions
 if [ "$GITHUB_ACTIONS" = "true" ]; then
   UWSGI_OPTS="$UWSGI_OPTS --single-interpreter --manage-script-name --mount /private-admin=/srv/app/wsgi.py"
+  SUPERVISOR_USER="root"
+else
+  SUPERVISOR_USER="ckan"
 fi
 echo "Starting CKAN with the following uwsgi options: $UWSGI_OPTS"
 
@@ -38,9 +41,13 @@ export SCRIPT_NAME="/private-admin"
 if [ $? -eq 0 ]
 then
     # Start supervisord
-    supervisord --configuration /srv/app/supervisor/supervisord.conf --user $(whoami) &
+    supervisord --configuration /srv/app/supervisor/supervisord.conf --user $SUPERVISOR_USER &
     # Start uwsgi
     uwsgi $UWSGI_OPTS
 else
   echo "[prerun] failed...not starting CKAN."
 fi
+
+echo "WHOAMI: $(whoami)"
+echo "PS: $(ps -a)"
+echo "LS: $(ls -a)"
