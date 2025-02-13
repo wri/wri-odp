@@ -68,8 +68,9 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
-USER ckan
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
+
+USER ckan
 
 ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display issues envvars
 
