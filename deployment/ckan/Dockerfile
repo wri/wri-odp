@@ -75,6 +75,7 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
+<<<<<<< HEAD
 RUN apk --no-cache add openssl sudo
 # Configure sudo access for ckan user
 RUN echo "ckan ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ckan && \
@@ -99,12 +100,13 @@ USER root
 
 RUN chown -R ckan:ckan ${APP_DIR}/src/
 
-COPY setup/supervisord.conf /etc/supervisord.conf
-COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
-COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
+RUN mkdir -p ${APP_DIR}/supervisor/supervisord.d
 
-RUN chown -R ckan:ckan /etc/supervisord.d
-RUN chown -R ckan:ckan /etc/supervisord.conf
+COPY setup/supervisord.conf ${APP_DIR}/supervisor/supervisord.conf
+COPY setup/supervisor.worker.conf ${APP_DIR}/supervisor/supervisord.d/worker.conf
+COPY setup/supervisor.harvest.conf ${APP_DIR}/supervisor/supervisord.d/harvest.conf
+
+RUN chown -R ckan:ckan ${APP_DIR}/supervisor
+RUN chmod -R u+w ${APP_DIR}/supervisor
 
 USER ckan
-

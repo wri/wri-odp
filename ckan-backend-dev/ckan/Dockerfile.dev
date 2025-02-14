@@ -139,6 +139,14 @@ COPY setup/supervisord.conf /etc/supervisord.conf
 COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
 COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
 
+RUN SUPERVISOR_USER="root"; \
+    SUPERVISOR_HOME="/tmp"; \
+    sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/harvest.conf && \
+    sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/harvest.conf && \
+    sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/worker.conf && \
+    sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/worker.conf && \
+    sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.conf
+
 RUN chown -R ckan:ckan /etc/supervisord.d
 RUN chown -R ckan:ckan /etc/supervisord.conf
 
