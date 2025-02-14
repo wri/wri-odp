@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Run the prerun script to init CKAN and create the default admin user
 python3 prerun.py
 
@@ -50,3 +49,7 @@ then
 else
   echo "[prerun] failed...not starting CKAN."
 fi
+
+echo "WHOAMI: $(whoami)"
+echo "PS: $(ps -a)"
+echo "LS: $(ls -a)"
