@@ -68,8 +68,9 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
-USER ckan
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
+
+USER ckan
 
 ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display issues envvars
 
@@ -85,12 +86,13 @@ USER root
 
 RUN chown -R ckan:ckan ${APP_DIR}/src/
 
-COPY setup/supervisord.conf /etc/supervisord.conf
-COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
-COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
+RUN mkdir -p ${APP_DIR}/supervisor/supervisord.d
 
-RUN chown -R ckan:ckan /etc/supervisord.d
-RUN chown -R ckan:ckan /etc/supervisord.conf
+COPY setup/supervisord.conf ${APP_DIR}/supervisor/supervisord.conf
+COPY setup/supervisor.worker.conf ${APP_DIR}/supervisor/supervisord.d/worker.conf
+COPY setup/supervisor.harvest.conf ${APP_DIR}/supervisor/supervisord.d/harvest.conf
+
+RUN chown -R ckan:ckan ${APP_DIR}/supervisor
+RUN chmod -R u+w ${APP_DIR}/supervisor
 
 USER ckan
-
