@@ -75,7 +75,6 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
-<<<<<<< HEAD
 RUN apk --no-cache add openssl sudo
 # Configure sudo access for ckan user
 RUN echo "ckan ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ckan && \
