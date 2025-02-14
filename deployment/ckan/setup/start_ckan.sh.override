@@ -1,10 +1,14 @@
 #!/bin/sh
 
+echo "[setup] Starting CKAN initialization..."
+
+echo "[setup] Adding initial datapusher API token..."
 # Add ckan.datapusher.api_token to the CKAN config file (updated with corrected value later)
 ckan config-tool $CKAN_INI ckan.datapusher.api_token=xxx
 
 # Set up the Secret key used by Beaker and Flask
 # This can be overriden using a CKAN___BEAKER__SESSION__SECRET env var
+echo "[setup] Checking and configuring security keys..."
 if grep -E "beaker.session.secret ?= ?$" production.ini
 then
     echo "Setting beaker.session.secret in ini file"
@@ -16,12 +20,15 @@ then
 fi
 
 # Run the prerun script to init CKAN and create the default admin user
+echo "[setup] Running prerun script to initialize CKAN and create default admin user..."
 sudo -u ckan -EH python3 prerun.py
 
+echo "[setup] Configuring final datapusher API token..."
 echo "Set up ckan.datapusher.api_token in the CKAN config file"
 ckan config-tool $CKAN_INI "ckan.datapusher.api_token=$(ckan -c $CKAN_INI user token add ckan_admin datapusher | tail -n 1 | tr -d '\t')"
 
 # Run any startup scripts provided by images extending this one
+echo "[setup] Checking for additional startup scripts..."
 if [[ -d "/docker-entrypoint.d" ]]
 then
     for f in /docker-entrypoint.d/*; do
@@ -34,6 +41,7 @@ then
     done
 fi
 
+echo "[setup] Configuring uWSGI options..."
 # Set the common uwsgi options
 UWSGI_OPTS="--plugins http,python \
             --socket /tmp/uwsgi.sock \
@@ -49,8 +57,10 @@ UWSGI_OPTS="--plugins http,python \
 if [ $? -eq 0 ]
 then
     # Start supervisord
+    echo "[setup] Starting supervisord..."
     supervisord --configuration /etc/supervisord.conf &
     # Start uwsgi
+    echo "[setup] Starting uWSGI server..."
     sudo -u ckan -EH uwsgi $UWSGI_OPTS
 else
   echo "[prerun] failed...not starting CKAN."

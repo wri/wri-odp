@@ -244,11 +244,19 @@ if __name__ == "__main__":
     if maintenance:
         print("[prerun] Maintenance mode, skipping setup...")
     else:
+        print("[prerun] Starting setup...")
+        print("[prerun] Checking main db connection...")
         check_main_db_connection()
+        print("[prerun] Initializing db...")
         init_db()
+        print("[prerun] Updating plugins...")
         update_plugins()
+        print("[prerun] Checking datastore db connection...")
         check_datastore_db_connection()
+        print("[prerun] Initializing datastore db...")
         init_datastore_db()
+        print("[prerun] Checking solr connection...")
         check_solr_connection()
+        print("[prerun] Creating sysadmin user...")
         create_sysadmin()
         
