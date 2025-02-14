@@ -119,9 +119,9 @@ def init_db():
                 if line.startswith('sqlalchemy.url'):
                     db_url = line.split('=')[1].strip()
                     break
-        else:
-            print("Error: sqlalchemy.url not found in production.ini")
-            sys.exit(1)
+                else:
+                   print("Error: sqlalchemy.url not found in production.ini")
+                   sys.exit(1)
     except FileNotFoundError:
         print("Error: production.ini not found")
         sys.exit(1)
