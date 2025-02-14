@@ -75,7 +75,10 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
-RUN apk --no-cache add openssl
+RUN apk --no-cache add openssl sudo
+# Configure sudo access for ckan user
+RUN echo "ckan ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ckan && \
+    chmod 0440 /etc/sudoers.d/ckan
 RUN pip3 install -r /srv/app/src/ckan/requirements.txt
 
 USER ckan
