@@ -110,7 +110,7 @@ def check_solr_connection(retry=None):
             print('[prerun] Succesfully connected to solr, but CKAN schema not found')
 
 def init_db():
-    db_command = ['ckan', '-c', '/srv/app/production.ini', 'db', 'init', '--skip-plugins']
+    db_command = ['ckan', '-c', '/srv/app/production.ini', 'db', 'init']
 
     # Extract the database URL from the production.ini file
     db_url = os.environ.get("CKAN_SQLALCHEMY_URL")
