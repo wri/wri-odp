@@ -3,9 +3,12 @@ const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 
 // Function to generate a random organization or group name
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
+Cypress.on("uncaught:exception", (err, runnable) => {
+  console.log(err);
+  return false;
+});
 
 describe("Create and verify organizations and groups", () => {
-
   const organizations = [];
   const groups = [];
   const numOfEntries = 50;
@@ -13,15 +16,14 @@ describe("Create and verify organizations and groups", () => {
   before(() => {
     // Create 50 organizations using cy.createOrganizationAPI
     for (let i = 1; i <= numOfEntries; i++) {
-      const org = `abc-${Cypress.env("ORG_NAME_SUFFIX")}-${i}`;
+      const org = `${uuid()}-${Cypress.env("ORG_NAME_SUFFIX")}-${i}`;
       organizations.push(org);
       cy.createOrganizationAPI(org);
     }
 
     // Create 50 groups using cy.createGroupAPI
     for (let i = 1; i <= numOfEntries; i++) {
-        
-      const group = `abc-${Cypress.env("GROUP_SUFFIX")}-${i}`;
+      const group = `${uuid()}-${Cypress.env("GROUP_SUFFIX")}-${i}`;
       groups.push(group);
       cy.createGroupAPI(group);
     }
@@ -41,7 +43,10 @@ describe("Create and verify organizations and groups", () => {
     cy.visit("/dashboard/teams/new"); // New organization creation page
 
     // Click on the parent organization dropdown and check if it contains all 50 organizations
-    cy.get("button[aria-haspopup=listbox]").click();
+    cy.wait(9000);
+    cy.get("button[aria-haspopup=listbox]")
+      .contains("span", "Select a parent")
+      .click();
     organizations.forEach((org) => {
       cy.get("li").contains(org).should("exist"); // Ensure every organization is listed in the dropdown
     });

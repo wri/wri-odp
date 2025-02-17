@@ -1,6 +1,10 @@
 import { UseFormReturn } from 'react-hook-form'
 import { TeamFormType } from '@/schema/team.schema'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
+import {
+    ErrorDisplay,
+    InputGroup,
+    InputGroupCustom,
+} from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
@@ -9,6 +13,46 @@ import { UploadResult } from '@uppy/core'
 import { api } from '@/utils/api'
 import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
+
+function ToolTipOnEdit() {
+    return (
+        <>
+            Changing a Team&apos;s visibility to public will not change the
+            visibility of the datasets owned by that Team or the sub-Teams under
+            this Team. Dataset and sub-Team visibility must be updated
+            independently.
+        </>
+    )
+}
+
+function ToolTipForSubTeam() {
+    return (
+        <>
+            It is not possible to have a public sub-Team under a private Team.
+            To change the visibility of the parent Team to public, please
+            contact a sysadmin.
+        </>
+    )
+}
+
+function TooltipForParent() {
+    return (
+        <>
+            <b>Public Teams</b> will appear on public pages and all users can
+            browse public datasets owned by that team.
+            <br />
+            <br />
+            <b>Private Teams</b> are not listed on public pages; these are
+            recommended for internal use and cases where the nature of the Team
+            is sensitive or not publicly relevant. Datasets owned by a private
+            team are not able to be made public.
+            <br />
+            <br />
+            Once a team has been set to private, only a sysadmin can make it
+            public again.
+        </>
+    )
+}
 
 export default function TeamForm({
     formObj,
@@ -130,6 +174,52 @@ export default function TeamForm({
                         ))}
                     <ErrorDisplay name="parent" errors={errors} />
                 </InputGroup>
+                <InputGroupCustom
+                    label="Visibility"
+                    labelClassName="pt-[0.9rem]"
+                    className="items-start"
+                    info={
+                        editing
+                            ? ToolTipOnEdit()
+                            : watch('parent')?.value !== '' &&
+                              possibleParents.data?.find(
+                                  (a) =>
+                                      a.name === watch('parent')?.value &&
+                                      a.visibility === 'private'
+                              )
+                            ? ToolTipForSubTeam()
+                            : TooltipForParent()
+                    }
+                    required
+                >
+                    <SimpleSelect
+                        key={editing ? 'edit' : 'create'}
+                        id="visibility"
+                        formObj={formObj}
+                        name="visibility"
+                        options={
+                            watch('parent')?.value !== '' &&
+                            possibleParents.data?.find(
+                                (a) =>
+                                    a.name === watch('parent')?.value &&
+                                    a.visibility === 'private'
+                            )
+                                ? [
+                                      {
+                                          label: 'Private',
+                                          value: 'private',
+                                          default: true,
+                                      },
+                                  ]
+                                : [
+                                      { label: 'Public', value: 'public' },
+                                      { label: 'Private', value: 'private' },
+                                  ]
+                        }
+                        placeholder="Select visibility"
+                    />
+                    <ErrorDisplay name="parent" errors={errors} />
+                </InputGroupCustom>
             </div>
         </div>
     )

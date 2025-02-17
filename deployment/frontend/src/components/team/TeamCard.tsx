@@ -49,9 +49,9 @@ export default function TeamCard({
                     <span className="mr-2">
                         {teamsDetails[team.id]?.package_count &&
                         (teamsDetails[team.id]?.package_count as number) <= 1
-                            ? `${teamsDetails[team.id]?.package_count} dataset`
+                            ? `${teamsDetails[team.id]?.package_count || 0} dataset`
                             : `${teamsDetails[team.id]
-                                  ?.package_count} datasets`}
+                                  ?.package_count || 0} datasets`}
                     </span>
                 )}
                 {!isGroupTree(team) && (
