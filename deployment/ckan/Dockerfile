@@ -15,7 +15,7 @@ RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf285
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@okta#egg=ckanext-auth' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
-    #pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues' && \
     # Required by ckanext-issues, but it's no longer included in any of the requirements files or the subdependencies
     pip3 install mock && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-harvest.git@v1.6.0#egg=ckanext-harvest' && \
@@ -86,7 +86,7 @@ RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 in
 
 
 # ENV CKAN__PLUGINS "image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display envvars"
-ENV CKAN__PLUGINS datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display envvars
+ENV CKAN__PLUGINS datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester  auth hierarchy_display envvars
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
