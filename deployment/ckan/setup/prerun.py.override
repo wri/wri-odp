@@ -248,6 +248,7 @@ if __name__ == "__main__":
         print("[prerun] Checking main db connection...")
         check_main_db_connection()
         print("[prerun] Checking plugins...")
+        print(os.environ.get("CKAN__PLUGINS", "No plugins found"))
         check_plugins()
         print("[prerun] Initializing db...")
         init_db()
