@@ -86,9 +86,9 @@ RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 in
 
 
 # ENV CKAN__PLUGINS "image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display envvars"
-# ENV CKAN__PLUGINS datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display envvars
+ENV CKAN__PLUGINS datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display envvars
 
-#RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
+RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
 RUN ckan config-tool ${CKAN_INI} -s app:main "ckan.datapusher.api_token = xxxx-xxxx-xxxx-xxxx"
