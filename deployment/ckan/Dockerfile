@@ -65,15 +65,15 @@ RUN chown -R ckan:ckan ${APP_DIR}/src/ckanext-wri
 RUN chmod +x ${APP_DIR}/prerun.py
 RUN chmod +x ${APP_DIR}/start_ckan.sh
 
-COPY patches ${APP_DIR}/patches
-RUN apk --no-cache add patch
-RUN for d in $APP_DIR/patches/*; do \
-        if [ -d $d ]; then \
-            for f in `ls $d/*.patch | sort -g`; do \
-                cd $SRC_DIR/`basename "$d"` && echo "$0: Applying patch $f to $SRC_DIR/`basename $d`"; patch -p1 < "$f" ; \
-            done ; \
-        fi ; \
-    done
+#COPY patches ${APP_DIR}/patches
+#RUN apk --no-cache add patch
+#RUN for d in $APP_DIR/patches/*; do \
+#        if [ -d $d ]; then \
+#            for f in `ls $d/*.patch | sort -g`; do \
+#                cd $SRC_DIR/`basename "$d"` && echo "$0: Applying patch $f to $SRC_DIR/`basename $d`"; patch -p1 < "$f" ; \
+#            done ; \
+#        fi ; \
+#    done
 
 RUN apk --no-cache add openssl sudo
 # Configure sudo access for ckan user
