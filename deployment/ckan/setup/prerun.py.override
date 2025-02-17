@@ -109,6 +109,17 @@ def check_solr_connection(retry=None):
         else:                                                                                                                                                          
             print('[prerun] Succesfully connected to solr, but CKAN schema not found')
 
+def check_plugins():
+  plugin_command = ['ckan', '-c', '/srv/app/production.ini', 'config', 'search']
+  try:
+    output = subprocess.check_output(plugin_command, stderr=subprocess.STDOUT)
+    print(output.decode('utf-8'))  # Print the output if successful
+  except subprocess.CalledProcessError as e:
+    print(f"Error running ckan config search: {e}")
+    print(f"Command output:\n{e.output.decode('utf-8')}")  # Print the output if there's an error
+    raise e
+
+
 def init_db():
     db_command = ['ckan', '-c', '/srv/app/production.ini', 'db', 'init']
 
@@ -236,6 +247,8 @@ if __name__ == "__main__":
         print("[prerun] Starting setup...")
         print("[prerun] Checking main db connection...")
         check_main_db_connection()
+        print("[prerun] Checking plugins...")
+        check_plugins()
         print("[prerun] Initializing db...")
         init_db()
         print("[prerun] Updating plugins...")
