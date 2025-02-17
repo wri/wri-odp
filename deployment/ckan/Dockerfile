@@ -76,26 +76,28 @@ RUN chmod +x ${APP_DIR}/start_ckan.sh
 #    done
 
 RUN apk --no-cache add openssl sudo
+
 # Configure sudo access for ckan user
+
 RUN echo "ckan ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ckan && \
     chmod 0440 /etc/sudoers.d/ckan
+
 RUN pip3 install -r /srv/app/src/ckan/requirements.txt
 
 USER ckan
+
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
-
 # ENV CKAN__PLUGINS "image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display envvars"
-ENV CKAN__PLUGINS datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display envvars
+ENV CKAN__PLUGINS "datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_harvester auth hierarchy_display envvars"
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
-RUN ckan config-tool ${CKAN_INI} -s app:main "ckan.datapusher.api_token = xxxx-xxxx-xxxx-xxxx"
+RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 
-RUN if [ "$GITHUB_ACTIONS" = "true" ]; then \
-      ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"; \
-    fi
+RUN if [ "$GITHUB_ACTIONS" = "true" ]; then ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"; fi
+
 
 USER root
 
