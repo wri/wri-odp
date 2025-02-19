@@ -6,6 +6,10 @@ unset CKAN__PLUGINS
 
 rm -rf /srv/app/ckan.ini
 
+echo "[setup] Checking for custom production.ini..."
+echo $CKAN_INI
+cat $CKAN_INI
+
 echo "[setup] Adding initial datapusher API token..."
 # Add ckan.datapusher.api_token to the CKAN config file (updated with corrected value later)
 ckan config-tool $CKAN_INI ckan.datapusher.api_token=xxx
