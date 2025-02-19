@@ -49,7 +49,3 @@ then
 else
   echo "[prerun] failed...not starting CKAN."
 fi
-
-echo "WHOAMI: $(whoami)"
-echo "PS: $(ps -a)"
-echo "LS: $(ls -a)"
