@@ -5,7 +5,6 @@ WORKDIR /app
 
 COPY package.json package-lock.json* ./
 COPY tableschema-1.12.6.tgz ./
-COPY layer-manager-v3.1.0-wri-gfw.tgz ./
 
 RUN npm ci -f
 

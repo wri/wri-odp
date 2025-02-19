@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Run the prerun script to init CKAN and create the default admin user
 python3 prerun.py
 
@@ -31,6 +30,9 @@ echo "From GitHub Actions: $GITHUB_ACTIONS"
 # Check if we are running in GitHub Actions
 if [ "$GITHUB_ACTIONS" = "true" ]; then
   UWSGI_OPTS="$UWSGI_OPTS --single-interpreter --manage-script-name --mount /private-admin=/srv/app/wsgi.py"
+  SUPERVISOR_USER="root"
+else
+  SUPERVISOR_USER="ckan"
 fi
 echo "Starting CKAN with the following uwsgi options: $UWSGI_OPTS"
 
@@ -39,8 +41,9 @@ export SCRIPT_NAME="/private-admin"
 if [ $? -eq 0 ]
 then
     # Start supervisord
-    export ENV_SUPERVISOR_USER=$(whoami)
-    supervisord --configuration /etc/supervisord.conf &
+    supervisord --configuration /srv/app/supervisor/supervisord.conf --user $SUPERVISOR_USER &
+    # Start supercronic
+    ./supercronic-linux-amd64 crontab &
     # Start uwsgi
     uwsgi $UWSGI_OPTS
 else
