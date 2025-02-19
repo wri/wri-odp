@@ -26,11 +26,11 @@ fi
 
 echo "Custom tables initialized successfully"
 
-#ckan -c production.ini issuesdb
+ckan -c production.ini issuesdb
 
-#if [ $EXIT_CODE -ne 0 ]; then
-#    echo "Failed to initialize the issues table"
-#    exit $EXIT_CODE
-#fi
-#
-#echo "Issues table initialized successfully"
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "Failed to initialize the issues table"
+    exit $EXIT_CODE
+fi
+
+echo "Issues table initialized successfully"
