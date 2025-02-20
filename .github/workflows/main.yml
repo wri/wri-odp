@@ -135,6 +135,8 @@ jobs:
           node-version: 18
           runTests: false
           working-directory: ./e2e-tests
+      - name: Initialize the Extensions
+        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Run Integration tests 🧪
         if: ${{ env.ENABLE_INT_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
@@ -150,8 +152,6 @@ jobs:
           follow-redirect: false # Optional, defaults to "false"
           # Fail this action after this many failed attempts
           max-attempts: 3 # Optional, defaults to 1
-      - name: Initialize the Extensions
-        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Run frontend tests 🧪
         if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
