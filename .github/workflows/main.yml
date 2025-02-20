@@ -103,8 +103,6 @@ jobs:
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
-      - name: Initialize the Extensions
-        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Cypress Install and CKAN setup
         if: ${{ env.ENABLE_INT_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
@@ -122,8 +120,6 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
-      - name: Initialize the Extensions
-        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
         env:
@@ -154,6 +150,8 @@ jobs:
           follow-redirect: false # Optional, defaults to "false"
           # Fail this action after this many failed attempts
           max-attempts: 3 # Optional, defaults to 1
+      - name: Initialize the Extensions
+        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Run frontend tests 🧪
         if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
