@@ -282,16 +282,32 @@ def send_email(emails: list[str], url: str, download_filename: str):
                        )
 
 
-ERROR_EMAIL_HTML = '''
+ERROR_EMAIL_HTML = """
 <html>
     <body>
-        <p>An error happened while preparing the file you requested for download. Please, try again.</p>
+         <p>
+         You recently requested the below data from the World Resources Institute Data Explorer. 
+         Our systems encountered an error during the packaging of this data and we are unable to deliver your files at this time.
+        </p>
+
+        <b>
+        {}
+        </b>
+        </br>
+        <b>
+        <a target="_blank" href="{}/datasets/{}">Dataset link</a>
+        </b>
+
+        <p>
+        This may be a temporary issue but more likely represents some misconfiguration in our systems. 
+        Please reach out to <a href="mailto:data@wri.org">data@wri.org</a> to request immediate support.
+        </p>
         <br>
         <a target="_blank" href="{}">{}</a>
     </body>
 </html>
 
-'''
+"""
 
 
 def send_error(emails: list[str], resource_title):
@@ -300,5 +316,5 @@ def send_error(emails: list[str], resource_title):
         mail_recipient("", email,
                        "WRI - Failed to process file ({})".format(resource_title),
                        "",
-                       ERROR_EMAIL_HTML.format(odp_url, odp_url)
+                       ERROR_EMAIL_HTML.format(resource_title,odp_url,resource_title,odp_url, odp_url),
                        )

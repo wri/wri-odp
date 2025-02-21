@@ -128,36 +128,52 @@ def convert_store_to_file(
     filename,
     download_filename,
 ):
-    logger = get_run_logger()
-    ckan_url = config.get("CKAN_URL")
+    try:
+        logger = get_run_logger()
+        ckan_url = config.get("CKAN_URL")
 
-    logger.info("Fetching data...")
-    data = query_datastore(
-        api_key, ckan_url, sql, provider, rw_id, carto_account, format
-    )
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        logger.info("Converting data..." + " " + format)
-        tmp_filepath = os.path.join(tmp_dir, filename)
-        data_to_file(data, tmp_filepath, format)
-
-        logger.info("Uploading data...")
-        url = s3_upload(
-            tmp_filepath, "_downloads_cache/{}".format(filename), download_filename
+        logger.info("Fetching data...")
+        data = query_datastore(
+            api_key, ckan_url, sql, provider, rw_id, carto_account, format
         )
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            logger.info("Converting data..." + " " + format)
+            tmp_filepath = os.path.join(tmp_dir, filename)
+            data_to_file(data, tmp_filepath, format)
 
-    # TODO: send error/success (send status)
-    send_callback(
-        api_key,
-        ckan_url,
-        "prefect_download_callback",
-        {
-            "task_id": task_id,
-            "url": url,
-            "state": "complete",
-            "entity_id": resource_id,
-            "key": format,
-        },
-    )
+            logger.info("Uploading data...")
+            url = s3_upload(
+                tmp_filepath, "_downloads_cache/{}".format(filename), download_filename
+            )
+
+        # TODO: send error/success (send status)
+        send_callback(
+            api_key,
+            ckan_url,
+            "prefect_download_callback",
+            {
+                "task_id": task_id,
+                "url": url,
+                "state": "complete",
+                "entity_id": resource_id,
+                "key": format,
+            },
+        )
+    except Exception as e:
+        # send notification to task user
+        ckan_url = config.get("CKAN_URL")
+        send_callback(
+            api_key,
+            ckan_url,
+            "prefect_send_error_callback",
+            {
+                "task_id": task_id,
+                "url": url,
+                "state": "complete",
+                "entity_id": resource_id,
+                "key": format,
+            },
+        )
 
 
 @flow(log_prints=True)
@@ -174,39 +190,58 @@ async def download_subset_of_data(
     dataset_id,
     num_of_rows,
 ):
-    logger = get_run_logger()
-    ckan_url = config.get("CKAN_URL")
+    try:
+        logger = get_run_logger()
+        ckan_url = config.get("CKAN_URL")
 
-    logger.info("Fetching data...")
-    data = []
-    if provider == "datastore":
-        tasks = await query_subset_datastore(id, sql, num_of_rows, ckan_url)
-        data = list(chain.from_iterable(tasks))
-    else:
-        tasks = await query_rw(id, sql, connector_url, provider, num_of_rows)
-        data = list(chain.from_iterable(tasks))
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        logger.info("Converting data..." + " " + format)
-        tmp_filepath = os.path.join(tmp_dir, filename)
-        data_to_file(data, tmp_filepath, format)
-        logger.info("Uploading data...")
-        url = s3_upload(
-            tmp_filepath, "_downloads_cache/{}".format(filename), download_filename
+        logger.info("Fetching data...")
+        data = []
+        if provider == "datastore":
+            tasks = await query_subset_datastore(id, sql, num_of_rows, ckan_url)
+            data = list(chain.from_iterable(tasks))
+        else:
+            tasks = await query_rw(id, sql, connector_url, provider, num_of_rows)
+            data = list(chain.from_iterable(tasks))
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            logger.info("Converting data..." + " " + format)
+            tmp_filepath = os.path.join(tmp_dir, filename)
+            data_to_file(data, tmp_filepath, format)
+            logger.info("Uploading data...")
+            url = s3_upload(
+                tmp_filepath, "_downloads_cache/{}".format(filename), download_filename
+            )
+    
+
+        # TODO: send error/success (send status)
+        send_callback(
+            api_key,
+            ckan_url,
+            "prefect_download_subset_callback",
+            {
+                "task_id": task_id,
+                "url": url,
+                "state": "complete",
+                "entity_id": id if provider == "datastore" else dataset_id,
+                "key": filename,
+            },
         )
-
-    # TODO: send error/success (send status)
-    send_callback(
-        api_key,
-        ckan_url,
-        "prefect_download_subset_callback",
-        {
-            "task_id": task_id,
-            "url": url,
-            "state": "complete",
-            "entity_id": id if provider == "datastore" else dataset_id,
-            "key": filename,
-        },
-    )
+    except Exception as e:
+        # send notification to task user
+        ckan_url = config.get("CKAN_URL")
+        send_callback(
+            api_key,
+            ckan_url,
+            "prefect_send_error_callback",
+            {
+                "task_id": task_id,
+                "url": "",
+                "state": "failed",
+                "entity_id": id if provider == "datastore" else dataset_id,
+                "key": filename,
+            },
+        )
+        #re-raise exception to notify admin about failed flow
+        raise e
 
 
 @flow(log_prints=True)
@@ -218,34 +253,51 @@ async def download_resources_zipped(
     filename,
     download_filename,
 ):
-    logger = get_run_logger()
-    ckan_url = config.get("CKAN_URL")
-    print("Filename", filename)
-    with tempfile.TemporaryDirectory() as temp_dir:
-        tasks = await download_keys(keys, filename, temp_dir)
-        data = list(tasks)
-        zipped_file = f"{filename}.zip"
-        zipped_file = os.path.join(temp_dir, zipped_file)
-        zip_files(data, zipped_file)
-        logger.info("Zipped data to {}".format(zipped_file))
-        tmp_filepath = os.path.join(temp_dir, zipped_file)
-        logger.info("Uploading data...")
-        url = s3_upload(
-            tmp_filepath, "_downloads_cache/{}".format(f"{filename}.zip"), f"{download_filename}.zip"
+    try:
+        logger = get_run_logger()
+        ckan_url = config.get("CKAN_URL")
+        print("Filename", filename)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            tasks = await download_keys(keys, filename, temp_dir)
+            data = list(tasks)
+            zipped_file = f"{filename}.zip"
+            zipped_file = os.path.join(temp_dir, zipped_file)
+            zip_files(data, zipped_file)
+            logger.info("Zipped data to {}".format(zipped_file))
+            tmp_filepath = os.path.join(temp_dir, zipped_file)
+            logger.info("Uploading data...")
+            url = s3_upload(
+                tmp_filepath, "_downloads_cache/{}".format(f"{filename}.zip"), f"{download_filename}.zip"
+            )
+        send_callback(
+            api_key,
+            ckan_url,
+            "prefect_download_zipped_callback",
+            {
+                "task_id": task_id,
+                "url": url,
+                "state": "complete",
+                "entity_id": dataset_id,
+                "key": filename,
+            },
         )
-    logger.info("Uploading data...")
-    send_callback(
-        api_key,
-        ckan_url,
-        "prefect_download_zipped_callback",
-        {
-            "task_id": task_id,
-            "url": url,
-            "state": "complete",
-            "entity_id": dataset_id,
-            "key": filename,
-        },
-    )
+    except Exception as e:
+        # send notification to task user
+        ckan_url = config.get("CKAN_URL")
+        send_callback(
+            api_key,
+            ckan_url,
+            "prefect_send_error_callback",
+            {
+                "task_id": task_id,
+                "url": "",
+                "state": "failed",
+                "entity_id": dataset_id,
+                "key": filename,
+            },
+        )
+        #re-raise exception to notify admin about failed flow
+        raise e
 
 
 if __name__ == "__main__":
