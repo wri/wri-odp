@@ -12,7 +12,7 @@ RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf285
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/signed-url#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/signed-url/requirements.txt' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/signed-url/dev-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@okta#egg=ckanext-auth' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@0ee17faf8929b30056e8df7be0243b3eeba778f1#egg=ckanext-auth' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@86a506ed897f4a2a83274a43759b1237fbfd05c8#egg=ckanext-issues' && \
