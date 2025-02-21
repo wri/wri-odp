@@ -32,7 +32,7 @@ RUN chmod 777 ${APP_DIR}/src/ckanext-s3filestore
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
 RUN apk update
-RUN apk add postgresql15-client=15.10-r0
+# RUN apk add postgresql15-client=15.10-r0
 RUN apk add libpq=15.10-r0
 RUN apk add git=2.40.1-r0
 
