@@ -15,7 +15,7 @@ RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf285
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@a9e42702b797eaf3ffe967040867519219d32224#egg=ckanext-auth' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@1318c770383b8d2ecdca2e5cb058ef000f39103d#egg=ckanext-issues' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@59277c13d3deb8cbef44362bd8e70c05d5ed7865#egg=ckanext-issues' && \
     # Required by ckanext-issues, but it's no longer included in any of the requirements files or the subdependencies
     pip3 install mock && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-harvest.git@v1.6.0#egg=ckanext-harvest' && \
@@ -33,7 +33,6 @@ RUN chmod 777 ${APP_DIR}/src/ckanext-s3filestore
 RUN apk --update add build-base libxslt-dev python3-dev 
 RUN apk update
 RUN apk add postgresql15-client=15.11-r0
-RUN apk add git=2.48.1-r0
 
 RUN pip install --force-reinstall -v "Pillow==11.0.0"
 
