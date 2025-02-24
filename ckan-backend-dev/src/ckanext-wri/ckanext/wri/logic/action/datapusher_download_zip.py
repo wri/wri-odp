@@ -56,8 +56,8 @@ def build_download_filename(dataset_id: str, context) -> str:
             },
         )
         download_filename = (
-            dataset_dict.get("title")
-            or dataset_dict.get("name")
+            dataset_dict.get("name")
+            or dataset_dict.get("title")
             or dataset_dict.get("id")
             or "file"
         )
@@ -288,7 +288,27 @@ def send_error_callback(context: Context, data_dict: dict[str, Any]):
     value = json.loads(task["value"])
     emails = value.get("emails", [])
     download_filename = value.get("download_filename")
-    send_error(emails, download_filename)
+    dataset_name = fetch_dataset_name({
+        "entity_id": entity_id,
+        "entity_type": data_dict.get("entity_type", "dataset")
+    })
+    send_error(emails, download_filename, dataset_name)
+
+
+def fetch_dataset_name(data_dict):
+    entity_id = data_dict.get("entity_id")
+    entity_type = data_dict.get("entity_type")
+    if entity_type == "dataset":
+        dataset_dict = p.toolkit.get_action("package_show")(
+            {"ignore_auth": True}, {"id": entity_id}
+        )
+        return dataset_dict.get("name")
+    else:
+        resource_dict = p.toolkit.get_action("resource_show")(
+            {"ignore_auth": True}, {"id": entity_id}
+        )
+        return resource_dict.get("package_id")
+    
 
 
 FILE_EMAIL_HTML = """
@@ -347,13 +367,14 @@ ERROR_EMAIL_HTML = """
 """
 
 
-def send_error(emails: list[str], resource_title):
+def send_error(emails: list[str], resource_title,dataset_name: str=None):
     odp_url = config.get("ckanext.wri.odp_url")
+    datasetName = dataset_name if dataset_name else resource_title
     for email in emails:
         mail_recipient(
             "",
             email,
             "Your WRI data file could not be delivered ({})".format(resource_title),
             "",
-            ERROR_EMAIL_HTML.format(resource_title,odp_url,resource_title,odp_url, odp_url),
+            ERROR_EMAIL_HTML.format(datasetName,odp_url,datasetName,odp_url, odp_url),
         )

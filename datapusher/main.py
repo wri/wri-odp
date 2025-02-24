@@ -156,6 +156,7 @@ def convert_store_to_file(
                 "url": url,
                 "state": "complete",
                 "entity_id": resource_id,
+                "entity_type": "resource",
                 "key": format,
             },
         )
@@ -171,6 +172,7 @@ def convert_store_to_file(
                 "url": url,
                 "state": "complete",
                 "entity_id": resource_id,
+                "entity_type": "resource",
                 "key": format,
             },
         )
@@ -222,6 +224,7 @@ async def download_subset_of_data(
                 "url": url,
                 "state": "complete",
                 "entity_id": id if provider == "datastore" else dataset_id,
+                "entity_type": "resource" if provider == "datastore" else "dataset",
                 "key": filename,
             },
         )
@@ -237,6 +240,7 @@ async def download_subset_of_data(
                 "url": "",
                 "state": "failed",
                 "entity_id": id if provider == "datastore" else dataset_id,
+                "entity_type": "resource" if provider == "datastore" else "dataset",
                 "key": filename,
             },
         )
@@ -293,6 +297,7 @@ async def download_resources_zipped(
                 "url": "",
                 "state": "failed",
                 "entity_id": dataset_id,
+                "entity_type": "dataset",
                 "key": filename,
             },
         )
