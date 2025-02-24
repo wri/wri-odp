@@ -78,12 +78,10 @@ if [ $? -eq 0 ]
 then
     # Start supervisord
     supervisord --configuration /srv/app/supervisor/supervisord.conf --user $SUPERVISOR_USER &
+    # Start supercronic
+    ./supercronic-linux-amd64 crontab &
     # Start uwsgi
     uwsgi $UWSGI_OPTS
 else
   echo "[prerun] failed...not starting CKAN."
 fi
-
-echo "WHOAMI: $(whoami)"
-echo "PS: $(ps -a)"
-echo "LS: $(ls -a)"
