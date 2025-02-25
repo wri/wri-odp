@@ -15,7 +15,7 @@ RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf285
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@a9e42702b797eaf3ffe967040867519219d32224#egg=ckanext-auth' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@b7bdfa7a16c968ad7907b894c16d5fd4ad2978b8#egg=ckanext-issues' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@d830ba9bd2116275fed089d042c299ae3bbd69b4#egg=ckanext-issues' && \
     # Required by ckanext-issues, but it's no longer included in any of the requirements files or the subdependencies
     pip3 install mock && \
     pip3 install -e 'git+https://github.com/ckan/ckanext-harvest.git@v1.6.0#egg=ckanext-harvest' && \
