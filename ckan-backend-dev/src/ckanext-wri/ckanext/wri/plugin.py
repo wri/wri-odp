@@ -12,6 +12,7 @@ from ckanext.wri.logic.action.datapusher_download_subset import (
 from ckanext.wri.logic.action.datapusher_download_zip import (
     zipped_download_request,
     zipped_download_callback,
+    send_error_callback,
 )
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
@@ -270,7 +271,8 @@ class WriPlugin(plugins.SingletonPlugin):
             "package_show": package_show,
             "package_update": package_update,
             "download_event_create": download_event_create,
-            "download_event_list": get_download_events
+            "download_event_list": get_download_events,
+            "prefect_send_error_callback": send_error_callback,
         }
 
     # IPermissionLabels
