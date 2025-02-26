@@ -184,6 +184,8 @@ jobs:
         working-directory: ./ckan-backend-dev
       - name: Initialize the pending datasets table
         run: docker exec ckan-wri sh -c "ckan -c production.ini pendingdatasetsdb"
+      - name: Initialize the issues table
+        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
       - name: Run Unit Tests 🧪
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
