@@ -25,9 +25,7 @@ RUN chmod 777 ${APP_DIR}/src/ckanext-s3filestore
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
 RUN apk update
-RUN apk add postgresql15-client
-RUN apk add libpq
-RUN apk add git=2.40.1-r0
+RUN apk add postgresql15-client=15.11-r0
 
 RUN pip install --force-reinstall -v "Pillow==11.0.0"
 
@@ -96,3 +94,15 @@ RUN chown -R ckan:ckan ${APP_DIR}/supervisor
 RUN chmod -R u+w ${APP_DIR}/supervisor
 
 USER ckan
+
+# From: https://fly.io/docs/blueprints/supercronic/
+# Latest releases available at https://github.com/aptible/supercronic/releases
+ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.29/supercronic-linux-amd64 \
+    SUPERCRONIC=supercronic-linux-amd64 \
+    SUPERCRONIC_SHA1SUM=cd48d45c4b10f3f0bfdd3a57d054cd05ac96812b
+
+RUN curl -fsSLO "$SUPERCRONIC_URL" \
+ && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
+ && chmod +x "$SUPERCRONIC"
+
+COPY setup/crontab ${APP_DIR}/crontab
