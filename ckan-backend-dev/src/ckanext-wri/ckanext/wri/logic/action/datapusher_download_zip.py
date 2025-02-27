@@ -56,8 +56,8 @@ def build_download_filename(dataset_id: str, context) -> str:
             },
         )
         download_filename = (
-            dataset_dict.get("title")
-            or dataset_dict.get("name")
+            dataset_dict.get("name")
+            or dataset_dict.get("title")
             or dataset_dict.get("id")
             or "file"
         )
@@ -274,6 +274,42 @@ def zipped_download_callback(context: Context, data_dict: dict[str, Any]):
         send_error(emails, download_filename)
         log.error(error)
 
+def send_error_callback(context: Context, data_dict: dict[str, Any]):
+    entity_id = data_dict.get("entity_id")
+    key = data_dict.get("key")
+    task = p.toolkit.get_action("task_status_show")(
+        context,
+        {"entity_id": entity_id, "task_type": "download_zipped", "key": key},
+    )
+
+    if not task:
+        raise logic.NotFound("Task not found")
+    
+    value = json.loads(task["value"])
+    emails = value.get("emails", [])
+    download_filename = value.get("download_filename")
+    dataset_name = fetch_dataset_name({
+        "entity_id": entity_id,
+        "entity_type": data_dict.get("entity_type", "dataset")
+    })
+    send_error(emails, download_filename, dataset_name)
+
+
+def fetch_dataset_name(data_dict):
+    entity_id = data_dict.get("entity_id")
+    entity_type = data_dict.get("entity_type")
+    if entity_type == "dataset":
+        dataset_dict = p.toolkit.get_action("package_show")(
+            {"ignore_auth": True}, {"id": entity_id}
+        )
+        return dataset_dict.get("name")
+    else:
+        resource_dict = p.toolkit.get_action("resource_show")(
+            {"ignore_auth": True}, {"id": entity_id}
+        )
+        return resource_dict.get("package_id")
+    
+
 
 FILE_EMAIL_HTML = """
 <html>
@@ -306,7 +342,23 @@ def send_email(emails: list[str], url: str, download_filename: str):
 ERROR_EMAIL_HTML = """
 <html>
     <body>
-        <p>An error happened while preparing the file you requested for download. Please, try again.</p>
+         <p>
+         You recently requested the below data from the World Resources Institute Data Explorer. 
+         Our systems encountered an error during the packaging of this data and we are unable to deliver your files at this time.
+        </p>
+
+        <b>
+        {}
+        </b>
+        </br>
+        <b>
+        <a target="_blank" href="{}/datasets/{}">Dataset link</a>
+        </b>
+
+        <p>
+        This may be a temporary issue but more likely represents some misconfiguration in our systems. 
+        Please reach out to <a href="mailto:data@wri.org">data@wri.org</a> to request immediate support.
+        </p>
         <br>
         <a target="_blank" href="{}">{}</a>
     </body>
@@ -315,13 +367,14 @@ ERROR_EMAIL_HTML = """
 """
 
 
-def send_error(emails: list[str], resource_title):
+def send_error(emails: list[str], resource_title,dataset_name: str=None):
     odp_url = config.get("ckanext.wri.odp_url")
+    datasetName = dataset_name if dataset_name else resource_title
     for email in emails:
         mail_recipient(
             "",
             email,
-            "WRI - Failed to process file ({})".format(resource_title),
+            "Your WRI data file could not be delivered ({})".format(resource_title),
             "",
-            ERROR_EMAIL_HTML.format(odp_url, odp_url),
+            ERROR_EMAIL_HTML.format(datasetName,odp_url,datasetName,odp_url, odp_url),
         )
