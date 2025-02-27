@@ -216,6 +216,11 @@ export default function TeamForm({
                                           value: 'private',
                                           default: true,
                                       },
+                                      {
+                                          label: 'Public',
+                                          value: 'public',
+                                          disabled: true,
+                                      },
                                   ]
                                 : [
                                       { label: 'Public', value: 'public' },
