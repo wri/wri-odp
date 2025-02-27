@@ -66,50 +66,13 @@ export default function TeamForm({
     const {
         register,
         setValue,
-        setError,
         watch,
         formState: { errors, isSubmitting },
     } = formObj
-    const { data: session } = useSession()
-    const username = session?.user?.name ?? ''
-    const sysadmin = session?.user?.sysadmin ?? false
-    const possibleParents = api.teams.getAllTeams.useQuery()
 
-    useEffect(() => {
-        if (!sysadmin) {
-            const parentname = watch('parent')
-            const parent = possibleParents.data?.find(
-                (team) => team.name === parentname?.value
-            )
-            const capacity = parent?.capacity
-            const saveButton = document.querySelector('button[type="submit"]')
-
-            if (!editing) {
-                const isAdmin = parent && capacity !== 'admin'
-                setError('parent', {
-                    type: 'manual',
-                    message: isAdmin
-                        ? 'You do not have permission to create a sub-team under this team'
-                        : '',
-                })
-                //@ts-ignore
-                if (saveButton) saveButton.disabled = isAdmin ? true : false
-            } else {
-                const canEdit =
-                    parent && !['admin', 'editor'].includes(capacity)
-
-                setError('parent', {
-                    type: 'manual',
-                    message: canEdit
-                        ? 'You do not have permission to edit this team'
-                        : '',
-                })
-
-                //@ts-ignore
-                if (saveButton) saveButton.disabled = canEdit ? true : false
-            }
-        }
-    }, [watch('parent')])
+    const possibleParents = api.teams.getAllTeams.useQuery(undefined, {
+        refetchOnMount: false,
+    })
 
     return (
         <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
