@@ -22,6 +22,8 @@ import { Tab } from '@headlessui/react'
 import { Fragment } from 'react'
 import classNames from '@/utils/classnames'
 import { Members } from '../metadata/Members'
+import { z } from 'zod'
+import { useSession } from 'next-auth/react'
 
 type TeamOutput = RouterOutput['teams']['getTeam']
 
@@ -29,6 +31,9 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [deleteOpen, setDeleteOpen] = useState(false)
     const router = useRouter()
+    const possibleParents = api.teams.getAllTeams.useQuery()
+    const { data: session } = useSession()
+    const sysadmin = session?.user?.sysadmin ?? false
     const links = [
         { label: 'Teams', url: '/dashboard/teams', current: false },
         {
@@ -37,6 +42,40 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             current: true,
         },
     ]
+
+    const TeamSchemaRefine = TeamSchema.superRefine((val, ctx) => {
+        if (val.visibility.value === 'public' && val.parent) {
+            const parent = possibleParents.data?.find(
+                (team) => team.name === val.parent?.value
+            )
+            const visibility = parent?.visibility
+            const isPrivate = parent && visibility === 'private'
+            if (isPrivate) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['parent'],
+                    message:
+                        'Parent Organization has private visibility and cannot create public teams',
+                })
+            }
+        }
+
+        if (!sysadmin && val.parent) {
+            const org = possibleParents.data?.find((team) => team.id === val.id)
+
+            const capacity = org?.capacity
+            const isAdmin = org && capacity !== 'admin'
+
+            if (isAdmin) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['parent'],
+                    message:
+                        'User does not have admin access to edit a sub team',
+                })
+            }
+        }
+    })
 
     const formObj = useForm<TeamFormType>({
         defaultValues: {
@@ -61,7 +100,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                 },
             })),
         },
-        resolver: zodResolver(TeamSchema),
+        resolver: zodResolver(TeamSchemaRefine),
     })
 
     const utils = api.useContext()

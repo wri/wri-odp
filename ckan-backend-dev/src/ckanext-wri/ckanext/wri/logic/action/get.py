@@ -1780,8 +1780,8 @@ def organization_patch(context, data_dict):
     isSysadmin = authz.is_sysadmin(user)
 
     if not isSysadmin:
-        
-        old_org = get_action("organization_show")(context, data_dict)
+        temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
+        old_org = get_action("organization_show")(temp_context, data_dict)
         old_parent = old_org.get("groups", [])
         if len(old_parent) == 0 or data_dict.get("parent") is None:
             raise ValidationError({"message": _("You can't edit or create a Parent Team")})
@@ -1793,7 +1793,8 @@ def organization_patch(context, data_dict):
         if visibility == "private":
             users = old_org.get("users", [])
             if users:
-                user_capacity = [user.get("capacity") for user in users if user.get("name") == user]
+                c_user = str(user)
+                user_capacity = [user.get("capacity") for user in users if user.get("name") == c_user]
                 if "admin" not in user_capacity:
                     raise ValidationError({"message": _("You can't update visibility of a team")})
         
@@ -1802,7 +1803,8 @@ def organization_patch(context, data_dict):
         parent_org = data_dict.get("parent")
         parent_org = parent_org.get("value") if parent_org else None
         if parent_org:
-            parent_org = get_action("organization_show")(context, {"id": parent_org})
+            temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
+            parent_org = get_action("organization_show")(temp_context, {"id": parent_org})
             if parent_org.get("visibility", "public") == "private":
                 raise ValidationError({"message": _("Parent Team has private visibility and cannot create public teams")})
             
@@ -1812,7 +1814,8 @@ def organization_patch(context, data_dict):
             "fq": f"(organization:({data_dict.get('name')}) AND visibility_type:(public OR internal))", 
             "include_private": False  # Include private datasets in the search
         }
-        public_package = get_action("package_search")(context, rdata_dict)
+        temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
+        public_package = get_action("package_search")(temp_context, rdata_dict)
         if public_package.get("count") > 0:
             raise ValidationError({"message": _(f"Team has {public_package.get('count')} public dataset(s) and cannot be made private")})
     return old_organization_patch(context, data_dict)

@@ -13,6 +13,8 @@ import { UploadResult } from '@uppy/core'
 import { api } from '@/utils/api'
 import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
+import { useSession } from 'next-auth/react'
+import { useEffect } from 'react'
 
 function ToolTipOnEdit() {
     return (
@@ -67,7 +69,11 @@ export default function TeamForm({
         watch,
         formState: { errors, isSubmitting },
     } = formObj
-    const possibleParents = api.teams.getAllTeams.useQuery()
+
+    const possibleParents = api.teams.getAllTeams.useQuery(undefined, {
+        refetchOnMount: false,
+    })
+
     return (
         <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
             <div className="flex flex-col justify-start gap-y-4">
@@ -182,13 +188,13 @@ export default function TeamForm({
                         editing
                             ? ToolTipOnEdit()
                             : watch('parent')?.value !== '' &&
-                              possibleParents.data?.find(
-                                  (a) =>
-                                      a.name === watch('parent')?.value &&
-                                      a.visibility === 'private'
-                              )
-                            ? ToolTipForSubTeam()
-                            : TooltipForParent()
+                                possibleParents.data?.find(
+                                    (a) =>
+                                        a.name === watch('parent')?.value &&
+                                        a.visibility === 'private'
+                                )
+                              ? ToolTipForSubTeam()
+                              : TooltipForParent()
                     }
                     required
                 >
@@ -210,6 +216,11 @@ export default function TeamForm({
                                           value: 'private',
                                           default: true,
                                       },
+                                      {
+                                          label: 'Public',
+                                          value: 'public',
+                                          disabled: true,
+                                      },
                                   ]
                                 : [
                                       { label: 'Public', value: 'public' },
@@ -218,7 +229,7 @@ export default function TeamForm({
                         }
                         placeholder="Select visibility"
                     />
-                    <ErrorDisplay name="parent" errors={errors} />
+                    <ErrorDisplay name="visibility" errors={errors} />
                 </InputGroupCustom>
             </div>
         </div>

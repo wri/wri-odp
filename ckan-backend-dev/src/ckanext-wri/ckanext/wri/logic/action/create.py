@@ -38,6 +38,9 @@ import uuid
 from ckan.logic.action.create import (
     organization_create as old_organization_create)
 
+from ckan.logic.action.get import ( 
+    organization_show as old_organization_show)
+
 import ckan.authz as authz
 
 NotificationGetUserViewedActivity: TypeAlias = None
@@ -873,27 +876,33 @@ def download_event_create(context: Context, data_dict: DataDict):
     return download_event_list_dictize(events, context)
 
 
+import copy
+
 @logic.side_effect_free
 def organization_create(context, data_dict):
     visibility = data_dict.get('visibility', "public")
+    
 
-    if visibility == "public":
-        parent_org = data_dict.get("parent")
-        parent_org = parent_org.get("value") if parent_org else None
-        if parent_org:
-            parent_org = logic.get_action("organization_show")(context, {"id": parent_org})
-            users = parent_org.get("users", [])
-            username = context.get("user")
-            if users:
-                user_capacity = [user.get("capacity") for user in users if user.get("name") == username]
-                if "admin" not in user_capacity:
-                    raise ValidationError({"message": _("User does not have admin access to create a sub team")})
-            if parent_org.get("visibility", "public") == "private":
-                raise ValidationError({"message": _("Parent Organization has private visibility and cannot create public teams")})
-            
-        else:
-            if not authz.is_sysadmin(context.get("user")):
-                raise ValidationError({"message": _("Only sysadmins can create public teams without a parent")})
+    temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
+
+    
+    parent_org = data_dict.get("parent")
+    parent_org = parent_org.get("value") if parent_org else None
+    if parent_org:
+        parent_org = old_organization_show(temp_context, {"id": parent_org})
+        users = parent_org.get("users", [])
+        username = context.get("user")
+        if users and not authz.is_sysadmin(context.get("user")):
+            user_capacity = [user.get("capacity") for user in users if user.get("name") == username]
+            if not any(role in user_capacity for role in ["admin", "editor"]):
+                raise ValidationError({"message": _("User does not have admin access to create a sub team")})
+        if parent_org.get("visibility", "public") == "private" and visibility == "public":
+            raise ValidationError({"message": _("Parent Organization has private visibility and cannot create public teams")})
+        
+    else:
+        if not authz.is_sysadmin(context.get("user")):
+            raise ValidationError({"message": _("Only sysadmins can create public teams without a parent")})
+
     
     result = old_organization_create(context, data_dict)
     return result
