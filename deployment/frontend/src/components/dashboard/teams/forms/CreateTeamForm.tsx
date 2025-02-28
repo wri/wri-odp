@@ -11,6 +11,8 @@ import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { useRouter } from 'next/router'
+import { z } from 'zod'
+import { useSession } from 'next-auth/react'
 
 const links = [
     { label: 'Teams', url: '/dashboard/teams', current: false },
@@ -20,8 +22,45 @@ const links = [
 export default function CreateTeamForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const router = useRouter()
+    const possibleParents = api.teams.getAllTeams.useQuery()
+    const { data: session } = useSession()
+    const sysadmin = session?.user?.sysadmin ?? false
+
+    const TeamSchemaRefine = TeamSchema.superRefine((val, ctx) => {
+        if (val.visibility.value === 'public' && val.parent) {
+            const parent = possibleParents.data?.find(
+                (team) => team.name === val.parent?.value
+            )
+            const visibility = parent?.visibility
+            const isPrivate = parent && visibility === 'private'
+            if (isPrivate) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['parent'],
+                    message:
+                        'Parent Organization has private visibility and cannot create public teams',
+                })
+            }
+        }
+
+        if (!sysadmin && val.parent) {
+            const parent = possibleParents.data?.find(
+                (team) => team.name === val.parent?.value
+            )
+            const capacity = parent?.capacity
+            const isAdmin = parent && !['admin', 'editor'].includes(capacity)
+            if (isAdmin) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['parent'],
+                    message:
+                        'User does not have admin access to create a sub team',
+                })
+            }
+        }
+    })
     const formObj = useForm<TeamFormType>({
-        resolver: zodResolver(TeamSchema),
+        resolver: zodResolver(TeamSchemaRefine),
     })
 
     const createTeam = api.teams.createTeam.useMutation({
