@@ -82,9 +82,9 @@ RUN echo "ckan ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ckan && \
 
 RUN pip3 install -r /srv/app/src/ckan/requirements.txt
 
-USER ckan
-
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
+
+USER ckan
 
 ENV CKAN__PLUGINS text_view image_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest hierarchy_display wri wri_harvester auth issues envvars
 
