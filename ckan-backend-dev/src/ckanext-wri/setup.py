@@ -1,16 +1,8 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages  # Always prefer setuptools over distutils
-from codecs import open  # To use a consistent encoding
-from os import path
-
-here = path.abspath(path.dirname(__file__))
-
-# Get the long description from the relevant file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
 
 setup(
-    name='''ckanext-wri''',
+    name='ckanext-wri',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -18,7 +10,7 @@ setup(
     version='1.2.2',
 
     description='''CKAN Extension for WRI''',
-    long_description=long_description,
+    long_description='''CKAN Extension for WRI''',
 
     # The project's main homepage.
     url='https://github.com/wri/wri-odp',
@@ -56,15 +48,13 @@ setup(
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
-    entry_points='''
+    entry_points=\
+        """
         [ckan.plugins]
         wri=ckanext.wri.plugin:WriPlugin
         wri_api_tracking=ckanext.wri.plugin:WriApiTracking
         wri_harvester=ckanext.wri.harvesters.wri_harvester:CKANHarvesterWRI
-
-        [babel.extractors]
-        ckan = ckan.lib.extract:extract_ckan
-    ''',
+        """,
 
     # If you are changing from the default layout of your extension, you may
     # have to change the message extractors, you can read more about babel
