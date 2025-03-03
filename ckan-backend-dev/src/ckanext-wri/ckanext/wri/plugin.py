@@ -12,6 +12,7 @@ from ckanext.wri.logic.action.datapusher_download_subset import (
 from ckanext.wri.logic.action.datapusher_download_zip import (
     zipped_download_request,
     zipped_download_callback,
+    send_error_callback,
 )
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
@@ -32,6 +33,7 @@ from ckanext.wri.logic.action.create import (
     resource_create,
     old_package_create,
     download_event_create,
+    organization_create
 )
 from ckanext.wri.logic.action.update import (
     notification_update,
@@ -70,6 +72,7 @@ from ckanext.wri.logic.action.get import (
     organization_show,
     package_show,
     get_download_events,
+    
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -270,7 +273,10 @@ class WriPlugin(plugins.SingletonPlugin):
             "package_show": package_show,
             "package_update": package_update,
             "download_event_create": download_event_create,
-            "download_event_list": get_download_events
+            "download_event_list": get_download_events,
+            "organization_create": organization_create,
+            
+            "prefect_send_error_callback": send_error_callback,
         }
 
     # IPermissionLabels
