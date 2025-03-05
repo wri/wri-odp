@@ -353,3 +353,13 @@ $dark-pink: #c32d7b;
 li.osano-cm-drawer-item:nth-child(5) {
     display: none;
 }
+
+.mapbox-gl-draw_ctrl-draw-btn {
+  width: auto !important;
+  padding: 5px 10px 5px 5px !important;
+  background: none;
+  color: black !important;
+  display: flex !important;
+  align-items: center;
+  gap: 0.3rem;
+}
