@@ -30,7 +30,14 @@ import { useLayersFromRW } from '@/utils/queryHooks'
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
 import { TabularResource } from '../visualizations/Visualizations'
 import { APIButton } from './datafiles/API'
-import { Layer, Map, MapRef, Marker, Source } from 'react-map-gl'
+import {
+    Layer,
+    Map,
+    MapLayerMouseEvent,
+    MapRef,
+    Marker,
+    Source,
+} from 'react-map-gl'
 import GeocoderControl from '@/components/search/GeocoderControl'
 import { useQuery } from 'react-query'
 import { UseFormReturn, useForm } from 'react-hook-form'
@@ -67,12 +74,16 @@ function LocationSearch({
     geojsons,
     formObj,
     open,
+    toggleDatafileToDownload,
 }: {
     geojsons: any[]
     open: boolean
     formObj: UseFormReturn<LocationSearchFormType>
+    toggleDatafileToDownload: (datafile: Resource) => void
 }) {
     const { setValue } = formObj
+    const [cursor, setCursor] = useState('grab')
+
     const mapRef = useRef<MapRef | null>(null)
     const accessToken =
         'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA'
@@ -94,6 +105,71 @@ function LocationSearch({
             )
         }
     )
+
+    // Store a reference to the geojsons by layer ID for lookup
+    const layerGeojsonMap = useRef<Record<string, any>>({})
+
+    // Set up the layer reference map whenever geojsons change
+    useEffect(() => {
+        const newMap: Record<string, any> = {}
+        geojsons
+            .filter((g) => !g.address)
+            .forEach((geojson, index) => {
+                const fillLayerId = `fill-layer-${index}`
+                const lineLayerId = `line-layer-${index}`
+                newMap[fillLayerId] = geojson
+                newMap[lineLayerId] = geojson
+            })
+        layerGeojsonMap.current = newMap
+    }, [geojsons])
+
+    // Handle map clicks and determine if a layer was clicked
+    const handleMapClick = useCallback(
+        (event: MapLayerMouseEvent) => {
+            if (!mapRef.current) return
+
+            // Get the features at the clicked point
+            const features = mapRef.current.queryRenderedFeatures(event.point)
+
+            // Check if any of our layers were clicked
+            if (features.length > 0) {
+                const clickedLayerId = features[0]?.layer.id
+                if (!clickedLayerId) return
+                const geojson = layerGeojsonMap.current[clickedLayerId]
+
+                if (geojson) {
+                    console.log('Layer clicked:', geojson)
+                    // Call your toggle function or other actions
+                    if (geojson.datafile) {
+                        toggleDatafileToDownload(geojson.datafile)
+                    }
+                }
+            }
+        },
+        [toggleDatafileToDownload]
+    )
+
+    // Handle mouse movement to change cursor
+    const handleMouseMove = useCallback((event: MapLayerMouseEvent) => {
+        if (!mapRef.current) return
+
+        const features = mapRef.current.queryRenderedFeatures(event.point)
+
+        // Check if any of our layers are under the mouse
+        if (features.length > 0) {
+            const hoveredLayerId = features[0]?.layer.id
+            if (!hoveredLayerId) return
+
+            // If the layer ID is in our mapping, it's one of our layers
+            if (layerGeojsonMap.current[hoveredLayerId]) {
+                setCursor('default') // Set to default arrow cursor
+            } else {
+                setCursor('grab') // Set to the default map grabbing cursor
+            }
+        } else {
+            setCursor('grab') // Default map cursor
+        }
+    }, [])
 
     const onUpdate = useCallback((e: any) => {
         const newFeatures = {}
@@ -127,6 +203,9 @@ function LocationSearch({
             dragRotate={false}
             touchZoomRotate={false}
             mapStyle="mapbox://styles/mapbox/streets-v9"
+            onClick={handleMapClick}
+            onMouseMove={handleMouseMove}
+            cursor={cursor}
         >
             <GeocoderControl
                 mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
@@ -134,7 +213,6 @@ function LocationSearch({
                 placeholder="Search datafiles by location"
                 initialValue={formObj.getValues('location')}
                 onResult={(e) => {
-                    console.log('GEOCODING RESULT', e)
                     setValue('bbox', [
                         [e.result.bbox[0], e.result.bbox[1]],
                         [e.result.bbox[2], e.result.bbox[3]],
@@ -159,11 +237,13 @@ function LocationSearch({
                 .map((geojson, index) => (
                     <Source key={index} type="geojson" data={geojson}>
                         <Layer
+                            id={`fill-layer-${index}`} // Unique ID is crucial
                             type="fill"
                             paint={{
-                                'fill-color': geojson.filtered
-                                    ? '#023020'
-                                    : '#BAE1BD',
+                                'fill-color':
+                                    geojson.filtered || geojson.selected
+                                        ? '#023020'
+                                        : '#BAE1BD',
                                 'fill-opacity': 0.3,
                             }}
                         />
@@ -275,16 +355,19 @@ export function DataFiles({
     const geojsons = useMemo(() => {
         return filteredDatafilesByName
             .filter((r) => r.spatial_type !== 'global')
+            .filter((r) => r.spatial_address || r.spatial_geom)
             .map((df) => ({
                 ...df.spatial_geom,
                 address: df.spatial_address,
+                selected: datafilesToDownload.some((f) => f.id === df.id),
                 filtered:
                     filteredDatafiles.length !==
                         filteredDatafilesByName.length &&
                     filteredDatafiles.some((f) => f.id === df.id),
                 id: df.id,
+                datafile: df,
             }))
-    }, [filteredDatafilesByName, filteredDatafiles])
+    }, [filteredDatafilesByName, filteredDatafiles, datafilesToDownload])
 
     const addDatafileToDownload = (datafile: Resource) => {
         setDatafilesToDownload((prev) => [...prev, datafile])
@@ -293,6 +376,14 @@ export function DataFiles({
         setDatafilesToDownload((prev) =>
             prev.filter((r) => r.id !== datafile.id)
         )
+    }
+
+    const toggleDatafileToDownload = (datafile: Resource) => {
+        if (datafilesToDownload.some((f) => f.id === datafile.id)) {
+            removeDatafileToDownload(datafile)
+        } else {
+            addDatafileToDownload(datafile)
+        }
     }
 
     const filteredUploadedDatafiles = filteredDatafiles.filter(
@@ -317,7 +408,7 @@ export function DataFiles({
             toast('Failed to send your information', {
                 type: 'error',
             })
-            setOpen(false)
+            setOpenDownload(false)
         },
     })
 
@@ -345,7 +436,7 @@ export function DataFiles({
                     toast("You'll receive an email when the file is ready", {
                         type: 'success',
                     })
-                    setOpen(false)
+                    setOpenDownload(false)
                 },
                 onError: (err) => {
                     console.error(err)
@@ -356,7 +447,7 @@ export function DataFiles({
             }
         )
     }
-    const [open, setOpen] = useState(false)
+    const [openDownload, setOpenDownload] = useState(false)
     return (
         <>
             <div className="relative py-4">
@@ -367,13 +458,15 @@ export function DataFiles({
                     placeholder="Search datafiles by title or description"
                 />
                 <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
-                {dataset.is_approved && (
-                    <Disclosure>
+                {dataset.is_approved && geojsons.length > 0 && (
+                    <Disclosure defaultOpen={true}>
                         {({ open }) => (
                             <>
                                 <Disclosure.Button as={Fragment}>
                                     <Button className="my-2 ml-auto group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
-                                        Filter by Location
+                                        {open
+                                            ? 'Collapse'
+                                            : 'Open Filter by Location'}
                                         <GlobeAmericasIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
                                     </Button>
                                 </Disclosure.Button>
@@ -437,6 +530,9 @@ export function DataFiles({
                                         )}
                                     >
                                         <LocationSearch
+                                            toggleDatafileToDownload={
+                                                toggleDatafileToDownload
+                                            }
                                             open={open}
                                             geojsons={geojsons}
                                             formObj={formObj}
@@ -544,7 +640,7 @@ export function DataFiles({
             </div>
             {datafilesToDownload.length > 0 && (
                 <Button
-                    onClick={() => setOpen(true)}
+                    onClick={() => setOpenDownload(true)}
                     className="group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3"
                 >
                     Download Selected Datafiles
@@ -613,8 +709,8 @@ export function DataFiles({
             <DownloadPopup
                 title="The selected datafiles are being prepared for download"
                 subtitle="Please enter your information so that you receive the download link via email"
-                isOpen={open}
-                onClose={() => setOpen(false)}
+                isOpen={openDownload}
+                onClose={() => setOpenDownload(false)}
                 dataset={dataset}
                 onSubmit={handleFormSubmit}
                 downloadButton={
