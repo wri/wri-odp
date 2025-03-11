@@ -8,6 +8,7 @@ export interface IRowProfile {
     image?: string
     image_display_url?: string
     name?: string
+    capacity?: "admin" | "editor" | "member"
 }
 
 export default function RowProfile({

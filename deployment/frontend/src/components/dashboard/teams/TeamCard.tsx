@@ -153,6 +153,7 @@ function SubCardProfile({
                                 <Row
                                     key={index}
                                     highlighted={highlighted}
+                                    authorized={team?.capacity === 'admin'}
                                     groupStyle="group/item group-hover/item:visible "
                                     className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                                     rowMain={
@@ -435,6 +436,7 @@ export default function TeamCard() {
                                 key={index}
                                 className={`pr-2`}
                                 highlighted={team?.highlighted}
+                                authorized={team?.capacity === 'admin'}
                                 rowMain={
                                     <TeamProfile
                                         team={team}

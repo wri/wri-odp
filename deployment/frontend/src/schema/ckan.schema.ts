@@ -148,6 +148,7 @@ export interface WriDataset extends Omit<Dataset, 'groups'> {
     is_approved?: boolean
     release_notes: string
     groups?: Array<Group | Application>
+    is_authorized?: boolean
 }
 
 export type WriDatasetWithoutDetails = Omit<WriDataset, 'resources'> & {
@@ -226,6 +227,7 @@ export interface GroupTree {
     image_display_url?: string
     parent_name?: string
     private?: boolean
+    capacity?: 'admin' | 'editor' | 'member'
 }
 
 export interface Collaborator {

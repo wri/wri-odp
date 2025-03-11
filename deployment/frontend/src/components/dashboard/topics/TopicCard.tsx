@@ -79,99 +79,122 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
     <div className='flex flex-col pt-2 pl-4'>
       {
         teams.map((team, index) => {
-          return (<>
-
-            {
-              (team as GroupTree).children?.length ?
-                (
-                  <>
-                    <Row
-                      key={index}
-                      highlighted={highlighted}
-                      groupStyle="group/item group-hover/item:visible "
-                      className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
-                      rowMain={
-                        <SubTopicProfile team={team as GroupTree} topic2Image={topic2Image} />
-                      }
-                      linkButton={{
-                        label: "View topic",
-                        link: `../topics/${team.name}`,
-                      }}
-                      controlButtons={[
-                        {
-                          label: "Edit",
-                          color: 'bg-wri-gold hover:bg-yellow-500',
-                          icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
-                          tooltip: {
-                            id: `edit-tooltip-${team.name}`,
-                            content: "Edit topic"
-                          },
-                          onClick: () => {
-                            router.push(`/dashboard/topics/${team.name}/edit`)
-                          }
-                        },
-                        {
-                          label: "Delete",
-                          color: 'bg-red-600 hover:bg-red-500',
-                          icon: <TrashIcon className='w-4 h-4 text-white' />,
-                          tooltip: {
-                            id: `delete-tooltip-${team.name}`,
-                            content: "Delete topic"
-                          },
-                          onClick: () => handleOpenModal(team as GroupTree)
-                        },
-                      ]}
-                      isDropDown
-                      rowSub={<SubCardProfile teams={(team as GroupTree).children} topic2Image={topic2Image} />}
-                    />
-                  </>
-
-                )
-                : (
-                  <>
-                    <Row
-                      key={index}
-                      groupStyle="group/item group-hover/item:visible "
-                      className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
-                      rowMain={
-                        <div className='flex pl-4 sm:pl-6  '>
-                          <RowProfile imgStyle='w-8 h-8 mt-2' isPad profile={Topic(team as GroupTree)} defaultImg='/images/placeholders/topics/topicsdefault.png' />
-                        </div>
-                      }
-                      linkButton={{
-                        label: "View topic",
-                        link: `../topics/${team.name}`,
-                      }}
-                      controlButtons={[
-                        {
-                          label: "Edit",
-                          color: 'bg-wri-gold hover:bg-yellow-500',
-                          icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
-                          tooltip: {
-                            id: `edit-tooltip-${team.name}`,
-                            content: "Edit topic"
-                          },
-                          onClick: () => {
-                            router.push(`/dashboard/topics/${team.name}/edit`)
-                          }
-                        },
-                        {
-                          label: "Delete",
-                          color: 'bg-red-600 hover:bg-red-500',
-                          icon: <TrashIcon className='w-4 h-4 text-white' />,
-                          tooltip: {
-                            id: `delete-tooltip-${team.name}`,
-                            content: "Delete topic"
-                          },
-                          onClick: () => handleOpenModal(team as GroupTree)
-                        },
-                      ]}
-                    />
-                  </>
-
-                )
-            }
-          </>)
+          return (
+              <>
+                  {(team as GroupTree).children?.length ? (
+                      <>
+                          <Row
+                              key={index}
+                              highlighted={highlighted}
+                              authorized={team?.capacity === 'admin'}
+                              groupStyle="group/item group-hover/item:visible "
+                              className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
+                              rowMain={
+                                  <SubTopicProfile
+                                      team={team as GroupTree}
+                                      topic2Image={topic2Image}
+                                  />
+                              }
+                              linkButton={{
+                                  label: 'View topic',
+                                  link: `../topics/${team.name}`,
+                              }}
+                              controlButtons={[
+                                  {
+                                      label: 'Edit',
+                                      color: 'bg-wri-gold hover:bg-yellow-500',
+                                      icon: (
+                                          <PencilSquareIcon className="w-4 h-4 text-white" />
+                                      ),
+                                      tooltip: {
+                                          id: `edit-tooltip-${team.name}`,
+                                          content: 'Edit topic',
+                                      },
+                                      onClick: () => {
+                                          router.push(
+                                              `/dashboard/topics/${team.name}/edit`
+                                          )
+                                      },
+                                  },
+                                  {
+                                      label: 'Delete',
+                                      color: 'bg-red-600 hover:bg-red-500',
+                                      icon: (
+                                          <TrashIcon className="w-4 h-4 text-white" />
+                                      ),
+                                      tooltip: {
+                                          id: `delete-tooltip-${team.name}`,
+                                          content: 'Delete topic',
+                                      },
+                                      onClick: () =>
+                                          handleOpenModal(team as GroupTree),
+                                  },
+                              ]}
+                              isDropDown
+                              rowSub={
+                                  <SubCardProfile
+                                      teams={(team as GroupTree).children}
+                                      topic2Image={topic2Image}
+                                  />
+                              }
+                          />
+                      </>
+                  ) : (
+                      <>
+                          <Row
+                              key={index}
+                              groupStyle="group/item group-hover/item:visible "
+                              className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
+                              rowMain={
+                                  <div className="flex pl-4 sm:pl-6  ">
+                                      <RowProfile
+                                          imgStyle="w-8 h-8 mt-2"
+                                          isPad
+                                          profile={Topic(team as GroupTree)}
+                                          defaultImg="/images/placeholders/topics/topicsdefault.png"
+                                      />
+                                  </div>
+                              }
+                              linkButton={{
+                                  label: 'View topic',
+                                  link: `../topics/${team.name}`,
+                              }}
+                              controlButtons={[
+                                  {
+                                      label: 'Edit',
+                                      color: 'bg-wri-gold hover:bg-yellow-500',
+                                      icon: (
+                                          <PencilSquareIcon className="w-4 h-4 text-white" />
+                                      ),
+                                      tooltip: {
+                                          id: `edit-tooltip-${team.name}`,
+                                          content: 'Edit topic',
+                                      },
+                                      onClick: () => {
+                                          router.push(
+                                              `/dashboard/topics/${team.name}/edit`
+                                          )
+                                      },
+                                  },
+                                  {
+                                      label: 'Delete',
+                                      color: 'bg-red-600 hover:bg-red-500',
+                                      icon: (
+                                          <TrashIcon className="w-4 h-4 text-white" />
+                                      ),
+                                      tooltip: {
+                                          id: `delete-tooltip-${team.name}`,
+                                          content: 'Delete topic',
+                                      },
+                                      onClick: () =>
+                                          handleOpenModal(team as GroupTree),
+                                  },
+                              ]}
+                          />
+                      </>
+                  )}
+              </>
+          )
         })
       }
       {
@@ -278,6 +301,7 @@ export default function TopicCard() {
                     key={index}
                     className={`pr-6`}
                     highlighted={topic?.highlighted}
+                    authorized={topic?.capacity === 'admin'}
                     rowMain={<TopicProfile team={topic} topic2Image={data?.topic2Image as Record<string, string>} />}
                     linkButton={{
                       label: "View topic",
