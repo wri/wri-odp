@@ -227,7 +227,7 @@ export interface GroupTree {
     image_display_url?: string
     parent_name?: string
     private?: boolean
-    capacity?: 'admin' | 'editor' | 'member'
+    capacity?: string
 }
 
 export interface Collaborator {
