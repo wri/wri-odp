@@ -926,6 +926,15 @@ export const DatasetRouter = createTRPCRouter({
                 fq += '+is_approved:true'
             }
 
+            let user_organization: WriOrganization[] | null = null
+
+            if (!ctx.session?.user.sysadmin) {
+                user_organization = await getUserOrganizations({
+                    userId: ctx.session?.user.id || '',
+                    apiKey: ctx.session?.user.apikey || '',
+                })
+            }
+
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session?.user.apikey ?? '',
                 fq: `${fq}${input.appendRawFq ?? ''}`,
@@ -946,6 +955,18 @@ export const DatasetRouter = createTRPCRouter({
                       })),
                   }))
                 : dataset.datasets
+
+            if (user_organization) {
+                _datasets.forEach((d) => {
+                    d.is_authorized = user_organization.some(
+                        (org) =>
+                            org.id === d.owner_org &&
+                            (org.capacity === 'admin' ||
+                                org.capacity === 'editor')
+                    )
+                })
+            }
+
             return {
                 datasets: _datasets as unknown as WriDataset[],
                 count: dataset.count,
