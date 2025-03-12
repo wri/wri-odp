@@ -60,7 +60,10 @@ UWSGI_OPTS="--plugins http,python \
             --master --enable-threads \
             --lazy-apps \
             -p 2 -L -b 32768 --vacuum \
-            --harakiri $UWSGI_HARAKIRI"
+            --http-keepalive --http-timeout ${UWSGI_HTTP_TIMEOUT:-3600} \
+            --socket-timeout ${UWSGI_SOCKET_TIMEOUT:-3600} \
+            --disable-write-exception \
+            --harakiri ${UWSGI_HARAKIRI:-1800}"
 
 echo "From GitHub Actions: $GITHUB_ACTIONS"
 # Check if we are running in GitHub Actions
