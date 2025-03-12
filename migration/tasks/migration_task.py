@@ -202,7 +202,7 @@ def iso_language_code(value):
         return value
 
 
-def url_validator(value):
+def url_validator(key, value):
     """
     Check that the value is a valid URL. Must start with "http://" or "https://".
     "ftp://" is not currently supported.
@@ -217,17 +217,40 @@ def url_validator(value):
         return value
 
     if isinstance(value, str):
+        # Attempt to handle markdown links
+        match = re.match(r"\[.*?\]\((https?://.*?)\)", value)
+
+        if match:
+            log.info(f"{key} - Markdown link found: {value}")
+
+            extracted_url = match.group(1)
+
+            log.info(f"{key} - Attempting to extract URL: {extracted_url}")
+
+            valid_markdown_url = url_validator(key, extracted_url)
+
+            if valid_markdown_url:
+                log.info(f"{key} - URL successfully extracted: {valid_markdown_url}")
+
+                return valid_markdown_url
+            else:
+                log.error(f"{key} - Failed to extract URL from markdown link: {extracted_url}")
+
+                return ""
+
         if not value.startswith("http://") and not value.startswith("https://"):
-            error_message = 'Value must start with "http://" or "https://"'
+            error_message = f'{key} - Value must start with "http://" or "https://"'
     else:
-        error_message = "URL is not a string"
+        error_message = (
+            f"{key} - Must be a string\nValue: {value}\nValue type: {type(value)}"
+        )
 
     if error_message:
         log.error(error_message)
 
         return ""
-    else:
-        return value
+
+    return value
 
 
 def normalize_value(value):
@@ -506,7 +529,7 @@ def migrate_dataset(data_dict):
             dataset_value = dataset.get(key)
 
             if (
-                not all(v in ["", None] for v in [dataset_value, value])
+                not all(v in ["", [], None] for v in [dataset_value, value])
                 and dataset_value != value
                 and key
                 not in [
@@ -1063,7 +1086,12 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
         language = iso_language_code(language)
 
     citation = get_value("citation")
+
     learn_more_link = get_value("learn_more") or get_value("learn_more_link")
+
+    if learn_more_link:
+        learn_more_link = url_validator("learn_more", learn_more_link)
+
     function = get_value("functions")
 
     if function in [None, ""]:
@@ -1075,7 +1103,7 @@ def prepare_dataset(data_dict, original_data_dict, gfw_only=False):
         data_download_link = get_value("data_download_link")
 
     if data_download_link:
-        data_download_link = url_validator(data_download_link)
+        data_download_link = url_validator("data_download_link", data_download_link)
 
     extras = dataset.get("extras", [])
 
