@@ -16,30 +16,11 @@ type DrawControlProps = ConstructorParameters<typeof MapboxDraw>[0] & {
 
 export default function DrawControl(props: DrawControlProps) {
     const [draw, setDraw] = useState(null)
-    function getAction(e) {
-        console.log(e)
-    }
-    function deleteAllFeatures(e) {
+    function create(e) {
         if (draw) {
-            const data = draw.getAll()
-            if (draw.getMode() == 'draw_polygon') {
-                var pids = []
-
-                // ID of the added template empty feature
-                const lid = data.features[data.features.length - 1].id
-
-                data.features.forEach((f) => {
-                    if (f.geometry.type === 'Polygon' && f.id !== lid) {
-                        pids.push(f.id)
-                    }
-                })
-                draw.delete(pids)
-                props.onUpdate({
-                    features: data.features,
-                    action: 'draw_polygon',
-                })
-            }
+            draw.deleteAll()
         }
+        props.onCreate(e)
     }
     const _props = {
         ...props,
@@ -53,19 +34,10 @@ export default function DrawControl(props: DrawControlProps) {
             return _draw
         },
         ({ map }: { map: MapRef }) => {
-            map.on('draw.create', props.onCreate)
-            map.on('draw.update', props.onUpdate)
-            map.on('draw.modechange', deleteAllFeatures)
-            map.on('draw.trash', deleteAllFeatures)
-            map.on('draw.actionable', getAction)
+            map.on('draw.create', create)
         },
         ({ map }: { map: MapRef }) => {
-            map.off('draw.create', props.onCreate)
-            map.off('draw.update', props.onUpdate)
-            map.off('draw.delete', props.onDelete)
-            map.off('draw.modechange', deleteAllFeatures)
-            map.off('draw.trash', deleteAllFeatures)
-            map.off('draw.actionable', getAction)
+            map.off('draw.create', create)
         },
         {
             position: props.position,

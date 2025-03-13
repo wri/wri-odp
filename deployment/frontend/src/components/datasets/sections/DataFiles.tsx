@@ -81,7 +81,7 @@ function LocationSearch({
     formObj: UseFormReturn<LocationSearchFormType>
     toggleDatafileToDownload: (datafile: Resource) => void
 }) {
-    const { setValue } = formObj
+    const { setValue, getValues } = formObj
     const [cursor, setCursor] = useState('grab')
 
     const mapRef = useRef<MapRef | null>(null)
@@ -172,11 +172,14 @@ function LocationSearch({
     }, [])
 
     const onUpdate = useCallback((e: any) => {
-        const newFeatures = {}
         for (const f of e.features) {
             if (f.geometry.coordinates[0].length === 5) {
                 setValue('point', null)
                 setValue('location', '')
+                setValue('bbox', [
+                    f.geometry.coordinates[0][2],
+                    f.geometry.coordinates[0][4],
+                ])
                 setValue('bbox', [
                     f.geometry.coordinates[0][2],
                     f.geometry.coordinates[0][4],
@@ -201,6 +204,11 @@ function LocationSearch({
             mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
             style={{ height: 300 }}
             dragRotate={false}
+            initialViewState={{
+                longitude: 0,
+                latitude: 0,
+                zoom: 1,
+            }}
             touchZoomRotate={false}
             mapStyle="mapbox://styles/mapbox/streets-v9"
             onClick={handleMapClick}
@@ -308,6 +316,16 @@ export function DataFiles({
     const [datafilesToDownload, setDatafilesToDownload] = useState<Resource[]>(
         []
     )
+    const [showOnlySelected, setShowOnlySelected] = useState(false)
+    function addDatafilesToDownload(resources: Resource[]) {
+        const existingResources = datafilesToDownload.filter((resource) =>
+            resources.some((r) => r.id === resource.id)
+        )
+        setDatafilesToDownload((prev) => [
+            ...prev.filter((resource) => !existingResources.includes(resource)),
+            ...resources,
+        ])
+    }
     const datafiles = dataset?.resources
     const formObj = useForm<LocationSearchFormType>({
         defaultValues: {
@@ -318,56 +336,70 @@ export function DataFiles({
         },
     })
     const { data: searchedResources, isLoading: isLoadingLocationSearch } =
-        api.dataset.resourceLocationSearch.useQuery({
-            bbox: formObj.watch('bbox'),
-            point: formObj.watch('point'),
-            location: formObj.watch('location'),
-            package_id: dataset.name,
-            is_pending: false,
-        })
+        api.dataset.resourceLocationSearch.useQuery(
+            {
+                bbox: formObj.watch('bbox'),
+                point: formObj.watch('point'),
+                location: formObj.watch('location'),
+                package_id: dataset.name,
+                is_pending: false,
+            },
+            {
+                onSuccess: (data) => {
+                    addDatafilesToDownload(data ?? [])
+                },
+            }
+        )
     const [q, setQ] = useState('')
-    const filteredDatafilesByName =
-        q !== ''
-            ? datafiles?.filter((datafile) =>
-                  index.search(q).includes(datafile.id)
-              )
-            : datafiles
-    const searchedDatafilesIds = searchedResources?.map((df) => df.id) ?? []
-    let filteredDatafiles = searchedResources
-        ? filteredDatafilesByName?.filter(
-              (r) =>
-                  searchedDatafilesIds.includes(r.id) ||
-                  (formObj.watch('global') === 'include' &&
-                      r.spatial_address === 'Global')
-          )
-        : filteredDatafilesByName
-    if (formObj.watch('global') === 'exclude') {
-        filteredDatafiles = filteredDatafiles.filter(
-            (r) => r.spatial_address !== 'Global'
-        )
-    }
-    if (formObj.watch('global') === 'only') {
-        filteredDatafiles = filteredDatafilesByName.filter(
-            (r) => r.spatial_address === 'Global'
-        )
+
+    function handleSearch() {
+        const filteredDatafilesByName =
+            q !== ''
+                ? datafiles?.filter((datafile) =>
+                      index.search(q).includes(datafile.id)
+                  )
+                : []
+        addDatafilesToDownload(filteredDatafilesByName)
     }
 
+    //if (formObj.watch('global') === 'exclude') {
+    //    filteredDatafiles = filteredDatafiles.filter(
+    //        (r) => r.spatial_address !== 'Global'
+    //    )
+    //}
+    //if (formObj.watch('global') === 'only') {
+    //    filteredDatafiles = filteredDatafilesByName.filter(
+    //        (r) => r.spatial_address === 'Global'
+    //    )
+    //}
+    const containsGlobal = useMemo(() => {
+        return datafiles
+            .filter((r) => r.spatial_type !== 'global')
+            .filter((r) => r.spatial_address || r.spatial_geom)
+            .some((df) => df.spatial_address === 'Global')
+    }, [datafiles])
+
     const geojsons = useMemo(() => {
-        return filteredDatafilesByName
+        return datafiles
             .filter((r) => r.spatial_type !== 'global')
             .filter((r) => r.spatial_address || r.spatial_geom)
             .map((df) => ({
                 ...df.spatial_geom,
                 address: df.spatial_address,
                 selected: datafilesToDownload.some((f) => f.id === df.id),
-                filtered:
-                    filteredDatafiles.length !==
-                        filteredDatafilesByName.length &&
-                    filteredDatafiles.some((f) => f.id === df.id),
                 id: df.id,
                 datafile: df,
             }))
-    }, [filteredDatafilesByName, filteredDatafiles, datafilesToDownload])
+    }, [datafilesToDownload])
+
+    const datafileList = useMemo(() => {
+        if (!showOnlySelected) {
+            return datafiles
+        }
+        return datafiles.filter((d) =>
+            datafilesToDownload.some((r) => r.id === d.id)
+        )
+    }, [datafilesToDownload, showOnlySelected])
 
     const addDatafileToDownload = (datafile: Resource) => {
         setDatafilesToDownload((prev) => [...prev, datafile])
@@ -386,22 +418,10 @@ export function DataFiles({
         }
     }
 
-    const filteredUploadedDatafiles = filteredDatafiles.filter(
-        (r) => r.url_type === 'upload' || r.url_type === 'link'
-    )
-
     const uploadedDatafiles = datafiles.filter(
         (r) => r.url_type === 'upload' || r.url_type === 'link'
     )
 
-    const filteredDatafilesEqualToDownloadDatafiles = () => {
-        return (
-            datafilesToDownload.length === filteredDatafiles.length &&
-            datafilesToDownload.every((r) =>
-                filteredDatafiles.some((f) => f.id === r.id)
-            )
-        )
-    }
     const downloadZipped = api.dataset.downloadZippedResources.useMutation()
     const createDownloadEvent = api.downloadEvents.createEvents.useMutation({
         onError: (err) => {
@@ -450,14 +470,21 @@ export function DataFiles({
     const [openDownload, setOpenDownload] = useState(false)
     return (
         <>
-            <div className="relative py-4">
-                <input
-                    className="block w-full rounded-t-md border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
-                    onChange={(e) => setQ(e.target.value)}
-                    value={q}
-                    placeholder="Search datafiles by title or description"
-                />
-                <MagnifyingGlassIcon className="w-5 h-5 text-black absolute top-[30px] right-4" />
+            <div className="py-4">
+                <div className="flex justify-between">
+                    <input
+                        className="block w-full rounded-l-md py-3 pl-4 border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
+                        onChange={(e) => setQ(e.target.value)}
+                        value={q}
+                        placeholder="Search datafiles by title or description"
+                    />
+                    <Button
+                        onClick={handleSearch}
+                        className="bg-amber-400 px-3 rounded-l-none h-full flex items-center justify-center rounded-r-md border-1 border-l-0"
+                    >
+                        <MagnifyingGlassIcon className="w-5 h-5 text-black" />
+                    </Button>
+                </div>
                 {dataset.is_approved && geojsons.length > 0 && (
                     <Disclosure defaultOpen={true}>
                         {({ open }) => (
@@ -474,54 +501,58 @@ export function DataFiles({
                                     unmount={false}
                                     className="pb-3 w-full"
                                 >
-                                    <div className="pb-3 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
-                                        <div className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                onChange={() =>
-                                                    formObj.setValue(
-                                                        'global',
+                                    {containsGlobal && (
+                                        <div className="pb-3 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    onChange={() =>
+                                                        formObj.setValue(
+                                                            'global',
+                                                            formObj.watch(
+                                                                'global'
+                                                            ) === 'only'
+                                                                ? 'include'
+                                                                : 'only'
+                                                        )
+                                                    }
+                                                    checked={
                                                         formObj.watch(
                                                             'global'
                                                         ) === 'only'
-                                                            ? 'include'
-                                                            : 'only'
-                                                    )
-                                                }
-                                                checked={
-                                                    formObj.watch('global') ===
-                                                    'only'
-                                                }
-                                                className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
-                                            />
-                                            <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
-                                                Only global
-                                            </label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                onChange={() =>
-                                                    formObj.setValue(
-                                                        'global',
+                                                    }
+                                                    className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
+                                                />
+                                                <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                                    Only global
+                                                </label>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    onChange={() =>
+                                                        formObj.setValue(
+                                                            'global',
+                                                            formObj.watch(
+                                                                'global'
+                                                            ) === 'exclude'
+                                                                ? 'include'
+                                                                : 'exclude'
+                                                        )
+                                                    }
+                                                    checked={
                                                         formObj.watch(
                                                             'global'
                                                         ) === 'exclude'
-                                                            ? 'include'
-                                                            : 'exclude'
-                                                    )
-                                                }
-                                                checked={
-                                                    formObj.watch('global') ===
-                                                    'exclude'
-                                                }
-                                                className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
-                                            />
-                                            <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
-                                                Exclude global
-                                            </label>
+                                                    }
+                                                    className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
+                                                />
+                                                <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                                    Exclude global
+                                                </label>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                     <div
                                         className={classNames(
                                             formObj.watch('global') === 'only'
@@ -544,11 +575,50 @@ export function DataFiles({
                     </Disclosure>
                 )}
             </div>
-            <span className="font-acumin text-base font-normal text-black">
-                {filteredDatafiles?.length ?? 0} Data Files
+            <span className="font-acumin text-base font-normal text-black flex items-center gap-x-1">
+                {datafiles?.length ?? 0} Data Files{' '}
+                {datafilesToDownload.length > 0 ? (
+                    <span className="flex items-center">
+                        {isLoadingLocationSearch && (
+                            <svg
+                                className="animate-spin mx-1 h-4 w-4 text-black"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                        )}{' '}
+                        ({datafilesToDownload.length} Selected datafiles)
+                    </span>
+                ) : (
+                    ''
+                )}
             </span>
             <div className="flex justify-end pb-1 lg:flex-col xl:flex-row">
                 <div className="flex gap-x-4 lg:justify-end">
+                    {datafilesToDownload.length > 0 && (
+                        <button
+                            onClick={() =>
+                                setShowOnlySelected(!showOnlySelected)
+                            }
+                            className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
+                        >
+                            {showOnlySelected ? 'Show All' : 'Show Selected'}
+                        </button>
+                    )}
                     {datafiles.some(
                         (r) => r.url_type === 'upload' || r.url_type === 'link'
                     ) && (
@@ -567,23 +637,12 @@ export function DataFiles({
                                     Select all datafiles
                                 </button>
                             )}
-                            {!filteredDatafilesEqualToDownloadDatafiles() &&
-                                datafilesToDownload.length !==
-                                    uploadedDatafiles.length && (
-                                    <button
-                                        onClick={() =>
-                                            setDatafilesToDownload(
-                                                filteredUploadedDatafiles
-                                            )
-                                        }
-                                        className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
-                                    >
-                                        Select all filtered datafiles
-                                    </button>
-                                )}
                             {datafilesToDownload.length > 0 && (
                                 <button
-                                    onClick={() => setDatafilesToDownload([])}
+                                    onClick={() => {
+                                        setShowOnlySelected(false)
+                                        setDatafilesToDownload([])
+                                    }}
                                     className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                                 >
                                     Unselect all datafiles
@@ -591,10 +650,10 @@ export function DataFiles({
                             )}
                         </>
                     )}
-                    {datafiles.some(
+                    {datafiles.filter(
                         (r) =>
                             r.url_type === 'layer' || r.url_type === 'layer-raw'
-                    ) && (
+                    ).length > 1 && (
                         <>
                             <button
                                 onClick={() => {
@@ -648,33 +707,7 @@ export function DataFiles({
                 </Button>
             )}
             <div className="flex flex-col gap-y-4">
-                {isLoadingLocationSearch &&
-                (formObj.watch('bbox') !== null ||
-                    formObj.watch('point') !== null) ? (
-                    <div className="flex h-20">
-                        <svg
-                            className={classNames('h-5 w-5 animate-spin mr-2')}
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                            ></circle>
-                            <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                        </svg>
-                        Loading data
-                    </div>
-                ) : filteredDatafiles?.length === 0 ? (
+                {datafiles?.length === 0 ? (
                     <div className="flex items-center justify-center h-20">
                         <p className="font-acumin text-base font-normal text-black">
                             No data files found
@@ -682,7 +715,7 @@ export function DataFiles({
                     </div>
                 ) : (
                     <>
-                        {filteredDatafiles?.map((datafile, index) => (
+                        {datafileList.map((datafile, index) => (
                             <DatafileCard
                                 setMapDisplayPreview={setMapDisplayPreview}
                                 mapDisplaypreview={mapDisplaypreview}
