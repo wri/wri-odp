@@ -75,6 +75,7 @@ export default function DatasetLCardList({
                         return (
                             <DatasetRow
                                 key={index}
+                                authorized={items.is_authorized}
                                 dataset={items}
                                 handleOpenModal={handleOpenModal}
                                 className={
