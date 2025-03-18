@@ -143,6 +143,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
                       <>
                           <Row
                               key={index}
+                              authorized={team?.capacity === 'admin'}
                               groupStyle="group/item group-hover/item:visible "
                               className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                               rowMain={

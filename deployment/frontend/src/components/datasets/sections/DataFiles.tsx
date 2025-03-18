@@ -286,7 +286,6 @@ interface LocationSearchFormType {
     bbox: Array<Array<number>> | null
     point: Array<number> | null
     location: string
-    global: 'include' | 'exclude' | 'only'
 }
 
 export function DataFiles({
@@ -332,7 +331,6 @@ export function DataFiles({
             bbox: null,
             point: null,
             location: '',
-            global: 'include',
         },
     })
     const { data: searchedResources, isLoading: isLoadingLocationSearch } =
@@ -361,23 +359,6 @@ export function DataFiles({
                 : []
         addDatafilesToDownload(filteredDatafilesByName)
     }
-
-    //if (formObj.watch('global') === 'exclude') {
-    //    filteredDatafiles = filteredDatafiles.filter(
-    //        (r) => r.spatial_address !== 'Global'
-    //    )
-    //}
-    //if (formObj.watch('global') === 'only') {
-    //    filteredDatafiles = filteredDatafilesByName.filter(
-    //        (r) => r.spatial_address === 'Global'
-    //    )
-    //}
-    const containsGlobal = useMemo(() => {
-        return datafiles
-            .filter((r) => r.spatial_type !== 'global')
-            .filter((r) => r.spatial_address || r.spatial_geom)
-            .some((df) => df.spatial_address === 'Global')
-    }, [datafiles])
 
     const geojsons = useMemo(() => {
         return datafiles
@@ -501,65 +482,7 @@ export function DataFiles({
                                     unmount={false}
                                     className="pb-3 w-full"
                                 >
-                                    {containsGlobal && (
-                                        <div className="pb-3 space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
-                                            <div className="flex items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    onChange={() =>
-                                                        formObj.setValue(
-                                                            'global',
-                                                            formObj.watch(
-                                                                'global'
-                                                            ) === 'only'
-                                                                ? 'include'
-                                                                : 'only'
-                                                        )
-                                                    }
-                                                    checked={
-                                                        formObj.watch(
-                                                            'global'
-                                                        ) === 'only'
-                                                    }
-                                                    className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
-                                                />
-                                                <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
-                                                    Only global
-                                                </label>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    onChange={() =>
-                                                        formObj.setValue(
-                                                            'global',
-                                                            formObj.watch(
-                                                                'global'
-                                                            ) === 'exclude'
-                                                                ? 'include'
-                                                                : 'exclude'
-                                                        )
-                                                    }
-                                                    checked={
-                                                        formObj.watch(
-                                                            'global'
-                                                        ) === 'exclude'
-                                                    }
-                                                    className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
-                                                />
-                                                <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
-                                                    Exclude global
-                                                </label>
-                                            </div>
-                                        </div>
-                                    )}
-                                    <div
-                                        className={classNames(
-                                            formObj.watch('global') === 'only'
-                                                ? 'hidden'
-                                                : 'block'
-                                        )}
-                                    >
+                                    <div>
                                         <LocationSearch
                                             toggleDatafileToDownload={
                                                 toggleDatafileToDownload
