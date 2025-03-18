@@ -418,6 +418,33 @@ export async function getUserOrganizations({
     }
 }
 
+export async function getCollaboratorPackages({
+    userId,
+    apiKey,
+}: {
+    userId: string
+    apiKey: string
+}): Promise<Collaborator[]> {
+    try {
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/package_collaborator_list_for_user?id=${userId}`,
+            {
+                headers: {
+                    Authorization: `${apiKey}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+
+        const data = (await response.json()) as CkanResponse<Collaborator[]>
+        const collab: Collaborator[] = data.success === true ? data.result : []
+        return collab
+    } catch (e) {
+        console.error(e)
+        return []
+    }
+}
+
 export async function getUserDataset({
     userId,
     apiKey,
@@ -2767,9 +2794,8 @@ export function advance_search_query(filters: Filter[]) {
                 ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
                 : '*'
 
-            fq[
-                'metadata_modified'
-            ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+            fq['metadata_modified'] =
+                `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
         } else if (key == 'spatial') {
             const coordinates = keyFilters[0]?.value
             const address = keyFilters[0]?.label
