@@ -17,6 +17,24 @@ ckan_ini = os.environ.get("CKAN_INI", "/srv/app/production.ini")
 
 RETRY = 5
 
+def is_postgres_running(db_url):
+    """
+    Checks if the PostgreSQL server is running and accepting connections.
+
+    Args:
+        db_url (str): The PostgreSQL connection URL.
+
+    Returns:
+        bool: True if PostgreSQL is running, False otherwise.
+    """
+    try:
+        # Attempt to connect to the database
+        conn = psycopg2.connect(db_url)
+        conn.close()
+        return True
+    except psycopg2.Error as e:
+        print(f"PostgreSQL connection error: {e}")
+        return False
 
 def update_plugins():
 
@@ -83,32 +101,56 @@ def check_solr_connection(retry=None):
         time.sleep(10)
         check_solr_connection(retry=retry - 1)
     else:
-        import re
-        conn_info = connection.read()
-        schema_name = json.loads(conn_info)
-        if 'ckan' in schema_name['name']:
-            print('[prerun] Succesfully connected to solr and CKAN schema loaded')
-        else:
+        import re                                                                                                                                                      
+        conn_info = connection.read()                                                                                                                                  
+        schema_name = json.loads(conn_info)                                                                                                                            
+        if 'ckan' in schema_name['name']:                                                                                                                              
+            print('[prerun] Succesfully connected to solr and CKAN schema loaded')                                                                                     
+        else:                                                                                                                                                          
             print('[prerun] Succesfully connected to solr, but CKAN schema not found')
+
+def check_plugins():
+  plugin_command = ['ckan', '-c', '/srv/app/production.ini', 'config', 'declaration']
+  try:
+    output = subprocess.check_output(plugin_command, stderr=subprocess.STDOUT)
+    print(output.decode('utf-8'))  # Print the output if successful
+  except subprocess.CalledProcessError as e:
+    print(f"Error running ckan config search: {e}")
+    print(f"Command output:\n{e.output.decode('utf-8')}")  # Print the output if there's an error
+    raise e
 
 
 def init_db():
+    db_command = ['ckan', '-c', '/srv/app/production.ini', 'db', 'init']
 
-    db_command = ["ckan", "-c", ckan_ini, "db", "init"]
-    print("[prerun] Initializing or upgrading db - start")
-    try:
-        subprocess.check_output(db_command, stderr=subprocess.STDOUT)
-        print("[prerun] Initializing or upgrading db - end")
-    except subprocess.CalledProcessError as e:
-        if "OperationalError" in e.output.decode("utf-8"):
-            print(e.output.decode("utf-8"))
-            print("[prerun] Database not ready, waiting a bit before exit...")
-            time.sleep(5)
-            sys.exit(1)
+    # Extract the database URL from the production.ini file
+    db_url = os.environ.get("CKAN_SQLALCHEMY_URL")
+
+    # Check if PostgreSQL is running before proceeding
+    max_attempts = 10
+    attempt = 0
+    while attempt < max_attempts:
+        if is_postgres_running(db_url):
+            print("PostgreSQL is running. Proceeding with CKAN database initialization.")
+            break
         else:
-            print(e.output)
-            raise e
+            attempt += 1
+            print(f"PostgreSQL is not yet running.  Attempt {attempt}/{max_attempts}.  Waiting...")
+            time.sleep(5)  # Wait for 5 seconds before retrying
+    else:
+        print("Error: PostgreSQL did not become available after multiple attempts.")
+        sys.exit(1)
 
+    try:
+        output = subprocess.check_output(db_command, stderr=subprocess.STDOUT)
+        print(output.decode('utf-8'))  # Print the output if successful
+    except subprocess.CalledProcessError as e:
+        print(f"Error running ckan db init: {e}")
+        print(f"Command output:\n{e.output.decode('utf-8')}")  # Print the output if there's an error
+        raise e
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        raise e
 
 def init_datastore_db():
 
@@ -202,10 +244,22 @@ if __name__ == "__main__":
     if maintenance:
         print("[prerun] Maintenance mode, skipping setup...")
     else:
+        print("[prerun] Starting setup...")
+        print("[prerun] Checking main db connection...")
         check_main_db_connection()
+        print("[prerun] Checking plugins...")
+        print(os.environ.get("CKAN__PLUGINS", "No plugins found"))
+        check_plugins()
+        print("[prerun] Initializing db...")
         init_db()
-        update_plugins()
+        #print("[prerun] Updating plugins...")
+        #update_plugins()
+        print("[prerun] Checking datastore db connection...")
         check_datastore_db_connection()
+        print("[prerun] Initializing datastore db...")
         init_datastore_db()
+        print("[prerun] Checking solr connection...")
         check_solr_connection()
+        print("[prerun] Creating sysadmin user...")
         create_sysadmin()
+        

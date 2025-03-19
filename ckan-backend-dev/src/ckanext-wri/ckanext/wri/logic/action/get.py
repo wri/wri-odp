@@ -13,8 +13,7 @@ import socket
 from ckan.common import config, asbool, aslist
 from ckan.model import Package
 from sqlalchemy import text, engine
-from shapely import MultiPolygon, Polygon, wkb, wkt
-from shapely import make_valid
+from shapely import wkb, wkt
 import ckan.model as model
 from ckan.logic.action.get import (
     _unpick_search, 
@@ -827,6 +826,7 @@ def group_activity_list_wri(context: Context, data_dict: DataDict):
     return results
 
 
+
 @logic.side_effect_free
 def user_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
@@ -1274,11 +1274,6 @@ def resource_search(context: Context, data_dict: DataDict):
                 shape = get_shape_from_dataapi(spatial_address, point)
                 if shape:
                     shape = wkt.loads(shape)
-                    bbox = Polygon([(-180, -90), (180, -90), (180, 90), (-180, 90)])
-                    shape = make_valid(shape)
-                    shape = shape.intersection(bbox)
-                    polygons = [geom for geom in shape.geoms if isinstance(geom, (Polygon, MultiPolygon))]
-                    shape = MultiPolygon(polygons)
                     spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
                     location_queries.append(
                         geoalchemy2.functions.ST_Intersects(
@@ -1453,6 +1448,7 @@ def organization_list_for_user(context: Context,
     return orgs_list
 
 
+
 @logic.side_effect_free
 def organization_list(context: Context,
                       data_dict: DataDict) -> ActionResult.OrganizationList:
@@ -1514,6 +1510,7 @@ def organization_list(context: Context,
     data_dict['groups'] = data_dict.pop('organizations', [])
     data_dict.setdefault('type', 'organization')
     return _group_or_org_list(context, data_dict, is_org=True)
+
 
 
 def _group_or_org_list(
@@ -1842,6 +1839,8 @@ def validate_visibility(context, data_dict):
         org_visibility = org.get("visibility", "public")
         if org_visibility == "private":
             raise ValidationError({"message": _("Organization has private visibility and cannot create public datasets")})
+
+
 
 
 @logic.side_effect_free

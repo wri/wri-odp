@@ -1,16 +1,21 @@
 ckan:
+  auth:
+    enable: false
   ckan:
     replicaCount: 2
     envVarsSecretName: ckan-cloud-centeralized-sql
     env:
-      UWSGI_HARAKIRI: "600"
+      UWSGI_HARAKIRI: "1800"
+      UWSGI_HTTP_TIMEOUT: "3600"
+      UWSGI_SOCKET_TIMEOUT: "3600"
       CKANEXT__DCAT__ENABLE_CONTENT_NEGOTIATION: "True"
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
-      CKAN_SITE_ID: wri-staging
-      CKAN_SITE_URL: https://wri.staging.frontend.datopian.com
+      CKAN_SITE_ID: wri-dev 
+      CKAN__SITE_URL: https://wri.dev.frontend.datopian.com
+      CKAN_SITE_URL: https://wri.dev.frontend.datopian.com
       CKAN_HOMEPAGE_STYLE: "2"
-      CKAN__DATAPUSHER__URL: http://wri-staging-datapusher-svc:80/
+      CKAN__DATAPUSHER__URL: http://wri-dev-datapusher-svc:80/
       CKAN_SVC_PORT_80_TCP_PROTO: tcp
       CKAN__AUTH__ANON_CREATE_DATASET: "False"
       CKAN__AUTH__CREATE_DATASET_IF_NOT_IN_ORGANIZATION: "True"
@@ -25,12 +30,11 @@ ckan:
       CKAN__HARVEST__MQ__TYPE: redis
       CKAN__LOCALE_DEFAULT: en
       CKAN__RESOURCE_PROXY__MAX_FILE_SIZE: "100000000"
-      CKAN__SITE_TITLE: WRI OpenData Platform Staging
+      CKAN__SITE_TITLE: WRI OpenData Platform Dev
       CKAN__STORAGE_PATH: /tmp
-      CKAN__VIEWS__DEFAULT_VIEWS: recline_view text_view image_view pdf_view geojson_view
-      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_api_tracking wri_harvester auth hierarchy_display issues envvars
+      CKAN__VIEWS__DEFAULT_VIEWS: datatables_view text_view image_view pdf_view geojson_view
+      CKAN__PLUGINS: image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest wri wri_api_tracking wri_harvester auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
       CKAN__AUTH__CREATE_UNOWNED_DATASET: "True"
-      CKAN__GROUP_AND_ORGANIZATIONS_LIST_ALL_FIELDS_MAX: "150"
       CKAN__AUTH__ALLOW_DATASET_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_ADMIN_COLLABORATORS: "True"
       CKAN__AUTH__ALLOW_COLLABORATORS_TO_CHANGE_OWNER_ORG: "True"
@@ -42,7 +46,7 @@ ckan:
       CKAN__DATASTORE__SQLSEARCH__ENABLED: "True"
       CKANEXT__WRI__MIGRATION_DEPLOYMENT_NAME: migration_deployment
       CKANEXT__WRI__MIGRATION_FLOW_NAME: trigger-migration
-      CKANEXT__WRI__MIGRATION_DEPLOYMENT_ENV: staging
+      CKANEXT__WRI__MIGRATION_DEPLOYMENT_ENV: dev
     hpa:
       enable: true
       minReplicas: 2
@@ -58,7 +62,7 @@ ckan:
     image:
       pullPolicy: Always
       repository: {{REGISTRY}}/{{CKAN_REPO}}
-      tag: staging-{{GITHUB_SHA}}
+      tag: dev-{{GITHUB_SHA}}
     runInitContainers: false
     service:
       port: 80
@@ -80,7 +84,7 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: staging-{{GITHUB_SHA}}
+      tag: dev-{{GITHUB_SHA}}
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
@@ -101,7 +105,7 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: staging-{{GITHUB_SHA}}-migration
+      tag: dev-{{GITHUB_SHA}}-migration
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
@@ -120,7 +124,7 @@ ckan:
     enable: true
     image:
       repository: {{REGISTRY}}/{{FRONTEND_REPO}}
-      tag: staging-{{GITHUB_SHA}}
+      tag: dev-{{GITHUB_SHA}}
     env:
       SITE_TITLE: WRI ODP
     targetPort: 3000
@@ -166,20 +170,16 @@ ckan:
     autoscaling:
       enable: false
     customResource: true
-    projectId: wri-staging
+    projectId: wri-dev
     resources: {}
     useProductionCerts: true
   ingress:
-    domain: wri.staging.ckan.datopian.com
+    domain: wri.dev.ckan.datopian.com
     enable: true
     enableExternal: false
     extraAnnotations:
       cert-manager.io/cluster-issuer: cert-manager
-      nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
-      nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
-      nginx.ingress.kubernetes.io/large-client-header-buffers: 4 16k
       nginx.ingress.kubernetes.io/configuration-snippet: |
-        proxy_set_header X-Forwarded-For  $remote_addr;
         more_set_headers "server: hide";
         more_set_headers "X-Content-Type-Options: nosniff";
         more_set_headers "X-Xss-Protection: 1";
@@ -189,51 +189,51 @@ ckan:
       nginx.ingress.kubernetes.io/limit-connections: "50"
       nginx.ingress.kubernetes.io/limit-rps: "50"
       nginx.ingress.kubernetes.io/server-snippet: |
-        if ($http_user_agent ~* (360Spider|80legs.com|Abonti|AcoonBot|Acunetix|adbeat_bot|AddThis.com|adidxbot|ADmantX|AhrefsBot|AngloINFO|Antelope|Applebot|BaiduSpider|BeetleBot|billigerbot|binlar|bitlybot|BlackWidow|BLP_bbot|BoardReader|Bolt\ 0|BOT\ for\ JCE|Bot\ mailto\:craftbot@yahoo\.com|casper|CazoodleBot|CCBot|checkprivacy|ChinaClaw|chromeframe|Clerkbot|Cliqzbot|clshttp|CommonCrawler|comodo|CPython|crawler4j|Crawlera|CRAZYWEBCRAWLER|Curious|Curl|Custo|CWS_proxy|Default\ Browser\ 0|diavol|DigExt|Digincore|DIIbot|discobot|DISCo|DoCoMo|DotBot|Download\ Demon|DTS.Agent|EasouSpider|eCatch|ecxi|EirGrabber|Elmer|EmailCollector|EmailSiphon|EmailWolf|Exabot|ExaleadCloudView|ExpertSearchSpider|ExpertSearch|Express\ WebPictures|ExtractorPro|extract|EyeNetIE|Ezooms|F2S|FastSeek|feedfinder|FeedlyBot|FHscan|finbot|Flamingo_SearchEngine|FlappyBot|FlashGet|flicky|Flipboard|g00g1e|Genieo|GetRight|GetWeb\!|GigablastOpenSource|GozaikBot|Go\!Zilla|Go\-Ahead\-Got\-It|GrabNet|Grafula|GrapeshotCrawler|GTB5|GT\:\:WWW|Guzzle|harvest|heritrix|HMView|HomePageBot|HTTP\:\:Lite|HTTrack|HubSpot|ia_archiver|icarus6|IDBot|id\-search|IlseBot|Image\ Stripper|Image\ Sucker|Indigonet|Indy\ Library|integromedb|InterGET|InternetSeer\.com|Internet\ Ninja|IRLbot|ISC\ Systems\ iRc\ Search\ 2\.1|jakarta|Java|JetCar|JobdiggerSpider|JOC\ Web\ Spider|Jooblebot|kanagawa|KINGSpider|kmccrew|larbin|LeechFTP|libwww|Lingewoud|LinkChecker|linkdexbot|LinksCrawler|LinksManager\.com_bot|linkwalker|LinqiaRSSBot|LivelapBot|ltx71|LubbersBot|lwp\-trivial|Mail.RU_Bot|masscan|Mass\ Downloader|maverick|Maxthon$|Mediatoolkitbot|MegaIndex|MFC_Tear_Sample|Microsoft\ URL\ Control|microsoft\.url|MIDown\ tool|miner|Missigua\ Locator|Mister\ PiX|mj12bot|Mozilla.*Indy|Mozilla.*NEWT|MSFrontPage|msnbot|Navroad|NearSite|NetAnts|netEstate|NetSpider|NetZIP|Net\ Vampire|NextGenSearchBot|nutch|Octopus|Offline\ Explorer|Offline\ Navigator|OpenindexSpider|OpenWebSpider|OrangeBot|Owlin|PageGrabber|PagesInventory|panopta|panscient\.com|Papa\ Foto|pavuk|pcBrowser|PECL\:\:HTTP|PeoplePal|Photon|PHPCrawl|planetwork|PleaseCrawl|PNAMAIN.EXE|PodcastPartyBot|prijsbest|proximic|psbot|purebot|pycurl|QuerySeekerSpider|R6_CommentReader|R6_FeedFetcher|RealDownload|ReGet|Riddler|Rippers\ 0|rogerbot|RSSingBot|rv\:1.9.1|RyzeCrawler|SafeSearch|SBIder|Scrapy|Screaming|SeaMonkey$|search.goo.ne.jp|SearchmetricsBot|search_robot|SemrushBot|SentiBot|SEOkicks|SeznamBot|ShowyouBot|SightupBot|SISTRIX|sitecheck\.internetseer\.com|siteexplorer.info|SiteSnagger|skygrid|Slackbot|Slurp|SmartDownload|Snoopy|Sogou|Sosospider|spaumbot|Steeler|sucker|SuperBot|Superfeedr|SuperHTTP|SurdotlyBot|Surfbot|tAkeOut|Teleport\ Pro|TinEye-bot|TinEye|Toata\ dragostea\ mea\ pentru\ diavola|Toplistbot|trendictionbot|TurnitinBot|turnit|Twitterbot|URI\:\:Fetch|urllib|Vagabondo|vikspider|VoidEYE|VoilaBot|WBSearchBot|webalta|WebAuto|WebBandit|WebCollage|WebCopier|WebFetch|WebGo\ IS|WebLeacher|WebReaper|WebSauger|Website\ eXtractor|Website\ Quester|WebStripper|WebWhacker|WebZIP|Web\ Image\ Collector|Web\ Sucker|Wells\ Search\ II|WEP\ Search|WeSEE|Wget|Widow|WinInet|woobot|woopingbot|worldwebheritage.org|Wotbox|WPScan|WWWOFFLE|WWW\-Mechanize|Xaldon\ WebSpider|XoviBot|yacybot|Yahoo|YandexBot|YandexFavicons|YandexImages|YisouSpider|zermelo|Zeus|zh-CN|ZmEu|ZumBot|ZyBorg|Amazonbot|DotBot|Googlebot|bingbot|ClaudeBot|PetalBot|GPTBot|DuckDuckBot|DataForSeoBot|OAI-SearchBot|meta-externalagent|facebookexternalhit) ) {
-            return 403;
+        location / {
+          if ($http_user_agent ~* (360Spider|80legs.com|Abonti|AcoonBot|Acunetix|adbeat_bot|AddThis.com|adidxbot|ADmantX|AhrefsBot|AngloINFO|Antelope|Applebot|BaiduSpider|BeetleBot|billigerbot|binlar|bitlybot|BlackWidow|BLP_bbot|BoardReader|Bolt\ 0|BOT\ for\ JCE|Bot\ mailto\:craftbot@yahoo\.com|casper|CazoodleBot|CCBot|checkprivacy|ChinaClaw|chromeframe|Clerkbot|Cliqzbot|clshttp|CommonCrawler|comodo|CPython|crawler4j|Crawlera|CRAZYWEBCRAWLER|Curious|Curl|Custo|CWS_proxy|Default\ Browser\ 0|diavol|DigExt|Digincore|DIIbot|discobot|DISCo|DoCoMo|DotBot|Download\ Demon|DTS.Agent|EasouSpider|eCatch|ecxi|EirGrabber|Elmer|EmailCollector|EmailSiphon|EmailWolf|Exabot|ExaleadCloudView|ExpertSearchSpider|ExpertSearch|Express\ WebPictures|ExtractorPro|extract|EyeNetIE|Ezooms|F2S|FastSeek|feedfinder|FeedlyBot|FHscan|finbot|Flamingo_SearchEngine|FlappyBot|FlashGet|flicky|Flipboard|g00g1e|Genieo|genieo|GetRight|GetWeb\!|GigablastOpenSource|GozaikBot|Go\!Zilla|Go\-Ahead\-Got\-It|GrabNet|grab|Grafula|GrapeshotCrawler|GTB5|GT\:\:WWW|Guzzle|harvest|heritrix|HMView|HomePageBot|HTTP\:\:Lite|HTTrack|HubSpot|ia_archiver|icarus6|IDBot|id\-search|IlseBot|Image\ Stripper|Image\ Sucker|Indigonet|Indy\ Library|integromedb|InterGET|InternetSeer\.com|Internet\ Ninja|IRLbot|ISC\ Systems\ iRc\ Search\ 2\.1|jakarta|Java|JetCar|JobdiggerSpider|JOC\ Web\ Spider|Jooblebot|kanagawa|KINGSpider|kmccrew|larbin|LeechFTP|libwww|Lingewoud|LinkChecker|linkdexbot|LinksCrawler|LinksManager\.com_bot|linkwalker|LinqiaRSSBot|LivelapBot|ltx71|LubbersBot|lwp\-trivial|Mail.RU_Bot|masscan|Mass\ Downloader|maverick|Maxthon$|Mediatoolkitbot|MegaIndex|MegaIndex|megaindex|MFC_Tear_Sample|Microsoft\ URL\ Control|microsoft\.url|MIDown\ tool|miner|Missigua\ Locator|Mister\ PiX|mj12bot|Mozilla.*Indy|Mozilla.*NEWT|MSFrontPage|msnbot|Navroad|NearSite|NetAnts|netEstate|NetSpider|NetZIP|Net\ Vampire|NextGenSearchBot|nutch|Octopus|Offline\ Explorer|Offline\ Navigator|OpenindexSpider|OpenWebSpider|OrangeBot|Owlin|PageGrabber|PagesInventory|panopta|panscient\.com|Papa\ Foto|pavuk|pcBrowser|PECL\:\:HTTP|PeoplePal|Photon|PHPCrawl|planetwork|PleaseCrawl|PNAMAIN.EXE|PodcastPartyBot|prijsbest|proximic|psbot|purebot|pycurl|QuerySeekerSpider|R6_CommentReader|R6_FeedFetcher|RealDownload|ReGet|Riddler|Rippers\ 0|rogerbot|RSSingBot|rv\:1.9.1|RyzeCrawler|SafeSearch|SBIder|Scrapy|Scrapy|Screaming|SeaMonkey$|search.goo.ne.jp|SearchmetricsBot|search_robot|SemrushBot|Semrush|SentiBot|SEOkicks|SeznamBot|ShowyouBot|SightupBot|SISTRIX|sitecheck\.internetseer\.com|siteexplorer.info|SiteSnagger|skygrid|Slackbot|Slurp|SmartDownload|Snoopy|Sogou|Sosospider|spaumbot|Steeler|sucker|SuperBot|Superfeedr|SuperHTTP|SurdotlyBot|Surfbot|tAkeOut|Teleport\ Pro|TinEye-bot|TinEye|Toata\ dragostea\ mea\ pentru\ diavola|Toplistbot|trendictionbot|TurnitinBot|turnit|Twitterbot|URI\:\:Fetch|urllib|Vagabondo|Vagabondo|vikspider|VoidEYE|VoilaBot|WBSearchBot|webalta|WebAuto|WebBandit|WebCollage|WebCopier|WebFetch|WebGo\ IS|WebLeacher|WebReaper|WebSauger|Website\ eXtractor|Website\ Quester|WebStripper|WebWhacker|WebZIP|Web\ Image\ Collector|Web\ Sucker|Wells\ Search\ II|WEP\ Search|WeSEE|Wget|Widow|WinInet|woobot|woopingbot|worldwebheritage.org|Wotbox|WPScan|WWWOFFLE|WWW\-Mechanize|Xaldon\ WebSpider|XoviBot|yacybot|Yahoo|YandexBot|Yandex|YisouSpider|zermelo|Zeus|zh-CN|ZmEu|ZumBot|ZyBorg) ) {
+              return 403;
+          }
         }
     hosts:
-      - host: wri.staging.console.datopian.com
+      - host: wri.dev.console.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-staging-hasura-svc
-      - host: wri.staging.data.datopian.com
+            service: wri-dev-hasura-svc
+      - host: wri.dev.data.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-staging-data-api-svc
-      - host: wri.staging.ckan.datopian.com
+            service: wri-dev-data-api-svc
+      - host: wri.dev.ckan.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-staging-ckan-svc
-      #- host: wri.staging.frontend.datopian.com
+            service: wri-dev-ckan-svc
+      #- host: wri.dev.frontend.datopian.com
       #  isExternal: false
       #  paths:
       #    - path: /(.*)
       #      port: 80
-      #      service: wri-staging-frontend-svc
+      #      service: wri-dev-frontend-svc
     ingressNamespace: nginx-ingress
     ingressClass: nginx
     tls:
       - hosts:
-          - wri.staging.ckan.datopian.com
-        secretName: wri.staging.ckan.datopian.com
+          - wri.dev.ckan.datopian.com
+        secretName: wri.dev.ckan.datopian.com
       - hosts:
-          - wri.staging.data.datopian.com
-        secretName: wri.staging.data.datopian.com
+          - wri.dev.data.datopian.com
+        secretName: wri.dev.data.datopian.com
       #- hosts:
-      #    - wri.staging.frontend.datopian.com
-      #  secretName: wri.staging.frontend.datopian.com
+      #    - wri.dev.frontend.datopian.com
+      #  secretName: wri.dev.frontend.datopian.com
       - hosts:
-          - wri.staging.console.datopian.com
-        secretName: wri.staging.console.datopian.com
-  auth:
-    enable: false
+          - wri.dev.console.datopian.com
+        secretName: wri.dev.console.datopian.com
   solr:
     enable: false
     image:
