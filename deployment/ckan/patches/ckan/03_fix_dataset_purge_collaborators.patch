@@ -1,0 +1,19 @@
+diff --git a/ckan/logic/action/delete.py b/ckan/logic/action/delete.py
+index dc3ce8ec2..1828effca 100644
+--- a/ckan/logic/action/delete.py
++++ b/ckan/logic/action/delete.py
+@@ -152,6 +152,14 @@ def dataset_purge(context: Context, data_dict: DataDict) -> ActionResult.Dataset
+                 model.PackageRelationship.object_package_id == pkg.id)).all():
+         r.purge()
+ 
++    dataset_collaborators = (
++        model.Session.query(model.PackageMember)
++        .filter(model.PackageMember.package_id == id)
++        .all()
++    )
++    for collaborator in dataset_collaborators:
++        collaborator.delete()
++
+     pkg = model.Package.get(id)
+     assert pkg
+     pkg.purge()
