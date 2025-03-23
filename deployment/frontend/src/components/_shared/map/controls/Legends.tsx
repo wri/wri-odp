@@ -13,12 +13,23 @@ import {
     // @ts-ignore
 } from 'vizzuality-components'
 
-// @ts-ignore
-import { LegendItemTimeline } from 'old-vizzuality-components'
 import { type ActiveLayerGroup } from '@/interfaces/state.interface'
 import LegendItemButtonThreshold from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonThreshold'
 import LegendItemTypesList from '@/components/vizzuality/components/legend/components/legend-item-types/LegendItemTypesList'
 import LegendItemButtonRemoveLayer from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonRemoveLayer'
+import dynamic from 'next/dynamic'
+
+// @ts-ignore
+const LegendItemTimeline = dynamic(
+    () =>
+        // @ts-ignore
+        import('old-vizzuality-components').then(
+            (mod) => mod.LegendItemTimeline
+        ),
+    {
+        ssr: false,
+    }
+)
 
 export function Legends() {
     const { data: layerGroups } = useLayerGroupsFromRW()
@@ -58,18 +69,20 @@ export function Legends() {
                                 key={`legend-list-item-${i}`}
                                 layerGroup={{
                                     ...lg,
-                                    visibility: !currentLayers.size || lg.layers
-                                        .map((l: APILayerSpec) => {
-                                            const layerState =
-                                                currentLayers.get(l.id)
+                                    visibility:
+                                        !currentLayers.size ||
+                                        lg.layers
+                                            .map((l: APILayerSpec) => {
+                                                const layerState =
+                                                    currentLayers.get(l.id)
 
-                                            if (layerState?.active) {
-                                                return layerState.visibility
-                                            }
+                                                if (layerState?.active) {
+                                                    return layerState.visibility
+                                                }
 
-                                            return false
-                                        })
-                                        .some((l: boolean) => l),
+                                                return false
+                                            })
+                                            .some((l: boolean) => l),
                                     layers: lg.layers.map((l: APILayerSpec) => {
                                         const layerState = currentLayers.get(
                                             l.id
@@ -187,6 +200,7 @@ export function Legends() {
                                         ) => !!l.timelineParams
                                     ) && (
                                         <LegendItemTimeline
+                                            // @ts-ignore
                                             onChangeLayer={(
                                                 layer: APILayerSpec
                                             ) => {
