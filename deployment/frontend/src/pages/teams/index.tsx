@@ -57,7 +57,7 @@ export default function TeamsPage(
 
     const { data, isLoading } = api.teams.getGeneralTeam.useQuery({
         search: '',
-        page: { start: 0, rows: 100 },
+        page: { start: 0, rows: 10000 },
         allTree: true,
     })
     const indexTeams = new Index({
