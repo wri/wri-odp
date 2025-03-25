@@ -22,10 +22,7 @@ export default function EditCard({
     if (user) {
         const user2 = user as WriUser
 
-        if (
-            user2?.capacity &&
-            ['admin', 'editor'].includes(user2?.capacity as string)
-        )
+        if (user2?.capacity && ['admin'].includes(user2?.capacity as string))
             return (
                 <Link
                     href={`/dashboard/teams/${teamName}/edit`}
