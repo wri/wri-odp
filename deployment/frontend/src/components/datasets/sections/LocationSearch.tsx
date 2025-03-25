@@ -93,28 +93,6 @@ export default function LocationSearch({
         [toggleDatafileToDownload]
     )
 
-    // Handle mouse movement to change cursor
-    const handleMouseMove = useCallback((event: MapLayerMouseEvent) => {
-        if (!mapRef.current) return
-
-        const features = mapRef.current.queryRenderedFeatures(event.point)
-
-        // Check if any of our layers are under the mouse
-        if (features.length > 0) {
-            const hoveredLayerId = features[0]?.layer.id
-            if (!hoveredLayerId) return
-
-            // If the layer ID is in our mapping, it's one of our layers
-            if (layerGeojsonMap.current[hoveredLayerId]) {
-                setCursor('default') // Set to default arrow cursor
-            } else {
-                setCursor('grab') // Set to the default map grabbing cursor
-            }
-        } else {
-            setCursor('grab') // Default map cursor
-        }
-    }, [])
-
     const onUpdate = useCallback((e: any) => {
         for (const f of e.features) {
             if (f.geometry.coordinates[0].length === 5) {
@@ -140,6 +118,15 @@ export default function LocationSearch({
         }
     }, [mapRef.current, open])
 
+    const onModeChange = useCallback((e: any) => {
+        if (e.mode === 'draw_polygon') {
+            setCursor('crosshair')
+        } else {
+            setCursor('grab')
+        }
+    }, [])
+
+    console.log('cursor', cursor)
     return (
         <Map
             ref={(_map) => {
@@ -156,7 +143,6 @@ export default function LocationSearch({
             touchZoomRotate={false}
             mapStyle="mapbox://styles/mapbox/streets-v9"
             onClick={handleMapClick}
-            onMouseMove={handleMouseMove}
             cursor={cursor}
         >
             <GeocoderControl
@@ -210,15 +196,20 @@ export default function LocationSearch({
                 ))}{' '}
             <DrawControl
                 position="top-left"
-                onClear={() => setValue('bbox', null)}
+                onClear={() => {
+                    setCursor('grab')
+                    setValue('bbox', null)
+                }}
                 displayControlsDefault={false}
                 controls={{
                     polygon: true,
                 }}
+                onModeChange={onModeChange}
                 defaultMode="simple_select"
                 onCreate={onUpdate}
                 onUpdate={onUpdate}
                 onDelete={() => {
+                    setCursor('grab')
                     setValue('bbox', null)
                 }}
             />
