@@ -6,7 +6,6 @@ import { DatasetHeader } from '@/components/datasets/DatasetHeader'
 import DatasetPageLayout from '@/components/datasets/DatasetPageLayout'
 import { DatasetTabs } from '@/components/datasets/DatasetTabs'
 import AddLayers from '@/components/datasets/add-layers/AddLayers'
-import { API } from '@/components/datasets/sections/API'
 import { About } from '@/components/datasets/sections/About'
 import { Contact } from '@/components/datasets/sections/Contact'
 import { DataFiles } from '@/components/datasets/sections/DataFiles'
@@ -56,6 +55,20 @@ function customDataLayer(data: { event: string; resource_name: string }) {
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/Visualizations'),
+    {
+        loading: () => (
+            <div className="min-h-[90vh] bg-lima-700 opacity-75 flex-col items-center justify-center">
+                <Spinner className="text-wri-green w-12 h-12" />
+                <h2 className="text-center text-xl font-semibold text-black">
+                    Loading...
+                </h2>
+            </div>
+        ),
+    }
+)
+
+const API = dynamic(
+    () => import('@/components/datasets/sections/API').then((mod) => mod.API),
     {
         loading: () => (
             <div className="min-h-[90vh] bg-lima-700 opacity-75 flex-col items-center justify-center">

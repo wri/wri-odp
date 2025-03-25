@@ -284,48 +284,18 @@ export const teamRouter = createTRPCRouter({
     getGeneralTeam: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            let groupTree: GroupTree[] = []
-
-            if (input.search) {
-                groupTree = await searchHierarchy({
-                    isSysadmin: true,
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    q: input.search,
-                    group_type: 'organization',
-                })
-
-                if (input.tree) {
-                    for (const gtree of groupTree) {
-                        const findtree = findNameInTree(gtree, input.search)
-                        if (findtree) {
-                            groupTree = [findtree]
-                            break
-                        }
-                    }
-                }
-
-                if (input.allTree) {
-                    const filterTree = groupTree.flatMap((group) => {
-                        const search = input.search.toLowerCase()
-                        if (
-                            group.name.toLowerCase().includes(search) ||
-                            group.title?.toLowerCase().includes(search)
-                        )
-                            return [group]
-                        const findtree = findAllNameInTree(group, input.search)
-                        return findtree
-                    })
-
-                    groupTree = filterTree
-                }
-            } else {
-                groupTree = await searchHierarchy({
+            const [groupTree, allGroups] = await Promise.all([
+                searchHierarchy({
                     isSysadmin: true,
                     apiKey: ctx?.session?.user.apikey ?? '',
                     q: '',
                     group_type: 'organization',
-                })
-            }
+                }),
+
+                await getAllOrganizations({
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                }),
+            ])
 
             if (groupTree.length === 0) {
                 return {
@@ -334,10 +304,6 @@ export const teamRouter = createTRPCRouter({
                     count: 0,
                 }
             }
-            const allGroups = (await getAllOrganizations({
-                apiKey: ctx?.session?.user.apikey ?? '',
-            }))!
-
             const teamDetails = allGroups.reduce(
                 (acc, org) => {
                     acc[org.id] = {
@@ -365,6 +331,7 @@ export const teamRouter = createTRPCRouter({
             const result = groupTree
             return {
                 teams: result,
+                allTeams: allGroups,
                 teamsDetails: teamDetails,
                 count: result.length,
             }
