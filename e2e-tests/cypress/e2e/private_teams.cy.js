@@ -20,7 +20,7 @@ describe("Create and edit team", () => {
     cy.createOrganizationAPI(parentOrg);
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
@@ -81,7 +81,6 @@ describe("Create and edit team", () => {
 
   it("should not be possible to view parent", () => {
     cy.logout();
-    cy.login(normalUser, normalUserPassword);
     cy.visit("/teams");
     cy.contains(parentOrg).should("not.exist");
     cy.contains(org).should("not.exist");
@@ -89,6 +88,8 @@ describe("Create and edit team", () => {
 
 
   it("Should edit parent team to public", () => {
+    cy.logout();
+    cy.login(normalUser, normalUserPassword);
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.wait(10000);
       cy.get("input[name=title]").should("have.value", parentOrg);
