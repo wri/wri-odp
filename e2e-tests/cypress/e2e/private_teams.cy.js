@@ -1,8 +1,8 @@
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
-const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
+const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 const normalUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const normalUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_member`;
 const normalUserPassword = "test1234";
