@@ -35,7 +35,7 @@ describe("Create and edit team", () => {
     cy.get("li").contains("Private").click();
     cy.wait(5000);
     cy.get("button[type=submit]").click();
-    cy.wait(90000);
+    cy.wait(5000);
 
     cy.visit(`/teams/${org}`).then(() => {
       cy.once("uncaught:exception", () => false);
@@ -45,6 +45,7 @@ describe("Create and edit team", () => {
   });
 
   it("should assign private team to a parent", () => {
+    cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", org);
       cy.get("button[aria-haspopup=listbox]")
@@ -59,8 +60,6 @@ describe("Create and edit team", () => {
   });
 
   it("should view public parent and not private child", () => {
-    cy.logout();
-    cy.login(normalUser, normalUserPassword);
     cy.visit("/teams");
     cy.wait(9000);
     cy.contains(parentOrg).should("exist");
@@ -68,7 +67,6 @@ describe("Create and edit team", () => {
   });
 
   it("should edit parent team to private", () => {
-    cy.logout();
     cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
@@ -86,7 +84,6 @@ describe("Create and edit team", () => {
       },
     },
     () => {
-      cy.logout();
       cy.clearCookies();
       cy.clearLocalStorage();
       cy.clearAllSessionStorage();
@@ -98,8 +95,7 @@ describe("Create and edit team", () => {
 
 
   it("Should edit parent team to public", () => {
-    cy.logout();
-    cy.login(normalUser, normalUserPassword);
+    cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.wait(10000);
       cy.get("input[name=title]").should("have.value", parentOrg);
@@ -110,8 +106,6 @@ describe("Create and edit team", () => {
   });
 
   it("Should edit team and assign public dataset and edit team back to private", () => {
-    cy.logout();
-    cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/datasets/new`);
     cy.wait(10000);
     cy.get("input[name=title]").type(datasetSuffix);

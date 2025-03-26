@@ -5,9 +5,9 @@ export default defineConfig({
   pageLoadTimeout: 120000,
   video: false,
   env: {
-    CKAN_USERNAME: 'ckan_admin',
-    CKAN_PASSWORD: 'test1234',
-    API_KEY: "CKAN_API_TOKEN",
+    CKAN_USERNAME: 'luccas',
+    CKAN_PASSWORD: 'gandalf@256',
+    API_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkbThMeEFKQ0Y0WDFtYlhUUFpRUWliVGc4cHZBM0p5SHJWX0MtVFAtZDVnIiwiaWF0IjoxNzQyOTg5NzQ1fQ.aMVRxwhz8kjXJD9npjYhtlhVkJ9TwLj7sbV0s4c5ZpY",
     ORG_NAME_SUFFIX: '-organization-test',
     DATASET_NAME_SUFFIX: '-dataset-test',
     GROUP_SUFFIX: '-group-test',
@@ -15,11 +15,11 @@ export default defineConfig({
   },
   e2e: {
     baseUrl: 'http://127.0.0.1:3000',
-    apiUrl: 'http://ckan-dev:5000/private-admin/en',
+    apiUrl: 'https://wri.dev.frontend.datopian.com',
     setupNodeEvents(on, config) {
       on('task', {
         table(violations) {
-         
+
           console.table(violations)
           return null
         },
