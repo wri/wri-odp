@@ -18,10 +18,10 @@ describe("Create and edit team", () => {
   before(() => {
     cy.createUserApi(normalUser, normalUserEmail, normalUserPassword);
     cy.createOrganizationAPI(parentOrg);
+    cy.login(ckanUserName, ckanUserPassword);
   });
 
   it("Should create team", () => {
-    cy.login(ckanUserName, ckanUserPassword);
     cy.visit("/dashboard/teams/new");
     //get input with name=title
     cy.wait(6000);
@@ -53,6 +53,7 @@ describe("Create and edit team", () => {
         .click();
       cy.get("li").contains(parentOrg).click();
       cy.get("button[type=submit]").click();
+      cy.contains(`Successfully edited the ${org} team`)
       cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
         cy.get("input[name=title]").should("have.value", org);
       });
@@ -61,7 +62,7 @@ describe("Create and edit team", () => {
 
   it("should view public parent and not private child", () => {
     cy.visit("/teams");
-    cy.wait(9000);
+    cy.get('input[name="search"]').type(parentOrg);
     cy.contains(parentOrg).should("exist");
     cy.contains(org).should("not.exist");
   });
@@ -89,27 +90,28 @@ describe("Create and edit team", () => {
       cy.clearCookies();
       cy.clearLocalStorage();
       cy.clearAllSessionStorage();
-      cy.login(ckanUserName, ckanUserPassword);
-      cy.wait(1000)
-      cy.visit("/teams");
+      cy.visit("/");
+      cy.visit('/teams');
       cy.contains(parentOrg).should("not.exist");
       cy.contains(org).should("not.exist");
     });
 
 
   it("Should edit parent team to public", () => {
+    cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-      cy.wait(10000);
       cy.get("input[name=title]").should("have.value", parentOrg);
       cy.get("button#visibility").click();
       cy.get("li").contains("Public").click();
       cy.get("button[type=submit]").click();
+      cy.contains(`Successfully edited the ${parentOrg} team`)
     });
   });
 
   it("Should edit team and assign public dataset and edit team back to private", () => {
+    cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/datasets/new`);
-    cy.wait(10000);
+    cy.wait(5000);
     cy.get("input[name=title]").type(datasetName);
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("input[name=url]").type("https://google.com");
@@ -148,7 +150,7 @@ describe("Create and edit team", () => {
       cy.get("button#visibility").click();
       cy.get("li").contains("Private").click();
       cy.get("button[type=submit]").click();
-      cy.wait(10000);
+      cy.wait(5000);
       cy.contains(
         "Team has 1 public dataset(s) and cannot be made private"
       ).should("exist");
