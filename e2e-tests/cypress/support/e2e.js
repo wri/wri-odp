@@ -651,6 +651,7 @@ Cypress.Commands.add('clearCkanDevSessionCookies', () => {
   cy.origin(origin, () => {
     cy.getAllCookies().then((cookies) => {
       cookies.forEach((cookie) => {
+        cy.log(`Clearing cookie ${cookie.name} for ${cookie.domain}`);
         cy.clearCookie(cookie.name, { domain: cookie.domain });
       });
     });

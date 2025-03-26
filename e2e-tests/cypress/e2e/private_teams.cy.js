@@ -95,6 +95,11 @@ describe("Create and edit team", () => {
       cy.clearAllSessionStorage();
       cy.visit("/");
       cy.visit('/teams');
+      // Print all cookies to the Cypress command log
+      cy.getCookies().then((cookies) => {
+        cy.log("All Cookies:", cookies);
+      });
+
       cy.contains(parentOrg).should("not.exist");
       cy.contains(org).should("not.exist");
     });

@@ -1,7 +1,7 @@
 import {
-    createTRPCRouter,
-    protectedProcedure,
-    publicProcedure,
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
 } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import { CkanResponse, Collaborator } from '@/schema/ckan.schema'
@@ -11,459 +11,454 @@ import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
 import { searchSchema } from '@/schema/search.schema'
 import type {
-    GroupTree,
-    GroupsmDetails,
-    User,
-    WriOrganization,
+  GroupTree,
+  GroupsmDetails,
+  User,
+  WriOrganization,
 } from '@/schema/ckan.schema'
 import {
-    getGroups,
-    getAllOrganizations,
-    searchHierarchy,
-    findAllNameInTree,
-    getAllDatasetFq,
-    fetchFacets,
+  getGroups,
+  getAllOrganizations,
+  searchHierarchy,
+  findAllNameInTree,
+  getAllDatasetFq,
+  fetchFacets,
 } from '@/utils/apiUtils'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
 import { json } from 'stream/consumers'
 import { flattenTree } from '@/utils/flattenGroupTree'
 
 export const teamRouter = createTRPCRouter({
-    getAllTeams: protectedProcedure.query(async ({ ctx }) => {
-        const user = ctx.session.user
-        const teamsMap = new Map()
-        const teamsList = await Promise.all(
-            [0, 1, 2, 3, 4, 5].map(async (i) => {
-                const teamRes = await fetch(
-                    user.sysadmin
-                        ? `${
-                              env.CKAN_URL
-                          }/api/action/organization_list?all_fields=True&include_extras=true&limit=${
-                              (i + 1) * 25
-                          }&offset=${i * 25}`
-                        : `${
-                              env.CKAN_URL
-                          }/api/action/organization_list_for_user?all_fields=True&include_extras=true&limit=${
-                              (i + 1) * 25
-                          }&offset=${i * 25}`,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `${user.apikey}`,
-                        },
-                    }
-                )
-                const teams: CkanResponse<WriOrganization[]> =
-                    await teamRes.json()
-                if (!teams.success && teams.error) {
-                    if (teams.error.message)
-                        throw Error(replaceNames(teams.error.message, true))
-                    throw Error(replaceNames(JSON.stringify(teams.error), true))
-                }
-                teams.result.forEach((team) => {
-                    if (teamsMap.has(team.id)) return
-                    teamsMap.set(team.id, team)
-                })
-            })
-        )
-        return Array.from(teamsMap.values()).sort((a, b) => {
-            const nameA = a.name.toLowerCase()
-            const nameB = b.name.toLowerCase()
-            return nameA.localeCompare(nameB, undefined, {
-                numeric: true,
-                sensitivity: 'base',
-            })
-        })
-    }),
-    editTeam: protectedProcedure
-        .input(TeamSchema)
-        .mutation(async ({ ctx, input }) => {
-            try {
-                const user = ctx.session.user
-
-                // only sysadmin is allowed to create Parent teams
-                if (
-                    !user.sysadmin &&
-                    (!input.parent || input.parent.value === '')
-                )
-                    throw Error('Only sysadmin can create parent teams')
-
-                var newMembers = []
-                for (const member of input.members) {
-                    newMembers.push({
-                        name: member.user.value,
-                        capacity: member.capacity.value,
-                    })
-                }
-                try {
-                    sendMemberNotifications(
-                        user.id,
-                        newMembers,
-                        input.users,
-                        input.id,
-                        'team'
-                    )
-                } catch (e) {
-                    console.error(e)
-                }
-                input.users = newMembers
-                const body = JSON.stringify({
-                    ...input,
-                    image_display_url: input.image_url
-                        ? `${env.CKAN_URL}/uploads/group/${input.image_url}`
-                        : null,
-                    groups:
-                        input.parent && input.parent.value !== ''
-                            ? [{ name: input.parent.value }]
-                            : [],
-                    visibility: input.visibility.value,
-                })
-                const teamRes = await fetch(
-                    `${env.CKAN_URL}/api/action/organization_patch`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `${user.apikey}`,
-                        },
-                        body,
-                    }
-                )
-                const team: CkanResponse<Organization> = await teamRes.json()
-                if (!team.success && team.error) {
-                    if (team.error.message)
-                        throw Error(replaceNames(team.error.message, true))
-                    throw Error(replaceNames(JSON.stringify(team.error), true))
-                }
-                return team.result
-            } catch (e) {
-                let error =
-                    'Something went wrong please contact the system administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(replaceNames(error, true))
-            }
-        }),
-    getTeam: protectedProcedure
-        .input(z.object({ id: z.string() }))
-        .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
-            const teamRes = await fetch(
-                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True&include_extras=true`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            )
-            const team: CkanResponse<
-                WriOrganization & {
-                    groups: Organization[]
-                }
-            > = await teamRes.json()
-            return {
-                ...team.result,
-                parent: team.result.groups[0]?.name ?? null,
-            }
-        }),
-    deleteTeam: protectedProcedure
-        .input(z.object({ id: z.string() }))
-        .mutation(async ({ ctx, input }) => {
-            const user = ctx.session.user
-            const teamRes = await fetch(
-                `${env.CKAN_URL}/api/action/organization_delete`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                    body: JSON.stringify({ id: input.id }),
-                }
-            )
-            const team: CkanResponse<
-                Organization & { groups: Organization[] }
-            > = await teamRes.json()
-            if (!team.success && team.error) {
-                if (team.error.message)
-                    throw Error(replaceNames(team.error.message, true))
-                throw Error(replaceNames(JSON.stringify(team.error), true))
-            }
-            return {
-                ...team.result,
-            }
-        }),
-    getTeamUsers: protectedProcedure
-        .input(z.object({ id: z.string(), capacity: z.string().optional() }))
-        .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
-            const membersListRes = await fetch(
-                `${env.CKAN_URL}/api/action/member_list?id=${input.id}${
-                    input.capacity ? `&capacity=${input.capacity}` : ''
-                }&object_type=user`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            )
-            const membersList: CkanResponse<string[][]> =
-                await membersListRes.json()
-            return membersList.result
-        }),
-    createTeam: protectedProcedure
-        .input(TeamSchema)
-        .mutation(async ({ ctx, input }) => {
-            try {
-                const user = ctx.session.user
-
-                // only sysadmin is allowed to create Parent teams
-                if (
-                    !user.sysadmin &&
-                    (!input.parent || input.parent.value === '')
-                )
-                    throw Error('Only sysadmin can create parent teams')
-
-                const body = JSON.stringify({
-                    ...input,
-                    image_display_url: input.image_url
-                        ? `${env.CKAN_URL}/uploads/group/${input.image_url}`
-                        : null,
-                    groups:
-                        input.parent && input.parent.value !== ''
-                            ? [{ name: input.parent.value }]
-                            : [],
-                    visibility: input.visibility.value,
-                })
-
-                const teamRes = await fetch(
-                    `${env.CKAN_URL}/api/action/organization_create`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `${user.apikey}`,
-                        },
-                        body,
-                    }
-                )
-                const team: CkanResponse<Organization> = await teamRes.json()
-                if (!team.success && team.error) {
-                    if (team.error.message)
-                        throw Error(replaceNames(team.error.message, true))
-                    throw Error(replaceNames(JSON.stringify(team.error), true))
-                }
-                return team.result
-            } catch (e) {
-                let error =
-                    'Something went wrong please contact the system administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(replaceNames(error, true))
-            }
-        }),
-    deleteDashboardTeam: protectedProcedure
-        .input(z.string())
-        .mutation(async ({ input, ctx }) => {
-            const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/organization_delete`,
-                {
-                    method: 'POST',
-                    body: JSON.stringify({ id: input }),
-                    headers: {
-                        Authorization: ctx.session.user.apikey,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
-            const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error)
-                throw Error(replaceNames(data.error.message, true))
-            return data
-        }),
-    getGeneralTeam: publicProcedure
-        .input(searchSchema)
-        .query(async ({ input, ctx }) => {
-            const [groupTree, allGroups] = await Promise.all([
-                searchHierarchy({
-                    isSysadmin: true,
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    q: '',
-                    group_type: 'organization',
-                }),
-
-                await getAllOrganizations({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                }),
-            ])
-
-            if (groupTree.length === 0) {
-                return {
-                    teams: groupTree,
-                    teamsDetails: {} as Record<string, GroupsmDetails>,
-                    count: 0,
-                }
-            }
-            const teamDetails = allGroups.reduce(
-                (acc, org) => {
-                    acc[org.id] = {
-                        img_url: org.image_display_url ?? '',
-                        description: org.description ?? '',
-                        package_count: org.package_count!,
-                        name: org.name,
-                    }
-                    return acc
-                },
-                {} as Record<string, GroupsmDetails>
-            )
-
-            const facets = await fetchFacets(
-                teamDetails,
-                'organization',
-                ctx?.session?.user.apikey ?? ''
-            )
-
-            for (const group in teamDetails) {
-                const team = teamDetails[group]!
-                team.package_count = facets[team.name] ?? 0
-            }
-
-            const result = groupTree
-            return {
-                teams: result,
-                allTeams: allGroups,
-                teamsDetails: teamDetails,
-                count: result.length,
-            }
-        }),
-    getPossibleMembers: protectedProcedure
-        .input(z.object({ id: z.string() }))
-        .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
-            const teamRes = await fetch(
-                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            )
-            const team: CkanResponse<
-                Organization & { groups: Organization[] }
-            > = await teamRes.json()
-            if (!team.success && team.error) {
-                if (team.error.message)
-                    throw Error(replaceNames(team.error.message, true))
-                throw Error(replaceNames(JSON.stringify(team.error), true))
-            }
-            const teamUsers = team?.result?.users?.map(
-                (user) => user.name
-            ) as string[]
-            const usersRes = await fetch(
-                `${env.CKAN_URL}/api/action/user_list?all_fields=True&limit=1000`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            )
-            const users: CkanResponse<User[]> = await usersRes.json()
-            if (!users.success && users.error) {
-                if (users.error.message)
-                    throw Error(replaceNames(users.error.message, true))
-                throw Error(replaceNames(JSON.stringify(users.error), true))
-            }
-
-            return users.result.filter(
-                (user) => user.name && !teamUsers.includes(user.name)
-            )
-        }),
-    getCurrentMembers: protectedProcedure
-        .input(z.object({ id: z.string() }))
-        .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
-            const teamRes = await fetch(
-                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            )
-            const team: CkanResponse<
-                Organization & { groups: Organization[] }
-            > = await teamRes.json()
-            if (!team.success && team.error) {
-                if (team.error.message)
-                    throw Error(replaceNames(team.error.message, true))
-                throw Error(replaceNames(JSON.stringify(team.error), true))
-            }
-
-            return team.result.users
-        }),
-    list: publicProcedure.query(async ({ ctx, input }) => {
+  getAllTeams: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.session.user
+    const teamsMap = new Map()
+    const teamsList = await Promise.all(
+      [0, 1, 2, 3, 4, 5].map(async (i) => {
         const teamRes = await fetch(
-            `${env.CKAN_URL}/api/action/organization_list?all_fields=True`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }
+          user.sysadmin
+            ? `${env.CKAN_URL
+            }/api/action/organization_list?all_fields=True&include_extras=true&limit=${(i + 1) * 25
+            }&offset=${i * 25}`
+            : `${env.CKAN_URL
+            }/api/action/organization_list_for_user?all_fields=True&include_extras=true&limit=${(i + 1) * 25
+            }&offset=${i * 25}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `${user.apikey}`,
+            },
+          }
         )
-
-        const team: CkanResponse<Organization[]> = await teamRes.json()
-        if (!team.success && team.error)
-            throw Error(replaceNames(team.error.message))
-        return {
-            teams: team.result,
+        const teams: CkanResponse<WriOrganization[]> =
+          await teamRes.json()
+        if (!teams.success && teams.error) {
+          if (teams.error.message)
+            throw Error(replaceNames(teams.error.message, true))
+          throw Error(replaceNames(JSON.stringify(teams.error), true))
         }
-    }),
-    getNumberOfSubTeams: publicProcedure.query(async ({ ctx, input }) => {
-        const teamRes = await fetch(
-            `${env.CKAN_URL}/api/3/action/organization_list_wri`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${ctx?.session?.user.apikey}`,
-                },
-            }
+        teams.result.forEach((team) => {
+          if (teamsMap.has(team.id)) return
+          teamsMap.set(team.id, team)
+        })
+      })
+    )
+    return Array.from(teamsMap.values()).sort((a, b) => {
+      const nameA = a.name.toLowerCase()
+      const nameB = b.name.toLowerCase()
+      return nameA.localeCompare(nameB, undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      })
+    })
+  }),
+  editTeam: protectedProcedure
+    .input(TeamSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const user = ctx.session.user
+
+        // only sysadmin is allowed to create Parent teams
+        if (
+          !user.sysadmin &&
+          (!input.parent || input.parent.value === '')
         )
-        const team: CkanResponse<GroupTree[]> = await teamRes.json()
-        if (!team.success && team.error)
-            throw Error(replaceNames(team.error.message))
-        const numOfSubtopics = flattenTree(team.result)
-        return numOfSubtopics
+          throw Error('Only sysadmin can create parent teams')
+
+        var newMembers = []
+        for (const member of input.members) {
+          newMembers.push({
+            name: member.user.value,
+            capacity: member.capacity.value,
+          })
+        }
+        try {
+          sendMemberNotifications(
+            user.id,
+            newMembers,
+            input.users,
+            input.id,
+            'team'
+          )
+        } catch (e) {
+          console.error(e)
+        }
+        input.users = newMembers
+        const body = JSON.stringify({
+          ...input,
+          image_display_url: input.image_url
+            ? `${env.CKAN_URL}/uploads/group/${input.image_url}`
+            : null,
+          groups:
+            input.parent && input.parent.value !== ''
+              ? [{ name: input.parent.value }]
+              : [],
+          visibility: input.visibility.value,
+        })
+        const teamRes = await fetch(
+          `${env.CKAN_URL}/api/action/organization_patch`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `${user.apikey}`,
+            },
+            body,
+          }
+        )
+        const team: CkanResponse<Organization> = await teamRes.json()
+        if (!team.success && team.error) {
+          if (team.error.message)
+            throw Error(replaceNames(team.error.message, true))
+          throw Error(replaceNames(JSON.stringify(team.error), true))
+        }
+        return team.result
+      } catch (e) {
+        let error =
+          'Something went wrong please contact the system administrator'
+        if (e instanceof Error) error = e.message
+        throw Error(replaceNames(error, true))
+      }
     }),
-    removeMember: protectedProcedure
-        .input(z.object({ id: z.string(), username: z.string() }))
-        .mutation(async ({ ctx, input }) => {
-            const user = ctx.session.user
-            const teamRes = await fetch(
-                `${env.CKAN_URL}/api/action/member_delete`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                    body: JSON.stringify({
-                        id: input.id,
-                        object: input.username,
-                        object_type: 'user',
-                    }),
-                }
-            )
-            const team: CkanResponse<
-                Organization & { groups: Organization[] }
-            > = await teamRes.json()
-            if (!team.success && team.error) {
-                if (team.error.message)
-                    throw Error(replaceNames(team.error.message, true))
-                throw Error(replaceNames(JSON.stringify(team.error), true))
-            }
-            return team.result
+  getTeam: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user
+      const teamRes = await fetch(
+        `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True&include_extras=true`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      )
+      const team: CkanResponse<
+        WriOrganization & {
+          groups: Organization[]
+        }
+      > = await teamRes.json()
+      return {
+        ...team.result,
+        parent: team.result.groups[0]?.name ?? null,
+      }
+    }),
+  deleteTeam: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.session.user
+      const teamRes = await fetch(
+        `${env.CKAN_URL}/api/action/organization_delete`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+          body: JSON.stringify({ id: input.id }),
+        }
+      )
+      const team: CkanResponse<
+        Organization & { groups: Organization[] }
+      > = await teamRes.json()
+      if (!team.success && team.error) {
+        if (team.error.message)
+          throw Error(replaceNames(team.error.message, true))
+        throw Error(replaceNames(JSON.stringify(team.error), true))
+      }
+      return {
+        ...team.result,
+      }
+    }),
+  getTeamUsers: protectedProcedure
+    .input(z.object({ id: z.string(), capacity: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user
+      const membersListRes = await fetch(
+        `${env.CKAN_URL}/api/action/member_list?id=${input.id}${input.capacity ? `&capacity=${input.capacity}` : ''
+        }&object_type=user`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      )
+      const membersList: CkanResponse<string[][]> =
+        await membersListRes.json()
+      return membersList.result
+    }),
+  createTeam: protectedProcedure
+    .input(TeamSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const user = ctx.session.user
+
+        // only sysadmin is allowed to create Parent teams
+        if (
+          !user.sysadmin &&
+          (!input.parent || input.parent.value === '')
+        )
+          throw Error('Only sysadmin can create parent teams')
+
+        const body = JSON.stringify({
+          ...input,
+          image_display_url: input.image_url
+            ? `${env.CKAN_URL}/uploads/group/${input.image_url}`
+            : null,
+          groups:
+            input.parent && input.parent.value !== ''
+              ? [{ name: input.parent.value }]
+              : [],
+          visibility: input.visibility.value,
+        })
+
+        const teamRes = await fetch(
+          `${env.CKAN_URL}/api/action/organization_create`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `${user.apikey}`,
+            },
+            body,
+          }
+        )
+        const team: CkanResponse<Organization> = await teamRes.json()
+        if (!team.success && team.error) {
+          if (team.error.message)
+            throw Error(replaceNames(team.error.message, true))
+          throw Error(replaceNames(JSON.stringify(team.error), true))
+        }
+        return team.result
+      } catch (e) {
+        let error =
+          'Something went wrong please contact the system administrator'
+        if (e instanceof Error) error = e.message
+        throw Error(replaceNames(error, true))
+      }
+    }),
+  deleteDashboardTeam: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ input, ctx }) => {
+      const response = await fetch(
+        `${env.CKAN_URL}/api/3/action/organization_delete`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ id: input }),
+          headers: {
+            Authorization: ctx.session.user.apikey,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+      const data = (await response.json()) as CkanResponse<null>
+      if (!data.success && data.error)
+        throw Error(replaceNames(data.error.message, true))
+      return data
+    }),
+  getGeneralTeam: publicProcedure
+    .input(searchSchema)
+    .query(async ({ input, ctx }) => {
+      const [groupTree, allGroups] = await Promise.all([
+        searchHierarchy({
+          isSysadmin: ctx.session?.user.sysadmin ?? false,
+          apiKey: ctx?.session?.user.apikey ?? '',
+          q: '',
+          group_type: 'organization',
         }),
+
+        await getAllOrganizations({
+          apiKey: ctx?.session?.user.apikey ?? '',
+        }),
+      ])
+
+      if (groupTree.length === 0) {
+        return {
+          teams: groupTree,
+          teamsDetails: {} as Record<string, GroupsmDetails>,
+          count: 0,
+        }
+      }
+      const teamDetails = allGroups.reduce(
+        (acc, org) => {
+          acc[org.id] = {
+            img_url: org.image_display_url ?? '',
+            description: org.description ?? '',
+            package_count: org.package_count!,
+            name: org.name,
+          }
+          return acc
+        },
+        {} as Record<string, GroupsmDetails>
+      )
+
+      const facets = await fetchFacets(
+        teamDetails,
+        'organization',
+        ctx?.session?.user.apikey ?? ''
+      )
+
+      for (const group in teamDetails) {
+        const team = teamDetails[group]!
+        team.package_count = facets[team.name] ?? 0
+      }
+
+      const result = groupTree
+      return {
+        teams: result,
+        allTeams: allGroups,
+        teamsDetails: teamDetails,
+        count: result.length,
+      }
+    }),
+  getPossibleMembers: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user
+      const teamRes = await fetch(
+        `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      )
+      const team: CkanResponse<
+        Organization & { groups: Organization[] }
+      > = await teamRes.json()
+      if (!team.success && team.error) {
+        if (team.error.message)
+          throw Error(replaceNames(team.error.message, true))
+        throw Error(replaceNames(JSON.stringify(team.error), true))
+      }
+      const teamUsers = team?.result?.users?.map(
+        (user) => user.name
+      ) as string[]
+      const usersRes = await fetch(
+        `${env.CKAN_URL}/api/action/user_list?all_fields=True&limit=1000`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      )
+      const users: CkanResponse<User[]> = await usersRes.json()
+      if (!users.success && users.error) {
+        if (users.error.message)
+          throw Error(replaceNames(users.error.message, true))
+        throw Error(replaceNames(JSON.stringify(users.error), true))
+      }
+
+      return users.result.filter(
+        (user) => user.name && !teamUsers.includes(user.name)
+      )
+    }),
+  getCurrentMembers: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user
+      const teamRes = await fetch(
+        `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      )
+      const team: CkanResponse<
+        Organization & { groups: Organization[] }
+      > = await teamRes.json()
+      if (!team.success && team.error) {
+        if (team.error.message)
+          throw Error(replaceNames(team.error.message, true))
+        throw Error(replaceNames(JSON.stringify(team.error), true))
+      }
+
+      return team.result.users
+    }),
+  list: publicProcedure.query(async ({ ctx, input }) => {
+    const teamRes = await fetch(
+      `${env.CKAN_URL}/api/action/organization_list?all_fields=True`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    const team: CkanResponse<Organization[]> = await teamRes.json()
+    if (!team.success && team.error)
+      throw Error(replaceNames(team.error.message))
+    return {
+      teams: team.result,
+    }
+  }),
+  getNumberOfSubTeams: publicProcedure.query(async ({ ctx, input }) => {
+    const teamRes = await fetch(
+      `${env.CKAN_URL}/api/3/action/organization_list_wri`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${ctx?.session?.user.apikey}`,
+        },
+      }
+    )
+    const team: CkanResponse<GroupTree[]> = await teamRes.json()
+    if (!team.success && team.error)
+      throw Error(replaceNames(team.error.message))
+    const numOfSubtopics = flattenTree(team.result)
+    return numOfSubtopics
+  }),
+  removeMember: protectedProcedure
+    .input(z.object({ id: z.string(), username: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.session.user
+      const teamRes = await fetch(
+        `${env.CKAN_URL}/api/action/member_delete`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+          body: JSON.stringify({
+            id: input.id,
+            object: input.username,
+            object_type: 'user',
+          }),
+        }
+      )
+      const team: CkanResponse<
+        Organization & { groups: Organization[] }
+      > = await teamRes.json()
+      if (!team.success && team.error) {
+        if (team.error.message)
+          throw Error(replaceNames(team.error.message, true))
+        throw Error(replaceNames(JSON.stringify(team.error), true))
+      }
+      return team.result
+    }),
 })
