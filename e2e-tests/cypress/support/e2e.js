@@ -242,16 +242,16 @@ Cypress.Commands.add("createGroupAPI", (name, parent = null) => {
     headers: headers,
     body: parent
       ? {
-          name: name,
-          title: name,
-          description: "Some sub-topic description",
-          groups: [{ name: parent }],
-        }
+        name: name,
+        title: name,
+        description: "Some sub-topic description",
+        groups: [{ name: parent }],
+      }
       : {
-          name: name,
-          title: name,
-          description: "Some group description",
-        },
+        name: name,
+        title: name,
+        description: "Some group description",
+      },
   });
 });
 
@@ -644,3 +644,15 @@ Cypress.Commands.add(
     );
   }
 );
+
+Cypress.Commands.add('clearCkanDevSessionCookies', () => {
+  const origin = 'http://ckan-dev:5000';
+
+  cy.origin(origin, () => {
+    cy.getAllCookies().then((cookies) => {
+      cookies.forEach((cookie) => {
+        cy.clearCookie(cookie.name, { domain: cookie.domain });
+      });
+    });
+  });
+});

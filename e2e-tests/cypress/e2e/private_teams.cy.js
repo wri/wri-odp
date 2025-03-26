@@ -88,7 +88,8 @@ describe("Create and edit team", () => {
     },
     () => {
       cy.wait(2000)
-      cy.viewport(1600, 1000);
+      cy.clearCkanDevSessionCookies();
+      cy.viewport(1600, 1200);
       cy.clearCookies();
       cy.clearLocalStorage();
       cy.clearAllSessionStorage();
