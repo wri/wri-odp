@@ -87,8 +87,7 @@ describe("Create and edit team", () => {
       },
     },
     () => {
-      cy.logout();
-      cy.visit(`/dashboard/teams/${parentOrg}`);
+      cy.wait(1000)
       cy.logout();
       cy.wait(1000)
       cy.visit("/teams");
