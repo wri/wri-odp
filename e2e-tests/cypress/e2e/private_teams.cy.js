@@ -68,6 +68,8 @@ describe("Create and edit team", () => {
   });
 
   it("should edit parent team to private", () => {
+    cy.logout();
+    cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
       cy.get("button#visibility").click();
@@ -96,7 +98,7 @@ describe("Create and edit team", () => {
 
 
   it("Should edit parent team to public", () => {
-    cy.logou();
+    cy.logout();
     cy.login(normalUser, normalUserPassword);
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.wait(10000);
@@ -108,6 +110,8 @@ describe("Create and edit team", () => {
   });
 
   it("Should edit team and assign public dataset and edit team back to private", () => {
+    cy.logout();
+    cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/datasets/new`);
     cy.wait(10000);
     cy.get("input[name=title]").type(datasetSuffix);
