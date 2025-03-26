@@ -20,11 +20,8 @@ describe("Create and edit team", () => {
     cy.createOrganizationAPI(parentOrg);
   });
 
-  beforeEach(function() {
-    cy.login(ckanUserName, ckanUserPassword);
-  });
-
   it("Should create team", () => {
+    cy.login(ckanUserName, ckanUserPassword);
     cy.visit("/dashboard/teams/new");
     //get input with name=title
     cy.wait(6000);
@@ -87,6 +84,7 @@ describe("Create and edit team", () => {
       },
     },
     () => {
+      cy.logout();
       cy.clearCookies();
       cy.clearLocalStorage();
       cy.clearAllSessionStorage();
@@ -98,7 +96,7 @@ describe("Create and edit team", () => {
 
 
   it("Should edit parent team to public", () => {
-    cy.logout();
+    cy.logou();
     cy.login(normalUser, normalUserPassword);
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.wait(10000);
