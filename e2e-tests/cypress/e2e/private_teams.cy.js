@@ -87,8 +87,9 @@ describe("Create and edit team", () => {
       },
     },
     () => {
-      cy.wait(1000)
-      cy.logout();
+      cy.clearCookies();
+      cy.clearLocalStorage();
+      cy.clearSessionStorage();
       cy.wait(1000)
       cy.visit("/teams");
       cy.contains(parentOrg).should("not.exist");
