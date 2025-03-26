@@ -1,7 +1,7 @@
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
-const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
+const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
 const normalUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const normalUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_member`;
@@ -73,6 +73,8 @@ describe("Create and edit team", () => {
       cy.get("button#visibility").click();
       cy.get("li").contains("Private").click();
       cy.get("button[type=submit]").click();
+      cy.contains(`Successfully edited the ${parentOrg} team`)
+      cy.wait(5000)
     });
   });
 
@@ -87,6 +89,7 @@ describe("Create and edit team", () => {
       cy.clearCookies();
       cy.clearLocalStorage();
       cy.clearAllSessionStorage();
+      cy.login(ckanUserName, ckanUserPassword);
       cy.wait(1000)
       cy.visit("/teams");
       cy.contains(parentOrg).should("not.exist");
@@ -95,7 +98,6 @@ describe("Create and edit team", () => {
 
 
   it("Should edit parent team to public", () => {
-    cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.wait(10000);
       cy.get("input[name=title]").should("have.value", parentOrg);
@@ -108,8 +110,8 @@ describe("Create and edit team", () => {
   it("Should edit team and assign public dataset and edit team back to private", () => {
     cy.visit(`/dashboard/datasets/new`);
     cy.wait(10000);
-    cy.get("input[name=title]").type(datasetSuffix);
-    cy.get("input[name=name]").should("have.value", datasetSuffix);
+    cy.get("input[name=title]").type(datasetName);
+    cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("input[name=url]").type("https://google.com");
     cy.get("#language").click();
     cy.get("li").contains("English").click();
@@ -137,7 +139,9 @@ describe("Create and edit team", () => {
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
-    cy.wait(10000);
+    cy.contains(`Successfully created the "${datasetName}" dataset`, {
+      timeout: 20000,
+    });
 
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
@@ -152,7 +156,7 @@ describe("Create and edit team", () => {
   });
 
   after(() => {
-    cy.deleteDatasetAPI(datasetSuffix);
+    cy.deleteDatasetAPI(datasetName);
     cy.deleteOrganizationAPI(org);
     cy.deleteOrganizationAPI(parentOrg);
   });
