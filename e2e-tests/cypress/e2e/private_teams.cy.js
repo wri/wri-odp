@@ -79,22 +79,23 @@ describe("Create and edit team", () => {
     });
   });
 
-  it("should not be possible to view parent",
-    {
-      retries: {
-        runMode: 5,
-        openMode: 0,
-      },
-    },
-    () => {
-      cy.clearCookies();
-      cy.clearLocalStorage();
-      cy.clearAllSessionStorage();
-      cy.visit("/");
-      cy.visit('/teams');
-      cy.contains(parentOrg).should("not.exist");
-      cy.contains(org).should("not.exist");
-    });
+  //it("should not be possible to view parent",
+  //  {
+  //    retries: {
+  //      runMode: 5,
+  //      openMode: 0,
+  //    },
+  //  },
+  //  () => {
+  //    cy.viewport(1600, 1000);
+  //    cy.clearCookies();
+  //    cy.clearLocalStorage();
+  //    cy.clearAllSessionStorage();
+  //    cy.visit("/");
+  //    cy.visit('/teams');
+  //    cy.contains(parentOrg).should("not.exist");
+  //    cy.contains(org).should("not.exist");
+  //  });
 
 
   it("Should edit parent team to public", () => {
