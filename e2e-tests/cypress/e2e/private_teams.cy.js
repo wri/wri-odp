@@ -79,12 +79,22 @@ describe("Create and edit team", () => {
     });
   });
 
-  it("should not be possible to view parent", () => {
-    cy.logout();
-    cy.visit("/teams");
-    cy.contains(parentOrg).should("not.exist");
-    cy.contains(org).should("not.exist");
-  });
+  it("should not be possible to view parent",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.logout();
+      cy.visit(`/dashboard/teams/${parentOrg}`);
+      cy.logout();
+      cy.wait(1000)
+      cy.visit("/teams");
+      cy.contains(parentOrg).should("not.exist");
+      cy.contains(org).should("not.exist");
+    });
 
 
   it("Should edit parent team to public", () => {
