@@ -61,6 +61,13 @@ describe("Create and edit team", () => {
     });
   });
 
+  it("should check if parent is private", () => {
+    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
+      cy.get("input[name=title]").should("have.value", parentOrg);
+      cy.get("button#visibility").should("contain.text", "Private");
+    });
+  });
+
   it("should view public parent and not private child", () => {
     cy.logout();
     cy.login(normalUser, normalUserPassword);
@@ -86,7 +93,6 @@ describe("Create and edit team", () => {
     cy.contains(parentOrg).should("not.exist");
     cy.contains(org).should("not.exist");
   });
-
 
   it("Should edit parent team to public", () => {
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
