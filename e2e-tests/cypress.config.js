@@ -19,7 +19,7 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       on('task', {
         table(violations) {
-         
+
           console.table(violations)
           return null
         },

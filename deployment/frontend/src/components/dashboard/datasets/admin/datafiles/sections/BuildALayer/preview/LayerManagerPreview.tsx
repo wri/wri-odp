@@ -1,11 +1,12 @@
 //@ts-ignore
-import { PluginMapboxGl } from 'layer-manager'
+import { PluginMapboxGl } from 'wri-layer-manager'
 import { useMap } from 'react-map-gl'
 import {
     Layer,
     LayerManager as VizzLayerManager,
+    //@ts-ignore
+} from 'wri-layer-manager/dist/components'
 //@ts-ignore
-} from 'layer-manager/dist/components'
 import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
 import pick from 'lodash/pick'
 import { CartoProvider } from '@/utils/providers/cartoProvider'

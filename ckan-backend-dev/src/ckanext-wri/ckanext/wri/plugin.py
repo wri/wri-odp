@@ -12,6 +12,7 @@ from ckanext.wri.logic.action.datapusher_download_subset import (
 from ckanext.wri.logic.action.datapusher_download_zip import (
     zipped_download_request,
     zipped_download_callback,
+    send_error_callback,
 )
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
@@ -32,6 +33,7 @@ from ckanext.wri.logic.action.create import (
     resource_create,
     old_package_create,
     download_event_create,
+    organization_create
 )
 from ckanext.wri.logic.action.update import (
     notification_update,
@@ -64,8 +66,13 @@ from ckanext.wri.logic.action.get import (
     issue_search_wri,
     package_collaborator_list_wri,
     resource_search,
+    organization_list_for_user,
+    organization_list,
+    organization_patch,
+    organization_show,
     package_show,
     get_download_events,
+    
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
@@ -257,12 +264,18 @@ class WriPlugin(plugins.SingletonPlugin):
             "old_package_patch": old_package_patch,
             "old_package_update": old_package_update,
             "resource_update": resource_update,
+            "organization_list_for_user": organization_list_for_user,
             "resource_create": resource_create,
+            'organization_list': organization_list,
+            'organization_patch': organization_patch,
+            'organization_show': organization_show,
             # "package_delete": package_delete,
             "package_show": package_show,
             "package_update": package_update,
             "download_event_create": download_event_create,
-            "download_event_list": get_download_events
+            "download_event_list": get_download_events,
+            "organization_create": organization_create,
+            "prefect_send_error_callback": send_error_callback,
         }
 
     # IPermissionLabels
@@ -498,6 +511,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def can_view(self):
         return True
+    
 
 
 class WriApiTracking(plugins.SingletonPlugin):

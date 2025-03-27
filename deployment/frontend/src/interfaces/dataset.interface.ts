@@ -1,5 +1,6 @@
 import { DataDictionaryFormType } from '@/schema/dataset.schema'
-import { Activity, Group, Organization } from '@portaljs/ckan'
+import { Activity, Group } from '@portaljs/ckan'
+import { Organization } from '@/schema/ckan.schema'
 import { APILayerSpec } from './layer.interface'
 import { PlotParams } from 'react-plotly.js'
 

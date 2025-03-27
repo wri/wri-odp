@@ -12,4 +12,3 @@ diff --git a/ckan/ckan/authz.py b/ckan/ckan/authz.py
      # Handle when permissions cascade. Check the user's roles on groups higher
      # in the group hierarchy for permission.
      for capacity in capacities:
-
