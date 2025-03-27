@@ -131,10 +131,14 @@ export const TopicRouter = createTRPCRouter({
             {} as Record<string, GroupsmDetails>
         )
         if (user) {
-            const facets = await fetchFacets(topicDetails, "groups", ctx?.session?.user.apikey ?? '')
+            const facets = await fetchFacets(
+                topicDetails,
+                'groups',
+                ctx?.session?.user.apikey ?? ''
+            )
             for (const group in topicDetails) {
                 const topic = topicDetails[group]!
-                topic.package_count = facets[topic.name] ?? 0;
+                topic.package_count = facets[topic.name] ?? 0
             }
         }
         return {
@@ -327,47 +331,18 @@ export const TopicRouter = createTRPCRouter({
     getGeneralTopics: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            let groupTree: GroupTree[] = []
-
-            if (input.search) {
-                groupTree = await searchHierarchy({
-                    isSysadmin: true,
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    q: input.search,
-                    group_type: 'group',
-                })
-
-                if (input.tree) {
-                    for (const gtree of groupTree) {
-                        const findtree = findNameInTree(gtree, input.search)
-                        if (findtree) {
-                            groupTree = [findtree]
-                            break
-                        }
-                    }
-                }
-                if (input.allTree) {
-                    const filterTree = groupTree.flatMap((group) => {
-                        const search = input.search.toLowerCase()
-                        if (
-                            group.name.toLowerCase().includes(search) ||
-                            group.title?.toLowerCase().includes(search)
-                        )
-                            return [group]
-                        const findtree = findAllNameInTree(group, search)
-                        return findtree
-                    })
-                    groupTree = filterTree
-                }
-            } else {
-                groupTree = await searchHierarchy({
+            const [groupTree, allGroups] = await Promise.all([
+                searchHierarchy({
                     isSysadmin: true,
                     apiKey: ctx?.session?.user.apikey ?? '',
                     q: '',
                     group_type: 'group',
-                })
-            }
-
+                }),
+                getUserGroups({
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    userId: '',
+                }),
+            ])
             if (groupTree.length === 0) {
                 return {
                     topics: groupTree,
@@ -375,12 +350,7 @@ export const TopicRouter = createTRPCRouter({
                     count: 0,
                 }
             }
-
-            const allGroups = (await getUserGroups({
-                apiKey: ctx?.session?.user.apikey ?? '',
-                userId: '',
-            }))!
-            const topicDetails = allGroups.reduce(
+            const topicDetails = (allGroups ?? []).reduce(
                 (acc, org) => {
                     acc[org.id] = {
                         img_url: org.image_display_url,
@@ -393,16 +363,21 @@ export const TopicRouter = createTRPCRouter({
                 {} as Record<string, GroupsmDetails>
             )
 
-            const facets = await fetchFacets(topicDetails, "groups", ctx?.session?.user.apikey ?? '')
+            const facets = await fetchFacets(
+                topicDetails,
+                'groups',
+                ctx?.session?.user.apikey ?? ''
+            )
 
             for (const group in topicDetails) {
-                const topic = topicDetails[group]!;
-                topic.package_count = facets[topic.name] ?? 0;
+                const topic = topicDetails[group]!
+                topic.package_count = facets[topic.name] ?? 0
             }
 
             const result = groupTree
             return {
                 topics: result,
+                allTopics: allGroups,
                 topicDetails: topicDetails,
                 count: result.length,
             }

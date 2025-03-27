@@ -363,3 +363,7 @@ li.osano-cm-drawer-item:nth-child(5) {
   align-items: center;
   gap: 0.3rem;
 }
+
+.mapbox-gl-draw_polygon.active {
+  background-color:  #F3B229 !important;
+}

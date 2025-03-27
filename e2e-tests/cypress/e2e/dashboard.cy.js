@@ -18,6 +18,8 @@ const application = `${uuid()}_application`;
 const user = `${uuid()}-user`;
 const email = `${uuid()}@gmail.com`;
 const userfullname = `${uuid()}-fullname`;
+const user_2 = `${uuid()}-test-user`;
+const user_email_2 = `${uuid()}@gmail.com`;
 
 describe("Dashboard Test", () => {
   let senderid;
@@ -27,25 +29,25 @@ describe("Dashboard Test", () => {
   before(() => {
     cy.createOrganizationAPI(parentOrg);
     cy.createDatasetAPI(parentOrg, datasetName, true, {
-        'notes': 'test',
-        'draft': 'true',
-        'approval_status': 'pending',
-        'short_description': 'test',
-        "technical_notes": "https://source.com/stat",
-        "visibility_type": "public",
-        "authors": [{ name: "Stephen Oni", email: "stephenoni2@gmail.com" }],
-        "maintainers": [{ name: "Stephen", email: "stephenoni2@gmail.com" }],
-        "update_frequency": "hourly",
-        "is_approved": "false",
-      });
+      notes: "test",
+      draft: "true",
+      approval_status: "pending",
+      short_description: "test",
+      technical_notes: "https://source.com/stat",
+      visibility_type: "public",
+      authors: [{ name: "Stephen Oni", email: "stephenoni2@gmail.com" }],
+      maintainers: [{ name: "Stephen", email: "stephenoni2@gmail.com" }],
+      update_frequency: "hourly",
+      is_approved: "false",
+    });
 
     cy.createOrganizationAPI(parentOrg2);
     cy.createDatasetAPI(parentOrg2, datasetName2, true);
-    
 
     cy.createGroupAPI(group);
     cy.createApplicationAPI(application);
     cy.createUserApi(user, email, "test1234");
+    cy.createUserApi(user_2, user_email_2, "test1234");
 
     cy.userMetadata(user).as("sender");
 
@@ -60,26 +62,25 @@ describe("Dashboard Test", () => {
             reciever.id,
             sender.id,
             dataset.id,
-            "new dataset",
+            "new dataset"
           );
           cy.addNotificationApi(
             reciever.id,
             sender.id,
             dataset.id,
-            "changed dataset",
+            "changed dataset"
           );
           cy.addNotificationApi(
             reciever.id,
             sender.id,
             dataset.id,
-            "deleted dataset",
+            "deleted dataset"
           );
         });
       });
     });
   });
 
-  
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
@@ -94,6 +95,21 @@ describe("Dashboard Test", () => {
     cy.contains("div", datasetName2).should("exist", { timeout: 15000 });
     cy.get("button#rowshow").first().click();
     cy.contains(parentOrg2);
+  });
+
+  it("Should test collaborator permission on dataset page", () => {
+    cy.addPackageCollaboratorApi(user_2, datasetName2, "admin");
+    cy.logout();
+    cy.login(user_2, "test1234");
+    cy.viewport("iphone-6");
+    cy.visit("/dashboard/datasets");
+    cy.get("#alldataset").should("exist");
+    cy.get("#alldataset").find("div").should("have.length.greaterThan", 0);
+
+    cy.get('input[type="search"]').type(datasetName2).type("{enter}");
+    cy.contains("div", datasetName2).should("exist", { timeout: 15000 });
+    const buttonId = `delete-tooltip-${datasetName2}`;
+    cy.get(`#${buttonId}`).should("be.visible");
   });
 
   it("Should test activity stream", () => {
@@ -194,12 +210,13 @@ describe("Dashboard Test", () => {
             .then(() => {
               cy.get("#unreadn").should("not.exist");
             });
-        },
+        }
       );
-    },
+    }
   );
 
-  it("should delete notification",
+  it(
+    "should delete notification",
     {
       retries: {
         runMode: 5,
@@ -207,38 +224,38 @@ describe("Dashboard Test", () => {
       },
     },
     () => {
-    cy.viewport(1440, 900);
-    cy.visit("/dashboard/notifications");
-    cy.get('input[name="notifications"]').eq(1).check();
-    cy.get('input[name="notifications"]').eq(1).should("be.checked");
-    cy.get("#deletenotification").click();
-    cy.get("#headlessui-portal-root", { timeout: 15000, force: true }).then(
-      () => {
-        cy.contains("button", "Delete Notification", { timeout: 30000 })
-          .click({ force: true })
-          .then(() => {
-            cy.contains(`Successfully deleted the notification`, {
-              timeout: 15000,
+      cy.viewport(1440, 900);
+      cy.visit("/dashboard/notifications");
+      cy.get('input[name="notifications"]').eq(1).check();
+      cy.get('input[name="notifications"]').eq(1).should("be.checked");
+      cy.get("#deletenotification").click();
+      cy.get("#headlessui-portal-root", { timeout: 15000, force: true }).then(
+        () => {
+          cy.contains("button", "Delete Notification", { timeout: 30000 })
+            .click({ force: true })
+            .then(() => {
+              cy.contains(`Successfully deleted the notification`, {
+                timeout: 15000,
+              });
             });
-          });
-      },
-    );
-  });
-  
+        }
+      );
+    }
+  );
+
   it("Should reject dataset", () => {
     cy.visit("/dashboard/approval-request");
-    cy.contains(datasetName,  { timeout: 30000 });
-     cy.get(`button#delete-tooltip-${datasetName}`)
+    cy.contains(datasetName, { timeout: 30000 });
+    cy.get(`button#delete-tooltip-${datasetName}`)
       .first()
       .click({ force: true });
 
     cy.get("input[id=title]").type("Test");
     cy.get(".tiptap.ProseMirror").type("Test");
-    cy.contains('button', 'Reject and send feedback').click({ force: true });
-    cy.wait(15000)
+    cy.contains("button", "Reject and send feedback").click({ force: true });
+    cy.wait(15000);
     // cy.contains(`Dataset ${datasetName} is successfully rejected`, { timeout: 30000 });
-
-  })
+  });
 
   it("Should have issues", () => {
     cy.visit("/datasets/" + datasetName + "?approval=true");
@@ -246,58 +263,57 @@ describe("Dashboard Test", () => {
     cy.get(".tiptap.ProseMirror").type("Test");
     cy.get("input[id=title]").type("Test");
     cy.get("button[id=reject]").click();
-    cy.wait(15000)
+    cy.wait(15000);
   });
 
   it("Should view issues", () => {
     cy.visit("/datasets/" + datasetName);
-    cy.wait(18000)
-    cy.contains("Issues").click({force: true});
+    cy.wait(18000);
+    cy.contains("Issues").click({ force: true });
     cy.contains("Test");
     cy.contains("Test").click();
-    cy.wait(15000)
+    cy.wait(15000);
     cy.get(".tiptap.ProseMirror").type("issue comment");
     cy.get("button").contains("Comment").click();
-    cy.wait(15000)
+    cy.wait(15000);
     cy.contains("issue comment", { timeout: 15000 });
-
-   })
-  
+  });
 
   it("Should be in awaiting approval", () => {
     cy.visit("/dashboard/datasets");
     cy.contains("Awaiting Approval").click();
-    cy.wait(15000)
+    cy.wait(15000);
     cy.get('input[type="search"]').type(datasetName).type("{enter}");
     cy.contains(datasetName).should("exist", { timeout: 15000 });
-  })
+  });
 
   it("Should edit pending dataset", () => {
     cy.visit("/dashboard/datasets/" + datasetName + "/edit");
     cy.get("input[name=title]")
       .clear()
       .type(datasetName + " EDITED");
-    cy.get("button").contains("Update Dataset").click({ force: true, });
+    cy.get("button").contains("Update Dataset").click({ force: true });
     cy.wait(20000);
-  })
+  });
 
   it("Should have approve dataset", () => {
     cy.visit("/dashboard/approval-request");
     cy.contains(datasetName, { timeout: 30000 });
     cy.get("button#rowshow").first().click();
-    cy.contains("Title")
-    cy.contains(datasetName + " EDITED")
+    cy.contains("Title");
+    cy.contains(datasetName + " EDITED");
     cy.get(`button#approve-tooltip-${datasetName}`)
       .first()
       .click({ force: true });
-    cy.contains('button', 'Approve Dataset').click({ force: true });
-    cy.wait(15000)
+    cy.contains("button", "Approve Dataset").click({ force: true });
+    cy.wait(15000);
     // cy.contains(`Successfully approved the dataset ${datasetName}`, {timeout: 20000});
-  })
-  
+  });
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);
     cy.deleteOrganizationAPI(parentOrg);
+    cy.deleteUserApi(user_2);
+    cy.deleteUserApi(user);
   });
 });
