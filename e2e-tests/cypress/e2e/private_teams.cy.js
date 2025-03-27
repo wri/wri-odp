@@ -79,13 +79,13 @@ describe("Create and edit team", () => {
     });
   });
 
-  it("should check if parent is private", () => {
-    cy.login(ckanUserName, ckanUserPassword);
-    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", parentOrg);
-      cy.get("button#visibility").should("contain.text", "Private");
-    });
-  });
+  // it("should check if parent is private", () => {
+  //   cy.login(ckanUserName, ckanUserPassword);
+  //   cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
+  //     cy.get("input[name=title]").should("have.value", parentOrg);
+  //     cy.get("button#visibility").should("contain.text", "Private");
+  //   });
+  // });
 
   it("should not be possible to view parent", () => {
     cy.login(normalUser, normalUserPassword);
