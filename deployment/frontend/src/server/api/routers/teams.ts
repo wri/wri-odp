@@ -22,11 +22,7 @@ import {
     searchHierarchy,
     findAllNameInTree,
     getAllDatasetFq,
-<<<<<<< HEAD
-    fetchFacets
-=======
     fetchFacets,
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
 } from '@/utils/apiUtils'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
 import { json } from 'stream/consumers'
@@ -320,8 +316,6 @@ export const teamRouter = createTRPCRouter({
                 },
                 {} as Record<string, GroupsmDetails>
             )
-        
-            const facets = await fetchFacets(teamDetails, "organization", ctx?.session?.user.apikey ?? '')
 
             const facets = await fetchFacets(
                 teamDetails,
@@ -330,13 +324,8 @@ export const teamRouter = createTRPCRouter({
             )
 
             for (const group in teamDetails) {
-<<<<<<< HEAD
-                const team = teamDetails[group]!;
-                team.package_count = facets[team.name] ?? 0;
-=======
                 const team = teamDetails[group]!
                 team.package_count = facets[team.name] ?? 0
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
             }
 
             const result = groupTree

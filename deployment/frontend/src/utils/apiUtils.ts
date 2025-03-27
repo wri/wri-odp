@@ -317,16 +317,12 @@ export async function getAllDatasetFq({
     extAddressQ?: string
     extGlobalQ?: string
     user?: boolean | null
-<<<<<<< HEAD
-}): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets; facets: FacetsCount }> {
-=======
 }): Promise<{
     datasets: WriDataset[]
     count: number
     searchFacets: Facets
     facets: FacetsCount
 }> {
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
     try {
         let url = `${env.CKAN_URL}/api/3/action/package_search?q=${query.search}`
 
@@ -1057,13 +1053,6 @@ export async function getOrganizationTreeDetails({
         },
         {} as Record<string, GroupsmDetails>
     )
-<<<<<<< HEAD
-    
-    const facets = await fetchFacets(teamDetails, 'organization', session?.user.apikey ?? '');
-    for (const group in teamDetails) {
-        const team = teamDetails[group]!;
-        team.package_count = facets[team.name] ?? 0;
-=======
 
     const facets = await fetchFacets(
         teamDetails,
@@ -1073,7 +1062,6 @@ export async function getOrganizationTreeDetails({
     for (const group in teamDetails) {
         const team = teamDetails[group]!
         team.package_count = facets[team.name] ?? 0
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
     }
 
     const result = groupTree
@@ -1089,28 +1077,18 @@ export async function fetchFacets(
     groupType: 'organization' | 'groups',
     apiKey: string
 ): Promise<Record<string, number>> {
-<<<<<<< HEAD
-    const fq = `(${Object.values(teamDetails).map(item => item.name).join(' OR ')})`;
-=======
     const fq = `(${Object.values(teamDetails)
         .map((item) => item.name)
         .join(' OR ')})`
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
 
     const facetsQuery = await getAllDatasetFq({
         apiKey: apiKey,
         fq: `${groupType}:${fq}+is_approved:true`,
         facetFields: [groupType],
         query: { search: '', page: { start: 0, rows: 0 } },
-<<<<<<< HEAD
-    });
-
-    return facetsQuery.facets[groupType] ?? {};
-=======
     })
 
     return facetsQuery.facets[groupType] ?? {}
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
 }
 
 export async function getTopicTreeDetails({
@@ -1172,13 +1150,6 @@ export async function getTopicTreeDetails({
         {} as Record<string, GroupsmDetails>
     )
 
-<<<<<<< HEAD
-    const facets = await fetchFacets(topicDetails, 'groups', session?.user.apikey ?? '');
-
-    for (const group in topicDetails) {
-        const topic = topicDetails[group]!;
-        topic.package_count = facets[topic.name] ?? 0;
-=======
     const facets = await fetchFacets(
         topicDetails,
         'groups',
@@ -1188,7 +1159,6 @@ export async function getTopicTreeDetails({
     for (const group in topicDetails) {
         const topic = topicDetails[group]!
         topic.package_count = facets[topic.name] ?? 0
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
     }
 
     const result = groupTree

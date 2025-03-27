@@ -153,10 +153,7 @@ function SubCardProfile({
                                 <Row
                                     key={index}
                                     highlighted={highlighted}
-<<<<<<< HEAD
-=======
                                     authorized={team?.capacity === 'admin'}
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
                                     groupStyle="group/item group-hover/item:visible "
                                     className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                                     rowMain={
@@ -230,10 +227,7 @@ function SubCardProfile({
                             <>
                                 <Row
                                     key={index}
-<<<<<<< HEAD
-=======
                                     authorized={team?.capacity === 'admin'}
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
                                     groupStyle="group/item group-hover/item:visible "
                                     className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                                     rowMain={
@@ -443,10 +437,7 @@ export default function TeamCard() {
                                 key={index}
                                 className={`pr-2`}
                                 highlighted={team?.highlighted}
-<<<<<<< HEAD
-=======
                                 authorized={team?.capacity === 'admin'}
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
                                 rowMain={
                                     <TeamProfile
                                         team={team}

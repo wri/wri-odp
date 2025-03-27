@@ -131,12 +131,6 @@ export const TopicRouter = createTRPCRouter({
             {} as Record<string, GroupsmDetails>
         )
         if (user) {
-<<<<<<< HEAD
-            const facets = await fetchFacets(topicDetails, "groups", ctx?.session?.user.apikey ?? '')
-            for (const group in topicDetails) {
-                const topic = topicDetails[group]!
-                topic.package_count = facets[topic.name] ?? 0;
-=======
             const facets = await fetchFacets(
                 topicDetails,
                 'groups',
@@ -145,7 +139,6 @@ export const TopicRouter = createTRPCRouter({
             for (const group in topicDetails) {
                 const topic = topicDetails[group]!
                 topic.package_count = facets[topic.name] ?? 0
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
             }
         }
         return {
@@ -370,13 +363,6 @@ export const TopicRouter = createTRPCRouter({
                 {} as Record<string, GroupsmDetails>
             )
 
-<<<<<<< HEAD
-            const facets = await fetchFacets(topicDetails, "groups", ctx?.session?.user.apikey ?? '')
-
-            for (const group in topicDetails) {
-                const topic = topicDetails[group]!;
-                topic.package_count = facets[topic.name] ?? 0;
-=======
             const facets = await fetchFacets(
                 topicDetails,
                 'groups',
@@ -386,7 +372,6 @@ export const TopicRouter = createTRPCRouter({
             for (const group in topicDetails) {
                 const topic = topicDetails[group]!
                 topic.package_count = facets[topic.name] ?? 0
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
             }
 
             const result = groupTree

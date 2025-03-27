@@ -64,9 +64,6 @@ export SCRIPT_NAME="/private-admin"
 if [ $? -eq 0 ]
 then
     # Start supervisord
-<<<<<<< HEAD
-    export ENV_SUPERVISOR_USER=$(whoami)
-=======
     echo "==================================="
     echo "SUPERVISOR_USER: $SUPERVISOR_USER"
     echo "SUPERVISOR_HOME: $SUPERVISOR_HOME"
@@ -78,7 +75,6 @@ then
     sed -i "s|SUPERVISOR_HOME|$SUPERVISOR_HOME|g" /etc/supervisord.d/worker.conf
     sed -i "s|SUPERVISOR_HOME|$SUPERVISOR_HOME|g" /etc/supervisord.conf
 
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
     supervisord --configuration /etc/supervisord.conf &
     # Start uwsgi
     sudo -u ckan -EH uwsgi $UWSGI_OPTS

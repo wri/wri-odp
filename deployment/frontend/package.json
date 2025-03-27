@@ -79,10 +79,6 @@
         "highlight.js": "^11.9.0",
         "js-deep-equals": "^2.1.1",
         "jwks-rsa": "^3.1.0",
-<<<<<<< HEAD
-        "layer-manager": "file:layer-manager-v3.1.0-wri-gfw.tgz",
-=======
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
         "lodash": "^4.17.21",
         "lowlight": "^3.1.0",
         "luma.gl": "^7.3.2",
@@ -126,10 +122,7 @@
         "usehooks-ts": "^2.9.1",
         "uuid": "^9.0.1",
         "vizzuality-components": "^3.0.3",
-<<<<<<< HEAD
-=======
         "wri-layer-manager": "^1.0.3",
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
         "xstate": "^4.38.3",
         "zod": "^3.22.4",
         "zustand": "^4.4.4",

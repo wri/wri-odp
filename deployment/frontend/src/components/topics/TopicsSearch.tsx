@@ -27,11 +27,7 @@ export default function TopicsSearch({
                 className="w-full px-8 xxl:px-0 max-w-8xl mx-auto -mt-[37px] "
             >
                 <div className="w-full max-w-[819px] xxl:pl-8 2xl:px-0 ">
-<<<<<<< HEAD
-                    <h1 className="text-[40px]  leading-[48px] font-['Acumin Pro SemiCondensed'] font-semibold text-white mb-[31px]">
-=======
                     <h1 className="text-[40px]  leading-[48px] font-acumin font-semibold text-white mb-[25px]">
->>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
                         {groupType}
                     </h1>
                 </div>
