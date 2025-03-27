@@ -1,0 +1,16 @@
+diff --git a/ckan/lib/dictization/model_save.py b/ckan/lib/dictization/model_save.py
+index 24b17e716..5eece2a57 100644
+--- a/ckan/lib/dictization/model_save.py
++++ b/ckan/lib/dictization/model_save.py
+@@ -47,8 +47,10 @@ def resource_dict_save(res_dict: dict[str, Any],
+ 
+     changed, skipped = obj.from_dict(res_dict)
+ 
+-    if 'url' in changed or ('last_modified' in changed and not new):
++    if "url" in changed:
+         obj.url_changed = True
++    elif "last_modified" in changed and not new:
++        obj.url_changed = False
+ 
+     if changed or obj.extras != skipped:
+         obj.metadata_modified = datetime.datetime.utcnow()

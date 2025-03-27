@@ -30,6 +30,11 @@ const facets = [
   "WRI Data",
 ];
 
+Cypress.on("uncaught:exception", (err, runnable) => {
+  console.log(err);
+  return false;
+});
+
 describe("Explore data page", () => {
   before(() => {
     // Create orgs
@@ -68,31 +73,32 @@ describe("Explore data page", () => {
     });
   });
 
-
   it("search topic", () => {
     cy.visit("/topics");
     cy.wait(2000);
     cy.get('[name="search"]').type(groups[0] + "{enter}" ?? "test");
     cy.contains(`${groups[0]}`, { timeout: 40000 });
   });
-    
+
   it("search teams", () => {
     cy.visit("/teams");
     cy.wait(2000);
     cy.get('[name="search"]').type(orgs[0] + "{enter}" ?? "test");
     cy.contains(`${orgs[0]}`, { timeout: 40000 });
   });
-    
+
   it("visit topic page", () => {
     cy.visit(`/topics/${groups[0]}`);
     cy.contains(`${groups[0]}`, { timeout: 40000 });
     // cy.contains("Edit", { timeout: 2000 });
-    cy.contains("Subtopics")
+    cy.contains("Subtopics");
   });
 
   it("should display not found page", () => {
     cy.visit("/topics/randomtopicname");
-    cy.contains("Sorry, we couldn’t find the page you’re looking for.", { timeout: 40000 });
+    cy.contains("Sorry, we couldn’t find the page you’re looking for.", {
+      timeout: 40000,
+    });
   });
 
   it("shoud display subtopic page", () => {

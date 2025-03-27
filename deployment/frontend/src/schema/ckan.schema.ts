@@ -148,6 +148,7 @@ export interface WriDataset extends Omit<Dataset, 'groups'> {
     is_approved?: boolean
     release_notes: string
     groups?: Array<Group | Application>
+    is_authorized?: boolean
 }
 
 export type WriDatasetWithoutDetails = Omit<WriDataset, 'resources'> & {
@@ -164,7 +165,7 @@ export interface OpenIn {
     url: string
 }
 
-interface Organization {
+export interface Organization {
     id: string
     name: string
     title: string
@@ -182,6 +183,7 @@ interface Organization {
     activity_stream?: Array<CkanActivity>
     users?: Array<User>
     tags?: Array<Tag>
+    visibility?: 'public' | 'private'
 }
 
 export type Application = Group & {
@@ -207,6 +209,7 @@ export interface WriOrganization extends Organization {
     groups?: Group[]
     users?: WriUser[]
     capacity?: string
+    parent?: string | null
 }
 
 export interface WriUser extends CkanUser {
@@ -223,6 +226,8 @@ export interface GroupTree {
     title?: string
     image_display_url?: string
     parent_name?: string
+    private?: boolean
+    capacity?: string
 }
 
 export interface Collaborator {

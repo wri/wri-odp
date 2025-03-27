@@ -15,6 +15,7 @@ export interface Option<V> {
     label: string
     value: V
     default?: boolean
+    disbaled?: boolean
 }
 
 interface SimpleSelectProps<T extends FieldValues, V extends Object> {
@@ -109,12 +110,13 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                         {options.map((option) => (
                                             <Listbox.Option
                                                 key={option.value}
+                                                disabled={option.disabled}
                                                 className={({ active }) =>
                                                     classNames(
                                                         active
                                                             ? 'bg-blue-800 text-white'
                                                             : 'text-gray-900',
-                                                        'relative cursor-default select-none py-2 pl-3 pr-9'
+                                                        `relative cursor-default select-none py-2 pl-3 pr-9 ${option.disabled ? 'opacity-50' : ''}`
                                                     )
                                                 }
                                                 value={option}
@@ -130,6 +132,13 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                                             )}
                                                         >
                                                             {option.label}
+                                                            {option?.visibility &&
+                                                            option.visibility ===
+                                                                'private' ? (
+                                                                <> &#128274;</>
+                                                            ) : (
+                                                                ''
+                                                            )}
                                                         </span>
                                                     </>
                                                 )}

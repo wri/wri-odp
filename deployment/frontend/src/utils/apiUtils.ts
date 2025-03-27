@@ -78,6 +78,7 @@ export async function searchHierarchy({
                         : 'organization_list_wri'
                 }`
             }
+
             response = await fetch(urLink, {
                 headers: {
                     Authorization: apiKey,
@@ -316,7 +317,16 @@ export async function getAllDatasetFq({
     extAddressQ?: string
     extGlobalQ?: string
     user?: boolean | null
+<<<<<<< HEAD
 }): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets; facets: FacetsCount }> {
+=======
+}): Promise<{
+    datasets: WriDataset[]
+    count: number
+    searchFacets: Facets
+    facets: FacetsCount
+}> {
+>>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
     try {
         let url = `${env.CKAN_URL}/api/3/action/package_search?q=${query.search}`
 
@@ -407,6 +417,33 @@ export async function getUserOrganizations({
         const organizations: WriOrganization[] | [] =
             data.success === true ? data.result : []
         return organizations
+    } catch (e) {
+        console.error(e)
+        return []
+    }
+}
+
+export async function getCollaboratorPackages({
+    userId,
+    apiKey,
+}: {
+    userId: string
+    apiKey: string
+}): Promise<Collaborator[]> {
+    try {
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/package_collaborator_list_for_user?id=${userId}`,
+            {
+                headers: {
+                    Authorization: `${apiKey}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+
+        const data = (await response.json()) as CkanResponse<Collaborator[]>
+        const collab: Collaborator[] = data.success === true ? data.result : []
+        return collab
     } catch (e) {
         console.error(e)
         return []
@@ -550,6 +587,19 @@ export async function getOneDataset(
     if (!dataset.success && dataset.error) {
         if (dataset.error.message) throw Error(dataset.error.message)
         throw Error(JSON.stringify(dataset.error))
+    }
+
+    if (dataset.result.owner_org) {
+        const org = await getOrgDetails({
+            orgId: dataset.result.owner_org,
+            apiKey: session?.user.apikey ?? '',
+        })
+
+        const visibility = org?.visibility || 'public'
+
+        const organization = dataset.result.organization!
+        organization.visibility = visibility
+        dataset.result = { ...dataset.result, organization }
     }
 
     if (dataset.result.rw_id && dataset.result.approval_status !== 'pending') {
@@ -707,7 +757,20 @@ export async function getOnePendingDataset(
         }
         throw Error(JSON.stringify(data.error))
     }
-    const dataset = data.result.package_data
+    let dataset = data.result.package_data
+
+    if (dataset.owner_org) {
+        const org = await getOrgDetails({
+            orgId: dataset.owner_org,
+            apiKey: session?.user.apikey ?? '',
+        })
+
+        const visibility = org?.visibility || 'public'
+
+        const organization = dataset.organization!
+        organization.visibility = visibility
+        dataset = { ...dataset, organization }
+    }
 
     // if (dataset.rw_id) {
     const resourceLayer = dataset.resources.filter(
@@ -931,6 +994,7 @@ export function findAllNameInTree(
 
     return result
 }
+
 export async function getOrganizationTreeDetails({
     input,
     session,
@@ -947,10 +1011,15 @@ export async function getOrganizationTreeDetails({
             q: input.search,
             group_type: 'organization',
         })
+
         if (input.tree) {
             for (const gtree of groupTree) {
                 const findtree = findNameInTree(gtree, input.search)
                 if (findtree) {
+                    if (findtree.private) {
+                        groupTree = []
+                        break
+                    }
                     groupTree = [findtree]
                     break
                 }
@@ -988,11 +1057,23 @@ export async function getOrganizationTreeDetails({
         },
         {} as Record<string, GroupsmDetails>
     )
+<<<<<<< HEAD
     
     const facets = await fetchFacets(teamDetails, 'organization', session?.user.apikey ?? '');
     for (const group in teamDetails) {
         const team = teamDetails[group]!;
         team.package_count = facets[team.name] ?? 0;
+=======
+
+    const facets = await fetchFacets(
+        teamDetails,
+        'organization',
+        session?.user.apikey ?? ''
+    )
+    for (const group in teamDetails) {
+        const team = teamDetails[group]!
+        team.package_count = facets[team.name] ?? 0
+>>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
     }
 
     const result = groupTree
@@ -1008,16 +1089,28 @@ export async function fetchFacets(
     groupType: 'organization' | 'groups',
     apiKey: string
 ): Promise<Record<string, number>> {
+<<<<<<< HEAD
     const fq = `(${Object.values(teamDetails).map(item => item.name).join(' OR ')})`;
+=======
+    const fq = `(${Object.values(teamDetails)
+        .map((item) => item.name)
+        .join(' OR ')})`
+>>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
 
     const facetsQuery = await getAllDatasetFq({
         apiKey: apiKey,
         fq: `${groupType}:${fq}+is_approved:true`,
         facetFields: [groupType],
         query: { search: '', page: { start: 0, rows: 0 } },
+<<<<<<< HEAD
     });
 
     return facetsQuery.facets[groupType] ?? {};
+=======
+    })
+
+    return facetsQuery.facets[groupType] ?? {}
+>>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
 }
 
 export async function getTopicTreeDetails({
@@ -1079,11 +1172,23 @@ export async function getTopicTreeDetails({
         {} as Record<string, GroupsmDetails>
     )
 
+<<<<<<< HEAD
     const facets = await fetchFacets(topicDetails, 'groups', session?.user.apikey ?? '');
 
     for (const group in topicDetails) {
         const topic = topicDetails[group]!;
         topic.package_count = facets[topic.name] ?? 0;
+=======
+    const facets = await fetchFacets(
+        topicDetails,
+        'groups',
+        session?.user.apikey ?? ''
+    )
+
+    for (const group in topicDetails) {
+        const topic = topicDetails[group]!
+        topic.package_count = facets[topic.name] ?? 0
+>>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
     }
 
     const result = groupTree

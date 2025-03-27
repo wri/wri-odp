@@ -5,7 +5,7 @@ import {
 } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import { CkanResponse, Collaborator } from '@/schema/ckan.schema'
-import { Organization } from '@portaljs/ckan'
+import { Organization } from '@/schema/ckan.schema'
 import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
@@ -22,7 +22,11 @@ import {
     searchHierarchy,
     findAllNameInTree,
     getAllDatasetFq,
+<<<<<<< HEAD
     fetchFacets
+=======
+    fetchFacets,
+>>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
 } from '@/utils/apiUtils'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
 import { json } from 'stream/consumers'
@@ -38,12 +42,12 @@ export const teamRouter = createTRPCRouter({
                     user.sysadmin
                         ? `${
                               env.CKAN_URL
-                          }/api/action/organization_list?all_fields=True&limit=${
+                          }/api/action/organization_list?all_fields=True&include_extras=true&limit=${
                               (i + 1) * 25
                           }&offset=${i * 25}`
                         : `${
                               env.CKAN_URL
-                          }/api/action/organization_list_for_user?all_fields=True&limit=${
+                          }/api/action/organization_list_for_user?all_fields=True&include_extras=true&limit=${
                               (i + 1) * 25
                           }&offset=${i * 25}`,
                     {
@@ -53,7 +57,8 @@ export const teamRouter = createTRPCRouter({
                         },
                     }
                 )
-                const teams: CkanResponse<Organization[]> = await teamRes.json()
+                const teams: CkanResponse<WriOrganization[]> =
+                    await teamRes.json()
                 if (!teams.success && teams.error) {
                     if (teams.error.message)
                         throw Error(replaceNames(teams.error.message, true))
@@ -79,6 +84,14 @@ export const teamRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const user = ctx.session.user
+
+                // only sysadmin is allowed to create Parent teams
+                if (
+                    !user.sysadmin &&
+                    (!input.parent || input.parent.value === '')
+                )
+                    throw Error('Only sysadmin can create parent teams')
+
                 var newMembers = []
                 for (const member of input.members) {
                     newMembers.push({
@@ -107,6 +120,7 @@ export const teamRouter = createTRPCRouter({
                         input.parent && input.parent.value !== ''
                             ? [{ name: input.parent.value }]
                             : [],
+                    visibility: input.visibility.value,
                 })
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_patch`,
@@ -138,7 +152,7 @@ export const teamRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const user = ctx.session.user
             const teamRes = await fetch(
-                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
+                `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True&include_extras=true`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -147,7 +161,9 @@ export const teamRouter = createTRPCRouter({
                 }
             )
             const team: CkanResponse<
-                WriOrganization & { groups: Organization[] }
+                WriOrganization & {
+                    groups: Organization[]
+                }
             > = await teamRes.json()
             return {
                 ...team.result,
@@ -205,6 +221,14 @@ export const teamRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const user = ctx.session.user
+
+                // only sysadmin is allowed to create Parent teams
+                if (
+                    !user.sysadmin &&
+                    (!input.parent || input.parent.value === '')
+                )
+                    throw Error('Only sysadmin can create parent teams')
+
                 const body = JSON.stringify({
                     ...input,
                     image_display_url: input.image_url
@@ -214,7 +238,9 @@ export const teamRouter = createTRPCRouter({
                         input.parent && input.parent.value !== ''
                             ? [{ name: input.parent.value }]
                             : [],
+                    visibility: input.visibility.value,
                 })
+
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_create`,
                     {
@@ -262,48 +288,18 @@ export const teamRouter = createTRPCRouter({
     getGeneralTeam: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            let groupTree: GroupTree[] = []
-
-            if (input.search) {
-                groupTree = await searchHierarchy({
-                    isSysadmin: true,
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    q: input.search,
-                    group_type: 'organization',
-                })
-
-                if (input.tree) {
-                    for (const gtree of groupTree) {
-                        const findtree = findNameInTree(gtree, input.search)
-                        if (findtree) {
-                            groupTree = [findtree]
-                            break
-                        }
-                    }
-                }
-
-                if (input.allTree) {
-                    const filterTree = groupTree.flatMap((group) => {
-                        const search = input.search.toLowerCase()
-                        if (
-                            group.name.toLowerCase().includes(search) ||
-                            group.title?.toLowerCase().includes(search)
-                        )
-                            return [group]
-                        const findtree = findAllNameInTree(group, input.search)
-                        return findtree
-                    })
-
-                    groupTree = filterTree
-                }
-            } else {
-                groupTree = await searchHierarchy({
+            const [groupTree, allGroups] = await Promise.all([
+                searchHierarchy({
                     isSysadmin: true,
                     apiKey: ctx?.session?.user.apikey ?? '',
                     q: '',
                     group_type: 'organization',
-                })
-            }
+                }),
+
+                await getAllOrganizations({
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                }),
+            ])
 
             if (groupTree.length === 0) {
                 return {
@@ -312,10 +308,6 @@ export const teamRouter = createTRPCRouter({
                     count: 0,
                 }
             }
-            const allGroups = (await getAllOrganizations({
-                apiKey: ctx?.session?.user.apikey ?? '',
-            }))!
-
             const teamDetails = allGroups.reduce(
                 (acc, org) => {
                     acc[org.id] = {
@@ -331,14 +323,26 @@ export const teamRouter = createTRPCRouter({
         
             const facets = await fetchFacets(teamDetails, "organization", ctx?.session?.user.apikey ?? '')
 
+            const facets = await fetchFacets(
+                teamDetails,
+                'organization',
+                ctx?.session?.user.apikey ?? ''
+            )
+
             for (const group in teamDetails) {
+<<<<<<< HEAD
                 const team = teamDetails[group]!;
                 team.package_count = facets[team.name] ?? 0;
+=======
+                const team = teamDetails[group]!
+                team.package_count = facets[team.name] ?? 0
+>>>>>>> 5b29a5e10ef85064e84332503b6def4fa9dbce7e
             }
 
             const result = groupTree
             return {
                 teams: result,
+                allTeams: allGroups,
                 teamsDetails: teamDetails,
                 count: result.length,
             }
@@ -420,6 +424,7 @@ export const teamRouter = createTRPCRouter({
                 },
             }
         )
+
         const team: CkanResponse<Organization[]> = await teamRes.json()
         if (!team.success && team.error)
             throw Error(replaceNames(team.error.message))
@@ -429,10 +434,11 @@ export const teamRouter = createTRPCRouter({
     }),
     getNumberOfSubTeams: publicProcedure.query(async ({ ctx, input }) => {
         const teamRes = await fetch(
-            `${env.CKAN_URL}/api/action/organization_list_wri?q=`,
+            `${env.CKAN_URL}/api/3/action/organization_list_wri`,
             {
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `${ctx?.session?.user.apikey}`,
                 },
             }
         )

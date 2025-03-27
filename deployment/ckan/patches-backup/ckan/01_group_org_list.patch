@@ -1,0 +1,13 @@
+diff --git a/ckan/logic/action/get.py b/ckan/logic/action/get.py
+index 4002e2d33..89f422389 100644
+--- a/ckan/logic/action/get.py
++++ b/ckan/logic/action/get.py
+@@ -355,7 +355,7 @@ def _group_or_org_list(
+         except ValueError:
+             max_limit = 1000
+ 
+-    if limit is None or int(limit) > max_limit:
++    if limit is None or int(limit) > int(max_limit):
+         limit = max_limit
+ 
+     # order_by deprecated in ckan 1.8

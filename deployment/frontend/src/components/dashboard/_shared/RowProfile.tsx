@@ -8,6 +8,7 @@ export interface IRowProfile {
     image?: string
     image_display_url?: string
     name?: string
+    capacity?: string
 }
 
 export default function RowProfile({
@@ -33,8 +34,8 @@ export default function RowProfile({
                         src={
                             profile?.image_display_url
                                 ? profile.image_display_url
-                                : defaultImg ??
-                                  '/images/placeholders/user/userdefault.png'
+                                : (defaultImg ??
+                                  '/images/placeholders/user/userdefault.png')
                         }
                         alt=""
                         className="rounded-md object-cover"
@@ -81,8 +82,8 @@ export function RowProfilev2({
                         src={
                             profile?.image_display_url
                                 ? profile.image_display_url
-                                : defaultImg ??
-                                  '/images/placeholders/user/userdefault.png'
+                                : (defaultImg ??
+                                  '/images/placeholders/user/userdefault.png')
                         }
                         alt=""
                         className="rounded-md"

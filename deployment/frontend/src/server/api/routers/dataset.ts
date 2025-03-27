@@ -29,6 +29,7 @@ import {
     fetchDatasetCollabIds,
     approvePendingDataset,
     getDatasetReleaseNotes,
+    getCollaboratorPackages,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -927,6 +928,29 @@ export const DatasetRouter = createTRPCRouter({
                 fq += '+is_approved:true'
             }
 
+            let user_organization: WriOrganization[] = []
+            let collab: Collaborator[] = []
+
+            if (!ctx.session?.user.sysadmin) {
+                try {
+                    ;[user_organization, collab] = await Promise.all([
+                        getUserOrganizations({
+                            userId: ctx.session?.user.id || '',
+                            apiKey: ctx.session?.user.apikey || '',
+                        }),
+                        getCollaboratorPackages({
+                            userId: ctx.session?.user.id || '',
+                            apiKey: ctx.session?.user.apikey || '',
+                        }),
+                    ])
+                } catch (e) {
+                    let error =
+                        'Something went wrong, please contact the system administrator'
+                    if (e instanceof Error) error = e.message
+                    throw Error(error)
+                }
+            }
+
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session?.user.apikey ?? '',
                 fq: `${fq}${input.appendRawFq ?? ''}`,
@@ -947,6 +971,25 @@ export const DatasetRouter = createTRPCRouter({
                       })),
                   }))
                 : dataset.datasets
+
+            if (user_organization || collab) {
+                _datasets.forEach((d) => {
+                    d.is_authorized =
+                        user_organization.some(
+                            (org) =>
+                                org.id === d.owner_org &&
+                                (org.capacity === 'admin' ||
+                                    org.capacity === 'editor')
+                        ) ||
+                        collab.some(
+                            (c) =>
+                                c.package_id === d.id &&
+                                (c.capacity === 'admin' ||
+                                    c.capacity === 'editor')
+                        )
+                })
+            }
+
             return {
                 datasets: _datasets as unknown as WriDataset[],
                 count: dataset.count,

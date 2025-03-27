@@ -114,8 +114,6 @@ jobs:
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
-      - name: Initialize the Extensions
-        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Cypress Install and CKAN setup
         if: ${{ env.ENABLE_INT_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
@@ -133,8 +131,6 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:prod-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
-      - name: Initialize the Extensions
-        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
         env:
@@ -150,6 +146,8 @@ jobs:
           node-version: 18
           runTests: false
           working-directory: ./e2e-tests
+      - name: Initialize the Extensions
+        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Run Integration tests 🧪
         if: ${{ env.ENABLE_INT_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
@@ -197,6 +195,8 @@ jobs:
         working-directory: ./ckan-backend-dev
       - name: Initialize the pending datasets table
         run: docker exec ckan-wri sh -c "ckan -c production.ini pendingdatasetsdb"
+      - name: Initialize the issues table
+        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
       - name: Run Unit Tests 🧪
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
