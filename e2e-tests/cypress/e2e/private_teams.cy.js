@@ -72,20 +72,23 @@ describe("Create and edit team", () => {
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
       cy.get("button#visibility").click();
-      cy.get("li").contains("Private").click();
+      cy.screenshot("after-click-dropdown");
+      cy.get("li").contains("Private").click({ force: true });
+      cy.screenshot("after-private-click");
+      cy.wait(5000);
       cy.get("button[type=submit]").click();
       cy.contains(`Successfully edited the ${parentOrg} team`);
       cy.wait(5000);
     });
   });
 
-  // it("should check if parent is private", () => {
-  //   cy.login(ckanUserName, ckanUserPassword);
-  //   cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-  //     cy.get("input[name=title]").should("have.value", parentOrg);
-  //     cy.get("button#visibility").should("contain.text", "Private");
-  //   });
-  // });
+  it("should check if parent is private", () => {
+    cy.login(ckanUserName, ckanUserPassword);
+    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
+      cy.get("input[name=title]").should("have.value", parentOrg);
+      cy.get("button#visibility").should("contain.text", "Private");
+    });
+  });
 
   it("should not be possible to view parent", () => {
     cy.login(normalUser, normalUserPassword);
