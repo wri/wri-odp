@@ -77,6 +77,7 @@ describe("Create and edit team", () => {
       cy.screenshot("after-private-click");
       cy.wait(5000);
       cy.get("button[type=submit]").click();
+      cy.screenshot("after-submit-click");
       cy.contains(`Successfully edited the ${parentOrg} team`);
       cy.wait(5000);
     });
@@ -86,6 +87,7 @@ describe("Create and edit team", () => {
     cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
+      cy.screenshot("team edit-page-view");
       cy.get("button#visibility").should("contain.text", "Private");
     });
   });
