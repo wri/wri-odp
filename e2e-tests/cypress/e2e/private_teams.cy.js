@@ -72,12 +72,10 @@ describe("Create and edit team", () => {
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
       cy.get("button#visibility").click();
-      cy.screenshot("after-click-dropdown");
       cy.get("li").contains("Private").click({ force: true });
-      cy.screenshot("after-private-click");
       cy.wait(5000);
       cy.get("button[type=submit]").click();
-      cy.screenshot("after-submit-click");
+      cy.wait(5000);
       cy.contains(`Successfully edited the ${parentOrg} team`);
       cy.wait(5000);
     });
