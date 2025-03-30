@@ -8,6 +8,9 @@ const normalUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_member`;
 const normalUserPassword = "test1234";
 
 const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`.toLowerCase();
+const parentPrivateOrg = `${uuid()}${Cypress.env(
+  "ORG_NAME_SUFFIX"
+)}`.toLowerCase();
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`.toLowerCase();
 Cypress.on("uncaught:exception", (err, runnable) => {
   console.log(err);
@@ -18,6 +21,7 @@ describe("Create and edit team", () => {
   before(() => {
     cy.createUserApi(normalUser, normalUserEmail, normalUserPassword);
     cy.createOrganizationAPI(parentOrg);
+    cy.createOrganizationAPI(parentPrivateOrg, "private");
     cy.login(ckanUserName, ckanUserPassword);
   });
 
@@ -67,44 +71,38 @@ describe("Create and edit team", () => {
     cy.contains(org).should("not.exist");
   });
 
-  it("should edit parent team to private", () => {
+  it("should assign private team to a private parent", () => {
     cy.login(ckanUserName, ckanUserPassword);
-    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", parentOrg);
-      cy.get("button#visibility").click();
-      cy.get("li").contains("Private").click({ force: true });
+    cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
+      cy.get("input[name=title]").should("have.value", org);
       cy.wait(5000);
+      cy.get("button[aria-haspopup=listbox]")
+        .contains("span", `${parentOrg}`)
+        .click();
+      cy.get("li").contains(parentPrivateOrg).click();
       cy.get("button[type=submit]").click();
-      cy.wait(5000);
-      cy.contains(`Successfully edited the ${parentOrg} team`);
-      cy.wait(5000);
-    });
-  });
-
-  it("should check if parent is private", () => {
-    cy.login(ckanUserName, ckanUserPassword);
-    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", parentOrg);
-      cy.screenshot("team edit-page-view");
-      cy.get("button#visibility").should("contain.text", "Private");
+      cy.contains(`Successfully edited the ${org} team`);
+      cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
+        cy.get("input[name=title]").should("have.value", org);
+      });
     });
   });
 
   it("should not be possible to view parent", () => {
     cy.login(normalUser, normalUserPassword);
     cy.visit("/teams");
-    cy.contains(parentOrg).should("not.exist");
+    cy.contains(parentPrivateOrg).should("not.exist");
     cy.contains(org).should("not.exist");
   });
 
   it("Should edit parent team to public", () => {
     cy.login(ckanUserName, ckanUserPassword);
-    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", parentOrg);
+    cy.visit(`/dashboard/teams/${parentPrivateOrg}/edit`).then(() => {
+      cy.get("input[name=title]").should("have.value", parentPrivateOrg);
       cy.get("button#visibility").click();
       cy.get("li").contains("Public").click();
       cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${parentOrg} team`);
+      cy.contains(`Successfully edited the ${parentPrivateOrg} team`);
     });
   });
 
@@ -120,7 +118,7 @@ describe("Create and edit team", () => {
     cy.get("#visibility_type").click();
     cy.get("li").contains("Public").click();
     cy.get("#team").click();
-    cy.get("li").contains(parentOrg).click();
+    cy.get("li").contains(parentPrivateOrg).click();
     cy.get("button").contains("Tags").click();
     cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
     cy.get("input[name=project]").focus().type("Project 1");
@@ -145,8 +143,8 @@ describe("Create and edit team", () => {
       timeout: 20000,
     });
 
-    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", parentOrg);
+    cy.visit(`/dashboard/teams/${parentPrivateOrg}/edit`).then(() => {
+      cy.get("input[name=title]").should("have.value", parentPrivateOrg);
       cy.get("button#visibility").click();
       cy.get("li").contains("Private").click();
       cy.get("button[type=submit]").click();
@@ -161,5 +159,6 @@ describe("Create and edit team", () => {
     cy.deleteDatasetAPI(datasetName);
     cy.deleteOrganizationAPI(org);
     cy.deleteOrganizationAPI(parentOrg);
+    cy.deleteOrganizationAPI(parentPrivateOrg);
   });
 });
