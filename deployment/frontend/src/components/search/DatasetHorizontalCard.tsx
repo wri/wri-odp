@@ -88,7 +88,7 @@ export default function DatasetHorizontalCard({
                     </div>
                 </div>
 
-                <p className="font-acumin text-[1rem] leading-[22px] font-light text-[#1A1919] line-clamp-4 mt-[12px] w-full  h-[88px] lg:w-[733.783px] mb-[21px] ">
+                <p className="font-acumin text-[1rem] leading-[22px] font-light text-[#1A1919] mt-[12px] w-full min-h-[88px] mb-[21px] ">
                     {dataset.short_description ?? ''}
                 </p>
 
