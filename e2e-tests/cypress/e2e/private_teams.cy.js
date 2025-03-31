@@ -71,6 +71,12 @@ describe("Create and edit team", () => {
     cy.contains(org).should("not.exist");
   });
 
+  it("should check if privat parent is not visible", () => {
+    cy.visit("/teams");
+    cy.wait(5000);
+    cy.contains(parentPrivateOrg).should("not.exist");
+  });
+
   it("should assign private team to a private parent", () => {
     cy.login(ckanUserName, ckanUserPassword);
     cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
@@ -91,6 +97,11 @@ describe("Create and edit team", () => {
   it("should not be possible to view parent", () => {
     cy.login(normalUser, normalUserPassword);
     cy.visit("/teams");
+    cy.wait(5000);
+    cy.scrollTo("bottom");
+    cy.screenshot("private-parent-team");
+    cy.scrollTo("top");
+    cy.screenshot("private-parent-team-top");
     cy.contains(parentPrivateOrg).should("not.exist");
     cy.contains(org).should("not.exist");
   });
