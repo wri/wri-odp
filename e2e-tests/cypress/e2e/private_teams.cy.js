@@ -98,9 +98,9 @@ describe("Create and edit team", () => {
     cy.login(normalUser, normalUserPassword);
     cy.visit("/teams");
     cy.wait(5000);
-    cy.scrollTo("bottom");
+    cy.scrollTo("bottom", { duration: 2000 });
     cy.screenshot("private-parent-team");
-    cy.scrollTo("top");
+    cy.scrollTo("top", { duration: 2000 });
     cy.screenshot("private-parent-team-top");
     cy.contains(parentPrivateOrg).should("not.exist");
     cy.contains(org).should("not.exist");
