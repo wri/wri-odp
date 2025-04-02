@@ -90,8 +90,6 @@ def download_request(context: Context, data_dict: dict[str, Any]):
 
     task["value"] = json.dumps(value)
 
-    if email:
-        task["value"] = json.dumps({"emails": [email]})
 
     try:
         existing_task = p.toolkit.get_action("task_status_show")(
