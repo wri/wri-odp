@@ -25,6 +25,21 @@ describe("Create and edit team", () => {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
+  it("should check if privat parent is not visible", () => {
+    cy.visit("/teams");
+    cy.wait(5000);
+    cy.contains(parentPrivateOrg).should("not.exist");
+  });
+
+  it("should check if private parent visbility is truly private", () => {
+    cy.login(ckanUserName, ckanUserPassword);
+    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
+      cy.get("input[name=title]").should("have.value", parentOrg);
+      cy.wait(5000);
+      cy.contains("Private").should("exist");
+    });
+  });
+
   it("Should create team", () => {
     cy.visit("/dashboard/teams/new");
     //get input with name=title
@@ -69,12 +84,6 @@ describe("Create and edit team", () => {
     cy.get('input[name="search"]').type(parentOrg);
     cy.contains(parentOrg).should("exist");
     cy.contains(org).should("not.exist");
-  });
-
-  it("should check if privat parent is not visible", () => {
-    cy.visit("/teams");
-    cy.wait(5000);
-    cy.contains(parentPrivateOrg).should("not.exist");
   });
 
   it("should assign private team to a private parent", () => {
