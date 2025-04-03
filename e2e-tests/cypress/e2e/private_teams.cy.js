@@ -25,21 +25,6 @@ describe("Create and edit team", () => {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
-  it("should check if privat parent is not visible", () => {
-    cy.visit("/teams");
-    cy.wait(5000);
-    cy.contains(parentPrivateOrg).should("not.exist");
-  });
-
-  it("should check if private parent visbility is truly private", () => {
-    cy.login(ckanUserName, ckanUserPassword);
-    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", parentOrg);
-      cy.wait(5000);
-      cy.contains("Private").should("exist");
-    });
-  });
-
   it("Should create team", () => {
     cy.visit("/dashboard/teams/new");
     //get input with name=title
@@ -60,6 +45,21 @@ describe("Create and edit team", () => {
       cy.once("uncaught:exception", () => false);
       cy.wait(10000);
       cy.contains(org).should("exist");
+    });
+  });
+
+  it("should check if privat parent is not visible", () => {
+    cy.visit("/teams");
+    cy.wait(5000);
+    cy.contains(parentPrivateOrg).should("not.exist");
+  });
+
+  it("should check if private parent visbility is truly private", () => {
+    cy.login(ckanUserName, ckanUserPassword);
+    cy.visit(`/dashboard/teams/${parentPrivateOrg}/edit`).then(() => {
+      cy.get("input[name=title]").should("have.value", parentPrivateOrg);
+      cy.wait(5000);
+      cy.contains("Private").should("exist");
     });
   });
 
@@ -91,8 +91,12 @@ describe("Create and edit team", () => {
     cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", org);
       cy.wait(5000);
+      cy.scrollTo("bottom", { duration: 2000 });
+      cy.screenshot("private-parent-team");
+      cy.scrollTo("top", { duration: 2000 });
+      cy.screenshot("private-parent-team-top");
       cy.get("button[aria-haspopup=listbox]")
-        .contains("span", `${parentOrg}`)
+        .contains("span", new RegExp(`^${parentOrg}$`, "i"))
         .click();
       cy.get("li").contains(parentPrivateOrg).click();
       cy.get("button[type=submit]").click();
