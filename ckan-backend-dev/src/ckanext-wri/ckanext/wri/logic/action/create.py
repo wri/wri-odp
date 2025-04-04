@@ -885,9 +885,6 @@ def organization_create(context, data_dict):
 
     temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
 
-    if visibility == "private":
-        log.error("===========LOGED PRIVATE ORGANIZATION CREATE===================")
-        log.error(data_dict)
     
     parent_org = data_dict.get("parent")
     parent_org = parent_org.get("value") if parent_org else None
@@ -908,7 +905,4 @@ def organization_create(context, data_dict):
 
     
     result = old_organization_create(context, data_dict)
-    if visibility == "private":
-        log.error("===========LOGED PRIVATE ORGANIZATION CREATE RESULT===================")
-        log.error(result)
     return result
