@@ -22,7 +22,6 @@ describe("Create and edit team", () => {
     cy.createUserApi(normalUser, normalUserEmail, normalUserPassword);
     cy.createOrganizationAPI(parentOrg);
     cy.createOrganizationAPI(parentPrivateOrg, "private");
-    cy.login(ckanUserName, ckanUserPassword);
   });
 
   // it("Should create team", () => {
@@ -59,6 +58,10 @@ describe("Create and edit team", () => {
     cy.visit(`/dashboard/teams/${parentPrivateOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentPrivateOrg);
       cy.wait(5000);
+      cy.scrollTo("bottom", { duration: 2000 });
+      cy.screenshot("private-parent-team");
+      cy.scrollTo("top", { duration: 2000 });
+      cy.screenshot("private-parent-team-top");
       cy.contains("Private").should("exist");
     });
   });

@@ -156,11 +156,16 @@ export const teamRouter = createTRPCRouter({
                     },
                 }
             )
+
             const team: CkanResponse<
                 WriOrganization & {
                     groups: Organization[]
                 }
             > = await teamRes.json()
+            console.log(
+                'WRI-FRONTEND: =============Team===============\n',
+                team.result
+            )
             return {
                 ...team.result,
                 parent: team.result.groups[0]?.name ?? null,

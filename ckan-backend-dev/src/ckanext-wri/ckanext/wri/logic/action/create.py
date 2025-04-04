@@ -908,4 +908,7 @@ def organization_create(context, data_dict):
 
     
     result = old_organization_create(context, data_dict)
+    if visibility == "private":
+        log.error("===========LOGED PRIVATE ORGANIZATION CREATE RESULT===================")
+        log.error(result)
     return result
