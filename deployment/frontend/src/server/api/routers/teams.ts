@@ -156,6 +156,7 @@ export const teamRouter = createTRPCRouter({
                     },
                 }
             )
+
             const team: CkanResponse<
                 WriOrganization & {
                     groups: Organization[]

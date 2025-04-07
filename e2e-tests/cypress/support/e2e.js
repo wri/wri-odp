@@ -204,7 +204,7 @@ Cypress.Commands.add("deleteOrganization", (orgName) => {
 });
 
 // Command for frontend test sepecific
-Cypress.Commands.add("createOrganizationAPI", (name) => {
+Cypress.Commands.add("createOrganizationAPI", (name, visibility = "public") => {
   cy.request({
     method: "POST",
     url: apiUrl("organization_create"),
@@ -213,6 +213,7 @@ Cypress.Commands.add("createOrganizationAPI", (name) => {
       name: name,
       title: name,
       description: "Some organization description",
+      visibility: visibility,
     },
   });
 });
