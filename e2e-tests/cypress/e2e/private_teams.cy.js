@@ -53,7 +53,7 @@ describe("Create and edit team", () => {
         .click();
       cy.get("li").contains(parentOrg).click();
       cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${org} team`)
+      cy.contains(`Successfully edited the ${org} team`);
       cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
         cy.get("input[name=title]").should("have.value", org);
       });
@@ -74,29 +74,16 @@ describe("Create and edit team", () => {
       cy.get("button#visibility").click();
       cy.get("li").contains("Private").click();
       cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${parentOrg} team`)
-      cy.wait(5000)
+      cy.contains(`Successfully edited the ${parentOrg} team`);
+      cy.wait(5000);
     });
   });
 
-  //it("should not be possible to view parent",
-  //  {
-  //    retries: {
-  //      runMode: 5,
-  //      openMode: 0,
-  //    },
-  //  },
-  //  () => {
-  //    cy.viewport(1600, 1000);
-  //    cy.clearCookies();
-  //    cy.clearLocalStorage();
-  //    cy.clearAllSessionStorage();
-  //    cy.visit("/");
-  //    cy.visit('/teams');
-  //    cy.contains(parentOrg).should("not.exist");
-  //    cy.contains(org).should("not.exist");
-  //  });
-
+  it("should not be possible to view parent", () => {
+    cy.visit("/teams");
+    cy.contains(parentOrg).should("not.exist");
+    cy.contains(org).should("not.exist");
+  });
 
   it("Should edit parent team to public", () => {
     cy.login(ckanUserName, ckanUserPassword);
@@ -105,7 +92,7 @@ describe("Create and edit team", () => {
       cy.get("button#visibility").click();
       cy.get("li").contains("Public").click();
       cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${parentOrg} team`)
+      cy.contains(`Successfully edited the ${parentOrg} team`);
     });
   });
 
