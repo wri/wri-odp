@@ -85,7 +85,8 @@ def get_admin_emails_for_dataset(dataset_id: str) -> list[str]:
                     users_obj = p.toolkit.get_action("user_show")(
                         {"ignore_auth": True}, {"id": user.get("id")}
                     )
-                    admin_email.append(users_obj.get("email"))
+                    if users_obj.get("email", False):
+                        admin_email.append(users_obj.get("email"))
     return admin_email
 
 
