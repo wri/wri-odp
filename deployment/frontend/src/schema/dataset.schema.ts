@@ -114,7 +114,7 @@ const DatasetSchemaObject = z.object({
         })
         .optional(),
     team: z.object({
-        value: z.string(),
+        value: z.string().min(1, { message: 'Team is required' }),
         label: z.string(),
         id: z.string(),
         visibility: z.string(),
@@ -340,6 +340,16 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         {
             message: 'Public dataset cannot be assigned to private team',
             path: ['visibility_type'],
+        }
+    )
+    .refine(
+        (obj) => {
+            if (!obj.team || !obj.team.value) return false
+            return true
+        },
+        {
+            message: 'Team is required for all datasets',
+            path: ['team'],
         }
     )
 
