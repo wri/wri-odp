@@ -18,6 +18,8 @@ describe("Create and edit team", () => {
   before(() => {
     cy.createUserApi(normalUser, normalUserEmail, normalUserPassword);
     cy.createOrganizationAPI(parentOrg);
+    cy.wait(5000);
+    cy.createOrganizationMemberAPI(parentOrg, normalUser, "admin");
     cy.login(ckanUserName, ckanUserPassword);
   });
 
@@ -142,6 +144,27 @@ describe("Create and edit team", () => {
       cy.contains(
         "Team has 1 public dataset(s) and cannot be made private"
       ).should("exist");
+    });
+  });
+
+  // normal user should be able to edit parentOrg
+  it("should edit parent team description and visibility to private by normal user", () => {
+    cy.login(normalUser, normalUserPassword);
+    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
+      cy.get("input[name=title]").should("have.value", parentOrg);
+      cy.get("textarea[name=description]").clear().type("Test description");
+      cy.get("button[type=submit]").click();
+      cy.contains(`Successfully edited the ${parentOrg} team`);
+    });
+
+    cy.wait(5000);
+
+    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
+      cy.get("input[name=title]").should("have.value", parentOrg);
+      cy.get("textarea[name=description]").should(
+        "have.value",
+        "Test description"
+      );
     });
   });
 
