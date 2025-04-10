@@ -467,10 +467,11 @@ export const DatasetRouter = createTRPCRouter({
                         license_id: input.license_id?.value ?? '',
                         license_title: input.license_id?.label ?? '',
                         rw_id: rw_id ?? '',
-                        owner_org: datasetDetails.organization?.name ===
-                              input.team.value
+                        owner_org:
+                            datasetDetails.organization?.name ===
+                            input.team?.value
                                 ? datasetDetails.owner_org
-                                : input.team.value,
+                                : input.team?.value,
                         organization: org,
                         collaborators: null,
                         update_frequency: input.update_frequency?.value ?? '',

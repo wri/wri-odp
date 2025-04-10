@@ -231,7 +231,9 @@ const DatasetSchemaObject = z.object({
     collaborators: z.array(CollaboratorSchema).default([]),
     spatial_address: z.string().optional().nullable(),
     spatial: z.any().optional(),
-    spatial_type: z.enum(['address', 'geom', 'global', 'derived_from_resources']).optional(),
+    spatial_type: z
+        .enum(['address', 'geom', 'global', 'derived_from_resources'])
+        .optional(),
     release_notes: z.string().optional(),
 })
 
