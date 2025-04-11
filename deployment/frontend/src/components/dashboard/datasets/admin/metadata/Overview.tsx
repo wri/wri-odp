@@ -112,7 +112,7 @@ export function OverviewForm({
                             options={languageOptions}
                         />
                     </InputGroup>
-                    <InputGroup label="Team">
+                    <InputGroup label="Team" required>
                         {match(possibleOwners)
                             .with({ isLoading: true }, () => (
                                 <span className="flex items-center text-sm gap-x-2">
@@ -135,12 +135,6 @@ export function OverviewForm({
                                         name="team"
                                         id="team"
                                         options={[
-                                            {
-                                                label: 'No team',
-                                                value: '',
-                                                id: '',
-                                                visibility: '',
-                                            },
                                             ...data.map((team) => ({
                                                 label: team.title ?? team.name,
                                                 value: team.name,
