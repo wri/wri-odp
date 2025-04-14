@@ -81,13 +81,6 @@ export const teamRouter = createTRPCRouter({
             try {
                 const user = ctx.session.user
 
-                // only sysadmin is allowed to create Parent teams
-                if (
-                    !user.sysadmin &&
-                    (!input.parent || input.parent.value === '')
-                )
-                    throw Error('Only sysadmin can create parent teams')
-
                 var newMembers = []
                 for (const member of input.members) {
                     newMembers.push({
@@ -156,6 +149,7 @@ export const teamRouter = createTRPCRouter({
                     },
                 }
             )
+
             const team: CkanResponse<
                 WriOrganization & {
                     groups: Organization[]

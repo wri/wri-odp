@@ -26,6 +26,28 @@ describe("Create dataset", () => {
     cy.login(user, "test_user");
   });
 
+  it("Should fail to create dataset without team", () => {
+    cy.visit("/dashboard/datasets/new");
+
+    cy.get("input[name=title]").type(dataset);
+    cy.get("input[name=name]").should("have.value", dataset);
+    cy.get("input[name=url]").type("https://google.com");
+    cy.get("#language").click();
+    cy.get("li").contains("English").click();
+    cy.get("#visibility_type").click();
+    cy.get("li").contains("Public").click();
+    // Intentionally skip team selection
+    cy.get("#topicsButton").click();
+    cy.get("div").contains(topic).click({ force: true });
+    cy.get("button").contains("Tags").click();
+    cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
+    cy.get("textarea[name=short_description]").type("test");
+    cy.contains("Next: Datafiles").click();
+    
+    // Verify the validation error for missing team
+    cy.contains("Team is required").should("be.visible");
+  });
+
   it("Should create dataset", () => {
     cy.visit("/dashboard/datasets/new");
 

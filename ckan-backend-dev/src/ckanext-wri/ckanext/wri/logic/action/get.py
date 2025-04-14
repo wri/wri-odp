@@ -1782,21 +1782,10 @@ def organization_patch(context, data_dict):
     if not isSysadmin:
         temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
         old_org = get_action("organization_show")(temp_context, data_dict)
-        old_parent = old_org.get("groups", [])
-        if len(old_parent) == 0 or data_dict.get("parent") is None:
-            raise ValidationError({"message": _("You can't edit or create a Parent Team")})
         if old_org.get("visibility", "public") == "private" and visibility == "public":
             raise ValidationError({"message": 
-                                   _("Team has private visibility and cannot be updated; Only sysadmin can update private team")
+                                   _("Team has private visibility and cannot be updated; Only sysadmin can switch private to public")
                                    })
-
-        if visibility == "private":
-            users = old_org.get("users", [])
-            if users:
-                c_user = str(user)
-                user_capacity = [user.get("capacity") for user in users if user.get("name") == c_user]
-                if "admin" not in user_capacity:
-                    raise ValidationError({"message": _("You can't update visibility of a team")})
         
 
     if visibility == "public":
@@ -1847,7 +1836,6 @@ def validate_visibility(context, data_dict):
 def organization_show(context, data_dict):
     data_dict = old_organization_show(context, data_dict)
     user = context.get("user")
-
 
     if not authz.is_sysadmin(user):
         is_authorized = get_action("organization_list")(context, {"q": data_dict.get("name")})
