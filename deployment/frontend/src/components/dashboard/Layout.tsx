@@ -318,7 +318,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             className="hidden w-full sm:max-w-[300px] lg:z-10 lg:flex lg:flex-col "
                         >
                             {/* Sidebar component, swap this element with another sidebar if you like */}
-                            <div className="flex grow flex-col gap-y-5  pb-4  bg-wri-green">
+                            <div className="flex grow flex-col gap-y-5  pb-4 bg-wri-green dashboard-sidebar">
                                 <nav className="flex flex-1 flex-col ">
                                     <ul
                                         role="list"
