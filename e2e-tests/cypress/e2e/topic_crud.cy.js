@@ -15,7 +15,7 @@ describe("Create and edit topics", () => {
   before(() => {
     cy.createGroupAPI(parentTopic);
   });
-  beforeEach(function () {
+  beforeEach(function() {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
@@ -40,11 +40,17 @@ describe("Create and edit topics", () => {
   after(() => {
     cy.deleteGroupAPI(parentTopic);
     cy.deleteGroupAPI(topic);
+    cy.logout(); // Add this line to explicitly log out after the first test group
   });
 });
 
 describe("Non-admin users cannot access topics", () => {
   before(() => {
+    cy.clearCookies();
+    cy.clearLocalStorage();
+    cy.window().then((win) => {
+      win.sessionStorage.clear();
+    });
     // Create a non-admin user
     cy.createUserApi(nonAdminUser, nonAdminEmail, nonAdminPassword);
   });
