@@ -131,7 +131,6 @@ def convert_store_to_file(
     try:
         logger = get_run_logger()
         ckan_url = config.get("CKAN_URL")
-
         logger.info("Fetching data...")
         data = query_datastore(
             api_key, ckan_url, sql, provider, rw_id, carto_account, format
@@ -169,7 +168,8 @@ def convert_store_to_file(
             "prefect_send_error_callback",
             {
                 "task_id": task_id,
-                "url": url,
+                "url": "",
+                "task_type": "download",
                 "state": "complete",
                 "entity_id": resource_id,
                 "entity_type": "resource",
@@ -195,7 +195,6 @@ async def download_subset_of_data(
     try:
         logger = get_run_logger()
         ckan_url = config.get("CKAN_URL")
-
         logger.info("Fetching data...")
         data = []
         if provider == "datastore":
@@ -237,6 +236,7 @@ async def download_subset_of_data(
             "prefect_send_error_callback",
             {
                 "task_id": task_id,
+                "task_type": "download_subset",
                 "url": "",
                 "state": "failed",
                 "entity_id": id if provider == "datastore" else dataset_id,
@@ -260,7 +260,6 @@ async def download_resources_zipped(
     try:
         logger = get_run_logger()
         ckan_url = config.get("CKAN_URL")
-        print("Filename", filename)
         with tempfile.TemporaryDirectory() as temp_dir:
             tasks = await download_keys(keys, filename, temp_dir)
             data = list(tasks)
@@ -295,6 +294,7 @@ async def download_resources_zipped(
             {
                 "task_id": task_id,
                 "url": "",
+                "task_type": "download_zipped",
                 "state": "failed",
                 "entity_id": dataset_id,
                 "entity_type": "dataset",
