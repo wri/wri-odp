@@ -1,20 +1,15 @@
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
-const uuid = () => Math.random().toString(36).slice(2) + "-test";
 const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
-const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
 
+const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const dataset = `${uuid()}-test-datasettytytyty`;
 
 describe("Upload file and create dataset", () => {
-  beforeEach(function() {
+  beforeEach(function () {
     cy.login("ckan_admin", "test1234");
-  });
-
-  before(() => {
-    cy.createOrganizationAPI(org);
   });
 
   it("Should create dataset", () => {
@@ -23,8 +18,6 @@ describe("Upload file and create dataset", () => {
     cy.get("input[name=name]").should("have.value", dataset);
     cy.get("#visibility_type").click();
     cy.get("li").contains("Public").click();
-    cy.get("#team").click();
-    cy.get("li").contains(org).click();
     cy.get("input[name=technical_notes]").type("https://google.com");
     cy.get("textarea[name=short_description]").type("test");
 

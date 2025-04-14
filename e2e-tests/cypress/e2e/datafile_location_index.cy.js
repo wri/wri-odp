@@ -10,12 +10,8 @@ const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 describe("Data file location", () => {
-  beforeEach(function() {
+  beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
-  });
-
-  before(() => {
-    cy.createOrganizationAPI(org);
   });
 
   it(
@@ -32,8 +28,6 @@ describe("Data file location", () => {
       cy.get("input[name=name]").should("have.value", datasetName);
       cy.get("textarea[name=short_description]").type("test");
 
-      cy.get("#team").click();
-      cy.get("li").contains(org).click();
       cy.contains("Add Author").click();
       cy.get('input[name="authors.0.name"]').type("Test Author 1");
       cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");

@@ -10,12 +10,8 @@ const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 describe("Chart view", () => {
-  beforeEach(function() {
+  beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
-  });
-
-  before(() => {
-    cy.createOrganizationAPI(org);
   });
 
   it("Should create dataset", () => {
@@ -24,8 +20,6 @@ describe("Chart view", () => {
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("textarea[name=short_description]").type("test");
 
-    cy.get("#team").click();
-    cy.get("li").contains(org).click();
     cy.contains("Add Author").click();
     cy.get('input[name="authors.0.name"]').type("Test Author 1");
     cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
@@ -66,7 +60,7 @@ describe("Chart view", () => {
       cy.contains("Data Files").click();
       cy.get('.datafile-accordion-trigger').eq(0).click()
       cy.contains("Datapusher").click();
-      cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
+      cy.contains("Submit to Datapusher", { timeout: 50000}).click();
       cy.contains(`Successfully submited datafile to the datapusher`, {
         timeout: 15000,
       });

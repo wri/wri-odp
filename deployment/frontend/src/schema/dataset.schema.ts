@@ -114,7 +114,7 @@ const DatasetSchemaObject = z.object({
         })
         .optional(),
     team: z.object({
-        value: z.string().min(1, { message: 'Team is required' }),
+        value: z.string(),
         label: z.string(),
         id: z.string(),
         visibility: z.string(),
@@ -231,9 +231,7 @@ const DatasetSchemaObject = z.object({
     collaborators: z.array(CollaboratorSchema).default([]),
     spatial_address: z.string().optional().nullable(),
     spatial: z.any().optional(),
-    spatial_type: z
-        .enum(['address', 'geom', 'global', 'derived_from_resources'])
-        .optional(),
+    spatial_type: z.enum(['address', 'geom', 'global', 'derived_from_resources']).optional(),
     release_notes: z.string().optional(),
 })
 
@@ -342,16 +340,6 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         {
             message: 'Public dataset cannot be assigned to private team',
             path: ['visibility_type'],
-        }
-    )
-    .refine(
-        (obj) => {
-            if (!obj.team || !obj.team.value) return false
-            return true
-        },
-        {
-            message: 'Team is required for all datasets',
-            path: ['team'],
         }
     )
 
