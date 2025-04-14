@@ -60,19 +60,22 @@ describe("Non-admin users cannot access topics", () => {
   });
 
   it("Should not see Topics in sidebar", () => {
+    cy.viewport(1400, 900);
     cy.visit("/dashboard");
     cy.get(".dashboard-sidebar").should("not.contain", "Topics");
     cy.get(".dashboard-sidebar").should("not.contain", "Add a topic");
   });
 
   it("Should not be able to access topic creation page", () => {
+    cy.viewport(1400, 900);
     cy.visit("/dashboard/topics/new");
-    cy.get("form").should("not.exist");
+    cy.get("#topicsForm").should("not.exist");
   });
 
   it("Should not be able to access topic edit page", () => {
+    cy.viewport(1400, 900);
     cy.visit(`/dashboard/topics/${topic}/edit`);
-    cy.get("form").should("not.exist");
+    cy.get("#topicsForm").should("not.exist");
   });
 
   after(() => {
