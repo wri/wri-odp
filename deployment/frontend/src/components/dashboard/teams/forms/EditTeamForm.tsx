@@ -237,6 +237,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                                             <TeamForm
                                                 formObj={formObj}
                                                 editing={true}
+                                                sysadmin={sysadmin}
                                             />
                                         </div>
                                     </div>
