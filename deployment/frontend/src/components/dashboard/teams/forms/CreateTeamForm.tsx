@@ -107,7 +107,7 @@ export default function CreateTeamForm() {
                 >
                     <div className="w-full py-8 border-b border-blue-800 shadow">
                         <div className="px-2 sm:px-8">
-                            <TeamForm formObj={formObj} />
+                            <TeamForm formObj={formObj} sysadmin={sysadmin} />
                             <div className="col-span-full flex justify-end">
                                 <LoaderButton
                                     loading={createTeam.isLoading}
