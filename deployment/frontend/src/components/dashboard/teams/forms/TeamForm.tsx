@@ -59,9 +59,11 @@ function TooltipForParent() {
 export default function TeamForm({
     formObj,
     editing = false,
+    sysadmin = false,
 }: {
     formObj: UseFormReturn<TeamFormType>
     editing?: boolean
+    sysadmin?: boolean
 }) {
     const {
         register,
@@ -141,6 +143,7 @@ export default function TeamForm({
                     label="Parent"
                     labelClassName="pt-[0.9rem]"
                     className="items-start"
+                    required={!sysadmin}
                 >
                     {match(possibleParents)
                         .with({ isLoading: true }, () => (
