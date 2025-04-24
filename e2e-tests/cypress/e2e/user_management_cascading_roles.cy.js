@@ -2,7 +2,7 @@ const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
 const userSuffix = Cypress.env("USER_NAME_SUFFIX");
-const emailSuffix = '@test.com';
+const emailSuffix = "@test.com";
 
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
@@ -33,6 +33,7 @@ describe("Assigning Team User Roles", () => {
     cy.createOrganizationMemberAPI(parentOrg, editorUser, "editor");
     cy.createOrganizationMemberAPI(parentOrg, adminUser, "admin");
   });
+
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
@@ -114,14 +115,14 @@ describe("Assigning Team User Roles", () => {
     cy.contains("div", "Members").click();
     cy.get("span.hidden")
       .filter(
-        (_, el) => el.id.startsWith("members.") && el.id.endsWith(".user")
+        (_, el) => el.id.startsWith("members-") && el.id.endsWith("-user")
       )
-      .contains(memberUser)
+      .filter((_, el) => el.getAttribute("data-value") === memberUser)
       .invoke("attr", "id")
       .then((userId) => {
-        const index = userId.match(/members\.(\d+)\.user/)[1];
-        cy.get(`#members.${index}.capacity`)
-          .invoke("text")
+        const index = userId.match(/members\-(\d+)\-user/)[1];
+        cy.get(`#members-${index}-capacity`)
+          .invoke("attr", "data-value")
           .should("eq", "admin");
       });
 
@@ -129,14 +130,14 @@ describe("Assigning Team User Roles", () => {
     cy.contains("div", "Members").click();
     cy.get("span.hidden")
       .filter(
-        (_, el) => el.id.startsWith("members.") && el.id.endsWith(".user")
+        (_, el) => el.id.startsWith("members-") && el.id.endsWith("-user")
       )
-      .contains(memberUser)
+      .filter((_, el) => el.getAttribute("data-value") === memberUser)
       .invoke("attr", "id")
       .then((userId) => {
-        const index = userId.match(/members\.(\d+)\.user/)[1];
-        cy.get(`#members.${index}.capacity`)
-          .invoke("text")
+        const index = userId.match(/members\-(\d+)\-user/)[1];
+        cy.get(`#members-${index}-capacity`)
+          .invoke("attr", "data-value")
           .should("eq", "editor");
       });
 
@@ -144,7 +145,7 @@ describe("Assigning Team User Roles", () => {
     cy.contains("div", "Members").click();
     cy.get("span.hidden")
       .filter(
-        (_, el) => el.id.startsWith("members.") && el.id.endsWith(".user")
+        (_, el) => el.id.startsWith("members-") && el.id.endsWith("-user")
       )
       .contains(memberUser)
       .should("not.exist");

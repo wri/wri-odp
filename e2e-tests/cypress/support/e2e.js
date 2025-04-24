@@ -42,7 +42,7 @@ Cypress.Commands.add("login", (username, password) => {
     cy.visit("/");
     cy.get('body').then(($body) => {
       if ($body.find('.osano-cm-manage').length) {
-        cy.get('.osano-cm-manage').click();
+        cy.get('.osano-cm-manage').click({ force: true });
         cy.contains('button', 'Save').click({ force: true });
       }
     });
