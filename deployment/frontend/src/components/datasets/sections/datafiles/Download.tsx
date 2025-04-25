@@ -101,7 +101,7 @@ export function DownloadButton({
             package_id: datafile.package_id ?? '',
             acceptTerms: true,
             typeOfForm: 'direct-download' as any,
-            package_name: datafile.title ?? datafile.name!,
+            package_name: `${dataset.title ?? dataset.name}: ${datafile.title ?? datafile.name}`,
         }
         createDownloadEvent.mutate(_data)
     }

@@ -73,6 +73,12 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                     message:
                         'User does not have admin access to edit a sub team',
                 })
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['visibility'],
+                    message:
+                        'User does not have admin access to edit this team',
+                })
             }
         }
     })
