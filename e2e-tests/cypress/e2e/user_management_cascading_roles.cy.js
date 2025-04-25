@@ -4,7 +4,7 @@ const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
 const userSuffix = Cypress.env("USER_NAME_SUFFIX");
 const emailSuffix = "@test.com";
 
-const uuid = () => Math.random().toString(36).slice(2) + "-test";
+const uuid = () => Math.random().toString(36).slice(2);
 
 const parentOrg = `${uuid()}${orgSuffix}`;
 const childOrg = `${uuid()}${orgSuffix}`;
@@ -78,11 +78,17 @@ describe("Assigning Team User Roles", () => {
     cy.get("input[name=title]").should("have.value", childOrg);
     cy.get("input[name=title]")
       .clear()
-      .type(childOrg + " edited");
+      .type(childOrg + " edited")
+      .blur();
     cy.get("button[type=submit]").click();
 
     cy.visit(`/teams/${childOrg}`);
-    cy.contains(childOrg + " edited");
+    cy.contains("div", "Edit").should("exist");
+    cy.contains("div", "Edit")
+      .click()
+      .then(() => {
+        cy.get("input[name=title]").should("have.value", childOrg + " edited");
+      });
 
     cy.visit(`/teams/${grandchildOrg}`);
     cy.contains("div", "Edit").should("exist");
@@ -90,10 +96,20 @@ describe("Assigning Team User Roles", () => {
     cy.get("input[name=title]").should("have.value", grandchildOrg);
     cy.get("input[name=title]")
       .clear()
-      .type(grandchildOrg + " edited");
+      .type(grandchildOrg + " edited")
+      .blur();
     cy.get("button[type=submit]").click();
+
     cy.visit(`/teams/${grandchildOrg}`);
-    cy.contains(grandchildOrg + " edited");
+    cy.contains("div", "Edit").should("exist");
+    cy.contains("div", "Edit")
+      .click()
+      .then(() => {
+        cy.get("input[name=title]").should(
+          "have.value",
+          grandchildOrg + " edited"
+        );
+      });
 
     cy.visit(`/teams/${parentOrg}`);
     cy.contains("div", "Edit").should("exist");
@@ -101,10 +117,17 @@ describe("Assigning Team User Roles", () => {
     cy.get("input[name=title]").should("have.value", parentOrg);
     cy.get("input[name=title]")
       .clear()
-      .type(parentOrg + " edited");
+      .type(parentOrg + " edited")
+      .blur();
     cy.get("button[type=submit]").click();
+
     cy.visit(`/teams/${parentOrg}`);
-    cy.contains(parentOrg + " edited");
+    cy.contains("div", "Edit").should("exist");
+    cy.contains("div", "Edit")
+      .click()
+      .then(() => {
+        cy.get("input[name=title]").should("have.value", parentOrg + " edited");
+      });
   });
 
   it("Should have specified roles from Member Management", () => {
