@@ -1409,24 +1409,49 @@ def organization_list_for_user(context: Context,
             .filter(model.Member.state == 'active') \
             .join(model.Group)
 
-        group_ids: set[str] = set()
+        
         roles_that_cascade = cast(
             "list[str]",
             authz.check_config_permission('roles_that_cascade_to_sub_groups')
         )
+        group_extra_alias = aliased(model.GroupExtra)
+        public_groups_query = (
+            model.Session.query(model.Group.id)
+            .outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
+            .filter(
+                _or_(
+                    _and_(
+                        group_extra_alias.key == 'visibility',
+                        group_extra_alias.value == 'public'
+                    ),
+                    group_extra_alias.key == None
+                )
+            )
+        )
+        public_group_ids = {gid for gid, in public_groups_query.all()}
+        group_ids: set[str] = set()
         group_ids_to_capacities: dict[str, str] = {}
         for member, group in q.all():
-            if member.capacity in roles_that_cascade:
-                children_group_ids = [
-                    grp_tuple[0] for grp_tuple
-                    in group.get_children_group_hierarchy(type='organization')
-                ]
-                for group_id in children_group_ids:
-                    group_ids_to_capacities[group_id] = member.capacity
-                group_ids |= set(children_group_ids)
-
-            group_ids_to_capacities[group.id] = member.capacity
             group_ids.add(group.id)
+            group_ids_to_capacities[group.id] = member.capacity
+            children_group_ids = [
+                grp_tuple[0] for grp_tuple
+                in group.get_children_group_hierarchy(type='organization')
+            ]
+            if member.capacity in roles_that_cascade:
+                
+                for group_id in children_group_ids:
+                    group_ids.add(group_id)
+                    group_ids_to_capacities[group_id] = member.capacity
+            else:
+                for group_id in children_group_ids:
+                    if group_id in public_group_ids:
+                        group_ids.add(group_id)
+                        group_ids_to_capacities[group_id] = member.capacity
+
+
+            # group_ids_to_capacities[group.id] = member.capacity
+            # group_ids.add(group.id)
 
         if not group_ids:
             return []
@@ -1446,6 +1471,8 @@ def organization_list_for_user(context: Context,
                 org['visibility'] = extra['value']
                 break
     return orgs_list
+
+
 
 
 
@@ -1820,7 +1847,7 @@ def validate_visibility(context, data_dict):
         if id_org:
             org = get_action("organization_show")(context, {"id": id_org})
             org_visibility = org.get("visibility", "public")
-            if org_visibility == "public":
+            if org_visibility == "private":
                 raise ValidationError({"message": _("Organization has private visibility and cannot be made public")})
         
     elif visibility in ["public", "internal"] and owner_org:
