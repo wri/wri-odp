@@ -1840,22 +1840,12 @@ def validate_visibility(context, data_dict):
     
     visibility = data_dict.get('visibility_type', "public")
     owner_org = data_dict.get('owner_org', None)
-    id = data_dict.get('id', None)
-    if visibility in ["public", "internal"] and id:
-        package_show = get_action("package_show")(context, {"id": id})
-        id_org = package_show.get("owner_org", None)
-        if id_org:
-            org = get_action("organization_show")(context, {"id": id_org})
-            org_visibility = org.get("visibility", "public")
-            if org_visibility == "private":
-                raise ValidationError({"message": _("Organization has private visibility and cannot be made public")})
-        
-    elif visibility in ["public", "internal"] and owner_org:
+    if visibility in ["public", "internal"] and  owner_org:
         org = get_action("organization_show")(context, {"id": owner_org})
         org_visibility = org.get("visibility", "public")
         if org_visibility == "private":
             raise ValidationError({"message": _("Organization has private visibility and cannot create public datasets")})
-
+        
 
 
 
