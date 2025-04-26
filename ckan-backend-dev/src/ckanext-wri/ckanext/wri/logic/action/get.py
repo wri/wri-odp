@@ -1007,11 +1007,9 @@ def organization_list_wri(context: Context, data_dict: DataDict):
     user_orgs = None
     if not user:
        private_orgs = get_private_organizations(context)
-       log.warning(f"Private orgs: {private_orgs} \n\n {orgs}")
 
     if user:
         user_orgs = orgs
-        log.warning(f"User orgs: {user_orgs} \n\n {orgs}")
     results = get_hierarchy_group(context, orgs, "organization", q, private_orgs, user_orgs)
     return results
 
