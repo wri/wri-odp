@@ -182,7 +182,8 @@ describe("Assigning Team User Roles", () => {
     cy.get("input[name=title]").should("have.value", parentOrg + " edited");
     cy.get("input[name=title]")
       .clear()
-      .type(parentOrg + " edited again");
+      .type(parentOrg + " edited again")
+      .blur();
     cy.get("button[type=submit]").click();
 
     cy.visit(`/teams/${parentOrg}`);
