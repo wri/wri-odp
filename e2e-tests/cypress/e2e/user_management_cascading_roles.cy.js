@@ -187,7 +187,12 @@ describe("Assigning Team User Roles", () => {
     cy.get("button[type=submit]").click();
 
     cy.visit(`/teams/${parentOrg}`);
-    cy.contains(parentOrg + " edited again");
+    cy.contains("div", "Edit").should("exist");
+    cy.contains("div", "Edit")
+      .click()
+      .then(() => {
+        cy.get("input[name=title]").should("have.value", parentOrg + " edited again");
+      });
 
     cy.visit(`/teams/${childOrg}`);
     cy.contains("div", "Edit").should("not.exist");
