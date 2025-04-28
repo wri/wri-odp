@@ -40,6 +40,12 @@ const apiUrl = (path) => {
 Cypress.Commands.add("login", (username, password) => {
   cy.session([username, password], () => {
     cy.visit("/");
+    cy.get('body').then(($body) => {
+      if ($body.find('.osano-cm-manage').length) {
+        cy.get('.osano-cm-manage').click({ force: true });
+        cy.contains('button', 'Save').click({ force: true });
+      }
+    });
     cy.get("#nav-login-button").click();
     cy.get("#login-modal").as("login-modal");
 

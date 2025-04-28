@@ -231,6 +231,7 @@ export default function TeamForm({
                                   ]
                         }
                         placeholder="Select visibility"
+                        disabled={!sysadmin && watch('visibility')?.value === 'private'}
                     />
                     <ErrorDisplay name="visibility" errors={errors} />
                 </InputGroupCustom>
