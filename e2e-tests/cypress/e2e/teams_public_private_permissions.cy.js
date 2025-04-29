@@ -6,6 +6,9 @@ const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 const normalUserEmail = Math.random().toString(36).slice(2) + "@test.com";
 const normalUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_member`;
 const normalUserPassword = "test1234";
+const adminUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_admin`;
+const adminUserEmail = Math.random().toString(36).slice(2) + "@test.com";
+const adminUserPassword = "test1234";
 
 const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`.toLowerCase();
 Cypress.on("uncaught:exception", (err, runnable) => {
@@ -16,8 +19,10 @@ Cypress.on("uncaught:exception", (err, runnable) => {
 describe("Create public Team", () => {
   before(() => {
     cy.createUserApi(normalUser, normalUserEmail, normalUserPassword);
+    cy.createUserApi(adminUser, adminUserEmail, adminUserPassword);
     cy.createOrganizationAPI(parentOrg);
-    cy.createOrganizationMemberAPI(parentOrg, normalUser, "admin");
+    cy.createOrganizationMemberAPI(parentOrg, normalUser, "editor");
+    cy.createOrganizationMemberAPI(parentOrg, adminUser, "admin");
   });
 
   beforeEach(() => {
@@ -48,48 +53,34 @@ describe("Create public Team", () => {
     });
   });
 
-  it("Normal user can change visibility to private", () => {
+  it("Normal user can't change visibility", () => {
     cy.logout();
     cy.login(normalUser, normalUserPassword);
 
-    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", parentOrg);
-      cy.get("span.block").contains("Public").should("exist");
-
-      cy.get("button#visibility").click();
-      cy.get("li").contains("Private").click();
-    });
-    cy.get("button[type=submit]").click();
-
-    cy.contains(`Successfully edited the ${parentOrg} team`);
-
-    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", parentOrg);
-      cy.get("span.block").contains("Private").should("exist");
-      cy.get("button#visibility").should("be.disabled");
-
-      cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${parentOrg} team`);
-    });
+    cy.visit(`/dashboard/teams/${parentOrg}/edit`);
+    cy.get("span.block").contains("Public").should("exist");
+    cy.get("button#visibility").should("be.disabled");
   });
 
-  it("Normal user can't change visibility to public", () => {
+  it("Admin can change visibility to private but not back to public", () => {
     cy.logout();
-    cy.login(normalUser, normalUserPassword);
+    cy.login(adminUser, adminUserPassword);
 
-    cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", parentOrg);
-      cy.get("span.block").contains("Private").should("exist");
+    cy.visit(`/dashboard/teams/${parentOrg}/edit`);
+    cy.get("span.block").contains("Public").should("exist");
+    cy.get("button#visibility").click();
+    cy.get("li").contains("Private").click();
+    cy.get("button[type=submit]").click();
+    cy.contains(`Successfully edited the ${parentOrg} team`);
 
-      cy.get("button#visibility").should("be.disabled");
-
-      cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${parentOrg} team`);
-    });
+    cy.visit(`/dashboard/teams/${parentOrg}/edit`);
+    cy.get("span.block").contains("Private").should("exist");
+    cy.get("button#visibility").should("be.disabled");
   });
 
   after(() => {
     cy.deleteOrganizationAPI(parentOrg);
     cy.deleteUserApi(normalUser);
+    cy.deleteUserApi(adminUser);
   });
 });
