@@ -66,6 +66,31 @@ def build_download_filename(dataset_id: str, context) -> str:
         return False
 
 
+
+def get_admin_emails_for_dataset(dataset_id: str) -> list[str]:
+    package = p.toolkit.get_action("package_show")(
+        {"ignore_auth": True}, {"id": dataset_id}
+    )
+    organization = package.get("organization", None)
+    admin_email = []
+    if organization:
+        organization = organization.get("name")
+        org = p.toolkit.get_action("organization_show")(
+            {"ignore_auth": True}, {"id": organization, "include_users": True}
+        )
+        users = org.get("users", [])
+        if users:
+            for user in users:
+                if user.get("capacity") == "admin":
+                    users_obj = p.toolkit.get_action("user_show")(
+                        {"ignore_auth": True}, {"id": user.get("id")}
+                    )
+                    if users_obj.get("email", False):
+                        admin_email.append(users_obj.get("email"))
+    return admin_email
+
+
+
 def zipped_download_request(context: Context, data_dict: dict[str, Any]):
     prefect_url: str = config.get("ckanext.wri.prefect_url")
     deployment_name: str = config.get("ckanext.wri.datapusher_deployment_name")
@@ -93,11 +118,21 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
         "state": "submitting",
         "key": filename,
         "value": "{}",
-        "error": "{}",
+        "error": "{}", 
     }
 
+    admin_email= get_admin_emails_for_dataset(dataset_id)
+    log.error(f"admin_email: {admin_email}")
+
+    
+    value = {}
+    if admin_email:
+        value["admin_emails"] = admin_email
+    
     if email:
-        task["value"] = json.dumps({"emails": [email]})
+        value["emails"] = [email]
+
+    task["value"] = json.dumps(value)
 
     try:
         existing_task = p.toolkit.get_action("task_status_show")(
@@ -129,6 +164,8 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
 
                 if update_emails:
                     existing_task_values["emails"] = existing_task_emails
+                    if admin_email:
+                        existing_task_values["admin_emails"] = admin_email
                     existing_task["value"] = json.dumps(existing_task_values)
                     p.toolkit.get_action("task_status_update")(
                         {"ignore_auth": True}, existing_task
@@ -204,7 +241,7 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email], "Zipped data")
+        send_error([email]+admin_email, "Zipped data")
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -226,13 +263,16 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email], "Zipped data")
+        send_error([email] + admin_email, "Zipped data")
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
 
     if email:
         value["emails"] = [email]
+
+    if admin_email:
+        value["admin_emails"] = admin_email
 
     value["download_filename"] = download_filename
 
@@ -265,21 +305,23 @@ def zipped_download_callback(context: Context, data_dict: dict[str, Any]):
 
     value = json.loads(task["value"])
     emails = value.get("emails", [])
+    admin_email = value.get("admin_emails", [])
     download_filename = value.get("download_filename")
 
     if state == "complete":
         url = data_dict.get("url")
         send_email(emails, url, download_filename)
     else:
-        send_error(emails, download_filename)
+        send_error(emails+admin_email, download_filename)
         log.error(error)
 
 def send_error_callback(context: Context, data_dict: dict[str, Any]):
     entity_id = data_dict.get("entity_id")
+    task_type = data_dict.get("task_type")
     key = data_dict.get("key")
     task = p.toolkit.get_action("task_status_show")(
         context,
-        {"entity_id": entity_id, "task_type": "download_zipped", "key": key},
+        {"entity_id": entity_id, "task_type": task_type, "key": key},
     )
 
     if not task:
@@ -287,6 +329,8 @@ def send_error_callback(context: Context, data_dict: dict[str, Any]):
     
     value = json.loads(task["value"])
     emails = value.get("emails", [])
+    admin_emails = value.get("admin_emails", [])
+    emails += admin_emails
     download_filename = value.get("download_filename")
     dataset_name = fetch_dataset_name({
         "entity_id": entity_id,
