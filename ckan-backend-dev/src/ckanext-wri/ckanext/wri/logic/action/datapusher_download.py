@@ -6,7 +6,7 @@ import ckan.logic as logic
 import ckanext.s3filestore.uploader as uploader
 from ckan.lib.mailer import mail_recipient
 from ckan.common import config
-from .datapusher_download_zip import  fetch_dataset_name
+from .datapusher_download_zip import  fetch_dataset_name, get_admin_emails_for_dataset
 
 import datetime
 import requests
@@ -75,8 +75,21 @@ def download_request(context: Context, data_dict: dict[str, Any]):
         "error": "{}",
     }
 
+    dataset_id = fetch_dataset_name({
+        "entity_id": res_id,
+        "entity_type": "resource"
+    })
+    admin_email= get_admin_emails_for_dataset(dataset_id)
+
+    value = {}
+    if admin_email:
+        value["admin_emails"] = admin_email
+    
     if email:
-        task["value"] = json.dumps({"emails": [email]})
+        value["emails"] = [email]
+
+    task["value"] = json.dumps(value)
+
 
     try:
         existing_task = p.toolkit.get_action("task_status_show")(
@@ -105,6 +118,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
 
                 if update_emails:
                     existing_task_values['emails'] = existing_task_emails
+                    existing_task_values["admin_emails"] = admin_email
                     existing_task['value'] = json.dumps(existing_task_values)
                     p.toolkit.get_action("task_status_update")({ "ignore_auth": True }, existing_task)
 
@@ -182,7 +196,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
             "entity_id": res_id,
             "entity_type": "resource"
         })
-        send_error([email], resource_title, dataset_name)
+        send_error([email]+admin_email, resource_title, dataset_name)
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -208,11 +222,11 @@ def download_request(context: Context, data_dict: dict[str, Any]):
             "entity_id": res_id,
             "entity_type": "resource"
         })
-        send_error([email], resource_title, dataset_name)
+        send_error([email]+admin_email, resource_title, dataset_name)
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
-
+    value["admin_emails"] = admin_email
     if email:
         value["emails"] = [email]
 
@@ -251,6 +265,7 @@ def download_callback(context: Context, data_dict: dict[str, Any]):
 
     value = json.loads(task["value"])
     emails = value.get("emails", [])
+    admin_email = value.get("admin_emails", [])
     download_filename = value.get("download_filename")
 
     log.info("Preparing to send email...")
@@ -263,7 +278,7 @@ def download_callback(context: Context, data_dict: dict[str, Any]):
             "entity_id": entity_id,
             "entity_type": "resource"
         })
-        send_error(emails, download_filename, dataset_name)
+        send_error(emails+admin_email, download_filename, dataset_name)
         log.error(error)
 
 

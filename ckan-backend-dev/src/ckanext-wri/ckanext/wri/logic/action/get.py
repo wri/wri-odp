@@ -1848,7 +1848,6 @@ def organization_show(context, data_dict):
     data_dict = old_organization_show(context, data_dict)
     user = context.get("user")
 
-
     if not authz.is_sysadmin(user):
         is_authorized = get_action("organization_list")(context, {"q": data_dict.get("name")})
         if not is_authorized:
