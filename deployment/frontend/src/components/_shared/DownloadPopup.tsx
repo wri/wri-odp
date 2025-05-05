@@ -237,6 +237,7 @@ export function DownloadPopup({
                                             {subtitle}
                                         </Dialog.Title>
                                         <form
+                                            form-id="email-download"
                                             onSubmit={handleSubmit(onSubmit)}
                                             className="mt-6 text-left flex flex-col gap-y-2"
                                         >
@@ -585,6 +586,7 @@ export function DirectDownloadPopup({
                                             {subtitle}
                                         </Dialog.Title>
                                         <form
+                                            form-id="direct-download"
                                             onSubmit={handleSubmit(onSubmit)}
                                             className="mt-6 text-left flex flex-col gap-y-2"
                                         >
