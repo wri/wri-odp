@@ -647,6 +647,7 @@ export default function DatasetPage(
                 />
             )}
             <DatasetPageLayout
+                hasViz={canVisualizeDataset(datasetData as any)}
                 lhs={
                     isAddingLayers ? (
                         <div className="px-4 sm:px-6">
@@ -847,4 +848,42 @@ export default function DatasetPage(
             />
         </>
     )
+}
+
+/**
+ * Checks if a dataset has resources or properties that allow for
+ * map or table visualization previews.
+ *
+ * @param {WriDataset} dataset - The dataset object to check.
+ * @returns {boolean} True if the dataset can be visualized, false otherwise.
+ */
+function canVisualizeDataset(dataset: WriDataset) {
+    // If dataset or its resources are not available, it cannot be visualized
+    if (!dataset || !dataset.resources) {
+        return false
+    }
+
+    // Check for a map layer resource (based on format 'Layer' or presence of rw_id)
+    const hasLayerResource = dataset.resources.some(
+        (resource) => resource.format === 'Layer' || resource.rw_id
+    )
+    if (hasLayerResource) {
+        return true
+    }
+
+    // Check for a table preview based on dataset-level provider and rw_id
+    if (dataset.provider && dataset.rw_id) {
+        return true
+    }
+
+    // Check for a table preview based on a resource with datastore_active
+    const hasDatastoreResource = dataset.resources.some(
+        (resource) => resource.datastore_active
+    )
+    if (hasDatastoreResource) {
+        return true
+    }
+
+    // If none of the above conditions are met, it cannot be visualized
+    return false
 }
