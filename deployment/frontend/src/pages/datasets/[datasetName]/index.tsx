@@ -647,7 +647,10 @@ export default function DatasetPage(
                 />
             )}
             <DatasetPageLayout
-                hasViz={canVisualizeDataset(datasetData as any)}
+                hasViz={
+                    canVisualizeDataset(datasetData as any) ||
+                    canVisualizeDataset(prevDatasetData as any)
+                }
                 lhs={
                     isAddingLayers ? (
                         <div className="px-4 sm:px-6">
@@ -850,13 +853,6 @@ export default function DatasetPage(
     )
 }
 
-/**
- * Checks if a dataset has resources or properties that allow for
- * map or table visualization previews.
- *
- * @param {WriDataset} dataset - The dataset object to check.
- * @returns {boolean} True if the dataset can be visualized, false otherwise.
- */
 function canVisualizeDataset(dataset: WriDataset) {
     // If dataset or its resources are not available, it cannot be visualized
     if (!dataset || !dataset.resources) {
