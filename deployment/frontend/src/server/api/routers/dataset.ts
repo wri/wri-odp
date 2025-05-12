@@ -167,7 +167,7 @@ export const DatasetRouter = createTRPCRouter({
                     language: input.language?.value ?? '',
                     license_id: input.license_id?.value ?? '',
                     license_title: input.license_id?.label ?? '',
-                    owner_org: input.team ? input.team.value : '',
+                    owner_org: input.team.value,
                     collaborators: null,
                     rw_id: '',
                     update_frequency: input.update_frequency?.value ?? '',
@@ -467,12 +467,11 @@ export const DatasetRouter = createTRPCRouter({
                         license_id: input.license_id?.value ?? '',
                         license_title: input.license_id?.label ?? '',
                         rw_id: rw_id ?? '',
-                        owner_org: input.team
-                            ? datasetDetails.organization?.name ===
-                              input.team.value
+                        owner_org:
+                            datasetDetails.organization?.name ===
+                            input.team?.value
                                 ? datasetDetails.owner_org
-                                : input.team.value
-                            : '',
+                                : input.team?.value,
                         organization: org,
                         collaborators: null,
                         update_frequency: input.update_frequency?.value ?? '',
@@ -682,7 +681,7 @@ export const DatasetRouter = createTRPCRouter({
 
                     let data =
                         (await response.json()) as CkanResponse<PendingDataset>
-                    console.log('DATA', data)
+                    // console.log('DATA', data)
                     if (!data.success && data.error) {
                         const error = JSON.stringify(data.error).toLowerCase()
                         if (!error.includes('not found')) {
@@ -712,7 +711,7 @@ export const DatasetRouter = createTRPCRouter({
                                 // get dataset collaborators id
                                 const collab = await fetchDatasetCollabIds(
                                     pendingDataset.id,
-                                    ctx.session.user.apikey
+                                    env.SYS_ADMIN_API_KEY
                                 )
                                 if (
                                     !['private', 'draft'].includes(

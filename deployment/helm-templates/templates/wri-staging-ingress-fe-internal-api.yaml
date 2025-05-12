@@ -25,6 +25,7 @@ metadata:
   name: wri-staging-ingress-fe-internal-api
   namespace: wri-odp-staging
 spec:
+  ingressClassName: nginx
   rules:
   - host: wri.staging.frontend.datopian.com
     http:

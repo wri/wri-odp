@@ -239,6 +239,7 @@ export function DownloadPopup({
                                         <form
                                             form-id="email-download"
                                             onSubmit={handleSubmit(onSubmit)}
+                                            form-id="email-download"
                                             className="mt-6 text-left flex flex-col gap-y-2"
                                         >
                                             <div>
