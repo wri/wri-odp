@@ -71,7 +71,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             href: '/topics',
             active: false,
             count: 0,
-            isSysAdmin: false,
+            isSysAdmin: true,
         },
         {
             name: 'Applications',
@@ -175,7 +175,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                         </div>
                                     </Transition.Child>
                                     {/* Sidebar component, swap this element with another sidebar if you like */}
-                                    <div className="flex grow flex-col gap-y-5 overflow-y-auto   bg-wri-green pb-4">
+                                    <div className="flex grow flex-col gap-y-5 overflow-y-auto   bg-wri-green pb-4 dashboard-sidebar">
                                         <nav className="flex flex-1 flex-col ">
                                             <ul
                                                 role="list"
@@ -318,7 +318,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             className="hidden w-full sm:max-w-[300px] lg:z-10 lg:flex lg:flex-col "
                         >
                             {/* Sidebar component, swap this element with another sidebar if you like */}
-                            <div className="flex grow flex-col gap-y-5  pb-4  bg-wri-green">
+                            <div className="flex grow flex-col gap-y-5  pb-4 bg-wri-green dashboard-sidebar">
                                 <nav className="flex flex-1 flex-col ">
                                     <ul
                                         role="list"
@@ -328,12 +328,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                             <UserProfile />
                                         </li>
                                         {navigation.map((item) => {
-                                                    if (
-                                                        item.isSysAdmin &&
-                                                        !session?.user.sysadmin
-                                                    ) {
-                                                        return <></>
-                                                    }
+                                            if (
+                                                item.isSysAdmin &&
+                                                !session?.user.sysadmin
+                                            ) {
+                                                return <></>
+                                            }
                                             return (
                                                 <Fragment key={item.name}>
                                                     {item.name ==

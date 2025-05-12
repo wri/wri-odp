@@ -10,6 +10,25 @@ import { api } from '@/utils/api'
 import Spinner from '../_shared/Spinner'
 import EditCard from './EditCard'
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline'
+import { useEffect } from 'react'
+import { WriUser } from '@/schema/ckan.schema'
+
+async function getCascadingUserCapacity(
+    utils: ReturnType<typeof api.useUtils>,
+    orgId: string,
+    username: string
+): Promise<string | undefined> {
+    let currentId = orgId;
+
+    while (currentId) {
+        const data = await utils.teams.getTeam.fetch({ id: currentId });
+        const user = data.users?.find((u) => u.name === username);
+        if (user?.capacity) return user.capacity;
+        currentId = data.parent ?? '';
+    }
+
+    return undefined;
+}
 
 export default function TeamHeaderCard({
     teams,
@@ -30,6 +49,26 @@ export default function TeamHeaderCard({
             enabled: !!enableQuery,
         }
     )
+
+    const [currentUserCapacity, setCurrentUserCapacity] = useState<string | undefined>(undefined);
+    const utils = api.useUtils();
+
+    useEffect(() => {
+        if (!session?.user?.name || !team?.id || currentUserCapacity) return;
+
+        const fallback = async () => {
+            const localRole = orgdetails.data?.users?.find((u: WriUser) => u.name === session.user.name)?.capacity;
+            const next = localRole || await getCascadingUserCapacity(utils, team.id, session.user.name!);
+
+            if (next) {
+                setCurrentUserCapacity(next);
+            }
+        };
+
+        fallback().catch(console.error);
+    }, [session?.user?.name, team?.id, orgdetails.data]);
+
+    let canEdit = currentUserCapacity === 'admin';
 
     return (
         <section
@@ -67,7 +106,7 @@ export default function TeamHeaderCard({
                     </div>
                 </div>
                 <div className="w-full px-2 md:w-fit flex flex-col justify-center gap-y-3 md:pl-8">
-                    {authorized && !enableQuery ? (
+                    {(authorized && !enableQuery) || canEdit ? (
                         <>
                             <Link
                                 href={`/dashboard/teams/${team.name}/edit`}

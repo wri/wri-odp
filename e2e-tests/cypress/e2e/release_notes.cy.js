@@ -19,7 +19,7 @@ describe("Release notes", () => {
     cy.createGroupAPI(topic);
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     cy.login(user, "test_user");
     cy.viewport(1920, 1080);
   });
@@ -37,6 +37,8 @@ describe("Release notes", () => {
       cy.get("input[name=title]").type(dataset);
       cy.get("input[name=name]").should("have.value", dataset);
       cy.get("input[name=url]").type("https://google.com");
+      cy.get("#team").click();
+      cy.get("li").contains(org).click();
       cy.get("#visibility_type").click();
       cy.get("li").contains("Public").click();
       cy.get("textarea[name=short_description]").type("test");
@@ -87,9 +89,9 @@ describe("Release notes", () => {
         force: true,
       });
       cy.get('[type="submit"]').click({ force: true });
-     cy.contains(`Successfully edited the "${dataset}" dataset`, {
-       timeout: 30000,
-     });
+      cy.contains(`Successfully edited the "${dataset}" dataset`, {
+        timeout: 30000,
+      });
     })
 
   it(
@@ -105,7 +107,7 @@ describe("Release notes", () => {
       cy.contains('Related Datasets', { timeout: 10000 })
       cy.contains('Collaborators', { timeout: 50000 })
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
-      cy.contains("Testing release notes", { timeout: 60000});
+      cy.contains("Testing release notes", { timeout: 60000 });
       cy.contains("Approve request").click({ force: true });
       cy.contains("Approve Dataset").click({ force: true });
       cy.wait(5000);
@@ -126,7 +128,7 @@ describe("Release notes", () => {
       cy.contains('Related Datasets', { timeout: 10000 })
       cy.contains('Collaborators', { timeout: 50000 })
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
-      cy.contains("Testing release notes", { timeout: 60000});
+      cy.contains("Testing release notes", { timeout: 60000 });
     },
   );
 

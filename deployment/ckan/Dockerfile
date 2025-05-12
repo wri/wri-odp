@@ -14,7 +14,7 @@ RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf285
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/signed-url/dev-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@a9e42702b797eaf3ffe967040867519219d32224#egg=ckanext-auth' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-hierarchy.git@wri#egg=ckanext-hierarchy' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-hierarchy.git@5d069a5d032ba384f43d266fc397a0aa0a4b444c#egg=ckanext-hierarchy' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ea2b3cbace924a162de009fd8e5626052ebc99e1#egg=ckanext-issues' && \
     # Required by ckanext-issues, but it's no longer included in any of the requirements files or the subdependencies
     pip3 install mock && \
@@ -93,6 +93,7 @@ RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
 RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_unowned_dataset = false"
 
 RUN if [ "$GITHUB_ACTIONS" = "true" ]; then ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"; fi
 
