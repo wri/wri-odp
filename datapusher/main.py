@@ -19,7 +19,7 @@ from tasks.normalize_timestamps import normalize_timestamps
 from tasks.sort_and_dedup import sort_and_dedup
 from tasks.validate_csv import validate_csv
 from tasks.data_to_file import data_to_file
-from tasks.s3_upload import s3_upload
+from tasks.s3_upload import s3_upload, s3_upload_zip
 from tasks.zip_files import download_keys, zip_files
 
 from tasks.send_callback import send_callback
@@ -269,7 +269,7 @@ async def download_resources_zipped(
             logger.info("Zipped data to {}".format(zipped_file))
             tmp_filepath = os.path.join(temp_dir, zipped_file)
             logger.info("Uploading data...")
-            url = s3_upload(
+            url = s3_upload_zip(
                 tmp_filepath, "_downloads_cache/{}".format(f"{filename}.zip"), f"{download_filename}.zip"
             )
         send_callback(
