@@ -16,6 +16,8 @@ def s3_upload(filepath: str, object_name: str, download_filename: str):
             region_name=s3_config.get("S3_BUCKET_REGION"),
             )
 
+    if download_filename.lower().endswith('.zip'):
+        download_filename = download_filename + '.zip'
     s3_client.upload_file(
             filepath,
             s3_config.get("S3_BUCKET_NAME"),
@@ -23,7 +25,9 @@ def s3_upload(filepath: str, object_name: str, download_filename: str):
             # TODO: should this be public? Resoning: we don't know when the user is going
             # to access the email
             # ExtraArgs={'ACL': 'public-read'}
-            ExtraArgs={'ContentDisposition': 'attachment; filename="{}"'.format(download_filename)}
+            ExtraArgs={'ContentDisposition': 'attachment; filename="{}"'.format(download_filename),
+                       'ContentType': 'application/zip' # <--- This is key for format
+            }
             )
 
     url = s3_client.generate_presigned_url(
