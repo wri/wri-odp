@@ -681,7 +681,7 @@ export const DatasetRouter = createTRPCRouter({
 
                     let data =
                         (await response.json()) as CkanResponse<PendingDataset>
-                    console.log('DATA', data)
+                    // console.log('DATA', data)
                     if (!data.success && data.error) {
                         const error = JSON.stringify(data.error).toLowerCase()
                         if (!error.includes('not found')) {
@@ -711,7 +711,7 @@ export const DatasetRouter = createTRPCRouter({
                                 // get dataset collaborators id
                                 const collab = await fetchDatasetCollabIds(
                                     pendingDataset.id,
-                                    ctx.session.user.apikey
+                                    env.SYS_ADMIN_API_KEY
                                 )
                                 if (
                                     !['private', 'draft'].includes(
