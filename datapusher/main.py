@@ -33,6 +33,8 @@ DATASTORE_URLS = {
     "resource_update": "{ckan_url}/api/action/resource_patch",
 }
 
+DEPLOYMENT_ENV = os.environ["FLOW_DEPLOYMENT_ENV"]
+
 
 @flow(log_prints=True)
 def push_to_datastore(resource_id, api_key):
@@ -311,6 +313,7 @@ if __name__ == "__main__":
         parameters={"resource_id": "test_id", "api_key": "api_key"},
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     download_zipped_deployment = download_resources_zipped.to_deployment(
         name=config.get("DEPLOYMENT_NAME"),
@@ -324,6 +327,7 @@ if __name__ == "__main__":
         },
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     conversion_deployment = convert_store_to_file.to_deployment(
         name=config.get("DEPLOYMENT_NAME"),
@@ -341,6 +345,7 @@ if __name__ == "__main__":
         },
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     download_subset_deployment = download_subset_of_data.to_deployment(
         name=config.get("DEPLOYMENT_NAME"),
@@ -359,6 +364,7 @@ if __name__ == "__main__":
         },
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     serve(
         datastore_deployment,
