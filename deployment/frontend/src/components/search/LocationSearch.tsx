@@ -6,6 +6,7 @@ import { Dispatch, SetStateAction } from 'react'
 import { SearchInput } from '@/schema/search.schema'
 import { Filter } from '@/interfaces/search.interface'
 import classNames from '@/utils/classnames'
+import { HideBoundaries } from '../_shared/HideBoundaries'
 
 export default function LocationSearch({
     setFilters,
@@ -145,6 +146,7 @@ export default function LocationSearch({
                                     dragRotate={false}
                                     touchZoomRotate={false}
                                 >
+                                    <HideBoundaries />
                                     <GeocoderControl
                                         mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                         position="bottom-right"
