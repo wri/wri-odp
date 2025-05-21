@@ -268,7 +268,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
             "entity_id": id if provider == "datastore" else dataset_id,
             "entity_type": "resource" if provider == "datastore" else "dataset"
         })
-        send_error([email]+admin_email, "Subset of data", dataset_name)
+        send_error([email], admin_email, "Subset of data", dataset_name)
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -294,7 +294,7 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
             "entity_id": id if provider == "datastore" else dataset_id,
             "entity_type": "resource" if provider == "datastore" else "dataset"
         })
-        send_error([email]+admin_email, "Subset of data", dataset_name)
+        send_error([email],admin_email, "Subset of data", dataset_name)
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
@@ -345,7 +345,7 @@ def subset_download_callback(context: Context, data_dict: dict[str, Any]):
             "entity_id": entity_id,
             "entity_type": data_dict.get("entity_type", "resource")
         })
-        send_error(emails + admin_emails, download_filename, dataset_name)
+        send_error(emails, admin_emails, download_filename, dataset_name)
         log.error(error)
 
 
@@ -404,8 +404,34 @@ ERROR_EMAIL_HTML = """
 
 """
 
+ERROR_EMAIL_HTML_ADMIN = """
+<html>
+    <body>
+         <p> 
+         Our systems encountered an error during the packaging of this data and we are unable to deliver your files at this time.
+        </p>
 
-def send_error(emails: list[str], resource_title, dataset_name):
+        <b>
+        {}
+        </b>
+        </br>
+        <b>
+        <a target="_blank" href="{}/datasets/{}">Dataset link</a>
+        </b>
+
+        <p>
+        This may be a temporary issue but more likely represents some misconfiguration in our systems. 
+        Please reach out to <a href="mailto:data@wri.org">data@wri.org</a> to request immediate support.
+        </p>
+        <br>
+        <a target="_blank" href="{}">{}</a>
+    </body>
+</html>
+
+"""
+
+
+def send_error(emails: list[str], admin_email , resource_title, dataset_name):
     odp_url = config.get("ckanext.wri.odp_url")
     for email in emails:
         mail_recipient(
@@ -414,4 +440,13 @@ def send_error(emails: list[str], resource_title, dataset_name):
             "WRI - Failed to process file ({})".format(resource_title),
             "",
             ERROR_EMAIL_HTML.format(dataset_name,odp_url,dataset_name,odp_url, odp_url),
+        )
+
+    for email in admin_email:
+        mail_recipient(
+            "",
+            email,
+            "WRI - Failed to process file ({})".format(resource_title),
+            "",
+            ERROR_EMAIL_HTML_ADMIN.format(dataset_name,odp_url,dataset_name,odp_url, odp_url),
         )

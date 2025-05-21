@@ -241,7 +241,7 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email]+admin_email, "Zipped data")
+        send_error([email],admin_email, "Zipped data")
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -263,7 +263,7 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email] + admin_email, "Zipped data")
+        send_error([email] , admin_email, "Zipped data")
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
@@ -312,7 +312,7 @@ def zipped_download_callback(context: Context, data_dict: dict[str, Any]):
         url = data_dict.get("url")
         send_email(emails, url, download_filename)
     else:
-        send_error(emails+admin_email, download_filename)
+        send_error(emails,admin_email, download_filename)
         log.error(error)
 
 def send_error_callback(context: Context, data_dict: dict[str, Any]):
@@ -330,13 +330,12 @@ def send_error_callback(context: Context, data_dict: dict[str, Any]):
     value = json.loads(task["value"])
     emails = value.get("emails", [])
     admin_emails = value.get("admin_emails", [])
-    emails += admin_emails
     download_filename = value.get("download_filename")
     dataset_name = fetch_dataset_name({
         "entity_id": entity_id,
         "entity_type": data_dict.get("entity_type", "dataset")
     })
-    send_error(emails, download_filename, dataset_name)
+    send_error(emails, admin_emails, download_filename, dataset_name)
 
 
 def fetch_dataset_name(data_dict):
@@ -411,7 +410,7 @@ ERROR_EMAIL_HTML = """
 """
 
 
-def send_error(emails: list[str], resource_title,dataset_name: str=None):
+def send_error(emails: list[str], admin_emails, resource_title,dataset_name: str=None):
     odp_url = config.get("ckanext.wri.odp_url")
     datasetName = dataset_name if dataset_name else resource_title
     for email in emails:
@@ -422,3 +421,40 @@ def send_error(emails: list[str], resource_title,dataset_name: str=None):
             "",
             ERROR_EMAIL_HTML.format(datasetName,odp_url,datasetName,odp_url, odp_url),
         )
+
+    for email in admin_emails:
+        mail_recipient(
+            "",
+            email,
+            "WRI data file could not be delivered ({})".format(resource_title),
+            "",
+            ERROR_EMAIL_HTML_ADMIN.format(datasetName,odp_url,datasetName,odp_url, odp_url),
+        )
+
+
+
+ERROR_EMAIL_HTML_ADMIN = """
+<html>
+    <body>
+         <p> 
+         Our systems encountered an error during the packaging of this data and we are unable to deliver your files at this time.
+        </p>
+
+        <b>
+        {}
+        </b>
+        </br>
+        <b>
+        <a target="_blank" href="{}/datasets/{}">Dataset link</a>
+        </b>
+
+        <p>
+        This may be a temporary issue but more likely represents some misconfiguration in our systems. 
+        Please reach out to <a href="mailto:data@wri.org">data@wri.org</a> to request immediate support.
+        </p>
+        <br>
+        <a target="_blank" href="{}">{}</a>
+    </body>
+</html>
+
+"""
