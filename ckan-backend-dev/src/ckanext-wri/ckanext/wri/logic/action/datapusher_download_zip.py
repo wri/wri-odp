@@ -331,26 +331,33 @@ def send_error_callback(context: Context, data_dict: dict[str, Any]):
     emails = value.get("emails", [])
     admin_emails = value.get("admin_emails", [])
     download_filename = value.get("download_filename")
-    dataset_name = fetch_dataset_name({
+    dataset_rslt = fetch_dataset_entity({
         "entity_id": entity_id,
         "entity_type": data_dict.get("entity_type", "dataset")
     })
-    send_error(emails, admin_emails, download_filename, dataset_name)
+
+    dataset_name = dataset_rslt.get("name")
+    dataset_team = dataset_rslt.get("organization", {}).get("title")
+    send_error(emails, admin_emails, download_filename,dataset_team, dataset_name)
 
 
-def fetch_dataset_name(data_dict):
+def fetch_dataset_entity(data_dict):
     entity_id = data_dict.get("entity_id")
     entity_type = data_dict.get("entity_type")
     if entity_type == "dataset":
         dataset_dict = p.toolkit.get_action("package_show")(
             {"ignore_auth": True}, {"id": entity_id}
         )
-        return dataset_dict.get("name")
+        return dataset_dict
     else:
         resource_dict = p.toolkit.get_action("resource_show")(
             {"ignore_auth": True}, {"id": entity_id}
         )
-        return resource_dict.get("package_id")
+        pkg_id = resource_dict.get("package_id")
+        dataset_dict = p.toolkit.get_action("package_show")(
+            {"ignore_auth": True}, {"id": pkg_id}
+        )
+        return dataset_dict
     
 
 
@@ -410,7 +417,7 @@ ERROR_EMAIL_HTML = """
 """
 
 
-def send_error(emails: list[str], admin_emails, resource_title,dataset_name: str=None):
+def send_error(emails: list[str], admin_emails, resource_title,dataset_team,dataset_name: str=None):
     odp_url = config.get("ckanext.wri.odp_url")
     datasetName = dataset_name if dataset_name else resource_title
     for email in emails:
@@ -426,9 +433,9 @@ def send_error(emails: list[str], admin_emails, resource_title,dataset_name: str
         mail_recipient(
             "",
             email,
-            "WRI data file could not be delivered ({})".format(resource_title),
+            "WRI data file could not be delivered to one of your users  ({})".format(dataset_name),
             "",
-            ERROR_EMAIL_HTML_ADMIN.format(datasetName,odp_url,datasetName,odp_url, odp_url),
+            ERROR_EMAIL_HTML_ADMIN.format(datasetName,odp_url,datasetName,dataset_team, odp_url, odp_url),
         )
 
 
@@ -437,23 +444,31 @@ ERROR_EMAIL_HTML_ADMIN = """
 <html>
     <body>
          <p> 
-         Our systems encountered an error during the packaging of this data and we are unable to deliver your files at this time.
+        Hello,
+        </p>
+        <p>
+        A user recently attempted to download the below data from the WRI Data Explorer. Due to an unspecified system error, we were unable to deliver the requested files to the user. 
         </p>
 
-        <b>
-        {}
-        </b>
+        
+        <b>Dataset Name</b>:{}
+        
         </br>
-        <b>
-        <a target="_blank" href="{}/datasets/{}">Dataset link</a>
-        </b>
+        
+        <b>Dataset link </b>: <a target="_blank" href="{}/datasets/{}">Dataset link</a>
+
+        </br>
+
+        <b>Team</b>: {}       
 
         <p>
-        This may be a temporary issue but more likely represents some misconfiguration in our systems. 
-        Please reach out to <a href="mailto:data@wri.org">data@wri.org</a> to request immediate support.
+       You are receiving this message because you are an administrator of the Team responsible for this dataset. 
+       The delivery failure is likely due to a misconfiguration of the data in the Data Explorer. 
+       If so, you may wish to investigate. You may also contact a SysAdmin for further assistance.
         </p>
-        <br>
-        <a target="_blank" href="{}">{}</a>
+        </br>
+        Please note: the affected user has received an automated failure notification which directs them to contact <a target="_blank" href="{}">{}</a> if they require immediate support.
+        
     </body>
 </html>
 
