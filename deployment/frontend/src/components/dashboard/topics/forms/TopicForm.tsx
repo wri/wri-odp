@@ -26,7 +26,10 @@ export default function TopicForm({
     } = formObj
     const possibleParents = api.topics.getAllTopics.useQuery()
     return (
-        <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
+        <div
+            id="topicsForm"
+            className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24"
+        >
             <div className="flex flex-col justify-start gap-y-4">
                 <InputGroup label="Title" required>
                     <Input
@@ -100,11 +103,15 @@ export default function TopicForm({
                                 <span className="mt-1">Loading parents...</span>
                             </span>
                         ))
-                        .with({ isError: true, errors: P.select() }, (errors) => (
-                            <span className="flex items-center text-sm text-red-600">
-                                Error({JSON.stringify(errors)}) loading parents, please refresh the page
-                            </span>
-                        ))
+                        .with(
+                            { isError: true, errors: P.select() },
+                            (errors) => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error({JSON.stringify(errors)}) loading
+                                    parents, please refresh the page
+                                </span>
+                            )
+                        )
                         .with({ isSuccess: true, data: P.select() }, (data) => (
                             <SimpleSelect
                                 formObj={formObj}

@@ -10,12 +10,19 @@ const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 describe("Chart view", () => {
+  before(() => {
+    cy.createOrganizationAPI(org);
+  });
+
   it("Should create dataset", () => {
     cy.login(ckanUserName, ckanUserPassword);
     cy.visit("/dashboard/datasets/new");
     cy.get("input[name=title]").type(datasetName);
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("textarea[name=short_description]").type("test");
+
+    cy.get("#team").click();
+    cy.get("li").contains(org).click();
 
     cy.contains("Add Author").click();
     cy.get('input[name="authors.0.name"]').type("Test Author 1");

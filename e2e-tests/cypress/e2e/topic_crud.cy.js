@@ -7,27 +7,25 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const parentTopic = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const topic = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const nonAdminUser = `non-admin-${uuid()}`;
+const nonAdminEmail = `non-admin-${uuid()}@example.com`;
+const nonAdminPassword = "NonAdminPassword123";
 
 describe("Create and edit topics", () => {
   before(() => {
     cy.createGroupAPI(parentTopic);
   });
-  beforeEach(function () {
+  beforeEach(function() {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
   it("Should create and edit team", () => {
     cy.visit("/dashboard/topics/new");
-    //get input with name=title
     cy.get("input[name=title]").type(topic);
-    //check if input with name url has the content of "test-team"
     cy.get("input[name=name]").should("have.value", topic);
     cy.get("textarea[name=description]").type("Test description");
-    //get button with aria-haspopup=true
     cy.get("button[aria-haspopup=listbox]").click();
-    // get li element that contains the text "test-topicanization"
     cy.get("li").contains(parentTopic).click();
-    //get button of type submit and click it
     cy.get("button[type=submit]").click();
     cy.visit(`/dashboard/topics/${topic}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", topic);
@@ -42,5 +40,45 @@ describe("Create and edit topics", () => {
   after(() => {
     cy.deleteGroupAPI(parentTopic);
     cy.deleteGroupAPI(topic);
+    cy.logout(); // Add this line to explicitly log out after the first test group
+  });
+});
+
+describe("Non-admin users cannot access topics", () => {
+  before(() => {
+    cy.clearCookies();
+    cy.clearLocalStorage();
+    cy.window().then((win) => {
+      win.sessionStorage.clear();
+    });
+    // Create a non-admin user
+    cy.createUserApi(nonAdminUser, nonAdminEmail, nonAdminPassword);
+  });
+
+  beforeEach(() => {
+    cy.login(nonAdminUser, nonAdminPassword);
+  });
+
+  it("Should not see Topics in sidebar", () => {
+    cy.viewport(1400, 900);
+    cy.visit("/dashboard");
+    cy.get(".dashboard-sidebar").should("not.contain", "Topics");
+    cy.get(".dashboard-sidebar").should("not.contain", "Add a topic");
+  });
+
+  it("Should not be able to access topic creation page", () => {
+    cy.viewport(1400, 900);
+    cy.visit("/dashboard/topics/new");
+    cy.get("#topicsForm").should("not.exist");
+  });
+
+  it("Should not be able to access topic edit page", () => {
+    cy.viewport(1400, 900);
+    cy.visit(`/dashboard/topics/${topic}/edit`);
+    cy.get("#topicsForm").should("not.exist");
+  });
+
+  after(() => {
+    cy.deleteUserApi(nonAdminUser);
   });
 });

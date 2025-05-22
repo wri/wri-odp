@@ -19,7 +19,7 @@ from tasks.normalize_timestamps import normalize_timestamps
 from tasks.sort_and_dedup import sort_and_dedup
 from tasks.validate_csv import validate_csv
 from tasks.data_to_file import data_to_file
-from tasks.s3_upload import s3_upload, s3_upload_zip
+from tasks.s3_upload import s3_upload
 from tasks.zip_files import download_keys, zip_files
 
 from tasks.send_callback import send_callback
@@ -32,6 +32,8 @@ DATASTORE_URLS = {
     "datastore_delete": "{ckan_url}/api/action/datastore_delete",
     "resource_update": "{ckan_url}/api/action/resource_patch",
 }
+
+DEPLOYMENT_ENV = os.environ["FLOW_DEPLOYMENT_ENV"]
 
 
 @flow(log_prints=True)
@@ -269,7 +271,7 @@ async def download_resources_zipped(
             logger.info("Zipped data to {}".format(zipped_file))
             tmp_filepath = os.path.join(temp_dir, zipped_file)
             logger.info("Uploading data...")
-            url = s3_upload_zip(
+            url = s3_upload(
                 tmp_filepath, "_downloads_cache/{}".format(f"{filename}.zip"), f"{download_filename}.zip"
             )
         send_callback(
@@ -311,6 +313,7 @@ if __name__ == "__main__":
         parameters={"resource_id": "test_id", "api_key": "api_key"},
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     download_zipped_deployment = download_resources_zipped.to_deployment(
         name=config.get("DEPLOYMENT_NAME"),
@@ -324,6 +327,7 @@ if __name__ == "__main__":
         },
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     conversion_deployment = convert_store_to_file.to_deployment(
         name=config.get("DEPLOYMENT_NAME"),
@@ -341,6 +345,7 @@ if __name__ == "__main__":
         },
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     download_subset_deployment = download_subset_of_data.to_deployment(
         name=config.get("DEPLOYMENT_NAME"),
@@ -359,6 +364,7 @@ if __name__ == "__main__":
         },
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     serve(
         datastore_deployment,

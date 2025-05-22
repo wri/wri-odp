@@ -225,6 +225,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     : dataset.spatial
                       ? 'geom'
                       : undefined,
+            extras: dataset?.extras ? dataset.extras : [],
         },
     })
 

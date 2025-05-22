@@ -40,6 +40,12 @@ const apiUrl = (path) => {
 Cypress.Commands.add("login", (username, password) => {
   cy.session([username, password], () => {
     cy.visit("/");
+    cy.get('body').then(($body) => {
+      if ($body.find('.osano-cm-manage').length) {
+        cy.get('.osano-cm-manage').click({ force: true });
+        cy.contains('button', 'Save').click({ force: true });
+      }
+    });
     cy.get("#nav-login-button").click();
     cy.get("#login-modal").as("login-modal");
 
@@ -204,16 +210,24 @@ Cypress.Commands.add("deleteOrganization", (orgName) => {
 });
 
 // Command for frontend test sepecific
-Cypress.Commands.add("createOrganizationAPI", (name, visibility = "public") => {
+Cypress.Commands.add("createOrganizationAPI", (name, visibility = "public", parent = null) => {
   cy.request({
     method: "POST",
     url: apiUrl("organization_create"),
     headers: headers,
-    body: {
-      name: name,
-      title: name,
-      description: "Some organization description",
-      visibility: visibility,
+    body: parent
+      ? {
+          name: name,
+          title: name,
+          description: "Some organization description",
+          visibility: visibility,
+          groups: [{ name: parent }],
+        }
+      : {
+          name: name,
+          title: name,
+          description: "Some organization description",
+          visibility: visibility,
     },
   });
 });
@@ -229,7 +243,7 @@ Cypress.Commands.add(
       body: {
         id: org,
         username: member,
-        role,
+        role: role,
       },
     });
   }

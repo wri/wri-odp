@@ -8,6 +8,7 @@ import { Transition } from '@headlessui/react'
 import classNames from '@/utils/classnames'
 import { useSession } from 'next-auth/react'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { useRouter } from 'next/router'
 
 type RowButton = {
     label?: string
@@ -50,6 +51,7 @@ export default function Row({
 }: RowProps) {
     const [isShowSubRow, setIsShowSubRow] = useState(highlighted)
     const { data: session } = useSession()
+    const router = useRouter()
     // state event to change hover effect on desktop to click effect on mobile
     // const [isHover, setIsHover] = useState(false)
     const enableControlDiv =
@@ -76,7 +78,7 @@ export default function Row({
                             ''
                         )}
                         {controlButtons &&
-                        (session?.user.sysadmin || authorized)
+                        (router.pathname.includes('/topics') ? session?.user.sysadmin : (session?.user.sysadmin || authorized))
                             ? controlButtons.map((button, index) => {
                                   return (
                                       <React.Fragment key={index}>
