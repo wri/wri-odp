@@ -42,6 +42,10 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             current: true,
         },
     ]
+    const userCapacity = api.user.getUserCapacity.useQuery()
+    const isAdminCurrentTeam = userCapacity.data?.adminOrg.some(
+        (org) => org.name === team.name
+    ) ?? false
 
     const TeamSchemaRefine = TeamSchema.superRefine((val, ctx) => {
         if (val.visibility.value === 'public' && val.parent) {
@@ -72,6 +76,12 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                     path: ['parent'],
                     message:
                         'User does not have admin access to edit a sub team',
+                })
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['visibility'],
+                    message:
+                        'User does not have admin access to edit this team',
                 })
             }
         }
@@ -237,6 +247,10 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                                             <TeamForm
                                                 formObj={formObj}
                                                 editing={true}
+                                                sysadmin={sysadmin}
+                                                isAdminCurrentTeam={
+                                                    isAdminCurrentTeam
+                                                }
                                             />
                                         </div>
                                     </div>

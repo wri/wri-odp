@@ -98,6 +98,7 @@ function MemberForm({
     return (
         <div className="flex items-center gap-x-2">
             <div className="grid grow grid-cols-1 items-start gap-x-24 md:grid-cols-2">
+                <span className="hidden" id={`members-${index}-user`} data-value={formObj.watch(`members.${index}.user`).value}/>
                 <InputGroup label="User">
                     {match(allUsers)
                         .with({ isLoading: true }, () => (
@@ -128,6 +129,7 @@ function MemberForm({
                             </span>
                         ))}
                 </InputGroup>
+                <span className="hidden" id={`members-${index}-capacity`} data-value={formObj.watch(`members.${index}.capacity`).value}/>
                 <InputGroup label="Capacity">
                     <SimpleSelect
                         formObj={formObj}

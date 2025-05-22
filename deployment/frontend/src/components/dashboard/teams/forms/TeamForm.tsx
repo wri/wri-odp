@@ -59,9 +59,13 @@ function TooltipForParent() {
 export default function TeamForm({
     formObj,
     editing = false,
+    sysadmin = false,
+    isAdminCurrentTeam = false,
 }: {
     formObj: UseFormReturn<TeamFormType>
     editing?: boolean
+    sysadmin?: boolean
+    isAdminCurrentTeam?: boolean
 }) {
     const {
         register,
@@ -141,6 +145,7 @@ export default function TeamForm({
                     label="Parent"
                     labelClassName="pt-[0.9rem]"
                     className="items-start"
+                    required={!sysadmin}
                 >
                     {match(possibleParents)
                         .with({ isLoading: true }, () => (
@@ -228,6 +233,9 @@ export default function TeamForm({
                                   ]
                         }
                         placeholder="Select visibility"
+                        disabled={(!sysadmin && watch('visibility')?.value === 'private') ||
+                            (!sysadmin && !isAdminCurrentTeam && watch('visibility')?.value === 'public')
+                        }
                     />
                     <ErrorDisplay name="visibility" errors={errors} />
                 </InputGroupCustom>

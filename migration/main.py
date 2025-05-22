@@ -61,6 +61,7 @@ if __name__ == "__main__":
         name=f"migration_deployment_{DEPLOYMENT_ENV}",
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
 
     serve(migration_deployment)

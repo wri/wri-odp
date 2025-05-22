@@ -468,6 +468,7 @@ def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.Pac
     You must be authorized to edit the dataset and the groups that it belongs
     to.
     """
+    validate_visibility(context, data_dict)
     _before_dataset_create_or_update(context, data_dict)
     _check_access("package_patch", context, data_dict)
 
