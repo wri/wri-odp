@@ -1,0 +1,28 @@
+diff --git a/ckan/logic/action/delete.py b/ckan/logic/action/delete.py
+index b26ce09ab..0ba446a47 100644
+--- a/ckan/logic/action/delete.py
++++ b/ckan/logic/action/delete.py
+@@ -402,20 +402,9 @@ def _group_or_org_delete(
+                         .filter(model.Package.state != 'deleted') \
+                         .count()
+         if datasets:
+-            if not authz.check_config_permission(
+-                    'ckan.auth.create_unowned_dataset'):
+-                raise ValidationError({
+-                    'message': _('Organization cannot be deleted while it '
+-                                      'still has datasets')})
+-
+-            pkg_table = model.package_table
+-            # using Core SQLA instead of the ORM should be faster
+-            model.Session.execute(
+-                pkg_table.update().where(
+-                    sqla.and_(pkg_table.c["owner_org"] == group.id,
+-                              pkg_table.c["state"] != 'deleted')
+-                ).values(owner_org=None)
+-            )
++            raise ValidationError({
++                'message': _('Organization cannot be deleted while it '
++                                  'still has datasets')})
+ 
+     # The group's Member objects are deleted
+     # (including hierarchy connections to parent and children groups)
