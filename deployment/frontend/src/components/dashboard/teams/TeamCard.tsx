@@ -21,6 +21,7 @@ import type { GroupTree } from '@/schema/ckan.schema'
 import { useQuery } from 'react-query'
 import { DownloadIcon } from '@/components/_shared/icons/DownloadIcon'
 import { ArchiveBoxArrowDownIcon } from '@heroicons/react/24/solid'
+import { ErrorAlert } from '@/components/_shared/Alerts'
 
 function downloadCsv(data: string, filename: string) {
     const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' })
@@ -112,6 +113,7 @@ function SubCardProfile({
     const [open, setOpen] = useState(false)
     const [selectedTeam, setSelectedTeam] = useState<GroupTree | null>(null)
     const router = useRouter()
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const deleteTeam = api.teams.deleteDashboardTeam.useMutation({
         onSuccess: async (data) => {
             await utils.organization.getUsersOrganizations.invalidate({
@@ -123,6 +125,10 @@ function SubCardProfile({
                 `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} team`,
                 'error'
             )
+        },
+        onError: (error) => {
+          console.log('DELETION ERROR', error)
+          setErrorMessage(error.message)
         },
     })
     const getDownloadEvents = api.downloadEvents.getAllEvents.useMutation({
@@ -342,6 +348,12 @@ function SubCardProfile({
                         >
                             Cancel
                         </Button>
+                    {errorMessage ? (
+                        <ErrorAlert
+                            text={errorMessage}
+                            title="Delete Team failed"
+                        />
+                    ) : null}
                     </div>
                 </Modal>
             )}
@@ -362,6 +374,7 @@ export default function TeamCard() {
         api.organization.getUsersOrganizations.useQuery(query)
     const [selectedTeam, setSelectedTeam] = useState<GroupTree | null>(null)
     const [open, setOpen] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const router = useRouter()
     const deleteTeam = api.teams.deleteDashboardTeam.useMutation({
         onSuccess: async (data) => {
@@ -371,6 +384,10 @@ export default function TeamCard() {
                 `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} team`,
                 'error'
             )
+        },
+        onError: (error) => {
+          console.log('DELETION ERROR', error)
+          setErrorMessage(error.message)
         },
     })
     const getDownloadEvents = api.downloadEvents.getAllEvents.useMutation({
@@ -565,6 +582,14 @@ export default function TeamCard() {
                             Cancel
                         </Button>
                     </div>
+                    <div className="py-2">
+                        {errorMessage ? (
+                            <ErrorAlert
+                                text={errorMessage}
+                                title="Delete Team failed"
+                            />
+                        ) : null}
+                        </div>
                 </Modal>
             )}
         </section>
