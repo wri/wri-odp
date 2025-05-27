@@ -38,6 +38,10 @@ from ckanext.harvest.model import HarvestObject
 log = logging.getLogger(__name__)
 
 
+def asbool_check(val) -> bool:
+    return str(val).strip().lower() == "true"
+
+
 class WRIHarvesterBase(HarvesterBase):
     """
     Base class for WRI harvesters
@@ -895,7 +899,7 @@ class CKANHarvesterWRI(WRIHarvesterBase):
                 # Clear remote url_type for resources (eg datastore, upload) as
                 # we are only creating normal resources with links to the
                 # remote ones
-                if not self.config.get("create_resources", False) and not harvest_object.job.source.url.strip("/") in resource.get("url", ""):
+                if asbool_check(self.config.get("create_resources")) is False and harvest_object.job.source.url.strip("/") not in resource.get("url", ""):
                     resource.pop("url_type", None)
 
                 # Clear revision_id as the revision won't exist on this CKAN
