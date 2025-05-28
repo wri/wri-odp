@@ -61,6 +61,8 @@ def build_download_filename(dataset_id: str, context) -> str:
             or dataset_dict.get("id")
             or "file"
         )
+        if not download_filename.lower().endswith('.zip'):
+            download_filename = download_filename + '.zip'
         return download_filename
     except logic.NotFound:
         return False
