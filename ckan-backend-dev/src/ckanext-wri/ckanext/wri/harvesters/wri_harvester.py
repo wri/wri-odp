@@ -116,7 +116,7 @@ class WRIHarvesterBase(HarvesterBase):
         return package_dict
 
     def _create_or_update_package(
-        self, package_dict, harvest_object, package_dict_form="rest"
+        self, package_dict, harvest_object, package_dict_form="rest", create_resources=False
     ):
         """
         Creates a new package or updates an existing one according to the
@@ -161,6 +161,7 @@ class WRIHarvesterBase(HarvesterBase):
         for rest api based dicts
         """
         assert package_dict_form in ("rest", "package_show")
+
         try:
             # Change default schema
             schema = default_create_package_schema()
@@ -219,7 +220,10 @@ class WRIHarvesterBase(HarvesterBase):
                         "old_package_update"
                     )(context, package_dict)
                     package_dict["id"] = new_package["id"]
-                    new_package = self._upload_resources(context, package_dict, harvest_object)
+
+                    if create_resources:
+                        log.info("create_resources is set to True, uploading resources")
+                        new_package = self._upload_resources(context, package_dict, harvest_object)
                 else:
                     log.info(
                         "No changes to package with GUID %s, skipping..."
@@ -271,7 +275,10 @@ class WRIHarvesterBase(HarvesterBase):
                     "old_package_create"
                 )(context, package_dict)
                 package_dict["id"] = new_package["id"]
-                new_package = self._upload_resources(context, package_dict, harvest_object)
+
+                if create_resources:
+                    log.info("create_resources is set to True, uploading resources")
+                    new_package = self._upload_resources(context, package_dict, harvest_object)
 
             Session.commit()
 
@@ -697,6 +704,10 @@ class CKANHarvesterWRI(WRIHarvesterBase):
 
         self._set_config(harvest_object.job.source.config)
 
+        create_resources = asbool_check(
+            self.config.get("create_resources", False)
+        )
+
         try:
             package_dict = json.loads(harvest_object.content)
 
@@ -852,6 +863,7 @@ class CKANHarvesterWRI(WRIHarvesterBase):
 
             # Set default groups if needed
             default_groups = self.config.get("default_groups", [])
+
             if default_groups:
                 if "groups" not in package_dict:
                     package_dict["groups"] = []
@@ -899,7 +911,8 @@ class CKANHarvesterWRI(WRIHarvesterBase):
                 # Clear remote url_type for resources (eg datastore, upload) as
                 # we are only creating normal resources with links to the
                 # remote ones
-                if asbool_check(self.config.get("create_resources")) is False and harvest_object.job.source.url.strip("/") not in resource.get("url", ""):
+
+                if create_resources is False and harvest_object.job.source.url.strip("/") not in resource.get("url", ""):
                     resource.pop("url_type", None)
 
                 # Clear revision_id as the revision won't exist on this CKAN
@@ -910,7 +923,7 @@ class CKANHarvesterWRI(WRIHarvesterBase):
             package_dict = self.modify_package_dict(package_dict, harvest_object)
 
             result = self._create_or_update_package(
-                package_dict, harvest_object, package_dict_form="package_show"
+                package_dict, harvest_object, package_dict_form="package_show", create_resources=create_resources
             )
 
             return result
