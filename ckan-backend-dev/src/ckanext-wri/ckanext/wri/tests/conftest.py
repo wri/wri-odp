@@ -6,7 +6,6 @@ import http.server
 @pytest.fixture
 def clean_db(reset_db, migrate_db_for):
     reset_db()
-    migrate_db_for("activity")
     migrate_db_for("harvest")
     create_tables()
 
