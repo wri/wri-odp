@@ -912,7 +912,13 @@ class CKANHarvesterWRI(WRIHarvesterBase):
                 # we are only creating normal resources with links to the
                 # remote ones
 
-                if create_resources is False and harvest_object.job.source.url.strip("/") not in resource.get("url", ""):
+
+                if (
+                    create_resources is False
+                    and resource.get("url_type") == "upload"
+                    and harvest_object.job.source.url.strip("/")
+                    not in resource.get("url", "")
+                ):
                     resource.pop("url_type", None)
 
                 # Clear revision_id as the revision won't exist on this CKAN
