@@ -34,6 +34,25 @@ mock_ckan.serve()
 
 
 SOURCE_URL = "http://localhost:8998/files/"
+DATASET_FIELDS = [
+    "name", "title", "notes", "state", "license_id", "license_title",
+    "license_url", "num_resources", "num_tags", "update_frequency",
+    "wri_data", "rw_dataset", "short_description", "spatial_address",
+    "spatial_type", "visibility_type", "has_chart_views", "isopen",
+    "is_approved", "approval_status", "methodology", "cautions",
+    "citation", "function", "learn_more", "technical_notes",
+    "draft", "featured_dataset", "language", "authors", "maintainers"
+]
+
+
+def extract_field(resources, field):
+    return sorted(r.get(field) or "" for r in resources if isinstance(r, dict))
+
+
+def extract_tag_field(dataset, field):
+    return sorted(
+        t.get(field) or "" for t in dataset.get("tags", []) if isinstance(t, dict)
+    )
 
 
 def was_last_job_considered_error_free():
@@ -473,208 +492,73 @@ class TestWriCkanHarvester(object):
         for dataset_id, _ in results_by_guid.items():
             actual_dataset = toolkit.get_action("package_show")({}, {"id": dataset_id})
             expected_dataset = source_datasets_by_id[dataset_id]
+            actual_resources = actual_dataset.get("resources", [])
+            expected_resources = expected_dataset.get("resources", [])
 
-            assert actual_dataset.get("name") == expected_dataset.get(
-                "name"
-            ), f"Name mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("title") == expected_dataset.get(
-                "title"
-            ), f"Title mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("notes") == expected_dataset.get(
-                "notes"
-            ), f"Notes mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("state") == expected_dataset.get(
-                "state"
-            ), f"State mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("license_id") == expected_dataset.get(
-                "license_id"
-            ), f"License ID mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("license_title") == expected_dataset.get(
-                "license_title"
-            ), f"License title mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("license_url") == expected_dataset.get(
-                "license_url"
-            ), f"License URL mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("num_resources") == expected_dataset.get(
-                "num_resources"
-            ), f"Num resources mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("num_tags") == expected_dataset.get(
-                "num_tags"
-            ), f"Num tags mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("update_frequency") == expected_dataset.get(
-                "update_frequency"
-            ), f"Update frequency mismatch in dataset {dataset_id}"
+            for field in DATASET_FIELDS:
+                assert actual_dataset.get(field) == expected_dataset.get(field), f"{field} mismatch in dataset {dataset_id}"
 
-            resource_names = [
-                r.get("name") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_names = [
-                r.get("name") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_names) == sorted(
-                expected_resource_names
-            ), f"Resource names mismatch in dataset {dataset_id}"
+            for field in ["name", "title", "description", "format", "resource_type"]:
+                assert extract_field(actual_resources, field) == extract_field(
+                    expected_resources, field
+                ), f"Resource {field}s mismatch in dataset {dataset_id}"
 
-            resource_titles = [
-                r.get("title") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_titles = [
-                r.get("title") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_titles) == sorted(
-                expected_resource_titles
-            ), f"Resource titles mismatch in dataset {dataset_id}"
+            actual_resource_url_types_by_name = {
+                r.get("name"): (r.get("url_type") or "" if isinstance(r, dict) else "")
+                for r in actual_resources
+            }
+            expected_resource_url_types_by_name = {
+                r.get("name"): (r.get("url_type") or "" if isinstance(r, dict) else "")
+                for r in expected_resources
+            }
 
-            resource_url_types = [
-                r.get("url_type") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_url_types = [
-                r.get("url_type") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_url_types) != sorted(
-                expected_resource_url_types
-            ), f"Resource URL types mismatch in dataset {dataset_id}"
-            resource_urls = [
-                r.get("url") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_urls = [
-                r.get("url") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_urls) == sorted(
-                expected_resource_urls
-            ), f"Resource URLs mismatch in dataset {dataset_id}"
+            for name, expected_url_type in expected_resource_url_types_by_name.items():
+                actual_type = actual_resource_url_types_by_name.get(name, "")
 
-            resource_descriptions = [
-                r.get("description") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_descriptions = [
-                r.get("description") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_descriptions) == sorted(
-                expected_resource_descriptions
-            ), f"Resource descriptions mismatch in dataset {dataset_id}"
+                if expected_url_type == "upload":
+                    assert (
+                        actual_type == "link"
+                    ), f"Resource URL type mismatch for resource '{name}' in dataset {dataset_id}"
+                else:
+                    assert (
+                        actual_type == expected_url_type
+                    ), f"Resource URL type mismatch for resource '{name}' in dataset {dataset_id}"
 
-            resource_formats = [
-                r.get("format") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_formats = [
-                r.get("format") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_formats) == sorted(
-                expected_resource_formats
-            ), f"Resource formats mismatch in dataset {dataset_id}"
+            actual_resource_urls = {
+                r.get("name"): {
+                    "url_type": r.get("url_type") or "",
+                    "url": r.get("url") or ""
+                } if isinstance(r, dict) else {"url_type": "", "url": ""}
+                for r in actual_resources
+            }
 
-            resource_types = [
-                r.get("resource_type") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_types = [
-                r.get("resource_type") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_types) == sorted(
-                expected_resource_types
-            ), f"Resource types mismatch in dataset {dataset_id}"
+            expected_resource_urls = {
+                r.get("name"): {
+                    "url_type": r.get("url_type") or "",
+                    "url": r.get("url") or ""
+                } if isinstance(r, dict) else {"url_type": "", "url": ""}
+                for r in expected_resources
+            }
 
-            dataset_tag_names = [
-                tag.get("name") or "" if isinstance(tag, dict) else ""
-                for tag in actual_dataset.get("tags", [])
-            ]
-            expected_dataset_tag_names = [
-                tag.get("name") or "" if isinstance(tag, dict) else ""
-                for tag in expected_dataset.get("tags", [])
-            ]
-            assert sorted(dataset_tag_names) == sorted(
-                expected_dataset_tag_names
-            ), f"Tag names mismatch in dataset {dataset_id}"
+            for name, expected_url in expected_resource_urls.items():
+                actual_url = actual_resource_urls.get(name, {"url_type": "", "url": ""})
 
-            dataset_tag_display_names = [
-                tag.get("display_name") or "" if isinstance(tag, dict) else ""
-                for tag in actual_dataset.get("tags", [])
-            ]
-            expected_dataset_tag_display_names = [
-                tag.get("display_name") or "" if isinstance(tag, dict) else ""
-                for tag in expected_dataset.get("tags", [])
-            ]
-            assert sorted(dataset_tag_display_names) == sorted(
-                expected_dataset_tag_display_names
-            ), f"Tag display names mismatch in dataset {dataset_id}"
+                assert (
+                    actual_url["url"] == expected_url["url"]
+                ), f"Resource URL mismatch for resource '{name}' in dataset {dataset_id}"
 
-            assert actual_dataset.get("wri_data") == expected_dataset.get(
-                "wri_data"
-            ), f"WRI data mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("rw_dataset") == expected_dataset.get(
-                "rw_dataset"
-            ), f"RW dataset mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("short_description") == expected_dataset.get(
-                "short_description"
-            ), f"Short description mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("spatial_address") == expected_dataset.get(
-                "spatial_address"
-            ), f"Spatial address mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("spatial_type") == expected_dataset.get(
-                "spatial_type"
-            ), f"Spatial type mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("visibility_type") == expected_dataset.get(
-                "visibility_type"
-            ), f"Visibility type mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("has_chart_views") == expected_dataset.get(
-                "has_chart_views"
-            ), f"Has chart views mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("isopen") == expected_dataset.get(
-                "isopen"
-            ), f"Is open mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("is_approved") == expected_dataset.get(
-                "is_approved"
-            ), f"Is approved mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("approval_status") == expected_dataset.get(
-                "approval_status"
-            ), f"Approval status mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("methodology") == expected_dataset.get(
-                "methodology"
-            ), f"Methodology mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("cautions") == expected_dataset.get(
-                "cautions"
-            ), f"Cautions mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("citation") == expected_dataset.get(
-                "citation"
-            ), f"Citation mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("function") == expected_dataset.get(
-                "function"
-            ), f"Function mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("learn_more") == expected_dataset.get(
-                "learn_more"
-            ), f"Learn more mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("technical_notes") == expected_dataset.get(
-                "technical_notes"
-            ), f"Technical notes mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("draft") == expected_dataset.get(
-                "draft"
-            ), f"Draft mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("featured_dataset") == expected_dataset.get(
-                "featured_dataset"
-            ), f"Featured dataset mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("language") == expected_dataset.get(
-                "language"
-            ), f"Language mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("authors") == expected_dataset.get(
-                "authors"
-            ), f"Authors mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("maintainers") == expected_dataset.get(
-                "maintainers"
-            ), f"Maintainers mismatch in dataset {dataset_id}"
+                if expected_url["url_type"] == "upload":
+                    assert (
+                        actual_url["url_type"] == "link"
+                    ), f"Resource URL type mismatch for resource '{name}' in dataset {dataset_id}"
+                else:
+                    assert (
+                        actual_url["url_type"] == expected_url["url_type"]
+                    ), f"Resource URL type mismatch for resource '{name}' in dataset {dataset_id}"
+
+            for tag_field in ["name", "display_name"]:
+                assert extract_tag_field(actual_dataset, tag_field) == extract_tag_field(expected_dataset, tag_field), \
+                    f"Tag {tag_field}s mismatch in dataset {dataset_id}"
 
     def test_import_metadata_create_resources(self):
         config = {"create_resources": True}
@@ -693,239 +577,72 @@ class TestWriCkanHarvester(object):
         for dataset_id, _ in results_by_guid.items():
             actual_dataset = toolkit.get_action("package_show")({}, {"id": dataset_id})
             expected_dataset = source_datasets_by_id[dataset_id]
+            actual_resources = actual_dataset.get("resources", [])
+            expected_resources = expected_dataset.get("resources", [])
 
-            assert actual_dataset.get("name") == expected_dataset.get(
-                "name"
-            ), f"Name mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("title") == expected_dataset.get(
-                "title"
-            ), f"Title mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("notes") == expected_dataset.get(
-                "notes"
-            ), f"Notes mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("state") == expected_dataset.get(
-                "state"
-            ), f"State mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("license_id") == expected_dataset.get(
-                "license_id"
-            ), f"License ID mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("license_title") == expected_dataset.get(
-                "license_title"
-            ), f"License title mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("license_url") == expected_dataset.get(
-                "license_url"
-            ), f"License URL mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("num_resources") == expected_dataset.get(
-                "num_resources"
-            ), f"Num resources mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("num_tags") == expected_dataset.get(
-                "num_tags"
-            ), f"Num tags mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("update_frequency") == expected_dataset.get(
-                "update_frequency"
-            ), f"Update frequency mismatch in dataset {dataset_id}"
+            for field in DATASET_FIELDS:
+                assert actual_dataset.get(field) == expected_dataset.get(
+                    field
+                ), f"{field} mismatch in dataset {dataset_id}"
 
-            resource_names = [
-                r.get("name") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_names = [
-                r.get("name") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_names) == sorted(
-                expected_resource_names
-            ), f"Resource names mismatch in dataset {dataset_id}"
+            for field in ["name", "title", "description", "format", "resource_type"]:
+                assert extract_field(actual_resources, field) == extract_field(
+                    expected_resources, field
+                ), f"Resource {field}s mismatch in dataset {dataset_id}"
 
-            resource_titles = [
-                r.get("title") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_titles = [
-                r.get("title") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_titles) == sorted(
-                expected_resource_titles
-            ), f"Resource titles mismatch in dataset {dataset_id}"
+            actual_resource_url_types_by_name = {
+                r.get("name"): (r.get("url_type") or "" if isinstance(r, dict) else "")
+                for r in actual_resources
+            }
+            expected_resource_url_types_by_name = {
+                r.get("name"): (r.get("url_type") or "" if isinstance(r, dict) else "")
+                for r in expected_resources
+            }
 
-            resource_url_types = [
-                r.get("url_type") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_url_types = [
-                r.get("url_type") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_url_types) == sorted(
-                expected_resource_url_types
-            ), f"Resource URL types mismatch in dataset {dataset_id}"
+            for name, expected_url_type in expected_resource_url_types_by_name.items():
+                actual_type = actual_resource_url_types_by_name.get(name, "")
 
-            resource_urls = [
-                r.get("url") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-                if r.get("url_type") == "upload"
-            ]
-            expected_resource_urls = [
-                r.get("url") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-                if r.get("url_type") == "upload"
-            ]
-            if len(resource_urls) > 0 and len(expected_resource_urls) > 0:
-                assert sorted(resource_urls) != sorted(
-                    expected_resource_urls
-                ), f"Resource URLs mismatch in dataset {dataset_id}"
+                assert (
+                    actual_type == expected_url_type
+                ), f"Resource URL type mismatch for resource '{name}' in dataset {dataset_id}"
 
-                assert all(ckan_site_url in res_url for res_url in resource_urls)
+            actual_resource_urls = {
+                r.get("name"): (
+                    {"url_type": r.get("url_type") or "", "url": r.get("url") or ""}
+                    if isinstance(r, dict)
+                    else {"url_type": "", "url": ""}
+                )
+                for r in actual_resources
+            }
 
-            remote_resource_urls = [
-                r.get("url") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-                if r.get("url_type") != "upload"
-            ]
-            expected_remote_resource_urls = [
-                r.get("url") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-                if r.get("url_type") != "upload"
-            ]
+            expected_resource_urls = {
+                r.get("name"): (
+                    {"url_type": r.get("url_type") or "", "url": r.get("url") or ""}
+                    if isinstance(r, dict)
+                    else {"url_type": "", "url": ""}
+                )
+                for r in expected_resources
+            }
 
-            if len(remote_resource_urls) > 0 and len(expected_remote_resource_urls) > 0:
-                assert sorted(remote_resource_urls) == sorted(
-                    expected_remote_resource_urls
-                ), f"Resource URLs mismatch in dataset {dataset_id}"
+            for name, expected_url in expected_resource_urls.items():
+                actual_url = actual_resource_urls.get(name, {"url_type": "", "url": ""})
 
-                source_resource_uploads = []
+                assert expected_url["url_type"] == actual_url["url_type"], (
+                    f"Resource URL type mismatch for resource '{name}' in dataset {dataset_id}"
+                )
 
-                for r in actual_dataset.get("resources", []):
-                    if SOURCE_URL in r.get("url", ""):
-                        source_resource_uploads.append(r.get("name"))
+                if expected_url["url_type"] == "upload":
+                    assert (
+                        ckan_site_url in actual_url["url"]
+                    ), f"Resource URL should contain CKAN site URL for {name} in dataset {dataset_id}"
+                else:
+                    assert (
+                        actual_url["url"] == expected_url["url"]
+                    ), f"Resource URL mismatch for resource '{name}' in dataset {dataset_id}"
 
-                assert all(
-                    ckan_site_url in r.get("url", "")
-                    for r in actual_dataset.get("resources", [])
-                    if r.get("name") in source_resource_uploads
-                ), f"Resource URLs should contain CKAN site URL for dataset {dataset_id}"
-
-            resource_descriptions = [
-                r.get("description") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_descriptions = [
-                r.get("description") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_descriptions) == sorted(
-                expected_resource_descriptions
-            ), f"Resource descriptions mismatch in dataset {dataset_id}"
-
-            resource_formats = [
-                r.get("format") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_formats = [
-                r.get("format") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_formats) == sorted(
-                expected_resource_formats
-            ), f"Resource formats mismatch in dataset {dataset_id}"
-
-            resource_types = [
-                r.get("resource_type") or "" if isinstance(r, dict) else ""
-                for r in actual_dataset.get("resources", [])
-            ]
-            expected_resource_types = [
-                r.get("resource_type") or "" if isinstance(r, dict) else ""
-                for r in expected_dataset.get("resources", [])
-            ]
-            assert sorted(resource_types) == sorted(
-                expected_resource_types
-            ), f"Resource types mismatch in dataset {dataset_id}"
-
-            dataset_tag_names = [
-                tag.get("name") or "" if isinstance(tag, dict) else ""
-                for tag in actual_dataset.get("tags", [])
-            ]
-            expected_dataset_tag_names = [
-                tag.get("name") or "" if isinstance(tag, dict) else ""
-                for tag in expected_dataset.get("tags", [])
-            ]
-            assert sorted(dataset_tag_names) == sorted(
-                expected_dataset_tag_names
-            ), f"Tag names mismatch in dataset {dataset_id}"
-
-            dataset_tag_display_names = [
-                tag.get("display_name") or "" if isinstance(tag, dict) else ""
-                for tag in actual_dataset.get("tags", [])
-            ]
-            expected_dataset_tag_display_names = [
-                tag.get("display_name") or "" if isinstance(tag, dict) else ""
-                for tag in expected_dataset.get("tags", [])
-            ]
-            assert sorted(dataset_tag_display_names) == sorted(
-                expected_dataset_tag_display_names
-            ), f"Tag display names mismatch in dataset {dataset_id}"
-
-            assert actual_dataset.get("wri_data") == expected_dataset.get(
-                "wri_data"
-            ), f"WRI data mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("rw_dataset") == expected_dataset.get(
-                "rw_dataset"
-            ), f"RW dataset mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("short_description") == expected_dataset.get(
-                "short_description"
-            ), f"Short description mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("spatial_address") == expected_dataset.get(
-                "spatial_address"
-            ), f"Spatial address mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("spatial_type") == expected_dataset.get(
-                "spatial_type"
-            ), f"Spatial type mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("visibility_type") == expected_dataset.get(
-                "visibility_type"
-            ), f"Visibility type mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("has_chart_views") == expected_dataset.get(
-                "has_chart_views"
-            ), f"Has chart views mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("isopen") == expected_dataset.get(
-                "isopen"
-            ), f"Is open mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("is_approved") == expected_dataset.get(
-                "is_approved"
-            ), f"Is approved mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("approval_status") == expected_dataset.get(
-                "approval_status"
-            ), f"Approval status mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("methodology") == expected_dataset.get(
-                "methodology"
-            ), f"Methodology mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("cautions") == expected_dataset.get(
-                "cautions"
-            ), f"Cautions mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("citation") == expected_dataset.get(
-                "citation"
-            ), f"Citation mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("function") == expected_dataset.get(
-                "function"
-            ), f"Function mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("learn_more") == expected_dataset.get(
-                "learn_more"
-            ), f"Learn more mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("technical_notes") == expected_dataset.get(
-                "technical_notes"
-            ), f"Technical notes mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("draft") == expected_dataset.get(
-                "draft"
-            ), f"Draft mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("featured_dataset") == expected_dataset.get(
-                "featured_dataset"
-            ), f"Featured dataset mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("language") == expected_dataset.get(
-                "language"
-            ), f"Language mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("authors") == expected_dataset.get(
-                "authors"
-            ), f"Authors mismatch in dataset {dataset_id}"
-            assert actual_dataset.get("maintainers") == expected_dataset.get(
-                "maintainers"
-            ), f"Maintainers mismatch in dataset {dataset_id}"
+            for tag_field in ["name", "display_name"]:
+                assert extract_tag_field(
+                    actual_dataset, tag_field
+                ) == extract_tag_field(
+                    expected_dataset, tag_field
+                ), f"Tag {tag_field}s mismatch in dataset {dataset_id}"
