@@ -912,8 +912,8 @@ class CKANHarvesterWRI(WRIHarvesterBase):
                 # we are only creating normal resources with links to the
                 # remote ones
 
-                if create_resources is False:
-                    resource.pop("url_type", None)
+                if create_resources is False and resource.get("url_type") == "upload":
+                    resource["url_type"] = "link"
 
                 # Clear revision_id as the revision won't exist on this CKAN
                 # and saving it will cause an IntegrityError with the foreign
