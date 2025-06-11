@@ -82,6 +82,7 @@ export function CreateDataFilesSection({
                             type: 'empty-file',
                             format: '',
                             schema: [],
+                            not_downloadable: false,
                             layerObj: null,
                         })
                     }

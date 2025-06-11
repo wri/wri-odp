@@ -74,6 +74,7 @@ export default function CreateDatasetForm() {
                     resourceId: uuidv4(),
                     title: 'Example title',
                     type: 'empty-file',
+                    not_downloadable: false,
                     format: '',
                     schema: [],
                 },
