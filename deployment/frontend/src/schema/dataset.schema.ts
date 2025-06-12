@@ -55,6 +55,7 @@ export const ResourceSchema = z
         size: z.number().optional().nullable(),
         title: z.string().optional(),
         advanced_api_usage: z.string().optional().nullable(),
+        not_downloadable: z.boolean().optional().default(false),
         fileBlob: z.any(),
         type: z.enum([
             'link',

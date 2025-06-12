@@ -181,6 +181,16 @@ You can also delete a datafile by clicking the little red button next to the dat
 
 ![Delete datafile](./delete_datafile.png)
 
+## Disable betch downloading for datafile
+
+If you want to disable the downloading of a datafile, you can do that by clicking on the `This is not a downloadable link`, this will disable the ability for users to select the datafile to receive an email download, usecases can vary from when you dont want this data to be moved to the data-explorer servers location or when the data is not a file but rather a webpage for example.
+
+![Disable batch download](./not_downloadable_checkbox.png)
+
+This will be the resulting UI
+
+![Disable batch download resulting ui](./not_downloadable_result.png)
+
 ## Collaborators
 
 In the edit dataset page, you can also add, edit and remove collaborators, which are basically a way for you to give people access to a particular dataset, you will only be able to see this tab in the following scenarios

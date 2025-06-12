@@ -31,14 +31,14 @@ export function CreateLayersSection({
         })
 
     const layers = fields.filter(
-        (r) => r.type !== 'upload' &&
-            r.type !== 'link' &&
-            r.type !== 'empty-file')
+        (r) =>
+            r.type !== 'upload' && r.type !== 'link' && r.type !== 'empty-file'
+    )
 
     const notLayers = fields.filter(
-        (r) => r.type === 'upload' ||
-            r.type === 'link' ||
-            r.type === 'empty-file')
+        (r) =>
+            r.type === 'upload' || r.type === 'link' || r.type === 'empty-file'
+    )
 
     return (
         <>
@@ -72,6 +72,7 @@ export function CreateLayersSection({
                     onClick={() =>
                         append({
                             resourceId: uuidv4(),
+                            not_downloadable: false,
                             title: '',
                             type: 'empty-layer',
                             format: '',
@@ -104,12 +105,12 @@ export function AddLayer({
 }) {
     const { setValue, watch } = formObj
     const datafile = watch(`resources.${index}`)
-    const notLayers = watch("resources")?.filter(
-        (r) => r.type === 'upload' ||
-            r.type === 'link' ||
-            r.type === 'empty-file')
+    const notLayers = watch('resources')?.filter(
+        (r) =>
+            r.type === 'upload' || r.type === 'link' || r.type === 'empty-file'
+    )
 
-    const notLayersCount = notLayers?.length ?? 0;
+    const notLayersCount = notLayers?.length ?? 0
 
     return (
         <>
