@@ -358,6 +358,7 @@ function AddDataFile({
                                     removeFile={() =>
                                         setValue(`resources.${index}`, {
                                             resourceId: uuidv4(),
+                                            not_downloadable: false,
                                             title: '',
                                             type: 'empty-file',
                                             schema: [],
