@@ -467,7 +467,7 @@ interface DatafilePreviewProps {
         | 'empty-file'
         | 'empty-layer'
         | 'layer-raw'
-        | 'derived-layer'
+        | 'reference-layer'
     name: string
     title: string
     format: string

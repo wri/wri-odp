@@ -123,7 +123,11 @@ export function AddLayer({
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
                         {match(datafile.type)
                             .with(
-                                P.union('layer', 'layer-raw', 'derived-layer'),
+                                P.union(
+                                    'layer',
+                                    'layer-raw',
+                                    'reference-layer'
+                                ),
                                 () => (
                                     <>
                                         <div className="flex items-center gap-x-2">
@@ -150,7 +154,7 @@ export function AddLayer({
                             .with('empty-layer', () => 0)
                             .with('layer', () => 1)
                             .with('layer-raw', () => 2)
-                            .with('derived-layer', () => 3)
+                            .with('reference-layer', () => 3)
                             .otherwise(() => 0)}
                     >
                         <Tab.List
@@ -244,7 +248,7 @@ export function AddLayer({
                                 onClick={() =>
                                     setValue(
                                         `resources.${index}.type`,
-                                        'derived-layer'
+                                        'reference-layer'
                                     )
                                 }
                             >
@@ -266,7 +270,7 @@ export function AddLayer({
                                                     selected ? 'font-bold' : ''
                                                 )}
                                             >
-                                                Build a derived layer
+                                                Build a referenced layer
                                                 (read-only)
                                                 {watch('rw_dataset') ===
                                                     false && (

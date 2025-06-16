@@ -26,7 +26,7 @@ export default function DerivedLayerForm({
                     <InformationCircleIcon className="h-5 w-5 text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
                     <div>
                         <h3 className="text-sm font-medium text-blue-800">
-                            Derived Layer (Read-Only)
+                            Referenced Layer (Read-Only)
                         </h3>
                         <p className="mt-1 text-sm text-blue-700">
                             This layer references an existing RW layer by ID. It
@@ -60,7 +60,7 @@ export default function DerivedLayerForm({
             <InputGroup label="Description">
                 <Input
                     {...register(`resources.${index}.description`)}
-                    placeholder="Optional description of this derived layer"
+                    placeholder="Optional description of this referenced layer"
                 />
                 <ErrorDisplay name="description" errors={errors} />
             </InputGroup>

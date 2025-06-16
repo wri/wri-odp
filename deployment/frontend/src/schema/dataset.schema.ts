@@ -64,7 +64,7 @@ export const ResourceSchema = z
             'empty-file',
             'empty-layer',
             'layer-raw',
-            'derived-layer',
+            'reference-layer',
         ]),
         url_type: z
             .enum([
@@ -74,7 +74,7 @@ export const ResourceSchema = z
                 'empty-file',
                 'empty-layer',
                 'layer-raw',
-                'derived-layer',
+                'reference-layer',
             ])
             .optional()
             .nullable(),
