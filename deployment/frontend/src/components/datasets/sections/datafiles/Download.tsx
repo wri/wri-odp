@@ -187,7 +187,7 @@ export function DownloadButton({
                             className="whitespace-nowrap underline"
                         >
                             {datafile.not_downloadable
-                                ? 'Not thanks, proceed to data'
+                                ? 'No thanks, proceed to data'
                                 : 'No thanks, proceed to download'}
                         </button>
                     }

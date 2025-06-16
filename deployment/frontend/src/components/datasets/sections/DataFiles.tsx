@@ -305,8 +305,8 @@ export function DataFiles({
                         )}{' '}
                         ({datafilesToDownload.length} Selected datafiles
                         {notDownloadable.length > 0
-                            ? `, ${notDownloadable.length} not available to download`
-                            : ''}
+                            ? `, ${notDownloadable.length} not available to download)`
+                            : ')'}
                     </span>
                 ) : (
                     ''
