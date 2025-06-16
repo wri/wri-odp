@@ -160,7 +160,7 @@ export function Preview({
                         </div>
                     )}
                     {(watch('authors')?.length > 0 ||
-                      watch('maintainers')?.length > 0) && (
+                        watch('maintainers')?.length > 0) && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
                                 Points of Contact
@@ -181,18 +181,24 @@ export function Preview({
                                     ))}
                                 </dl>
                                 <dl className="flex flex-col gap-y-6">
-                                    {watch('maintainers')?.map((maintainer, index) => (
-                                        <div key={`maintainer-${index}`}>
-                                            <SimpleDescription
-                                                label="Maintainer Name"
-                                                text={maintainer.name ?? '_'}
-                                            />
-                                            <SimpleDescription
-                                                label="Maintainer Email"
-                                                text={maintainer.email ?? '_'}
-                                            />
-                                        </div>
-                                    ))}
+                                    {watch('maintainers')?.map(
+                                        (maintainer, index) => (
+                                            <div key={`maintainer-${index}`}>
+                                                <SimpleDescription
+                                                    label="Maintainer Name"
+                                                    text={
+                                                        maintainer.name ?? '_'
+                                                    }
+                                                />
+                                                <SimpleDescription
+                                                    label="Maintainer Email"
+                                                    text={
+                                                        maintainer.email ?? '_'
+                                                    }
+                                                />
+                                            </div>
+                                        )
+                                    )}
                                 </dl>
                             </div>
                         </div>
@@ -461,6 +467,7 @@ interface DatafilePreviewProps {
         | 'empty-file'
         | 'empty-layer'
         | 'layer-raw'
+        | 'derived-layer'
     name: string
     title: string
     format: string
