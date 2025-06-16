@@ -72,7 +72,9 @@ export function LinkExternalForm({
                         htmlFor="not_downloadable"
                         className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
                     >
-                        This is not a directly downloadable link
+                        This is not a directly downloadable link (i.e. directs
+                        to another URL where further steps may be needed to
+                        access the data file)
                     </label>
                 </div>
             </div>

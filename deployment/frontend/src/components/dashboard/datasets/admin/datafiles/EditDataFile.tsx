@@ -362,6 +362,11 @@ export function EditDataFile({
                                                             This is not a
                                                             directly
                                                             downloadable link
+                                                            (i.e. directs to
+                                                            another URL where
+                                                            further steps may be
+                                                            needed to access the
+                                                            data file)
                                                         </label>
                                                     </div>
                                                 </div>
