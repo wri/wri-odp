@@ -225,6 +225,9 @@ export function DataFiles({
         )
     }
     const [openDownload, setOpenDownload] = useState(false)
+    const notDownloadable = uploadedDatafiles.filter(
+        (r) => r.not_downloadable === true
+    )
     return (
         <>
             <div className="py-4">
@@ -300,7 +303,10 @@ export function DataFiles({
                                 ></path>
                             </svg>
                         )}{' '}
-                        ({datafilesToDownload.length} Selected datafiles)
+                        ({datafilesToDownload.length} Selected datafiles
+                        {notDownloadable.length > 0
+                            ? `, ${notDownloadable.length} not available to download)`
+                            : ')'}
                     </span>
                 ) : (
                     ''
@@ -328,7 +334,10 @@ export function DataFiles({
                                 <button
                                     onClick={() =>
                                         setDatafilesToDownload(
-                                            uploadedDatafiles
+                                            uploadedDatafiles.filter(
+                                                (r) =>
+                                                    r.not_downloadable !== true
+                                            )
                                         )
                                     }
                                     className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
@@ -544,25 +553,42 @@ function DatafileCard({
                         <div className="flex items-center gap-3">
                             {['upload', 'link'].includes(
                                 datafile.url_type ?? ''
-                            ) && (
-                                <DefaultTooltip content="Select to download">
-                                    <input
-                                        aria-label={`Select ${datafile.title}`}
-                                        type="checkbox"
-                                        className="h-4 w-4  rounded  bg-white "
-                                        checked={selected}
-                                        onChange={() => {
-                                            if (selected) {
-                                                removeDatafileToDownload(
-                                                    datafile
-                                                )
-                                            } else {
-                                                addDatafileToDownload(datafile)
-                                            }
-                                        }}
-                                    />
-                                </DefaultTooltip>
-                            )}
+                            ) &&
+                                datafile.not_downloadable !== true && (
+                                    <DefaultTooltip content="Select to download">
+                                        <input
+                                            aria-label={`Select ${datafile.title}`}
+                                            type="checkbox"
+                                            className="h-4 w-4  rounded  bg-white "
+                                            checked={selected}
+                                            onChange={() => {
+                                                if (selected) {
+                                                    removeDatafileToDownload(
+                                                        datafile
+                                                    )
+                                                } else {
+                                                    addDatafileToDownload(
+                                                        datafile
+                                                    )
+                                                }
+                                            }}
+                                        />
+                                    </DefaultTooltip>
+                                )}
+                            {['upload', 'link'].includes(
+                                datafile.url_type ?? ''
+                            ) &&
+                                datafile.not_downloadable && (
+                                    <DefaultTooltip content="Not selectable for direct download">
+                                        <input
+                                            aria-label={`Select ${datafile.title}`}
+                                            type="checkbox"
+                                            className="h-4 w-4  rounded  bg-gray-200 border-gray-300"
+                                            disabled
+                                            checked={false}
+                                        />
+                                    </DefaultTooltip>
+                                )}
                             {datafile?.format && (
                                 <span
                                     className={classNames(

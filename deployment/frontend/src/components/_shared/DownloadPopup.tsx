@@ -232,7 +232,7 @@ export function DownloadPopup({
                                         </Dialog.Title>
                                         <Dialog.Title
                                             as="h4"
-                                            className="text-xl font-light leading-6 text-gray-600"
+                                            className="font-light leading-6 text-gray-600"
                                         >
                                             {subtitle}
                                         </Dialog.Title>
@@ -581,7 +581,7 @@ export function DirectDownloadPopup({
                                         </Dialog.Title>
                                         <Dialog.Title
                                             as="h4"
-                                            className="text-xl font-light leading-6 text-gray-600"
+                                            className="font-light leading-6 text-gray-600"
                                         >
                                             {subtitle}
                                         </Dialog.Title>

@@ -6,7 +6,7 @@ import ckan.logic as logic
 import ckanext.s3filestore.uploader as uploader
 from ckan.lib.mailer import mail_recipient
 from ckan.common import config
-from .datapusher_download_zip import  fetch_dataset_name, get_admin_emails_for_dataset
+from .datapusher_download_zip import  fetch_dataset_entity, get_admin_emails_for_dataset, ERROR_EMAIL_HTML_ADMIN
 
 import datetime
 import requests
@@ -75,10 +75,11 @@ def download_request(context: Context, data_dict: dict[str, Any]):
         "error": "{}",
     }
 
-    dataset_id = fetch_dataset_name({
+    dataset_rslt = fetch_dataset_entity({
         "entity_id": res_id,
         "entity_type": "resource"
     })
+    dataset_id = dataset_rslt.get("id")
     admin_email= get_admin_emails_for_dataset(dataset_id)
 
     value = {}
@@ -192,11 +193,13 @@ def download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        dataset_name = fetch_dataset_name({
+        dataset_rslt = fetch_dataset_entity({
             "entity_id": res_id,
             "entity_type": "resource"
         })
-        send_error([email]+admin_email, resource_title, dataset_name)
+        dataset_name = dataset_rslt.get("id")
+        dataset_team = dataset_rslt.get("organization", {}).get("title")
+        send_error([email],admin_email, resource_title,dataset_team, dataset_name)
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -218,11 +221,13 @@ def download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        dataset_name = fetch_dataset_name({
+        dataset_rslt = fetch_dataset_entity({
             "entity_id": res_id,
             "entity_type": "resource"
         })
-        send_error([email]+admin_email, resource_title, dataset_name)
+        dataset_name = dataset_rslt.get("id")
+        dataset_team = dataset_rslt.get("organization", {}).get("title")
+        send_error([email],admin_email, resource_title,dataset_team, dataset_name)
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
@@ -274,11 +279,13 @@ def download_callback(context: Context, data_dict: dict[str, Any]):
         url = data_dict.get("url")
         send_email(emails, url, download_filename)
     else:
-        dataset_name = fetch_dataset_name({
+        dataset_rslt = fetch_dataset_entity({
             "entity_id": entity_id,
             "entity_type": "resource"
         })
-        send_error(emails+admin_email, download_filename, dataset_name)
+        dataset_name = dataset_rslt.get("id")
+        dataset_team = dataset_rslt.get("organization", {}).get("title")
+        send_error(emails,admin_email, download_filename,dataset_team, dataset_name)
         log.error(error)
 
 
@@ -338,11 +345,18 @@ ERROR_EMAIL_HTML = """
 """
 
 
-def send_error(emails: list[str], resource_title, dataset_name):
+def send_error(emails: list[str], admin_emails, resource_title, dataset_team, dataset_name):
     odp_url = config.get('ckanext.wri.odp_url')
     for email in emails:
         mail_recipient("", email,
                        "WRI - Failed to process file ({})".format(resource_title),
                        "",
                        ERROR_EMAIL_HTML.format(dataset_name,odp_url,dataset_name,odp_url, odp_url),
+                       )
+
+    for email in admin_emails:
+        mail_recipient("", email,
+                       "WRI - Failed to process file ({})".format(resource_title),
+                       "",
+                       ERROR_EMAIL_HTML_ADMIN.format(dataset_name,odp_url,dataset_name,dataset_team,odp_url, odp_url),
                        )

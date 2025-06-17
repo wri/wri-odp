@@ -163,6 +163,7 @@ export const teamRouter = createTRPCRouter({
     deleteTeam: protectedProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ ctx, input }) => {
+          try {
             const user = ctx.session.user
             const teamRes = await fetch(
                 `${env.CKAN_URL}/api/action/organization_delete`,
@@ -186,6 +187,12 @@ export const teamRouter = createTRPCRouter({
             return {
                 ...team.result,
             }
+          } catch (e) {
+            let error =
+              'Something went wrong please contact the system administrator'
+            if (e instanceof Error) error = e.message
+            throw Error(replaceNames(error, true))
+          }
         }),
     getTeamUsers: protectedProcedure
         .input(z.object({ id: z.string(), capacity: z.string().optional() }))
@@ -259,6 +266,7 @@ export const teamRouter = createTRPCRouter({
     deleteDashboardTeam: protectedProcedure
         .input(z.string())
         .mutation(async ({ input, ctx }) => {
+          try {
             const response = await fetch(
                 `${env.CKAN_URL}/api/3/action/organization_delete`,
                 {
@@ -274,6 +282,12 @@ export const teamRouter = createTRPCRouter({
             if (!data.success && data.error)
                 throw Error(replaceNames(data.error.message, true))
             return data
+          } catch (e) {
+            let error =
+              'Something went wrong please contact the system administrator'
+            if (e instanceof Error) error = e.message
+            throw Error(replaceNames(error, true))
+          }
         }),
     getGeneralTeam: publicProcedure
         .input(searchSchema)
