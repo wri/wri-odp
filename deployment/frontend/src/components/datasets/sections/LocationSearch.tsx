@@ -7,12 +7,14 @@ import {
     MapRef,
     Marker,
     Source,
+    useMap,
 } from 'react-map-gl'
 import GeocoderControl from '@/components/search/GeocoderControl'
 import { useQuery } from 'react-query'
 import { UseFormReturn, useForm } from 'react-hook-form'
 import DrawControl from '@/components/search/Draw'
 import { LocationSearchFormType } from './DataFiles'
+import { HideBoundaries } from '@/components/_shared/HideBoundaries'
 
 export default function LocationSearch({
     geojsons,
@@ -126,7 +128,6 @@ export default function LocationSearch({
         }
     }, [])
 
-    console.log('cursor', cursor)
     return (
         <Map
             ref={(_map) => {
@@ -145,6 +146,7 @@ export default function LocationSearch({
             onClick={handleMapClick}
             cursor={cursor}
         >
+            <HideBoundaries />
             <GeocoderControl
                 mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                 position="bottom-right"

@@ -21,6 +21,7 @@ import GeocoderControl from '@/components/search/GeocoderControl'
 import { Layer, Map, Source } from 'react-map-gl'
 import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner'
+import { HideBoundaries } from '@/components/_shared/HideBoundaries'
 
 export function LocationForm({
     formObj,
@@ -245,6 +246,7 @@ export function LocationForm({
                                     touchZoomRotate={false}
                                     initialViewState={{ zoom: 2 }}
                                 >
+                                    <HideBoundaries />
                                     <Source
                                         type="geojson"
                                         data={watch('spatial')}
@@ -280,6 +282,7 @@ export function LocationForm({
                                 dragRotate={false}
                                 touchZoomRotate={false}
                             >
+                                <HideBoundaries />
                                 <GeocoderControl
                                     mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     position="bottom-right"
@@ -292,7 +295,9 @@ export function LocationForm({
                                     onClear={(e) => {
                                         setValue('spatial_address', '')
                                     }}
-                                    initialValue={watch('spatial_address') ?? undefined}
+                                    initialValue={
+                                        watch('spatial_address') ?? undefined
+                                    }
                                 />
                             </Map>
                         </Tab.Panel>

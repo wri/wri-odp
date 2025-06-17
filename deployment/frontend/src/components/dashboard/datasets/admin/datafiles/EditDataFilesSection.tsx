@@ -54,7 +54,6 @@ export function EditDataFilesSection({
                     return (
                         <SortableItem key={field.id}>
                             <div>
-
                                 {field.new ? (
                                     <AddDataFile
                                         key={index}
@@ -88,6 +87,7 @@ export function EditDataFilesSection({
                             type: 'empty-file',
                             format: '',
                             new: true,
+                            not_downloadable: false,
                             schema: [],
                         })
                     }

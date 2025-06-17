@@ -15,6 +15,7 @@ import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner'
 import { UseFormReturn } from 'react-hook-form'
 import * as turf from '@turf/turf'
+import { HideBoundaries } from '@/components/_shared/HideBoundaries'
 
 export function DatafileLocation({
     formObj,
@@ -211,6 +212,7 @@ export function DatafileLocation({
                                     touchZoomRotate={false}
                                     initialViewState={{ zoom: 2 }}
                                 >
+                                    <HideBoundaries />
                                     <Source
                                         type="geojson"
                                         data={watch(
@@ -248,6 +250,7 @@ export function DatafileLocation({
                                 dragRotate={false}
                                 touchZoomRotate={false}
                             >
+                                <HideBoundaries />
                                 <GeocoderControl
                                     mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     position="bottom-right"
