@@ -11,11 +11,11 @@ ckan:
       CKANEXT__DCAT__ENABLE_CONTENT_NEGOTIATION: "True"
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
-      CKAN_SITE_ID: wri-dev 
-      CKAN__SITE_URL: https://wri.dev.frontend.datopian.com
-      CKAN_SITE_URL: https://wri.dev.frontend.datopian.com
+      CKAN_SITE_ID: wri-staging 
+      CKAN__SITE_URL: https://wri.staging.frontend.datopian.com
+      CKAN_SITE_URL: https://wri.staging.frontend.datopian.com
       CKAN_HOMEPAGE_STYLE: "2"
-      CKAN__DATAPUSHER__URL: http://wri-dev-datapusher-svc:80/
+      CKAN__DATAPUSHER__URL: http://wri-staging-datapusher-svc:80/
       CKAN_SVC_PORT_80_TCP_PROTO: tcp
       CKAN__AUTH__ANON_CREATE_DATASET: "False"
       CKAN__AUTH__CREATE_DATASET_IF_NOT_IN_ORGANIZATION: "True"
@@ -46,7 +46,7 @@ ckan:
       CKAN__DATASTORE__SQLSEARCH__ENABLED: "True"
       CKANEXT__WRI__MIGRATION_DEPLOYMENT_NAME: migration_deployment
       CKANEXT__WRI__MIGRATION_FLOW_NAME: trigger-migration
-      CKANEXT__WRI__MIGRATION_DEPLOYMENT_ENV: dev
+      CKANEXT__WRI__MIGRATION_DEPLOYMENT_ENV: staging
     hpa:
       enable: true
       minReplicas: 2
@@ -62,7 +62,7 @@ ckan:
     image:
       pullPolicy: Always
       repository: {{REGISTRY}}/{{CKAN_REPO}}
-      tag: dev-{{GITHUB_SHA}}
+      tag: staging-{{GITHUB_SHA}}
     runInitContainers: false
     service:
       port: 80
@@ -84,7 +84,7 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: dev-{{GITHUB_SHA}}
+      tag: staging-{{GITHUB_SHA}}
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
@@ -105,7 +105,7 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: dev-{{GITHUB_SHA}}-migration
+      tag: staging-{{GITHUB_SHA}}-migration
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
@@ -124,7 +124,7 @@ ckan:
     enable: true
     image:
       repository: {{REGISTRY}}/{{FRONTEND_REPO}}
-      tag: dev-{{GITHUB_SHA}}
+      tag: staging-{{GITHUB_SHA}}
     env:
       SITE_TITLE: WRI ODP
     targetPort: 3000
@@ -170,11 +170,11 @@ ckan:
     autoscaling:
       enable: false
     customResource: true
-    projectId: wri-dev
+    projectId: wri-staging
     resources: {}
     useProductionCerts: true
   ingress:
-    domain: wri.dev.ckan.datopian.com
+    domain: wri.staging.ckan.datopian.com
     enable: true
     enableExternal: false
     extraAnnotations:
@@ -195,45 +195,45 @@ ckan:
           }
         }
     hosts:
-      - host: wri.dev.console.datopian.com
+      - host: wri.staging.console.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-dev-hasura-svc
-      - host: wri.dev.data.datopian.com
+            service: wri-staging-hasura-svc
+      - host: wri.staging.data.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-dev-data-api-svc
-      - host: wri.dev.ckan.datopian.com
+            service: wri-staging-data-api-svc
+      - host: wri.staging.ckan.datopian.com
         isExternal: false
         paths:
           - path: /(.*)
             port: 80
-            service: wri-dev-ckan-svc
-      #- host: wri.dev.frontend.datopian.com
+            service: wri-staging-ckan-svc
+      #- host: wri.staging.frontend.datopian.com
       #  isExternal: false
       #  paths:
       #    - path: /(.*)
       #      port: 80
-      #      service: wri-dev-frontend-svc
+      #      service: wri-staging-frontend-svc
     ingressNamespace: nginx-ingress
     ingressClass: nginx
     tls:
       - hosts:
-          - wri.dev.ckan.datopian.com
-        secretName: wri.dev.ckan.datopian.com
+          - wri.staging.ckan.datopian.com
+        secretName: wri.staging.ckan.datopian.com
       - hosts:
-          - wri.dev.data.datopian.com
-        secretName: wri.dev.data.datopian.com
+          - wri.staging.data.datopian.com
+        secretName: wri.staging.data.datopian.com
       #- hosts:
-      #    - wri.dev.frontend.datopian.com
-      #  secretName: wri.dev.frontend.datopian.com
+      #    - wri.staging.frontend.datopian.com
+      #  secretName: wri.staging.frontend.datopian.com
       - hosts:
-          - wri.dev.console.datopian.com
-        secretName: wri.dev.console.datopian.com
+          - wri.staging.console.datopian.com
+        secretName: wri.staging.console.datopian.com
   solr:
     enable: false
     image:
