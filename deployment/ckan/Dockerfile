@@ -94,6 +94,7 @@ RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = False"
 RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
 RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_unowned_dataset = False"
+RUN ckan config-tool ${CKAN_INI} "ckan.views.default_views = ''"
 
 RUN if [ "$GITHUB_ACTIONS" = "true" ]; then ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"; fi
 
