@@ -358,5 +358,5 @@ def send_error(emails: list[str], admin_emails, resource_title, dataset_team, da
         mail_recipient("", email,
                        "WRI - Failed to process file ({})".format(resource_title),
                        "",
-                       ERROR_EMAIL_HTML_ADMIN.format(dataset_name,odp_url,dataset_name,dataset_team,odp_url, odp_url),
+                       ERROR_EMAIL_HTML_ADMIN.format(dataset_name,odp_url,dataset_name,dataset_team),
                        )

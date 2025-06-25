@@ -426,7 +426,7 @@ def send_error(emails: list[str], admin_emails, resource_title,dataset_team,data
         mail_recipient(
             "",
             email,
-            "Your WRI data file could not be delivered ({})".format(resource_title),
+            "Your WRI data file could not be delivered ({})".format(datasetName),
             "",
             ERROR_EMAIL_HTML.format(datasetName,odp_url,datasetName,odp_url, odp_url),
         )
@@ -437,7 +437,7 @@ def send_error(emails: list[str], admin_emails, resource_title,dataset_team,data
             email,
             "WRI data file could not be delivered to one of your users  ({})".format(dataset_name),
             "",
-            ERROR_EMAIL_HTML_ADMIN.format(datasetName,odp_url,datasetName,dataset_team, odp_url, odp_url),
+            ERROR_EMAIL_HTML_ADMIN.format(datasetName,odp_url,datasetName,dataset_team),
         )
 
 
@@ -453,11 +453,11 @@ ERROR_EMAIL_HTML_ADMIN = """
         </p>
 
         
-        <b>Dataset Name</b>:{}
+        <b>Dataset name</b>: {}
         
         </br>
         
-        <b>Dataset link </b>: <a target="_blank" href="{}/datasets/{}">Dataset link</a>
+        <b>Dataset link</b>: <a target="_blank" href="{}/datasets/{}">Dataset link</a>
 
         </br>
 
@@ -469,7 +469,7 @@ ERROR_EMAIL_HTML_ADMIN = """
        If so, you may wish to investigate. You may also contact a SysAdmin for further assistance.
         </p>
         </br>
-        Please note: the affected user has received an automated failure notification which directs them to contact <a target="_blank" href="{}">{}</a> if they require immediate support.
+        Please note: the affected user has received an automated failure notification which directs them to contact <a href="mailto:data@wri.org">data@wri.org</a> if they require immediate support.
         
     </body>
 </html>
