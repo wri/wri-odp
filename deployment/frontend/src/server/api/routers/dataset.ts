@@ -265,7 +265,7 @@ export const DatasetRouter = createTRPCRouter({
                                     // schema: resource.schema
                                     //     ? { value: resource.schema }
                                     //     : '{}',
-                                    url: resource.url ?? resource.name,
+                                    url: resource.url ?? 'https://example.com',
                                 }
                             } else {
                                 return {
@@ -294,7 +294,6 @@ export const DatasetRouter = createTRPCRouter({
                         : null,
                 }
 
-                console.log(`BODY`, body)
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
                     {

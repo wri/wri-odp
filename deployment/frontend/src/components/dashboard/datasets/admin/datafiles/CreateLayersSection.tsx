@@ -17,6 +17,7 @@ import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import { RWDatasetForm } from '../metadata/RWDataset'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import SortableList, { SortableItem } from 'react-easy-sort'
+import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm'
 
 export function CreateLayersSection({
     formObj,
@@ -31,14 +32,14 @@ export function CreateLayersSection({
         })
 
     const layers = fields.filter(
-        (r) => r.type !== 'upload' &&
-            r.type !== 'link' &&
-            r.type !== 'empty-file')
+        (r) =>
+            r.type !== 'upload' && r.type !== 'link' && r.type !== 'empty-file'
+    )
 
     const notLayers = fields.filter(
-        (r) => r.type === 'upload' ||
-            r.type === 'link' ||
-            r.type === 'empty-file')
+        (r) =>
+            r.type === 'upload' || r.type === 'link' || r.type === 'empty-file'
+    )
 
     return (
         <>
@@ -72,6 +73,7 @@ export function CreateLayersSection({
                     onClick={() =>
                         append({
                             resourceId: uuidv4(),
+                            not_downloadable: false,
                             title: '',
                             type: 'empty-layer',
                             format: '',
@@ -104,12 +106,12 @@ export function AddLayer({
 }) {
     const { setValue, watch } = formObj
     const datafile = watch(`resources.${index}`)
-    const notLayers = watch("resources")?.filter(
-        (r) => r.type === 'upload' ||
-            r.type === 'link' ||
-            r.type === 'empty-file')
+    const notLayers = watch('resources')?.filter(
+        (r) =>
+            r.type === 'upload' || r.type === 'link' || r.type === 'empty-file'
+    )
 
-    const notLayersCount = notLayers?.length ?? 0;
+    const notLayersCount = notLayers?.length ?? 0
 
     return (
         <>
@@ -120,19 +122,26 @@ export function AddLayer({
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
                         {match(datafile.type)
-                            .with(P.union('layer', 'layer-raw'), () => (
-                                <>
-                                    <div className="flex items-center gap-x-2">
-                                        <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
-                                        <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
-                                            {field.title}
-                                        </span>
-                                    </div>
-                                    <button onClick={() => remove()}>
-                                        <MinusCircleIcon className="h-6 w-6 text-red-500" />
-                                    </button>
-                                </>
-                            ))
+                            .with(
+                                P.union(
+                                    'layer',
+                                    'layer-raw',
+                                    'reference-layer'
+                                ),
+                                () => (
+                                    <>
+                                        <div className="flex items-center gap-x-2">
+                                            <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
+                                            <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
+                                                {field.title}
+                                            </span>
+                                        </div>
+                                        <button onClick={() => remove()}>
+                                            <MinusCircleIcon className="h-6 w-6 text-red-500" />
+                                        </button>
+                                    </>
+                                )
+                            )
                             .otherwise(() => (
                                 <></>
                             ))}
@@ -145,6 +154,7 @@ export function AddLayer({
                             .with('empty-layer', () => 0)
                             .with('layer', () => 1)
                             .with('layer-raw', () => 2)
+                            .with('reference-layer', () => 3)
                             .otherwise(() => 0)}
                     >
                         <Tab.List
@@ -232,6 +242,47 @@ export function AddLayer({
                                     </DefaultTooltip>
                                 )}
                             </Tab>
+                            <Tab
+                                id="tabDerived"
+                                disabled={watch('rw_dataset') === false}
+                                onClick={() =>
+                                    setValue(
+                                        `resources.${index}.type`,
+                                        'reference-layer'
+                                    )
+                                }
+                            >
+                                {({ selected }) => (
+                                    <DefaultTooltip content="This option allows you to import a layer that already exists in the Resource Watch API to be shown in the data explorer">
+                                        <span
+                                            className={classNames(
+                                                'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                                selected ? 'bg-amber-400' : '',
+                                                datafile.type === 'upload'
+                                                    ? 'hidden'
+                                                    : ''
+                                            )}
+                                        >
+                                            <Square3Stack3DIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                            <div
+                                                className={classNames(
+                                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm flex flex-col px-4',
+                                                    selected ? 'font-bold' : ''
+                                                )}
+                                            >
+                                                Build a referenced layer
+                                                (read-only)
+                                                {watch('rw_dataset') ===
+                                                    false && (
+                                                    <span>
+                                                        Toggle RW Data to enable
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </span>
+                                    </DefaultTooltip>
+                                )}
+                            </Tab>
                         </Tab.List>
                         <Tab.Panels as="div" className="mt-2">
                             <Tab.Panel className="hidden"></Tab.Panel>
@@ -240,6 +291,12 @@ export function AddLayer({
                             </Tab.Panel>
                             <Tab.Panel>
                                 <BuildALayerRaw
+                                    formObj={formObj}
+                                    index={index}
+                                />
+                            </Tab.Panel>
+                            <Tab.Panel>
+                                <DerivedLayerForm
                                     formObj={formObj}
                                     index={index}
                                 />

@@ -90,10 +90,11 @@ USER ckan
 ENV CKAN__PLUGINS text_view image_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest hierarchy_display wri wri_harvester auth issues envvars
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = False"
 RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_unowned_dataset = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_unowned_dataset = False"
+RUN ckan config-tool ${CKAN_INI} "ckan.views.default_views = 'image_view'"
 
 RUN if [ "$GITHUB_ACTIONS" = "true" ]; then ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"; fi
 
