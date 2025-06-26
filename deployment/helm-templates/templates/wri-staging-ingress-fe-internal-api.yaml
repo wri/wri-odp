@@ -4,7 +4,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: cert-manager
     meta.helm.sh/release-name: dx-helm-wri-staging-release
-    meta.helm.sh/release-namespace: wri-odp-dev
+    meta.helm.sh/release-namespace: wri-odp-staging
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_headers "server: hide";
       more_set_headers "X-Content-Type-Options: nosniff";
@@ -22,7 +22,7 @@ metadata:
   labels:
     app.kubernetes.io/managed-by: Helm
   name: wri-staging-ingress-fe-internal-api
-  namespace: wri-odp-dev
+  namespace: wri-odp-staging
 spec:
   ingressClassName: nginx
   rules:
