@@ -203,7 +203,7 @@ dataset_fields:
 
 - field_name: authors
   label: Authors
-  preset: authors_agents_json_object
+  preset: agents_json_object
   form_placeholder: 'eg. [{"name": "Joe Bloggs", "email": "joe.bloggs@example.com"}, {"name": "Example Organization (or Initiative)", "email": "contact@example.com"}]'
 
 #- field_name: maintainer

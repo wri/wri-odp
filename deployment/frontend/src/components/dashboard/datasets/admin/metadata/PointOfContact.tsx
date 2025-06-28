@@ -57,6 +57,7 @@ export function PointOfContactForm({
                         <div className="flex items-center gap-x-1 pb-10">
                             <span className="text-lg font-semibold">
                                 Authors{' '}
+                            <span className="text-red-500">*</span>
                             </span>
                             <DefaultTooltip content="Authors are the people who created the dataset. They might not be involved in the day-to-day maintenance of the dataset anymore.">
                                 <InformationCircleIcon
@@ -69,6 +70,15 @@ export function PointOfContactForm({
                     className="mb-2 flex flex-col items-start sm:flex-col"
                 >
                 <div className="border-b border-gray-300 pb-4 mb-4">
+                    {authorFields.length === 0 && (
+                        <div>
+                            <span className={errors?.authors ? "text-red-600" : "text-gray-600"}>
+                                <i>
+                                    {errors?.authors?.message || "At least one (1) Author Name is required."}
+                                </i>
+                            </span>
+                        </div>
+                    )}
                     {authorFields.map((field, index) => (
                         <div key={field.id} className="flex items-center gap-x-4 border-b border-gray-150 pb-4 mb-4">
                             <div className="flex flex-col gap-y-2 flex-grow flex-wrap">
