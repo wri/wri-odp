@@ -177,16 +177,11 @@ const DatasetSchemaObject = z.object({
     authors: z
         .array(
             z.object({
-                name: z.string().min(1, { message: 'Author Name is required' }),
-                email: z.string().email().min(1, {
-                    message: 'Author Email is required',
-                }),
+                name: z.string(),
+                email: z.string().email(),
             })
         )
-        .min(1, {
-            message:
-                'At least one (1) Author Name and Author Email is required.',
-        }),
+        .optional(),
     maintainers: z
         .array(
             z.object({
@@ -308,17 +303,6 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         {
             message: 'Technical notes are required for public datasets',
             path: ['technical_notes'],
-        }
-    )
-    .refine(
-        (obj) => {
-            if (obj.authors.length === 0) return false
-            return true
-        },
-        {
-            message:
-                'At least one (1) Author Name and Author Email is required.',
-            path: ['authors'],
         }
     )
     .refine(
