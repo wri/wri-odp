@@ -74,7 +74,7 @@ export function PointOfContactForm({
                         <div>
                             <span className={errors?.authors ? "text-red-600" : "text-gray-600"}>
                                 <i>
-                                    {errors?.authors?.message || "At least one (1) Author Name and Author Email is required."}
+                                    {errors?.authors?.message || "At least one (1) Author Name is required."}
                                 </i>
                             </span>
                         </div>

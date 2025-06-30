@@ -178,14 +178,12 @@ const DatasetSchemaObject = z.object({
         .array(
             z.object({
                 name: z.string().min(1, { message: 'Author Name is required' }),
-                email: z.string().email().min(1, {
-                    message: 'Author Email is required',
-                }),
+                email: z.string().optional().nullable().or(emptyStringToUndefined),
             })
         )
         .min(1, {
             message:
-                'At least one (1) Author Name and Author Email is required.',
+                'At least one (1) Author Name is required.',
         }),
     maintainers: z
         .array(
@@ -317,7 +315,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         },
         {
             message:
-                'At least one (1) Author Name and Author Email is required.',
+                'At least one (1) Author Name is required.',
             path: ['authors'],
         }
     )
