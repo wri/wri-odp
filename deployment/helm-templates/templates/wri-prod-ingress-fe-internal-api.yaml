@@ -3,8 +3,8 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cert-manager
-    meta.helm.sh/release-name: dx-helm-wri-staging-release
-    meta.helm.sh/release-namespace: wri-odp-staging
+    meta.helm.sh/release-name: dx-helm-wri-prod-release
+    meta.helm.sh/release-namespace: wri-odp-prod
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_headers "server: hide";
       more_set_headers "X-Content-Type-Options: nosniff";
@@ -21,32 +21,32 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
   labels:
     app.kubernetes.io/managed-by: Helm
-  name: wri-staging-ingress-fe-internal-api
-  namespace: wri-odp-staging
+  name: wri-prod-ingress-fe-internal-api
+  namespace: wri-odp-prod
 spec:
   ingressClassName: nginx
   rules:
-  - host: wri.staging.frontend.datopian.com
+  - host: wri.prod.frontend.datopian.com
     http:
       paths:
       - backend:
           service:
-            name: wri-staging-ckan-svc
+            name: wri-prod-ckan-svc
             port:
               number: 80
         path: /api/action/(.*)
         pathType: ImplementationSpecific
-  - host: wri.staging.frontend.datopian.com
+  - host: wri.prod.frontend.datopian.com
     http:
       paths:
       - backend:
           service:
-            name: wri-staging-ckan-svc
+            name: wri-prod-ckan-svc
             port:
               number: 80
         path: /api/3/action/(.*)
         pathType: ImplementationSpecific
   tls:
   - hosts:
-    - wri.staging.frontend.datopian.com
-    secretName: wri.staging.frontend.datopian.com
+    - wri.prod.frontend.datopian.com
+    secretName: wri.prod.frontend.datopian.com
