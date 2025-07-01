@@ -78,6 +78,7 @@ export interface Resource {
     spatial_address?: string
     spatial_coordinates?: any
     spatial_type?: string
+    not_downloadable?: boolean
 }
 
 interface DatasetListQueryOptions {

@@ -55,6 +55,7 @@ export const ResourceSchema = z
         size: z.number().optional().nullable(),
         title: z.string().optional(),
         advanced_api_usage: z.string().optional().nullable(),
+        not_downloadable: z.boolean().optional().default(false),
         fileBlob: z.any(),
         type: z.enum([
             'link',
@@ -63,6 +64,7 @@ export const ResourceSchema = z
             'empty-file',
             'empty-layer',
             'layer-raw',
+            'reference-layer',
         ]),
         url_type: z
             .enum([
@@ -72,6 +74,7 @@ export const ResourceSchema = z
                 'empty-file',
                 'empty-layer',
                 'layer-raw',
+                'reference-layer',
             ])
             .optional()
             .nullable(),

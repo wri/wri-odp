@@ -3,7 +3,6 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cert-manager
-    kubernetes.io/ingress.class: nginx
     meta.helm.sh/release-name: dx-helm-wri-prod-release
     meta.helm.sh/release-namespace: wri-odp-prod
     nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -27,7 +26,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: datasets.wri.org
+  - host: wri.prod.frontend.datopian.com
     http:
       paths:
       - backend:
@@ -37,7 +36,7 @@ spec:
               number: 80
         path: /api/action/(.*)
         pathType: ImplementationSpecific
-  - host: datasets.wri.org
+  - host: wri.prod.frontend.datopian.com
     http:
       paths:
       - backend:
@@ -49,5 +48,5 @@ spec:
         pathType: ImplementationSpecific
   tls:
   - hosts:
-    - datasets.wri.org
-    secretName: datasets.wri.org
+    - wri.prod.frontend.datopian.com
+    secretName: wri.prod.frontend.datopian.com

@@ -243,7 +243,7 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email]+admin_email, "Zipped data")
+        send_error([email],admin_email, "Zipped data")
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -265,7 +265,7 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email] + admin_email, "Zipped data")
+        send_error([email] , admin_email, "Zipped data")
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
@@ -314,7 +314,7 @@ def zipped_download_callback(context: Context, data_dict: dict[str, Any]):
         url = data_dict.get("url")
         send_email(emails, url, download_filename)
     else:
-        send_error(emails+admin_email, download_filename)
+        send_error(emails,admin_email, download_filename)
         log.error(error)
 
 def send_error_callback(context: Context, data_dict: dict[str, Any]):
@@ -332,28 +332,34 @@ def send_error_callback(context: Context, data_dict: dict[str, Any]):
     value = json.loads(task["value"])
     emails = value.get("emails", [])
     admin_emails = value.get("admin_emails", [])
-    emails += admin_emails
     download_filename = value.get("download_filename")
-    dataset_name = fetch_dataset_name({
+    dataset_rslt = fetch_dataset_entity({
         "entity_id": entity_id,
         "entity_type": data_dict.get("entity_type", "dataset")
     })
-    send_error(emails, download_filename, dataset_name)
+
+    dataset_name = dataset_rslt.get("name")
+    dataset_team = dataset_rslt.get("organization", {}).get("title")
+    send_error(emails, admin_emails, download_filename,dataset_team, dataset_name)
 
 
-def fetch_dataset_name(data_dict):
+def fetch_dataset_entity(data_dict):
     entity_id = data_dict.get("entity_id")
     entity_type = data_dict.get("entity_type")
     if entity_type == "dataset":
         dataset_dict = p.toolkit.get_action("package_show")(
             {"ignore_auth": True}, {"id": entity_id}
         )
-        return dataset_dict.get("name")
+        return dataset_dict
     else:
         resource_dict = p.toolkit.get_action("resource_show")(
             {"ignore_auth": True}, {"id": entity_id}
         )
-        return resource_dict.get("package_id")
+        pkg_id = resource_dict.get("package_id")
+        dataset_dict = p.toolkit.get_action("package_show")(
+            {"ignore_auth": True}, {"id": pkg_id}
+        )
+        return dataset_dict
     
 
 
@@ -413,14 +419,59 @@ ERROR_EMAIL_HTML = """
 """
 
 
-def send_error(emails: list[str], resource_title,dataset_name: str=None):
+def send_error(emails: list[str], admin_emails, resource_title,dataset_team,dataset_name: str=None):
     odp_url = config.get("ckanext.wri.odp_url")
     datasetName = dataset_name if dataset_name else resource_title
     for email in emails:
         mail_recipient(
             "",
             email,
-            "Your WRI data file could not be delivered ({})".format(resource_title),
+            "Your WRI data file could not be delivered ({})".format(datasetName),
             "",
             ERROR_EMAIL_HTML.format(datasetName,odp_url,datasetName,odp_url, odp_url),
         )
+
+    for email in admin_emails:
+        mail_recipient(
+            "",
+            email,
+            "WRI data file could not be delivered to one of your users  ({})".format(dataset_name),
+            "",
+            ERROR_EMAIL_HTML_ADMIN.format(datasetName,odp_url,datasetName,dataset_team),
+        )
+
+
+
+ERROR_EMAIL_HTML_ADMIN = """
+<html>
+    <body>
+         <p> 
+        Hello,
+        </p>
+        <p>
+        A user recently attempted to download the below data from the WRI Data Explorer. Due to an unspecified system error, we were unable to deliver the requested files to the user. 
+        </p>
+
+        
+        <b>Dataset name</b>: {}
+        
+        </br>
+        
+        <b>Dataset link</b>: <a target="_blank" href="{}/datasets/{}">Dataset link</a>
+
+        </br>
+
+        <b>Team</b>: {}       
+
+        <p>
+       You are receiving this message because you are an administrator of the Team responsible for this dataset. 
+       The delivery failure is likely due to a misconfiguration of the data in the Data Explorer. 
+       If so, you may wish to investigate. You may also contact a SysAdmin for further assistance.
+        </p>
+        </br>
+        Please note: the affected user has received an automated failure notification which directs them to contact <a href="mailto:data@wri.org">data@wri.org</a> if they require immediate support.
+        
+    </body>
+</html>
+
+"""
