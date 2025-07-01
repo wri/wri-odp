@@ -58,6 +58,26 @@ export function LinkExternalForm({
                     name={`resources.${index}.format`}
                 />
             </InputGroup>
+            <div className="relative flex justify-start">
+                <div className="flex h-6 items-center">
+                    <input
+                        id="not_downloadable"
+                        {...register(`resources.${index}.not_downloadable`)}
+                        type="checkbox"
+                        className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
+                    />
+                </div>
+                <div className="ml-3 text-sm leading-6">
+                    <label
+                        htmlFor="not_downloadable"
+                        className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
+                    >
+                        This is not a directly downloadable link (i.e. directs
+                        to another URL where further steps may be needed to
+                        access the data file)
+                    </label>
+                </div>
+            </div>
             <InputGroup
                 label={
                     <span className="flex items-center gap-x-1">

@@ -312,6 +312,7 @@ export function AddDataFile({
                                                 resourceId: uuidv4(),
                                                 title: '',
                                                 type: 'empty-file',
+                                                not_downloadable: false,
                                                 schema: [],
                                                 layerObj: null,
                                             })
