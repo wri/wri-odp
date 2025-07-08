@@ -900,32 +900,12 @@ export function DatasetHeader({
           ) : (
             ''
           )}
-          {session.data?.user ? (
-            dataset?.technical_notes && (
-              <div
-                className={classNames(
-                  'flex items-center rounded-[3px] border border-green-500 bg-green-800',
-                  highlighted('technical_notes'),
-                  highlighted('technical_notes') !== ''
-                    ? 'border-yellow-200'
-                    : ''
-                )}
-              >
-                <div className="px-2 font-acumin text-xs font-medium text-white">
-                  RDI approved
-                </div>
-              </div>
-            )
-          ) : (
-            <></>
-          )}
           {dataset?.resources &&
             dataset?.resources.filter((resource) => resource.format)
               .length > 0 && (
               <div
                 className={classNames(
-                  'flex gap-x-2 border-zinc-300',
-                  session.data?.user ? 'border-l pl-3' : ''
+                  'flex gap-x-2 border-zinc-300'
                 )}
               >
                 {[
