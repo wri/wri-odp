@@ -10,6 +10,12 @@ import { env } from '@/env.mjs'
 import { api } from '@/utils/api'
 import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
+import DefaultTooltip from '@/components/_shared/Tooltip'
+import {
+    ArrowsPointingInIcon,
+    ExclamationCircleIcon,
+    InformationCircleIcon,
+} from '@heroicons/react/24/outline'
 
 export default function TopicForm({
     formObj,
@@ -44,6 +50,11 @@ export default function TopicForm({
                         {...register('name')}
                         disabled={editing}
                         placeholder="name-of-topic"
+                        icon={
+                            <DefaultTooltip content="Please choose a URL that is not already in use for another Topic, Team, or Application.">
+                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                            </DefaultTooltip>
+                        }
                         type="text"
                         className="pl-[4.6rem] lg:pl-[4rem]"
                     >
@@ -61,6 +72,7 @@ export default function TopicForm({
                         <div className="w-[11rem]">
                             <ImageUploader
                                 clearImage={() => setValue('image_url', '')}
+                                tooltip="Recommended size: 5-10 MB. Optimal dimensions and file formats: .png, .svg, .webp"
                                 defaultImage={
                                     watch('image_url') &&
                                     watch('image_display_url')
