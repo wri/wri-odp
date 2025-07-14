@@ -114,7 +114,7 @@ describe("Create dataset", () => {
       .type("RICH TEXT EDITOR");
     cy.get("input[name=learn_more]").type("https://google.com");
     cy.contains("Link to Another WRI Product").click();
-    cy.get("button").contains("Add a link to another wri product").click();
+    cy.get("button").contains("Add a link to another WRI product").click();
     cy.get('input[name="open_in.0.title"]').type("Test");
     cy.get('input[name="open_in.0.url"]').type("https://google.com");
     cy.get("button").contains("Add a link to another wri product").click();
