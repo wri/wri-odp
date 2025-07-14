@@ -307,8 +307,8 @@ export const DatasetRouter = createTRPCRouter({
                 )
                 const dataset: CkanResponse<Dataset> = await datasetRes.json()
                 if (!dataset.success && dataset.error) {
-                    //@ts-ignore
                     if (
+                        //@ts-ignore
                         dataset.error.name[0] === 'That URL is already in use.'
                     ) {
                         throw Error(
