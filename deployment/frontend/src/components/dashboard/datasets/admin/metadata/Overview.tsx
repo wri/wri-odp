@@ -117,7 +117,11 @@ export function OverviewForm({
                             options={languageOptions}
                         />
                     </InputGroup>
-                    <InputGroup label="Team" required>
+                    <InputGroup
+                        label="Team"
+                        required
+                        info="Teams will only appear in the dropdown if you are an Admin or Editor of that Team. The padlock icon indicates the Team is private."
+                    >
                         {match(possibleOwners)
                             .with({ isLoading: true }, () => (
                                 <span className="flex items-center text-sm gap-x-2">
@@ -394,7 +398,25 @@ export function OverviewForm({
                         />
                         <ErrorDisplay name="visibility_type" errors={errors} />
                     </InputGroup>
-                    <InputGroup label="License">
+                    <InputGroup
+                        label="License"
+                        info={
+                            <span>
+                                License definitions and additional information
+                                can be found at{' '}
+                                <a
+                                    href="http://opendefinition.org"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    opendefinition.org
+                                </a>
+                                . The data license you select also applies to
+                                the contents of any data files that you add to
+                                this dataset.
+                            </span>
+                        }
+                    >
                         {match(possibleLicenses)
                             .with({ isLoading: true }, () => (
                                 <span className="flex items-center text-sm gap-x-2">

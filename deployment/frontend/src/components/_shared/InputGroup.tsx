@@ -39,7 +39,7 @@ export function InputGroup({
                     {info && (
                         <DefaultTooltip content={info} contentClassName="">
                             <InformationCircleIcon
-                                className="h-5 w-5 text-neutral-500 ml-1 mb-1"
+                                className="h-5 w-5 text-neutral-500 ml-1 shrink-0 mt-0.5"
                                 aria-hidden="true"
                             />
                         </DefaultTooltip>
