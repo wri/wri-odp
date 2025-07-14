@@ -68,12 +68,17 @@ export function OverviewForm({
                         />
                         <ErrorDisplay name="title" errors={errors} />
                     </InputGroup>
-                    <InputGroup label="Url" required>
+                    <InputGroup label="URL" required>
                         <Input
                             {...register('name')}
                             disabled={editing}
                             placeholder="name-of-dataset"
                             type="text"
+                            icon={
+                                <DefaultTooltip content="Please choose a URL that is not already in use for another Topic, Team, or Application.">
+                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                </DefaultTooltip>
+                            }
                             className={`pl-[5.9rem] sm:pl-[5.6rem] md:pl-[5.2rem] lg:pl-[5.4rem] ${editing ? 'hidden' : ''} `}
                         >
                             {editing ? (
@@ -96,7 +101,7 @@ export function OverviewForm({
                             placeholder="ex. https://source/to/original/data"
                             type="text"
                             icon={
-                                <DefaultTooltip content="Placeholder">
+                                <DefaultTooltip content="Optional reference link to the original data source. This will appear in the About section. To add direct links to data files (preferred), please go to the next page (Data Files tab)">
                                     <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                 </DefaultTooltip>
                             }
@@ -330,7 +335,7 @@ export function OverviewForm({
                                 className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
                             >
                                 This dataset was developed by WRI
-                                <DefaultTooltip content="This flags this dataset as having been produced and curated by WRI">
+                                <DefaultTooltip content="Checking this box flags this dataset as having been produced and curated by WRI">
                                     <InformationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
                                 </DefaultTooltip>
                             </label>
@@ -354,13 +359,32 @@ export function OverviewForm({
                             {...register('citation')}
                             className="h-44"
                             icon={
-                                <DefaultTooltip content="Placeholder">
+                                <DefaultTooltip content="Provide a proper citation for this dataset (e.g., author(s), year, title).">
                                     <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                                 </DefaultTooltip>
                             }
                         />
                     </InputGroup>
-                    <InputGroup label="Visibility" required>
+                    <InputGroup
+                        label="Visibility"
+                        required
+                        info={
+                            <ul>
+                                <li>
+                                    Public datasets are visible to any user,
+                                    including public and anonymous.
+                                </li>
+                                <li>
+                                    Private datasets are only visible to Team
+                                    members.
+                                </li>
+                                <li>
+                                    Internal Use datasets are visible to any
+                                    Data Explorer user with a login.
+                                </li>
+                            </ul>
+                        }
+                    >
                         <SimpleSelect
                             placeholder="Select visiblity"
                             name="visibility_type"
@@ -434,8 +458,8 @@ export function OverviewForm({
                                     htmlFor="featured_dataset"
                                     className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
                                 >
-                                    Request administrator feature this dataset
-                                    <DefaultTooltip content="Setting this to true will show the dataset in the feature list both on the homepage and in the search page">
+                                    Request to be featured in Dataset Highlights
+                                    <DefaultTooltip content="Checking this box will send a feature request to an administrator. The dataset will appear under ‘Dataset Highlights’ (on the homepage) only upon approval.">
                                         <InformationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
                                     </DefaultTooltip>
                                 </label>

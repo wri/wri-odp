@@ -18,7 +18,7 @@ export function InputGroup({
     labelClassName?: string
     children: React.ReactNode
     required?: boolean
-    info?: string
+    info?: string | React.ReactNode
 }) {
     return (
         <div

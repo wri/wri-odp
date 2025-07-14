@@ -1,4 +1,9 @@
-import { UseFormReturn, useFieldArray, useForm, useFormContext } from 'react-hook-form'
+import {
+    UseFormReturn,
+    useFieldArray,
+    useForm,
+    useFormContext,
+} from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Button, LoaderButton } from '@/components/_shared/Button'
@@ -414,7 +419,7 @@ export default function SourceForm({
                         <div>
                             <h2 className="text-lg flex items-center gap-x-2">
                                 Location Coverage
-                                <DefaultTooltip content="This field defines whether a data file will show up on the results or not when doing a search by location">
+                                <DefaultTooltip content="Complete this section if the data file should be included in search results when doing a search by location">
                                     <InformationCircleIcon
                                         className="h-5 w-5 text-neutral-500"
                                         aria-hidden="true"

@@ -323,11 +323,16 @@ export function EditDataFile({
                                                 className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <TextArea
-                                                    placeholder="Add description"
+                                                    placeholder="Add a short description. If there are additional steps for accessing data not stored directly in the Data Explorer, you may want to include them here."
                                                     {...register(
                                                         `resources.${index}.description`
                                                     )}
                                                     type="text"
+                                                    icon={
+                                                        <DefaultTooltip content="Recommended: 150-200 characters">
+                                                            <InformationCircleIcon className="h-5 w-5" />
+                                                        </DefaultTooltip>
+                                                    }
                                                     maxWidth="max-w-[55rem]"
                                                 />
                                             </InputGroup>
