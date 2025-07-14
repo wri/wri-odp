@@ -10,7 +10,7 @@ const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 describe("Chart view", () => {
-  beforeEach(function() {
+  beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
@@ -35,15 +35,21 @@ describe("Chart view", () => {
 
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
-    cy.get('input[name="maintainers.0.email"]').type("test-maintainer-1@example.com");
+    cy.get('input[name="maintainers.0.email"]').type(
+      "test-maintainer-1@example.com",
+    );
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
-    cy.get('input[name="maintainers.1.email"]').type("test-maintainer-2@example.com");
-    cy.contains("Next: Datafiles").click();
-    cy.get('.datafile-accordion-trigger').eq(0).click()
-    cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/airtravel.csv", {
-      force: true,
-    });
+    cy.get('input[name="maintainers.1.email"]').type(
+      "test-maintainer-2@example.com",
+    );
+    cy.contains("Next: Data files").click();
+    cy.get(".datafile-accordion-trigger").eq(0).click();
+    cy.get("input[type=file]")
+      .eq(0)
+      .selectFile("cypress/fixtures/airtravel.csv", {
+        force: true,
+      });
     cy.wait(5000);
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
@@ -64,10 +70,10 @@ describe("Chart view", () => {
     () => {
       cy.visit("/dashboard/datasets/" + datasetName + "/edit");
       cy.contains("Data Files").click();
-      cy.get('.datafile-accordion-trigger').eq(0).click()
+      cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.contains("Datapusher").click();
       cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
-      cy.contains(`Successfully submited datafile to the datapusher`, {
+      cy.contains(`Successfully submited data file to the datapusher`, {
         timeout: 15000,
       });
       cy.wait(30000);
@@ -88,8 +94,8 @@ describe("Chart view", () => {
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
 
-      cy.wait(9000)
-      cy.get('.datafile-accordion-trigger').eq(0).click({ force: true })
+      cy.wait(9000);
+      cy.get(".datafile-accordion-trigger").eq(0).click({ force: true });
       cy.get(".views-tab").click({ force: true });
 
       cy.contains("Add a view").click({ force: true });
@@ -105,18 +111,18 @@ describe("Chart view", () => {
       cy.get("@chart-container").contains("Data").click({ force: true });
 
       cy.get("@chart-container").get("#dimension").click({ force: true });
-      cy.wait(500)
+      cy.wait(500);
       cy.get("@chart-container").contains("Month").click({ force: true });
-      cy.wait(500)
+      cy.wait(500);
       cy.get("@chart-container").get("#measure").click({ force: true });
-      cy.wait(500)
+      cy.wait(500);
       cy.get("@chart-container").contains("1958").click({ force: true });
 
       cy.get("@chart-container")
         .contains("Update Preview")
         .click({ force: true, timeout: "60000" });
 
-      cy.wait(5000)
+      cy.wait(5000);
 
       cy.get("@chart-container")
         .contains("Add to Views")
@@ -127,7 +133,7 @@ describe("Chart view", () => {
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
-      cy.get('.datafile-accordion-trigger').eq(0).click({ force: true })
+      cy.get(".datafile-accordion-trigger").eq(0).click({ force: true });
 
       cy.get(".views-tab").click({ force: true });
 
@@ -147,7 +153,7 @@ describe("Chart view", () => {
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
-      cy.get('.datafile-accordion-trigger').eq(0).click({ force: true })
+      cy.get(".datafile-accordion-trigger").eq(0).click({ force: true });
 
       cy.get(".views-tab").click({ force: true });
 
@@ -163,15 +169,15 @@ describe("Chart view", () => {
         .contains("Update Preview")
         .click({ force: true, timeout: "90000" });
 
-      cy.wait(6000)
+      cy.wait(6000);
       cy.get("@chart-container")
         .contains("Update View")
         .click({ force: true, timeout: "90000" });
-      cy.wait(40000)
+      cy.wait(40000);
       cy.visit(`/dashboard/datasets/${datasetName}/edit`);
 
       cy.contains("Data Files", { timeout: 20000 }).click({ force: true });
-      cy.get('.datafile-accordion-trigger').eq(0).click({ force: true })
+      cy.get(".datafile-accordion-trigger").eq(0).click({ force: true });
 
       cy.get(".views-tab").click({ force: true });
 
@@ -191,8 +197,8 @@ describe("Chart view", () => {
       cy.visit(`/datasets/${datasetName}`);
 
       cy.contains("View Chart Preview").click({ force: true });
-      cy.wait(15000)
-      cy.contains("This is my awesome chart")
+      cy.wait(15000);
+      cy.contains("This is my awesome chart");
     },
   );
 });

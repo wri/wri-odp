@@ -42,7 +42,7 @@ describe("Create dataset", () => {
     cy.get("button").contains("Tags").click();
     cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
     cy.get("textarea[name=short_description]").type("test");
-    cy.contains("Next: Datafiles").click();
+    cy.contains("Next: Data files").click();
 
     // Verify the validation error for missing team
     cy.contains("Team is required").should("be.visible");
@@ -127,7 +127,7 @@ describe("Create dataset", () => {
     cy.get("button").contains("Add a custom field").click();
     cy.get('input[name="extras.1.key"]').type("Test 2");
     cy.get('input[name="extras.1.value"]').type("Test 2");
-    cy.contains("Next: Datafiles").click();
+    cy.contains("Next: Data files").click();
     cy.get(".datafile-accordion-trigger").eq(0).click();
     cy.get("input[type=file]").selectFile("cypress/fixtures/logo.png", {
       force: true,

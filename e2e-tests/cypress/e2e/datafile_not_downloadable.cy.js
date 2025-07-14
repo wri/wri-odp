@@ -52,7 +52,7 @@ describe("Data file not downloadable", () => {
         "test-maintainer-2@example.com",
       );
 
-      cy.contains("Next: Datafiles").click();
+      cy.contains("Next: Data files").click();
       cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.contains("Link to file in cloud storage").click();
       cy.get('input[name="resources.0.url"]').type(
