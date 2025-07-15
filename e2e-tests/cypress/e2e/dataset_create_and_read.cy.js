@@ -117,7 +117,7 @@ describe("Create dataset", () => {
     cy.get("button").contains("Add a link to another WRI product").click();
     cy.get('input[name="open_in.0.title"]').type("Test");
     cy.get('input[name="open_in.0.url"]').type("https://google.com");
-    cy.get("button").contains("Add a link to another wri product").click();
+    cy.get("button").contains("Add a link to another WRI product").click();
     cy.get('input[name="open_in.1.title"]').type("Test");
     cy.get('input[name="open_in.1.url"]').type("https://google.com");
     cy.contains("Custom Fields").click();
