@@ -63,7 +63,7 @@ describe("Release notes", () => {
         "test-maintainer-2@example.com",
       );
 
-      cy.contains("Next: Datafiles").click();
+      cy.contains("Next: Data files").click();
       cy.contains("Next: Map Visualizations").click();
       cy.contains("Next: Preview").click();
       cy.get('button[type="submit"]').click();

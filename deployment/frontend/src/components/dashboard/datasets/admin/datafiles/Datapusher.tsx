@@ -28,7 +28,11 @@ export function DatapusherStatus({ datafile }: { datafile: ResourceFormType }) {
         },
         {
             refetchInterval: (data) =>
-                data && data.type === 'COMPLETED' ? false : data && data.type === 'RUNNING' ? 5000 : 1000,
+                data && data.type === 'COMPLETED'
+                    ? false
+                    : data && data.type === 'RUNNING'
+                      ? 5000
+                      : 1000,
         }
     )
     if (!flowState) return <></>
@@ -45,9 +49,9 @@ export function DatapusherStatus({ datafile }: { datafile: ResourceFormType }) {
             }
         >
             {flowState?.type}{' '}
-            {['RUNNING', 'PENDING', 'QUEUED', 'SCHEDULED'].includes(flowState.type) && (
-                <Spinner className="text-white w-3 h-3 mb-1" />
-            )}
+            {['RUNNING', 'PENDING', 'QUEUED', 'SCHEDULED'].includes(
+                flowState.type
+            ) && <Spinner className="text-white w-3 h-3 mb-1" />}
         </Badge>
     )
 }
@@ -60,7 +64,7 @@ export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
                 resourceId: datafile.id ?? '',
             })
             notify(
-                `Successfully submited datafile to the datapusher`,
+                `Successfully submited data file to the datapusher`,
                 'success'
             )
         },

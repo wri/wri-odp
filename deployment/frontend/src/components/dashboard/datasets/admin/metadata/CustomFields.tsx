@@ -79,21 +79,23 @@ export function CustomFieldsForm({
                     />
                 ))}
                 <div className="w-full flex justify-end">
-                    <button
-                        type="button"
-                        onClick={() =>
-                            append({
-                                key: '',
-                                value: '',
-                            })
-                        }
-                        className="pt-5 flex items-center justify-end gap-x-1"
-                    >
-                        <PlusCircleIcon className="h-5 w-5 text-amber-400" />
-                        <div className="font-['Acumin Pro SemiCondensed'] text-xl font-normal leading-tight text-black">
-                            Add a custom field
-                        </div>
-                    </button>
+                    <DefaultTooltip content="Custom fields allow additional metadata to be displayed on the dataset page. They do not impact search or filtering.">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                append({
+                                    key: '',
+                                    value: '',
+                                })
+                            }
+                            className="pt-5 flex items-center justify-end gap-x-1"
+                        >
+                            <PlusCircleIcon className="h-5 w-5 text-amber-400" />
+                            <div className="font-['Acumin Pro SemiCondensed'] text-xl font-normal leading-tight text-black">
+                                Add a custom field
+                            </div>
+                        </button>
+                    </DefaultTooltip>
                 </div>
             </Disclosure.Panel>
         </MetadataAccordion>
