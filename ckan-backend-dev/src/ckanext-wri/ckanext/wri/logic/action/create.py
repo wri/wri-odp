@@ -897,7 +897,7 @@ def organization_create(context, data_dict):
             if not any(role in user_capacity for role in ["admin", "editor"]):
                 raise ValidationError({"message": _("User does not have admin access to create a sub team")})
         if parent_org.get("visibility", "public") == "private" and visibility == "public":
-            raise ValidationError({"message": _("Parent Organization has private visibility and cannot create public teams")})
+            raise ValidationError({"message": _("Team visibility cannot be set to public if selected parent Team is private.")})
         
     else:
         if not authz.is_sysadmin(context.get("user")):
