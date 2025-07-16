@@ -11,6 +11,8 @@ export function InputGroup({
     labelClassName,
     children,
     required = false,
+    deepInfoIcon = false,
+    contentClassName = '',
     info,
 }: {
     label: string | React.ReactNode
@@ -19,6 +21,8 @@ export function InputGroup({
     children: React.ReactNode
     required?: boolean
     info?: string | React.ReactNode
+    deepInfoIcon?: boolean
+    contentClassName?: string
 }) {
     return (
         <div
@@ -42,6 +46,22 @@ export function InputGroup({
                                 className="h-5 w-5 text-neutral-500 ml-1 shrink-0 mt-0.5"
                                 aria-hidden="true"
                             />
+                        </DefaultTooltip>)}
+                        <DefaultTooltip
+                            content={info}
+                            contentClassName={contentClassName}
+                        >
+                            {deepInfoIcon ? (
+                                <InformationSolidCircle
+                                    className="h-5 w-5 text-neutral-500 ml-1 mb-1"
+                                    aria-hidden="true"
+                                />
+                            ) : (
+                                <InformationCircleIcon
+                                    className="h-5 w-5 text-neutral-500 ml-1 mb-1"
+                                    aria-hidden="true"
+                                />
+                            )}
                         </DefaultTooltip>
                     )}
                 </span>
