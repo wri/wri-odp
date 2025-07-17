@@ -59,7 +59,12 @@ describe("Create public Team", () => {
 
     cy.visit(`/dashboard/teams/${parentOrg}/edit`);
     cy.get("span.block").contains("Public").should("exist");
-    cy.get("button#visibility").should("be.disabled");
+    cy.get("button#visibility").click();
+    cy.get("li").contains("Private").click();
+    cy.get("button[type=submit]").click();
+    cy.contains("User does not have admin access to edit this team").should(
+      "exist"
+    );
   });
 
   it("Admin can change visibility to private but not back to public", () => {
@@ -75,7 +80,12 @@ describe("Create public Team", () => {
 
     cy.visit(`/dashboard/teams/${parentOrg}/edit`);
     cy.get("span.block").contains("Private").should("exist");
-    cy.get("button#visibility").should("be.disabled");
+    cy.get("button#visibility").click();
+    cy.get("li").contains("Public").click();
+    cy.get("button[type=submit]").click();
+    cy.contains(
+      "User is unauthorized to change visibility from private to public. Please contact a SysAdmin."
+    ).should("exist");
   });
 
   after(() => {
