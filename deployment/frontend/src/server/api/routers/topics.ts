@@ -297,6 +297,14 @@ export const TopicRouter = createTRPCRouter({
                 )
                 const topic: CkanResponse<Group> = await topicRes.json()
                 if (!topic.success && topic.error) {
+                    if (
+                        replaceNames(topic.error.message) ==
+                        'Topic name already exists in database or there is a team with this name'
+                    ) {
+                        throw Error(
+                            '[!] A page with this URL already exists. Please choose a different URL.'
+                        )
+                    }
                     if (topic.error.message)
                         throw Error(replaceNames(topic.error.message))
                     throw Error(replaceNames(JSON.stringify(topic.error)))
