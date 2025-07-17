@@ -41,29 +41,23 @@ export function InputGroup({
                     {label}{' '}
                     {required && <span className="text-red-500">*</span>}
                     {info && (
-                        <DefaultTooltip content={info} contentClassName="">
-                            <InformationCircleIcon
-                                className="h-5 w-5 text-neutral-500 ml-1 shrink-0 mt-0.5"
-                                aria-hidden="true"
-                            />
+                        <DefaultTooltip
+                            content={info}
+                            contentClassName={contentClassName}
+                        >
+                            {deepInfoIcon ? (
+                                <InformationSolidCircle
+                                    className="h-5 w-5 text-neutral-500 ml-1 mb-1"
+                                    aria-hidden="true"
+                                />
+                            ) : (
+                                <InformationCircleIcon
+                                    className="h-5 w-5 text-neutral-500 ml-1 mb-1"
+                                    aria-hidden="true"
+                                />
+                            )}
                         </DefaultTooltip>
                     )}
-                    <DefaultTooltip
-                        content={info}
-                        contentClassName={contentClassName}
-                    >
-                        {deepInfoIcon ? (
-                            <InformationSolidCircle
-                                className="h-5 w-5 text-neutral-500 ml-1 mb-1"
-                                aria-hidden="true"
-                            />
-                        ) : (
-                            <InformationCircleIcon
-                                className="h-5 w-5 text-neutral-500 ml-1 mb-1"
-                                aria-hidden="true"
-                            />
-                        )}
-                    </DefaultTooltip>
                 </span>
             ) : (
                 <>{label}</>
