@@ -85,11 +85,7 @@ export function MoreDetailsForm({
                     <InputGroup
                         label="Cautions"
                         className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
-                        info={
-                            <DefaultTooltip content="Describe any quality issues or limitations that data users should know about">
-                                <ExclamationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
-                            </DefaultTooltip>
-                        }
+                        info="Describe any quality issues or limitations that data users should know about"
                     >
                         <SimpleEditor
                             formObj={formObj}

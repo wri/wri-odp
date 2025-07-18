@@ -1,4 +1,8 @@
-import { FolderPlusIcon, MinusCircleIcon } from '@heroicons/react/24/outline'
+import {
+    FolderPlusIcon,
+    InformationCircleIcon,
+    MinusCircleIcon,
+} from '@heroicons/react/24/outline'
 import { Disclosure } from '@headlessui/react'
 import { Input } from '@/components/_shared/SimpleInput'
 import { InputGroup } from '@/components/_shared/InputGroup'
@@ -66,6 +70,12 @@ export function CustomFieldsForm({
                 <>
                     <FolderPlusIcon className="h-7 w-7" />
                     Custom Fields
+                    <DefaultTooltip content="Custom fields allow additional metadata to be displayed on the dataset page. They do not impact search or filtering.">
+                        <InformationCircleIcon
+                            className="h-5 w-5 text-neutral-500"
+                            aria-hidden="true"
+                        />
+                    </DefaultTooltip>
                 </>
             }
         >
@@ -79,23 +89,21 @@ export function CustomFieldsForm({
                     />
                 ))}
                 <div className="w-full flex justify-end">
-                    <DefaultTooltip content="Custom fields allow additional metadata to be displayed on the dataset page. They do not impact search or filtering.">
-                        <button
-                            type="button"
-                            onClick={() =>
-                                append({
-                                    key: '',
-                                    value: '',
-                                })
-                            }
-                            className="pt-5 flex items-center justify-end gap-x-1"
-                        >
-                            <PlusCircleIcon className="h-5 w-5 text-amber-400" />
-                            <div className="font-['Acumin Pro SemiCondensed'] text-xl font-normal leading-tight text-black">
-                                Add a custom field
-                            </div>
-                        </button>
-                    </DefaultTooltip>
+                    <button
+                        type="button"
+                        onClick={() =>
+                            append({
+                                key: '',
+                                value: '',
+                            })
+                        }
+                        className="pt-5 flex items-center justify-end gap-x-1"
+                    >
+                        <PlusCircleIcon className="h-5 w-5 text-amber-400" />
+                        <div className="font-['Acumin Pro SemiCondensed'] text-xl font-normal leading-tight text-black">
+                            Add a custom field
+                        </div>
+                    </button>
                 </div>
             </Disclosure.Panel>
         </MetadataAccordion>
