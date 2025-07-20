@@ -38,7 +38,10 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
     id,
     onChange: _onChange = (val) => {},
     disabled,
-}: SimpleSelectProps<T, V> & { onChange?: (val: any) => void, disabled?: boolean }) {
+}: SimpleSelectProps<T, V> & {
+    onChange?: (val: any) => void
+    disabled?: boolean
+}) {
     const { control } = formObj ?? useForm()
     return (
         <Controller

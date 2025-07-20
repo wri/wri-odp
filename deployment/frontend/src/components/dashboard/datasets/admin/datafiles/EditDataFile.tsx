@@ -323,11 +323,16 @@ export function EditDataFile({
                                                 className="whitespace-nowrap flex-wrap sm:flex-nowrap"
                                             >
                                                 <TextArea
-                                                    placeholder="Add description"
+                                                    placeholder="Add a short description. If there are additional steps for accessing data not stored directly in the Data Explorer, you may want to include them here."
                                                     {...register(
                                                         `resources.${index}.description`
                                                     )}
                                                     type="text"
+                                                    icon={
+                                                        <DefaultTooltip content="Recommended: 150-200 characters">
+                                                            <InformationCircleIcon className="h-5 w-5" />
+                                                        </DefaultTooltip>
+                                                    }
                                                     maxWidth="max-w-[55rem]"
                                                 />
                                             </InputGroup>
@@ -375,7 +380,7 @@ export function EditDataFile({
                                                 label={
                                                     <span className="flex items-center gap-x-1">
                                                         Advanced API Usage
-                                                        <DefaultTooltip content="This field will end up in the Datafile API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
+                                                        <DefaultTooltip content="This field will end up in the Data file API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
                                                             <InformationCircleIcon className="h-5 w-5" />
                                                         </DefaultTooltip>
                                                     </span>

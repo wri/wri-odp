@@ -111,6 +111,7 @@ export default function CreateDatasetForm() {
         formState: { dirtyFields, errors },
     } = formObj
 
+    console.log('ERRORS', errors)
     useEffect(() => {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])
@@ -257,7 +258,7 @@ export default function CreateDatasetForm() {
                         >
                             Next:{' '}
                             {match(selectedIndex)
-                                .with(0, () => 'Datafiles')
+                                .with(0, () => 'Data files')
                                 .with(1, () => 'Map Visualizations')
                                 .otherwise(() => 'Preview')}
                         </Button>
