@@ -17,6 +17,7 @@ import MetadataModifiedFacet from './MetadataModifiedFacet'
 import Spinner from '../_shared/Spinner'
 import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants'
 import Tags from './Tag'
+import React from 'react'
 
 export default function FilteredSearchLayout({
     children,
@@ -104,7 +105,23 @@ export default function FilteredSearchLayout({
                     // @ts-ignore
                     display_name: updateFrequencyLabels[i.name],
                 }))
+            } else if (key === 'organization' && facetsData?.teamVisibility) {
+                const visibilityMap = facetsData.teamVisibility
+                // @ts-ignore
+                searchFacets[key].items = searchFacets[key].items.map((item) => {
+                    const baseName = item.display_name ?? item.name
+                    const isPrivate = visibilityMap[item.name] === 'private'
+                    const lockEmoji = '🔒'
+                    const displayName = isPrivate && !baseName.includes(lockEmoji)
+                        ? `${baseName} ${lockEmoji}`
+                        : baseName
+                    return {
+                        ...item,
+                        display_name: displayName,
+                    }
+                })
             }
+
         }
     }
 
@@ -278,7 +295,7 @@ export default function FilteredSearchLayout({
                                                                         />
                                                                     ) : ff.key ===
                                                                       'groups' ? (
-                                                                        <>
+                                                                        <React.Fragment key={ff.key}>
                                                                             <Facet
                                                                                 text={
                                                                                     'Topics'
@@ -404,7 +421,7 @@ export default function FilteredSearchLayout({
                                                                                     filters
                                                                                 }
                                                                             />
-                                                                        </>
+                                                                        </React.Fragment>
                                                                     ) : (
                                                                         <Facet
                                                                             text={

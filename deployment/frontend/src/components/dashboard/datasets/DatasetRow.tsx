@@ -56,6 +56,12 @@ function ApprovalDatasetCardProfile({ dataset }: { dataset: WriDataset }) {
             <div className="flex flex-col w-full">
                 <p className="font-semibold text-[15px]">
                     {dataset?.title ?? dataset?.name}
+                    {dataset.visibility_type &&
+                        dataset.visibility_type != 'public' && (
+                            <>
+                                <span className="ml-2" title="Private — only visible to members.">&#128274;</span>
+                            </>
+                        )}
                 </p>
                 <div className="flex font-normal">
                     <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />
@@ -76,6 +82,12 @@ function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
             <div className="flex flex-col w-full">
                 <p className="font-semibold text-[15px]">
                     {dataset?.title ?? dataset?.name}
+                    {dataset.visibility_type &&
+                        dataset.visibility_type != 'public' && (
+                            <>
+                                <span className="ml-2" title="Private — only visible to members.">&#128274;</span>
+                            </>
+                        )}
                 </p>
                 <div className="flex font-normal">
                     <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />

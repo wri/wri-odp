@@ -22,6 +22,9 @@ import { useQuery } from 'react-query'
 import { DownloadIcon } from '@/components/_shared/icons/DownloadIcon'
 import { ArchiveBoxArrowDownIcon } from '@heroicons/react/24/solid'
 import { ErrorAlert } from '@/components/_shared/Alerts'
+import { visibilityTypeLabels } from '@/utils/constants'
+import Chip from '../../_shared/Chip'
+
 
 function downloadCsv(data: string, filename: string) {
     const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' })
@@ -71,6 +74,17 @@ function TeamProfile({
                 profile={team}
                 defaultImg="/images/placeholders/teams/teamdefault.png"
             />
+            {team.visibility === 'private' && (
+              <div className='ml-2 py-3'>
+                <Chip
+                    text={
+                        visibilityTypeLabels[
+                            team.visibility
+                        ] ?? ''
+                    }
+                />
+              </div>
+            )}
         </div>
     )
 }
@@ -96,6 +110,17 @@ function SubTeamProfile({
                 profile={team}
                 defaultImg="/images/placeholders/teams/teamdefault.png"
             />
+            {team.visibility === 'private' && (
+                <div className='ml-2 py-3'>
+                    <Chip
+                        text={
+                            visibilityTypeLabels[
+                            team.visibility
+                            ] ?? ''
+                        }
+                    />
+                </div>
+            )}
         </div>
     )
 }
@@ -448,6 +473,8 @@ export default function TeamCard() {
                 </div>
             ) : (
                 ProcessedTeam.data?.organizations.map((team, index) => {
+                    const isPrivate = team?.visibility === 'private'
+                    //console.log('IS PRIVATE', isPrivate)
                     return (
                         <div key={team.name}>
                             <Row
@@ -530,6 +557,7 @@ export default function TeamCard() {
                                     />
                                 }
                                 isDropDown
+                                isPrivate={isPrivate}
                             />
                         </div>
                     )

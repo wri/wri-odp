@@ -70,13 +70,13 @@ export async function searchHierarchy({
                     group_type == 'group'
                         ? 'group_list_wri'
                         : 'organization_list_wri'
-                }?q=${q}`
+                }?include_extras=true&all_fields=true&q=${q}`
             } else {
                 urLink = `${env.CKAN_URL}/api/3/action/${
                     group_type == 'group'
                         ? 'group_list_wri'
                         : 'organization_list_wri'
-                }`
+                }?include_extras=true&all_fields=true`
             }
 
             response = await fetch(urLink, {
@@ -91,8 +91,8 @@ export async function searchHierarchy({
             response = await fetch(
                 `${env.CKAN_URL}/api/3/action/${
                     group_type == 'group'
-                        ? `group_list_authz_wri${q ? `?q=${q}` : ''}`
-                        : `organization_list_for_user_wri${q ? `?q=${q}` : ''}`
+                        ? `group_list_authz_wri?include_extras=true&all_fields=true${q ? `&q=${q}` : ''}`
+                        : `organization_list_for_user_wri?include_extras=true&all_fields=true${q ? `&q=${q}` : ''}`
                 }`,
                 {
                     headers: {
@@ -122,7 +122,7 @@ export async function getGroups({
 }): Promise<GroupTree[]> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/group_tree?all_fields=True&type=${group_type}`,
+            `${env.CKAN_URL}/api/3/action/group_tree?include_extras=true&all_fields=true&type=${group_type}`,
             {
                 headers: {
                     Authorization: apiKey,
@@ -140,7 +140,7 @@ export async function getGroups({
 
 export async function groupList({ apiKey }: { apiKey: string | null }) {
     const topicRes = await fetch(
-        `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+        `${env.CKAN_URL}/api/action/group_list?include_extras=true&all_fields=true`,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ export async function getAllOrganizations({
                 const response = await fetch(
                     `${
                         env.CKAN_URL
-                    }/api/3/action/organization_list?all_fields=True&limit=${
+                    }/api/3/action/organization_list?include_extras=true&all_fields=true&limit=${
                         (i + 1) * 25
                     }&offset=${i * 25}`,
                     {
@@ -252,7 +252,7 @@ export async function getUserGroups({
 }): Promise<Group[] | null> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/group_list?all_fields=true`,
+            `${env.CKAN_URL}/api/3/action/group_list?include_extras=true&all_fields=true`,
             {
                 headers: {
                     Authorization: apiKey,
@@ -400,7 +400,7 @@ export async function getUserOrganizations({
 }): Promise<WriOrganization[]> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/organization_list_for_user?all_fields=true`,
+            `${env.CKAN_URL}/api/3/action/organization_list_for_user?include_extras=true&all_fields=true`,
             {
                 headers: {
                     Authorization: `${apiKey}`,
@@ -1047,6 +1047,7 @@ export async function getOrganizationTreeDetails({
                 description: org.description ?? '',
                 package_count: org.package_count!,
                 name: org.name,
+                visibility: org.visibility!
             }
             return acc
         },

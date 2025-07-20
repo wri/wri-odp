@@ -5,6 +5,8 @@ import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { api } from '@/utils/api'
 import { Organization } from '@portaljs/ckan'
 import Link from 'next/link'
+import { visibilityTypeLabels } from '@/utils/constants'
+import Chip from '@/components/_shared/Chip'
 
 //write a typeguard to check if the topic is a GroupTree
 function isGroupTree(org: GroupTree | Organization): org is GroupTree {
@@ -15,7 +17,7 @@ export default function TeamCard({
     team,
     teamsDetails,
 }: {
-    team: GroupTree | (Organization & { numSubTeams: number })
+    team: GroupTree | (Organization & { numSubTeams: number, notes?: string })
     teamsDetails: Record<string, GroupsmDetails>
 }) {
     const { data: numOfSubTeams } = api.teams.getNumberOfSubTeams.useQuery()
@@ -36,13 +38,25 @@ export default function TeamCard({
                     className="object-cover"
                 />
             </div>
-            <div className="bg-white w-[70%] pt-2 -ml-[1px] -mt-6 z-10 line-clamp-2 h-16 pb-1.5">
+            <div className="bg-white w-[95%] pt-2 -ml-[1px] -mt-6 z-10 line-clamp-2 h-[4.25rem] pb-1.5">
                 <h2 className="text-2xl font-bold w-[80%]">{team.title}</h2>
             </div>
+            {'visibility' in team && team.visibility === 'private' && (
+                <div className="mt-2 mb-1">
+                    <Chip
+                        text={
+                            visibilityTypeLabels[
+                            team.visibility
+                            ] ?? ''
+                        }
+                        className={""}
+                    />
+                </div>
+            )}
             <article className=" line-clamp-3 w-[88%] font-light text-base mt-2 leading-[1.375rem] h-16">
                 {isGroupTree(team)
-                    ? teamsDetails[team.id]?.description
-                    : team.description}
+                    ? teamsDetails[team.id]?.description || team.description || teamsDetails[team.id]?.notes || team.notes
+                    : team.description || team.notes}
             </article>
             <div className="flex font-light text-sm text-wri-black mt-1 leading-[1.375rem] items-center">
                 {isGroupTree(team) && (

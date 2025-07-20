@@ -319,6 +319,7 @@ export const teamRouter = createTRPCRouter({
                         description: org.description ?? '',
                         package_count: org.package_count!,
                         name: org.name,
+                        visibility: org.visibility!
                     }
                     return acc
                 },

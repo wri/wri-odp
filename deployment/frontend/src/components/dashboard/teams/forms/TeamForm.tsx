@@ -173,6 +173,7 @@ export default function TeamForm({
                                         .map((team) => ({
                                             label: team.title ?? team.name,
                                             value: team.name,
+                                            visibility: team.visibility,
                                         })),
                                 ]}
                                 placeholder="Select a parent"
@@ -220,16 +221,18 @@ export default function TeamForm({
                                           label: 'Private',
                                           value: 'private',
                                           default: true,
+                                          visibility: 'private',
                                       },
                                       {
                                           label: 'Public',
                                           value: 'public',
                                           disabled: true,
+                                          visibility: 'public',
                                       },
                                   ]
                                 : [
-                                      { label: 'Public', value: 'public' },
-                                      { label: 'Private', value: 'private' },
+                                      { label: 'Public', value: 'public', visibility: 'public' },
+                                      { label: 'Private', value: 'private', visibility: 'private' },
                                   ]
                         }
                         placeholder="Select visibility"
