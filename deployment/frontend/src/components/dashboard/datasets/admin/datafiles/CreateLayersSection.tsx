@@ -173,7 +173,7 @@ export function AddLayer({
                                 }
                             >
                                 {({ selected }) => (
-                                    <DefaultTooltip content="This option will try to guide you toward building some of the most common map specs; it's more limited but easier overall">
+                                    <DefaultTooltip content="This option will try to guide you towards building some of the most common map specs; it's more limited but easier overall">
                                         <span
                                             className={classNames(
                                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
