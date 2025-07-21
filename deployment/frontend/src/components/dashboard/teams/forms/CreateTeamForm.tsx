@@ -36,9 +36,9 @@ export default function CreateTeamForm() {
             if (isPrivate) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    path: ['parent'],
+                    path: ['visibility'],
                     message:
-                        'Parent Organization has private visibility and cannot create public teams',
+                        'Team visibility cannot be set to public if selected parent Team is private.',
                 })
             }
         }
@@ -75,7 +75,7 @@ export default function CreateTeamForm() {
                 error.message.includes('Team name already exists in database')
             ) {
                 errorMessage =
-                    'Team name already exists in database or there is a topic with this name'
+                    '[!] A page with this URL already exists. Please choose a different URL.'
             }
 
             setErrorMessage(errorMessage)

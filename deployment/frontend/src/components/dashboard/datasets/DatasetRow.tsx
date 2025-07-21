@@ -10,12 +10,6 @@ import { DefaultTooltip } from '@/components/_shared/Tooltip'
 function subFields(dataset: WriDataset) {
     return [
         {
-            title: 'Status',
-            description: dataset.technical_notes
-                ? 'RDI Approved'
-                : 'RDI Pending',
-        },
-        {
             title: 'Coverage Start',
             description: dataset?.temporal_coverage_start,
         },

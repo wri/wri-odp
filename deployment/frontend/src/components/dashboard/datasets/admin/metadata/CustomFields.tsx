@@ -1,4 +1,8 @@
-import { FolderPlusIcon, MinusCircleIcon } from '@heroicons/react/24/outline'
+import {
+    FolderPlusIcon,
+    InformationCircleIcon,
+    MinusCircleIcon,
+} from '@heroicons/react/24/outline'
 import { Disclosure } from '@headlessui/react'
 import { Input } from '@/components/_shared/SimpleInput'
 import { InputGroup } from '@/components/_shared/InputGroup'
@@ -66,6 +70,12 @@ export function CustomFieldsForm({
                 <>
                     <FolderPlusIcon className="h-7 w-7" />
                     Custom Fields
+                    <DefaultTooltip content="Custom fields allow additional metadata to be displayed on the dataset page. They do not impact search or filtering.">
+                        <InformationCircleIcon
+                            className="h-5 w-5 text-neutral-500"
+                            aria-hidden="true"
+                        />
+                    </DefaultTooltip>
                 </>
             }
         >

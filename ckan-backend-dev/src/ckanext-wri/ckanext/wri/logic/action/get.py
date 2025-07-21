@@ -1809,7 +1809,7 @@ def organization_patch(context, data_dict):
         old_org = get_action("organization_show")(temp_context, data_dict)
         if old_org.get("visibility", "public") == "private" and visibility == "public":
             raise ValidationError({"message": 
-                                   _("Team has private visibility and cannot be updated; Only sysadmin can switch private to public")
+                                   _("User is unauthorized to change visibility from private to public. Please contact a SysAdmin.")
                                    })
         
 
@@ -1820,7 +1820,7 @@ def organization_patch(context, data_dict):
             temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
             parent_org = get_action("organization_show")(temp_context, {"id": parent_org})
             if parent_org.get("visibility", "public") == "private":
-                raise ValidationError({"message": _("Parent Team has private visibility and cannot create public teams")})
+                raise ValidationError({"message": _("Team visibility cannot be set to public if selected parent Team is private.")})
             
     if visibility == "private":
         rdata_dict = {
