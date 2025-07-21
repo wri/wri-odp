@@ -118,57 +118,6 @@ export function InputGroupCustom({
     )
 }
 
-export function InputGroupCustom({
-    label,
-    className,
-    labelClassName,
-    children,
-    required = false,
-    info,
-}: {
-    label: string | React.ReactNode
-    className?: string
-    labelClassName?: string
-    children: React.ReactNode
-    required?: boolean
-    info?: React.ReactNode | string
-}) {
-    return (
-        <div
-            className={classNames(
-                'grid sm:grid-cols-8 justify-between gap-x-14',
-                className ?? ''
-            )}
-        >
-            {typeof label === 'string' ? (
-                <span
-                    className={classNames(
-                        'col-span-2 text-left sm:text-end font-acumin xxl:text-lg font-normal leading-tight text-black  flex ',
-                        labelClassName ?? ''
-                    )}
-                >
-                    {label}{' '}
-                    {required && <span className="text-red-500">*</span>}
-                    {info && (
-                        <DefaultTooltip
-                            content={info}
-                            contentClassName=" bg-[#E5E5E5] text-[12px] "
-                        >
-                            <InformationSolidCircle
-                                className="h-5 w-5 text-neutral-500 ml-1 mb-1"
-                                aria-hidden="true"
-                            />
-                        </DefaultTooltip>
-                    )}
-                </span>
-            ) : (
-                <>{label}</>
-            )}
-            <div className="col-span-6 h-full grow w-full">{children}</div>
-        </div>
-    )
-}
-
 export function ErrorDisplay({
     name,
     errors,
