@@ -121,6 +121,7 @@ export class CartoProvider implements ProviderMaker {
         resolve?: (layerSpec: LayerSpec) => void,
         reject?: (err: Error) => void
     ): void => {
+        console.log('layer', layer)
         try {
             const result = {
                 ...layer,

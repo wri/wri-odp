@@ -17,9 +17,11 @@ export const assertFullfilled = <T>(
     return input.status === 'fulfilled'
 }
 
-function isUUID ( uuid: string ) {
-    let s = "" + uuid;
-    return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i.test(s);
+function isUUID(uuid: string) {
+    let s = '' + uuid
+    return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i.test(
+        s
+    )
 }
 
 export async function deleteLayerRw(r: ResourceFormType) {
@@ -82,6 +84,7 @@ export async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
         }
     )
     const layerRw: RwResponse = await layerRwRes.json()
+    console.log('RW LAYER', layerRw)
     if (isRwError(layerRw)) throw new Error(JSON.stringify(layerRw.errors))
     if (!isRwLayerResp(layerRw)) throw new Error('Invalid response from RW API')
     const url = `https://api.resourcewatch.org/v1/dataset/${layerRw.data.attributes.dataset}/layer/${layerRw.data.id}`

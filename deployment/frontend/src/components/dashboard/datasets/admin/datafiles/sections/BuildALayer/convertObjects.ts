@@ -70,50 +70,53 @@ export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
                                       removeKeysWithUndefined({
                                           'circle-opacity':
                                               layer.type.value === 'circle'
-                                                  ? layer.paint[
+                                                  ? (layer.paint[
                                                         'circle-opacity'
-                                                    ] ?? undefined
+                                                    ] ?? undefined)
                                                   : undefined,
                                           'circle-radius':
                                               layer.type.value === 'circle'
-                                                  ? layer.paint[
+                                                  ? (layer.paint[
                                                         'circle-radius'
-                                                    ] ?? undefined
+                                                    ] ?? undefined)
                                                   : undefined,
                                           'circle-color': matchColorPattern(
                                               layer.type.value === 'circle'
-                                                  ? layer.paint[
+                                                  ? (layer.paint[
                                                         'circle-color'
-                                                    ] ?? undefined
+                                                    ] ?? undefined)
                                                   : undefined
                                           ),
                                           'line-width':
                                               layer.type.value === 'line'
-                                                  ? layer.paint['line-width'] ??
-                                                    undefined
+                                                  ? (layer.paint[
+                                                        'line-width'
+                                                    ] ?? undefined)
                                                   : undefined,
                                           'line-opacity':
                                               layer.type.value === 'line'
-                                                  ? layer.paint[
+                                                  ? (layer.paint[
                                                         'line-opacity'
-                                                    ] ?? undefined
+                                                    ] ?? undefined)
                                                   : undefined,
                                           'line-color': matchColorPattern(
                                               layer.type.value === 'line'
-                                                  ? layer.paint['line-color'] ??
-                                                        undefined
+                                                  ? (layer.paint[
+                                                        'line-color'
+                                                    ] ?? undefined)
                                                   : undefined
                                           ),
                                           'fill-opacity':
                                               layer.type.value === 'fill'
-                                                  ? layer.paint[
+                                                  ? (layer.paint[
                                                         'fill-opacity'
-                                                    ] ?? undefined
+                                                    ] ?? undefined)
                                                   : undefined,
                                           'fill-color': matchColorPattern(
                                               layer.type.value === 'fill'
-                                                  ? layer.paint['fill-color'] ??
-                                                        undefined
+                                                  ? (layer.paint[
+                                                        'fill-color'
+                                                    ] ?? undefined)
                                                   : undefined
                                           ),
                                       }),
@@ -364,7 +367,6 @@ function parseRender(render: any) {
 }
 
 export const getApiSpecFromRawObj = (rawLayerFormObj: RawLayerFormType) => {
-    console.log('RW LAYER OBJ FORM', rawLayerFormObj)
     const { generalConfig, layerConfig, interactionConfig, legendConfig } =
         rawLayerFormObj
     try {

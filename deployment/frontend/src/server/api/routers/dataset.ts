@@ -265,7 +265,7 @@ export const DatasetRouter = createTRPCRouter({
                                     // schema: resource.schema
                                     //     ? { value: resource.schema }
                                     //     : '{}',
-                                    url: resource.url ?? 'https://example.com',
+                                    url: resource.url,
                                 }
                             } else {
                                 return {
