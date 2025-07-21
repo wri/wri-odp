@@ -16,6 +16,7 @@ import Spinner from '@/components/_shared/Spinner'
 import { UseFormReturn } from 'react-hook-form'
 import * as turf from '@turf/turf'
 import { HideBoundaries } from '@/components/_shared/HideBoundaries'
+import DefaultTooltip from '@/components/_shared/Tooltip'
 
 export function DatafileLocation({
     formObj,
@@ -155,18 +156,23 @@ export function DatafileLocation({
                                 )
                             }}
                             id="locationUpload"
-                            className={classNames(
-                                'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2'
-                            )}
                         >
-                            <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                            <div
-                                className={classNames(
-                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
-                                )}
-                            >
-                                Upload a GeoJSON file
-                            </div>
+                            <DefaultTooltip content="Upload a GeoJSON file when the desired area cannot be mapped directly to an administrative boundary">
+                                <span
+                                    className={classNames(
+                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2'
+                                    )}
+                                >
+                                    <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                    <div
+                                        className={classNames(
+                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
+                                        )}
+                                    >
+                                        Upload a GeoJSON file
+                                    </div>
+                                </span>
+                            </DefaultTooltip>
                         </Tab>
                         <Tab
                             id="locationString"

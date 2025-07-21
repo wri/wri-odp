@@ -344,7 +344,7 @@ export function DownloadButton({
             </Popover>
             {convertTo && (
                 <DownloadPopup
-                    title="The selected datafiles are being prepared for download"
+                    title="The selected data files are being prepared for download"
                     subtitle="Please enter your information so that you receive the download link via email"
                     isOpen={open}
                     onClose={() => setOpen(false)}

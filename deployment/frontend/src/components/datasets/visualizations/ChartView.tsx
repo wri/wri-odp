@@ -38,7 +38,7 @@ export default function ChartView() {
 
     const { watch, handleSubmit, reset } = formObj
 
-    // TODO: we should group options by datafile
+    // TODO: we should group options by data file
     const chartOptions = activeCharts
         .filter((v: View) => v?.config_obj?.type == 'chart')
         .map((v: View) => ({ label: v.title, value: v }))
@@ -110,7 +110,7 @@ export default function ChartView() {
                 <Chart config={getConfigWithOverrides()} />
             )}
 
-            <form onSubmit={handleSubmit((data) => { })} className="mt-10">
+            <form onSubmit={handleSubmit((data) => {})} className="mt-10">
                 <div className="grid grid-cols-2 xl:grid-cols-2 mb-5 space-x-2">
                     <InputGroup
                         label="X axis tick angle"

@@ -236,7 +236,7 @@ export function DataFiles({
                         className="block w-full rounded-l-md py-3 pl-4 border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
                         onChange={(e) => setQ(e.target.value)}
                         value={q}
-                        placeholder="Search datafiles by title or description"
+                        placeholder="Search data files by title or description"
                     />
                     <Button
                         onClick={handleSearch}
@@ -303,7 +303,7 @@ export function DataFiles({
                                 ></path>
                             </svg>
                         )}{' '}
-                        ({datafilesToDownload.length} Selected datafiles
+                        ({datafilesToDownload.length} Selected data files
                         {notDownloadable.length > 0
                             ? `, ${notDownloadable.length} not available to download)`
                             : ')'}
@@ -353,7 +353,7 @@ export function DataFiles({
                                     }}
                                     className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                                 >
-                                    Unselect all datafiles
+                                    Unselect all data files
                                 </button>
                             )}
                         </>
@@ -410,7 +410,7 @@ export function DataFiles({
                     onClick={() => setOpenDownload(true)}
                     className="group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3"
                 >
-                    Download Selected Datafiles
+                    Download Selected Data files
                     <ArrowDownCircleIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
                 </Button>
             )}
@@ -448,7 +448,7 @@ export function DataFiles({
                 )}
             </div>
             <DownloadPopup
-                title="The selected datafiles are being prepared for download"
+                title="The selected data files are being prepared for download"
                 subtitle="Please enter your information so that you receive the download link via email"
                 isOpen={openDownload}
                 onClose={() => setOpenDownload(false)}

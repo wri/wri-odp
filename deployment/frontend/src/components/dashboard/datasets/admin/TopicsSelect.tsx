@@ -169,8 +169,8 @@ function TopicsInner({
                         <div
                             className={classNames(
                                 topic.children
-                                    ? 'font-acumin text-base font-normal text-black group-hover:text-white'
-                                    : 'font-acumin text-base font-normal text-neutral-600 group-hover:text-white',
+                                    ? 'text-base font-normal text-black group-hover:text-white'
+                                    : 'text-base font-normal text-neutral-600 group-hover:text-white',
                                 userTopics && !userTopics.includes(topic.name)
                                     ? 'text-gray-400'
                                     : ''
@@ -200,7 +200,7 @@ function TopicsInner({
                     className="relative flex h-auto min-h-[7rem] w-full flex-row items-start justify-between rounded-md border-0 px-5 py-3 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 hover:bg-white focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
                 >
                     <div className="flex w-full items-start justify-between">
-                        <span className="font-acumin text-base font-light text-zinc-500">
+                        <span className="font-light text-zinc-500">
                             {value.length === 0 ? (
                                 'Start typing in a topic or select topics from the dropdown'
                             ) : (

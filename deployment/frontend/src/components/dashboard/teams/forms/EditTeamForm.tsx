@@ -57,9 +57,9 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             if (isPrivate) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    path: ['parent'],
+                    path: ['visibility'],
                     message:
-                        'Parent Organization has private visibility and cannot create public teams',
+                        'Team visibility cannot be set to public if selected parent Team is private.',
                 })
             }
         }

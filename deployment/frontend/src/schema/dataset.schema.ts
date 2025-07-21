@@ -53,7 +53,9 @@ export const ResourceSchema = z
         key: z.string().optional(),
         format: z.string().optional().nullable(),
         size: z.number().optional().nullable(),
-        title: z.string().optional(),
+        title: z
+            .string()
+            .min(2, { message: 'Title is required (minimum of 2 characters)' }),
         advanced_api_usage: z.string().optional().nullable(),
         not_downloadable: z.boolean().optional().default(false),
         fileBlob: z.any(),
@@ -91,10 +93,15 @@ export const ResourceSchema = z
         (obj) => {
             if (obj.type !== 'link') return true
             if (!obj.url) return false
+            if (
+                !obj.url.startsWith('http://') &&
+                !obj.url.startsWith('https://')
+            )
+                return false
             return true
         },
         {
-            message: 'URL are required for resource of type link',
+            message: 'Invalid URL',
             path: ['url'],
         }
     )
@@ -102,9 +109,24 @@ export const ResourceSchema = z
 const DatasetSchemaObject = z.object({
     id: z.string().uuid().optional().nullable(),
     rw_id: z.string().optional().nullable(),
-    title: z.string().min(1, { message: 'Title is required' }),
-    name: z.string().min(1, { message: 'Name is required' }),
-    url: z.string().optional().nullable().or(emptyStringToUndefined),
+    title: z
+        .string()
+        .min(2, { message: 'Title is required (minimum 2 characters)' }),
+    name: z
+        .string()
+        .min(1, { message: 'Name is required' })
+        .regex(
+            /^[^\(\) +]+$/,
+            'Name must be URL-compatible and cannot include spaces or the dot(.) character.'
+        ),
+    url: z
+        .string()
+        .url({
+            message: 'Must be in a valid URL format',
+        })
+        .optional()
+        .nullable()
+        .or(emptyStringToUndefined),
     rw_dataset: z.boolean().default(false),
     connectorUrl: z.string().optional().nullable().default(''),
     connectorType: z.string().optional().nullable().default('rest'),
@@ -117,7 +139,9 @@ const DatasetSchemaObject = z.object({
         })
         .optional(),
     team: z.object({
-        value: z.string().min(1, { message: 'Team is required' }),
+        value: z
+            .string()
+            .min(1, { message: 'Team is required for all datasets' }),
         label: z.string(),
         id: z.string(),
         visibility: z.string(),
@@ -178,14 +202,15 @@ const DatasetSchemaObject = z.object({
         .array(
             z.object({
                 name: z.string().min(1, { message: 'Author Name is required' }),
-                email: z.string().email().min(1, {
-                    message: 'Author Email is required',
-                }),
+                email: z
+                    .string()
+                    .optional()
+                    .nullable()
+                    .or(emptyStringToUndefined),
             })
         )
         .min(1, {
-            message:
-                'At least one (1) Author Name and Author Email is required.',
+            message: 'At least one (1) Author Name is required.',
         }),
     maintainers: z
         .array(
@@ -316,8 +341,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
             return true
         },
         {
-            message:
-                'At least one (1) Author Name and Author Email is required.',
+            message: 'At least one (1) Author Name is required.',
             path: ['authors'],
         }
     )
