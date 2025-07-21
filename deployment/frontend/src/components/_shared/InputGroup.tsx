@@ -47,12 +47,12 @@ export function InputGroup({
                         >
                             {deepInfoIcon ? (
                                 <InformationSolidCircle
-                                    className="h-5 w-5 text-neutral-500 ml-1 mb-1"
+                                    className="h-5 w-5 text-neutral-500 ml-1 mb-1 shrink-0"
                                     aria-hidden="true"
                                 />
                             ) : (
                                 <InformationCircleIcon
-                                    className="h-5 w-5 text-neutral-500 ml-1 mb-1"
+                                    className="h-5 w-5 text-neutral-500 ml-1 mb-1 shrink-0"
                                     aria-hidden="true"
                                 />
                             )}
