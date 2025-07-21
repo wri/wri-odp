@@ -73,7 +73,7 @@ export default function MulText<T extends FieldValues>({
                         >
                             <div className="flex w-full items-start justify-between">
                                 {value.length === 0 ? (
-                                    <span className="font-acumin text-base font-light text-zinc-500">
+                                    <span className="font-light text-zinc-500">
                                         {title}
                                     </span>
                                 ) : (
@@ -139,7 +139,7 @@ export default function MulText<T extends FieldValues>({
                             onChange={(e) => onChange(e)}
                             multiple
                         >
-                            <span className="font-acumin text-base font-semibold text-black">
+                            <span className="font-light text-black">
                                 {title}
                             </span>
                             <div className="relative isolate">

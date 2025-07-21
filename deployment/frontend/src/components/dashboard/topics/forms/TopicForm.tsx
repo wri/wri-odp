@@ -67,12 +67,12 @@ export default function TopicForm({
                 <InputGroup
                     label="Image"
                     className="items-start justify-start gap-x-[2.7rem]"
+                    info="Appears on /topics, /topics/topic-name, and homepage carousels. We recommend a horizontal image between 5-10 MB."
                 >
                     <div className="col-span-full lg:col-span-2">
                         <div className="w-[11rem]">
                             <ImageUploader
                                 clearImage={() => setValue('image_url', '')}
-                                tooltip="Appears on /topics, /topics/topic-name, and homepage carousels. We recommend a horizontal image between 5-10 MB."
                                 defaultImage={
                                     watch('image_url') &&
                                     watch('image_display_url')

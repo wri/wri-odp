@@ -15,6 +15,8 @@ import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
+import DefaultTooltip from '@/components/_shared/Tooltip'
+import { InformationCircleIcon } from '@heroicons/react/24/outline'
 
 function ToolTipVisibility() {
     return (
@@ -71,7 +73,6 @@ export default function TeamForm({
                     required
                     deepInfoIcon
                     contentClassName="bg-[#E5E5E5] text-[12px]"
-                    info="Please choose a URL that is not already in use for another Topic, Team, or Application."
                 >
                     <Input
                         {...register('name')}
@@ -79,6 +80,11 @@ export default function TeamForm({
                         placeholder="name-of-team"
                         type="text"
                         className="pl-[4.6rem] lg:pl-[4rem]"
+                        icon={
+                            <DefaultTooltip content="Please choose a URL that is not already in use for another Topic, Team, or Application.">
+                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                            </DefaultTooltip>
+                        }
                     >
                         <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
                             /teams/
@@ -89,8 +95,6 @@ export default function TeamForm({
                 <InputGroup
                     label="Image"
                     className="items-start justify-start gap-x-[2.7rem]"
-                    deepInfoIcon
-                    contentClassName="bg-[#E5E5E5] text-[12px]"
                     info="Appears on Team detail page and Teams overview page. We recommend a horizontal image between 5-10 MB."
                 >
                     <div className="col-span-full lg:col-span-2">

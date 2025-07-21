@@ -40,6 +40,7 @@ export interface CkanResponse<T> {
     success: boolean
     error?: {
         __type: string
+        name?: string
         message: string
     }
     result: T

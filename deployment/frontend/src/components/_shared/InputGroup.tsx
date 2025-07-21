@@ -20,9 +20,9 @@ export function InputGroup({
     labelClassName?: string
     children: React.ReactNode
     required?: boolean
+    info?: string | React.ReactNode
     deepInfoIcon?: boolean
     contentClassName?: string
-    info?: string
 }) {
     return (
         <div
