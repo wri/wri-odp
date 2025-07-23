@@ -700,7 +700,11 @@ export function DatasetHeader({
               </span>
             </h2>
             {session?.data?.user && dataset?.organization?.visibility === "private" && (
-              <span className='text-xs'> &#128274;</span>
+              <span
+                className={`rounded-full h-fit text-sm lg:text-xs px-2 py-y border border-gray-400 capitalize`}
+              >
+                {dataset?.organization?.visibility}
+              </span>
             )}
           </div>
           <div className="flex items-center gap-x-3">

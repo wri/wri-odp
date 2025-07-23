@@ -6,6 +6,8 @@ import type { WriDataset } from '@/schema/ckan.schema'
 import { formatDate } from '@/utils/general'
 import { useRouter } from 'next/router'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { visibilityTypeLabels } from '@/utils/constants'
+import Chip from '@/components/_shared/Chip'
 
 function subFields(dataset: WriDataset) {
     return [
@@ -74,13 +76,17 @@ function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
     return (
         <div className="flex  py-3 rounded-md pl-4 sm:pl-14 gap-x-2">
             <div className="flex flex-col w-full">
-                <p className="font-semibold text-[15px]">
+                <p className="flex font-semibold text-[15px]">
                     {dataset?.title ?? dataset?.name}
                     {dataset.visibility_type &&
                         dataset.visibility_type != 'public' && (
-                            <>
-                                <span className="ml-2" title="Private — only visible to members.">&#128274;</span>
-                            </>
+                            <Chip
+                                text={
+                                    visibilityTypeLabels[
+                                    dataset.visibility_type
+                                    ] ?? ''
+                                }
+                            />
                         )}
                 </p>
                 <div className="flex font-normal">
