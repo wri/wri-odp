@@ -14,7 +14,6 @@ import Controls from './controls/Controls'
 import Basemap from './Basemap'
 import Labels from './Labels'
 import dynamic from 'next/dynamic'
-import { GetLayers } from '../GetLayers'
 
 const DynamicLayerManger = dynamic(() => import('./LayerManager'), {
     ssr: false,
@@ -80,7 +79,6 @@ export default function Map({
                 {!!mapRef.current && layers && ready && (
                     <>
                         <DynamicLayerManger layers={layers} />
-                        <GetLayers />
                         <Basemap mapRef={mapRef} />
                         <Labels mapRef={mapRef} />
                         {showControls && (

@@ -56,18 +56,13 @@ async function getLayersFromRW(
     return await Promise.all(
         activeLayerGroups.map(
             async (layerGroup: ActiveLayerGroup, index: number) => {
-                console.log('LAYER GROUP', layerGroup)
-                console.log('LAYER AS LAYER OBJ', layerAsLayerObj)
                 const { datasetId, layers } = layerGroup
                 if (layers.length === 0) return []
                 const layersData = await Promise.all(
                     layers.map(async (layer: string) => {
                         layer = layer.replace('prev', '')
-                        console.log('LAYER', layer)
                         let layerInfo = layerAsLayerObj.get(layer)
-                        console.log('LAYER INFO', layerInfo)
                         layerInfo = layerInfo ?? 'approved'
-                        console.log('LAYER INFO', layerInfo)
                         if (layerInfo === 'approved') {
                             const response = await fetch(
                                 `https://api.resourcewatch.org/v1/layer/${layer}`
@@ -129,7 +124,6 @@ async function getLayersFromRW(
 
                             const resource = layerdata[0]!
 
-                            console.log('RESOURCE', resource)
                             const resourceLayer =
                                 resource?.layerObj ?? resource?.layerObjRaw
                             const currentLayer = currentLayers.get(resource.id)

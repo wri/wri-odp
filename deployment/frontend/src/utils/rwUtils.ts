@@ -84,7 +84,6 @@ export async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
         }
     )
     const layerRw: RwResponse = await layerRwRes.json()
-    console.log('RW LAYER', layerRw)
     if (isRwError(layerRw)) throw new Error(JSON.stringify(layerRw.errors))
     if (!isRwLayerResp(layerRw)) throw new Error('Invalid response from RW API')
     const url = `https://api.resourcewatch.org/v1/dataset/${layerRw.data.attributes.dataset}/layer/${layerRw.data.id}`
