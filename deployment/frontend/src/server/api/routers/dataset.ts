@@ -265,7 +265,7 @@ export const DatasetRouter = createTRPCRouter({
                                     // schema: resource.schema
                                     //     ? { value: resource.schema }
                                     //     : '{}',
-                                    url: resource.url,
+                                    url: resource.url ?? 'https://example.com',
                                 }
                             } else {
                                 return {
@@ -294,6 +294,7 @@ export const DatasetRouter = createTRPCRouter({
                         : null,
                 }
 
+                console.log('calling package_create')
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
                     {
@@ -307,8 +308,10 @@ export const DatasetRouter = createTRPCRouter({
                 )
                 const dataset: CkanResponse<Dataset> = await datasetRes.json()
                 if (!dataset.success && dataset.error) {
+                    console.log('dataset', dataset)
                     if (
                         //@ts-ignore
+                        dataset.error.name &&
                         dataset.error.name[0] === 'That URL is already in use.'
                     ) {
                         throw Error(
@@ -323,6 +326,7 @@ export const DatasetRouter = createTRPCRouter({
                 }
                 return dataset.result
             } catch (e) {
+                console.log('E', e)
                 let error =
                     'Something went wrong please contact the system administrator'
                 if (e instanceof Error) error = e.message

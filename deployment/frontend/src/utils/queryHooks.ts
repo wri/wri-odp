@@ -66,7 +66,7 @@ async function getLayersFromRW(
                         console.log('LAYER', layer)
                         let layerInfo = layerAsLayerObj.get(layer)
                         console.log('LAYER INFO', layerInfo)
-                        layerInfo = layerInfo ?? 'pending'
+                        layerInfo = layerInfo ?? 'approved'
                         console.log('LAYER INFO', layerInfo)
                         if (layerInfo === 'approved') {
                             const response = await fetch(
