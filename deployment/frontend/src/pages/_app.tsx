@@ -102,10 +102,13 @@ const MyApp: AppType<{ session: Session | null }> = ({
             if (resource.format == 'Layer') {
                 if (
                     (resource['layerObj'] || resource['layerObjRaw']) &&
-                    !resource.url
+                    // This is a temporary fix for the example.com url
+                    (!resource.url || resource.url.includes('example'))
                 ) {
+                    console.log('IS PENDING')
                     layerAsLayerObj.set(resource.rw_id, 'pending')
                 } else {
+                    console.log('IS APPROVED')
                     layerAsLayerObj.set(resource.rw_id, 'approved')
                 }
             }

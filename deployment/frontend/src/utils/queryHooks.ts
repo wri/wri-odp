@@ -125,7 +125,7 @@ async function getLayersFromRW(
                             const resource = layerdata[0]!
 
                             const resourceLayer =
-                                resource.layerObj ?? resource.layerObjRaw
+                                resource?.layerObj ?? resource?.layerObjRaw
                             const currentLayer = currentLayers.get(resource.id)
                             const layerPackage = {
                                 ...resourceLayer,
