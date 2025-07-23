@@ -40,7 +40,7 @@ export default function TopicForm({
                 <InputGroup label="Title" required>
                     <Input
                         {...register('title')}
-                        placeholder="My topic"
+                        placeholder="My Topic"
                         type="text"
                     />
                     <ErrorDisplay name="title" errors={errors} />

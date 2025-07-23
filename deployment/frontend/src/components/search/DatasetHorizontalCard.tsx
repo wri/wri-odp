@@ -175,7 +175,7 @@ export default function DatasetHorizontalCard({
 
                     <button className="flex justify-end lg:justify-start lg:ml-auto shrink-0 group-hover:text-wri-green">
                         <div className="text-base  leading-[24px] font-bold">
-                            View dataset
+                            View Dataset
                         </div>
                         <div className="pt-0.5">
                             <ChevronRightIcon className="h-4 w-4 stroke-current stroke-[3] " />

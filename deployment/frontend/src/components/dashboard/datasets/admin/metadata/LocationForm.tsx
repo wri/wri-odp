@@ -97,7 +97,7 @@ export function LocationForm({
                 <>
                     <MapPinIcon className="h-7 w-7" />
                     Location Coverage
-                    <DefaultTooltip content="Complete this section if the dataset should be included in search results when doing a search by location">
+                    <DefaultTooltip content="Complete this section if the Dataset should be included in search results when doing a search by location">
                         <InformationCircleIcon
                             className="h-5 w-5 text-neutral-500"
                             aria-hidden="true"
@@ -191,7 +191,7 @@ export function LocationForm({
                             }}
                         >
                             {({ selected }) => (
-                                <DefaultTooltip content="Select this option to indicate that the dataset covers global geographic scope and will be available broadly across the Data Explorer">
+                                <DefaultTooltip content="Select this option to indicate that the Dataset covers global geographic scope and will be available broadly across the Data Explorer">
                                     <span
                                         className={classNames(
                                             'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
@@ -223,7 +223,7 @@ export function LocationForm({
                             }}
                         >
                             {({ selected }) => (
-                                <DefaultTooltip content="Select this option if the dataset’s location should be derived from the combined locations of all included data files.">
+                                <DefaultTooltip content="Select this option if the Dataset’s location should be derived from the combined locations of all included Data Files.">
                                     <span
                                         className={classNames(
                                             'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',

@@ -68,7 +68,7 @@ export default function ApplicationCard() {
     onSuccess: async (data) => {
       await refetch();
       setOpen(false)
-      notify(`Successfully deleted the ${selectedApplication?.name} application`, 'error')
+      notify(`Successfully deleted the ${selectedApplication?.name} Application`, 'error')
     }
   })
 
@@ -97,7 +97,7 @@ export default function ApplicationCard() {
                     highlighted={false}
                     rowMain={<ApplicationProfile application={application} />}
                     linkButton={{
-                      label: "View application",
+                      label: "View Application",
                       link: `../applications/${application.name}`,
                     }}
                     controlButtons={[
@@ -107,7 +107,7 @@ export default function ApplicationCard() {
                         icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
                         tooltip: {
                           id: `edit-tooltip-${application.name}`,
-                          content: "Edit application"
+                          content: "Edit Application"
                         },
                         onClick: () => {
                           router.push(`/dashboard/applications/${application.name}/edit`)
@@ -119,7 +119,7 @@ export default function ApplicationCard() {
                         icon: <TrashIcon className='w-4 h-4 text-white' />,
                         tooltip: {
                           id: `delete-tooltip-${application.name}`,
-                          content: "Delete application"
+                          content: "Delete Application"
                         },
                         onClick: () => handleOpenModal(application)
                       },
@@ -157,7 +157,7 @@ export default function ApplicationCard() {
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      Are you sure you want to delete this application?
+                      Are you sure you want to delete this Application?
                     </p>
                   </div>
                 </div>

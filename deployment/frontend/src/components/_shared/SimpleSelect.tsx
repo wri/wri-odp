@@ -95,7 +95,7 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                                 ? selected.label.charAt(0).toUpperCase() + selected.label.slice(1)
                                                 : placeholder}
                                         </span>
-                                        {selected?.visibility === 'private' && (
+                                        {selected?.visibility === 'private' && selected?.value != 'private' && (
                                             <>&#128274;</>
                                         )}
                                     </span>
@@ -142,7 +142,7 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                                             {option.label}
                                                             {option?.visibility &&
                                                             option.visibility ===
-                                                                'private' ? (
+                                                                'private' && option.value != 'private' ? (
                                                                 <span className='ml-1'> &#128274;</span>
                                                             ) : (
                                                                 ''

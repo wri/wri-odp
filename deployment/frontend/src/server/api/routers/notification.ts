@@ -60,34 +60,34 @@ export const notificationRouter = createTRPCRouter({
                     const role = actionType[2]
                     const action = actionType[1]
                     if (action === 'removed') {
-                        msg = ` ${action} you as a collaborator (${role}) from the dataset`
+                        msg = ` ${action} you as a collaborator (${role}) from the Dataset`
                     } else if (action === 'added') {
-                        msg = ` ${action} you as a collaborator (${role}) for the dataset`
+                        msg = ` ${action} you as a collaborator (${role}) for the Dataset`
                     } else if (action === 'updated') {
-                        msg = ` ${action} your collaborator status to "${role}" for the dataset`
+                        msg = ` ${action} your collaborator status to "${role}" for the Dataset`
                     }
                 } else if (actionType[0] === 'issue') {
                     const action = actionType[1]
                     if (action === 'created') {
                         msg = ` ${action} an issue (${actionType[2]
                             ?.split('nbsp;')
-                            ?.join(' ')} ) for the dataset`
+                            ?.join(' ')} ) for the Dataset`
                     } else if (action === 'commented') {
                         msg = ` ${action} on an issue (${actionType[2]
                             ?.split('nbsp;')
-                            ?.join(' ')} ) for the dataset`
+                            ?.join(' ')} ) for the Dataset`
                     } else if (action === 'closed') {
                         msg = ` ${action} an issue (${actionType[2]
                             ?.split('nbsp;')
-                            ?.join(' ')} ) for the dataset`
+                            ?.join(' ')} ) for the Dataset`
                     } else if (action === 'open') {
                         msg = ` re-${action} an issue (${actionType[2]
                             ?.split('nbsp;')
-                            ?.join(' ')} ) for the dataset`
+                            ?.join(' ')} ) for the Dataset`
                     } else if (action === 'deleted') {
                         msg = ` ${action} an issue (${actionType[2]
                             ?.split('nbsp;')
-                            ?.join(' ')} ) for the dataset`
+                            ?.join(' ')} ) for the Dataset`
                     }
                 } else if (actionType[0] === 'pending') {
                     msg = ` created ${actionType[0]}  ${actionType[1]} `

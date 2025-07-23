@@ -165,7 +165,7 @@ export function DownloadButton({
                     isOpen={showDownloadForm}
                     subtitle={
                         datafile.not_downloadable
-                            ? 'The data you’re looking for is located outside the Data Explorer. Before directing you to the dataset’s location, we’d love to learn more about you.'
+                            ? 'The data you’re looking for is located outside the Data Explorer. Before directing you to the Dataset’s location, we’d love to learn more about you.'
                             : ''
                     }
                     onClose={() => setShowDownloadForm(false)}
@@ -230,7 +230,7 @@ export function DownloadButton({
                 isOpen={showDownloadForm}
                 subtitle={
                     datafile.not_downloadable
-                        ? 'The data you’re looking for is located outside the Data Explorer. Before directing you to the dataset’s location, we’d love to learn more about you.'
+                        ? 'The data you’re looking for is located outside the Data Explorer. Before directing you to the Dataset’s location, we’d love to learn more about you.'
                         : ''
                 }
                 onClose={() => setShowDownloadForm(false)}
@@ -344,7 +344,7 @@ export function DownloadButton({
             </Popover>
             {convertTo && (
                 <DownloadPopup
-                    title="The selected data files are being prepared for download"
+                    title="The selected Data Files are being prepared for download"
                     subtitle="Please enter your information so that you receive the download link via email"
                     isOpen={open}
                     onClose={() => setOpen(false)}

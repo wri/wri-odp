@@ -56,12 +56,6 @@ function ApprovalDatasetCardProfile({ dataset }: { dataset: WriDataset }) {
             <div className="flex flex-col w-full">
                 <p className="font-semibold text-[15px]">
                     {dataset?.title ?? dataset?.name}
-                    {dataset.visibility_type &&
-                        dataset.visibility_type != 'public' && (
-                            <>
-                                <span className="ml-2" title="Private — only visible to members.">&#128274;</span>
-                            </>
-                        )}
                 </p>
                 <div className="flex font-normal">
                     <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />
@@ -156,7 +150,7 @@ export default function DatasetRow({
                     icon: <PencilSquareIcon className="w-4 h-4 text-white" />,
                     tooltip: {
                         id: `edit-tooltip-${dataset.name}`,
-                        content: 'Edit dataset',
+                        content: 'Edit Dataset',
                     },
                     onClick: () => {
                         router.push(`/dashboard/datasets/${dataset.name}/edit`)
@@ -168,13 +162,13 @@ export default function DatasetRow({
                     icon: <TrashIcon className="w-4 h-4 text-white" />,
                     tooltip: {
                         id: `delete-tooltip-${dataset.name}`,
-                        content: 'Delete dataset',
+                        content: 'Delete Dataset',
                     },
                     onClick: () => handleOpenModal(dataset),
                 },
             ]}
             linkButton={{
-                label: 'View dataset',
+                label: 'View Dataset',
                 link: `../datasets/${dataset.name}`,
             }}
             rowSub={<SubCardProfile dataset={dataset} />}
@@ -207,7 +201,7 @@ export function ApprovalDatasetRow({
                     icon: <PencilSquareIcon className="w-4 h-4 text-white" />,
                     tooltip: {
                         id: `edit-tooltip-${dataset.name}`,
-                        content: 'Edit dataset',
+                        content: 'Edit Dataset',
                     },
                     onClick: () => {
                         router.push(`/dashboard/datasets/${dataset.name}/edit`)
@@ -219,7 +213,7 @@ export function ApprovalDatasetRow({
                     icon: <TrashIcon className="w-4 h-4 text-white" />,
                     tooltip: {
                         id: `delete-tooltip-${dataset.name}`,
-                        content: 'Delete dataset',
+                        content: 'Delete Dataset',
                     },
                     onClick: () => handleOpenModal(dataset),
                 },
@@ -248,19 +242,19 @@ export function FavouriteRow({
             className={`pr-2 sm:pr-4  ${className ? className : ''}`}
             rowMain={<DatasetCardProfile dataset={dataset} />}
             linkButton={{
-                label: 'View dataset',
+                label: 'View Dataset',
                 link: `../datasets/${dataset.name}`,
             }}
             controlButtons={[
                 {
-                    label: 'Remove from favorites',
+                    label: 'Remove from favourites',
                     color: 'bg-red-600 hover:bg-red-500',
                     icon: (
                         <StarIcon className="cursor-pointer h-4 w-4 text-white" />
                     ),
                     tooltip: {
                         id: `delete-tooltip-${dataset.name}`,
-                        content: 'Remove from favorites',
+                        content: 'Remove from favourites',
                     },
                     onClick: () => handleOpenModal(dataset),
                 },
@@ -293,7 +287,7 @@ export function DraftRow({
                     icon: <PencilSquareIcon className="w-4 h-4 text-white" />,
                     tooltip: {
                         id: `delete-tooltip-${dataset.name}`,
-                        content: 'Edit dataset',
+                        content: 'Edit Dataset',
                     },
                     onClick: () => {
                         router.push(`/dashboard/datasets/${dataset.name}/edit`)
@@ -305,7 +299,7 @@ export function DraftRow({
                     icon: <TrashIcon className="w-4 h-4 text-white" />,
                     tooltip: {
                         id: `delete-tooltip-${dataset.name}`,
-                        content: 'Delete dataset',
+                        content: 'Delete Dataset',
                     },
                     onClick: () => handleOpenModal(dataset),
                 },

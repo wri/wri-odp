@@ -387,7 +387,7 @@ export async function getAllDatasetFq({
         return { datasets, count, searchFacets, facets }
     } catch (e) {
         console.error(e)
-        throw new Error('Failed to fetch datasets')
+        throw new Error('Failed to fetch Datasets')
     }
 }
 
@@ -1374,16 +1374,16 @@ async function generateMemberEmail(
             const role = actionType[2]
             const action = actionType[1]
             if (action === 'removed') {
-                subMsg = `${action} you as a collaborator (${role}) from the dataset`
-                subject = `Collaborator role ${action} from dataset ${datasetTitle}`
+                subMsg = `${action} you as a collaborator (${role}) from the Dataset`
+                subject = `Collaborator role ${action} from Dataset ${datasetTitle}`
                 msg = `${senderUserLink} ${subMsg} ${datasetLink}`
             } else if (action === 'added') {
-                subMsg = `${action} you as a collaborator (${role}) for the dataset`
-                subject = `Collaborator role ${action} for dataset ${datasetTitle}`
+                subMsg = `${action} you as a collaborator (${role}) for the Dataset`
+                subject = `Collaborator role ${action} for Dataset ${datasetTitle}`
                 msg = `${senderUserLink} ${action} ${subMsg} ${datasetLink}`
             } else if (action === 'updated') {
-                subMsg = `${action} your collaborator role to "${role}" for the dataset`
-                subject = `Collaborator role ${action} for dataset ${datasetTitle}`
+                subMsg = `${action} your collaborator role to "${role}" for the Dataset`
+                subject = `Collaborator role ${action} for Dataset ${datasetTitle}`
                 msg = `${senderUserLink} ${action} ${subMsg} ${datasetLink}`
             }
         }
@@ -1416,7 +1416,7 @@ async function generateMemberEmail(
 
         if (!teamOrTopic) {
             throw new Error(
-                `Could not find team or topic with id ${notification.object_id}`
+                `Could not find Team or Topic with id ${notification.object_id}`
             )
         }
 
@@ -1804,11 +1804,11 @@ export async function sendIssueOrCommentNotigication({
                     recipientUsers
                         .filter((user) => user.email)
                         .map(async (user) => {
-                            const subject = `Issue ${action} on dataset ${dataset.title}`
+                            const subject = `Issue ${action} on Dataset ${dataset.title}`
                             const body = `<p>Hi ${
                                 user.name ?? user.display_name ?? 'There'
                             }</p>
-                        <p>There has been an issue ${action} on the dataset ${
+                        <p>There has been an issue ${action} on the Dataset ${
                             dataset.title
                         }.</p>`
                             const email = user.email!
@@ -2076,11 +2076,11 @@ export async function sendGroupNotification({
                         .filter((user) => user.email)
                         .map(async (user) => {
                             const mainAction = action.split('_')[0]
-                            const subject = `Approval status on dataset ${dataset.title}`
+                            const subject = `Approval status on Dataset ${dataset.title}`
                             const body = `<p>Hi ${
                                 user.name ?? user.display_name ?? 'There'
                             }</p>
-                        <p>The approval status for the dataset <a href="${
+                        <p>The approval status for the Dataset <a href="${
                             env.NEXTAUTH_URL
                         }/datasets/${dataset.name}">${
                             dataset.title

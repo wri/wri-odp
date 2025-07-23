@@ -63,24 +63,24 @@ export default function TeamCard({
                     <span className="mr-2">
                         {teamsDetails[team.id]?.package_count &&
                         (teamsDetails[team.id]?.package_count as number) <= 1
-                            ? `${teamsDetails[team.id]?.package_count || 0} dataset`
+                            ? `${teamsDetails[team.id]?.package_count || 0} Dataset`
                             : `${teamsDetails[team.id]
-                                  ?.package_count || 0} datasets`}
+                                  ?.package_count || 0} Datasets`}
                     </span>
                 )}
                 {!isGroupTree(team) && (
                     <span className="mr-2">
                         {team.package_count &&
                         (team.package_count as number) <= 1
-                            ? `${team.package_count} dataset`
-                            : `${team.package_count} datasets`}
+                            ? `${team.package_count} Dataset`
+                            : `${team.package_count} Datasets`}
                     </span>
                 )}
                 {isGroupTree(team) && (
                     <>
                         <div className="border-l border-wri-black h-4  mx-2"></div>
                         <span className="ml-2">
-                            {team.children.length} Subteams
+                            {team.children.length} SubTeams
                         </span>
                     </>
                 )}
@@ -92,7 +92,7 @@ export default function TeamCard({
                                 //@ts-ignore
                                 numOfSubTeams[team.name]
                             }{' '}
-                            Subteams
+                            SubTeams
                         </span>
                     </>
                 )}

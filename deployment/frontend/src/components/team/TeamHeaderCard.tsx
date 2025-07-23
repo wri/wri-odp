@@ -12,6 +12,8 @@ import EditCard from './EditCard'
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline'
 import { useEffect } from 'react'
 import { WriUser } from '@/schema/ckan.schema'
+import Chip from '../_shared/Chip'
+import { visibilityTypeLabels } from '@/utils/constants'
 
 async function getCascadingUserCapacity(
     utils: ReturnType<typeof api.useUtils>,
@@ -84,7 +86,7 @@ export default function TeamHeaderCard({
                 >
                     <ChevronLeftIcon className="mb-1 lg:mr-1 h-6 w-6 p-0" />
                     <span className="pr-2">{`${
-                        team.parent_name ? 'back' : 'See all teams'
+                        team.parent_name ? 'back' : 'See all Teams'
                     } `}</span>
                 </Link>
             </div>
@@ -133,8 +135,20 @@ export default function TeamHeaderCard({
                         <h2 className="font-bold text-[2.063rem]">
                             {team.title}
                         </h2>
+                        {team.visibility === 'private' && (
+                            <div className='mb-2'>
+                                <Chip
+                                    text={
+                                        visibilityTypeLabels[
+                                        team.visibility
+                                        ] ?? ''
+                                    }
+                                    className=""
+                                />
+                            </div>
+                        )}
                         <p className="line-clamp-3 font-light text-[1.125rem]">
-                            {teamsDetails[team.id]?.description}
+                            {teamsDetails[team.id]?.description || team.description || teamsDetails[team.id]?.notes || team.notes}
                         </p>
                         <div className="flex items-center gap-3">
                             <div className="text-base font-light text-black">
@@ -149,8 +163,8 @@ export default function TeamHeaderCard({
                             <div className="h-[18px] w-[1px] border border-black"></div>
                             <div className="text-base font-light text-black">
                                 {team.children.length <= 1
-                                    ? `${team.children.length} Subteam`
-                                    : `${team.children.length} Subeams`}
+                                    ? `${team.children.length} SubTeam`
+                                    : `${team.children.length} SubTeams`}
                             </div>
                         </div>
                         <CopyLink />

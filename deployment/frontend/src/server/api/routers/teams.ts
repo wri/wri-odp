@@ -131,7 +131,7 @@ export const teamRouter = createTRPCRouter({
                 return team.result
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
+                    'Something went wrong please contact the System Administrator'
                 if (e instanceof Error) error = e.message
                 throw Error(replaceNames(error, true))
             }
@@ -189,7 +189,7 @@ export const teamRouter = createTRPCRouter({
             }
           } catch (e) {
             let error =
-              'Something went wrong please contact the system administrator'
+              'Something went wrong please contact the System Administrator'
             if (e instanceof Error) error = e.message
             throw Error(replaceNames(error, true))
           }
@@ -224,7 +224,7 @@ export const teamRouter = createTRPCRouter({
                     !user.sysadmin &&
                     (!input.parent || input.parent.value === '')
                 )
-                    throw Error('Only sysadmin can create parent teams')
+                    throw Error('Only Sysadmins can create parent Teams')
 
                 const body = JSON.stringify({
                     ...input,
@@ -258,7 +258,7 @@ export const teamRouter = createTRPCRouter({
                 return team.result
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
+                    'Something went wrong please contact the System Administrator'
                 if (e instanceof Error) error = e.message
                 throw Error(replaceNames(error, true))
             }
@@ -284,7 +284,7 @@ export const teamRouter = createTRPCRouter({
             return data
           } catch (e) {
             let error =
-              'Something went wrong please contact the system administrator'
+              'Something went wrong please contact the System Administrator'
             if (e instanceof Error) error = e.message
             throw Error(replaceNames(error, true))
           }

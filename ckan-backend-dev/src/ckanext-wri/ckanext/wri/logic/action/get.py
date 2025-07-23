@@ -1137,6 +1137,7 @@ def group_list_authz_wri(context: Context, data_dict: DataDict):
 def organization_list_for_user_wri(context: Context, data_dict: DataDict):
     all_fields = data_dict.get("all_fields", False)
     orgs = get_action("organization_list_for_user")(context, data_dict)
+    full_orgs = orgs
 
     q = data_dict.get("q", False)
 
@@ -1152,8 +1153,8 @@ def organization_list_for_user_wri(context: Context, data_dict: DataDict):
 
     results = get_hierarchy_group(context, orgs, "organization", q, user_orgs=user_orgs)
 
-    if all_fields:
-        results = _set_orgs_or_groups_fields(orgs, results, ["visibility", "notes"], all_fields)
+    if all_fields and full_orgs != orgs:
+        results = _set_orgs_or_groups_fields(full_orgs, results, ["visibility", "notes"], all_fields)
 
     return results
 

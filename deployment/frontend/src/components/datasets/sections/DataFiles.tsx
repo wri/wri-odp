@@ -236,7 +236,7 @@ export function DataFiles({
                         className="block w-full rounded-l-md py-3 pl-4 border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
                         onChange={(e) => setQ(e.target.value)}
                         value={q}
-                        placeholder="Search data files by title or description"
+                        placeholder="Search Data Files by title or description"
                     />
                     <Button
                         onClick={handleSearch}
@@ -303,7 +303,7 @@ export function DataFiles({
                                 ></path>
                             </svg>
                         )}{' '}
-                        ({datafilesToDownload.length} Selected data files
+                        ({datafilesToDownload.length} Selected Data Files
                         {notDownloadable.length > 0
                             ? `, ${notDownloadable.length} not available to download)`
                             : ')'}
@@ -342,7 +342,7 @@ export function DataFiles({
                                     }
                                     className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                                 >
-                                    Select all datafiles
+                                    Select all Data Files
                                 </button>
                             )}
                             {datafilesToDownload.length > 0 && (
@@ -353,7 +353,7 @@ export function DataFiles({
                                     }}
                                     className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                                 >
-                                    Unselect all data files
+                                    Unselect all Data Files
                                 </button>
                             )}
                         </>
@@ -418,7 +418,7 @@ export function DataFiles({
                 {datafiles?.length === 0 ? (
                     <div className="flex items-center justify-center h-20">
                         <p className="font-acumin text-base font-normal text-black">
-                            No data files found
+                            No Data Files found
                         </p>
                     </div>
                 ) : (
@@ -448,7 +448,7 @@ export function DataFiles({
                 )}
             </div>
             <DownloadPopup
-                title="The selected data files are being prepared for download"
+                title="The selected Data Files are being prepared for download"
                 subtitle="Please enter your information so that you receive the download link via email"
                 isOpen={openDownload}
                 onClose={() => setOpenDownload(false)}

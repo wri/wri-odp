@@ -137,7 +137,7 @@ const DatasetSchemaObject = z.object({
     team: z.object({
         value: z
             .string()
-            .min(1, { message: 'Team is required for all datasets' }),
+            .min(1, { message: 'Team is required for all Datasets' }),
         label: z.string(),
         id: z.string(),
         visibility: z.string(),
@@ -268,7 +268,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         return true
     },
     {
-        message: 'An image is required for featured datasets',
+        message: 'An image is required for featured Datasets',
         path: ['featured_image'],
     }
 )
@@ -279,7 +279,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
             return true
         },
         {
-            message: 'Connector Type is required for RW datasets',
+            message: 'Connector Type is required for RW Datasets',
             path: ['connectorType'],
         }
     )
@@ -290,7 +290,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
             return true
         },
         {
-            message: 'Provider is required for RW datasets',
+            message: 'Provider is required for RW Datasets',
             path: ['provider'],
         }
     )
@@ -303,7 +303,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         },
         {
             message:
-                'ConnectorUrl is required for RW datasets, unless a table name is provided',
+                'ConnectorUrl is required for RW Datasets, unless a table name is provided',
             path: ['connectorUrl'],
         }
     )
@@ -316,7 +316,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         },
         {
             message:
-                'Tablename is required for RW datasets, unless a connectorUrl is provided',
+                'Tablename is required for RW Datasets, unless a connectorUrl is provided',
             path: ['tableName'],
         }
     )
@@ -327,7 +327,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
             return true
         },
         {
-            message: 'Technical notes are required for public datasets',
+            message: 'Technical notes are required for public Datasets',
             path: ['technical_notes'],
         }
     )
@@ -363,7 +363,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
             return true
         },
         {
-            message: 'Public dataset cannot be assigned to private team',
+            message: 'Public Dataset cannot be assigned to private team',
             path: ['visibility_type'],
         }
     )
@@ -373,7 +373,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
             return true
         },
         {
-            message: 'Team is required for all datasets',
+            message: 'Team is required for all Datasets',
             path: ['team'],
         }
     )

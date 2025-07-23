@@ -201,7 +201,7 @@ export const TopicRouter = createTRPCRouter({
                 return topic.result
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
+                    'Something went wrong please contact the System Administrator'
                 if (e instanceof Error) error = e.message
                 throw Error(replaceNames(error))
             }
@@ -314,11 +314,11 @@ export const TopicRouter = createTRPCRouter({
                 return topic.result
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
+                    'Something went wrong please contact the System Administrator'
                 if (e instanceof Error) error = e.message
                 if (
                     replaceNames(error) ==
-                    'Topic name already exists in database or there is a team with this name'
+                    'Topic name already exists in database or there is a Team with this name'
                 ) {
                     throw Error(
                         '[!] A page with this URL already exists. Please choose a different URL.'

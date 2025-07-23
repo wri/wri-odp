@@ -161,8 +161,8 @@ function TopicsInner({
                         }
                         content={
                             <span className="text-black">
-                                You are not part of this topic therefore you
-                                cant add a dataset to it
+                                You are not part of this Topic therefore you
+                                cant add a Dataset to it
                             </span>
                         }
                     >
@@ -202,7 +202,7 @@ function TopicsInner({
                     <div className="flex w-full items-start justify-between">
                         <span className="font-light text-zinc-500">
                             {value.length === 0 ? (
-                                'Start typing in a topic or select topics from the dropdown'
+                                'Start typing in a Topic or select Topics from the dropdown'
                             ) : (
                                 <div className="flex flex-wrap gap-2">
                                     {value.map((item, index) => (
@@ -291,7 +291,7 @@ function TopicsInner({
                     <CommandInput
                         value={query}
                         onValueChange={setQuery}
-                        placeholder="Search topics..."
+                        placeholder="Search Topics..."
                     />
                     <CommandEmpty>No framework found.</CommandEmpty>
                     <div className="pr-3">

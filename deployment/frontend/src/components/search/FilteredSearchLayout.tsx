@@ -105,7 +105,7 @@ export default function FilteredSearchLayout({
                     // @ts-ignore
                     display_name: updateFrequencyLabels[i.name],
                 }))
-            } else if (key === 'organization' && facetsData?.teamVisibility) {
+            } else if (key === 'organization') { // && facetsData?.teamVisibility) {
                 const visibilityMap = facetsData.teamVisibility
                 // @ts-ignore
                 searchFacets[key].items = searchFacets[key].items.map((item) => {

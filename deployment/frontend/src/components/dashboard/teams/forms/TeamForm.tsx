@@ -63,7 +63,7 @@ export default function TeamForm({
                 <InputGroup label="Title" required>
                     <Input
                         {...register('title')}
-                        placeholder="My team"
+                        placeholder="My Team"
                         type="text"
                     />
                     <ErrorDisplay name="title" errors={errors} />

@@ -95,7 +95,7 @@ export function OpenInForm({
                     />
                 ))}
                 <div className="w-full flex justify-end">
-                    <DefaultTooltip content="This allows you to link your dataset to an external application. For example, you could add a link to the same dataset on the Global Forest Watch website. This appears as an “Open in” link at the top of the Dataset Detail page and will open in a new tab.">
+                    <DefaultTooltip content="This allows you to link your Dataset to an external Application. For example, you could add a link to the same Dataset on the Global Forest Watch website. This appears as an “Open in” link at the top of the Dataset Detail page and will open in a new tab.">
                         <button
                             type="button"
                             onClick={() =>

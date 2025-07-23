@@ -9,7 +9,7 @@ const tabs = [
     {
         id: 'allteams',
         content: <TopicCard />,
-        title: 'All topics',
+        title: 'All Topics',
     },
 ]
 
@@ -47,7 +47,7 @@ export default function TopicList() {
                                 <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">
                                     <PlusSmallIcon className="w-3 h-3 text-white" />
                                 </div>
-                                <span>Add topic</span>
+                                <span>Add Topic</span>
                             </div>
                         </Link>
                     )}

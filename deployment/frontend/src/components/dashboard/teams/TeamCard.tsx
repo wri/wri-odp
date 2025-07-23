@@ -61,8 +61,8 @@ function TeamProfile({
     org2img: Record<string, string>
 }) {
     const description = team?.children?.length
-        ? `${team?.children?.length} subteams`
-        : 'No subteams'
+        ? `${team?.children?.length} SubTeams`
+        : 'No SubTeams'
     const TopicProfile = team as IRowProfile
     TopicProfile.description = description
     TopicProfile.image_display_url = org2img[team.id]
@@ -97,8 +97,8 @@ function SubTeamProfile({
     org2img: Record<string, string>
 }) {
     const description = team?.children?.length
-        ? `${team?.children?.length} subteams`
-        : 'No subteams'
+        ? `${team?.children?.length} SubTeams`
+        : 'No SubTeams'
     const TopicProfile = team as IRowProfile
     TopicProfile.description = description
     TopicProfile.image_display_url = org2img[team.id]
@@ -147,7 +147,7 @@ function SubCardProfile({
             })
             setOpen(false)
             notify(
-                `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} team`,
+                `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} Team`,
                 'error'
             )
         },
@@ -194,7 +194,7 @@ function SubCardProfile({
                                         />
                                     }
                                     linkButton={{
-                                        label: 'View team',
+                                        label: 'View Team',
                                         link: `../teams/${team.name}`,
                                     }}
                                     controlButtons={[
@@ -206,7 +206,7 @@ function SubCardProfile({
                                             ),
                                             tooltip: {
                                                 id: `edit-tooltip-${team.name}`,
-                                                content: 'Edit team',
+                                                content: 'Edit Team',
                                             },
                                             onClick: () => {
                                                 router.push(
@@ -222,7 +222,7 @@ function SubCardProfile({
                                             ),
                                             tooltip: {
                                                 id: `delete-tooltip-${team.name}`,
-                                                content: 'Delete team',
+                                                content: 'Delete Team',
                                             },
                                             onClick: () =>
                                                 handleOpenModal(
@@ -274,7 +274,7 @@ function SubCardProfile({
                                         </div>
                                     }
                                     linkButton={{
-                                        label: 'View team',
+                                        label: 'View Team',
                                         link: `../teams/${team.name}`,
                                     }}
                                     controlButtons={[
@@ -286,7 +286,7 @@ function SubCardProfile({
                                             ),
                                             tooltip: {
                                                 id: `edit-tooltip-${team.name}`,
-                                                content: 'Edit team',
+                                                content: 'Edit Team',
                                             },
                                             onClick: () => {
                                                 router.push(
@@ -302,7 +302,7 @@ function SubCardProfile({
                                             ),
                                             tooltip: {
                                                 id: `delete-tooltip-${team.name}`,
-                                                content: 'Delete team',
+                                                content: 'Delete Team',
                                             },
                                             onClick: () =>
                                                 handleOpenModal(
@@ -353,7 +353,7 @@ function SubCardProfile({
                             </Dialog.Title>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
-                                    Are you sure you want to delete this team?
+                                    Are you sure you want to delete this Team?
                                 </p>
                             </div>
                         </div>
@@ -406,7 +406,7 @@ export default function TeamCard() {
             await refetch()
             setOpen(false)
             notify(
-                `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} team`,
+                `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} Team`,
                 'error'
             )
         },
@@ -506,7 +506,7 @@ export default function TeamCard() {
                                         ),
                                         tooltip: {
                                             id: `edit-tooltip-${team.name}`,
-                                            content: 'Edit team',
+                                            content: 'Edit Team',
                                         },
                                         onClick: () => {
                                             // on click go to /teams/:teamName
@@ -523,7 +523,7 @@ export default function TeamCard() {
                                         ),
                                         tooltip: {
                                             id: `delete-tooltip-${team.name}`,
-                                            content: 'Delete team',
+                                            content: 'Delete Team',
                                         },
                                         onClick: () => handleOpenModal(team),
                                     },
@@ -586,7 +586,7 @@ export default function TeamCard() {
                             </Dialog.Title>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
-                                    Are you sure you want to delete this team?
+                                    Are you sure you want to delete this Team?
                                 </p>
                             </div>
                         </div>

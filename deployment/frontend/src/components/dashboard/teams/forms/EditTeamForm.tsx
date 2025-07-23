@@ -37,7 +37,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
     const links = [
         { label: 'Teams', url: '/dashboard/teams', current: false },
         {
-            label: 'Edit team',
+            label: 'Edit Team',
             url: `/dashboard/teams/${team.name}/edit`,
             current: true,
         },
@@ -75,13 +75,13 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                     code: z.ZodIssueCode.custom,
                     path: ['parent'],
                     message:
-                        'User does not have admin access to edit a sub team',
+                        'User does not have admin access to edit a SubTeam',
                 })
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ['visibility'],
                     message:
-                        'User does not have admin access to edit this team',
+                        'User does not have admin access to edit this Team',
                 })
             }
         }
@@ -117,7 +117,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
     const editTeam = api.teams.editTeam.useMutation({
         onSuccess: async ({ name, title }) => {
             await utils.teams.getTeam.invalidate({ id: name })
-            notify(`Successfully edited the ${title ?? name} team`, 'success')
+            notify(`Successfully edited the ${title ?? name} Team`, 'success')
             router.push('/dashboard/teams')
         },
         onError: (error) => setErrorMessage(error.message),
@@ -128,7 +128,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             await utils.teams.getTeam.invalidate({ id: team.name })
             setDeleteOpen(false)
             notify(
-                `Successfully deleted the ${team.title ?? team.name} team`,
+                `Successfully deleted the ${team.title ?? team.name} Team`,
                 'error'
             )
             router.push('/dashboard/teams')
@@ -167,7 +167,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                         </Dialog.Title>
                         <div className="mt-2">
                             <p className="text-sm text-gray-500">
-                                Are you sure you want to delete this team?
+                                Are you sure you want to delete this Team?
                             </p>
                         </div>
                     </div>
@@ -193,7 +193,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             <Container className="mb-20 font-acumin">
                 <div className="flex justify-between">
                     <h1 className="mb-[2rem] text-[1.57rem] font-semibold">
-                        Edit team
+                        Edit Team
                     </h1>
                     <Button
                         variant="destructive"
