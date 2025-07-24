@@ -542,6 +542,7 @@ export default function DatasetPage(
             const LayerResource = dataset?.resources.find(
                 (d) => d.format === 'Layer' || d.rw_id
             )
+            console.log('LAYER RESOURCE', LayerResource)
             if (LayerResource) {
                 removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id!)
                 setMapDisplayPreview(true)

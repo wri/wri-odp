@@ -93,11 +93,15 @@ export const ResourceSchema = z
         (obj) => {
             if (obj.type !== 'link') return true
             if (!obj.url) return false
+            if (
+                !obj.url.startsWith('http://') &&
+                !obj.url.startsWith('https://')
+            )
+                return false
             return true
         },
         {
-            message:
-                'Name must be URL-compatible and cannot include spaces or the dot(.) character.',
+            message: 'Invalid URL',
             path: ['url'],
         }
     )
