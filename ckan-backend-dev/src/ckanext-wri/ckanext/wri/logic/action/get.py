@@ -1936,7 +1936,7 @@ def organization_patch(context, data_dict):
         temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
         public_package = get_action("package_search")(temp_context, rdata_dict)
         if public_package.get("count") > 0:
-            raise ValidationError({"message": _(f"Team has {public_package.get('count')} public dataset(s) and cannot be made private")})
+            raise ValidationError({"message": _(f"Team has {public_package.get('count')} public Dataset(s) and cannot be made private")})
     return old_organization_patch(context, data_dict)
 
 def validate_visibility(context, data_dict):
@@ -1947,7 +1947,7 @@ def validate_visibility(context, data_dict):
         org = get_action("organization_show")(context, {"id": owner_org})
         org_visibility = org.get("visibility", "public")
         if org_visibility == "private":
-            raise ValidationError({"message": _("Organization has private visibility and cannot create public datasets")})
+            raise ValidationError({"message": _("Organization has private visibility and cannot create public Datasets")})
 
 
 @logic.side_effect_free

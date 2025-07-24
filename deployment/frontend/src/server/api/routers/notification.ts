@@ -120,13 +120,21 @@ export const notificationRouter = createTRPCRouter({
                     const role = actionType[2]
                     const action = actionType[1]
                     if (action === 'removed') {
-                        msg = ` ${action} you as a member (${role}) from the ${notification.object_type}`
+                        msg = ` ${action} you as a member (${role}) from the ${notification.object_type
+                          .split(' ')
+                          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                          .join(' ')
+                        }`
                     } else if (action === 'added') {
                         msg = ` ${action} you as a member${
                             role !== 'member' ? ` (${role})` : ''
                         } in the ${notification.object_type}`
                     } else if (action === 'updated') {
-                        msg = ` ${action} your member status to "${role}" in the ${notification.object_type}`
+                        msg = ` ${action} your member status to "${role}" in the ${notification.object_type
+                          .split(' ')
+                          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                          .join(' ')
+                        }`
                     }
                 }
             }

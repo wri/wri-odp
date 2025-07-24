@@ -54,7 +54,7 @@ describe("Chart view", () => {
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[form="create_dataset_form"]').click();
-    cy.contains(`Successfully created the "${datasetName}" dataset`, {
+    cy.contains(`Successfully created the "${datasetName}" Dataset`, {
       timeout: 20000,
     });
   });
@@ -73,7 +73,7 @@ describe("Chart view", () => {
       cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.contains("Datapusher").click();
       cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
-      cy.contains(`Successfully submited data file to the datapusher`, {
+      cy.contains(`Successfully submited Data File to the datapusher`, {
         timeout: 15000,
       });
       cy.wait(30000);
@@ -186,7 +186,7 @@ describe("Chart view", () => {
   );
 
   it(
-    "should be accessible throught the dataset page",
+    "should be accessible through the dataset page",
     {
       retries: {
         runMode: 10,

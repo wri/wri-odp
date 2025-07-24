@@ -235,7 +235,7 @@ describe("Create dataset", () => {
       cy.get("@moredetails").get(".tiptap.ProseMirror").eq(2).type("EDITED");
       cy.contains("Data Files").click();
       cy.wait(5000);
-      cy.get("button").contains("Add another data file").click();
+      cy.get("button").contains("Add another Data File").click();
       cy.wait(500);
       cy.get(".datafile-accordion-trigger").eq(1).click();
       cy.get("input[type=file]")

@@ -61,9 +61,9 @@ describe("Can add and remove members from teams and topics", () => {
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
     if (role === "member") {
-      cy.contains(` added you as a member in the team`);
+      cy.contains(` added you as a member in the Team`);
     } else {
-      cy.contains(` added you as a member (${role}) in the team`);
+      cy.contains(` added you as a member (${role}) in the Team`);
     }
     cy.contains(team);
   }
@@ -161,7 +161,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.login(switchUser, switchUserPassword);
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
-    cy.contains(' updated your member status to "admin" in the team');
+    cy.contains(' updated your member status to "admin" in the Team');
   });
 
   it("Remove members from team", () => {
@@ -300,7 +300,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.login(switchUser, switchUserPassword);
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
-    cy.contains(' updated your member status to "admin" in the topic');
+    cy.contains(' updated your member status to "admin" in the Topic');
   });
 
   it("Remove members from topic", () => {
@@ -349,7 +349,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.login(switchUser, switchUserPassword);
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
-    cy.contains(" removed you as a member (admin) from the topic");
+    cy.contains(" removed you as a member (admin) from the Topic");
   });
 
   after(() => {
