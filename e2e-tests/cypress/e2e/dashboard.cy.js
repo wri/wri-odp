@@ -123,7 +123,7 @@ describe("Dashboard Test", () => {
     cy.visit("/dashboard/activity-stream");
     cy.contains(`${ckanUserName} created the Dataset ${datasetName}`);
     cy.get('[id^="headlessui-listbox-button"]').eq(1).click();
-    cy.contains('[role="option"]', "teams").click();
+    cy.contains('[role="option"]', "Teams").click();
     cy.get('[id^="headlessui-listbox-button"]').eq(2).click();
     cy.contains('[role="option"]', `${parentOrg}`).click();
     cy.contains(`${ckanUserName} created the Dataset ${datasetName}`);
