@@ -60,8 +60,14 @@ async function getLayersFromRW(
                 if (layers.length === 0) return []
                 const layersData = await Promise.all(
                     layers.map(async (layer: string) => {
-                        layer = layer.replace('prev', '')
+                        if (!layer) return
                         let layerInfo = layerAsLayerObj.get(layer)
+                        if (!layerInfo) {
+                            layerInfo =
+                                currentLayers.get(layer)?.layerSource === 'ckan'
+                                    ? 'pending'
+                                    : 'approved'
+                        }
                         layerInfo = layerInfo ?? 'approved'
                         if (layerInfo === 'approved') {
                             const response = await fetch(
@@ -146,6 +152,7 @@ async function getLayersFromRW(
                                         ? resourceLayer?.default
                                         : true,
                             }
+                            console.log('LAYER PACKAGE', layerPackage)
                             return layerPackage
                         } else {
                             // for prevdataset
@@ -189,7 +196,7 @@ async function getLayersFromRW(
                 )
                 return {
                     dataset: datasetId,
-                    layers: layersData,
+                    layers: layersData.filter(Boolean),
                 }
             }
         )

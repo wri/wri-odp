@@ -55,6 +55,7 @@ export interface LayerState {
     zIndex?: number
     opacity?: number
     threshold?: number
+    layerSource?: 'ckan' | 'rw'
 }
 
 export type Labels = 'dark' | 'light' | 'none'

@@ -307,7 +307,11 @@ export const initializeStore = (preloadedState: any = {}) => {
                         },
                     })
                 },
-                addLayerToLayerGroup: (layerId: string, datasetId: string) => {
+                addLayerToLayerGroup: (
+                    layerId: string,
+                    datasetId: string,
+                    layerSource?: string
+                ) => {
                     const prev = get()
                     const activeLayerGroups = get().mapView.activeLayerGroups
                     const newActiveLayerGroups =
@@ -331,6 +335,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                         visibility: true,
                         active: true,
                         opacity: 1,
+                        layerSource: layerSource ? layerSource : null,
                         zIndex: Object.keys(currentLayers).length + 11,
                     })
 
