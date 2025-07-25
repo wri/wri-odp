@@ -12,6 +12,7 @@ export interface State {
     prevLayerGroups: ActiveLayerGroup[]
     storeDirtyFields: string[]
     mapView: {
+        initialrender: boolean
         isEmbedding: boolean
         isAddingLayers?: boolean
         viewState: ViewState
