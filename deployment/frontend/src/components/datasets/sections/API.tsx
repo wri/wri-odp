@@ -228,7 +228,7 @@ const SnippetInstructions = ({
         <>
             <h2 className="text-lg font-bold mb-5">Datasets API</h2>
             <SnippetEndpoint
-                description="Get this dataset's metadata"
+                description="Get this Dataset's metadata"
                 snippet={ckanPackageShowSnippet}
                 language={language}
             />
@@ -241,7 +241,7 @@ const SnippetInstructions = ({
                         Resource Watch API
                     </h2>
                     <SnippetEndpoint
-                        description="Get the metadata stored on the Resource Watch API for this dataset"
+                        description="Get the metadata stored on the Resource Watch API for this Dataset"
                         snippet={rwGetDatasetSnippet}
                         language={language}
                     />
@@ -249,12 +249,12 @@ const SnippetInstructions = ({
                     {dataset.provider && (
                         <>
                             <SnippetEndpoint
-                                description="Get this dataset's records metadata"
+                                description="Get this Dataset's records metadata"
                                 snippet={rwGetFieldsSnippet}
                                 language={language}
                             />
                             <SnippetEndpoint
-                                description="Run a SQL query against this dataset's records"
+                                description="Run a SQL query against this Dataset's records"
                                 snippet={rwQuerySnippet}
                                 language={language}
                             />

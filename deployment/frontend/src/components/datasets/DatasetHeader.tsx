@@ -438,7 +438,7 @@ export function DatasetHeader({
       setOpen(false)
       notify(
         `Successfully added the ${dataset?.title ?? dataset?.name
-        } dataset to your favorites`,
+        } Dataset to your favourites`,
         'success'
       )
     },
@@ -450,7 +450,7 @@ export function DatasetHeader({
       setFOpen(false)
       notify(
         `Successfully removed the ${dataset?.title ?? dataset?.name
-        } dataset from your favorites`,
+        } Dataset from your favourites`,
         'error'
       )
     },
@@ -525,11 +525,11 @@ export function DatasetHeader({
               <Spinner className="w-2 h-2" />
             ) : data !== undefined && data ? (
               <DefaultTooltip
-                content="remove from favorites"
+                content="remove from favourites"
                 side="bottom"
               >
                 <button
-                  aria-label="remove from favorites"
+                  aria-label="remove from favourites"
                   className="p-0 m-0 "
                   onClick={() => setFOpen(true)}
                 >
@@ -538,11 +538,11 @@ export function DatasetHeader({
               </DefaultTooltip>
             ) : (
               <DefaultTooltip
-                content="Add to favorites"
+                content="Add to favourites"
                 side="bottom"
               >
                 <button
-                  aria-label="add to favorite"
+                  aria-label="add to favourite"
                   className="p-0 m-0 "
                   onClick={() => setOpen(true)}
                 >
@@ -581,13 +581,13 @@ export function DatasetHeader({
                     as="h3"
                     className="text-base font-semibold leading-6 text-gray-900"
                   >
-                    Add to favorites
+                    Add to favourites
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
                       Are you sure you want to add{' '}
                       {dataset?.title ?? dataset?.name} to
-                      your favorites?
+                      your favourites?
                     </p>
                   </div>
                 </div>
@@ -634,13 +634,13 @@ export function DatasetHeader({
                     as="h3"
                     className="text-base font-semibold leading-6 text-gray-900"
                   >
-                    Remove from favorites
+                    Remove from favourites
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
                       Are you sure you want to remove{' '}
                       {dataset?.title ?? dataset?.name}{' '}
-                      from your favorites?
+                      from your favourites?
                     </p>
                   </div>
                 </div>
@@ -688,16 +688,25 @@ export function DatasetHeader({
           )}
         </div>
         <div className="flex max-w-[560px] flex-col gap-y-2">
-          <h2 className="text-xs font-bold uppercase leading-none tracking-wide text-green-700">
-            <span
-              className={classNames(
-                'w-fit',
-                highlighted('organization')
-              )}
-            >
-              {dataset?.organization?.title ?? 'No Team'}
-            </span>
-          </h2>
+          <div className="flex items-center gap-x-2">
+            <h2 className="text-xs font-bold uppercase leading-none tracking-wide text-green-700">
+              <span
+                className={classNames(
+                  'w-fit',
+                  highlighted('organization')
+                )}
+              >
+                {dataset?.organization?.title ?? 'No Team'}
+              </span>
+            </h2>
+            {session?.data?.user && dataset?.organization?.visibility === "private" && (
+              <span
+                className={`rounded-full h-fit text-sm lg:text-xs px-2 py-y border border-gray-400 capitalize`}
+              >
+                {dataset?.organization?.visibility}
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-x-3">
             <h1
               className={`w-fit text-3xl font-bold text-black ${dataset?.title

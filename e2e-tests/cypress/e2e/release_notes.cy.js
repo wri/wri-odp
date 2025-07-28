@@ -74,7 +74,7 @@ describe("Release notes", () => {
       cy.contains("Related Datasets", { timeout: 10000 });
       cy.contains("Collaborators", { timeout: 50000 });
       cy.get("#release-notes", { timeout: 10000 }).click({ force: true });
-      cy.contains("This dataset is at its initial version");
+      cy.contains("This Dataset is at its initial version");
     },
   );
 
@@ -96,7 +96,7 @@ describe("Release notes", () => {
           force: true,
         });
       cy.get('[type="submit"]').click({ force: true });
-      cy.contains(`Successfully edited the "${dataset}" dataset`, {
+      cy.contains(`Successfully edited the "${dataset}" Dataset`, {
         timeout: 30000,
       });
     },

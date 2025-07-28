@@ -91,7 +91,7 @@ describe("Explore data page", () => {
     cy.visit(`/topics/${groups[0]}`);
     cy.contains(`${groups[0]}`, { timeout: 40000 });
     // cy.contains("Edit", { timeout: 2000 });
-    cy.contains("Subtopics");
+    cy.contains("SubTopics");
   });
 
   it("should display not found page", () => {

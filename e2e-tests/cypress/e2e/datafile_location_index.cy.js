@@ -64,7 +64,7 @@ describe("Data file location", () => {
       cy.contains("Next: Map Visualizations").click();
       cy.contains("Next: Preview").click();
       cy.get('button[type="submit"]').click();
-      cy.contains(`Successfully created the "${datasetName}" dataset`, {
+      cy.contains(`Successfully created the "${datasetName}" Dataset`, {
         timeout: 20000,
       });
     },

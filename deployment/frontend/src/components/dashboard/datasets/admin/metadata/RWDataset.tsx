@@ -33,7 +33,7 @@ export function RWDatasetForm({
         >
             <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-24 py-5 md:grid-cols-2">
                 <p className="col-span-full">
-                    Enter the connector information from where your dataset is
+                    Enter the connector information from where your Dataset is
                     currently stored. If you’re unsure where to find this
                     information, please see the{' '}
                     <a
@@ -61,7 +61,7 @@ export function RWDatasetForm({
                             className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
                         >
                             Visualize my data on a map
-                            <DefaultTooltip content="Checking this box will create an equivalent dataset in the Resource Watch API, allowing you to display Mapbox Layers">
+                            <DefaultTooltip content="Checking this box will create an equivalent Dataset in the Resource Watch API, allowing you to display Mapbox Layers">
                                 <InformationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
                             </DefaultTooltip>
                         </label>

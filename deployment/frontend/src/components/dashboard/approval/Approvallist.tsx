@@ -46,7 +46,7 @@ export default function Approvallist() {
             })
             setApproveOpen(false)
             notify(
-                `Successfully approved the dataset ${
+                `Successfully approved the Dataset ${
                     selectDataset?.name ?? selectDataset?.title
                 }`,
                 'success'
@@ -163,7 +163,7 @@ export default function Approvallist() {
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
                                     Are you sure you want to approve this
-                                    dataset?
+                                    Dataset?
                                 </p>
                             </div>
                         </div>

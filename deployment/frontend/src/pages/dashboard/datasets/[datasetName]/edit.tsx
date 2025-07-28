@@ -101,7 +101,7 @@ export default function EditDatasetPage(
       setDeleteOpen(false)
       notify(
         `Successfully deleted the ${dataset.data?.name ?? datasetName
-        } dataset`,
+        } Dataset`,
         'error'
       )
       router.push('/dashboard/datasets')
@@ -144,7 +144,7 @@ export default function EditDatasetPage(
             </Dialog.Title>
             <div className="mt-2">
               <p className="text-sm text-gray-500">
-                Are you sure you want to delete this dataset?
+                Are you sure you want to delete this Dataset?
               </p>
             </div>
           </div>
@@ -207,8 +207,8 @@ export default function EditDatasetPage(
             ))
             .otherwise(() => (
               <span>
-                Something went wrong, please contact the system
-                administrator
+                Something went wrong, please contact the System
+                Administrator
               </span>
             ))}
         </main>

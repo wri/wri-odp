@@ -56,20 +56,20 @@ export default function DatasetHorizontalCard({
                         >
                             {dataset.title}
                         </h3>
+                    </div>
+
+                    <div className="flex lg:ml-auto gap-x-[12px]  shrink-0">
                         {dataset.visibility_type &&
                             session.status == 'authenticated' &&
                             dataset.visibility_type != 'public' && (
                                 <Chip
                                     text={
                                         visibilityTypeLabels[
-                                            dataset.visibility_type
+                                        dataset.visibility_type
                                         ] ?? ''
                                     }
                                 />
                             )}
-                    </div>
-
-                    <div className="flex lg:ml-auto gap-x-[12px]  shrink-0">
                         {formats.slice(0, 4).map((format) => (
                             <span
                                 key={`dataset-${dataset.name}-format-${format}`}
@@ -175,7 +175,7 @@ export default function DatasetHorizontalCard({
 
                     <button className="flex justify-end lg:justify-start lg:ml-auto shrink-0 group-hover:text-wri-green">
                         <div className="text-base  leading-[24px] font-bold">
-                            View dataset
+                            View Dataset
                         </div>
                         <div className="pt-0.5">
                             <ChevronRightIcon className="h-4 w-4 stroke-current stroke-[3] " />

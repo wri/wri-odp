@@ -123,7 +123,7 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
     return (
         <div className="font-acumin gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100">
             <p className="font-['Acumin Pro SemiCondensed'] text-xs font-bold uppercase leading-none tracking-wide text-wri-green">
-                {dataset.organization?.title ?? 'No team'}
+                {dataset.organization?.title ?? 'No Team'}
             </p>
             <Link href={`/datasets/${dataset.name}`}>
                 <h3 className="font-['Acumin Pro SemiCondensed'] mt-2 text-xl font-bold text-stone-900">
@@ -204,13 +204,13 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                     <div className="basis-full lg:basis-1/2">
                         <h2 className="text-2xl">{dataset.title}</h2>
                         <p className="text-base font-light wri-light-gray mt-2">
-                            Select one or more data files to be added.
+                            Select one or more Data Files to be added.
                         </p>
                         <hr className="mt-4 mb-2" />
                         <div className="relative py-4">
                             <input
                                 className="block w-full rounded-md border-b border-wri-green py-3 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
-                                placeholder="Search data files"
+                                placeholder="Search Data Files"
                                 onChange={(e) => setQ(e.target.value)}
                                 value={q}
                             />

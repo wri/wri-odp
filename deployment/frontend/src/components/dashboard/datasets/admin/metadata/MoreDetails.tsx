@@ -42,7 +42,7 @@ export function MoreDetailsForm({
                             {...register('learn_more')}
                             type="text"
                             icon={
-                                <DefaultTooltip content="Optional field to add an additional URL related to the dataset, such as a link to the original paper. This will appear as a ‘Learn More' button in the About section.">
+                                <DefaultTooltip content="Optional field to add an additional URL related to the Dataset, such as a link to the original paper. This will appear as a ‘Learn More' button in the About section.">
                                     <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                 </DefaultTooltip>
                             }
@@ -112,7 +112,7 @@ export function MoreDetailsForm({
                                 <DefaultTooltip
                                     contentClassName="max-w-sm whitespace-normal lg:max-w-xl"
                                     side="right"
-                                    content="This field will end up next to the API tab in the dataset page, you can use it to provide code samples that are useful for this particular data, the string {% DATASET_URL %} will get replaced with the actual url for this particular dataset"
+                                    content="This field will end up next to the API tab in the Dataset page, you can use it to provide code samples that are useful for this particular data, the string {% DATASET_URL %} will get replaced with the actual url for this particular Dataset"
                                 >
                                     <InformationCircleIcon className="h-5 w-5" />
                                 </DefaultTooltip>

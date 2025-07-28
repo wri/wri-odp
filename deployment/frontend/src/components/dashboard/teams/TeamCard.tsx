@@ -22,6 +22,9 @@ import { useQuery } from 'react-query'
 import { DownloadIcon } from '@/components/_shared/icons/DownloadIcon'
 import { ArchiveBoxArrowDownIcon } from '@heroicons/react/24/solid'
 import { ErrorAlert } from '@/components/_shared/Alerts'
+import { visibilityTypeLabels } from '@/utils/constants'
+import Chip from '../../_shared/Chip'
+
 
 function downloadCsv(data: string, filename: string) {
     const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' })
@@ -58,8 +61,8 @@ function TeamProfile({
     org2img: Record<string, string>
 }) {
     const description = team?.children?.length
-        ? `${team?.children?.length} subteams`
-        : 'No subteams'
+        ? `${team?.children?.length} SubTeams`
+        : 'No SubTeams'
     const TopicProfile = team as IRowProfile
     TopicProfile.description = description
     TopicProfile.image_display_url = org2img[team.id]
@@ -71,6 +74,17 @@ function TeamProfile({
                 profile={team}
                 defaultImg="/images/placeholders/teams/teamdefault.png"
             />
+            {team.visibility === 'private' && (
+              <div className='ml-2 py-3'>
+                <Chip
+                    text={
+                        visibilityTypeLabels[
+                            team.visibility
+                        ] ?? ''
+                    }
+                />
+              </div>
+            )}
         </div>
     )
 }
@@ -83,8 +97,8 @@ function SubTeamProfile({
     org2img: Record<string, string>
 }) {
     const description = team?.children?.length
-        ? `${team?.children?.length} subteams`
-        : 'No subteams'
+        ? `${team?.children?.length} SubTeams`
+        : 'No SubTeams'
     const TopicProfile = team as IRowProfile
     TopicProfile.description = description
     TopicProfile.image_display_url = org2img[team.id]
@@ -96,6 +110,17 @@ function SubTeamProfile({
                 profile={team}
                 defaultImg="/images/placeholders/teams/teamdefault.png"
             />
+            {team.visibility === 'private' && (
+                <div className='ml-2 py-3'>
+                    <Chip
+                        text={
+                            visibilityTypeLabels[
+                            team.visibility
+                            ] ?? ''
+                        }
+                    />
+                </div>
+            )}
         </div>
     )
 }
@@ -122,7 +147,7 @@ function SubCardProfile({
             })
             setOpen(false)
             notify(
-                `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} team`,
+                `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} Team`,
                 'error'
             )
         },
@@ -169,7 +194,7 @@ function SubCardProfile({
                                         />
                                     }
                                     linkButton={{
-                                        label: 'View team',
+                                        label: 'View Team',
                                         link: `../teams/${team.name}`,
                                     }}
                                     controlButtons={[
@@ -181,7 +206,7 @@ function SubCardProfile({
                                             ),
                                             tooltip: {
                                                 id: `edit-tooltip-${team.name}`,
-                                                content: 'Edit team',
+                                                content: 'Edit Team',
                                             },
                                             onClick: () => {
                                                 router.push(
@@ -197,7 +222,7 @@ function SubCardProfile({
                                             ),
                                             tooltip: {
                                                 id: `delete-tooltip-${team.name}`,
-                                                content: 'Delete team',
+                                                content: 'Delete Team',
                                             },
                                             onClick: () =>
                                                 handleOpenModal(
@@ -249,7 +274,7 @@ function SubCardProfile({
                                         </div>
                                     }
                                     linkButton={{
-                                        label: 'View team',
+                                        label: 'View Team',
                                         link: `../teams/${team.name}`,
                                     }}
                                     controlButtons={[
@@ -261,7 +286,7 @@ function SubCardProfile({
                                             ),
                                             tooltip: {
                                                 id: `edit-tooltip-${team.name}`,
-                                                content: 'Edit team',
+                                                content: 'Edit Team',
                                             },
                                             onClick: () => {
                                                 router.push(
@@ -277,7 +302,7 @@ function SubCardProfile({
                                             ),
                                             tooltip: {
                                                 id: `delete-tooltip-${team.name}`,
-                                                content: 'Delete team',
+                                                content: 'Delete Team',
                                             },
                                             onClick: () =>
                                                 handleOpenModal(
@@ -328,7 +353,7 @@ function SubCardProfile({
                             </Dialog.Title>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
-                                    Are you sure you want to delete this team?
+                                    Are you sure you want to delete this Team?
                                 </p>
                             </div>
                         </div>
@@ -381,7 +406,7 @@ export default function TeamCard() {
             await refetch()
             setOpen(false)
             notify(
-                `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} team`,
+                `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} Team`,
                 'error'
             )
         },
@@ -448,6 +473,8 @@ export default function TeamCard() {
                 </div>
             ) : (
                 ProcessedTeam.data?.organizations.map((team, index) => {
+                    const isPrivate = team?.visibility === 'private'
+                    //console.log('IS PRIVATE', isPrivate)
                     return (
                         <div key={team.name}>
                             <Row
@@ -479,7 +506,7 @@ export default function TeamCard() {
                                         ),
                                         tooltip: {
                                             id: `edit-tooltip-${team.name}`,
-                                            content: 'Edit team',
+                                            content: 'Edit Team',
                                         },
                                         onClick: () => {
                                             // on click go to /teams/:teamName
@@ -496,7 +523,7 @@ export default function TeamCard() {
                                         ),
                                         tooltip: {
                                             id: `delete-tooltip-${team.name}`,
-                                            content: 'Delete team',
+                                            content: 'Delete Team',
                                         },
                                         onClick: () => handleOpenModal(team),
                                     },
@@ -530,6 +557,7 @@ export default function TeamCard() {
                                     />
                                 }
                                 isDropDown
+                                isPrivate={isPrivate}
                             />
                         </div>
                     )
@@ -558,7 +586,7 @@ export default function TeamCard() {
                             </Dialog.Title>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
-                                    Are you sure you want to delete this team?
+                                    Are you sure you want to delete this Team?
                                 </p>
                             </div>
                         </div>
