@@ -49,6 +49,25 @@ import Image from 'next/image'
 import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover'
 import { env } from '@/env.mjs'
 import { useRouter } from 'next/router'
+import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
+
+
+const CopyButton = ({ content }: { content: string }) => {
+    return (
+        <DefaultTooltip content="Copy simple page URL">
+            <Button
+                aria-label="copy button"
+                className=" h-auto rounded-full p-1"
+                onClick={() => {
+                    navigator.clipboard.writeText(content)
+                    notify(`Dataset URL copied!`, 'success')
+                }}
+            >
+                <DocumentDuplicateIcon className="w-3 text-white" />
+            </Button>
+        </DefaultTooltip>
+    )
+}
 
 function OpenInButton({
   open_in,
@@ -725,6 +744,9 @@ export function DatasetHeader({
                 {dataset?.visibility_type}
               </span>
             )}
+            <div className=''>
+                <CopyButton content={`${env.NEXT_PUBLIC_NEXTAUTH_URL}/datasets/${dataset?.name}`} />
+            </div>
           </div>
           <p
             className={`text-justify text-base font-light leading-snug text-stone-900 w-fit ${highlighted(

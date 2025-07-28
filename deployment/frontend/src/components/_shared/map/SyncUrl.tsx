@@ -6,13 +6,36 @@ import {
     useLayerStates,
     useMapState,
     useBounds,
+    useInitialRender,
 } from '@/utils/storeHooks'
 import { encodeMapParam } from '@/utils/urlEncoding'
-import { useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { useDebounce } from 'usehooks-ts'
 import { env } from '@/env.mjs'
+import { active } from 'sortablejs'
 
+function stripZeroViewProps(obj: any) {
+    // on initial render of the first map , we do have this set of variable set to zero
+    // and on second rendering they are automatically remove without any chnaged, hence
+    // affecting the difference in encoded map string generated
+    if (
+        obj.pitch === 0 &&
+        obj.bearing === 0 &&
+        obj.padding &&
+        obj.padding.top === 0 &&
+        obj.padding.bottom === 0 &&
+        obj.padding.left === 0 &&
+        obj.padding.right === 0
+    ) {
+        delete obj.pitch
+        delete obj.bearing
+        delete obj.padding
+    }
+    return obj
+}
 export default function SyncUrl() {
+    const lastMapRef = useRef<string>('')
+    const initialStateMap = useRef<string>('')
     const { viewState } = useMapState()
     const { selectedBasemap } = useBasemap()
     const { showBoundaries } = useBoundaries()
@@ -20,6 +43,7 @@ export default function SyncUrl() {
     const { activeLayerGroups } = useActiveLayerGroups()
     const { bounds } = useBounds()
     const { currentLayers } = useLayerStates()
+    const { isInitialrender } = useInitialRender()
     const debouncedValue = useDebounce(
         {
             viewState,
@@ -28,6 +52,7 @@ export default function SyncUrl() {
             selectedLabels,
             showBoundaries,
             selectedBasemap,
+            isInitialrender,
             bounds,
         },
         500
@@ -63,7 +88,7 @@ export default function SyncUrl() {
         if (debouncedValue && typeof window !== 'undefined') {
             const map = encodeMapParam({
                 // @ts-ignore
-                viewState: debouncedValue.viewState,
+                viewState: stripZeroViewProps(debouncedValue.viewState),
                 basemap: selectedBasemap,
                 boundaries: showBoundaries,
                 labels: selectedLabels,
@@ -73,8 +98,21 @@ export default function SyncUrl() {
                     currentLayers ? currentLayers.entries() : []
                 ),
             })
-
-            updateURLParameter(window.location.href, 'map', map)
+            const isStillFirst = initialStateMap.current
+                ? initialStateMap.current === map
+                : true
+            if (lastMapRef.current === '') {
+                lastMapRef.current = map
+            } else if (isInitialrender === true && isStillFirst) {
+                lastMapRef.current = map
+                initialStateMap.current = map
+            } else if (
+                map !== lastMapRef.current &&
+                activeLayerGroups.length > 0
+            ) {
+                lastMapRef.current = map
+                updateURLParameter(window.location.href, 'map', map)
+            }
         }
     }, [
         debouncedValue,
@@ -84,6 +122,7 @@ export default function SyncUrl() {
         activeLayerGroups,
         bounds,
         currentLayers,
+        isInitialrender,
     ])
     return null
 }
