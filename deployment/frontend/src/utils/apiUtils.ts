@@ -2374,7 +2374,10 @@ export async function approvePendingDataset(
         ? await Promise.all(
               submittedDataset.resources
                   .filter(
-                      (r) => (r.layerObj || r.layerObjRaw) && r.rw_id && r.url
+                      (r) =>
+                          (r.layerObj || r.layerObjRaw) &&
+                          r.rw_id &&
+                          r.url?.startsWith('https://api.resourcewatch.org')
                   )
                   .map(async (r) => {
                       const rr = r as ResourceFormType
@@ -2395,9 +2398,14 @@ export async function approvePendingDataset(
         rw_id !== null
             ? await Promise.allSettled(
                   submittedDataset.resources
-                      .filter((r) => (r.layerObj || r.layerObjRaw) && !r.url)
+                      .filter(
+                          (r) =>
+                              (r.layerObj || r.layerObjRaw) &&
+                              !r.url?.startsWith(
+                                  'https://api.resourcewatch.org'
+                              )
+                      )
                       .map(async (r) => {
-                          console.log('RESOURCE', r)
                           const rr = r as ResourceFormType
                           if (r.layerObj) {
                               const layerForm = convertLayerObjToForm(

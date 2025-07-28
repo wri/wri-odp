@@ -102,13 +102,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
             if (resource.format == 'Layer') {
                 if (
                     (resource['layerObj'] || resource['layerObjRaw']) &&
-                    // This is a temporary fix for the example.com url
-                    (!resource.url || resource.url.includes('example'))
+                    (resource.rw_id == '' || !resource.rw_id)
                 ) {
-                    console.log('IS PENDING')
-                    layerAsLayerObj.set(resource.rw_id, 'pending')
+                    layerAsLayerObj.set(resource.id, 'pending')
                 } else {
-                    console.log('IS APPROVED')
                     layerAsLayerObj.set(resource.rw_id, 'approved')
                 }
             }
@@ -122,7 +119,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 if (resource.format == 'Layer') {
                     if (
                         (resource['layerObj'] || resource['layerObjRaw']) &&
-                        !resource.url
+                        (resource.rw_id == '' || !resource.rw_id)
                     ) {
                         layerAsLayerObj.set(resource.rw_id, 'pending')
                     } else {
@@ -143,7 +140,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 if (resource.format == 'Layer') {
                     if (
                         (resource['layerObj'] || resource['layerObjRaw']) &&
-                        !resource.url
+                        (resource.rw_id == '' || !resource.rw_id)
                     ) {
                         tempLayerAsLayerobj.set(resource.rw_id, 'pending')
                     } else {
@@ -158,8 +155,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
         for (const resource of prevdataset?.resources) {
             if (resource.format == 'Layer') {
                 if (
-                    resource['layerObj'] ||
-                    (resource['layerObjRaw'] && !resource.url)
+                    (resource['layerObj'] || resource['layerObjRaw']) &&
+                    (resource.rw_id == '' || !resource.rw_id)
                 ) {
                     tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')
                 } else {

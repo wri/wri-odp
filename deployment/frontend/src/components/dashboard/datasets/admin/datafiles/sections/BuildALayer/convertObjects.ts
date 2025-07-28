@@ -371,6 +371,7 @@ export const getApiSpecFromRawObj = (rawLayerFormObj: RawLayerFormType) => {
         rawLayerFormObj
     try {
         const apiSpec = {
+            id: uuidv4(),
             ...JSON.parse(generalConfig ?? '{}'),
             layerConfig: JSON.parse(layerConfig ?? '{}'),
             interactionConfig: JSON.parse(interactionConfig ?? '{}'),

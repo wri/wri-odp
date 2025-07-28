@@ -48,7 +48,6 @@ export function BuildALayerRaw({
             return getValues(`resources.${index}.layerObjRaw`)
                 ? {
                       ...apiSpec,
-                      id: getValues(`resources.${index}.rw_id`) ?? uuidv4(),
                   }
                 : null
         } catch (e) {
@@ -102,23 +101,6 @@ export function BuildALayerRaw({
                         <ErrorDisplay
                             name={`resources.${index}.title`}
                             errors={errors}
-                        />
-                    </InputGroup>
-                    <InputGroup
-                        label="Layer ID"
-                        className="sm:grid-cols-1 gap-x-2"
-                        labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
-                    >
-                        <Input
-                            placeholder="xxxx-xxxx-xxxxxx"
-                            {...register(`resources.${index}.rw_id`)}
-                            type="text"
-                            maxWidth="max-w-[70rem]"
-                            icon={
-                                <DefaultTooltip content="This is required if you want to setup a GEE layer, in this case the ID needs to match the tilecache ID on GEE">
-                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
-                                </DefaultTooltip>
-                            }
                         />
                     </InputGroup>
                     <InputGroup

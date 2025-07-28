@@ -631,19 +631,20 @@ function DatafileCard({
                         </div>
                         <div className="gap-x-2 hidden sm:flex">
                             {/* @ts-ignore */}
-                            {datafile?.rw_id && (
+                            {['layer', 'layer-raw', 'reference-layer'].includes(
+                                datafile.type
+                            ) && (
                                 <>
-                                    {activeLayers.some(
-                                        (a) =>
-                                            datafile.url?.endsWith(a.id) ||
-                                            datafile.id === a.id
-                                    ) ? (
+                                    {activeLayers.some((a) => {
+                                        return (
+                                            datafile.url?.endsWith(a?.id) ||
+                                            datafile.id === a?.id
+                                        )
+                                    }) ? (
                                         <Button
                                             variant="light"
                                             size="sm"
                                             onClick={() => {
-                                                {
-                                                }
                                                 // @ts-ignore
                                                 if (datafile.rw_id) {
                                                     removeLayerFromLayerGroup(
@@ -652,6 +653,11 @@ function DatafileCard({
                                                         dataset.id
                                                     )
                                                 }
+                                                removeLayerFromLayerGroup(
+                                                    // @ts-ignore
+                                                    datafile?.id,
+                                                    dataset.id
+                                                )
                                             }}
                                         >
                                             <span className="mt-1 text-xs 2xl:text-sm whitespace-nowrap">
@@ -666,19 +672,33 @@ function DatafileCard({
                                             className="text-xs 2xl:text-sm whitespace-nowrap"
                                             onClick={() => {
                                                 // @ts-ignore
-                                                if (datafile.rw_id) {
-                                                    if (!mapDisplaypreview) {
-                                                        setMapDisplayPreview(
-                                                            true
-                                                        )
-                                                    }
+                                                if (!mapDisplaypreview) {
+                                                    setMapDisplayPreview(true)
+                                                }
+                                                if (
+                                                    datafile.layerObj
+                                                        ?.layerConfig ||
+                                                    datafile.layerObjRaw
+                                                        ?.layerConfig
+                                                ) {
                                                     addLayerToLayerGroup(
                                                         // @ts-ignore
-                                                        datafile.rw_id,
-                                                        dataset.id
+                                                        datafile.id,
+                                                        dataset.id,
+                                                        'ckan'
+                                                    )
+                                                } else {
+                                                    addLayerToLayerGroup(
+                                                        // @ts-ignore
+                                                        datafile.rw_id != '' &&
+                                                            datafile.rw_id !=
+                                                                null
+                                                            ? datafile.rw_id
+                                                            : datafile.id,
+                                                        dataset.id,
+                                                        'rw'
                                                     )
                                                 }
-
                                                 customDataLayer({
                                                     event: 'gtm.click',
                                                     resource_name:

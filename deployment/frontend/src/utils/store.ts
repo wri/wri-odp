@@ -313,6 +313,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                 addLayerToLayerGroup: (
                     layerId: string,
                     datasetId: string,
+                    layerSource?: string,
                     first?: boolean
                 ) => {
                     const prev = get()
@@ -338,6 +339,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                         visibility: true,
                         active: true,
                         opacity: 1,
+                        layerSource: layerSource ? layerSource : null,
                         zIndex: Object.keys(currentLayers).length + 11,
                     })
 

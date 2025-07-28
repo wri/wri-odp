@@ -70,7 +70,6 @@ export function BuildALayer({
         const layerObjRaw = getRawObjFromApiSpec(
             convertFormToLayerObj(layerFormObj.getValues())
         )
-        formObj.setValue(`resources.${index}.rw_id`, layerObjRaw.id ?? '')
         formObj.setValue(`resources.${index}.layerObjRaw`, layerObjRaw)
         formObj.setValue(`resources.${index}.layerObj`, null)
     }
@@ -81,7 +80,9 @@ export function BuildALayer({
     }
 
     useEffect(() => {
-        syncValues()
+        if (formObj.getValues(`resources.${index}.type`) == 'layer') {
+            syncValues()
+        }
     }, [layerFormObj.watch()])
 
     const updatePreview = () => {
