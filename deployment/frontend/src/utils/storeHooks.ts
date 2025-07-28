@@ -90,6 +90,17 @@ export const useBasemap = () => {
     return { selectedBasemap, setBasemap }
 }
 
+export const useInitialRender = () => {
+    const { isInitialrender } = useStore(
+        (store) => ({
+            isInitialrender: store.mapView.initialrender,
+        }),
+        shallow
+    )
+
+    return { isInitialrender }
+}
+
 export const useIsDrawing = () => {
     const { isDrawing, setIsDrawing } = useStore(
         (store) => ({
@@ -177,7 +188,7 @@ export const useBounds = () => {
     return { bounds, setBounds }
 }
 
-const useStoreDirtyFields = () => {
+export const useStoreDirtyFields = () => {
     const { storeDirtyFields, setStoreDirtyFields } = useStore((store) => ({
         storeDirtyFields: store.storeDirtyFields,
         setStoreDirtyFields: store.setStoreDirtyFields,

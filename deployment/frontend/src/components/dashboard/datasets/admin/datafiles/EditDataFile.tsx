@@ -30,6 +30,7 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { DatafileLocation } from './DatafileLocation'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
+import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm'
 
 export function EditDataFile({
     remove,
@@ -120,23 +121,30 @@ export function EditDataFile({
                                     </button>
                                 </>
                             ))
-                            .with(P.union('layer', 'layer-raw'), () => (
-                                <>
-                                    <div className="flex items-center gap-x-2">
-                                        <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
-                                        <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
-                                            {field.title}
-                                        </span>
-                                    </div>
-                                    <button
-                                        aria-label="remove"
-                                        type="button"
-                                        onClick={() => remove()}
-                                    >
-                                        <MinusCircleIcon className="h-6 w-6 text-red-500" />
-                                    </button>
-                                </>
-                            ))
+                            .with(
+                                P.union(
+                                    'layer',
+                                    'layer-raw',
+                                    'reference-layer'
+                                ),
+                                () => (
+                                    <>
+                                        <div className="flex items-center gap-x-2">
+                                            <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
+                                            <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
+                                                {field.title}
+                                            </span>
+                                        </div>
+                                        <button
+                                            aria-label="remove"
+                                            type="button"
+                                            onClick={() => remove()}
+                                        >
+                                            <MinusCircleIcon className="h-6 w-6 text-red-500" />
+                                        </button>
+                                    </>
+                                )
+                            )
                             .otherwise(() => (
                                 <>
                                     <div className="flex items-center gap-x-2"></div>
@@ -164,6 +172,12 @@ export function EditDataFile({
                             .with('layer', () => (
                                 <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
                             ))
+                            .with('layer-raw', () => (
+                                <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
+                            ))
+                            .with('reference-layer', () => (
+                                <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
+                            ))
                             .otherwise(() => (
                                 <></>
                             ))}
@@ -188,6 +202,8 @@ export function EditDataFile({
                         <BuildALayer formObj={formObj} index={index} />
                     ) : datafile.type === 'layer-raw' ? (
                         <BuildALayerRaw formObj={formObj} index={index} />
+                    ) : datafile.type === 'reference-layer' ? (
+                        <DerivedLayerForm formObj={formObj} index={index} />
                     ) : (
                         <Tab.Group>
                             <div>

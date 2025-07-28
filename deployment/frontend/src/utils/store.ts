@@ -34,6 +34,7 @@ const getDefaultInitialState = () => {
         tempLayerAsLayerobj: new Map(),
         prevLayerGroups: [],
         mapView: {
+            initialrender: false,
             isEmbedding: false,
             isAddingLayers: false,
             activeLayerGroups: [],
@@ -72,6 +73,8 @@ export const Provider = zustandContext.Provider
 export const useStore = zustandContext.useStore
 
 export const initializeStore = (preloadedState: any = {}) => {
+    console.log('Initializing store with preloaded state', preloadedState)
+    console.log('Default initial state', getDefaultInitialState())
     return create(
         combine(
             {
@@ -307,12 +310,17 @@ export const initializeStore = (preloadedState: any = {}) => {
                         },
                     })
                 },
-                addLayerToLayerGroup: (layerId: string, datasetId: string) => {
+                addLayerToLayerGroup: (
+                    layerId: string,
+                    datasetId: string,
+                    layerSource?: string,
+                    first?: boolean
+                ) => {
                     const prev = get()
                     const activeLayerGroups = get().mapView.activeLayerGroups
                     const newActiveLayerGroups =
                         structuredClone(activeLayerGroups)
-
+                    const initialrender = first || false
                     const lg = newActiveLayerGroups.find(
                         (lg: any) => lg.datasetId == datasetId
                     )
@@ -331,6 +339,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                         visibility: true,
                         active: true,
                         opacity: 1,
+                        layerSource: layerSource ? layerSource : null,
                         zIndex: Object.keys(currentLayers).length + 11,
                     })
 
@@ -339,6 +348,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                         mapView: {
                             ...prev.mapView,
                             activeLayerGroups: newActiveLayerGroups || [],
+                            initialrender: initialrender,
                         },
                     })
                 },

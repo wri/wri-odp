@@ -75,7 +75,7 @@ export function OverviewForm({
                             placeholder="name-of-dataset"
                             type="text"
                             icon={
-                                <DefaultTooltip content="Please choose a URL that is not already in use for another Topic, Team, or Application.">
+                                <DefaultTooltip content="Please choose a URL that is not already in use for another Dataset.">
                                     <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                 </DefaultTooltip>
                             }

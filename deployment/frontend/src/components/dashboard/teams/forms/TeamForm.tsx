@@ -214,6 +214,7 @@ export default function TeamForm({
                                   ]
                         }
                         placeholder="Select visibility"
+                        
                     />
                     <ErrorDisplay name="visibility" errors={errors} />
                 </InputGroupCustom>

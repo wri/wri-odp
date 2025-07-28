@@ -677,14 +677,6 @@ export async function getOneDataset(
                 return r
             if (!r.layerObj && !r.layerObjRaw) {
                 const layerObj = await getLayerRw(r.url!)
-                if (r.url_type === 'layer')
-                    return {
-                        ...r,
-                        layerObj: !noLayer
-                            ? convertLayerObjToForm(layerObj)
-                            : true,
-                    }
-
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
@@ -692,23 +684,30 @@ export async function getOneDataset(
                             ? getRawObjFromApiSpec(layerObj)
                             : true,
                     }
-            }
-
-            if (r.layerObj || r.layerObjRaw) {
-                if (r.layerObj) {
+                if (r.url_type === 'layer')
                     return {
                         ...r,
                         layerObj: !noLayer
-                            ? convertLayerObjToForm(r.layerObj)
+                            ? convertLayerObjToForm(layerObj)
                             : true,
-                        rw_id: r.id,
                     }
-                }
+            }
+
+            if (r.layerObj || r.layerObjRaw) {
                 if (r.layerObjRaw) {
                     return {
                         ...r,
                         layerObjRaw: !noLayer
                             ? getRawObjFromApiSpec(r.layerObjRaw)
+                            : true,
+                        rw_id: r.id,
+                    }
+                }
+                if (r.layerObj) {
+                    return {
+                        ...r,
+                        layerObj: !noLayer
+                            ? convertLayerObjToForm(r.layerObj)
                             : true,
                         rw_id: r.id,
                     }
@@ -2375,7 +2374,10 @@ export async function approvePendingDataset(
         ? await Promise.all(
               submittedDataset.resources
                   .filter(
-                      (r) => (r.layerObj || r.layerObjRaw) && r.rw_id && r.url
+                      (r) =>
+                          (r.layerObj || r.layerObjRaw) &&
+                          r.rw_id &&
+                          r.url?.startsWith('https://api.resourcewatch.org')
                   )
                   .map(async (r) => {
                       const rr = r as ResourceFormType
@@ -2396,7 +2398,13 @@ export async function approvePendingDataset(
         rw_id !== null
             ? await Promise.allSettled(
                   submittedDataset.resources
-                      .filter((r) => (r.layerObj || r.layerObjRaw) && !r.url)
+                      .filter(
+                          (r) =>
+                              (r.layerObj || r.layerObjRaw) &&
+                              !r.url?.startsWith(
+                                  'https://api.resourcewatch.org'
+                              )
+                      )
                       .map(async (r) => {
                           const rr = r as ResourceFormType
                           if (r.layerObj) {
@@ -2544,7 +2552,7 @@ export async function approvePendingDataset(
             })
         } catch (error) {
             console.error(error)
-            throw Error('Error in sending issue /comment notification')
+            //throw Error('Error in sending issue /comment notification')
         }
     }
 
