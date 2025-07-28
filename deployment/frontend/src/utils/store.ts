@@ -313,7 +313,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                 addLayerToLayerGroup: (
                     layerId: string,
                     datasetId: string,
-                    layerSource?: string
+                    layerSource?: string,
                     first?: boolean
                 ) => {
                     const prev = get()
