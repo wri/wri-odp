@@ -76,7 +76,7 @@ export function Versioning({
                     {!isReleaseNotesChanged &&
                         !releaseNotes?.length &&
                         !isFirstReleaseNotes && (
-                            <span>This dataset is at its initial version</span>
+                            <span>This Dataset is at its initial version</span>
                         )}
                 </div>
             )}

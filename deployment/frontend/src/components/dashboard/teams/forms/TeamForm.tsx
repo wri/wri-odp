@@ -63,7 +63,7 @@ export default function TeamForm({
                 <InputGroup label="Title" required>
                     <Input
                         {...register('title')}
-                        placeholder="My team"
+                        placeholder="My Team"
                         type="text"
                     />
                     <ErrorDisplay name="title" errors={errors} />
@@ -163,6 +163,7 @@ export default function TeamForm({
                                         .map((team) => ({
                                             label: team.title ?? team.name,
                                             value: team.name,
+                                            visibility: team.visibility,
                                         })),
                                 ]}
                                 placeholder="Select a parent"
@@ -199,15 +200,17 @@ export default function TeamForm({
                                           label: 'Private',
                                           value: 'private',
                                           default: true,
+                                          visibility: 'private',
                                       },
                                       {
                                           label: 'Public',
                                           value: 'public',
+                                          visibility: 'public',
                                       },
                                   ]
                                 : [
-                                      { label: 'Public', value: 'public' },
-                                      { label: 'Private', value: 'private' },
+                                      { label: 'Public', value: 'public', visibility: 'public' },
+                                      { label: 'Private', value: 'private', visibility: 'private' },
                                   ]
                         }
                         placeholder="Select visibility"

@@ -47,7 +47,7 @@ export default function EditApplicationForm({ application }: { application: Appl
     const editApplication = api.applications.editApplication.useMutation({
         onSuccess: async ({ title, name }) => {
             await utils.applications.getApplication.invalidate({ id: name })
-            notify(`Successfully edited the ${title ?? name} application`, 'success')
+            notify(`Successfully edited the ${title ?? name} Application`, 'success')
             router.push('/dashboard/applications')
             formObj.reset()
         },
@@ -60,7 +60,7 @@ export default function EditApplicationForm({ application }: { application: Appl
         onSuccess: async () => {
             await utils.applications.getApplication.invalidate({ id: application.name })
             notify(
-                `Successfully deleted the ${application.title ?? application.name} team`,
+                `Successfully deleted the ${application.title ?? application.name} Team`,
                 'error'
             )
             setDeleteOpen(false)
@@ -99,7 +99,7 @@ export default function EditApplicationForm({ application }: { application: Appl
                         </Dialog.Title>
                         <div className="mt-2">
                             <p className="text-sm text-gray-500">
-                                Are you sure you want to delete this application?
+                                Are you sure you want to delete this Application?
                             </p>
                         </div>
                     </div>

@@ -293,12 +293,12 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
         <>
             <h2 className="text-lg font-bold mb-5">Data Files API</h2>
             <QueryEndpoint
-                description="Get this data file's metadata"
+                description="Get this Data File's metadata"
                 url={ckanResourcGetUrl}
             />
 
             <QueryEndpoint
-                description="update this data file's metadata"
+                description="update this Data File's metadata"
                 url={`${ckanBaseUrl}/resource_patch`}
                 method="POST"
                 headers={{
@@ -346,7 +346,7 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
             )}
             {ckanGetDatastoreInfoUrl && (
                 <QueryEndpoint
-                    description="Get this data file's records metadata"
+                    description="Get this Data File's records metadata"
                     url={ckanGetDatastoreInfoUrl}
                     method="POST"
                     body={`{ 
@@ -357,14 +357,14 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
             )}
             {ckanResourceGetDatastoreSearchUrl && (
                 <QueryEndpoint
-                    description="Search this data file's records"
+                    description="Search this Data File's records"
                     url={ckanResourceGetDatastoreSearchUrl}
                 />
             )}
 
             {ckanResourceGetDatastoreSqlUrl && (
                 <QueryEndpoint
-                    description="Run a SQL query against this data file's records"
+                    description="Run a SQL query against this Data File's records"
                     url={ckanResourceGetDatastoreSqlUrl}
                 />
             )}
@@ -378,7 +378,7 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
                     </h2>
 
                     <QueryEndpoint
-                        description="Get the layer object associated with this data file"
+                        description="Get the layer object associated with this Data File"
                         url={rwDatasetGetLayerUrl}
                     />
                     <RwMoreInfo />
@@ -456,7 +456,7 @@ const SnippetInstructions = ({
         <>
             <h2 className="text-lg font-bold mb-5">Data Files API</h2>
             <SnippetEndpoint
-                description="Edit this data file's metadata"
+                description="Edit this Data File's metadata"
                 snippet={getSnippetFn(
                     `${ckanBaseUrl}/resource_patch`,
                     'POST',
@@ -473,7 +473,7 @@ const SnippetInstructions = ({
                 language={language}
             />
             <SnippetEndpoint
-                description="Get this data file's metadata"
+                description="Get this Data File's metadata"
                 snippet={ckanResourcGetSnippet}
                 language={language}
             />
@@ -501,14 +501,14 @@ const SnippetInstructions = ({
             )}
             {ckanGetDatastoreInfoSnippet && (
                 <SnippetEndpoint
-                    description="Get this data file's records metadata"
+                    description="Get this Data File's records metadata"
                     snippet={ckanGetDatastoreInfoSnippet}
                     language={language}
                 />
             )}
             {ckanResourceGetDatastoreSearchSnippet && (
                 <SnippetEndpoint
-                    description="Search this data file's records"
+                    description="Search this Data File's records"
                     snippet={ckanResourceGetDatastoreSearchSnippet}
                     language={language}
                 />
@@ -516,7 +516,7 @@ const SnippetInstructions = ({
 
             {ckanResourceGetDatastoreSqlSnippet && (
                 <SnippetEndpoint
-                    description="Run a SQL query against this data file's records"
+                    description="Run a SQL query against this Data File's records"
                     snippet={ckanResourceGetDatastoreSqlSnippet}
                     language={language}
                 />
@@ -531,7 +531,7 @@ const SnippetInstructions = ({
                     </h2>
 
                     <SnippetEndpoint
-                        description="Get the layer object associated with this data file"
+                        description="Get the layer object associated with this Data File"
                         snippet={rwDatasetGetLayerSnippet}
                         language={language}
                     />

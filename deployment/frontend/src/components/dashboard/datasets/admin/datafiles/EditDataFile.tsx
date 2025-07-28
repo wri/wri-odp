@@ -387,7 +387,7 @@ export function EditDataFile({
                                                             another URL where
                                                             further steps may be
                                                             needed to access the
-                                                            data file)
+                                                            Data File)
                                                         </label>
                                                     </div>
                                                 </div>

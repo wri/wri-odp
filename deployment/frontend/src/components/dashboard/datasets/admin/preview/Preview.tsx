@@ -304,15 +304,15 @@ export function Preview({
                         text={
                             <ul className="list-disc">
                                 <li>
-                                    To add a chart view to your dataset, the
-                                    system first needs to load your data file.
+                                    To add a chart view to your Dataset, the
+                                    system first needs to load your Data File.
                                     Please wait 10-15 minutes and then choose to
-                                    edit your dataset. You will then be able to
+                                    edit your Dataset. You will then be able to
                                     add a chart.
                                 </li>
                                 <li>
                                     Charts views cannot be created while the
-                                    dataset is awaiting approval
+                                    Dataset is awaiting approval
                                 </li>
                             </ul>
                         }

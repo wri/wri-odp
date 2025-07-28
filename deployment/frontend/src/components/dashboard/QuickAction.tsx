@@ -34,14 +34,14 @@ export default function QuickAction({ drag }: { drag: boolean }) {
                     className={`hover:font-semibold font-normal rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? 'bg-white' : 'bg-slate-100'} `}
                 >
                     <ArrowDownOnSquareIcon className="w-8 h-8 text-black" />
-                    <div className="text-base">Add a dataset</div>
+                    <div className="text-base">Add a Dataset</div>
                 </Link>
                 <Link
                     href="/dashboard/teams/new"
                     className={`hover:font-semibold font-normal rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? 'bg-white' : 'bg-slate-100'} `}
                 >
                     <BuildingLibraryIcon className="w-8 h-8 text-black" />
-                    <div className="text-base">Add a team</div>
+                    <div className="text-base">Add a Team</div>
                 </Link>
             </div>
             <div className="flex flex-col sm:flex-row gap-x-4 gap-y-4">
@@ -51,7 +51,7 @@ export default function QuickAction({ drag }: { drag: boolean }) {
                         className={`hover:font-semibold font-normal rounded-md flex flex-col justify-center items-center w-full sm:w-1/2 py-12 hover:bg-wri-gold border-b-wri-gold border-b-2 ${drag ? 'bg-white' : 'bg-slate-100'} `}
                     >
                         <SquaresPlusIcon className="w-8 h-8 text-black" />
-                        <div className="text-base">Add a topic</div>
+                        <div className="text-base">Add a Topic</div>
                     </Link>
                 )}
                 <Link

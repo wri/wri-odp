@@ -41,8 +41,8 @@ export function ApplicationCard({
             </p>
             <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700">
                 {datasetCount && datasetCount > 1
-                    ? `${datasetCount} datasets`
-                    : `${datasetCount} dataset`}
+                    ? `${datasetCount} Datasets`
+                    : `${datasetCount} Dataset`}
             </p>
         </Link>
     )
@@ -60,7 +60,7 @@ export function ApplicationsCarousel() {
                 >
                     {error && (
                         <ErrorAlert
-                            title="Error loading applications"
+                            title="Error loading Applications"
                             text={error.message}
                         />
                     )}

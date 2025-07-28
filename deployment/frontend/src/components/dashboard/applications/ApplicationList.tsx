@@ -8,7 +8,7 @@ const tabs = [
     {
         id: 'allteams',
         content: <ApplicationCard />,
-        title: 'All applications',
+        title: 'All Applications',
     },
 ]
 
@@ -43,7 +43,7 @@ export default function ApplicationList() {
                             <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">
                                 <PlusSmallIcon className="w-3 h-3 text-white" />
                             </div>
-                            <span>Add application</span>
+                            <span>Add Application</span>
                         </div>
                     </Link>
                 </Tab.List>

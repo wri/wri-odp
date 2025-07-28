@@ -130,7 +130,7 @@ export function UploadForm({
             <div className="mt-10">
                 <h2 className="font-semibold text-lg flex items-center gap-x-2">
                     Location Coverage
-                    <DefaultTooltip content="Complete this section if the data file should be included in search results when doing a search by location">
+                    <DefaultTooltip content="Complete this section if the Data File should be included in search results when doing a search by location">
                         <InformationCircleIcon
                             className="h-5 w-5 text-neutral-500"
                             aria-hidden="true"
