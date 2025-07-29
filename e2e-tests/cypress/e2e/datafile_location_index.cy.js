@@ -9,7 +9,7 @@ const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
-describe("Data file location", () => {
+describe("Data File location", () => {
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
@@ -52,7 +52,7 @@ describe("Data file location", () => {
         "test-maintainer-2@example.com",
       );
 
-      cy.contains("Next: Data files").click();
+      cy.contains("Next: Data Files").click();
       cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.get("input[type=file]").selectFile("cypress/fixtures/airtravel.csv", {
         force: true,

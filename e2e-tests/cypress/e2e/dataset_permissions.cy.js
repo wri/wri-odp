@@ -42,7 +42,7 @@ describe("Chart view", () => {
       "test-maintainer-2@example.com",
     );
 
-    cy.contains("Next: Data files").click();
+    cy.contains("Next: Data Files").click();
     cy.get("input[type=file]")
       .eq(0)
       .selectFile("cypress/fixtures/airtravel.csv", {

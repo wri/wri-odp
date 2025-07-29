@@ -136,7 +136,7 @@ describe("Create and edit team", () => {
       "test-maintainer-1@example.com",
     );
 
-    cy.contains("Next: Data files").click();
+    cy.contains("Next: Data Files").click();
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
@@ -234,7 +234,7 @@ describe("Create and edit team", () => {
       "test-maintainer-1@example.com",
     );
 
-    cy.contains("Next: Data files").click();
+    cy.contains("Next: Data Files").click();
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
@@ -289,7 +289,7 @@ describe("Create and edit team", () => {
       "test-maintainer-1@example.com",
     );
 
-    cy.contains("Next: Data files").click();
+    cy.contains("Next: Data Files").click();
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
