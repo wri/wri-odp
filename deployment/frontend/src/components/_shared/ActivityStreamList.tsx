@@ -5,56 +5,56 @@ import type { activity as IActivity } from './ActivityStreamCard'
 
 export const activity: IActivity[] = [
   {
-    description: "someone updated the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone updated the Dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
     icon: "update",
     actionType: "changed_package"
 
   },
   {
-    description: "someone edited the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone edited the Dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
     icon: "edit",
     actionType: "changed_package"
   },
   {
-    description: "someone added the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone added the Dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
     icon: "add",
     actionType: "new_package"
   },
   {
-    description: "someone updated the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone updated the Dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
     icon: "update",
     actionType: "changed_package"
   },
   {
-    description: "someone edited the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone edited the Dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
     icon: "edit",
     actionType: "changed_package"
   },
   {
-    description: "someone added the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone added the Dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
     icon: "add",
     actionType: "new_package"
   },
   {
-    description: "someone deleted the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone deleted the Dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
     icon: "update",
     actionType: "deleted_package"
   },
   {
-    description: "someone deleted the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone deleted the Dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
     icon: "edit",
     actionType: "deleted_package"
   },
   {
-    description: "someone added the dataset XYZ Lorem ipsum this will probably be longer",
+    description: "someone added the Dataset XYZ Lorem ipsum this will probably be longer",
     time: "1 hour ago",
     icon: "add",
     actionType: "new_package"

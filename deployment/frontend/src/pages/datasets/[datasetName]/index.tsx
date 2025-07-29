@@ -450,7 +450,7 @@ export default function DatasetPage(
 
     const tabs = [
         {
-            name: 'Data files',
+            name: 'Data Files',
             enabled: true,
             highlighted:
                 !isCurrentVersion &&

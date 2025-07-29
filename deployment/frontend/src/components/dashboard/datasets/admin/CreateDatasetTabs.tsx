@@ -6,7 +6,7 @@ import { match } from 'ts-pattern'
 export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
     const steps = [
         { id: 0, name: 'Metadata', href: '#' },
-        { id: 1, name: 'Data files', href: '#' },
+        { id: 1, name: 'Data Files', href: '#' },
         { id: 2, name: 'Map Visualizations', href: '#' },
         { id: 3, name: 'Preview', href: '#' },
     ].map((step) => {

@@ -410,7 +410,7 @@ export function DataFiles({
                     onClick={() => setOpenDownload(true)}
                     className="group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3"
                 >
-                    Download Selected Data files
+                    Download Selected Data Files
                     <ArrowDownCircleIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
                 </Button>
             )}

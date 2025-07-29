@@ -16,7 +16,7 @@ import { useSession } from 'next-auth/react'
 
 const links = [
     { label: 'Teams', url: '/dashboard/teams', current: false },
-    { label: 'Create a team', url: '/dashboard/teams/new', current: true },
+    { label: 'Create a Team', url: '/dashboard/teams/new', current: true },
 ]
 
 export default function CreateTeamForm() {

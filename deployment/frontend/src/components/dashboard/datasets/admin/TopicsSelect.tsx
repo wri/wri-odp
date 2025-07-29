@@ -214,7 +214,7 @@ function TopicsInner({
                                                 {getTopicByName(item)?.title ??
                                                     item}
                                             </span>
-                                            <DefaultTooltip content="Remove topic">
+                                            <DefaultTooltip content="Remove Topic">
                                                 <XMarkIcon
                                                     onClick={(e) => {
                                                         e.stopPropagation()

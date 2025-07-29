@@ -390,7 +390,7 @@ export function OverviewForm({
                         }
                     >
                         <SimpleSelect
-                            placeholder="Select visiblity"
+                            placeholder="Select visibility"
                             name="visibility_type"
                             id="visibility_type"
                             formObj={formObj}
