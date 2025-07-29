@@ -30,6 +30,7 @@ import {
     approvePendingDataset,
     getDatasetReleaseNotes,
     getCollaboratorPackages,
+    getAllOrganizations
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -429,6 +430,7 @@ export const DatasetRouter = createTRPCRouter({
                     approval_status: org.approval_status,
                     is_organization: org.is_organization,
                     state: org.state,
+                    visibility: org.visibility,
                 }
             }
 
@@ -999,10 +1001,28 @@ export const DatasetRouter = createTRPCRouter({
                 })
             }
 
+            const orgSlugs = [
+              ...new Set(
+                dataset.datasets.map((d) => d.organization?.name).filter(Boolean)
+              ),
+            ]
+
+            const allOrgs = await getAllOrganizations({
+              apiKey: ctx.session?.user.apikey ?? '',
+            })
+
+            const teamVisibility = Object.fromEntries(
+              orgSlugs.map((slug) => {
+                const org = allOrgs.find((o) => o.name === slug)
+                return [slug, org?.visibility || 'public']
+              })
+            )
+
             return {
                 datasets: _datasets as unknown as WriDataset[],
                 count: dataset.count,
                 searchFacets: dataset.searchFacets,
+                teamVisibility: teamVisibility,
             }
         }),
     getDatasetCollaborators: protectedProcedure

@@ -54,7 +54,7 @@ export default function CreateTeamForm() {
                     code: z.ZodIssueCode.custom,
                     path: ['parent'],
                     message:
-                        'User does not have admin access to create a sub team',
+                        'User does not have admin access to create a SubTeam',
                 })
             }
         }
@@ -65,7 +65,7 @@ export default function CreateTeamForm() {
 
     const createTeam = api.teams.createTeam.useMutation({
         onSuccess: async ({ name, title }) => {
-            notify(`Successfully created the ${title ?? name} team`, 'success')
+            notify(`Successfully created the ${title ?? name} Team`, 'success')
             router.push('/dashboard/teams')
             formObj.reset()
         },
@@ -97,7 +97,7 @@ export default function CreateTeamForm() {
             <Breadcrumbs links={links} />
             <Container className="mb-20 font-acumin">
                 <h1 className="mb-[2rem] text-[1.57rem] font-semibold">
-                    Create a team
+                    Create a Team
                 </h1>
 
                 <form

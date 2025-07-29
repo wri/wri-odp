@@ -13,15 +13,15 @@ import { useState, useEffect } from 'react'
 const tabs = [
     {
         id: 'datasets',
-        name: 'All datasets',
+        name: 'All Datasets',
         content: DatasetLCardList,
-        title: 'All datasets',
+        title: 'All Datasets',
     },
     {
         id: 'mydatasets',
         content: Mydataset,
-        name: 'My datasets',
-        title: 'My datasets',
+        name: 'My Datasets',
+        title: 'My Datasets',
     },
     {
         id: 'favourites',

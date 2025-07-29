@@ -75,7 +75,7 @@ describe("Data files", () => {
       cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.contains("Datapusher").click();
       cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
-      cy.contains(`Successfully submited data file to the datapusher`, {
+      cy.contains(`Successfully submited Data File to the datapusher`, {
         timeout: 15000,
       });
       cy.wait(15000);

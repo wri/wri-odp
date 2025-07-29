@@ -62,7 +62,7 @@ describe("Data file not downloadable", () => {
         .clear()
         .type("Not downloadable file");
       cy.get('input[name="resources.0.not_downloadable"]').check();
-      cy.contains("Add another data file").click();
+      cy.contains("Add another Data File").click();
       cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.get(".datafile-accordion-trigger").eq(1).click();
       cy.contains("Link to file in cloud storage").click();
@@ -73,7 +73,7 @@ describe("Data file not downloadable", () => {
       cy.contains("Next: Map Visualizations").click();
       cy.contains("Next: Preview").click();
       cy.get('button[type="submit"]').click();
-      cy.contains(`Successfully created the "${datasetName}" dataset`, {
+      cy.contains(`Successfully created the "${datasetName}" Dataset`, {
         timeout: 20000,
       });
     },

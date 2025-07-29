@@ -287,13 +287,22 @@ export function AddLayer({
                         <Tab.Panels as="div" className="mt-2">
                             <Tab.Panel className="hidden"></Tab.Panel>
                             <Tab.Panel>
-                                <BuildALayer formObj={formObj} index={index} />
+                                {formObj.getValues(`resources.${index}.type`) ==
+                                    'layer' && (
+                                    <BuildALayer
+                                        formObj={formObj}
+                                        index={index}
+                                    />
+                                )}
                             </Tab.Panel>
                             <Tab.Panel>
-                                <BuildALayerRaw
-                                    formObj={formObj}
-                                    index={index}
-                                />
+                                {formObj.getValues(`resources.${index}.type`) ==
+                                    'layer-raw' && (
+                                    <BuildALayerRaw
+                                        formObj={formObj}
+                                        index={index}
+                                    />
+                                )}
                             </Tab.Panel>
                             <Tab.Panel>
                                 <DerivedLayerForm

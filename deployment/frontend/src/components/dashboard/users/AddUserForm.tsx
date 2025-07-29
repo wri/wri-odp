@@ -109,7 +109,7 @@ export default function AddUserForm({
                         maxWidth="xl:max-w-[50rem]"
                         options={[
                             {
-                                label: 'No team',
+                                label: 'No Team',
                                 value: '',
                                 id: '',
                             },
@@ -119,10 +119,10 @@ export default function AddUserForm({
                                 id: team.id,
                             })),
                         ]}
-                        placeholder="Select a team"
+                        placeholder="Select a Team"
                     />
                 </InputGroup>
-                {watch('team')?.label && watch('team')?.label !== 'No team' && (
+                {watch('team')?.label && watch('team')?.label !== 'No Team' && (
                     <InputGroup
                         label="Role"
                         labelClassName=" w-[13%] sm:w-[12%] sm:max-w-[40%] "

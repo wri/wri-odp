@@ -58,9 +58,9 @@ function LeftNode({
                 <SelectFilter
                     options={[
                         { id: 'None', label: 'Filter by' },
-                        { id: 'dataset', label: 'dataset' },
-                        { id: 'teams', label: 'teams' },
-                        { id: 'topics', label: 'topics' },
+                        { id: 'dataset', label: 'Dataset' },
+                        { id: 'teams', label: 'Teams' },
+                        { id: 'topics', label: 'Topics' },
                     ]}
                     filtername="selectEntity"
                     setQuery={setSelectEntity}
@@ -99,9 +99,9 @@ function LeftNode({
             <SelectFilter
                 options={[
                     { id: 'None', label: 'Filter by' },
-                    { id: 'dataset', label: 'dataset' },
-                    { id: 'teams', label: 'teams' },
-                    { id: 'topics', label: 'topics' },
+                    { id: 'dataset', label: 'Dataset' },
+                    { id: 'teams', label: 'Teams' },
+                    { id: 'topics', label: 'Topics' },
                     { id: 'reset', label: 'reset' },
                 ]}
                 filtername="selectEntity"
@@ -112,7 +112,7 @@ function LeftNode({
 
             {selectEntity.search === 'dataset' ? (
                 <SelectFilter
-                    options={[{ id: 'all', label: 'All dataset' }].concat(
+                    options={[{ id: 'all', label: 'All Datasets' }].concat(
                         getKeyValues(
                             dataset?.datasets as WriDataset[],
                             'title',
@@ -128,7 +128,7 @@ function LeftNode({
             )}
             {selectEntity.search === 'teams' ? (
                 <SelectFilter
-                    options={[{ id: 'all', label: 'All teams' }].concat(
+                    options={[{ id: 'all', label: 'All Teams' }].concat(
                         getKeyValues(
                             organization as WriOrganization[],
                             'title',
@@ -145,7 +145,7 @@ function LeftNode({
 
             {selectEntity.search === 'topics' ? (
                 <SelectFilter
-                    options={[{ id: 'all', label: 'All topics' }].concat(
+                    options={[{ id: 'all', label: 'All Topics' }].concat(
                         getKeyValues(group as Group[], 'title', 'id')
                     )}
                     filtername="groupId"

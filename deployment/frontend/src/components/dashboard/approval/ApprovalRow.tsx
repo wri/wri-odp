@@ -408,7 +408,7 @@ function SubCardProfile({
             ) : (
                 <>
                     <p className="mb-3">
-                        This is a new dataset, a previous version does not
+                        This is a new Dataset, a previous version does not
                         exist. Table shows the current values.
                     </p>
                     <Table>
@@ -487,7 +487,7 @@ export default function ApprovalRow({
                     icon: <CheckIcon className="w-4 h-4 text-white" />,
                     tooltip: {
                         id: `approve-tooltip-${approvalInfo.name}`,
-                        content: 'Approve dataset',
+                        content: 'Approve Dataset',
                     },
                     onClick: () => handleOpenModal(approvalInfo, 'approve'),
                 },
@@ -497,7 +497,7 @@ export default function ApprovalRow({
                     icon: <XMarkIcon className="w-4 h-4 text-white" />,
                     tooltip: {
                         id: `delete-tooltip-${approvalInfo.name}`,
-                        content: 'Reject dataset',
+                        content: 'Reject Dataset',
                     },
                     onClick: () => handleOpenModal(approvalInfo, 'reject'),
                 },

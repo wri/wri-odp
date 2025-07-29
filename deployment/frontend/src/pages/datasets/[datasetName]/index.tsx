@@ -542,11 +542,16 @@ export default function DatasetPage(
             const LayerResource = dataset?.resources.find(
                 (d) => d.format === 'Layer' || d.rw_id
             )
-            console.log('LAYER RESOURCE', LayerResource)
             if (LayerResource) {
                 removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id!)
                 setMapDisplayPreview(true)
-                addLayerToLayerGroup(LayerResource.rw_id!, dataset.id)
+                addLayerToLayerGroup(
+                    LayerResource.rw_id!,
+                    dataset.id,
+                    undefined,
+                    true
+                )
+
                 customDataLayer({
                     event: 'layer_view_event',
                     resource_name: LayerResource.title ?? LayerResource.name!,

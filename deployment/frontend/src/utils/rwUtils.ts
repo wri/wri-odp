@@ -92,7 +92,7 @@ export async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
     const description = layerRw.data.attributes.description
     r.url = url
     r.name = name
-    r.title = r.name !== '' ? r.name : title
+    r.title = r.title !== '' ? r.title : title
     if (r.layerObj) r.title = title
     r.description = r.description !== '' ? r.description : description
     r.rw_id = layerRw.data.id

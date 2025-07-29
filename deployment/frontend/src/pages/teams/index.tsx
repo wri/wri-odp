@@ -69,7 +69,7 @@ export default function TeamsPage(
                 team.id,
                 JSON.stringify({
                     title: team.title,
-                    description: team.description,
+                    description: team.description || team.notes,
                 })
             )
         })
@@ -123,7 +123,7 @@ export default function TeamsPage(
                         a specific WRI project or team.
                         <br />
                         If you have questions about a project&apos;s data reach
-                        out to the point of contact in the dataset or to{' '}
+                        out to the point of contact in the Dataset or to{' '}
                         <a
                             href="mailto:data@wri.org"
                             className="text-blue-700 underline"

@@ -37,7 +37,7 @@ export default function Favourite({
             notify(
                 `Successfully removed the ${
                     selectDataset?.title ?? selectDataset?.name
-                } dataset from your favorites`,
+                } Dataset from your favourites`,
                 'error'
             )
         },
@@ -136,12 +136,12 @@ export default function Favourite({
                                     as="h3"
                                     className="text-base font-semibold leading-6 text-gray-900"
                                 >
-                                    Remove from favorites
+                                    Remove from favourites
                                 </Dialog.Title>
                                 <div className="mt-2">
                                     <p className="text-sm text-gray-500">
                                         Are you sure you want to remove this
-                                        dataset from favorites?
+                                        Dataset from favourites?
                                     </p>
                                 </div>
                             </div>
