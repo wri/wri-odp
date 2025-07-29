@@ -53,20 +53,31 @@ import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
 
 
 const CopyButton = ({ content }: { content: string }) => {
-    return (
-        <DefaultTooltip content="Copy simple page URL">
-            <Button
-                aria-label="copy button"
-                className=" h-auto rounded-full p-1"
-                onClick={() => {
-                    navigator.clipboard.writeText(content)
-                    notify(`Dataset URL copied!`, 'success')
-                }}
-            >
-                <DocumentDuplicateIcon className="w-3 text-white" />
-            </Button>
-        </DefaultTooltip>
-    )
+  const [copied, setCopied] = useState(false)
+  const handleClick = () => {
+      navigator.clipboard.writeText(content)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500) 
+  }
+  return (
+      <DefaultTooltip
+          content={copied ? 'Dataset URL copied!' : 'Copy simple page URL'}
+          contentClassName={`${copied ? 'bg-green-500 text-white' : ''}`}
+          delayDuration={copied ? 0 : 100}
+          onOpenChange={(open) => {
+              if (copied && open) return
+          }}
+          open={copied ? true : undefined}
+      >
+          <Button
+              aria-label="copy button"
+              className={`h-auto rounded-full p-1`}
+              onClick={handleClick}
+          >
+              <DocumentDuplicateIcon className="w-3 text-white" />
+          </Button>
+      </DefaultTooltip>
+  )
 }
 
 function OpenInButton({
