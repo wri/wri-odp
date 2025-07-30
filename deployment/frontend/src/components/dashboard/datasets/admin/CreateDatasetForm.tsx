@@ -258,7 +258,7 @@ export default function CreateDatasetForm() {
                         >
                             Next:{' '}
                             {match(selectedIndex)
-                                .with(0, () => 'Data files')
+                                .with(0, () => 'Data Files')
                                 .with(1, () => 'Map Visualizations')
                                 .otherwise(() => 'Preview')}
                         </Button>

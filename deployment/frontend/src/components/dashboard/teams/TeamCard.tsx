@@ -494,7 +494,7 @@ export default function TeamCard() {
                                     />
                                 }
                                 linkButton={{
-                                    label: 'View team',
+                                    label: 'View Team',
                                     link: `../teams/${team.name}`,
                                 }}
                                 controlButtons={[

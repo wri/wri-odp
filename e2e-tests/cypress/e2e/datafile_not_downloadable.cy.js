@@ -9,7 +9,7 @@ const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
-describe("Data file not downloadable", () => {
+describe("Data File not downloadable", () => {
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
@@ -52,7 +52,7 @@ describe("Data file not downloadable", () => {
         "test-maintainer-2@example.com",
       );
 
-      cy.contains("Next: Data files").click();
+      cy.contains("Next: Data Files").click();
       cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.contains("Link to file in cloud storage").click();
       cy.get('input[name="resources.0.url"]').type(

@@ -96,7 +96,7 @@ export default function ApplicationForm({
                         placeholder="https://wri.org"
                         type="text"
                         icon={
-                            <DefaultTooltip content="Link to the preferred way to reach out to the Application support team. This could be a “contact us form” or a “mailto:app-help@wri.org” style link.">
+                            <DefaultTooltip content="Link to the preferred way to reach out to the Application support Team. This could be a “contact us form” or a “mailto:app-help@wri.org” style link.">
                                 <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                             </DefaultTooltip>
                         }

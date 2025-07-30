@@ -10,7 +10,7 @@ const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 // TODO: this test is not robust enoguh
-describe("Data files", () => {
+describe("Data Files", () => {
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
@@ -45,7 +45,7 @@ describe("Data files", () => {
       "test-maintainer-2@example.com",
     );
 
-    cy.contains("Next: Data files").click();
+    cy.contains("Next: Data Files").click();
     cy.get(".datafile-accordion-trigger").eq(0).click();
     cy.get("input[type=file]")
       .eq(0)

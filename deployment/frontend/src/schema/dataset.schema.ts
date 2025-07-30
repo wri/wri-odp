@@ -367,7 +367,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
             return true
         },
         {
-            message: 'Public Dataset cannot be assigned to private team',
+            message: 'Public Dataset cannot be assigned to private Team',
             path: ['visibility_type'],
         }
     )

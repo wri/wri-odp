@@ -73,10 +73,12 @@ export default function FilteredSearchLayout({
 
     const { data: facetsData, isLoading: isLoadingFacets } =
         api.dataset.getAllDataset.useQuery(facetsQuery)
+    console.log('facetsData in FilteredSearchLayout', JSON.stringify(facetsData, null, 2))
 
     const searchFacets = facetsData?.searchFacets
 
     if (searchFacets) {
+        console.log('searchFacets in FilteredSearchLayout', JSON.stringify(searchFacets, null, 2))
         for (let key in searchFacets) {
             /*
              * Boolean fields look better with Yes and No options

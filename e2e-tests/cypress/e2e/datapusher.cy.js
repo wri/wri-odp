@@ -45,7 +45,7 @@ describe("Upload file and create dataset", () => {
       "test-maintainer-2@example.com",
     );
 
-    cy.contains("Next: Data files").click();
+    cy.contains("Next: Data Files").click();
     cy.get(".datafile-accordion-trigger").eq(0).click();
     cy.get("input[type=file]").selectFile("cypress/fixtures/cities.csv", {
       force: true,

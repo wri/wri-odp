@@ -28,7 +28,7 @@ export function RelatedDatasets() {
     if (datasets.length === 0) {
         return (
             <div className="flex flex-col gap-y-4 py-2">
-                No related datasets found
+                No related Datasets found
             </div>
         )
     }
@@ -164,7 +164,7 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                     <TabularViewIcon dataset={dataset} />
                 </div>
                 {dataset.cautions && (
-                    <DefaultTooltip content="This dataset contains cautions">
+                    <DefaultTooltip content="This Dataset contains cautions">
                         <div className="rounded-full bg-stone-100 p-1">
                             <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600" />
                         </div>

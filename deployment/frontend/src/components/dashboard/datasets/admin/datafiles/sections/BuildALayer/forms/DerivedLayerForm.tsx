@@ -31,7 +31,7 @@ export default function DerivedLayerForm({
                         <p className="mt-1 text-sm text-blue-700">
                             This layer references an existing RW layer by ID. It
                             is read-only and cannot be edited through this
-                            application.
+                            Application.
                         </p>
                     </div>
                 </div>
