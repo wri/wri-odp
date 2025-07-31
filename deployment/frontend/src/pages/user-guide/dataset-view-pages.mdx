@@ -10,7 +10,7 @@ import MdxLayout from '@/components/_shared/mdx-layout'
 
         2. [Data File list section](#Data-file-list-section)
 
-            a. [Data file download](#Data-file-download)
+            a. [Data File download](#Data-file-download)
 
             b. [Tabular Previews](#Tabular-Previews)
 
@@ -30,36 +30,36 @@ import MdxLayout from '@/components/_shared/mdx-layout'
 
     g. [Release Note tab](#Release-Note-Tab)
 
-Assuming you’ve gone through the Basic and Advanced search page and you’ve identified the dataset you would like to view or you have a direct link to a dataset, here is the description of what the dataset page should look like:
+Assuming you’ve gone through the Basic and Advanced search page and you’ve identified the Dataset you would like to view or you have a direct link to a Dataset, here is the description of what the Dataset page should look like:
 
-On visiting a dataset, the layout should look like the following
+On visiting a Dataset, the layout should look like the following
 
 <img src="/images/user-guide/dataset1.webp" />
 
-The layout is divided into sections, The left side contains the dataset’s detailed information, ranging from metadata to data files and a list of all other entities, and the right-hand side contains Preview sections.
+The layout is divided into sections, The left side contains the Dataset’s detailed information, ranging from metadata to Data Files and a list of all other entities, and the right-hand side contains Preview sections.
 
-For the preview section, the image display above shows Map preview, and that's because the dataset contains a layer data file, and in cases where no layer data files is available, but tabular data filess are present, the preview section will contain a tabular preview and if no data filess at all, the preview section will be empty
+For the preview section, the image display above shows Map preview, and that's because the Dataset contains a layer Data File, and in cases where no layer Data Files is available, but tabular Data Files are present, the preview section will contain a tabular preview and if no Data Files at all, the preview section will be empty.
 
 ## Dataset Metadata
 
 <img src="/images/user-guide/dataset2.webp" />
 
-Starting from the <mark>Open in GFW</mark> button, the button enables us to open the same dataset layer in Global Forest Watch which is one of WRI’s products. And sometimes if the the dataset have a general tabular or gis daata the provider of such data will be listed
+Starting from the <mark>Open in GFW</mark> button, the button enables us to open the same Dataset layer in Global Forest Watch which is one of WRI’s products. And sometimes if the the Dataset have a general tabular or gis daata the provider of such data will be listed
 and just like GFW, clicking on it will direct us to the provider site.
 
-The top part of the metadata contains 3 sets of icons from left to right, showing that chart view, map view, and Tabular view are present for this dataset
+The top part of the metadata contains 3 sets of icons from left to right, showing that chart view, map view, and Tabular view are present for this Dataset
 
-The <mark>COST SPLITTING ORG</mark> signifies the title of the organization this dataset belongs.
+The <mark>COST SPLITTING ORG</mark> signifies the title of the organization this Dataset belongs.
 
-PM <mark>DATA PUSHER QA Jan 26</mark> signifies the title of the dataset. <mark>this is a short description</mark> trigger this represents the text added to the short description field when creating or editing the dataset.
+PM <mark>DATA PUSHER QA Jan 26</mark> signifies the title of the Dataset. <mark>this is a short description</mark> trigger this represents the text added to the short description field when creating or editing the Dataset.
 
-Below the short description, contains 4 metadata which are self-explanatory, show when the dataset was created and updated, and show the temporal coverage, it also indicates that the dataset
+Below the short description, contains 4 metadata which are self-explanatory, show when the Dataset was created and updated, and show the temporal coverage, it also indicates that the Dataset
 
-The <mark>WRI DATA</mark> tag shows that WRI developed this dataset. this will be present in the view of this field (This dataset was developed by WRI ) while creating or editing the dataset
+The <mark>WRI DATA</mark> tag shows that WRI developed this Dataset. this will be present in the view of this field (This Dataset was developed by WRI ) while creating or editing the Dataset
 
-The <mark>RDI approved</mark> tags show when a Technical note is added. The csv , XLSX , LAYER show that this dataset contains three types of data filess.
+The <mark>RDI approved</mark> tags show when a Technical note is added. The csv , XLSX , LAYER show that this Dataset contains three types of Data Files.
 
-The <mark>View Table preview</mark> once clicked diaplay the table in the preview panel
+The <mark>View Table preview</mark> once clicked display the table in the preview panel
 
 <img src="/images/user-guide/dataset3.webp" />
 
@@ -67,7 +67,7 @@ once you are done previewing the table you can click on Remove Tabular preview ,
 
 ## Dataset Tabs
 
-After the dataset header and metadata we have a list of tabs,
+After the Dataset header and metadata we have a list of tabs,
 
 <img src="/images/user-guide/dataset4.webp" />
 
@@ -75,11 +75,11 @@ The <mark>>></mark> is used to see the remaining collapsed tabs, and if the left
 
 ### Data Files
 
-This tab contains the list of data files belonging to the dataset
+This tab contains the list of Data Files belonging to the Dataset
 
 <img src="/images/user-guide/dataset5.webp" />
 
-First, we have the search section, which enables us to search data filess based on title and description. To search by location, click on the <mark>Location Search</mark> to enable the map view and map search
+First, we have the search section, which enables us to search Data Files based on title and description. To search by location, click on the <mark>Location Search</mark> to enable the map view and map search
 
 ### Location Search
 
@@ -89,31 +89,31 @@ In that map, you can search using a bbox by clicking on the square at the top le
 
 <img src="/images/user-guide/dataset7.webp" />
 
--   If that rectangle intersects or covers a geojson shape that is attached to a data files, that data files will then appear
+-   If that rectangle intersects or covers a geojson shape that is attached to a Data Files, that Data Files will then appear
 
--   If that rectangle covers the center coordinate of an address that is attached to a data files, that data files will also appear
+-   If that rectangle covers the center coordinate of an address that is attached to a Data Files, that Data Files will also appear
 
 Besides that, we also have an autocomplete field for addresses, which will match in the following way
 
--   If the center of that address is inside the geojson attached to a data files, then that data files will appear
+-   If the center of that address is inside the geojson attached to a Data Files, then that Data Files will appear
 
--   If the address typed matches or is contained by the address in a specific data files, then that data files will appear, for example, in the image below, we have a data files that is attached to the state of Lagos in Nigeria, if we type Ikeja, Lagos, Nigeria, which is a city inside that particular state, the result will match, given that possibly data about the state of Lagos will also contain data about that particular city
+-   If the address typed matches or is contained by the address in a specific Data Files, then that Data Files will appear, for example, in the image below, we have a Data Files that is attached to the state of Lagos in Nigeria, if we type Ikeja, Lagos, Nigeria, which is a city inside that particular state, the result will match, given that possibly data about the state of Lagos will also contain data about that particular city
 
 <img src="/images/user-guide/dataset8.webp" />
 
-### Data file list section
+### Data File list section
 
-contains all the default or filtered data filess
+contains all the default or filtered Data Files
 
 <img src="/images/user-guide/dataset10.webp" />
 
-#### Data file download
+#### Data File download
 
-As shown in the image above, we have different control buttons e.g Select all data filess this selects all the tabular data files and then displays the Download selected data filess to download all selected files as a zipped file
+As shown in the image above, we have different control buttons e.g Select all Data Files this selects all the tabular Data Files and then displays the Download selected Data Files to download all selected files as a zipped file
 
 <img src="/images/user-guide/dataset11.webp" />
 
-Once you filled the form, the zipped file will be sent to your email once its ready. and to download a single file, click on the dropdown icon for the data files you want to download and then click download
+Once you filled the form, the zipped file will be sent to your email once its ready. and to download a single file, click on the dropdown icon for the Data Files you want to download and then click download
 
 <img src="/images/user-guide/dataset12.webp" />
 
@@ -125,11 +125,11 @@ If the original format is clicked, the download is an instance if, for any other
 
 <img src="/images/user-guide/dataset14.webp" />
 
-Also, we have the Show all layers and Hide All this to display and hide the combined map view of all layer data filess.
+Also, we have the Show all layers and Hide All this to display and hide the combined map view of all layer Data Files.
 
 ### Tabular Previews
 
-The first data files in the image above is a tabular data files and it has view table preview button, if the button is clicked, the preview section shows the table preview
+The first Data Files in the image above is a tabular Data Files and it has view table preview button, if the button is clicked, the preview section shows the table preview
 
 <img src="/images/user-guide/dataset15.webp" />
 
@@ -147,7 +147,7 @@ Hide columns that you do not want to see at that specific moment, click on <mark
 
 <img src="/images/user-guide/dataset18.webp" />
 
-Filter data whereaver you like, by clicking in the funnel icon in the column, filters can be removed easily in the top bar
+Filter data wherever you like, by clicking in the funnel icon in the column, filters can be removed easily in the top bar
 
 <img src="/images/user-guide/dataset19.webp" />
 
@@ -157,7 +157,7 @@ If the column is inferred as a timestamp, then instead of a normal input a date 
 
 ### Chart Preview
 
-some of the data files in the list contain View chart Preview , if clicked it displays the chart preview
+some of the Data Files in the list contain View chart Preview , if clicked it displays the chart preview
 
 <img src="/images/user-guide/dataset21.webp" />
 
@@ -175,7 +175,7 @@ The chart is interactive on hover and you can also take a snapshot of the chart,
 
 ### Map Preview
 
-Datasets with geospatial data can be visualized in a feature-rich map on the dataset page.
+Datasets with geospatial data can be visualized in a feature-rich map on the Dataset page.
 
 <img src="/images/user-guide/dataset26.webp" />
 
@@ -219,7 +219,7 @@ It provides some extra functionality to the maps. Some of the features are:
 
 -   Display layer metadata such as the title
 
--   Render legends, that could be "choropleth", "gradient", "basic", "proportial" or "multiple" (for multiple legends)
+-   Render legends, that could be "choropleth", "gradient", "basic", "proportional" or "multiple" (for multiple legends)
 
 -   Reorder layers
 
@@ -235,21 +235,21 @@ Some layers may contain different threshold. In this case, a new select will be 
 
 <img src="/images/user-guide/dataset32.webp" width="600" height="600" />
 
-#### Add layers from other datasets
+#### Add layers from other Datasets
 
-The ma view has Add layers to add layer from other datasets
+The ma view has Add layers to add layer from other Datasets
 
 <img src="/images/user-guide/dataset33.webp" />
 
-on clicked it displays list of some associated datasets,
+on clicked it displays list of some associated Datasets,
 
 <img src="/images/user-guide/dataset34.webp" />
 
-if you click on Add to map on the selected dataset, the pop-up appeared has shown below
+if you click on Add to map on the selected Dataset, the pop-up appeared has shown below
 
 <img src="/images/user-guide/dataset35.webp" />
 
-now if you clicked on Add to map again the dataset map view will be layered with the previous view we have
+now if you clicked on Add to map again the Dataset map view will be layered with the previous view we have
 
 <img src="/images/user-guide/dataset36.webp" />
 
@@ -259,13 +259,13 @@ As you can see we now have two layer views and we can see the legends at the bot
 
 ### About tab
 
-Contains additional metada information about the datset, such as the description, Tags, licenses, citation etc.
+Contains additional metadata information about the Dataset, such as the description, Tags, licenses, citation etc.
 
 <img src="/images/user-guide/dataset38.webp" />
 
 ### Related Datasets
 
-Contain related datasets, that is datasets that belong to the same Topics
+Contain related Datasets, that is Datasets that belong to the same Topics
 
 <img src="/images/user-guide/dataset39.webp" />
 
@@ -277,19 +277,19 @@ Contains author and maintainer details
 
 ### Api Tab
 
-contains detailed information on how to use provided APIs across different programming language to create, edit, and view datasets and data filess
+contains detailed information on how to use provided APIs across different programming language to create, edit, and view Datasets and Data Files
 
 <img src="/images/user-guide/dataset41.webp" />
 
 ### Collaborators Tab
 
-Contains the list of collaborators on the dataset
+Contains the list of collaborators on the Dataset
 
 <img src="/images/user-guide/dataset42.webp" />
 
 ### Release Note Tab
 
-Release note are meant to be provided for every update the dataset has undergone. this tab displayed all the released note
+Release note are meant to be provided for every update the Dataset has undergone. this tab displayed all the released note
 
 <img src="/images/user-guide/dataset43.webp" />
 

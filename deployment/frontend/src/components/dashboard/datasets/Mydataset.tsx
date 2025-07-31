@@ -34,7 +34,7 @@ export default function Mydataset({
             notify(
                 `Successfully deleted the ${
                     selectDataset?.title ?? selectDataset?.name
-                } dataset`,
+                } Dataset`,
                 'error'
             )
         },
@@ -109,7 +109,7 @@ export default function Mydataset({
                                 <div className="mt-2">
                                     <p className="text-sm text-gray-500">
                                         Are you sure you want to delete this
-                                        dataset?
+                                        Dataset?
                                     </p>
                                 </div>
                             </div>

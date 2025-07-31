@@ -30,6 +30,7 @@ import {
     approvePendingDataset,
     getDatasetReleaseNotes,
     getCollaboratorPackages,
+    getAllOrganizations
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -294,6 +295,7 @@ export const DatasetRouter = createTRPCRouter({
                         : null,
                 }
 
+                console.log('calling package_create')
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
                     {
@@ -307,8 +309,10 @@ export const DatasetRouter = createTRPCRouter({
                 )
                 const dataset: CkanResponse<Dataset> = await datasetRes.json()
                 if (!dataset.success && dataset.error) {
+                    console.log('dataset', dataset)
                     if (
                         //@ts-ignore
+                        dataset.error.name &&
                         dataset.error.name[0] === 'That URL is already in use.'
                     ) {
                         throw Error(
@@ -318,11 +322,12 @@ export const DatasetRouter = createTRPCRouter({
                     if (dataset.error.message)
                         throw Error(dataset.error.message)
                     throw Error(
-                        JSON.stringify(dataset.error).concat(' datastet create')
+                        JSON.stringify(dataset.error).concat(' Dataset create')
                     )
                 }
                 return dataset.result
             } catch (e) {
+                console.log('E', e)
                 let error =
                     'Something went wrong please contact the system administrator'
                 if (e instanceof Error) error = e.message
@@ -425,6 +430,7 @@ export const DatasetRouter = createTRPCRouter({
                     approval_status: org.approval_status,
                     is_organization: org.is_organization,
                     state: org.state,
+                    visibility: org.visibility,
                 }
             }
 
@@ -995,10 +1001,28 @@ export const DatasetRouter = createTRPCRouter({
                 })
             }
 
+            const orgSlugs = [
+              ...new Set(
+                dataset.datasets.map((d) => d.organization?.name).filter(Boolean)
+              ),
+            ]
+            console.log('orgSlugs in getAllDataset', JSON.stringify(orgSlugs, null, 2))
+
+            const allOrgs = await getAllOrganizations({
+              apiKey: ctx.session?.user.apikey ?? '',
+            })
+            console.log('allOrgs in getAllDataset', JSON.stringify(allOrgs, null, 2))
+
+            const teamVisibility = Object.fromEntries(
+              allOrgs.map((org) => [org.name, org.visibility || 'public'])
+            )
+            console.log('teamVisibility in getAllDataset', JSON.stringify(teamVisibility, null, 2))
+
             return {
                 datasets: _datasets as unknown as WriDataset[],
                 count: dataset.count,
                 searchFacets: dataset.searchFacets,
+                teamVisibility: teamVisibility,
             }
         }),
     getDatasetCollaborators: protectedProcedure

@@ -33,23 +33,23 @@ describe("Create public Team", () => {
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
 
-      cy.get("span.block").contains("Public").should("exist");
+      cy.get('#visibility').contains("Public").should("exist");
 
       cy.get("button#visibility").click();
       cy.get("li").contains("Private").click();
       cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${parentOrg} team`);
+      cy.contains(`Successfully edited the ${parentOrg} Team`);
     });
 
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
 
-      cy.get("span.block").contains("Private").should("exist");
+      cy.get('#visibility').contains("Private").should("exist");
 
       cy.get("button#visibility").click();
       cy.get("li").contains("Public").click();
       cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${parentOrg} team`);
+      cy.contains(`Successfully edited the ${parentOrg} Team`);
     });
   });
 
@@ -58,11 +58,13 @@ describe("Create public Team", () => {
     cy.login(normalUser, normalUserPassword);
 
     cy.visit(`/dashboard/teams/${parentOrg}/edit`);
-    cy.get("span.block").contains("Public").should("exist");
+
+    cy.get('#visibility').contains("Public").should("exist");
+
     cy.get("button#visibility").click();
     cy.get("li").contains("Private").click();
     cy.get("button[type=submit]").click();
-    cy.contains("User does not have admin access to edit this team").should(
+    cy.contains("User does not have admin access to edit this Team").should(
       "exist"
     );
   });
@@ -72,14 +74,18 @@ describe("Create public Team", () => {
     cy.login(adminUser, adminUserPassword);
 
     cy.visit(`/dashboard/teams/${parentOrg}/edit`);
-    cy.get("span.block").contains("Public").should("exist");
+
+    cy.get('#visibility').contains("Public").should("exist");
+
     cy.get("button#visibility").click();
     cy.get("li").contains("Private").click();
     cy.get("button[type=submit]").click();
-    cy.contains(`Successfully edited the ${parentOrg} team`);
+    cy.contains(`Successfully edited the ${parentOrg} Team`);
 
     cy.visit(`/dashboard/teams/${parentOrg}/edit`);
-    cy.get("span.block").contains("Private").should("exist");
+
+    cy.get('#visibility').contains("Private").should("exist");
+
     cy.get("button#visibility").click();
     cy.get("li").contains("Public").click();
     cy.get("button[type=submit]").click();

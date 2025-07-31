@@ -31,7 +31,7 @@ export default function TopicsNotFound() {
                             href="/topics"
                             className="text-sm font-semibold text-gray-900"
                         >
-                            Go back to the topic search page
+                            Go back to the Topic search page
                         </a>
                     </div>
                 </div>

@@ -49,13 +49,13 @@ export default function TopicCard({
                     {isGroupTree(topic)
                         ? topicDetails[topic.id]?.package_count
                         : topic.package_count}{' '}
-                    datasets
+                    Datasets
                 </span>
                 {isGroupTree(topic) && (
                     <>
                         <div className="border-l border-wri-black h-4  mx-2"></div>
                         <span className="ml-2">
-                            {topic.children.length} Subtopics
+                            {topic.children.length} SubTopics
                         </span>
                     </>
                 )}
@@ -67,7 +67,7 @@ export default function TopicCard({
                                 //@ts-ignore
                                 numOfSubtopics[topic.name]
                             }{' '}
-                            Subtopics
+                            SubTopics
                         </span>
                     </>
                 )}

@@ -64,7 +64,7 @@ export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
                 resourceId: datafile.id ?? '',
             })
             notify(
-                `Successfully submited data file to the datapusher`,
+                `Successfully submited Data File to the datapusher`,
                 'success'
             )
         },

@@ -167,7 +167,7 @@ export default function SourceForm({
                             <div className="ml-3 text-sm leading-6">
                                 <label className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800">
                                     Timeline
-                                    <DefaultTooltip content="Set this to true to allow to order the layers of this dataset in a timeline">
+                                    <DefaultTooltip content="Set this to true to allow to order the layers of this Dataset in a timeline">
                                         <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                     </DefaultTooltip>
                                 </label>
@@ -402,7 +402,7 @@ export default function SourceForm({
                             label={
                                 <span className="flex items-center gap-x-1">
                                     Advanced API Usage
-                                    <DefaultTooltip content="This field will end up next to the API tab in the dataset page, you can use it to provide code samples that are useful for this particular data">
+                                    <DefaultTooltip content="This field will end up next to the API tab in the Dataset page, you can use it to provide code samples that are useful for this particular data">
                                         <InformationCircleIcon className="h-5 w-5" />
                                     </DefaultTooltip>
                                 </span>
@@ -419,7 +419,7 @@ export default function SourceForm({
                         <div>
                             <h2 className="text-lg flex items-center gap-x-2">
                                 Location Coverage
-                                <DefaultTooltip content="Complete this section if the data file should be included in search results when doing a search by location">
+                                <DefaultTooltip content="Complete this section if the Data File should be included in search results when doing a search by location">
                                     <InformationCircleIcon
                                         className="h-5 w-5 text-neutral-500"
                                         aria-hidden="true"

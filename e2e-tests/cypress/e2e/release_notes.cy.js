@@ -63,7 +63,7 @@ describe("Release notes", () => {
         "test-maintainer-2@example.com",
       );
 
-      cy.contains("Next: Data files").click();
+      cy.contains("Next: Data Files").click();
       cy.contains("Next: Map Visualizations").click();
       cy.contains("Next: Preview").click();
       cy.get('button[type="submit"]').click();
@@ -74,7 +74,7 @@ describe("Release notes", () => {
       cy.contains("Related Datasets", { timeout: 10000 });
       cy.contains("Collaborators", { timeout: 50000 });
       cy.get("#release-notes", { timeout: 10000 }).click({ force: true });
-      cy.contains("This dataset is at its initial version");
+      cy.contains("This Dataset is at its initial version");
     },
   );
 
@@ -96,7 +96,7 @@ describe("Release notes", () => {
           force: true,
         });
       cy.get('[type="submit"]').click({ force: true });
-      cy.contains(`Successfully edited the "${dataset}" dataset`, {
+      cy.contains(`Successfully edited the "${dataset}" Dataset`, {
         timeout: 30000,
       });
     },

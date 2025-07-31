@@ -32,8 +32,8 @@ export default function ApplicationCard({
             </p>
             <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700">
                 {datasetCount && datasetCount > 1
-                    ? `${datasetCount} datasets`
-                    : `${datasetCount} dataset`}
+                    ? `${datasetCount} Datasets`
+                    : `${datasetCount} Dataset`}
             </p>
         </Link>
     )

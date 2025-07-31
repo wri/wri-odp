@@ -70,13 +70,13 @@ export async function searchHierarchy({
                     group_type == 'group'
                         ? 'group_list_wri'
                         : 'organization_list_wri'
-                }?q=${q}`
+                }?include_extras=true&all_fields=true&q=${q}`
             } else {
                 urLink = `${env.CKAN_URL}/api/3/action/${
                     group_type == 'group'
                         ? 'group_list_wri'
                         : 'organization_list_wri'
-                }`
+                }?include_extras=true&all_fields=true`
             }
 
             response = await fetch(urLink, {
@@ -91,8 +91,8 @@ export async function searchHierarchy({
             response = await fetch(
                 `${env.CKAN_URL}/api/3/action/${
                     group_type == 'group'
-                        ? `group_list_authz_wri${q ? `?q=${q}` : ''}`
-                        : `organization_list_for_user_wri${q ? `?q=${q}` : ''}`
+                        ? `group_list_authz_wri?include_extras=true&all_fields=true${q ? `&q=${q}` : ''}`
+                        : `organization_list_for_user_wri?include_extras=true&all_fields=true${q ? `&q=${q}` : ''}`
                 }`,
                 {
                     headers: {
@@ -122,7 +122,7 @@ export async function getGroups({
 }): Promise<GroupTree[]> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/group_tree?all_fields=True&type=${group_type}`,
+            `${env.CKAN_URL}/api/3/action/group_tree?include_extras=true&all_fields=true&type=${group_type}`,
             {
                 headers: {
                     Authorization: apiKey,
@@ -140,7 +140,7 @@ export async function getGroups({
 
 export async function groupList({ apiKey }: { apiKey: string | null }) {
     const topicRes = await fetch(
-        `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+        `${env.CKAN_URL}/api/action/group_list?include_extras=true&all_fields=true`,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ export async function getAllOrganizations({
                 const response = await fetch(
                     `${
                         env.CKAN_URL
-                    }/api/3/action/organization_list?all_fields=True&limit=${
+                    }/api/3/action/organization_list?include_extras=true&all_fields=true&limit=${
                         (i + 1) * 25
                     }&offset=${i * 25}`,
                     {
@@ -252,7 +252,7 @@ export async function getUserGroups({
 }): Promise<Group[] | null> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/group_list?all_fields=true`,
+            `${env.CKAN_URL}/api/3/action/group_list?include_extras=true&all_fields=true`,
             {
                 headers: {
                     Authorization: apiKey,
@@ -388,7 +388,7 @@ export async function getAllDatasetFq({
         return { datasets, count, searchFacets, facets }
     } catch (e) {
         console.error(e)
-        throw new Error('Failed to fetch datasets')
+        throw new Error('Failed to fetch Datasets')
     }
 }
 
@@ -401,7 +401,7 @@ export async function getUserOrganizations({
 }): Promise<WriOrganization[]> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/organization_list_for_user?all_fields=true`,
+            `${env.CKAN_URL}/api/3/action/organization_list_for_user?include_extras=true&all_fields=true`,
             {
                 headers: {
                     Authorization: `${apiKey}`,
@@ -678,14 +678,6 @@ export async function getOneDataset(
                 return r
             if (!r.layerObj && !r.layerObjRaw) {
                 const layerObj = await getLayerRw(r.url!)
-                if (r.url_type === 'layer')
-                    return {
-                        ...r,
-                        layerObj: !noLayer
-                            ? convertLayerObjToForm(layerObj)
-                            : true,
-                    }
-
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
@@ -693,23 +685,30 @@ export async function getOneDataset(
                             ? getRawObjFromApiSpec(layerObj)
                             : true,
                     }
-            }
-
-            if (r.layerObj || r.layerObjRaw) {
-                if (r.layerObj) {
+                if (r.url_type === 'layer')
                     return {
                         ...r,
                         layerObj: !noLayer
-                            ? convertLayerObjToForm(r.layerObj)
+                            ? convertLayerObjToForm(layerObj)
                             : true,
-                        rw_id: r.id,
                     }
-                }
+            }
+
+            if (r.layerObj || r.layerObjRaw) {
                 if (r.layerObjRaw) {
                     return {
                         ...r,
                         layerObjRaw: !noLayer
                             ? getRawObjFromApiSpec(r.layerObjRaw)
+                            : true,
+                        rw_id: r.id,
+                    }
+                }
+                if (r.layerObj) {
+                    return {
+                        ...r,
+                        layerObj: !noLayer
+                            ? convertLayerObjToForm(r.layerObj)
                             : true,
                         rw_id: r.id,
                     }
@@ -1048,6 +1047,7 @@ export async function getOrganizationTreeDetails({
                 description: org.description ?? '',
                 package_count: org.package_count!,
                 name: org.name,
+                visibility: org.visibility!
             }
             return acc
         },
@@ -1374,16 +1374,16 @@ async function generateMemberEmail(
             const role = actionType[2]
             const action = actionType[1]
             if (action === 'removed') {
-                subMsg = `${action} you as a collaborator (${role}) from the dataset`
-                subject = `Collaborator role ${action} from dataset ${datasetTitle}`
+                subMsg = `${action} you as a collaborator (${role}) from the Dataset`
+                subject = `Collaborator role ${action} from Dataset ${datasetTitle}`
                 msg = `${senderUserLink} ${subMsg} ${datasetLink}`
             } else if (action === 'added') {
-                subMsg = `${action} you as a collaborator (${role}) for the dataset`
-                subject = `Collaborator role ${action} for dataset ${datasetTitle}`
+                subMsg = `${action} you as a collaborator (${role}) for the Dataset`
+                subject = `Collaborator role ${action} for Dataset ${datasetTitle}`
                 msg = `${senderUserLink} ${action} ${subMsg} ${datasetLink}`
             } else if (action === 'updated') {
-                subMsg = `${action} your collaborator role to "${role}" for the dataset`
-                subject = `Collaborator role ${action} for dataset ${datasetTitle}`
+                subMsg = `${action} your collaborator role to "${role}" for the Dataset`
+                subject = `Collaborator role ${action} for Dataset ${datasetTitle}`
                 msg = `${senderUserLink} ${action} ${subMsg} ${datasetLink}`
             }
         }
@@ -1416,7 +1416,7 @@ async function generateMemberEmail(
 
         if (!teamOrTopic) {
             throw new Error(
-                `Could not find team or topic with id ${notification.object_id}`
+                `Could not find Team or Topic with id ${notification.object_id}`
             )
         }
 
@@ -1804,11 +1804,11 @@ export async function sendIssueOrCommentNotigication({
                     recipientUsers
                         .filter((user) => user.email)
                         .map(async (user) => {
-                            const subject = `Issue ${action} on dataset ${dataset.title}`
+                            const subject = `Issue ${action} on Dataset ${dataset.title}`
                             const body = `<p>Hi ${
                                 user.name ?? user.display_name ?? 'There'
                             }</p>
-                        <p>There has been an issue ${action} on the dataset ${
+                        <p>There has been an issue ${action} on the Dataset ${
                             dataset.title
                         }.</p>`
                             const email = user.email!
@@ -2076,11 +2076,11 @@ export async function sendGroupNotification({
                         .filter((user) => user.email)
                         .map(async (user) => {
                             const mainAction = action.split('_')[0]
-                            const subject = `Approval status on dataset ${dataset.title}`
+                            const subject = `Approval status on Dataset ${dataset.title}`
                             const body = `<p>Hi ${
                                 user.name ?? user.display_name ?? 'There'
                             }</p>
-                        <p>The approval status for the dataset <a href="${
+                        <p>The approval status for the Dataset <a href="${
                             env.NEXTAUTH_URL
                         }/datasets/${dataset.name}">${
                             dataset.title
@@ -2375,7 +2375,10 @@ export async function approvePendingDataset(
         ? await Promise.all(
               submittedDataset.resources
                   .filter(
-                      (r) => (r.layerObj || r.layerObjRaw) && r.rw_id && r.url
+                      (r) =>
+                          (r.layerObj || r.layerObjRaw) &&
+                          r.rw_id &&
+                          r.url?.startsWith('https://api.resourcewatch.org')
                   )
                   .map(async (r) => {
                       const rr = r as ResourceFormType
@@ -2396,7 +2399,13 @@ export async function approvePendingDataset(
         rw_id !== null
             ? await Promise.allSettled(
                   submittedDataset.resources
-                      .filter((r) => (r.layerObj || r.layerObjRaw) && !r.url)
+                      .filter(
+                          (r) =>
+                              (r.layerObj || r.layerObjRaw) &&
+                              !r.url?.startsWith(
+                                  'https://api.resourcewatch.org'
+                              )
+                      )
                       .map(async (r) => {
                           const rr = r as ResourceFormType
                           if (r.layerObj) {
@@ -2544,7 +2553,7 @@ export async function approvePendingDataset(
             })
         } catch (error) {
             console.error(error)
-            throw Error('Error in sending issue /comment notification')
+            //throw Error('Error in sending issue /comment notification')
         }
     }
 
