@@ -63,7 +63,7 @@ describe("Non-admin users cannot access topics", () => {
     cy.viewport(1400, 900);
     cy.visit("/dashboard");
     cy.get(".dashboard-sidebar").should("not.contain", "Topics");
-    cy.get(".dashboard-sidebar").should("not.contain", "Add a topic");
+    cy.get(".dashboard-sidebar").should("not.contain", "Add a Topic");
   });
 
   it("Should not be able to access topic creation page", () => {

@@ -17,7 +17,7 @@ export default function NewDatasetPage() {
             <Breadcrumbs links={links} />
             <main className="flex flex-col justify-start gap-y-12 py-16">
                 <h1 className="mx-auto w-full max-w-[1380px] px-4 font-acumin text-2xl font-semibold text-black sm:px-6 xxl:px-0">
-                    Add a dataset
+                    Add a Dataset
                 </h1>
                 <CreateDatasetForm />
             </main>

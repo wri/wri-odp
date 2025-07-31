@@ -10,9 +10,9 @@ export default function AddDatasetSuccessModal() {
           <div className=' w-10 h-10 mx-auto flex justify-center items-center rounded-full bg-[#58B161]'>
             <CheckIcon className='w-6 h-6 text-white ' />
           </div>
-          <p className=' font-light font-wri-black text-[1.563rem] mt-6'>Your Dataset <b className=' font-bold'>Weather & Enviroment Data 2023</b> has been successfully submitted for approval!</p>
+          <p className=' font-light font-wri-black text-[1.563rem] mt-6'>Your Dataset <b className=' font-bold'>Weather & Environment Data 2023</b> has been successfully submitted for approval!</p>
           <p className=' mt-2 font-normal text-base text-[#666666] sm:px-[4rem]'>
-            Note that it could take up to 5-6 days for the dataset to get reviewed by XYZ. Meanwhile, the dataset will still be available for members of XYZ organization as a private dataset.
+            Note that it could take up to 5-6 days for the Dataset to get reviewed by XYZ. Meanwhile, the Dataset will still be available for members of XYZ organization as a private Dataset.
           </p>
         </div>
         <div className='sm:px-6 mt-8'>
@@ -20,7 +20,7 @@ export default function AddDatasetSuccessModal() {
             Go to dashboard
           </a>
           <a href="#" className='outline outline-1 outline-wri-gold mt-4  flex justify-center items-center w-full h-20  sm:w-[451px] sm:h-[114px] mx-auto font-semibold text-[1.25rem]'>
-            Add another dataset
+            Add another Dataset
           </a>
 
         </div>

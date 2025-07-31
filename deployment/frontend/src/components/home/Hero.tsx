@@ -221,7 +221,7 @@ export function Hero() {
                             Data Explorer - Beta
                         </h1>
                         <p className="font-acumin max-w-[705px] font-light text-[#DFDFDF] leading-[30px] text-[23px]">
-                            WRI produces and curates hundreds of datasets as
+                            WRI produces and curates hundreds of Datasets as
                             part of our commitment to turn information into
                             action. These products are based on our research and
                             are held to{' '}
@@ -258,7 +258,7 @@ export function Hero() {
                         >
                             <div className="mt-10 flex relative items-start justify-start  w-full max-w-[876px]">
                                 <input
-                                    placeholder="Search datasets - try “energy”, “Global Forest Watch”, or “food”"
+                                    placeholder="Search Datasets - try “energy”, “Global Forest Watch”, or “food”"
                                     aria-label="search"
                                     className="placeholder:text-[#5f5e5e]  flex-shrink flex-grow  placeholder:italic placeholder:font-light placeholder:leading-tight placeholder:sm:font-normal placeholder:sm:leading-normal text-[#4f4e4e]  text-xs md:text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white rounded-tl-[3px] rounded-bl-[3px] border-y-0 border-r-0"
                                     {...register('search')}

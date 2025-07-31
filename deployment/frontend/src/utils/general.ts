@@ -139,7 +139,7 @@ const datasetFormFieldmap: Record<string, string> = {
     update_frequency: 'Update Frequency',
     visibility_type: 'Visibility',
     license_id: 'License',
-    featured_dataset: 'Featured dataset',
+    featured_dataset: 'Featured Dataset',
     featured_image: 'Featured image',
     spatial: 'spatial',
     spatial_type: 'Spatial Type',

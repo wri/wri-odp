@@ -42,7 +42,7 @@ describe("Chart view", () => {
       "test-maintainer-2@example.com",
     );
 
-    cy.contains("Next: Data files").click();
+    cy.contains("Next: Data Files").click();
     cy.get("input[type=file]")
       .eq(0)
       .selectFile("cypress/fixtures/airtravel.csv", {
@@ -52,7 +52,7 @@ describe("Chart view", () => {
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
-    cy.contains(`Successfully created the "${datasetName}" dataset`, {
+    cy.contains(`Successfully created the "${datasetName}" Dataset`, {
       timeout: 20000,
     });
   });

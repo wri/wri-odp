@@ -14,7 +14,7 @@ import { useRouter } from 'next/router'
 
 const links = [
     { label: 'Topics', url: '/dashboard/teams', current: false },
-    { label: 'Create a topic', url: '/dashboard/teams/new', current: true },
+    { label: 'Create a Topic', url: '/dashboard/teams/new', current: true },
 ]
 
 export default function CreateTopicForm() {
@@ -26,7 +26,7 @@ export default function CreateTopicForm() {
 
     const createTopic = api.topics.createTopic.useMutation({
         onSuccess: async ({ name, title }) => {
-            notify(`Successfully created the ${title ?? name} topic`, 'success')
+            notify(`Successfully created the ${title ?? name} Topic`, 'success')
             router.push('/dashboard/topics')
             formObj.reset()
         },
@@ -36,7 +36,7 @@ export default function CreateTopicForm() {
                 error.message.includes('Topic name already exists in database')
             ) {
                 errorMessage =
-                    'Topic name already exists in database or there is a team with this name'
+                    'Topic name already exists in database or there is a Team with this name'
             }
 
             setErrorMessage(errorMessage)
@@ -58,7 +58,7 @@ export default function CreateTopicForm() {
             <Breadcrumbs links={links} />
             <Container className="mb-20 font-acumin">
                 <h1 className="mb-[2rem] text-[1.57rem] font-semibold">
-                    Create a topic
+                    Create a Topic
                 </h1>
 
                 <form

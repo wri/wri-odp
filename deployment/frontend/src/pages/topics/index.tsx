@@ -19,6 +19,7 @@ import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
 import { Group as CkanGroup } from '@portaljs/ckan'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
+import Topic from '@/interfaces/topic.interface'
 type Group = CkanGroup & { numSubtopics: number }
 
 const TopicsSearchResults = dynamic(
@@ -77,14 +78,25 @@ export default function TopicsPage(
         if (!data) return { topics: [], topicDetails: {}, count: 0 }
         const filteredTopics =
             query !== ''
-                ? data?.allTopics?.filter((t) =>
-                      indexTopics.search(query).includes(t.id)
-                  )
-                : data.topics
-        const topics = filteredTopics?.slice(
-            pagination.page.start,
-            pagination.page.start + pagination.page.rows
-        ) as GroupTree[] | Group[]
+                ? (data?.allTopics
+                      ?.filter((t) => indexTopics.search(query).includes(t.id))
+                      .filter(
+                          (obj, index, self) =>
+                              index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+                      ) ?? [])
+                : data.topics.filter(
+                      (obj, index, self) =>
+                          index === self.findIndex((t) => t.id === obj.id)
+                  ) // Compare based on 'id' property
+        const topics = filteredTopics
+            ?.slice(
+                pagination.page.start,
+                pagination.page.start + pagination.page.rows
+            )
+            .filter(
+                (obj, index, self) =>
+                    index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+            ) as GroupTree[] | Group[]
         const topicDetails = data.topicDetails
         return { topics, topicDetails, count: filteredTopics?.length }
     }
@@ -116,7 +128,7 @@ export default function TopicsPage(
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
                     <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
-                        Explore reliable datasets filtered by the topic of your
+                        Explore reliable Datasets filtered by the topic of your
                         interest.
                     </h3>
                 </div>
