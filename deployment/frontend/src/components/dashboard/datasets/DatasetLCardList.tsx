@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import DatasetHeader from './DatasetHeader'
 import DatasetRow from './DatasetRow'
 import { api } from '@/utils/api'
@@ -14,15 +14,19 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
+import { useRouter } from 'next/router'
 
-export default function DatasetLCardList() {
-    const [query, setQuery] = useState<SearchInput>({
-        search: '',
-        page: { start: 0, rows: 10 },
-        _isUserSearch: true,
+export default function DatasetLCardList({
+    setQuery,
+    query,
+}: {
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
+    query: SearchInput
+}) {
+    const { data, isLoading, refetch } = api.dataset.getAllDataset.useQuery({
+        ...query,
+        showPendingDataset: true,
     })
-    const { data, isLoading, refetch } =
-        api.dataset.getAllDataset.useQuery({ ...query, showPendingDataset: true })
     const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
     const [open, setOpen] = useState(false)
     const datasetDelete = api.dataset.deleteDataset.useMutation({
@@ -32,7 +36,7 @@ export default function DatasetLCardList() {
             notify(
                 `Successfully deleted the ${
                     selectDataset?.title ?? selectDataset?.name
-                } dataset`,
+                } Dataset`,
                 'error'
             )
         },
@@ -71,6 +75,7 @@ export default function DatasetLCardList() {
                         return (
                             <DatasetRow
                                 key={index}
+                                authorized={items.is_authorized}
                                 dataset={items}
                                 handleOpenModal={handleOpenModal}
                                 className={
@@ -106,7 +111,7 @@ export default function DatasetLCardList() {
                                 <div className="mt-2">
                                     <p className="text-sm text-gray-500">
                                         Are you sure you want to delete this
-                                        dataset?
+                                        Dataset?
                                     </p>
                                 </div>
                             </div>

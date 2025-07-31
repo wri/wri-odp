@@ -1,4 +1,4 @@
-FROM viderum/ckan:v2.10-dev-security-fix
+FROM viderum/ckan:v2.11.0
 
 # Set up environment variables
 ENV APP_DIR=/srv/app
@@ -21,17 +21,34 @@ ENV SRC_EXTENSIONS_DIR=${APP_DIR}/src_extensions
 # Clone the extension(s) your are writing for your own project in the `src` folder
 # to get them mounted in this image at runtime
 USER root
-RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
+RUN pip3 install --upgrade setuptools==70.0.0
+
+RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf2856aee97fa7b49de46847f8119dad355#egg=ckanext-scheming' && \
+    pip3 install -r 'https://raw.githubusercontent.com/ckan/ckanext-scheming/5ce30cf2856aee97fa7b49de46847f8119dad355/test-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@fd7113f076336c13b9952d6b2161c0f4339e5cc6#egg=ckanext-auth' && \
-    pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
+    #pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
+    # Use latest versions for now due to build errors. TODO: Update to specific newer versions (hopefully these are compatible)
+    pip3 install moto && \
+    pip3 install ckanapi && \
+    pip3 install httpretty && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@okta#egg=ckanext-auth' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-hierarchy.git@5d069a5d032ba384f43d266fc397a0aa0a4b444c#egg=ckanext-hierarchy' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues' && \
+    # Required by ckanext-issues, but it's no longer included in any of the requirements files or the subdependencies
+    pip3 install mock && \
+    pip3 install -e 'git+https://github.com/ckan/ckanext-harvest.git@v1.6.0#egg=ckanext-harvest' && \
+    pip3 install -r 'https://raw.githubusercontent.com/ckan/ckanext-harvest/refs/tags/v1.6.0/requirements.txt'
 
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
+
+# Fixing security vulnerabilities
+RUN apk --update add git
+RUN apk add postgresql15-client
+RUN apk add libpq
+RUN pip install --force-reinstall -v "Pillow==11.0.0"
 
 RUN apk add --virtual .build-deps \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
@@ -49,12 +66,22 @@ RUN pip install --disable-pip-version-check Shapely==2.0.1
 
 RUN apk del build-base python3-dev && \
     rm -rf /var/cache/apk/*
+
+RUN apk add proj proj-dev proj-util musl-dev python3-dev
+RUN pip3 install pyproj --no-binary pyproj
  
 # Update ckanext-s3filestore test.ini with minio credentials
-RUN sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \
-    sed -i "s|ckanext.s3filestore.aws_secret_access_key = test-secret-key|ckanext.s3filestore.aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}|g" src/ckanext-s3filestore/test.ini && \
-    sed -i "s|ckanext.s3filestore.aws_bucket_name = test-bucket|ckanext.s3filestore.aws_bucket_name = ${AWS_BUCKET_NAME}|g" src/ckanext-s3filestore/test.ini && \
-    sed -i "s|ckanext.s3filestore.host_name = http://127.0.0.1:9000|ckanext.s3filestore.host_name = ${HOST_NAME}|g" src/ckanext-s3filestore/test.ini
+USER root
+RUN chmod -R 777 src 
+RUN chmod -R 777 ${APP_DIR}/src/
+RUN chmod -R 777 ${APP_DIR}/src/*
+RUN sed --version
+RUN TMPDIR=/tmp sed -i "s|ckanext.s3filestore.aws_access_key_id = test-access-key|ckanext.s3filestore.aws_access_key_id = ${AWS_ACCESS_KEY_ID}|g" src/ckanext-s3filestore/test.ini && \
+    TMPDIR=/tmp sed -i "s|ckanext.s3filestore.aws_secret_access_key = test-secret-key|ckanext.s3filestore.aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}|g" src/ckanext-s3filestore/test.ini && \
+    TMPDIR=/tmp sed -i "s|ckanext.s3filestore.aws_bucket_name = test-bucket|ckanext.s3filestore.aws_bucket_name = ${AWS_BUCKET_NAME}|g" src/ckanext-s3filestore/test.ini && \
+    TMPDIR=/tmp sed -i "s|ckanext.s3filestore.host_name = http://127.0.0.1:9000|ckanext.s3filestore.host_name = ${HOST_NAME}|g" src/ckanext-s3filestore/test.ini
+
+RUN chmod -R 777 src
 
 COPY scripts/run_unit_tests.sh ${APP_DIR}/run_unit_tests.sh
 RUN chmod +x ${APP_DIR}/run_unit_tests.sh
@@ -85,6 +112,9 @@ RUN chown ckan:ckan ${APP_DIR}/start_ckan_development.sh
 
 RUN apk --no-cache add openssl
 
+RUN cat ${APP_DIR}/src/ckan/requirements.txt
+RUN pip3 install -r /srv/app/src/ckan/requirements.txt
+
 RUN openssl genpkey -algorithm RSA -out ${APP_DIR}/jwtRS256.key && \
     openssl rsa -in ${APP_DIR}/jwtRS256.key -pubout -outform PEM -out ${APP_DIR}/jwtRS256.key.pub && \
     chown ckan:ckan ${APP_DIR}/jwtRS256.key && \
@@ -98,5 +128,24 @@ RUN ckan config-tool ${CKAN_INI} "api_token.jwt.algorithm = RS256" && \
 COPY docker-entrypoint.d/* /docker-entrypoint.d/
 
 RUN ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"
+RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
+RUN ckan config-tool ${CKAN_INI} -s app:main "ckan.datapusher.api_token = xxxx-xxxx-xxxx-xxxx"
+
+COPY setup/who.ini ${APP_DIR}/src/ckan/who.ini
+
+COPY setup/supervisord.conf /etc/supervisord.conf
+COPY setup/supervisor.worker.conf /etc/supervisord.d/worker.conf
+COPY setup/supervisor.harvest.conf /etc/supervisord.d/harvest.conf
+
+RUN SUPERVISOR_USER="root"; \
+    SUPERVISOR_HOME="/tmp"; \
+    sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/harvest.conf && \
+    sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/harvest.conf && \
+    sed -i "s|SUPERVISOR_USER|${SUPERVISOR_USER}|g" /etc/supervisord.d/worker.conf && \
+    sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.d/worker.conf && \
+    sed -i "s|SUPERVISOR_HOME|${SUPERVISOR_HOME}|g" /etc/supervisord.conf
+
+RUN chown -R ckan:ckan /etc/supervisord.d
+RUN chown -R ckan:ckan /etc/supervisord.conf
 
 CMD ["sh", "-c", "${APP_DIR}/start_ckan_development.sh"]

@@ -90,6 +90,17 @@ export const useBasemap = () => {
     return { selectedBasemap, setBasemap }
 }
 
+export const useInitialRender = () => {
+    const { isInitialrender } = useStore(
+        (store) => ({
+            isInitialrender: store.mapView.initialrender,
+        }),
+        shallow
+    )
+
+    return { isInitialrender }
+}
+
 export const useIsDrawing = () => {
     const { isDrawing, setIsDrawing } = useStore(
         (store) => ({

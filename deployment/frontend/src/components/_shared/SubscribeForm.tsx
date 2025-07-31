@@ -7,7 +7,6 @@ import { z } from 'zod'
 import { ErrorDisplay } from './InputGroup'
 import { useMutation } from 'react-query'
 import { toast } from 'react-toastify'
-
 export function SubscribeForm() {
     const {
         formState: { errors },
@@ -43,7 +42,6 @@ export function SubscribeForm() {
                     },
                     onError: (err) => {
                         console.error(err)
-
                         toast('Failed to subscribe to newsletter', {
                             type: 'error',
                         })

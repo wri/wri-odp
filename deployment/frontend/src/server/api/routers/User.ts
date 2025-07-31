@@ -100,24 +100,6 @@ export const UserRouter = createTRPCRouter({
             if (!data.success && data.error) throw Error(data.error.message)
 
             let users = data.result
-            if (!ctx.session.user.sysadmin) {
-                let user = users.find((user) => user.id === ctx.session.user.id)
-                if (user) {
-                    let o_users = [user]
-                    let user_org = user.organizations
-                    if (user_org) {
-                        o_users = []
-                        for (const org of user_org) {
-                            for (const user of org.users!) {
-                                o_users.push(
-                                    users.find((u) => u.id === user.id)!
-                                )
-                            }
-                        }
-                    }
-                    users = o_users
-                }
-            }
 
             let result: IUsers[] = users.map((user) => {
                 let rslt = {
@@ -313,8 +295,7 @@ export const UserRouter = createTRPCRouter({
             )
             const apiToken: CkanResponse<ApiToken> = await res.json()
             if (!apiToken.success && apiToken.error) {
-                if (apiToken.error.message)
-                    throw Error(apiToken.error.message)
+                if (apiToken.error.message) throw Error(apiToken.error.message)
                 throw Error(JSON.stringify(apiToken.error))
             }
             return apiToken.result
@@ -335,8 +316,7 @@ export const UserRouter = createTRPCRouter({
             )
             const apiToken: CkanResponse<{ token: string }> = await res.json()
             if (!apiToken.success && apiToken.error) {
-                if (apiToken.error.message)
-                    throw Error(apiToken.error.message)
+                if (apiToken.error.message) throw Error(apiToken.error.message)
                 throw Error(JSON.stringify(apiToken.error))
             }
             return apiToken.result

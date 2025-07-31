@@ -5,6 +5,10 @@ from ckan.logic.auth.create import _check_group_auth
 from ckan.common import _
 import ckan.logic.auth as logic_auth
 
+import logging
+
+log = logging.getLogger(__name__)
+
 
 def _package_update(context: Context, data_dict: DataDict) -> AuthResult:
     model = context["model"]
@@ -101,19 +105,24 @@ def package_update(up_func, context, data_dict):
         if package.owner_org:
             # if there is an owner org then we must have update_dataset
             # permission for that organization
-            if authz.users_role_for_group_or_org(package.owner_org, user) != "admin":
-                return {
-                    "success": False,
-                    "msg": _("User %s not authorized to edit package %s")
-                    % (str(user), package.id),
-                }
+            if authz.users_role_for_group_or_org(package.owner_org, user) not in ["admin", "editor"]:
+                 if not  (authz.has_user_permission_for_group_or_org(
+                    package.owner_org, user, "admin"
+                ) or authz.has_user_permission_for_group_or_org(
+                    package.owner_org, user, "editor"
+                )):
+                    return {
+                        "success": False,
+                        "msg": _("User %s not authorized to edit package %s")
+                        % (str(user), package.id),
+                    }
+
         else:
             if authz.check_config_permission("allow_dataset_collaborators"):
                 # if org-level auth failed, check dataset-level auth
                 # (ie if user is a collaborator)
                 if user_obj:
                     if user_obj.id == package.creator_user_id:
-                        print("CREATOR ID")
                         return {"success": True}
                     if (
                         authz.user_is_collaborator_on_dataset(
@@ -150,8 +159,8 @@ def notification_create(context: Context, data_dict: DataDict) -> AuthResult:
 
 
 def pending_dataset_create(context: Context, data_dict: DataDict) -> AuthResult:
-    print("PENDING DATASET UPDATE", flush=True)
-    print(data_dict, flush=True)
+    #print("PENDING DATASET UPDATE", flush=True)
+    #print(data_dict, flush=True)
     return tk.check_access("package_create", context, data_dict)
 
 
@@ -169,13 +178,15 @@ def pending_dataset_show(context: Context, data_dict: DataDict) -> AuthResult:
 
 
 def pending_dataset_update(context: Context, data_dict: DataDict) -> AuthResult:
-    print("PENDING DATASET UPDATE", flush=True)
-    print(data_dict, flush=True)
+    print("CHECKING PENDING DATASET UPDATE AUTH", flush=True)
     return tk.check_access("package_update", context, data_dict)
-
 
 def pending_dataset_delete(context: Context, data_dict: DataDict) -> AuthResult:
     return tk.check_access("package_delete", context, data_dict)
 
 def package_collaborator_list(context: Context, data_dict: DataDict) -> AuthResult:
     return tk.check_access("package_show", context, data_dict)
+
+def download_event_create(context: Context, data_dict: DataDict):
+    """ Only sysadmins can create download events """
+    return tk.check_access("vocabulary_create", context, data_dict)

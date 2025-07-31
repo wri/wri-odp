@@ -11,7 +11,7 @@ import { api } from '@/utils/api'
 import { ErrorAlert } from '../_shared/Alerts'
 import Spinner from '../_shared/Spinner'
 
-export interface TopicProps {
+interface TopicProps {
     title: string
     numOfDatasets: number
     img: string
@@ -19,7 +19,7 @@ export interface TopicProps {
 
 const highlights = [
     {
-        title: 'Title of the dataset goes here lorem ipsum.',
+        title: 'Title of the Dataset goes here lorem ipsum.',
         description:
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem malesuada magna mollis euismod.',
         date: '2020 - 2023',
@@ -28,7 +28,7 @@ const highlights = [
         img: '/images/map.png',
     },
     {
-        title: 'Title of the dataset goes here lorem ipsum.',
+        title: 'Title of the Dataset goes here lorem ipsum.',
         description:
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem malesuada magna mollis euismod.',
         date: '2020 - 2023',
@@ -37,7 +37,7 @@ const highlights = [
         img: '/images/map1.png',
     },
     {
-        title: 'Title of the dataset goes here lorem ipsum.',
+        title: 'Title of the Dataset goes here lorem ipsum.',
         description:
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem malesuada magna mollis euismod.',
         date: '2020 - 2023',
@@ -46,7 +46,7 @@ const highlights = [
         img: '/images/map2.png',
     },
     {
-        title: 'Title of the dataset goes here lorem ipsum.',
+        title: 'Title of the Dataset goes here lorem ipsum.',
         description:
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem malesuada magna mollis euismod.',
         date: '2020 - 2023',
@@ -55,7 +55,7 @@ const highlights = [
         img: '/images/map3.png',
     },
     {
-        title: 'Title of the dataset goes here lorem ipsum.',
+        title: 'Title of the Dataset goes here lorem ipsum.',
         description:
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem malesuada magna mollis euismod.',
         date: '2020 - 2023',
@@ -64,7 +64,7 @@ const highlights = [
         img: '/images/map.png',
     },
     {
-        title: 'Title of the dataset goes here lorem ipsum.',
+        title: 'Title of the Dataset goes here lorem ipsum.',
         description:
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem malesuada magna mollis euismod.',
         date: '2020 - 2023',
@@ -73,7 +73,7 @@ const highlights = [
         img: '/images/map1.png',
     },
     {
-        title: 'Title of the dataset goes here lorem ipsum.',
+        title: 'Title of the Dataset goes here lorem ipsum.',
         description:
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem malesuada magna mollis euismod.',
         date: '2020 - 2023',
@@ -82,7 +82,7 @@ const highlights = [
         img: '/images/map2.png',
     },
     {
-        title: 'Title of the dataset goes here lorem ipsum.',
+        title: 'Title of the Dataset goes here lorem ipsum.',
         description:
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porta sem malesuada magna mollis euismod.',
         date: '2020 - 2023',

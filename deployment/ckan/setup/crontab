@@ -1,0 +1,1 @@
+*/10 * * * * ckan -c /srv/app/production.ini harvester run

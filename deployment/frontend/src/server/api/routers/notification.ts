@@ -31,7 +31,7 @@ export const notificationRouter = createTRPCRouter({
         )
 
         const data = (await response.json()) as CkanResponse<NotificationType[]>
-            
+
         if (!input.returnLength) {
             return {
                  count: data.result.filter((x)=> x.is_unread && x.state !== "deleted").length
@@ -40,7 +40,14 @@ export const notificationRouter = createTRPCRouter({
 
         let activities: NotificationType[] = []
 
-        for (const notification of data.result) { 
+        // Used to fix object capitalization
+        const titleCase = (str: string) =>
+        str
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+
+        for (const notification of data.result) {
 
             if (notification.state === 'deleted') continue
 
@@ -60,42 +67,47 @@ export const notificationRouter = createTRPCRouter({
                     const role = actionType[2]
                     const action = actionType[1]
                     if (action === 'removed') {
-                        msg = ` ${action} you as a collaborator (${role}) from the dataset`
+                        msg = ` ${action} you as a collaborator (${role}) from the Dataset`
                     } else if (action === 'added') {
-                        msg = ` ${action} you as a collaborator (${role}) for the dataset`
+                        msg = ` ${action} you as a collaborator (${role}) for the Dataset`
                     } else if (action === 'updated') {
-                        msg = ` ${action} your collaborator status to "${role}" for the dataset`
+                        msg = ` ${action} your collaborator status to "${role}" for the Dataset`
                     }
                 } else if (actionType[0] === 'issue') {
                     const action = actionType[1]
                     if (action === 'created') {
                         msg = ` ${action} an issue (${actionType[2]
                             ?.split('nbsp;')
-                            ?.join(' ')} ) for the dataset`
+                            ?.join(' ')} ) for the Dataset`
                     } else if (action === 'commented') {
                         msg = ` ${action} on an issue (${actionType[2]
                             ?.split('nbsp;')
-                            ?.join(' ')} ) for the dataset`
+                            ?.join(' ')} ) for the Dataset`
                     } else if (action === 'closed') {
                         msg = ` ${action} an issue (${actionType[2]
                             ?.split('nbsp;')
-                            ?.join(' ')} ) for the dataset`
+                            ?.join(' ')} ) for the Dataset`
                     } else if (action === 'open') {
                         msg = ` re-${action} an issue (${actionType[2]
                             ?.split('nbsp;')
-                            ?.join(' ')} ) for the dataset`
+                            ?.join(' ')} ) for the Dataset`
                     } else if (action === 'deleted') {
                         msg = ` ${action} an issue (${actionType[2]
                             ?.split('nbsp;')
-                            ?.join(' ')} ) for the dataset`
+                            ?.join(' ')} ) for the Dataset`
                     }
                 } else if (actionType[0] === 'pending') {
-                    msg = ` created ${actionType[0]}  ${actionType[1]} `
+                    msg = ` created ${actionType[0]}  ${titleCase(actionType[1] ?? '')} `
                 } else {
                     if (notification.activity_type.includes(' ')) {
-                        msg = ` ${notification.activity_type} `
+                        const parts = notification.activity_type.split(' ')
+                        // Fixes object capitalization
+                        const objectTypeFixed = parts[1]
+                            ? parts[1].charAt(0).toUpperCase() + parts[1].slice(1)
+                            : ''
+                        msg = ` ${parts[0]} ${objectTypeFixed} `
                     } else {
-                        msg = ` ${actionType[0]}  ${actionType[1]} `
+                        msg = ` ${actionType[0]}  ${titleCase(actionType[1] ?? '')} `
                     }
                 }
             } else if (
@@ -120,16 +132,17 @@ export const notificationRouter = createTRPCRouter({
                     const role = actionType[2]
                     const action = actionType[1]
                     if (action === 'removed') {
-                        msg = ` ${action} you as a member (${role}) from the ${notification.object_type}`
+                        msg = ` ${action} you as a member (${role}) from the ${titleCase(notification.object_type ?? '')}`
                     } else if (action === 'added') {
                         msg = ` ${action} you as a member${
                             role !== 'member' ? ` (${role})` : ''
-                        } in the ${notification.object_type}`
+                        } in the ${titleCase(notification.object_type ?? '')}`
                     } else if (action === 'updated') {
-                        msg = ` ${action} your member status to "${role}" in the ${notification.object_type}`
+                        msg = ` ${action} your member status to "${role}" in the ${titleCase(notification.object_type ?? '')}`
                     }
                 }
             }
+
             const resultNotification = {
                 ...notification,
                 sender_name: user_data?.name,
@@ -142,9 +155,9 @@ export const notificationRouter = createTRPCRouter({
                 msg: msg ?? '',
             }
             activities.push(resultNotification)
-                
+
         }
-         
+
         return activities
     }),
     updateNotification: protectedProcedure
@@ -152,14 +165,14 @@ export const notificationRouter = createTRPCRouter({
         .mutation(async ({ input, ctx }) => {
             try {
 
-                const noficicationPayload: NotificationType[] = input.notifications.map((notification) => {
+                const notificationPayload: NotificationType[] = input.notifications.map((notification) => {
                     if (input.state) notification.state = input.state
                     if (input.is_unread !== undefined) {
                         notification.is_unread = input.is_unread
                     }
                     return notification
                 })
-                
+
                 const response = await fetch(
                     `${env.CKAN_URL}/api/3/action/notification_bulk_update`,
                     {
@@ -168,7 +181,7 @@ export const notificationRouter = createTRPCRouter({
                             Authorization: env.SYS_ADMIN_API_KEY,
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({payload: noficicationPayload}),
+                        body: JSON.stringify({payload: notificationPayload}),
                     }
                 )
 

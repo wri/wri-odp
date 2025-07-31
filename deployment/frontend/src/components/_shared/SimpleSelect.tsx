@@ -15,11 +15,12 @@ export interface Option<V> {
     label: string
     value: V
     default?: boolean
+    disbaled?: boolean
 }
 
 interface SimpleSelectProps<T extends FieldValues, V extends Object> {
     options: PathValue<T, Path<T> & Option<V>>[]
-    placeholder: string
+    placeholder?: string
     className?: string
     maxWidth?: string
     formObj?: UseFormReturn<T>
@@ -36,7 +37,11 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
     name,
     id,
     onChange: _onChange = (val) => {},
-}: SimpleSelectProps<T, V> & { onChange?: (val: any) => void }) {
+    disabled,
+}: SimpleSelectProps<T, V> & {
+    onChange?: (val: any) => void
+    disabled?: boolean
+}) {
     const { control } = formObj ?? useForm()
     return (
         <Controller
@@ -49,7 +54,10 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                     label: '',
                 } as PathValue<T, Path<T> & Option<V>>)
             }
-            render={({ field: { onChange: setSelected, value: selected } }) => (
+            render={({ field: { onChange: setSelected, value: selected } }) => {
+                const selectedFull = options.find((o) => o.value === selected?.value)
+                console.log('Selected value:', selectedFull)
+                return (
                 <Listbox
                     value={selected}
                     onChange={(e) => {
@@ -58,6 +66,7 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                         }
                         setSelected(e)
                     }}
+                    disabled={disabled}
                 >
                     {({ open }) => (
                         <>
@@ -71,23 +80,24 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                     id={id}
                                     className={classNames(
                                         'relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6',
-                                        className ?? ''
+                                        className ?? '',
+                                        !placeholder ? 'min-h-[2.5rem]' : ''
                                     )}
                                 >
-                                    <span
-                                        className={classNames(
-                                            selected && selected.label
-                                                ? ''
-                                                : 'text-zinc-500',
-                                            'block'
+                                    <span className="flex items-center gap-2 truncate">
+                                        <span
+                                            className={classNames(
+                                                selected && selected.label ? '' : 'text-zinc-500',
+                                                'truncate'
+                                            )}
+                                        >
+                                            {selected && selected.label
+                                                ? selected.label.charAt(0).toUpperCase() + selected.label.slice(1)
+                                                : placeholder}
+                                        </span>
+                                        {selected?.visibility === 'private' && selected?.value != 'private' && (
+                                            <>&#128274;</>
                                         )}
-                                    >
-                                        {selected && selected.label
-                                            ? selected.label
-                                                  .charAt(0)
-                                                  .toUpperCase() +
-                                              selected.label.slice(1)
-                                            : placeholder}
                                     </span>
                                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                         <ChevronDownIcon
@@ -108,12 +118,13 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                         {options.map((option) => (
                                             <Listbox.Option
                                                 key={option.value}
+                                                disabled={option.disabled}
                                                 className={({ active }) =>
                                                     classNames(
                                                         active
                                                             ? 'bg-blue-800 text-white'
                                                             : 'text-gray-900',
-                                                        'relative cursor-default select-none py-2 pl-3 pr-9'
+                                                        `relative cursor-default select-none py-2 pl-3 pr-9 ${option.disabled ? 'opacity-50' : ''}`
                                                     )
                                                 }
                                                 value={option}
@@ -129,6 +140,13 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                                             )}
                                                         >
                                                             {option.label}
+                                                            {option?.visibility &&
+                                                            option.visibility ===
+                                                                'private' && option.value != 'private' ? (
+                                                                <span className='ml-1'> &#128274;</span>
+                                                            ) : (
+                                                                ''
+                                                            )}
                                                         </span>
                                                     </>
                                                 )}
@@ -141,6 +159,7 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                     )}
                 </Listbox>
             )}
+        }
         />
     )
 }

@@ -1,6 +1,10 @@
 import { UseFormReturn } from 'react-hook-form'
 import { TeamFormType } from '@/schema/team.schema'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
+import {
+    ErrorDisplay,
+    InputGroup,
+    InputGroupCustom,
+} from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
@@ -9,13 +13,38 @@ import { UploadResult } from '@uppy/core'
 import { api } from '@/utils/api'
 import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
+import { useSession } from 'next-auth/react'
+import { useEffect } from 'react'
+import DefaultTooltip from '@/components/_shared/Tooltip'
+import { InformationCircleIcon } from '@heroicons/react/24/outline'
+
+function ToolTipVisibility() {
+    return (
+        <>
+            <p>
+                Visibility determines whether an entity (Team, Topic,
+                Application) is publicly listed or restricted to internal
+                members.
+            </p>
+            <p>
+                Once a Team has been set to private, only a SysAdmin can make it
+                public again. Visibility of dataset and sub-Teams must be
+                updated independently.
+            </p>
+        </>
+    )
+}
 
 export default function TeamForm({
     formObj,
     editing = false,
+    sysadmin = false,
+    isAdminCurrentTeam = false,
 }: {
     formObj: UseFormReturn<TeamFormType>
     editing?: boolean
+    sysadmin?: boolean
+    isAdminCurrentTeam?: boolean
 }) {
     const {
         register,
@@ -23,25 +52,39 @@ export default function TeamForm({
         watch,
         formState: { errors, isSubmitting },
     } = formObj
-    const possibleParents = api.teams.getAllTeams.useQuery()
+
+    const possibleParents = api.teams.getAllTeams.useQuery(undefined, {
+        refetchOnMount: false,
+    })
+
     return (
         <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
             <div className="flex flex-col justify-start gap-y-4">
                 <InputGroup label="Title" required>
                     <Input
                         {...register('title')}
-                        placeholder="My team"
+                        placeholder="My Team"
                         type="text"
                     />
                     <ErrorDisplay name="title" errors={errors} />
                 </InputGroup>
-                <InputGroup label="URL" required>
+                <InputGroup
+                    label="URL"
+                    required
+                    deepInfoIcon
+                    contentClassName="bg-[#E5E5E5] text-[12px]"
+                >
                     <Input
                         {...register('name')}
                         disabled={editing}
                         placeholder="name-of-team"
                         type="text"
                         className="pl-[4.6rem] lg:pl-[4rem]"
+                        icon={
+                            <DefaultTooltip content="Please choose a URL that is not already in use for another Topic, Team, or Application.">
+                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                            </DefaultTooltip>
+                        }
                     >
                         <span className="absolute inset-y-0 left-5 flex items-center pr-3 sm:text-sm sm:leading-6">
                             /teams/
@@ -52,6 +95,7 @@ export default function TeamForm({
                 <InputGroup
                     label="Image"
                     className="items-start justify-start gap-x-[2.7rem]"
+                    info="Appears on Team detail page and Teams overview page. We recommend a horizontal image between 5-10 MB."
                 >
                     <div className="col-span-full lg:col-span-2">
                         <div className="w-[11rem]">
@@ -91,6 +135,7 @@ export default function TeamForm({
                     label="Parent"
                     labelClassName="pt-[0.9rem]"
                     className="items-start"
+                    required={!sysadmin}
                 >
                     {match(possibleParents)
                         .with({ isLoading: true }, () => (
@@ -118,6 +163,7 @@ export default function TeamForm({
                                         .map((team) => ({
                                             label: team.title ?? team.name,
                                             value: team.name,
+                                            visibility: team.visibility,
                                         })),
                                 ]}
                                 placeholder="Select a parent"
@@ -130,6 +176,48 @@ export default function TeamForm({
                         ))}
                     <ErrorDisplay name="parent" errors={errors} />
                 </InputGroup>
+                <InputGroupCustom
+                    label="Visibility"
+                    labelClassName="pt-[0.9rem]"
+                    className="items-start"
+                    info={ToolTipVisibility()}
+                    required
+                >
+                    <SimpleSelect
+                        key={editing ? 'edit' : 'create'}
+                        id="visibility"
+                        formObj={formObj}
+                        name="visibility"
+                        options={
+                            watch('parent')?.value !== '' &&
+                            possibleParents.data?.find(
+                                (a) =>
+                                    a.name === watch('parent')?.value &&
+                                    a.visibility === 'private'
+                            )
+                                ? [
+                                      {
+                                          label: 'Private',
+                                          value: 'private',
+                                          default: true,
+                                          visibility: 'private',
+                                      },
+                                      {
+                                          label: 'Public',
+                                          value: 'public',
+                                          visibility: 'public',
+                                      },
+                                  ]
+                                : [
+                                      { label: 'Public', value: 'public', visibility: 'public' },
+                                      { label: 'Private', value: 'private', visibility: 'private' },
+                                  ]
+                        }
+                        placeholder="Select visibility"
+                        
+                    />
+                    <ErrorDisplay name="visibility" errors={errors} />
+                </InputGroupCustom>
             </div>
         </div>
     )

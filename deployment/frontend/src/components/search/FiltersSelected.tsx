@@ -16,47 +16,49 @@ export default function FiltersSelected({
     return (
         <div className="flex flex-col lg:flex-row gap-y-4 lg:items-center justify-between">
             <div className="flex flex-wrap gap-2">
-                {filters.map((f) => (
-                    <div className="flex h-8 w-fit items-center gap-x-2 rounded-sm bg-neutral-100 hover:bg-neutral-200 transition px-3 py-1 shadow">
-                        <div className="font-['Acumin Pro SemiCondensed'] text-xs font-semibold leading-none text-black">
-                            {f.title}: {f.label}
-                        </div>
-                        <button
-                            onClick={() => {
-                                setFilters((prev) => {
-                                    const newFilters = [...prev]
-                                    newFilters.splice(
-                                        newFilters.findIndex(
-                                            (of) =>
-                                                f.key == of.key &&
-                                                of.value == f.value
-                                        ),
-                                        1
-                                    )
-                                    return newFilters
-                                })
-                                if (setFacetSelectedCount)
-                                    setFacetSelectedCount((prev) => {
-                                        const newFacetSelectedCount = {
-                                            ...prev,
-                                        }
-                                        //@ts-ignore
-                                        newFacetSelectedCount[f.key] -= 1
-                                        return newFacetSelectedCount
-                                    })
-
-                                if (setValue)
-                                    setValue((prev) => {
-                                        return prev.filter(
-                                            (value) => value !== f.label
+                {filters
+                    .filter((f) => f.value !== '')
+                    .map((f) => (
+                        <div className="flex h-8 w-fit items-center gap-x-2 rounded-sm bg-neutral-100 hover:bg-neutral-200 transition px-3 py-1 shadow">
+                            <div className="font-['Acumin Pro SemiCondensed'] text-xs font-semibold leading-none text-black">
+                                {f.title}: {f.label}
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setFilters((prev) => {
+                                        const newFilters = [...prev]
+                                        newFilters.splice(
+                                            newFilters.findIndex(
+                                                (of) =>
+                                                    f.key == of.key &&
+                                                    of.value == f.value
+                                            ),
+                                            1
                                         )
+                                        return newFilters
                                     })
-                            }}
-                        >
-                            <XCircleIcon className="h-4 w-4 text-red-600 cursor-pointer" />
-                        </button>
-                    </div>
-                ))}
+                                    if (setFacetSelectedCount)
+                                        setFacetSelectedCount((prev) => {
+                                            const newFacetSelectedCount = {
+                                                ...prev,
+                                            }
+                                            //@ts-ignore
+                                            newFacetSelectedCount[f.key] -= 1
+                                            return newFacetSelectedCount
+                                        })
+
+                                    if (setValue)
+                                        setValue((prev) => {
+                                            return prev.filter(
+                                                (value) => value !== f.label
+                                            )
+                                        })
+                                }}
+                            >
+                                <XCircleIcon className="h-4 w-4 text-red-600 cursor-pointer" />
+                            </button>
+                        </div>
+                    ))}
             </div>
             {filters.length ? (
                 <button

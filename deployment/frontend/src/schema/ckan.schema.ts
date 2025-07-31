@@ -1,10 +1,31 @@
 import { Dataset, Resource } from '@/interfaces/dataset.interface'
 import type {
-    Group,
     Tag,
     Activity as CkanActivity,
     User as CkanUser,
 } from '@portaljs/ckan'
+
+interface Group {
+    display_name: string
+    description: string
+    image_display_url: string
+    package_count: number
+    created: string
+    name: string
+    is_organization: false
+    state: 'active' | 'deleted' | 'inactive'
+    image_url: string
+    type: 'group' | 'application'
+    title: string
+    revision_id: string
+    num_followers: number
+    id: string
+    approval_status: string
+    packages?: Array<Dataset>
+    activity_stream?: Array<Activity>
+    tags?: Array<Tag>
+    users?: Array<User>
+}
 
 type Only<T, U> = {
     [P in keyof T]: T[P]
@@ -19,6 +40,7 @@ export interface CkanResponse<T> {
     success: boolean
     error?: {
         __type: string
+        name?: string
         message: string
     }
     result: T
@@ -75,7 +97,7 @@ export interface ActivityDisplay {
     packageGroup?: string[]
 }
 
-export interface WriDataset extends Dataset {
+export interface WriDataset extends Omit<Dataset, 'groups'> {
     has_chart_views?: boolean
     methodology?: string
     usecases?: string
@@ -101,7 +123,7 @@ export interface WriDataset extends Dataset {
     creator_user_id: string
     language?: string
     featured_image?: string
-    application?: string
+    applications?: Application[]
     cautions?: string
     citation?: string
     function?: string
@@ -113,6 +135,7 @@ export interface WriDataset extends Dataset {
     extras?: Extra[]
     spatial?: any
     spatial_address?: string
+    spatial_type?: string
     connectorUrl?: string
     connectorType?: string
     provider?: string
@@ -125,13 +148,15 @@ export interface WriDataset extends Dataset {
     rw_dataset?: boolean
     is_approved?: boolean
     release_notes: string
+    groups?: Array<Group | Application>
+    is_authorized?: boolean
 }
 
 export type WriDatasetWithoutDetails = Omit<WriDataset, 'resources'> & {
     resources: { datastore_active?: boolean | null; format?: string }[]
 }
 
-export interface Extra {
+interface Extra {
     key: string
     value: string
 }
@@ -148,6 +173,7 @@ export interface Organization {
     display_name?: string
     type?: string
     description?: string
+    notes?: string
     image_url?: string
     image_display_url?: string
     created?: string
@@ -159,12 +185,34 @@ export interface Organization {
     activity_stream?: Array<CkanActivity>
     users?: Array<User>
     tags?: Array<Tag>
+    visibility: string
+}
+
+export type Application = Group & {
+    approval_status?: 'approved'
+    type?: string
+    display_name?: string
+    is_organization: boolean
+    id: string
+    name: string
+    title: string
+    description: string
+    image_url: string
+    image_display_url: string
+    help_url: string
+    homepage_url: string
+    contact_url: string
+    packages?: Array<Dataset>
+    package_count: number
+    state: 'active'
+    visibility?: string
 }
 
 export interface WriOrganization extends Organization {
     groups?: Group[]
     users?: WriUser[]
     capacity?: string
+    parent?: string | null
 }
 
 export interface WriUser extends CkanUser {
@@ -179,7 +227,13 @@ export interface GroupTree {
     highlighted: boolean
     children: GroupTree[]
     title?: string
+    description?: string
+    notes?: string
     image_display_url?: string
+    parent_name?: string
+    private?: boolean
+    capacity?: string
+    visibility: string
 }
 
 export interface Collaborator {
@@ -207,7 +261,7 @@ export interface Issue {
     comments: Comment[]
 }
 
-export interface Comment {
+interface Comment {
     id: number
     comment: string
     user_id: string
@@ -227,11 +281,13 @@ export interface FolloweeList {
 export interface GroupsmDetails {
     img_url: string
     description: string
+    notes?: string
     package_count: number
-    name: string
+    name: string,
+    visibility?: string
 }
 
-export interface Member {
+interface Member {
     id: string
     name: string
     email: string

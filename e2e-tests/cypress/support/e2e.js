@@ -40,6 +40,12 @@ const apiUrl = (path) => {
 Cypress.Commands.add("login", (username, password) => {
   cy.session([username, password], () => {
     cy.visit("/");
+    cy.get('body').then(($body) => {
+      if ($body.find('.osano-cm-manage').length) {
+        cy.get('.osano-cm-manage').click({ force: true });
+        cy.contains('button', 'Save').click({ force: true });
+      }
+    });
     cy.get("#nav-login-button").click();
     cy.get("#login-modal").as("login-modal");
 
@@ -47,12 +53,13 @@ Cypress.Commands.add("login", (username, password) => {
     cy.get("@login-modal").get('input[name="password"]').type(password);
 
     cy.get("button#login-button").click({ force: true });
-
+    cy.wait(9000);
     cy.get("#nav-user-menu").should("be.visible");
   });
 });
 
 Cypress.Commands.add("logout", () => {
+  cy.visit("/");
   cy.get("#nav-user-menu").click();
   cy.get(":nth-child(3) > .px-2").should("be.visible").as("menuItem");
   cy.get("@menuItem").click();
@@ -104,12 +111,12 @@ Cypress.Commands.add("createLinkedDataset", () => {
     cy.get("#field-name").clear().type(datasetName);
     cy.get("button.btn-primary[type=submit]").click({ force: true });
     cy.get(
-      '[title="Link to a URL on the internet (you can also link to an API)"]',
+      '[title="Link to a URL on the internet (you can also link to an API)"]'
     ).click();
     cy.get("#field-image-url")
       .clear()
       .type(
-        "https://raw.githubusercontent.com/datapackage-examples/sample-csv/master/sample.csv",
+        "https://raw.githubusercontent.com/datapackage-examples/sample-csv/master/sample.csv"
       );
     cy.get(".btn-primary").click();
     cy.get(".content_action > .btn");
@@ -203,15 +210,24 @@ Cypress.Commands.add("deleteOrganization", (orgName) => {
 });
 
 // Command for frontend test sepecific
-Cypress.Commands.add("createOrganizationAPI", (name) => {
+Cypress.Commands.add("createOrganizationAPI", (name, visibility = "public", parent = null) => {
   cy.request({
     method: "POST",
     url: apiUrl("organization_create"),
     headers: headers,
-    body: {
-      name: name,
-      title: name,
-      description: "Some organization description",
+    body: parent
+      ? {
+          name: name,
+          title: name,
+          description: "Some organization description",
+          visibility: visibility,
+          groups: [{ name: parent }],
+        }
+      : {
+          name: name,
+          title: name,
+          description: "Some organization description",
+          visibility: visibility,
     },
   });
 });
@@ -227,14 +243,35 @@ Cypress.Commands.add(
       body: {
         id: org,
         username: member,
-        role,
+        role: role,
       },
     });
-  },
+  }
 );
 
 // Command for frontend test sepecific
-Cypress.Commands.add("createGroupAPI", (name) => {
+Cypress.Commands.add("createGroupAPI", (name, parent = null) => {
+  cy.request({
+    method: "POST",
+    url: apiUrl("group_create"),
+    headers: headers,
+    body: parent
+      ? {
+          name: name,
+          title: name,
+          description: "Some sub-topic description",
+          groups: [{ name: parent }],
+        }
+      : {
+          name: name,
+          title: name,
+          description: "Some group description",
+        },
+  });
+});
+
+// Command for frontend test sepecific
+Cypress.Commands.add("createApplicationAPI", (name) => {
   cy.request({
     method: "POST",
     url: apiUrl("group_create"),
@@ -243,6 +280,10 @@ Cypress.Commands.add("createGroupAPI", (name) => {
       name: name,
       title: name,
       description: "Some group description",
+      contact_url: "https://contact.com",
+      homepage_url: "https://homepage.com",
+      help_url: "https://help.com",
+      type: "application",
     },
   });
 });
@@ -275,7 +316,8 @@ Cypress.Commands.add(
       body: {
         owner_org: organization,
         name: name,
-        author: "datopian",
+        authors: [{ name: "Datopian", email: "datopian@example.com" }],
+        maintainers: [{ name: "Datopian", email: "datopian@example.com" }],
         license_id: "notspecified",
         approval_status: "approved",
         is_approved: "true",
@@ -295,7 +337,7 @@ Cypress.Commands.add(
         });
       });
     }
-  },
+  }
 );
 
 Cypress.Commands.add("createResourceAPI", (datasetId, resource) => {
@@ -424,7 +466,7 @@ Cypress.Commands.add("prepareFile", (dataset, file, format) => {
       data.append("format", `${format}`);
       data.append(
         "description",
-        "Lorem Ipsum is simply dummy text of the printing and type",
+        "Lorem Ipsum is simply dummy text of the printing and type"
       );
       data.append("upload", blob, `${file}`);
       var xhr = new XMLHttpRequest();
@@ -470,7 +512,7 @@ Cypress.Commands.add("iframe", { prevSubject: "element" }, ($iframe) => {
   const findBody = () => $iframeDoc.find("body");
   if ($iframeDoc.prop("readyState") === "complete") return findBody();
   return Cypress.Promise((resolve) =>
-    $iframe.on("load", () => resolve(findBody())),
+    $iframe.on("load", () => resolve(findBody()))
   );
 });
 
@@ -511,7 +553,7 @@ Cypress.Commands.add(
         capacity: capacity,
       },
     });
-  },
+  }
 );
 
 Cypress.Commands.add(
@@ -527,7 +569,7 @@ Cypress.Commands.add(
         description: issueDescription,
       },
     });
-  },
+  }
 );
 
 Cypress.Commands.add(
@@ -545,7 +587,7 @@ Cypress.Commands.add(
         object_type: "dataset",
       },
     });
-  },
+  }
 );
 
 Cypress.Commands.add("userMetadata", (name) => {
@@ -582,7 +624,7 @@ function printAccessibilityViolations(violations) {
       impact,
       description: `${description} (${id})`,
       nodes: nodes.map((el) => el.target).join(" / "),
-    })),
+    }))
   );
 }
 
@@ -613,7 +655,7 @@ Cypress.Commands.add(
         },
       },
       printAccessibilityViolations,
-      skipFailures,
+      skipFailures
     );
-  },
+  }
 );

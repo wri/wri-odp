@@ -1,3 +1,5 @@
+import json
+
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.plugins as lib_plugins
@@ -10,10 +12,11 @@ from ckanext.wri.logic.action.datapusher_download_subset import (
 from ckanext.wri.logic.action.datapusher_download_zip import (
     zipped_download_request,
     zipped_download_callback,
+    send_error_callback,
 )
 import ckanext.wri.logic.validators as wri_validators
 from ckan import model, logic, authz
-from ckan.types import Action, AuthFunction, Context
+from ckan.types import Action, AuthFunction, Context, DataDict
 from ckan.lib.search import SearchError
 from ckanext.wri.logic.auth import auth as auth
 from ckanext.wri.logic.action.datapusher import (
@@ -27,6 +30,10 @@ from ckanext.wri.logic.action.create import (
     migrate_dataset,
     migration_status,
     package_create,
+    resource_create,
+    old_package_create,
+    download_event_create,
+    organization_create
 )
 from ckanext.wri.logic.action.update import (
     notification_update,
@@ -37,6 +44,8 @@ from ckanext.wri.logic.action.update import (
     package_patch,
     resource_update,
     old_package_patch,
+    old_package_update,
+    package_update
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -57,10 +66,18 @@ from ckanext.wri.logic.action.get import (
     issue_search_wri,
     package_collaborator_list_wri,
     resource_search,
+    organization_list_for_user,
+    organization_list,
+    organization_patch,
+    organization_show,
+    package_show,
+    get_download_events,
+    
 )
 
 from ckanext.wri.logic.action.delete import pending_dataset_delete
 from ckanext.wri.search import SolrSpatialFieldSearchBackend
+from ckanext.wri.logic.action.action_helpers import stringify_actor_objects
 from ckan.lib.navl.validators import ignore_missing
 from ckanext.wri.logic.action.datapusher_download import (
     download_request,
@@ -70,6 +87,11 @@ import ckanext.wri.views.api as api_blueprint
 import ckanext.issues.logic.action as issue_action
 import queue
 import logging
+import shapely
+from shapely.geometry import mapping
+import shapely.geometry
+import shapely.ops
+import json
 
 log = logging.getLogger(__name__)
 
@@ -133,7 +155,21 @@ class WriPlugin(plugins.SingletonPlugin):
 
             setup_resource_location()
 
-        return [notificationdb, pendingdatasetsdb, resourcelocationdb]
+        @click.command()
+        def downloadeventdb():
+            """Creates download event table"""
+            from ckanext.wri.model import setup_download_event
+
+            setup_download_event()
+
+        @click.command()
+        def downloadeventdbupdate():
+            """Updates download event table"""
+            from ckanext.wri.model import update_download_event
+
+            update_download_event()
+
+        return [notificationdb, pendingdatasetsdb, resourcelocationdb, downloadeventdb, downloadeventdbupdate]
 
     # IAuth
 
@@ -148,6 +184,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "package_update": auth.package_update,
             "package_collaborator_list": auth.package_collaborator_list,
             "package_create": auth.package_create,
+            "download_event_create": auth.download_event_create,
         }
 
     # IValidators
@@ -156,6 +193,8 @@ class WriPlugin(plugins.SingletonPlugin):
         return {
             "iso_language_code": wri_validators.iso_language_code,
             "year_validator": wri_validators.year_validator,
+            "agents_json_object": wri_validators.agents_json_object,
+            "url_or_email_validator": wri_validators.url_or_email_validator,
         }
 
     # IFacets
@@ -163,7 +202,6 @@ class WriPlugin(plugins.SingletonPlugin):
     def dataset_facets(self, facets_dict, package_type):
         facets_dict["language"] = toolkit._("Language")
         facets_dict["project"] = toolkit._("Project")
-        facets_dict["application"] = toolkit._("Application")
         facets_dict["temporal_coverage_start"] = toolkit._("Temporal Coverage Start")
         facets_dict["temporal_coverage_end"] = toolkit._("Temporal Coverage End")
         facets_dict["update_frequency"] = toolkit._("Update Frequency")
@@ -221,12 +259,24 @@ class WriPlugin(plugins.SingletonPlugin):
             "resource_location_search": resource_search,
             "approve_pending_dataset": approve_pending_dataset,
             "package_create": package_create,
-            "old_package_create": logic.action.create.package_create,
+            "old_package_create": old_package_create,
             "package_patch": package_patch,
             "old_package_patch": old_package_patch,
-            "old_package_update": logic.action.update.package_update,
+            "old_package_update": old_package_update,
             "resource_update": resource_update,
-            #"package_delete": package_delete,
+            "organization_list_for_user": organization_list_for_user,
+            "resource_create": resource_create,
+            'organization_list': organization_list,
+            'organization_patch': organization_patch,
+            'organization_show': organization_show,
+            # "package_delete": package_delete,
+            "package_show": package_show,
+            "package_update": package_update,
+            "download_event_create": download_event_create,
+            "download_event_list": get_download_events,
+            "organization_create": organization_create,
+            
+            "prefect_send_error_callback": send_error_callback,
         }
 
     # IPermissionLabels
@@ -290,19 +340,16 @@ class WriPlugin(plugins.SingletonPlugin):
     # IResourceController
 
     def after_resource_create(self, context: Context, resource_dict: dict[str, Any]):
-
-        self._submit_to_datapusher(resource_dict)
         ResourceLocation.index_resource_by_location(
                         resource_dict, False
                     )
+        self._submit_to_datapusher(resource_dict)
 
     def after_resource_update(self, context: Context, resource_dict: dict[str, Any]):
-
-        self._submit_to_datapusher(resource_dict)
         ResourceLocation.index_resource_by_location(
                         resource_dict, False
                     )
-
+        self._submit_to_datapusher(resource_dict)
 
     def _submit_to_datapusher(self, resource_dict: dict[str, Any]):
         context = cast(
@@ -342,16 +389,43 @@ class WriPlugin(plugins.SingletonPlugin):
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)
 
-#        if pkg_dict.get("is_approved", False):
-#            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+        # if pkg_dict.get("is_approved", False):
+        #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment
 
-#        if pkg_dict.get("is_approved", False):
-#            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+        # if pkg_dict.get("is_approved", False):
+        #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+
+    def after_dataset_show(self, context, pkg_dict):
+        authors = pkg_dict.get("authors")
+        maintainers = pkg_dict.get("maintainers")
+        applications = pkg_dict.get("applications")
+
+        if applications:
+            context.pop("for_create", None)
+            context.pop("for_approval", None)
+            context.pop("for_update", None)
+            context.pop("for_view", None)
+
+        if isinstance(authors, str):
+            try:
+                authors = json.loads(authors)
+                pkg_dict["authors"] = authors
+            except Exception as e:
+                log.error(f"Error parsing authors: {e}")
+
+        if isinstance(maintainers, str):
+            try:
+                maintainers = json.loads(maintainers)
+                pkg_dict["maintainers"] = maintainers
+            except Exception as e:
+                log.error(f"Error parsing maintainers: {e}")
+
+        return pkg_dict
 
     def before_index(self, pkg_dict):
         return self.before_dataset_index(pkg_dict)
@@ -360,10 +434,35 @@ class WriPlugin(plugins.SingletonPlugin):
         return self.before_dataset_search(search_params)
 
     def before_dataset_index(self, pkg_dict):
-        if not pkg_dict.get("spatial"):
+        # Move the application group objects back to groups before indexing to avoid SOLR errors
+        applications = pkg_dict.get("applications")
+
+        if applications:
+            if isinstance(applications, list):
+                application_names = [app.get("name", app.get("id")) for app in applications if app.get("name", app.get("id"))]
+                pkg_dict["groups"] = pkg_dict.get("groups", []) + application_names
+
+        pkg_dict.pop("applications", None)
+
+        if any(key in pkg_dict for key in ("authors", "maintainers")):
+            pkg_dict = stringify_actor_objects(pkg_dict)
+
+        if not pkg_dict.get("spatial") and pkg_dict.get('spatial_type') != 'derived_from_resources':
             return pkg_dict
 
-        pkg_dict = SolrSpatialFieldSearchBackend().index_dataset(pkg_dict)
+        if pkg_dict.get("spatial_type") == "derived_from_resources":
+            dataset = logic.get_action("package_show")(
+                {"ignore_auth": True}, {"id": pkg_dict.get('id')}
+            )
+            print("Derived from resources", flush=True)
+            print(f"{len(dataset.get('resources'))} Resources", flush=True)
+            geometries = [shapely.geometry.shape(resource["spatial_geom"]["geometry"]) for resource in dataset.get("resources", []) if resource.get("spatial_geom") and resource.get("spatial_geom").get("geometry")]
+            if len(geometries) == 0:
+                return pkg_dict
+            merged_geom = shapely.ops.unary_union(geometries)
+            pkg_dict["spatial_geom"] = merged_geom.wkt
+        else:
+            pkg_dict = SolrSpatialFieldSearchBackend().index_dataset(pkg_dict)
 
         # Coupled resources are URL -> uuid links, they are not needed in SOLR
         # and might be huge if there are lot of coupled resources
@@ -374,6 +473,8 @@ class WriPlugin(plugins.SingletonPlugin):
         pkg_dict.pop("extras_spatial", None)
         pkg_dict.pop("spatial", None)
 
+        print("PACKAGE DICT", flush=True)
+        print(pkg_dict, flush=True)
         return pkg_dict
 
     def before_dataset_search(self, search_params):
@@ -411,6 +512,7 @@ class WriPlugin(plugins.SingletonPlugin):
 
     def can_view(self):
         return True
+    
 
 
 class WriApiTracking(plugins.SingletonPlugin):

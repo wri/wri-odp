@@ -6,6 +6,7 @@ import ckan.logic as logic
 import ckanext.s3filestore.uploader as uploader
 from ckan.lib.mailer import mail_recipient
 from ckan.common import config
+from .datapusher_download_zip import  fetch_dataset_entity, get_admin_emails_for_dataset, ERROR_EMAIL_HTML_ADMIN
 
 import datetime
 import requests
@@ -74,8 +75,22 @@ def download_request(context: Context, data_dict: dict[str, Any]):
         "error": "{}",
     }
 
+    dataset_rslt = fetch_dataset_entity({
+        "entity_id": res_id,
+        "entity_type": "resource"
+    })
+    dataset_id = dataset_rslt.get("id")
+    admin_email= get_admin_emails_for_dataset(dataset_id)
+
+    value = {}
+    if admin_email:
+        value["admin_emails"] = admin_email
+    
     if email:
-        task["value"] = json.dumps({"emails": [email]})
+        value["emails"] = [email]
+
+    task["value"] = json.dumps(value)
+
 
     try:
         existing_task = p.toolkit.get_action("task_status_show")(
@@ -104,6 +119,7 @@ def download_request(context: Context, data_dict: dict[str, Any]):
 
                 if update_emails:
                     existing_task_values['emails'] = existing_task_emails
+                    existing_task_values["admin_emails"] = admin_email
                     existing_task['value'] = json.dumps(existing_task_values)
                     p.toolkit.get_action("task_status_update")({ "ignore_auth": True }, existing_task)
 
@@ -177,7 +193,13 @@ def download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email], resource_title)
+        dataset_rslt = fetch_dataset_entity({
+            "entity_id": res_id,
+            "entity_type": "resource"
+        })
+        dataset_name = dataset_rslt.get("id")
+        dataset_team = dataset_rslt.get("organization", {}).get("title")
+        send_error([email],admin_email, resource_title,dataset_team, dataset_name)
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -199,11 +221,17 @@ def download_request(context: Context, data_dict: dict[str, Any]):
         task["state"] = "error"
         task["last_updated"] = (str(datetime.datetime.utcnow()),)
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email], resource_title)
+        dataset_rslt = fetch_dataset_entity({
+            "entity_id": res_id,
+            "entity_type": "resource"
+        })
+        dataset_name = dataset_rslt.get("id")
+        dataset_team = dataset_rslt.get("organization", {}).get("title")
+        send_error([email],admin_email, resource_title,dataset_team, dataset_name)
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
-
+    value["admin_emails"] = admin_email
     if email:
         value["emails"] = [email]
 
@@ -242,6 +270,7 @@ def download_callback(context: Context, data_dict: dict[str, Any]):
 
     value = json.loads(task["value"])
     emails = value.get("emails", [])
+    admin_email = value.get("admin_emails", [])
     download_filename = value.get("download_filename")
 
     log.info("Preparing to send email...")
@@ -250,7 +279,13 @@ def download_callback(context: Context, data_dict: dict[str, Any]):
         url = data_dict.get("url")
         send_email(emails, url, download_filename)
     else:
-        send_error(emails, download_filename)
+        dataset_rslt = fetch_dataset_entity({
+            "entity_id": entity_id,
+            "entity_type": "resource"
+        })
+        dataset_name = dataset_rslt.get("id")
+        dataset_team = dataset_rslt.get("organization", {}).get("title")
+        send_error(emails,admin_email, download_filename,dataset_team, dataset_name)
         log.error(error)
 
 
@@ -282,23 +317,46 @@ def send_email(emails: list[str], url: str, download_filename: str):
                        )
 
 
-ERROR_EMAIL_HTML = '''
+ERROR_EMAIL_HTML = """
 <html>
     <body>
-        <p>An error happened while preparing the file you requested for download. Please, try again.</p>
+         <p>
+         You recently requested the below data from the World Resources Institute Data Explorer. 
+         Our systems encountered an error during the packaging of this data and we are unable to deliver your files at this time.
+        </p>
+
+        <b>
+        {}
+        </b>
+        </br>
+        <b>
+        <a target="_blank" href="{}/datasets/{}">Dataset link</a>
+        </b>
+
+        <p>
+        This may be a temporary issue but more likely represents some misconfiguration in our systems. 
+        Please reach out to <a href="mailto:data@wri.org">data@wri.org</a> to request immediate support.
+        </p>
         <br>
         <a target="_blank" href="{}">{}</a>
     </body>
 </html>
 
-'''
+"""
 
 
-def send_error(emails: list[str], resource_title):
+def send_error(emails: list[str], admin_emails, resource_title, dataset_team, dataset_name):
     odp_url = config.get('ckanext.wri.odp_url')
     for email in emails:
         mail_recipient("", email,
                        "WRI - Failed to process file ({})".format(resource_title),
                        "",
-                       ERROR_EMAIL_HTML.format(odp_url, odp_url)
+                       ERROR_EMAIL_HTML.format(dataset_name,odp_url,dataset_name,odp_url, odp_url),
+                       )
+
+    for email in admin_emails:
+        mail_recipient("", email,
+                       "WRI - Failed to process file ({})".format(resource_title),
+                       "",
+                       ERROR_EMAIL_HTML_ADMIN.format(dataset_name,odp_url,dataset_name,dataset_team),
                        )

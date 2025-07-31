@@ -1,10 +1,12 @@
 import { DataDictionaryFormType } from '@/schema/dataset.schema'
-import { Activity, Group, Organization } from '@portaljs/ckan'
+import { Activity, Group } from '@portaljs/ckan'
+import { Organization } from '@/schema/ckan.schema'
 import { APILayerSpec } from './layer.interface'
 import { PlotParams } from 'react-plotly.js'
 
 export interface Dataset {
     author?: string
+    authors?: Array<{ name: string; email: string }>
     author_email?: string
     creator_user_id?: string
     id: string
@@ -12,6 +14,7 @@ export interface Dataset {
     license_id?: string
     license_title?: string
     maintainer?: string
+    maintainers?: Array<{ name: string; email: string }>
     maintainer_email?: string
     metadata_created?: string
     metadata_modified?: string
@@ -75,13 +78,14 @@ export interface Resource {
     spatial_address?: string
     spatial_coordinates?: any
     spatial_type?: string
+    not_downloadable?: boolean
 }
 
-export interface DatasetListQueryOptions {
+interface DatasetListQueryOptions {
     offset: number
     limit: number
 }
-export interface PackageSearchOptions {
+interface PackageSearchOptions {
     offset: number
     limit: number
     groups: Array<string>
@@ -93,7 +97,7 @@ export interface PackageSearchOptions {
     include_private?: boolean
 }
 
-export interface Tag {
+interface Tag {
     display_name?: string
     id: string
     name: string
@@ -109,9 +113,9 @@ export interface View {
     config_obj: ViewConfig
 }
 
-export type ViewType = 'chart'
+type ViewType = 'chart'
 
-export type ViewConfig = {
+type ViewConfig = {
     type: ViewType
     config: ChartViewConfig
     form_state: any /* | OtherViewConfig ... */

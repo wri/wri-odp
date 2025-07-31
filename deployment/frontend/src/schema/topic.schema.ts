@@ -3,8 +3,7 @@ import z from 'zod'
 
 const capacitySchema = z.enum(['admin', 'editor', 'member'])
 
-
-export const MemberSchema = z.object({
+const MemberSchema = z.object({
     user: z.object({ value: z.string(), label: z.string() }),
     topic_id: z.string(),
     capacity: z.object({
@@ -19,9 +18,9 @@ export const TopicSchema = z.object({
         .string()
         .regex(
             /^[^\(\) +]+$/,
-            'The name cant have spaces nor the dot(.) character, it needs to be URL Compatible'
+            'Name must be URL-compatible and cannot include spaces or the dot(.) character.'
         ),
-    title: z.string(),
+    title: z.string().min(2, 'Title is required (minimum 2 characters)'),
     image_display_url: z.string().optional().nullable(),
     image_url: z.string().optional().nullable(),
     description: z.string().optional().nullable(),
@@ -32,8 +31,10 @@ export const TopicSchema = z.object({
         })
         .optional(),
     members: z.array(MemberSchema).default([]),
-    users: z.array(z.object({ name: z.string(), capacity: z.string() })).default([]),
+    users: z
+        .array(z.object({ name: z.string(), capacity: z.string() }))
+        .default([]),
 })
 
 export type TopicFormType = z.infer<typeof TopicSchema>
-export type MemberFormType = z.infer<typeof MemberSchema>
+type MemberFormType = z.infer<typeof MemberSchema>

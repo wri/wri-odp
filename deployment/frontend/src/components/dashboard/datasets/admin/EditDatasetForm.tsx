@@ -139,14 +139,16 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
 
         return 0
     }) as unknown as ResourceFormType[]
+
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
         mode: 'onBlur',
         defaultValues: {
             ...dataset,
             id: dataset.id,
+            technical_notes: dataset?.technical_notes || null,
             rw_id: dataset.rw_id,
-            author_email: dataset?.author_email ? dataset.author_email : null,
+            //author_email: dataset?.author_email ? dataset.author_email : null,
             rw_dataset: dataset.rw_id ? !!dataset.rw_id : !!dataset.rw_dataset,
             tags: dataset.tags ? dataset.tags.map((tag) => tag.name) : [],
             temporal_coverage_start: dataset.temporal_coverage_start
@@ -162,15 +164,25 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 (option) => option.value === dataset.language
             ),
             topics: dataset.groups
-                ? dataset.groups.map((group) => group.name)
+                ? //@ts-ignore
+                  dataset.groups
+                      .filter((g) => g.type === 'group')
+                      .map((group) => group.name)
+                : [],
+            applications: dataset.groups
+                ? //@ts-ignore
+                  dataset.groups
+                      .filter((g) => g.type === 'application')
+                      .map((group) => group.name)
                 : [],
             team: dataset.organization
                 ? {
                       value: dataset.organization.name,
                       label: dataset.organization.title,
                       id: dataset.organization.id,
+                      visibility: dataset.organization.visibility,
                   }
-                : { value: '', label: 'No Team', id: '' },
+                : { value: '', label: 'No Team', id: '', visibility: '' },
             license_id: license
                 ? { value: license.id, label: license.title }
                 : undefined,
@@ -195,28 +207,36 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 }
                 return {
                     ...resource,
+                    type: resource.url_type as any,
                     resourceId: resource.id as string,
                     schema: resource.schema ? schema.value : undefined,
                 }
             }),
-            spatial_type:
-                dataset.spatial_address === 'Global'
-                    ? 'global'
-                    : dataset.spatial_address
+            spatial_type: dataset.spatial_type
+                ? (dataset.spatial_type as
+                      | 'address'
+                      | 'geom'
+                      | 'global'
+                      | 'derived_from_resources')
+                : dataset.spatial_address === 'Global'
+                  ? 'global'
+                  : dataset.spatial_address
                     ? 'address'
                     : dataset.spatial
-                    ? 'geom'
-                    : undefined,
+                      ? 'geom'
+                      : undefined,
+            extras: dataset?.extras ? dataset.extras : [],
         },
     })
 
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
             notify(
-                `Successfully edited the "${title ?? name}" dataset`,
+                `Successfully edited the "${title ?? name}" Dataset`,
                 'success'
             )
-            window.location.href = '/dashboard/datasets'
+
+            router.push(`/datasets/${name}`)
         },
         onError: (error) => {
             setErrorMessage(error.message)
@@ -493,10 +513,10 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                     return editDataset.mutate(toBeSavedData)
                                 } else {
                                     notify(
-                                        'No changes to the dataset',
+                                        'No changes to the Dataset',
                                         'success'
                                     )
-                                    router.push('/dashboard/datasets')
+                                    router.push(`/datasets/${dataset.name}`)
                                 }
                             }
                         },

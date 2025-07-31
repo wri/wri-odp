@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Tooltip from '../../../../tooltip';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 
-export interface LegendItemButtonVisibilityProps {
+interface LegendItemButtonVisibilityProps {
   activeLayer: Object,
   visibility: boolean,
   onChangeVisibility: (activeLayer, visibility: boolean) => void,

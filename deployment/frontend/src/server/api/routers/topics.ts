@@ -12,6 +12,8 @@ import {
     getUserGroups,
     findAllNameInTree,
     getAllDatasetFq,
+    groupList,
+    fetchFacets,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -27,6 +29,8 @@ import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
 import { TopicSchema } from '@/schema/topic.schema'
 import { replaceNames } from '@/utils/replaceNames'
 import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
+import { flattenTree } from '@/utils/flattenGroupTree'
+import { group } from 'console'
 
 export const TopicRouter = createTRPCRouter({
     getUsersTopics: protectedProcedure
@@ -52,17 +56,11 @@ export const TopicRouter = createTRPCRouter({
                     group_type: 'group',
                 })
             } else {
-                if (ctx.session.user.sysadmin) {
-                    groupTree = await getGroups({
-                        apiKey: ctx.session.user.apikey,
-                    })
-                } else {
-                    groupTree = await searchHierarchy({
-                        isSysadmin: ctx.session.user.sysadmin,
-                        apiKey: ctx.session.user.apikey,
-                        group_type: 'group',
-                    })
-                }
+                groupTree = await searchHierarchy({
+                    isSysadmin: ctx.session.user.sysadmin,
+                    apiKey: ctx.session.user.apikey,
+                    group_type: 'group',
+                })
             }
 
             const result = groupTree
@@ -89,34 +87,8 @@ export const TopicRouter = createTRPCRouter({
             }
         )
         let userTopics = null
-        if (!user.sysadmin) {
-            const userTopicsRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_list_authz`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            )
-            const _userTopics: CkanResponse<Group[]> =
-                await userTopicsRes.json()
-            if (!_userTopics.success && _userTopics.error)
-                throw Error(replaceNames(_userTopics.error.message))
-            userTopics = _userTopics.result.map((topic) => topic.name)
-        }
-        const tree: CkanResponse<TopicHierarchy[]> =
-            await topicHierarchyRes.json()
-        if (!tree.success && tree.error)
-            throw Error(replaceNames(tree.error.message))
-        return { hierarchy: tree.result, userTopics }
-    }),
-    getAllTopics: protectedProcedure.query(async ({ ctx }) => {
-        const user = ctx.session.user
-        const topicRes = await fetch(
-            user.sysadmin
-                ? `${env.CKAN_URL}/api/action/group_list?all_fields=True`
-                : `${env.CKAN_URL}/api/action/group_list_authz?all_fields=True`,
+        const userTopicsRes = await fetch(
+            `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -124,10 +96,59 @@ export const TopicRouter = createTRPCRouter({
                 },
             }
         )
-        const topics: CkanResponse<Group[]> = await topicRes.json()
-        if (!topics.success && topics.error)
-            throw Error(replaceNames(topics.error.message))
-        return topics.result.filter((topic) => topic.state === 'active')
+        const _userTopics: CkanResponse<Group[]> = await userTopicsRes.json()
+        if (!_userTopics.success && _userTopics.error)
+            throw Error(replaceNames(_userTopics.error.message))
+        userTopics = _userTopics.result.map((topic) => topic.name)
+        const tree: CkanResponse<TopicHierarchy[]> =
+            await topicHierarchyRes.json()
+        if (!tree.success && tree.error)
+            throw Error(replaceNames(tree.error.message))
+        return { hierarchy: tree.result, userTopics }
+    }),
+    getTopicsHomePage: publicProcedure.query(async ({ ctx }) => {
+        const user = ctx.session?.user
+        const apiKey = user ? user.apikey : null
+        const [topics, groupTree] = await Promise.all([
+            groupList({ apiKey }),
+            searchHierarchy({
+                isSysadmin: true,
+                apiKey: apiKey ?? '',
+                q: '',
+                group_type: 'group',
+            }),
+        ])
+        const topicDetails = topics.reduce(
+            (acc, org) => {
+                acc[org.id] = {
+                    img_url: org.image_display_url,
+                    description: org.description,
+                    package_count: org.package_count,
+                    name: org.name,
+                }
+                return acc
+            },
+            {} as Record<string, GroupsmDetails>
+        )
+        if (user) {
+            const facets = await fetchFacets(
+                topicDetails,
+                'groups',
+                ctx?.session?.user.apikey ?? ''
+            )
+            for (const group in topicDetails) {
+                const topic = topicDetails[group]!
+                topic.package_count = facets[topic.name] ?? 0
+            }
+        }
+        return {
+            topics: groupTree,
+            topicDetails: topicDetails,
+            count: groupTree.length,
+        }
+    }),
+    getAllTopics: protectedProcedure.query(async ({ ctx }) => {
+        return await groupList({ apiKey: ctx.session.user.apikey ?? null })
     }),
     editTopic: protectedProcedure
         .input(TopicSchema)
@@ -180,7 +201,7 @@ export const TopicRouter = createTRPCRouter({
                 return topic.result
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
+                    'Something went wrong please contact the System Administrator'
                 if (e instanceof Error) error = e.message
                 throw Error(replaceNames(error))
             }
@@ -276,6 +297,16 @@ export const TopicRouter = createTRPCRouter({
                 )
                 const topic: CkanResponse<Group> = await topicRes.json()
                 if (!topic.success && topic.error) {
+                    console.log('TOPIC ERROR', topic)
+                    if (
+                        //@ts-ignore
+                        topic.error.name[0] ===
+                        'Group name already exists in database'
+                    ) {
+                        throw Error(
+                            '[!] A page with this URL already exists. Please choose a different URL.'
+                        )
+                    }
                     if (topic.error.message)
                         throw Error(replaceNames(topic.error.message))
                     throw Error(replaceNames(JSON.stringify(topic.error)))
@@ -283,8 +314,16 @@ export const TopicRouter = createTRPCRouter({
                 return topic.result
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
+                    'Something went wrong please contact the System Administrator'
                 if (e instanceof Error) error = e.message
+                if (
+                    replaceNames(error) ==
+                    'Topic name already exists in database or there is a Team with this name'
+                ) {
+                    throw Error(
+                        '[!] A page with this URL already exists. Please choose a different URL.'
+                    )
+                }
                 throw Error(replaceNames(error))
             }
         }),
@@ -310,12 +349,26 @@ export const TopicRouter = createTRPCRouter({
     getGeneralTopics: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            let groupTree: GroupTree[] = []
-            const allGroups = (await getUserGroups({
-                apiKey: ctx?.session?.user.apikey ?? '',
-                userId: '',
-            }))!
-            const topicDetails = allGroups.reduce(
+            const [groupTree, allGroups] = await Promise.all([
+                searchHierarchy({
+                    isSysadmin: true,
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    q: '',
+                    group_type: 'group',
+                }),
+                getUserGroups({
+                    apiKey: ctx?.session?.user.apikey ?? '',
+                    userId: '',
+                }),
+            ])
+            if (groupTree.length === 0) {
+                return {
+                    topics: groupTree,
+                    topicDetails: {} as Record<string, GroupsmDetails>,
+                    count: 0,
+                }
+            }
+            const topicDetails = (allGroups ?? []).reduce(
                 (acc, org) => {
                     acc[org.id] = {
                         img_url: org.image_display_url,
@@ -328,56 +381,21 @@ export const TopicRouter = createTRPCRouter({
                 {} as Record<string, GroupsmDetails>
             )
 
+            const facets = await fetchFacets(
+                topicDetails,
+                'groups',
+                ctx?.session?.user.apikey ?? ''
+            )
+
             for (const group in topicDetails) {
                 const topic = topicDetails[group]!
-                const packagedetails = (await getAllDatasetFq({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    fq: `groups:${topic.name}+is_approved:true`,
-                    query: { search: '', page: { start: 0, rows: 10000 } },
-                }))!
-                topic.package_count = packagedetails.count
-            }
-
-            if (input.search) {
-                groupTree = await searchHierarchy({
-                    isSysadmin: true,
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    q: input.search,
-                    group_type: 'group',
-                })
-                if (input.tree) {
-                    let groupFetchTree = groupTree[0] as GroupTree
-                    const findTree = findNameInTree(
-                        groupFetchTree,
-                        input.search
-                    )
-                    if (findTree) {
-                        groupFetchTree = findTree
-                    }
-                    groupTree = [groupFetchTree]
-                }
-                if (input.allTree) {
-                    const filterTree = groupTree.flatMap((group) => {
-                        const search = input.search.toLowerCase()
-                        if (
-                            group.name.toLowerCase().includes(search) ||
-                            group.title?.toLowerCase().includes(search)
-                        )
-                            return [group]
-                        const findtree = findAllNameInTree(group, search)
-                        return findtree
-                    })
-                    groupTree = filterTree
-                }
-            } else {
-                groupTree = await getGroups({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                })
+                topic.package_count = facets[topic.name] ?? 0
             }
 
             const result = groupTree
             return {
                 topics: result,
+                allTopics: allGroups,
                 topicDetails: topicDetails,
                 count: result.length,
             }
@@ -402,6 +420,37 @@ export const TopicRouter = createTRPCRouter({
                 topic: topic.result,
             }
         }),
+    list: publicProcedure.query(async ({ ctx, input }) => {
+        const topicRes = await fetch(
+            `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+        const topic: CkanResponse<Group[]> = await topicRes.json()
+        if (!topic.success && topic.error)
+            throw Error(replaceNames(topic.error.message))
+        return {
+            topics: topic.result,
+        }
+    }),
+    getNumberOfSubtopics: publicProcedure.query(async ({ ctx, input }) => {
+        const topicRes = await fetch(
+            `${env.CKAN_URL}/api/action/group_list_wri?q=`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+        const topics: CkanResponse<GroupTree[]> = await topicRes.json()
+        if (!topics.success && topics.error)
+            throw Error(replaceNames(topics.error.message))
+        const numOfSubtopics = flattenTree(topics.result)
+        return numOfSubtopics
+    }),
 
     getFollowedTopics: protectedProcedure.query(async ({ ctx }) => {
         const response = await fetch(

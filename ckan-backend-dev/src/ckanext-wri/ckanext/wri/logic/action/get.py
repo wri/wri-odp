@@ -8,11 +8,21 @@ import json
 from typing import Any, cast
 import re
 from itertools import zip_longest
+import socket
 
-from ckan.common import config, asbool
+from ckan.common import config, asbool, aslist
 from ckan.model import Package
 from sqlalchemy import text, engine
+from shapely import wkb, wkt
+import ckan.model as model
+from ckan.logic.action.get import (
+    _unpick_search, 
+    organization_show as old_organization_show)
 
+from ckan.logic.action.patch import (
+    organization_patch as old_organization_patch,
+)
+from ckan.plugins.toolkit import chained_action
 
 import ckan
 import ckan.lib.dictization
@@ -29,8 +39,14 @@ import ckan.authz as authz
 from ckan.lib.dictization import table_dictize
 
 from ckan.common import _
-from ckan.types import ActionResult, Context, DataDict
+from ckan.types import ActionResult, Context, DataDict, Query, Schema
 from typing_extensions import TypeAlias
+from ckanext.wri.helpers.data_api import get_shape_from_dataapi
+from ckanext.wri.model.download_event import (
+    DownloadEvent,
+    download_event_dictize,
+    download_event_list_dictize
+)
 from ckanext.wri.model.notification import (
     Notification,
     notification_dictize,
@@ -52,6 +68,10 @@ from ckanext.wri.model.resource_location import ResourceLocation
 import geoalchemy2
 import sqlalchemy
 from sqlalchemy import text
+import ckan.authz as authz
+from sqlalchemy import or_
+from sqlalchemy.orm import aliased
+import copy
 
 _select = sqlalchemy.sql.select
 _or_ = sqlalchemy.or_
@@ -365,7 +385,8 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
                     try:
                         if return_user:
                             user = model_dictize.user_dictize(
-                                model.User.get(package_dict.get("creator_user_id")), context
+                                model.User.get(package_dict.get("creator_user_id")),
+                                context,
                             )
                             package_dict["user"] = user
                     except:
@@ -388,6 +409,14 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
         count = query.count
         facets = query.facets
 
+    results_with_group_types = []
+
+    for result in results:
+        result_dict = _add_group_types(context, result)
+        results_with_group_types.append(result_dict)
+
+    results = results_with_group_types
+
     search_results: dict[str, Any] = {
         "count": count,
         "facets": facets,
@@ -402,13 +431,21 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
         group_names.extend(facets.get(field_name, {}).keys())
 
     groups = (
-        session.query(model.Group.name, model.Group.title)
+            session.query(model.Group.name, model.Group.title)
+        # type_ignore_reason: incomplete SQLAlchemy types
+        .filter(model.Group.name.in_(group_names)).all()  # type: ignore
+        if group_names
+        else []
+    )
+    _groups = (
+            session.query(model.Group.name, model.Group.type)
         # type_ignore_reason: incomplete SQLAlchemy types
         .filter(model.Group.name.in_(group_names)).all()  # type: ignore
         if group_names
         else []
     )
     group_titles_by_name = dict(groups)
+    group_types_by_name = dict(_groups)
 
     # Transform facets into a more useful data structure.
     restructured_facets: dict[str, Any] = {}
@@ -419,9 +456,14 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
             new_facet_dict["name"] = key_
             if key in ("groups", "organization"):
                 display_name = group_titles_by_name.get(key_, key_)
+                group_type = group_types_by_name.get(key_, key_)
                 display_name = (
                     display_name if display_name and display_name.strip() else key_
                 )
+                group_type = (
+                    group_type if group_type and group_type.strip() else key_
+                )
+                new_facet_dict["type"] = group_type
                 new_facet_dict["display_name"] = display_name
             elif key == "license_id":
                 license = model.Package.get_license_register().get(key_)
@@ -542,6 +584,36 @@ def pending_dataset_show(context: Context, data_dict: DataDict):
 
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
+        if pending_dataset and pending_dataset.get('package_data'):
+            package_data = pending_dataset['package_data']
+            if package_data.get("groups", None) is not None:
+                _groups = [
+                    tk.get_action("group_show")(context, {"id": group.get('name')})
+                    for group in package_data.get("groups")
+                ]
+                groups = [
+                    {
+                        "description": group.get("description"),
+                        "display_name": group.get("display_name"),
+                        "id": group.get("id"),
+                        "image_display_url": group.get("image_display_url"),
+                        "name": group.get("name"),
+                        "title": group.get("title"),
+                        "type": group.get("type"),
+                        "homepage_url": group.get("homepage_url", None) if 'homepage_url' in group else None,
+                        "contact_url": group.get("contact_url", None) if 'contact_url' in group else None,
+                        "help_url": group.get("help_url", None) if 'help_url' in group else None,
+                    }
+                    for group in _groups
+                ]
+                for group in groups:
+                    if group.get('help_url') is None:
+                        del group['help_url']
+                    if group.get('contact_url') is None:
+                        del group['contact_url']
+                    if group.get('homepage_url') is None:
+                        del group['homepage_url']
+                pending_dataset['package_data']["groups"] = groups
     except Exception as e:
         log.error(e)
         raise tk.ValidationError(e)
@@ -569,7 +641,9 @@ def pending_diff_show(context: Context, data_dict: DataDict):
     try:
         pending_dataset = PendingDatasets.get(package_id=package_id)
         if pending_dataset is not None:
-            pending_dataset = pending_dataset.get("package_data")
+            # context["for_approval"] = True
+            pending_dataset = get_action('pending_dataset_show')(context, { "package_id": package_id})
+            pending_dataset = pending_dataset['package_data']
             existing_dataset = get_action("package_show")(context, {"id": package_id})
             dataset_diff = _diff(existing_dataset, pending_dataset)
     except Exception as e:
@@ -755,7 +829,10 @@ def group_activity_list_wri(context: Context, data_dict: DataDict):
 @logic.side_effect_free
 def user_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
-    results = get_action("user_list")(context, data_dict)
+    user = context.get("user")
+    is_sysadmin = authz.is_sysadmin(user)
+    # results = get_action("user_list")(context, data_dict)
+
     query = model.Session.query(
         model.User,
         model.User.name.label("name"),
@@ -776,28 +853,36 @@ def user_list_wri(context: Context, data_dict: DataDict):
     query = query.filter(model.User.name != site_id)
     query = query.filter(model.User.state != model.State.DELETED)
     query = query.all()
+
     results = []
     org_details = {}
+
+   
     for q in query:
-        user = model_dictize.user_dictize(q[0], context)
+        user_dict = model_dictize.user_dictize(q[0], context)
 
         member_query = (
             model.Session.query(model.Member)
             .filter(
                 model.Member.state == "active",
                 model.Member.table_name == "user",
-                model.Member.table_id == user["id"],
+                model.Member.table_id == user_dict["id"],
             )
             .all()
         )
 
-        user["organizations"] = []
+        
+        user_dict["organizations"] = []
+        
 
         for member in member_query:
+            
             organization = None
             if member.group_id in org_details:
                 organization = org_details[member.group_id]
+                
             else:
+                # Query the organization details
                 org_result = (
                     model.Session.query(model.Group)
                     .filter(
@@ -806,82 +891,268 @@ def user_list_wri(context: Context, data_dict: DataDict):
                     )
                     .first()
                 )
+
                 if org_result:
-                    organization = model_dictize.group_dictize(org_result, context)
-                    org_details[member.group_id] = organization
+                    # Now perform the organization visibility check here
+                    group_extra_alias = aliased(model.GroupExtra)
+                    org_query = model.Session.query(model.Group).outerjoin(
+                        group_extra_alias, model.Group.id == group_extra_alias.group_id
+                    )
+
+                    # Non-sysadmin users get only public organizations or private if they belong to the org
+                    if not is_sysadmin:
+                        user_id = authz.get_user_id_for_username(user, allow_none=True)
+                        # Allow access to public orgs or private ones the user belongs to
+                        org_query = org_query.filter(
+                            model.Group.id == member.group_id
+                        ).filter(
+                            sqlalchemy.or_(
+                                sqlalchemy.and_(
+                                    group_extra_alias.key == "visibility",
+                                    group_extra_alias.value == "public",
+                                    model.Member.table_id == user_id,
+                                    model.Member.group_id == model.Group.id,
+                                    model.Member.table_name == "user",
+                                    model.Member.state == "active"
+                                ),
+                                sqlalchemy.and_(
+                                    group_extra_alias.key == None,
+                                    model.Member.table_id == user_id,
+                                    model.Member.group_id == model.Group.id,
+                                    model.Member.table_name == "user",
+                                    model.Member.state == "active"
+                                ),
+                                
+                                sqlalchemy.and_(
+                                    group_extra_alias.key == "visibility",
+                                    group_extra_alias.value == "private",
+                                    model.Member.table_id == user_id,
+                                    model.Member.group_id == model.Group.id,
+                                    model.Member.table_name == "user",
+                                    model.Member.state == "active"
+                                ),
+                            )
+                        )
+
+                    # Execute the organization query
+                    filtered_org = org_query.first()
+
+                    if filtered_org:
+                        organization = model_dictize.group_dictize(org_result, context,
+                                                                   include_groups=False,
+                                                                   include_users=True,
+                                                                   include_extras=False,
+                                                                   include_tags=False,
+                                                                   packages_field=None)
+                        org_details[member.group_id] = organization
 
             if organization:
-                user_org = next(
-                    filter(lambda x: x["id"] == user["id"], organization["users"])
-                )
-                organization["capacity"] = user_org["capacity"]
-                user["organizations"].append(organization)
+                org_copy = copy.deepcopy(organization)
+                org_copy["capacity"] = member.capacity
+                user_dict["organizations"].append(org_copy)
 
-        results.append(user)
+        results.append(user_dict)
 
     return results
 
 
-def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any):
-    def recurcive_tree_ids(org, group_hierarchy_ids=[]):
+def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any, private_orgs: Any = None, user_orgs: Any = None):
+    def recurcive_tree_ids(org, group_hierarchy_ids=[],):
         group_hierarchy_ids.append(org["name"])
+
+        if private_orgs:
+            org["children"] = [
+                child for child in org["children"] if child["name"] not in private_orgs
+            ]
+
+        if user_orgs:
+            if org["name"] not in user_orgs:
+                org["private"] = True
+            else:
+                org["private"] = False
+
         for child in org["children"]:
-            recurcive_tree_ids(child)
+            recurcive_tree_ids(child, group_hierarchy_ids)
+
         return group_hierarchy_ids
 
     group_hierarchy_ids = []
     results = []
+
     for group in groups:
         if group in group_hierarchy_ids:
             continue
+
         group_tree = get_action("group_tree_section")(
             context, {"id": group, "type": group_type}
         )
+
         if q:
             group_tree["highlighted"] = True
+        else:
+            group_tree["highlighted"] = False
+
         group_hierarchy_ids += recurcive_tree_ids(group_tree)
+
+        if not context['user'] and (private_orgs and group_tree["name"] in private_orgs):
+            continue
+
         results.append(group_tree)
+    return results
+
+
+# def _get_orgs_or_groups_visibility(orgs: list[dict[str, Any]]) -> dict[str, str]:
+#     """
+#     Returns a dictionary with the name of the organization or group as key
+#     and its visibility as value.
+#     """
+#     org_visibility_by_name = {}
+#
+#     for org in orgs:
+#         visibility = org.get('visibility', 'public')
+#
+#         if visibility not in ('public', 'private'):
+#             visibility = 'public'
+#
+#         org_visibility_by_name[org['name']] = visibility
+#
+#     return org_visibility_by_name
+#
+
+# def _set_orgs_or_groups_visibility(orgs: list[dict[str, Any]], orgs_visibility_by_name: dict[str, str]):
+#     """
+#     Sets the visibility of each organization or group in the list to the given value.
+#     """
+#     for org in orgs:
+#         visibility = orgs_visibility_by_name.get(org['name'], 'public')
+#
+#         if visibility not in ('public', 'private'):
+#             visibility = 'public'
+#
+#         org['visibility'] = visibility
+#         org['private'] = (visibility == 'private')
+#
+#     return orgs
+
+
+def _set_orgs_or_groups_fields(orgs: list[dict[str, Any]], results: list[dict[str, Any]], fields: list[str], all_fields: bool = False):
+    """
+    Copy fields and values from the orgs list to the hierarchy results.
+    If all_fields is True, it will copy all fields from orgs to results.
+    """
+    for org in orgs:
+        if all_fields:
+            for field in fields:
+                if field in org:
+                    for result in results:
+                        if result['name'] == org['name']:
+                            result[field] = org[field]
+                            if field == 'notes':
+                                result['description'] = org[field]
+        else:
+            for field in fields:
+                if field in org and field not in result:
+                    for result in results:
+                        if result['name'] == org['name']:
+                            result[field] = org[field]
+                            if field == 'notes':
+                                result['description'] = org[field]
+
     return results
 
 
 @logic.side_effect_free
 def organization_list_wri(context: Context, data_dict: DataDict):
+    all_fields = data_dict.get("all_fields", False)
+
     orgs = get_action("organization_list")(context, data_dict)
+
+    if all_fields:
+        orgs_list = [org["name"] for org in orgs]
+    else:
+        orgs_list = orgs
+
+    user = context['user']
     q = data_dict.get("q", False)
-    results = get_hierarchy_group(context, orgs, "organization", q)
+    private_orgs = None
+    user_orgs = None
+
+    if not user:
+       private_orgs = get_private_organizations(context)
+
+    if user:
+        user_orgs = orgs_list
+
+    results = get_hierarchy_group(context, orgs_list, "organization", q, private_orgs, user_orgs)
+
+    if all_fields:
+        results = _set_orgs_or_groups_fields(orgs, results, ["visibility", "notes"], all_fields)
+
     return results
 
 
 @logic.side_effect_free
 def group_list_wri(context: Context, data_dict: DataDict):
+    all_fields = data_dict.get("all_fields", False)
+
     orgs = get_action("group_list")(context, data_dict)
+
+    if all_fields:
+        orgs_list = [org["name"] for org in orgs]
+    else:
+        orgs_list = orgs
+
     q = data_dict.get("q", False)
-    results = get_hierarchy_group(context, orgs, "group", q)
+
+    results = get_hierarchy_group(context, orgs_list, "group", q)
+
+    if all_fields:
+        results = _set_orgs_or_groups_fields(orgs, results, ["visibility", "notes"], all_fields)
+
     return results
 
 
 @logic.side_effect_free
 def group_list_authz_wri(context: Context, data_dict: DataDict):
+    all_fields = data_dict.get("all_fields", False)
     orgs = get_action("group_list_authz")(context, data_dict)
+
     # get list of name
     q = data_dict.get("q", False)
+
     if q:
         grp_names = [org["name"] for org in orgs if q in org["name"]]
+        results = grp_names
     else:
         grp_names = [org["name"] for org in orgs]
         results = get_hierarchy_group(context, grp_names, "group", q)
+
+    if all_fields:
+        results = _set_orgs_or_groups_fields(orgs, results, ["visibility", "notes"], all_fields)
+
     return results
 
 
 @logic.side_effect_free
 def organization_list_for_user_wri(context: Context, data_dict: DataDict):
+    all_fields = data_dict.get("all_fields", False)
     orgs = get_action("organization_list_for_user")(context, data_dict)
+    full_orgs = orgs
+
     q = data_dict.get("q", False)
+
     if q:
         orgs = [org["name"] for org in orgs if q in org["name"]]
     else:
         orgs = [org["name"] for org in orgs]
-    results = get_hierarchy_group(context, orgs, "organization", q)
+
+    user = context['user']
+
+    results = get_hierarchy_group(context, orgs, "organization", q, user_orgs=orgs)
+
+    if all_fields and full_orgs != orgs:
+        results = _set_orgs_or_groups_fields(full_orgs, results, ["visibility", "notes"], all_fields)
+
     return results
 
 
@@ -951,6 +1222,47 @@ def package_collaborator_list_wri(context: Context, data_dict: DataDict):
     return result
 
 
+def get_geojson_from_filesystem(address: str):
+    segments = address.split(",")
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    if len(segments) == 1:
+        path = os.path.join(
+            cwd,
+            "../../world_geojsons/countries/{}.geojson".format(segments[0].strip()),
+        )
+    else:
+        path = os.path.join(
+            cwd,
+            "../../world_geojsons/states/{}/{}.geojson".format(
+                segments[1].strip(), segments[0].strip()
+            ),
+        )
+
+    with open(path, "r") as f:
+        content = f.read()
+        geojson = json.loads(content)
+        geometries = []
+
+        if geojson["type"] == "GeometryCollection":
+            geometries = geojson["geometries"]
+        elif geojson["type"] == "FeatureCollection":
+            geometries = [x["geometry"] for x in geojson["features"]]
+        else:
+            geometries = [geojson]
+
+        valid_geometries = []
+        for geom in geometries:
+            json_str = json.dumps(geom)
+            shape = shapely.from_geojson(json_str)
+            if shape.is_valid:
+                valid_geometries.append(shape)
+
+        merged_geometry = unary_union(valid_geometries)
+        spatial_geom = geoalchemy2.functions.ST_GeomFromText(merged_geometry.wkt)
+        print("Getting geojson from filesystem", flush=True)
+        return spatial_geom
+
+
 @logic.side_effect_free
 def resource_search(context: Context, data_dict: DataDict):
     _check_access("resource_search", context, data_dict)
@@ -996,7 +1308,6 @@ def resource_search(context: Context, data_dict: DataDict):
             ResourceLocation.spatial_geom, "POINT({} {})".format(*point)
         )
 
-
     # if query is None:
     #     raise ValidationError({'query': _('Missing value')})
 
@@ -1028,10 +1339,6 @@ def resource_search(context: Context, data_dict: DataDict):
     )
     location_queries = []
     if spatial_address:
-        log.info("SPATIAL ADDRESS")
-        log.info(spatial_address)
-        cwd = os.path.abspath(os.path.dirname(__file__))
-
         segments = spatial_address.split(",")
         if len(segments) == 3:
             full_address = (
@@ -1061,65 +1368,24 @@ def resource_search(context: Context, data_dict: DataDict):
                 ResourceLocation.spatial_address.like(f"%{country}"),
             )
 
-        if len(segments) in [1, 2]:
-            # It's a country or a state
+        elif len(segments) == 3:
+            # It's a city
+            if point:
+                location_queries.append(point_query)
+
+        if point:
             try:
-                if len(segments) == 1:
-                    path = os.path.join(
-                        cwd,
-                        "../../world_geojsons/countries/{}.geojson".format(
-                            segments[0].strip()
-                        ),
-                    )
-                else:
-                    path = os.path.join(
-                        cwd,
-                        "../../world_geojsons/states/{}/{}.geojson".format(
-                            segments[1].strip(), segments[0].strip()
-                        ),
-                    )
-
-                with open(path, "r") as f:
-                    content = f.read()
-                    geojson = json.loads(content)
-                    geometries = []
-
-                    if geojson["type"] == "GeometryCollection":
-                        geometries = geojson["geometries"]
-                    elif geojson["type"] == "FeatureCollection":
-                        geometries = [x["geometry"] for x in geojson["features"]]
-                    else:
-                        geometries = [geojson]
-
-                    valid_geometries = []
-                    for geom in geometries:
-                        json_str = json.dumps(geom)
-                        shape = shapely.from_geojson(json_str)
-                        if shape.is_valid:
-                            valid_geometries.append(shape)
-
-                    merged_geometry = unary_union(valid_geometries)
-                    spatial_geom = geoalchemy2.functions.ST_GeomFromText(
-                        merged_geometry.wkt
-                    )
-                    print("SPATIAL GEOM", flush=True)
-                    print(spatial_geom, flush=True)
-
+                shape = get_shape_from_dataapi(spatial_address, point)
+                if shape:
+                    shape = wkt.loads(shape)
+                    spatial_geom = geoalchemy2.functions.ST_GeomFromText(shape.wkt)
                     location_queries.append(
                         geoalchemy2.functions.ST_Intersects(
                             ResourceLocation.spatial_geom, spatial_geom
                         )
                     )
-
             except Exception as e:
                 log.error(e)
-                if point:
-                    location_queries.append(point_query)
-
-        elif len(segments) == 3:
-            # It's a city
-            if point:
-                location_queries.append(point_query)
 
     if len(location_queries) == 0 and point_query is not None:
         location_queries.append(point_query)
@@ -1129,12 +1395,10 @@ def resource_search(context: Context, data_dict: DataDict):
 
     if location_queries:
         q = q.filter(_or_(*location_queries))
-        print("LOCATION QUERIES", flush=True)
         print(q, flush=True)
 
     resource_fields = model.Resource.get_columns()
     for field, term in fields.items():
-
         if field not in resource_fields:
             msg = _('Field "{field}" not recognised in resource_search.').format(
                 field=field
@@ -1204,3 +1468,708 @@ def resource_search(context: Context, data_dict: DataDict):
 
 # TODO:  customize package_show to include spatial_geom
 # conditionally (optimization of the data file geo indexing)
+
+@logic.side_effect_free
+def organization_list_for_user(context: Context,
+                               data_dict: DataDict) -> ActionResult.OrganizationListForUser:
+    
+    model = context['model']
+    if data_dict.get('id'):
+        user_obj = model.User.get(data_dict['id'])
+        if not user_obj:
+            raise NotFound
+        user = user_obj.name
+    else:
+        user = context['user']
+
+    _check_access('organization_list_for_user', context, data_dict)
+    sysadmin = authz.is_sysadmin(user)
+
+    orgs_q = model.Session.query(model.Group) \
+        .filter(model.Group.is_organization == True) \
+        .filter(model.Group.state == 'active')
+
+    if sysadmin:
+        orgs_and_capacities = [(org, 'admin') for org in orgs_q.all()]
+    else:
+        # for non-Sysadmins check they have the required permission
+
+        permission = data_dict.get('permission', 'manage_group')
+
+        roles = authz.get_roles_with_permission(permission)
+
+        if not roles:
+            return []
+        user_id = authz.get_user_id_for_username(user, allow_none=True)
+        if not user_id:
+            return []
+
+        q: Query[tuple[model.Member, model.Group]] = model.Session.query(model.Member, model.Group) \
+            .filter(model.Member.table_name == 'user') \
+            .filter(
+                model.Member.capacity.in_(roles)
+            ) \
+            .filter(model.Member.table_id == user_id) \
+            .filter(model.Member.state == 'active') \
+            .join(model.Group)
+
+        
+        roles_that_cascade = cast(
+            "list[str]",
+            authz.check_config_permission('roles_that_cascade_to_sub_groups')
+        )
+        group_extra_alias = aliased(model.GroupExtra)
+        public_groups_query = (
+            model.Session.query(model.Group.id)
+            .outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
+            .filter(
+                _or_(
+                    _and_(
+                        group_extra_alias.key == 'visibility',
+                        group_extra_alias.value == 'public'
+                    ),
+                    group_extra_alias.key == None
+                )
+            )
+        )
+        public_group_ids = {gid for gid, in public_groups_query.all()}
+        group_ids: set[str] = set()
+        group_ids_to_capacities: dict[str, str] = {}
+        for member, group in q.all():
+            group_ids.add(group.id)
+            group_ids_to_capacities[group.id] = member.capacity
+            children_group_ids = [
+                grp_tuple[0] for grp_tuple
+                in group.get_children_group_hierarchy(type='organization')
+            ]
+            if member.capacity in roles_that_cascade:
+                
+                for group_id in children_group_ids:
+                    group_ids.add(group_id)
+                    group_ids_to_capacities[group_id] = member.capacity
+            else:
+                for group_id in children_group_ids:
+                    if group_id in public_group_ids:
+                        group_ids.add(group_id)
+                        group_ids_to_capacities[group_id] = member.capacity
+
+
+            # group_ids_to_capacities[group.id] = member.capacity
+            # group_ids.add(group.id)
+
+        if not group_ids:
+            return []
+
+        orgs_q = orgs_q.filter(model.Group.id.in_(group_ids))
+        orgs_and_capacities = [
+            (org, group_ids_to_capacities[org.id]) for org in orgs_q.all()]
+
+    context['with_capacity'] = True
+    orgs_list = model_dictize.group_list_dictize(orgs_and_capacities, context,
+        with_package_counts=asbool(data_dict.get('include_dataset_count')),
+        include_extras=asbool(data_dict.get('include_extras')))
+    
+    for org in orgs_list:
+        for extra in org.get('extras', []):
+            if extra['key'] == 'visibility':
+                org['visibility'] = extra['value']
+                break
+    return orgs_list
+
+
+@logic.side_effect_free
+def organization_list(context: Context,
+                      data_dict: DataDict) -> ActionResult.OrganizationList:
+    
+    '''Return a list of the names of the site's organizations.
+
+    :param type: the type of organization to list (optional,
+        default: ``'organization'``),
+        See docs for :py:class:`~ckan.plugins.interfaces.IGroupForm`
+    :type type: string
+    :param order_by: the field to sort the list by, must be ``'name'`` or
+      ``'packages'`` (optional, default: ``'name'``) Deprecated use sort.
+    :type order_by: string
+    :param sort: sorting of the search results.  Optional.  Default:
+        "title asc" string of field name and sort-order. The allowed fields are
+        'name', 'package_count' and 'title'
+    :type sort: string
+    :param limit: the maximum number of organizations returned (optional)
+        Default: ``1000`` when all_fields=false unless set in site's
+        configuration ``ckan.group_and_organization_list_max``
+        Default: ``25`` when all_fields=true unless set in site's
+        configuration ``ckan.group_and_organization_list_all_fields_max``
+    :type limit: int
+    :param offset: when ``limit`` is given, the offset to start
+        returning organizations from
+    :type offset: int
+    :param organizations: a list of names of the groups to return,
+        if given only groups whose names are in this list will be
+        returned (optional)
+    :type organizations: list of strings
+    :param all_fields: return group dictionaries instead of just names. Only
+        core fields are returned - get some more using the include_* options.
+        Returning a list of packages is too expensive, so the `packages`
+        property for each group is deprecated, but there is a count of the
+        packages in the `package_count` property.
+        (optional, default: ``False``)
+    :type all_fields: bool
+    :param include_dataset_count: if all_fields, include the full package_count
+        (optional, default: ``True``)
+    :type include_dataset_count: bool
+    :param include_extras: if all_fields, include the organization extra fields
+        (optional, default: ``False``)
+    :type include_extras: bool
+    :param include_groups: if all_fields, include the organizations the
+        organizations are in
+        (optional, default: ``False``)
+    :type include_groups: bool
+    :param include_users: if all_fields, include the organization users
+        (optional, default: ``False``).
+    :type include_users: bool
+
+    :rtype: list of strings
+
+    '''
+    '''
+    log.error("========CALLED ORG LIST========")    
+    '''     
+    _check_access('organization_list', context, data_dict)
+    data_dict['groups'] = data_dict.pop('organizations', [])
+    data_dict.setdefault('type', 'organization')
+    return _group_or_org_list(context, data_dict, is_org=True)
+
+
+def _group_or_org_list(
+        context: Context, data_dict: DataDict, is_org: bool = False):
+    model = context['model']
+    api = context.get('api_version')
+    groups = data_dict.get('groups')
+    group_type = data_dict.get('type', 'group')
+    ref_group_by = 'id' if api == 2 else 'name'
+    pagination_dict = {}
+    limit = data_dict.get('limit')
+    if limit:
+        pagination_dict['limit'] = data_dict['limit']
+    offset = data_dict.get('offset')
+    if offset:
+        pagination_dict['offset'] = data_dict['offset']
+    if pagination_dict:
+        pagination_dict, errors = _validate(
+            data_dict, ckan.logic.schema.default_pagination_schema(), context)
+        if errors:
+            raise ValidationError(errors)
+    sort = data_dict.get('sort') or config.get('ckan.default_group_sort')
+    q = data_dict.get('q', '').strip()
+
+    all_fields = asbool(data_dict.get('all_fields', None))
+
+    if all_fields:
+        try:
+            max_limit = config.get(
+                'ckan.group_and_organization_list_all_fields_max')
+        except ValueError:
+            max_limit = 25
+    else:
+        try:
+            max_limit = config.get('ckan.group_and_organization_list_max')
+        except ValueError:
+            max_limit = 1000
+
+    if limit is None or int(limit) > int(max_limit):
+        limit = max_limit
+
+    order_by = data_dict.get('order_by', '')
+    if order_by:
+        log.warn('`order_by` deprecated please use `sort`')
+        if not data_dict.get('sort'):
+            sort = order_by
+
+    if sort.strip() in ('packages', 'package_count'):
+        sort = 'package_count desc'
+
+    sort_info = _unpick_search(sort,
+                               allowed_fields=['name', 'packages',
+                                               'package_count', 'title'],
+                               total=1)
+
+    if sort_info and sort_info[0][0] == 'package_count':
+        query = model.Session.query(model.Group.id,
+                                    model.Group.name,
+                                    sqlalchemy.func.count(model.Group.id))
+
+        query = query.filter(model.Member.group_id == model.Group.id) \
+                     .filter(model.Member.table_id == model.Package.id) \
+                     .filter(model.Member.table_name == 'package') \
+                     .filter(model.Package.state == 'active')
+    else:
+        query = model.Session.query(model.Group.id,
+                                    model.Group.name)
+
+    query = query.filter(model.Group.state == 'active')
+
+    # Filter organizations based on visibility
+    user = context['user']
+    is_sysadmin = authz.is_sysadmin(user)
+
+    # Use aliased() to refer to the group_extra table
+    group_extra_alias = aliased(model.GroupExtra)
+
+    # query = query.outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
+
+    if not is_sysadmin:
+        # User is logged in
+        if user:
+            
+            permission = data_dict.get('permission', 'manage_group')
+
+            roles = authz.get_roles_with_permission(permission)
+
+            if not roles:
+                return []
+           
+            user_id = authz.get_user_id_for_username(user, allow_none=True)
+            if not user_id:
+                return []
+
+
+            group_visibility_filter = sqlalchemy.or_(
+                # Organizations with visibility set to public
+                sqlalchemy.and_(
+                    group_extra_alias.key == 'visibility',
+                    group_extra_alias.value == 'public'
+                ),
+                # Organizations with no visibility entry (group_extra is None)
+                group_extra_alias.key == None
+            )
+
+            qmodel = model.Session.query(model.Member, model.Group) \
+                    .filter(sqlalchemy.or_(
+                        # User's groups
+                        sqlalchemy.and_(
+                            model.Member.table_name == 'user',
+                            model.Member.capacity.in_(roles),
+                            model.Member.table_id == user_id,
+                            model.Member.state == 'active',
+                        )
+                    )).join(model.Group)
+
+            group_ids: set[str] = set()
+            roles_that_cascade = cast(
+                "list[str]",
+                authz.check_config_permission('roles_that_cascade_to_sub_groups')
+            )
+            group_ids_to_capacities: dict[str, str] = {}
+            for member, group in qmodel.all():
+                if member.capacity in roles_that_cascade:
+                    children_group_ids = [
+                        grp_tuple[0] for grp_tuple
+                        in group.get_children_group_hierarchy(type='organization')
+                    ]
+                    for group_id in children_group_ids:
+                        group_ids_to_capacities[group_id] = member.capacity
+                    group_ids |= set(children_group_ids)
+
+                group_ids_to_capacities[group.id] = member.capacity
+                group_ids.add(group.id)
+
+
+            public_groups_query = model.Session.query(model.Group.id).outerjoin(
+                group_extra_alias, model.Group.id == group_extra_alias.group_id
+            ).filter(sqlalchemy.or_(
+                sqlalchemy.and_(
+                    group_extra_alias.key == 'visibility',
+                    group_extra_alias.value == 'public'
+                ),
+               
+                group_extra_alias.key == None
+            ))
+
+            public_group_ids = {group_id for group_id, in public_groups_query.all()}
+
+           
+            if not group_ids and not public_group_ids:
+                return []
+
+            group_ids |= public_group_ids
+           
+            query = query.filter(model.Group.id.in_(group_ids))
+            
+        # User is anonymous
+        else:
+            query = query.outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
+            query = query.filter(sqlalchemy.or_(
+                # Organizations with visibility set to public
+                sqlalchemy.and_(
+                    group_extra_alias.key == 'visibility',
+                    group_extra_alias.value == 'public'
+                ),
+                # Organizations with no visibility entry (group_extra is None)
+                group_extra_alias.key == None
+            ))
+
+    
+    if groups:
+        groups = aslist(groups, sep=",")
+        query = query.filter(model.Group.name.in_(groups))
+    if q:
+        q = u'%{0}%'.format(q)
+        query = query.filter(_or_(
+            model.Group.name.ilike(q),
+            model.Group.title.ilike(q),
+            model.Group.description.ilike(q),
+        ))
+
+    query = query.filter(model.Group.is_organization == is_org)
+    query = query.filter(model.Group.type == group_type)
+    query = query.distinct()
+
+    if sort_info:
+        sort_field = sort_info[0][0]
+        sort_direction = sort_info[0][1]
+        sort_model_field: Any = sqlalchemy.func.count(model.Group.id)
+        if sort_field == 'package_count':
+            query = query.group_by(model.Group.id, model.Group.name)
+        elif sort_field == 'name':
+            sort_model_field = model.Group.name
+        elif sort_field == 'title':
+            sort_model_field = model.Group.title
+
+        if sort_direction == 'asc':
+            query = query.order_by(sqlalchemy.asc(sort_model_field))
+        else:
+            query = query.order_by(sqlalchemy.desc(sort_model_field))
+
+    if limit:
+        query = query.limit(limit)
+    if offset:
+        query = query.offset(offset)
+
+    groups = query.all()
+
+    if all_fields:
+        action = 'organization_show' if is_org else 'group_show'
+        group_list = []
+        for group in groups:
+            data_dict['id'] = group.id
+            for key in ('include_extras', 'include_users',
+                        'include_groups', 'include_followers'):
+                if key not in data_dict:
+                    data_dict[key] = False
+            rslt = old_organization_show(context, data_dict)
+            group_list.append(rslt)
+    else:
+        group_list = [getattr(group, ref_group_by) for group in groups]
+
+    return group_list
+
+
+def get_private_organizations(context: Context):
+    model = context['model']
+    user = context.get('user')
+    
+    # Start the query for private organizations
+    query = model.Session.query(model.Group.id, model.Group.name)
+    query = query.filter(model.Group.state == 'active')
+    query = query.filter(model.Group.is_organization == True)
+
+    # Use aliased() to refer to the group_extra table for the 'visibility' check
+    group_extra_alias = aliased(model.GroupExtra)
+    query = query.outerjoin(group_extra_alias, model.Group.id == group_extra_alias.group_id)
+    query = query.filter(group_extra_alias.key == 'visibility', group_extra_alias.value == 'private')
+
+    # # Check if the user is logged in
+    # if user:
+    #     user_id = authz.get_user_id_for_username(user, allow_none=True)
+        
+        
+    #     # Exclude private organizations the user belongs to
+    #     subquery = model.Session.query(model.Member.group_id).filter(
+    #         model.Member.table_name == 'user',
+    #         model.Member.table_id == user_id,
+    #         model.Member.capacity.in_(["member", "admin", "editor"]),  # Ensure user is a 'member'
+    #         model.Member.state == 'active'
+    #     ).subquery()
+
+    #     query = query.filter(~model.Group.id.in_(subquery))
+    
+    # Fetch the final result
+    private_orgs = query.all()
+    
+    return [org.name for org in private_orgs]
+
+
+@logic.side_effect_free
+def organization_patch(context, data_dict):
+
+    visibility = data_dict.get('visibility', "public")
+    user = context.get("user")
+    isSysadmin = authz.is_sysadmin(user)
+
+    if not isSysadmin:
+        temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
+        old_org = get_action("organization_show")(temp_context, data_dict)
+        if old_org.get("visibility", "public") == "private" and visibility == "public":
+            raise ValidationError({"message": 
+                                   _("User is unauthorized to change visibility from private to public. Please contact a SysAdmin.")
+                                   })
+        
+
+    if visibility == "public":
+        parent_org = data_dict.get("parent")
+        parent_org = parent_org.get("value") if parent_org else None
+        if parent_org:
+            temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
+            parent_org = get_action("organization_show")(temp_context, {"id": parent_org})
+            if parent_org.get("visibility", "public") == "private":
+                raise ValidationError({"message": _("Team visibility cannot be set to public if selected parent Team is private.")})
+            
+    if visibility == "private":
+        rdata_dict = {
+            "q": "", 
+            "fq": f"(organization:({data_dict.get('name')}) AND visibility_type:(public OR internal))", 
+            "include_private": False  # Include private datasets in the search
+        }
+        temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
+        public_package = get_action("package_search")(temp_context, rdata_dict)
+        if public_package.get("count") > 0:
+            raise ValidationError({"message": _(f"Team has {public_package.get('count')} public Dataset(s) and cannot be made private")})
+    return old_organization_patch(context, data_dict)
+
+def validate_visibility(context, data_dict):
+    
+    visibility = data_dict.get('visibility_type', "public")
+    owner_org = data_dict.get('owner_org', None)
+    if visibility in ["public", "internal"] and  owner_org:
+        org = get_action("organization_show")(context, {"id": owner_org})
+        org_visibility = org.get("visibility", "public")
+        if org_visibility == "private":
+            raise ValidationError({"message": _("Organization has private visibility and cannot create public Datasets")})
+
+
+@logic.side_effect_free
+def organization_show(context, data_dict):
+    data_dict = old_organization_show(context, data_dict)
+    user = context.get("user")
+
+    if not authz.is_sysadmin(user):
+        is_authorized = get_action("organization_list")(context, {"q": data_dict.get("name")})
+        if not is_authorized:
+            raise NotAuthorized
+    return data_dict
+
+
+# IMPORTANT: This is almost a copy of the original package_show, but it calls the _add_group_types
+# function so that `applications` and `groups` are separated in the response.
+@logic.side_effect_free
+def package_show(context: Context, data_dict: DataDict) -> ActionResult.PackageShow:
+    """Return the metadata of a dataset (package) and its resources.
+
+    :param id: the id or name of the dataset
+    :type id: string
+    :param use_default_schema: use default package schema instead of
+        a custom schema defined with an IDatasetForm plugin (default: ``False``)
+    :type use_default_schema: bool
+    :param include_tracking: add tracking information to dataset and
+        resources (default: ``False``)
+    :type include_tracking: bool
+    :param include_plugin_data: Include the internal plugin data object
+        (sysadmin only, optional, default:``False``)
+    :type: include_plugin_data: bool
+    :rtype: dictionary
+
+    """
+    for_view = context.get("for_view", False)
+
+    if not for_view:
+        context["use_cache"] = False
+
+    model = context["model"]
+    user_obj = context.get("auth_user_obj")
+    context["session"] = model.Session
+    name_or_id = data_dict.get("id") or _get_or_bust(data_dict, "name_or_id")
+
+    include_plugin_data = asbool(data_dict.get("include_plugin_data", False))
+    if user_obj and user_obj.is_authenticated:
+        include_plugin_data = user_obj.sysadmin and include_plugin_data
+
+        if include_plugin_data:
+            context["use_cache"] = False
+
+    pkg = model.Package.get(name_or_id, for_update=context.get("for_update", False))
+
+    if pkg is None:
+        raise NotFound
+
+    context["package"] = pkg
+    _check_access("package_show", context, data_dict)
+
+    if data_dict.get("use_default_schema", False):
+        context["schema"] = ckan.logic.schema.default_show_package_schema()
+
+    include_tracking = asbool(data_dict.get("include_tracking", False))
+
+    package_dict = None
+    use_cache = context.get("use_cache", True)
+    package_dict_validated = False
+
+    if use_cache:
+        try:
+            search_result = search.show(name_or_id)
+        except (search.SearchError, socket.error):
+            pass
+        else:
+            use_validated_cache = "schema" not in context
+            if use_validated_cache and "validated_data_dict" in search_result:
+                package_json = search_result["validated_data_dict"]
+                package_dict = json.loads(package_json)
+                package_dict_validated = True
+            else:
+                package_dict = json.loads(search_result["data_dict"])
+                package_dict_validated = False
+            metadata_modified = pkg.metadata_modified.isoformat()
+            search_metadata_modified = search_result["metadata_modified"]
+            # solr stores less precise datetime,
+            # truncate to 22 charactors to get good enough match
+            if metadata_modified[:22] != search_metadata_modified[:22]:
+                package_dict = None
+
+    if not package_dict:
+        package_dict = model_dictize.package_dictize(pkg, context, include_plugin_data)
+        package_dict_validated = False
+
+    if include_tracking:
+        # page-view tracking summary data
+        package_dict["tracking_summary"] = model.TrackingSummary.get_for_package(
+            package_dict["id"]
+        )
+
+        for resource_dict in package_dict["resources"]:
+            summary = model.TrackingSummary.get_for_resource(resource_dict["url"])
+            resource_dict["tracking_summary"] = summary
+
+    if context.get("for_view"):
+        for item in plugins.PluginImplementations(plugins.IPackageController):
+            package_dict = item.before_dataset_view(package_dict)
+
+    for item in plugins.PluginImplementations(plugins.IPackageController):
+        item.read(pkg)
+
+    for item in plugins.PluginImplementations(plugins.IResourceController):
+        for resource_dict in package_dict["resources"]:
+            item.before_resource_show(resource_dict)
+
+    if not package_dict_validated:
+        package_plugin = lib_plugins.lookup_package_plugin(package_dict["type"])
+        schema = context.get("schema") or package_plugin.show_package_schema()
+
+        if bool(schema) and context.get("validate", True):
+            package_dict, _errors = lib_plugins.plugin_validate(
+                package_plugin, context, package_dict, schema, "package_show"
+            )
+
+    for item in plugins.PluginImplementations(plugins.IPackageController):
+        item.after_dataset_show(context, package_dict)
+
+    package_dict = _add_group_types(context, package_dict)
+
+    return package_dict
+
+
+def _add_group_types(context: Context, data_dict: DataDict):
+    for_view = context.get("for_view", False)
+    for_approval = context.get("for_approval", False)
+    for_update = context.get("for_update", False)
+    for_create = context.get("for_create", False)
+
+    if any([for_view, for_approval, for_update, for_create]):
+        return data_dict
+    try:
+        package_groups = data_dict.get("groups", [])
+        updated_package_groups = []
+        package_applications = []
+
+        for group in package_groups:
+            group_dict = get_action("group_show")(context, {"id": group["id"]})
+            group_type = group_dict.get("type", "group")
+
+            new_group_dict = {
+                "contact_url": group_dict.get("contact_url"),
+                "url": group_dict.get("url"),
+                "help_url": group_dict.get("help_url"),
+                "homepage_url": group_dict.get("homepage_url"),
+            }
+
+            if group_type == "application":
+                group_dict_updates = {"type": group_type}
+                group.update(group_dict_updates)
+
+                for key, value in new_group_dict.items():
+                    if value:
+                        group[key] = value
+                    else:
+                        group.pop(key, None)
+
+                package_applications.append(group)
+            else:
+                group.update({"type": group_type})
+                updated_package_groups.append(group)
+
+        data_dict["groups"] = updated_package_groups + package_applications
+    except Exception as e:
+        log.error(f"Error adding group types: {e}")
+
+    return data_dict
+
+def get_download_events(context: Context, data_dict: DataDict):
+    """Get download events, optionally as CSV.
+    
+    Args:
+        context: The context dict
+        data_dict: Dictionary containing:
+            - owner_org: Organization ID (required for non-sysadmins)
+            - format: 'json' (default) or 'csv' 
+    """
+    import csv
+    from io import StringIO
+    
+    owner_org = data_dict.get("owner_org")
+    output_format = data_dict.get("format", "json").lower()
+    
+    # Check if the user has access to the organization
+    tk.check_access("organization_member_create", context, {"id": owner_org})
+    
+    # Get download events
+    if owner_org:
+        org = tk.get_action("organization_show")(context, {"id": owner_org})
+        download_events = DownloadEvent.get_by_owner_org(org.get('id', None))
+    else:
+        download_events = DownloadEvent.get_all()
+
+    # Convert to dictionaries
+    events_dicts = download_event_list_dictize(download_events, context)
+
+    # Return JSON if requested (default)
+    if output_format == "json":
+        return events_dicts
+        
+    # Return CSV if requested
+    elif output_format == "csv":
+        if not events_dicts:
+            return ""
+            
+        output = StringIO()
+        writer = csv.DictWriter(
+            output,
+            fieldnames=events_dicts[0].keys(),
+            quoting=csv.QUOTE_NONNUMERIC
+        )
+        
+        writer.writeheader()
+        for event in events_dicts:
+            writer.writerow(event)
+            
+        return output.getvalue()
+        
+    else:
+        raise tk.ValidationError(f"Invalid format: {output_format}. Must be 'json' or 'csv'")

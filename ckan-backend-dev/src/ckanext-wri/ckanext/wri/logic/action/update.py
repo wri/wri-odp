@@ -19,11 +19,13 @@ from ckanext.wri.logic.action.send_group_notification import (
     GroupNotificationParams,
     send_group_notification,
 )
+from ckanext.wri.logic.action.action_helpers import stringify_actor_objects, _before_dataset_create_or_update
 import ckan.plugins.toolkit as tk
 import ckan.logic as logic
 from ckan.common import _
 import json
 import requests
+from ckanext.wri.logic.action.get import validate_visibility
 
 # encoding: utf-8
 
@@ -156,6 +158,7 @@ def notification_bulk_update(
 
 def pending_dataset_update(context: Context, data_dict: DataDict):
     """Update a Pending Dataset"""
+    context["for_approval"] = True
     package_id = data_dict.get("package_id")
     package_data = data_dict.get("package_data")
 
@@ -164,8 +167,6 @@ def pending_dataset_update(context: Context, data_dict: DataDict):
 
     if not package_data:
         raise tk.ValidationError(_("package_data is required"))
-
-    tk.check_access("package_create", context, package_data)
 
     pending_dataset = None
 
@@ -189,6 +190,8 @@ def issue_delete(context: Context, data_dict: DataDict):
 
 
 def package_patch(context: Context, data_dict: DataDict):
+    validate_visibility(context, data_dict)
+    context["for_update"] = True
     dataset_id = data_dict.get("id")
     try:
         pending_dataset_dict = tk.get_action("pending_dataset_show")(
@@ -233,6 +236,10 @@ def package_patch(context: Context, data_dict: DataDict):
     data_dict["is_approved"] = False
     data_dict["approval_status"] = "pending"
     _pending_dataset = {**pending_dataset, **data_dict}
+
+    # Override for authors/maintainers validation/formatting
+    _pending_dataset = stringify_actor_objects(_pending_dataset)
+
     patch_dataset = logic.action.patch.package_patch(
         {"ignore_auth": True},
         {
@@ -281,6 +288,165 @@ def package_patch(context: Context, data_dict: DataDict):
     return pending_update.get("package_data")
 
 
+# IMPORTANT: This function includes an override/change for authors/maintainers (the call to stringify_actor_objects).
+# This is not a 1:1 match with the original function, though all other logic is the same.
+def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.PackageUpdate:
+    """Update a dataset (package).
+
+    You must be authorized to edit the dataset and the groups that it belongs
+    to.
+
+    .. note:: Update methods may delete parameters not explicitly provided in the
+        data_dict. If you want to edit only a specific attribute use `package_patch`
+        instead.
+
+    It is recommended to call
+    :py:func:`ckan.logic.action.get.package_show`, make the desired changes to
+    the result, and then call ``package_update()`` with it.
+
+    Plugins may change the parameters of this function depending on the value
+    of the dataset's ``type`` attribute, see the
+    :py:class:`~ckan.plugins.interfaces.IDatasetForm` plugin interface.
+
+    For further parameters see
+    :py:func:`~ckan.logic.action.create.package_create`.
+
+    :param id: the name or id of the dataset to update
+    :type id: string
+
+    :returns: the updated dataset (if ``'return_id_only'`` is ``False`` in
+              the context, which is the default. Otherwise returns just the
+              dataset id)
+    :rtype: dictionary
+
+    """
+    context["for_update"] = True
+    model = context["model"]
+    name_or_id = data_dict.get("id") or data_dict.get("name")
+    if name_or_id is None:
+        raise ValidationError({"id": _("Missing value")})
+
+    pkg = model.Package.get(name_or_id)
+    if pkg is None:
+        raise NotFound(_("Package was not found."))
+    context["package"] = pkg
+
+    # Override for authors/maintainers validation/formatting
+    data_dict = stringify_actor_objects(data_dict)
+
+    # immutable fields
+    data_dict["id"] = pkg.id
+    data_dict["type"] = pkg.type
+
+    _check_access("package_update", context, data_dict)
+
+    user = context["user"]
+    # get the schema
+
+    package_plugin = lib_plugins.lookup_package_plugin(pkg.type)
+    schema = context.get("schema") or package_plugin.update_package_schema()
+    if "api_version" not in context:
+        # check_data_dict() is deprecated. If the package_plugin has a
+        # check_data_dict() we'll call it, if it doesn't have the method we'll
+        # do nothing.
+        check_data_dict = getattr(package_plugin, "check_data_dict", None)
+        if check_data_dict:
+            try:
+                package_plugin.check_data_dict(data_dict, schema)
+            except TypeError:
+                # Old plugins do not support passing the schema so we need
+                # to ensure they still work.
+                package_plugin.check_data_dict(data_dict)
+
+    resource_uploads = []
+    for resource in data_dict.get("resources", []):
+        # file uploads/clearing
+        upload = uploader.get_resource_uploader(resource)
+
+        if "mimetype" not in resource:
+            if hasattr(upload, "mimetype"):
+                resource["mimetype"] = upload.mimetype
+
+        if "url_type" in resource:
+            if hasattr(upload, "filesize"):
+                resource["size"] = upload.filesize
+
+        resource_uploads.append(upload)
+
+    data, errors = lib_plugins.plugin_validate(
+        package_plugin, context, data_dict, schema, "package_update"
+    )
+    log.debug(
+        "package_update validate_errs=%r user=%s package=%s data=%r",
+        errors,
+        user,
+        context["package"].name,
+        data,
+    )
+
+    if errors:
+        model.Session.rollback()
+        raise ValidationError(errors)
+
+    # avoid revisioning by updating directly
+    model.Session.query(model.Package).filter_by(id=pkg.id).update(
+        {"metadata_modified": datetime.datetime.utcnow()}
+    )
+    model.Session.refresh(pkg)
+
+    include_plugin_data = False
+    user_obj = context.get("auth_user_obj")
+    if user_obj:
+        plugin_data = data.get("plugin_data", False)
+        include_plugin_data = user_obj.sysadmin and plugin_data
+
+    pkg = model_save.package_dict_save(data, context, include_plugin_data)
+
+    context_org_update = context.copy()
+    context_org_update["ignore_auth"] = True
+    context_org_update["defer_commit"] = True
+    _get_action("package_owner_org_update")(
+        context_org_update, {"id": pkg.id, "organization_id": pkg.owner_org}
+    )
+
+    # Needed to let extensions know the new resources ids
+    model.Session.flush()
+    for index, (resource, upload) in enumerate(
+        zip(data.get("resources", []), resource_uploads)
+    ):
+        resource["id"] = pkg.resources[index].id
+
+        upload.upload(resource["id"], uploader.get_max_resource_size())
+
+    for item in plugins.PluginImplementations(plugins.IPackageController):
+        item.edit(pkg)
+
+        item.after_dataset_update(context, data)
+
+    if not context.get("defer_commit"):
+        model.repo.commit()
+
+    log.debug("Updated object %s" % pkg.name)
+
+    return_id_only = context.get("return_id_only", False)
+
+    # Make sure that a user provided schema is not used on package_show
+    context.pop("schema", None)
+
+    # we could update the dataset so we should still be able to read it.
+    context["ignore_auth"] = True
+    output = (
+        data_dict["id"]
+        if return_id_only
+        else _get_action("package_show")(
+            context, {"id": data_dict["id"], "include_plugin_data": include_plugin_data}
+        )
+    )
+    return output
+
+
+# IMPORTANT: This function includes an override/change for authors/maintainers (the call to stringify_actor_objects).
+# This is not a 1:1 match with the original function, though all other logic is the same.
 def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.PackagePatch:
     """Patch a dataset (package).
 
@@ -302,6 +468,8 @@ def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.Pac
     You must be authorized to edit the dataset and the groups that it belongs
     to.
     """
+    validate_visibility(context, data_dict)
+    _before_dataset_create_or_update(context, data_dict)
     _check_access("package_patch", context, data_dict)
 
     show_context: Context = {
@@ -320,11 +488,16 @@ def old_package_patch(context: Context, data_dict: DataDict) -> ActionResult.Pac
     patched = dict(package_dict)
     patched.update(data_dict)
     patched["id"] = package_dict["id"]
+
+    # Override for authors/maintainers validation/formatting
+    patched = stringify_actor_objects(patched)
+
     return _get_action("old_package_update")(context, patched)
 
 
 def approve_pending_dataset(context: Context, data_dict: DataDict):
     dataset_id = data_dict.get("dataset_id")
+    context["for_approval"] = True
     # Fetch Pending Dataset Information
     try:
         pending_dataset_dict = tk.get_action("pending_dataset_show")(
@@ -431,6 +604,7 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
 
     # Update Dataset
     try:
+        pending_dataset = stringify_actor_objects(pending_dataset)
         dataset = tk.get_action("package_update")(
             {"ignore_auth": True}, pending_dataset
         )
@@ -481,6 +655,9 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
         return dataset
 
 
+# IMPORTANT: This function includes an override/change for authors/maintainers (using old_package_update instead of package_update).
+# It also includes an override/change for multiple application support (adds "for_update": True to the context).
+# This is not a 1:1 match with the original function, though all other logic is the same.
 def resource_update(
     context: Context, data_dict: DataDict
 ) -> ActionResult.ResourceUpdate:
@@ -503,6 +680,7 @@ def resource_update(
     :rtype: string
 
     """
+    context["for_update"] = True
     model = context["model"]
     id: str = _get_or_bust(data_dict, "id")
 
@@ -545,7 +723,8 @@ def resource_update(
 
     try:
         context["use_cache"] = False
-        updated_pkg_dict = _get_action("package_update")(context, pkg_dict)
+        # Override for authors/maintainers validation/formatting
+        updated_pkg_dict = _get_action("old_package_update")(context, pkg_dict)
     except ValidationError as e:
         try:
             error_dict = cast("list[ErrorDict]", e.error_dict["resources"])[n]
@@ -565,3 +744,21 @@ def resource_update(
         plugin.after_resource_update(context, resource)
 
     return resource
+
+
+# IMPORTANT: This function includes an override/change to support multiple applications
+# We need to move the applications back to the groups field before calling the original package_update function
+def package_update(context: Context, data_dict: DataDict) -> ActionResult.PackageUpdate:
+    applications = data_dict.get("applications", [])
+
+    if applications:
+        if isinstance(applications, list) and all(
+            isinstance(app, dict) for app in applications
+        ):
+            data_dict["groups"] = data_dict.get("groups", []) + applications
+        else:
+            raise ValidationError(
+                {"applications": _("Applications must be a list of dictionaries")}
+            )
+
+    return old_package_update(context, data_dict)

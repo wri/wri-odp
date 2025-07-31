@@ -23,7 +23,7 @@ import { convertFormToLayerObj } from '@/components/dashboard/datasets/admin/dat
 import { Resource } from '@/interfaces/dataset.interface'
 import { getDecodeParams } from './decodeFunctions'
 
-export async function packageSearch() {
+async function packageSearch() {
     const ckan = new CKAN('https://ckan.x.demo.datopian.com')
     return await ckan.packageSearch({
         query: '',
@@ -35,14 +35,14 @@ export async function packageSearch() {
     })
 }
 
-export const useDatasetsQuery = () => {
+const useDatasetsQuery = () => {
     return useQuery({
         queryKey: ['datasets'],
         queryFn: packageSearch,
     })
 }
 
-export async function getLayersFromRW(
+async function getLayersFromRW(
     queryKey: any,
     currentLayers: Map<string, LayerState>,
     layerAsLayerObj: Map<string, string>,
@@ -60,8 +60,14 @@ export async function getLayersFromRW(
                 if (layers.length === 0) return []
                 const layersData = await Promise.all(
                     layers.map(async (layer: string) => {
-                        layer = layer.replace('prev', '')
+                        if (!layer) return
                         let layerInfo = layerAsLayerObj.get(layer)
+                        if (!layerInfo) {
+                            layerInfo =
+                                currentLayers.get(layer)?.layerSource === 'ckan'
+                                    ? 'pending'
+                                    : 'approved'
+                        }
                         layerInfo = layerInfo ?? 'approved'
                         if (layerInfo === 'approved') {
                             const response = await fetch(
@@ -125,7 +131,7 @@ export async function getLayersFromRW(
                             const resource = layerdata[0]!
 
                             const resourceLayer =
-                                resource.layerObj ?? resource.layerObjRaw
+                                resource?.layerObj ?? resource?.layerObjRaw
                             const currentLayer = currentLayers.get(resource.id)
                             const layerPackage = {
                                 ...resourceLayer,
@@ -146,6 +152,7 @@ export async function getLayersFromRW(
                                         ? resourceLayer?.default
                                         : true,
                             }
+                            console.log('LAYER PACKAGE', layerPackage)
                             return layerPackage
                         } else {
                             // for prevdataset
@@ -189,7 +196,7 @@ export async function getLayersFromRW(
                 )
                 return {
                     dataset: datasetId,
-                    layers: layersData,
+                    layers: layersData.filter(Boolean),
                 }
             }
         )

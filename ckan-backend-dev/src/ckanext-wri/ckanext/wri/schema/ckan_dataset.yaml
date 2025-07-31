@@ -38,6 +38,19 @@ dataset_fields:
   label: Spatial address
   validators: ignore_missing
 
+- field_name: spatial_type
+  label: Spatial type
+  preset: select
+  choices:
+  - value: address
+    label: Address
+  - value: geom
+    label: Geom
+  - value: global
+    label: Global
+  - value: derived_from_resources
+    label: Derived From Resources
+
 - field_name: spatial
   label: Spatial
   validators: ignore_missing
@@ -83,10 +96,6 @@ dataset_fields:
 - field_name: project
   label: Project
   form_placeholder: eg. Project Name
-
-- field_name: application
-  label: Application
-  form_placeholder: eg. Application Name
 
 - field_name: technical_notes
   label: Technical Notes
@@ -180,29 +189,39 @@ dataset_fields:
   form_snippet: markdown.html
   form_placeholder: eg. Some useful notes about the data
 
-- field_name: author
-  label: Author
-  form_placeholder: Joe Bloggs
-  display_property: dc:creator
+#- field_name: author
+#  label: Author
+#  form_placeholder: Joe Bloggs
+#  display_property: dc:creator
 
-- field_name: author_email
-  label: Author Email
-  form_placeholder: joe@example.com
-  display_property: dc:creator
-  display_snippet: email.html
-  display_email_name_field: author
+#- field_name: author_email
+#  label: Author Email
+#  form_placeholder: joe@example.com
+#  display_property: dc:creator
+#  display_snippet: email.html
+#  display_email_name_field: author
 
-- field_name: maintainer
-  label: Maintainer
-  form_placeholder: Joe Bloggs
-  display_property: dc:contributor
+- field_name: authors
+  label: Authors
+  preset: agents_json_object
+  form_placeholder: 'eg. [{"name": "Joe Bloggs", "email": "joe.bloggs@example.com"}, {"name": "Example Organization (or Initiative)", "email": "contact@example.com"}]'
 
-- field_name: maintainer_email
-  label: Maintainer Email
-  form_placeholder: joe@example.com
-  display_property: dc:contributor
-  display_snippet: email.html
-  display_email_name_field: maintainer
+#- field_name: maintainer
+#  label: Maintainer
+#  form_placeholder: Joe Bloggs
+#  display_property: dc:contributor
+
+#- field_name: maintainer_email
+#  label: Maintainer Email
+#  form_placeholder: joe@example.com
+#  display_property: dc:contributor
+#  display_snippet: email.html
+#  display_email_name_field: maintainer
+
+- field_name: maintainers
+  label: Maintainers
+  preset: agents_json_object
+  form_placeholder: 'eg. [{"name": "Joe Bloggs", "email": "joe.bloggs@example.com"}, {"name": "Example Organization (or Initiative)", "email": "contact@example.com"}]'
 
 - field_name: usecases
   label: Use cases

@@ -10,10 +10,10 @@ import notify from '@/utils/notify'
 import { api } from '@/utils/api'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 import { useRouter } from 'next/router'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
 import Link from 'next/link'
@@ -22,6 +22,8 @@ import { Tab } from '@headlessui/react'
 import { Fragment } from 'react'
 import classNames from '@/utils/classnames'
 import { Members } from '../metadata/Members'
+import { z } from 'zod'
+import { useSession } from 'next-auth/react'
 
 type TeamOutput = RouterOutput['teams']['getTeam']
 
@@ -29,14 +31,61 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [deleteOpen, setDeleteOpen] = useState(false)
     const router = useRouter()
+    const possibleParents = api.teams.getAllTeams.useQuery()
+    const { data: session } = useSession()
+    const sysadmin = session?.user?.sysadmin ?? false
     const links = [
         { label: 'Teams', url: '/dashboard/teams', current: false },
         {
-            label: 'Edit team',
+            label: 'Edit Team',
             url: `/dashboard/teams/${team.name}/edit`,
             current: true,
         },
     ]
+    const userCapacity = api.user.getUserCapacity.useQuery()
+    const isAdminCurrentTeam = userCapacity.data?.adminOrg.some(
+        (org) => org.name === team.name
+    ) ?? false
+
+    const TeamSchemaRefine = TeamSchema.superRefine((val, ctx) => {
+        if (val.visibility.value === 'public' && val.parent) {
+            const parent = possibleParents.data?.find(
+                (team) => team.name === val.parent?.value
+            )
+            const visibility = parent?.visibility
+            const isPrivate = parent && visibility === 'private'
+            if (isPrivate) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['visibility'],
+                    message:
+                        'Team visibility cannot be set to public if selected parent Team is private.',
+                })
+            }
+        }
+
+        if (!sysadmin && val.parent) {
+            const org = possibleParents.data?.find((team) => team.id === val.id)
+
+            const capacity = org?.capacity
+            const isAdmin = org && capacity !== 'admin'
+
+            if (isAdmin) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['parent'],
+                    message:
+                        'User does not have admin access to edit a SubTeam',
+                })
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['visibility'],
+                    message:
+                        'User does not have admin access to edit this Team',
+                })
+            }
+        }
+    })
 
     const formObj = useForm<TeamFormType>({
         defaultValues: {
@@ -44,6 +93,10 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             parent: {
                 value: team.groups[0]?.name ?? '',
                 label: team.groups[0]?.name ?? '',
+            },
+            visibility: {
+                value: team.visibility || 'public',
+                label: team.visibility || 'public',
             },
             members: team.users?.map((member) => ({
                 user: {
@@ -57,14 +110,14 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                 },
             })),
         },
-        resolver: zodResolver(TeamSchema),
+        resolver: zodResolver(TeamSchemaRefine),
     })
 
     const utils = api.useContext()
     const editTeam = api.teams.editTeam.useMutation({
         onSuccess: async ({ name, title }) => {
             await utils.teams.getTeam.invalidate({ id: name })
-            notify(`Successfully edited the ${title ?? name} team`, 'success')
+            notify(`Successfully edited the ${title ?? name} Team`, 'success')
             router.push('/dashboard/teams')
         },
         onError: (error) => setErrorMessage(error.message),
@@ -75,7 +128,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             await utils.teams.getTeam.invalidate({ id: team.name })
             setDeleteOpen(false)
             notify(
-                `Successfully deleted the ${team.title ?? team.name} team`,
+                `Successfully deleted the ${team.title ?? team.name} Team`,
                 'error'
             )
             router.push('/dashboard/teams')
@@ -114,7 +167,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                         </Dialog.Title>
                         <div className="mt-2">
                             <p className="text-sm text-gray-500">
-                                Are you sure you want to delete this team?
+                                Are you sure you want to delete this Team?
                             </p>
                         </div>
                     </div>
@@ -140,7 +193,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             <Container className="mb-20 font-acumin">
                 <div className="flex justify-between">
                     <h1 className="mb-[2rem] text-[1.57rem] font-semibold">
-                        Edit team
+                        Edit Team
                     </h1>
                     <Button
                         variant="destructive"
@@ -184,47 +237,42 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                         </Tab.List>
                         <Tab.Panels>
                             <Tab.Panel>
-
-                                    <form
-                                        onSubmit={formObj.handleSubmit((data) => {
-                                            editTeam.mutate(data)
-                                        })}
-                                    >
-                                        <div className="w-full py-8 border-b border-blue-800 shadow">
-                                            <div className="px-2 sm:px-8">
-                                                <TeamForm
-                                                    formObj={formObj}
-                                                    editing={true}
-                                                />
-                                            </div>
+                                <form
+                                    onSubmit={formObj.handleSubmit((data) => {
+                                        editTeam.mutate(data)
+                                    })}
+                                >
+                                    <div className="w-full py-8 border-b border-blue-800 shadow">
+                                        <div className="px-2 sm:px-8">
+                                            <TeamForm
+                                                formObj={formObj}
+                                                editing={true}
+                                                sysadmin={sysadmin}
+                                                isAdminCurrentTeam={
+                                                    isAdminCurrentTeam
+                                                }
+                                            />
                                         </div>
-                                        {errorMessage && (
-                                            <div className="py-4">
-                                                <ErrorAlert text={errorMessage} />
-                                            </div>
-                                        )}
-                                    </form>
+                                    </div>
+                                    {errorMessage && (
+                                        <div className="py-4">
+                                            <ErrorAlert text={errorMessage} />
+                                        </div>
+                                    )}
+                                </form>
                             </Tab.Panel>
                             <Tab.Panel
-                                    as="div"
-                                    className="flex flex-col gap-y-12 mt-8"
-                                >
-                                    <Members
-                                        team={team}
-                                        formObj={formObj}
-                                    />
+                                as="div"
+                                className="flex flex-col gap-y-12 mt-8"
+                            >
+                                <Members team={team} formObj={formObj} />
                             </Tab.Panel>
                         </Tab.Panels>
                     </div>
                 </Tab.Group>
                 <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-6 xxl:px-0">
-                    <Button
-                        type="button"
-                        variant="outline"
-                    >
-                        <Link href="/dashboard/teams">
-                            Cancel
-                        </Link>
+                    <Button type="button" variant="outline">
+                        <Link href="/dashboard/teams">Cancel</Link>
                     </Button>
                     <LoaderButton
                         loading={editTeam.isLoading}

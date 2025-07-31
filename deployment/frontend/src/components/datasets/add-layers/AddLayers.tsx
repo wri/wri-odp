@@ -21,7 +21,7 @@ export default function AddLayers() {
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
-        sortBy: 'relevance desc',
+        sortBy: 'score desc',
         fq: { res_format: 'Layer' },
         appendRawFq: ` -id:(${dataset.id})`
     })

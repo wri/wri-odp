@@ -17,6 +17,10 @@ import superjson from 'superjson'
 import { env } from '@/env.mjs'
 import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
+import { Group as CkanGroup } from '@portaljs/ckan'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
+type Group = CkanGroup & { numSubtopics: number }
+
 const TopicsSearchResults = dynamic(
     () => import('@/components/topics/TopicsSearchResults')
 )
@@ -25,7 +29,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
     const helpers = createServerSideHelpers({
         router: appRouter,
-        ctx: { session },
+        ctx: { session, ip: undefined },
         transformer: superjson,
     })
     await helpers.topics.getGeneralTopics.prefetch({
@@ -51,16 +55,21 @@ export default function TopicsPage(
     const [query, setQuery] = useState<string>('')
     const { data, isLoading } = api.topics.getGeneralTopics.useQuery({
         search: '',
-        page: { start: 0, rows: 1000 },
+        page: { start: 0, rows: 10000 },
         allTree: true,
     })
-
     const indexTopics = new Index({
         tokenize: 'full',
     })
-    if (data?.topics) {
-        data?.topics.forEach((topic) => {
-            indexTopics.add(topic.id, JSON.stringify(topic))
+    if (data?.allTopics) {
+        data?.allTopics.forEach((topic) => {
+            indexTopics.add(
+                topic.id,
+                JSON.stringify({
+                    title: topic.title,
+                    description: topic.description,
+                })
+            )
         })
     }
 
@@ -68,19 +77,31 @@ export default function TopicsPage(
         if (!data) return { topics: [], topicDetails: {}, count: 0 }
         const filteredTopics =
             query !== ''
-                ? data.topics.filter((t) =>
-                      indexTopics.search(query).includes(t.id)
-                  )
-                : data.topics
-        const topics = filteredTopics.slice(
-            pagination.page.start,
-            pagination.page.start + pagination.page.rows
-        )
+                ? (data?.allTopics
+                      ?.filter((t) => indexTopics.search(query).includes(t.id))
+                      .filter(
+                          (obj, index, self) =>
+                              index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+                      ) ?? [])
+                : data.topics.filter(
+                      (obj, index, self) =>
+                          index === self.findIndex((t) => t.id === obj.id)
+                  ) // Compare based on 'id' property
+        const topics = filteredTopics
+            ?.slice(
+                pagination.page.start,
+                pagination.page.start + pagination.page.rows
+            )
+            .filter(
+                (obj, index, self) =>
+                    index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+            ) as GroupTree[] | Organization[]
         const topicDetails = data.topicDetails
-        return { topics, topicDetails, count: filteredTopics.length }
+        return { topics, topicDetails, count: filteredTopics?.length }
     }
 
     const filteredTopics = ProcessTopics()
+    const links = [{ label: 'Topics', url: '/topics', current: true }]
 
     return (
         <>
@@ -95,26 +116,35 @@ export default function TopicsPage(
                 }}
             />
             <Header />
+            <Breadcrumbs links={links} />
             <TopicsSearch
                 isLoading={isLoading}
                 setQuery={setQuery}
                 query={query}
+                groupType="Topics"
             />
             <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
-                    <h3 className="pt-1 font-bold font-acumin text-xl font-light leading-loose text-neutral-700 ">
-                        Explore reliable datasets filtered by the topic of your
+                    <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
+                        Explore reliable Datasets filtered by the topic of your
                         interest.
                     </h3>
                 </div>
             </section>
             {isLoading ? (
-                <Spinner className="mx-auto" />
+                <div className="mx-auto h-[2898px] lg:h-[2406px]">
+                    <Spinner className="mx-auto" />
+                </div>
             ) : (
                 <>
                     <TopicsSearchResults
-                        count={filteredTopics.count}
+                        filtered={
+                            query !== '' &&
+                            query !== null &&
+                            typeof query !== 'undefined'
+                        }
+                        count={filteredTopics?.count ?? 0}
                         topics={filteredTopics.topics}
                         topicDetails={filteredTopics.topicDetails}
                     />
@@ -129,8 +159,11 @@ export default function TopicsPage(
             )}
             <Footer
                 links={{
-                    primary: { title: 'Advanced Search', href: '#' },
-                    secondary: { title: 'Explore Topics', href: '#' },
+                    primary: { title: 'Explore Teams', href: '/teams' },
+                    secondary: {
+                        title: 'Explore Applications',
+                        href: '/applications',
+                    },
                 }}
             />
         </>

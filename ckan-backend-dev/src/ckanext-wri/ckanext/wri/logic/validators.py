@@ -2,14 +2,25 @@ import datetime
 from typing import Any
 import pycountry
 import logging
+import json
+import re
+from urllib.parse import urlparse
+import string
 
 from ckan.types import Context
 from ckan.plugins.toolkit import ValidationError
 import ckan.lib.navl.dictization_functions as df
 from ckan.lib.navl.dictization_functions import StopOnError
-from ckan.lib.navl.validators import FlattenKey, FlattenDataDict, FlattenErrorDict, Context, Validator
+from ckan.lib.navl.validators import (
+    FlattenKey,
+    FlattenDataDict,
+    FlattenErrorDict,
+    Context,
+    Validator,
+)
 from ckan.lib.navl.dictization_functions import missing
 from ckan.common import _
+from ckan.logic.validators import email_validator
 
 
 Invalid = df.Invalid
@@ -20,7 +31,7 @@ log = logging.getLogger(__name__)
 # TODO: Do we want to enforce this datetime for temporal coverage?
 # Example values on their current portal range from "January 1, 2019 - December 31, 2019" to "2019 - 2021"
 # There are also empty values as well as " - ".
-#def iso_datetime_range(value: Any, context: Context):
+# def iso_datetime_range(value: Any, context: Context):
 #    """
 #    Validates that the value is a valid ISO 8601 datetime range.
 #
@@ -67,21 +78,17 @@ def iso_language_code(value: Any, context: Context):
         return
 
     if not isinstance(value, str):
-        log.error('Language code is not a string')
+        log.error("Language code is not a string")
         raise Invalid("Value must be a string")
 
     try:
         is_lang = pycountry.languages.get(alpha_2=value)
 
         if not is_lang:
-            log.error(
-                f'Value must be a valid ISO 639-1 language code: {is_lang}'
-            )
-            raise Invalid(
-                "Value must be a valid ISO 639-1 language code"
-            )
+            log.error(f"Value must be a valid ISO 639-1 language code: {is_lang}")
+            raise Invalid("Value must be a valid ISO 639-1 language code")
     except Exception as e:
-        log.error(f'Value must be a valid ISO 639-1 language code: {e}')
+        log.error(f"Value must be a valid ISO 639-1 language code: {e}")
         raise Invalid("Value must be a valid ISO 639-1 language code")
 
     return value
@@ -99,14 +106,15 @@ def year_validator(value: Any, context: Context):
     try:
         value = int(value)
     except ValueError as e:
-        log.error(f'Value must be a valid 4-digit year: {e}')
+        log.error(f"Value must be a valid 4-digit year: {e}")
         raise Invalid("Value must be a valid 4-digit year")
 
     if value < 0 or value > 3000:
-        log.error(f'Value must be a valid 4-digit year: {value}')
+        log.error(f"Value must be a valid 4-digit year: {value}")
         raise Invalid("Value must be a valid 4-digit year")
 
     return value
+
 
 def mutually_exclusive(other_key: str) -> Validator:
     """Ensure that either current value or other field has value, but not both.
@@ -138,8 +146,13 @@ def mutually_exclusive(other_key: str) -> Validator:
         assert not errors
 
     """
-    def callable(key: FlattenKey, data: FlattenDataDict,
-                 errors: FlattenErrorDict, context: Context):
+
+    def callable(
+        key: FlattenKey,
+        data: FlattenDataDict,
+        errors: FlattenErrorDict,
+        context: Context,
+    ):
         value = data.get(key)
         other_value = data.get(key[:-1] + (other_key,))
 
@@ -147,8 +160,137 @@ def mutually_exclusive(other_key: str) -> Validator:
             # Either current value or other field should have a value, but not both
             return
 
-        errors[key].append(_('Either {0} or {1} should be present, not both.')
-                           .format(key[-1], other_key))
+        errors[key].append(
+            _("Either {0} or {1} should be present, not both.").format(
+                key[-1], other_key
+            )
+        )
         raise StopOnError
 
     return callable
+
+
+def _validate_agent(agent: dict, context: Context):
+    """
+    Confirms that the agent is a valid dictionary with only "name" and "email" keys.
+
+    e.g.:
+    {
+      "name": "Joe Bloggs",
+      "email": "joe.bloggs@example.com"
+    }
+    """
+    required_keys = ["name", "email"]
+
+    for key in agent.keys():
+        if key not in required_keys:
+            log.error(f'Unsupported key "{key}"')
+            raise Invalid(f'Unsupported key "{key}"')
+
+    for key in required_keys:
+        if key not in agent:
+            log.error(f'"{key}" is required')
+            raise Invalid(f'"{key}" is required')
+
+        if not isinstance(agent[key], str):
+            log.error(f'"{key}" must be a string')
+            raise Invalid(f'"{key}" must be a string')
+
+        if key == "email":
+            agent[key] = email_validator(agent[key], context)
+
+
+def agents_json_object(value: Any, context: Context):
+    """
+    Confirms that the value is a valid JSON object (array of objects).
+    Must contain an array of objects with only "name" and "email" keys.
+
+    e.g.:
+    [
+      {
+        "name": "Joe Bloggs",
+        "email": "joe.bloggs@example.com"
+      },
+      {
+        "name": "Example Organization (or Initiative)",
+        "email": "contact@example.com"
+      }
+    ]
+    """
+    if not value:
+        return
+
+    loaded_value = value
+
+    if isinstance(value, str):
+        try:
+            loaded_value = json.loads(value)
+        except Exception as e:
+            log.error(f"Value must be a valid JSON object: {e}")
+            raise Invalid("Value must be a valid JSON object")
+    elif isinstance(value, list):
+        for agent in loaded_value:
+            _validate_agent(agent, context)
+
+    return value
+
+
+def _url_validator(value: str) -> bool:
+    """Checks that the provided value is a valid URL"""
+    try:
+        pieces = urlparse(value)
+        if all([pieces.scheme, pieces.netloc]) and pieces.scheme in [
+            "http",
+            "https",
+        ]:
+            hostname, port = (
+                pieces.netloc.split(":")
+                if ":" in pieces.netloc
+                else (pieces.netloc, None)
+            )
+            if set(hostname) <= set(string.ascii_letters + string.digits + "-.") and (
+                port is None or port.isdigit()
+            ):
+                return True
+    except ValueError:
+        # url is invalid
+        pass
+    return False
+
+
+# pattern from https://html.spec.whatwg.org/#e-mail-state-(type=email)
+email_pattern = re.compile(
+    # additional pattern to reject malformed dots usage
+    r"^(?!\.)(?!.*\.$)(?!.*?\.\.)"
+    r"[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9]"
+    r"(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9]"
+    r"(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+)
+
+
+def _email_validator(value: str) -> bool:
+    """Check that the value is a valid email address."""
+    if 'mailto:' in value:
+        value = value.split('mailto:')[1]
+        return bool(email_pattern.match(value))
+    else:
+        return False
+
+
+def url_or_email_validator(value: Any, context: Context):
+    """
+    Check that the value is a valid URL or email address.
+
+    e.g. "http://example.com" or "example.user@example.com"
+    """
+    if not value:
+        return
+
+    if not isinstance(value, str):
+        log.error("Value must be a string")
+        raise Invalid("Value must be a string")
+
+    if _email_validator(value) or _url_validator(value):
+        return value
+
+    raise Invalid(_("Invalid URL"))

@@ -32,7 +32,6 @@ def test_search_queries(mail_user):
         "language": "en",
         "owner_org": organization_dict["id"],
         "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
-        "application": "rw app",
         "groups": [{"id": group_dict["id"]}],
         "technical_notes": "http://example.com/technical_notes.pdf",
         "tag_string": "economy,mental health,government",
@@ -69,7 +68,6 @@ def test_search_queries(mail_user):
     fields_to_test = [
         "language",
         "project",
-        "application",
         "technical_notes",
         # 'temporal_coverage_start', 'temporal_coverage_end',
         "update_frequency",

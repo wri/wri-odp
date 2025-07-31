@@ -22,14 +22,20 @@ export default function TeamsSearch({
         >
             <form
                 onSubmit={(e) => console.log(e)}
-                className="w-full px-8 xxl:px-0 max-w-8xl mx-auto"
+                className="w-full px-8 xxl:px-0 max-w-8xl mx-auto -mt-[37px]"
             >
+                <div className="w-full max-w-[819px] xxl:pl-8 2xl:px-0 ">
+                    <h1 className="text-[40px]  leading-[48px] font-['Acumin Pro SemiCondensed'] font-semibold text-white mb-[31px]">
+                        Teams
+                    </h1>
+                </div>
+
                 <div className="relative flex w-full max-w-[819px] items-start justify-start gap-x-6 xxl:pl-8 2xl:px-0">
                     <input
                         onChange={(e) => setQuery(e.target.value)}
                         value={query}
                         name="search"
-                        placeholder="Search teams"
+                        placeholder="Search Teams"
                         aria-label="search"
                         className="h-14 rounded-sm block w-full border-0 px-5 py-2 text-gray-900 shadow-wri-small ring-1 ring-inset ring-gray-300 placeholder:text-gray-900 placeholder:text-base border-b-2 border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
                     />

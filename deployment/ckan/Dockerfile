@@ -1,22 +1,41 @@
-FROM viderum/ckan:v2.10-dev-security-fix
+FROM viderum/ckan:v2.11.0
 
 ENV CKAN_INI /srv/app/production.ini
 ENV APP_DIR=/srv/app
 
+USER root
+RUN pip3 install --upgrade setuptools==70.0.0
 # Install any extensions needed by your CKAN instance
-RUN pip3 install -e 'git+https://github.com/datopian/ckanext-scheming.git@ckan-2.10#egg=ckanext-scheming' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-scheming/ckan-2.10/test-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/cost-splitting-orgs#egg=ckanext-s3filestore' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/requirements.txt' && \
-    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/cost-splitting-orgs/dev-requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@fd7113f076336c13b9952d6b2161c0f4339e5cc6#egg=ckanext-auth' && \
-    pip3 install -e 'git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ckan-2.10#egg=ckanext-issues'
+
+RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf2856aee97fa7b49de46847f8119dad355#egg=ckanext-scheming' && \
+    pip3 install -r 'https://raw.githubusercontent.com/ckan/ckanext-scheming/5ce30cf2856aee97fa7b49de46847f8119dad355/test-requirements.txt' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/signed-url#egg=ckanext-s3filestore' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/signed-url/requirements.txt' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/signed-url/dev-requirements.txt' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@a9e42702b797eaf3ffe967040867519219d32224#egg=ckanext-auth' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-hierarchy.git@5d069a5d032ba384f43d266fc397a0aa0a4b444c#egg=ckanext-hierarchy' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ea2b3cbace924a162de009fd8e5626052ebc99e1#egg=ckanext-issues' && \
+    # Required by ckanext-issues, but it's no longer included in any of the requirements files or the subdependencies
+    pip3 install mock && \
+    pip3 install -e 'git+https://github.com/ckan/ckanext-harvest.git@v1.6.0#egg=ckanext-harvest' && \
+    pip3 install -r 'https://raw.githubusercontent.com/ckan/ckanext-harvest/refs/tags/v1.6.0/requirements.txt'
+    
+RUN pip3 install moto && \
+    pip3 install ckanapi && \
+    pip3 install httpretty
 
 USER root
 
+RUN chmod 777 ${APP_DIR}/src/ckanext-s3filestore
+
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
+RUN apk update
+RUN apk add git=2.40.4-r0
+
+
+RUN pip install --force-reinstall -v "Pillow==11.0.0"
 
 RUN apk add --virtual .build-deps \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
@@ -35,6 +54,9 @@ RUN pip install --disable-pip-version-check Shapely==2.0.1
 RUN apk del build-base python3-dev && \
     rm -rf /var/cache/apk/*
 
+RUN apk add proj proj-dev proj-util musl-dev python3-dev
+RUN pip3 install pyproj --no-binary pyproj
+
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 COPY setup/start_ckan.sh.override ${APP_DIR}/start_ckan.sh
@@ -52,12 +74,54 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
-USER ckan
+RUN apk --no-cache add openssl sudo
+
+# Configure sudo access for ckan user
+
+RUN echo "ckan ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ckan && \
+    chmod 0440 /etc/sudoers.d/ckan
+
+RUN pip3 install -r /srv/app/src/ckan/requirements.txt
+
 RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -r requirements.txt && pip3 install -r dev-requirements.txt && pip3 install -e .
 
-ENV CKAN__PLUGINS image_view text_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups wri auth hierarchy_display hierarchy_form hierarchy_group_form issues envvars
+USER ckan
+
+ENV CKAN__PLUGINS text_view image_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest hierarchy_display wri wri_harvester auth issues envvars
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = False"
+RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
+RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_unowned_dataset = False"
+RUN ckan config-tool ${CKAN_INI} "ckan.views.default_views = 'image_view'"
+
+RUN if [ "$GITHUB_ACTIONS" = "true" ]; then ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"; fi
+
+
+USER root
+
+RUN chown -R ckan:ckan ${APP_DIR}/src/
+
+RUN mkdir -p ${APP_DIR}/supervisor/supervisord.d
+
+COPY setup/supervisord.conf ${APP_DIR}/supervisor/supervisord.conf
+COPY setup/supervisor.worker.conf ${APP_DIR}/supervisor/supervisord.d/worker.conf
+COPY setup/supervisor.harvest.conf ${APP_DIR}/supervisor/supervisord.d/harvest.conf
+
+RUN chown -R ckan:ckan ${APP_DIR}/supervisor
+RUN chmod -R u+w ${APP_DIR}/supervisor
 
 USER ckan
+
+# From: https://fly.io/docs/blueprints/supercronic/
+# Latest releases available at https://github.com/aptible/supercronic/releases
+ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.29/supercronic-linux-amd64 \
+    SUPERCRONIC=supercronic-linux-amd64 \
+    SUPERCRONIC_SHA1SUM=cd48d45c4b10f3f0bfdd3a57d054cd05ac96812b
+
+RUN curl -fsSLO "$SUPERCRONIC_URL" \
+ && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
+ && chmod +x "$SUPERCRONIC"
+
+COPY setup/crontab ${APP_DIR}/crontab

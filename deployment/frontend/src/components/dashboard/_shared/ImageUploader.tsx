@@ -8,6 +8,7 @@ import { ArrowUpTrayIcon } from '@heroicons/react/24/outline'
 import { MinusCircleIcon } from '@heroicons/react/20/solid'
 import { Button } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
+import DefaultTooltip from '@/components/_shared/Tooltip'
 
 export function ImageUploader({
     onUploadSuccess,
@@ -16,6 +17,7 @@ export function ImageUploader({
     text = 'Upload image',
     clearImage,
     defaultImage,
+    tooltip,
 }: {
     onUploadSuccess: (result: UploadResult) => void
     onPresignedUrlSuccess?: (response: string) => void
@@ -23,6 +25,7 @@ export function ImageUploader({
     clearImage?: () => void
     text?: string
     defaultImage?: string | null
+    tooltip?: string
 }) {
     const [key, setKey] = useState<string | null>(null)
     const [uploading, setIsUploading] = useState(false)
@@ -101,7 +104,7 @@ export function ImageUploader({
         if (onUploadStart) onUploadStart()
     })
 
-    return (
+    const uplader = (
         <>
             <button
                 onClick={() => uploadInputRef.current?.click()}
@@ -192,4 +195,12 @@ export function ImageUploader({
                 )}
         </>
     )
+    if (tooltip) {
+        return (
+            <DefaultTooltip content={tooltip}>
+                <div>{uplader}</div>
+            </DefaultTooltip>
+        )
+    }
+    return uplader
 }

@@ -16,7 +16,7 @@ import type {
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
-import { Facets, Filter } from '@/interfaces/search.interface'
+import { Facets, FacetsCount, Filter } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { Session } from 'next-auth'
 import nodemailer from 'nodemailer'
@@ -70,14 +70,15 @@ export async function searchHierarchy({
                     group_type == 'group'
                         ? 'group_list_wri'
                         : 'organization_list_wri'
-                }?q=${q}`
+                }?include_extras=true&all_fields=true&q=${q}`
             } else {
                 urLink = `${env.CKAN_URL}/api/3/action/${
                     group_type == 'group'
                         ? 'group_list_wri'
                         : 'organization_list_wri'
-                }`
+                }?include_extras=true&all_fields=true`
             }
+
             response = await fetch(urLink, {
                 headers: {
                     Authorization: apiKey,
@@ -90,8 +91,8 @@ export async function searchHierarchy({
             response = await fetch(
                 `${env.CKAN_URL}/api/3/action/${
                     group_type == 'group'
-                        ? `group_list_authz_wri${q ? `?q=${q}` : ''}`
-                        : `organization_list_for_user_wri${q ? `?q=${q}` : ''}`
+                        ? `group_list_authz_wri?include_extras=true&all_fields=true${q ? `&q=${q}` : ''}`
+                        : `organization_list_for_user_wri?include_extras=true&all_fields=true${q ? `&q=${q}` : ''}`
                 }`,
                 {
                     headers: {
@@ -101,7 +102,6 @@ export async function searchHierarchy({
             )
 
             const data = (await response.json()) as CkanResponse<GroupTree[]>
-            console.log('TESTING', data)
             groups = data.success === true ? data.result : []
         }
 
@@ -122,7 +122,7 @@ export async function getGroups({
 }): Promise<GroupTree[]> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/group_tree?all_fields=True&type=${group_type}`,
+            `${env.CKAN_URL}/api/3/action/group_tree?include_extras=true&all_fields=true&type=${group_type}`,
             {
                 headers: {
                     Authorization: apiKey,
@@ -136,6 +136,22 @@ export async function getGroups({
         console.error(e)
         return []
     }
+}
+
+export async function groupList({ apiKey }: { apiKey: string | null }) {
+    const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/group_list?include_extras=true&all_fields=true`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${apiKey ?? ''}`,
+            },
+        }
+    )
+    const topics: CkanResponse<Group[]> = await topicRes.json()
+    if (!topics.success && topics.error)
+        throw Error(replaceNames(topics.error.message))
+    return topics.result.filter((topic) => topic.state === 'active')
 }
 
 export async function getGroup({
@@ -198,7 +214,7 @@ export async function getAllOrganizations({
                 const response = await fetch(
                     `${
                         env.CKAN_URL
-                    }/api/3/action/organization_list?all_fields=True&limit=${
+                    }/api/3/action/organization_list?include_extras=true&all_fields=true&limit=${
                         (i + 1) * 25
                     }&offset=${i * 25}`,
                     {
@@ -236,7 +252,7 @@ export async function getUserGroups({
 }): Promise<Group[] | null> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/group_list?all_fields=true`,
+            `${env.CKAN_URL}/api/3/action/group_list?include_extras=true&all_fields=true`,
             {
                 headers: {
                     Authorization: apiKey,
@@ -301,7 +317,12 @@ export async function getAllDatasetFq({
     extAddressQ?: string
     extGlobalQ?: string
     user?: boolean | null
-}): Promise<{ datasets: WriDataset[]; count: number; searchFacets: Facets }> {
+}): Promise<{
+    datasets: WriDataset[]
+    count: number
+    searchFacets: Facets
+    facets: FacetsCount
+}> {
     try {
         let url = `${env.CKAN_URL}/api/3/action/package_search?q=${query.search}`
 
@@ -310,7 +331,10 @@ export async function getAllDatasetFq({
         }
 
         if (facetFields) {
-            url += `&facet.field=["${facetFields.join('","')}"]`
+            const _facetFields = facetFields.filter(
+                (f) => f !== 'metadata_modified'
+            )
+            url += `&facet.field=["${_facetFields.join('","')}"]`
         }
 
         if (sortBy) {
@@ -346,6 +370,7 @@ export async function getAllDatasetFq({
             results: WriDataset[]
             count: number
             search_facets: Facets
+            facets: FacetsCount
         }>
 
         if (data.error) {
@@ -355,13 +380,14 @@ export async function getAllDatasetFq({
         const datasets = data.success === true ? data.result.results : []
 
         const count = data.success === true ? data.result.count : 0
+        const facets = data.success === true ? data.result.facets : {}
         const searchFacets =
             data.success === true ? data.result?.search_facets : {}
 
-        return { datasets, count, searchFacets }
+        return { datasets, count, searchFacets, facets }
     } catch (e) {
         console.error(e)
-        throw new Error('Failed to fetch datasets')
+        throw new Error('Failed to fetch Datasets')
     }
 }
 
@@ -374,7 +400,7 @@ export async function getUserOrganizations({
 }): Promise<WriOrganization[]> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/organization_list_for_user?all_fields=true`,
+            `${env.CKAN_URL}/api/3/action/organization_list_for_user?include_extras=true&all_fields=true`,
             {
                 headers: {
                     Authorization: `${apiKey}`,
@@ -386,6 +412,33 @@ export async function getUserOrganizations({
         const organizations: WriOrganization[] | [] =
             data.success === true ? data.result : []
         return organizations
+    } catch (e) {
+        console.error(e)
+        return []
+    }
+}
+
+export async function getCollaboratorPackages({
+    userId,
+    apiKey,
+}: {
+    userId: string
+    apiKey: string
+}): Promise<Collaborator[]> {
+    try {
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/package_collaborator_list_for_user?id=${userId}`,
+            {
+                headers: {
+                    Authorization: `${apiKey}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        )
+
+        const data = (await response.json()) as CkanResponse<Collaborator[]>
+        const collab: Collaborator[] = data.success === true ? data.result : []
+        return collab
     } catch (e) {
         console.error(e)
         return []
@@ -531,6 +584,19 @@ export async function getOneDataset(
         throw Error(JSON.stringify(dataset.error))
     }
 
+    if (dataset.result.owner_org) {
+        const org = await getOrgDetails({
+            orgId: dataset.result.owner_org,
+            apiKey: session?.user.apikey ?? '',
+        })
+
+        const visibility = org?.visibility || 'public'
+
+        const organization = dataset.result.organization!
+        organization.visibility = visibility
+        dataset.result = { ...dataset.result, organization }
+    }
+
     if (dataset.result.rw_id && dataset.result.approval_status !== 'pending') {
         const rwRes = await fetch(
             `https://api.resourcewatch.org/v1/dataset/${dataset.result.rw_id}`,
@@ -547,6 +613,7 @@ export async function getOneDataset(
                     datasetRw.errors
                 )})`
             )
+        console.log('FAILED HERE')
         dataset.result.connectorType = datasetRw.data.attributes.connectorType
         dataset.result.connectorUrl = datasetRw.data.attributes.connectorUrl
         dataset.result.provider = datasetRw.data.attributes.provider
@@ -558,6 +625,7 @@ export async function getOneDataset(
 
         if (resource.length) {
             const layer = resource[0]!
+            console.log('FAILED HERE 2')
             dataset.result.connectorType = layer.connectorType
             dataset.result.connectorUrl = layer.connectorUrl
             dataset.result.provider = layer.provider
@@ -578,13 +646,15 @@ export async function getOneDataset(
         dataset.result.resources.map(async (r) => {
             if (r.url_type === 'upload' || r.url_type === 'link') {
                 let _views: View[] = []
-                try {
-                    _views = await getResourceViews({
-                        id: r.id,
-                        session: session,
-                    })
-                } catch (e) {
-                    _views = []
+                if (r.datastore_active) {
+                    try {
+                        _views = await getResourceViews({
+                            id: r.id,
+                            session: session,
+                        })
+                    } catch (e) {
+                        _views = []
+                    }
                 }
                 const resourceHasChartView =
                     r.datastore_active &&
@@ -607,14 +677,6 @@ export async function getOneDataset(
                 return r
             if (!r.layerObj && !r.layerObjRaw) {
                 const layerObj = await getLayerRw(r.url!)
-                if (r.url_type === 'layer')
-                    return {
-                        ...r,
-                        layerObj: !noLayer
-                            ? convertLayerObjToForm(layerObj)
-                            : true,
-                    }
-
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
@@ -622,23 +684,30 @@ export async function getOneDataset(
                             ? getRawObjFromApiSpec(layerObj)
                             : true,
                     }
-            }
-
-            if (r.layerObj || r.layerObjRaw) {
-                if (r.layerObj) {
+                if (r.url_type === 'layer')
                     return {
                         ...r,
                         layerObj: !noLayer
-                            ? convertLayerObjToForm(r.layerObj)
+                            ? convertLayerObjToForm(layerObj)
                             : true,
-                        rw_id: r.id,
                     }
-                }
+            }
+
+            if (r.layerObj || r.layerObjRaw) {
                 if (r.layerObjRaw) {
                     return {
                         ...r,
                         layerObjRaw: !noLayer
                             ? getRawObjFromApiSpec(r.layerObjRaw)
+                            : true,
+                        rw_id: r.id,
+                    }
+                }
+                if (r.layerObj) {
+                    return {
+                        ...r,
+                        layerObj: !noLayer
+                            ? convertLayerObjToForm(r.layerObj)
                             : true,
                         rw_id: r.id,
                     }
@@ -682,7 +751,20 @@ export async function getOnePendingDataset(
         }
         throw Error(JSON.stringify(data.error))
     }
-    const dataset = data.result.package_data
+    let dataset = data.result.package_data
+
+    if (dataset.owner_org) {
+        const org = await getOrgDetails({
+            orgId: dataset.owner_org,
+            apiKey: session?.user.apikey ?? '',
+        })
+
+        const visibility = org?.visibility || 'public'
+
+        const organization = dataset.organization!
+        organization.visibility = visibility
+        dataset = { ...dataset, organization }
+    }
 
     // if (dataset.rw_id) {
     const resourceLayer = dataset.resources.filter(
@@ -690,6 +772,7 @@ export async function getOnePendingDataset(
     )
     if (resourceLayer.length) {
         const layer = resourceLayer[0]!
+        console.log('FAILED HERE 3')
         dataset.connectorType = layer.connectorType
         dataset.connectorUrl = layer.connectorUrl
         dataset.provider = layer.provider
@@ -870,6 +953,7 @@ export function findNameInTree(
     // Recursive case: search through children
     if (tree.children && tree.children.length > 0) {
         for (const child of tree.children) {
+            child.parent_name = tree.name
             const result = findNameInTree(child, targetName)
             if (result) {
                 return result // If found in child, return the result
@@ -904,6 +988,7 @@ export function findAllNameInTree(
 
     return result
 }
+
 export async function getOrganizationTreeDetails({
     input,
     session,
@@ -912,6 +997,44 @@ export async function getOrganizationTreeDetails({
     session: Session | null
 }) {
     let groupTree: GroupTree[] = []
+
+    if (input.search) {
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
+            apiKey: session?.user.apikey ?? '',
+            q: input.search,
+            group_type: 'organization',
+        })
+
+        if (input.tree) {
+            for (const gtree of groupTree) {
+                const findtree = findNameInTree(gtree, input.search)
+                if (findtree) {
+                    if (findtree.private) {
+                        groupTree = []
+                        break
+                    }
+                    groupTree = [findtree]
+                    break
+                }
+            }
+        }
+    } else {
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
+            apiKey: session?.user.apikey ?? '',
+            q: '',
+            group_type: 'organization',
+        })
+    }
+
+    if (groupTree.length === 0) {
+        return {
+            teams: groupTree,
+            teamsDetails: {} as Record<string, GroupsmDetails>,
+            count: 0,
+        }
+    }
     const allGroups = (await getAllOrganizations({
         apiKey: session?.user.apikey ?? '',
     }))!
@@ -923,43 +1046,21 @@ export async function getOrganizationTreeDetails({
                 description: org.description ?? '',
                 package_count: org.package_count!,
                 name: org.name,
+                visibility: org.visibility!
             }
             return acc
         },
         {} as Record<string, GroupsmDetails>
     )
 
+    const facets = await fetchFacets(
+        teamDetails,
+        'organization',
+        session?.user.apikey ?? ''
+    )
     for (const group in teamDetails) {
         const team = teamDetails[group]!
-        const packagedetails = (await getAllDatasetFq({
-            apiKey: session?.user.apikey ?? '',
-            fq: `organization:${team.name}+is_approved:true`,
-            query: { search: '', page: { start: 0, rows: 10000 } },
-        }))!
-        team.package_count = packagedetails.count
-    }
-
-    if (input.search) {
-        groupTree = await searchHierarchy({
-            isSysadmin: true,
-            apiKey: session?.user.apikey ?? '',
-            q: input.search,
-            group_type: 'organization',
-        })
-        groupTree = groupTree.filter((x) => x.name === input.search)
-        if (input.tree) {
-            let groupFetchTree = groupTree[0] as GroupTree
-            const findTree = findNameInTree(groupFetchTree, input.search)
-            if (findTree) {
-                groupFetchTree = findTree
-            }
-            groupTree = [groupFetchTree]
-        }
-    } else {
-        groupTree = await getGroups({
-            apiKey: session?.user.apikey ?? '',
-            group_type: 'organization',
-        })
+        team.package_count = facets[team.name] ?? 0
     }
 
     const result = groupTree
@@ -970,6 +1071,25 @@ export async function getOrganizationTreeDetails({
     }
 }
 
+export async function fetchFacets(
+    teamDetails: Record<string, { name: string }>,
+    groupType: 'organization' | 'groups',
+    apiKey: string
+): Promise<Record<string, number>> {
+    const fq = `(${Object.values(teamDetails)
+        .map((item) => item.name)
+        .join(' OR ')})`
+
+    const facetsQuery = await getAllDatasetFq({
+        apiKey: apiKey,
+        fq: `${groupType}:${fq}+is_approved:true`,
+        facetFields: [groupType],
+        query: { search: '', page: { start: 0, rows: 0 } },
+    })
+
+    return facetsQuery.facets[groupType] ?? {}
+}
+
 export async function getTopicTreeDetails({
     input,
     session,
@@ -978,6 +1098,40 @@ export async function getTopicTreeDetails({
     session: Session | null
 }) {
     let groupTree: GroupTree[] = []
+
+    if (input.search) {
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
+            apiKey: session?.user.apikey ?? '',
+            q: input.search,
+            group_type: 'group',
+        })
+
+        if (input.tree) {
+            for (const gtree of groupTree) {
+                const findtree = findNameInTree(gtree, input.search)
+                if (findtree) {
+                    groupTree = [findtree]
+                    break
+                }
+            }
+        }
+    } else {
+        groupTree = await searchHierarchy({
+            isSysadmin: true,
+            apiKey: session?.user.apikey ?? '',
+            q: '',
+            group_type: 'group',
+        })
+    }
+
+    if (groupTree.length === 0) {
+        return {
+            topics: groupTree,
+            topicDetails: {} as Record<string, GroupsmDetails>,
+            count: 0,
+        }
+    }
     const allGroups = (await getUserGroups({
         apiKey: session?.user.apikey ?? '',
         userId: '',
@@ -995,38 +1149,19 @@ export async function getTopicTreeDetails({
         {} as Record<string, GroupsmDetails>
     )
 
+    const facets = await fetchFacets(
+        topicDetails,
+        'groups',
+        session?.user.apikey ?? ''
+    )
+
     for (const group in topicDetails) {
         const topic = topicDetails[group]!
-        const packagedetails = (await getAllDatasetFq({
-            apiKey: session?.user.apikey ?? '',
-            fq: `groups:${topic.name}+is_approved:true`,
-            query: { search: '', page: { start: 0, rows: 10000 } },
-        }))!
-        topic.package_count = packagedetails.count
-    }
-    if (input.search) {
-        groupTree = await searchHierarchy({
-            isSysadmin: true,
-            apiKey: session?.user.apikey ?? '',
-            q: input.search,
-            group_type: 'group',
-        })
-        groupTree = groupTree.filter((x) => x.name === input.search)
-        if (input.tree) {
-            let groupFetchTree = groupTree[0] as GroupTree
-            const findTree = findNameInTree(groupFetchTree, input.search)
-            if (findTree) {
-                groupFetchTree = findTree
-            }
-            groupTree = [groupFetchTree]
-        }
-    } else {
-        groupTree = await getGroups({
-            apiKey: session?.user.apikey ?? '',
-        })
+        topic.package_count = facets[topic.name] ?? 0
     }
 
     const result = groupTree
+
     return {
         topics: result,
         topicDetails: topicDetails,
@@ -1197,7 +1332,7 @@ export function generateInviteEmail(
     `
 }
 
-export async function generateMemberEmail(
+async function generateMemberEmail(
     senderUser: User,
     recipientUser: User,
     notification: NotificationType
@@ -1238,16 +1373,16 @@ export async function generateMemberEmail(
             const role = actionType[2]
             const action = actionType[1]
             if (action === 'removed') {
-                subMsg = `${action} you as a collaborator (${role}) from the dataset`
-                subject = `Collaborator role ${action} from dataset ${datasetTitle}`
+                subMsg = `${action} you as a collaborator (${role}) from the Dataset`
+                subject = `Collaborator role ${action} from Dataset ${datasetTitle}`
                 msg = `${senderUserLink} ${subMsg} ${datasetLink}`
             } else if (action === 'added') {
-                subMsg = `${action} you as a collaborator (${role}) for the dataset`
-                subject = `Collaborator role ${action} for dataset ${datasetTitle}`
+                subMsg = `${action} you as a collaborator (${role}) for the Dataset`
+                subject = `Collaborator role ${action} for Dataset ${datasetTitle}`
                 msg = `${senderUserLink} ${action} ${subMsg} ${datasetLink}`
             } else if (action === 'updated') {
-                subMsg = `${action} your collaborator role to "${role}" for the dataset`
-                subject = `Collaborator role ${action} for dataset ${datasetTitle}`
+                subMsg = `${action} your collaborator role to "${role}" for the Dataset`
+                subject = `Collaborator role ${action} for Dataset ${datasetTitle}`
                 msg = `${senderUserLink} ${action} ${subMsg} ${datasetLink}`
             }
         }
@@ -1280,7 +1415,7 @@ export async function generateMemberEmail(
 
         if (!teamOrTopic) {
             throw new Error(
-                `Could not find team or topic with id ${notification.object_id}`
+                `Could not find Team or Topic with id ${notification.object_id}`
             )
         }
 
@@ -1444,7 +1579,7 @@ function findUpdatedMembers(
     })
 }
 
-export async function createNotification(
+async function createNotification(
     recipient_id: string,
     sender_id: string,
     activity_type: string,
@@ -1484,7 +1619,7 @@ export async function createNotification(
     }
 }
 
-export async function getTeamDetails({
+async function getTeamDetails({
     id,
     session,
 }: {
@@ -1509,7 +1644,7 @@ export async function getTeamDetails({
     return team.result
 }
 
-export async function getTopicDetails({
+async function getTopicDetails({
     id,
     session,
 }: {
@@ -1668,11 +1803,11 @@ export async function sendIssueOrCommentNotigication({
                     recipientUsers
                         .filter((user) => user.email)
                         .map(async (user) => {
-                            const subject = `Issue ${action} on dataset ${dataset.title}`
+                            const subject = `Issue ${action} on Dataset ${dataset.title}`
                             const body = `<p>Hi ${
                                 user.name ?? user.display_name ?? 'There'
                             }</p>
-                        <p>There has been an issue ${action} on the dataset ${
+                        <p>There has been an issue ${action} on the Dataset ${
                             dataset.title
                         }.</p>`
                             const email = user.email!
@@ -1940,11 +2075,11 @@ export async function sendGroupNotification({
                         .filter((user) => user.email)
                         .map(async (user) => {
                             const mainAction = action.split('_')[0]
-                            const subject = `Approval status on dataset ${dataset.title}`
+                            const subject = `Approval status on Dataset ${dataset.title}`
                             const body = `<p>Hi ${
                                 user.name ?? user.display_name ?? 'There'
                             }</p>
-                        <p>The approval status for the dataset <a href="${
+                        <p>The approval status for the Dataset <a href="${
                             env.NEXTAUTH_URL
                         }/datasets/${dataset.name}">${
                             dataset.title
@@ -1961,7 +2096,7 @@ export async function sendGroupNotification({
     }
 }
 
-export async function getPackageDiff({
+async function getPackageDiff({
     id,
     session,
 }: {
@@ -2052,6 +2187,7 @@ export async function patchDataset({
         if (datasetObj.error.message) throw Error(datasetObj.error.message)
         throw Error(JSON.stringify(datasetObj.error))
     }
+    return datasetObj
 }
 
 export async function updateDatasetHasChartsFlag({
@@ -2219,7 +2355,7 @@ export async function approvePendingDataset(
     const layerFilter = submittedDataset.resources.filter((x) => x.connectorUrl)
     const layer = layerFilter[0]!
 
-    if (!submittedDataset.rw_id && isLayer) {
+    if (!submittedDataset.rw_id && isLayer && layer) {
         const rwDataset = {
             title: submittedDataset.title! ?? '',
             connectorType: layer.connectorType!,
@@ -2231,11 +2367,17 @@ export async function approvePendingDataset(
         rw_id = datasetRw.data.id
     }
 
-    const resourcesToEditLayer = submittedDataset.rw_id
+    const hasLayersToEdit = submittedDataset.resources.some(
+        (l) => l.rw_id && l.url
+    )
+    const resourcesToEditLayer = hasLayersToEdit
         ? await Promise.all(
               submittedDataset.resources
                   .filter(
-                      (r) => (r.layerObj || r.layerObjRaw) && r.rw_id && r.url
+                      (r) =>
+                          (r.layerObj || r.layerObjRaw) &&
+                          r.rw_id &&
+                          r.url?.startsWith('https://api.resourcewatch.org')
                   )
                   .map(async (r) => {
                       const rr = r as ResourceFormType
@@ -2256,7 +2398,13 @@ export async function approvePendingDataset(
         rw_id !== null
             ? await Promise.allSettled(
                   submittedDataset.resources
-                      .filter((r) => (r.layerObj || r.layerObjRaw) && !r.url)
+                      .filter(
+                          (r) =>
+                              (r.layerObj || r.layerObjRaw) &&
+                              !r.url?.startsWith(
+                                  'https://api.resourcewatch.org'
+                              )
+                      )
                       .map(async (r) => {
                           const rr = r as ResourceFormType
                           if (r.layerObj) {
@@ -2333,6 +2481,7 @@ export async function approvePendingDataset(
         }
     )
     const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>
+    console.log('DATASET UPDATED', dataset)
     if (!dataset.success && dataset.error) {
         if (dataset.error.message)
             throw Error(
@@ -2403,7 +2552,7 @@ export async function approvePendingDataset(
             })
         } catch (error) {
             console.error(error)
-            throw Error('Error in sending issue /comment notification')
+            //throw Error('Error in sending issue /comment notification')
         }
     }
 
@@ -2426,11 +2575,10 @@ export async function approvePendingDataset(
     return dataset.result
 }
 
-export const datasetFields = [
-    'application',
+const datasetFields = [
+    'applications',
     'approval_status',
-    'author',
-    'author_email',
+    'authors',
     'citation',
     'creator_user_id',
     'draft',
@@ -2440,8 +2588,7 @@ export const datasetFields = [
     'isopen',
     'license_id',
     'license_title',
-    'maintainer',
-    'maintainer_email',
+    'maintainers',
     'metadata_created',
     'metadata_modified',
     'name',
@@ -2656,9 +2803,8 @@ export function advance_search_query(filters: Filter[]) {
                 ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
                 : '*'
 
-            fq[
-                'metadata_modified'
-            ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+            fq['metadata_modified'] =
+                `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
         } else if (key == 'spatial') {
             const coordinates = keyFilters[0]?.value
             const address = keyFilters[0]?.label

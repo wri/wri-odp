@@ -43,7 +43,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             href: '/approval-request',
             active: false,
             count: 1,
-            isSysAdmin: true,
+            isSysAdmin: false,
         },
         {
             name: 'Activity Stream',
@@ -71,7 +71,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             href: '/topics',
             active: false,
             count: 0,
-            isSysAdmin: false,
+            isSysAdmin: true,
+        },
+        {
+            name: 'Applications',
+            href: '/applications',
+            active: false,
+            count: 0,
+            isSysAdmin: true,
         },
         {
             name: 'Users',
@@ -168,7 +175,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                         </div>
                                     </Transition.Child>
                                     {/* Sidebar component, swap this element with another sidebar if you like */}
-                                    <div className="flex grow flex-col gap-y-5 overflow-y-auto   bg-wri-green pb-4">
+                                    <div className="flex grow flex-col gap-y-5 overflow-y-auto   bg-wri-green pb-4 dashboard-sidebar">
                                         <nav className="flex flex-1 flex-col ">
                                             <ul
                                                 role="list"
@@ -178,8 +185,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                     <UserProfile />
                                                 </li>
                                                 {navigation.map((item) => {
+                                                    if (
+                                                        item.isSysAdmin &&
+                                                        !session?.user.sysadmin
+                                                    ) {
+                                                        return <></>
+                                                    }
                                                     return (
-                                                        <Fragment key={item.name}>
+                                                        <Fragment
+                                                            key={item.name}
+                                                        >
                                                             {item.name ==
                                                             'Requests for approval' ? (
                                                                 <>
@@ -303,7 +318,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             className="hidden w-full sm:max-w-[300px] lg:z-10 lg:flex lg:flex-col "
                         >
                             {/* Sidebar component, swap this element with another sidebar if you like */}
-                            <div className="flex grow flex-col gap-y-5  pb-4  bg-wri-green">
+                            <div className="flex grow flex-col gap-y-5  pb-4 bg-wri-green dashboard-sidebar">
                                 <nav className="flex flex-1 flex-col ">
                                     <ul
                                         role="list"
@@ -313,6 +328,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                             <UserProfile />
                                         </li>
                                         {navigation.map((item) => {
+                                            if (
+                                                item.isSysAdmin &&
+                                                !session?.user.sysadmin
+                                            ) {
+                                                return <></>
+                                            }
                                             return (
                                                 <Fragment key={item.name}>
                                                     {item.name ==
@@ -426,16 +447,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </Disclosure>
 
                 <div className="w-full">
-                    {!sidebarOpen && <div className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:hidden lg:px-8">
-                        <button
-                            type="button"
-                            className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
-                            onClick={() => setSidebarOpen(true)}
-                        >
-                            <span className="sr-only">Open sidebar</span>
-                            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-                        </button>
-                    </div>}
+                    {!sidebarOpen && (
+                        <div className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:hidden lg:px-8">
+                            <button
+                                type="button"
+                                className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+                                onClick={() => setSidebarOpen(true)}
+                            >
+                                <span className="sr-only">Open sidebar</span>
+                                <Bars3Icon
+                                    className="h-6 w-6"
+                                    aria-hidden="true"
+                                />
+                            </button>
+                        </div>
+                    )}
 
                     <main className="w-full isolate mb-8">
                         <div className=" @container w-full ">{children}</div>

@@ -6,6 +6,8 @@ const TooltipProvider = TooltipPrimitive.Provider
 
 const Tooltip = TooltipPrimitive.Root
 
+const TooltipPortal = TooltipPrimitive.Portal
+
 const TooltipTrigger = TooltipPrimitive.Trigger
 
 const TooltipContent = React.forwardRef<
@@ -16,7 +18,7 @@ const TooltipContent = React.forwardRef<
         ref={ref}
         sideOffset={sideOffset}
         className={classNames(
-            'z-[1000] overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+            'z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
             className ?? ''
         )}
         {...props}
@@ -30,24 +32,32 @@ const DefaultTooltip = ({
     disabled = false,
     side = 'top',
     contentClassName = '',
+    open,
+    onOpenChange,
+    delayDuration = 100,
 }: {
     children: React.ReactNode
     content: React.ReactNode | string
     disabled?: boolean
     side?: 'top' | 'bottom' | 'left' | 'right'
     contentClassName?: string
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
+    delayDuration?: number
 }) => {
     if (disabled) return <>{children}</>
     return (
-        <TooltipProvider delayDuration={100}>
-            <Tooltip>
+        <TooltipProvider delayDuration={delayDuration}>
+            <Tooltip open={open} onOpenChange={onOpenChange}>
                 <TooltipTrigger asChild>{children}</TooltipTrigger>
-                <TooltipContent
-                    className={`bg-white whitespace-normal z-[10000] ${contentClassName}`}
-                    side={side}
-                >
-                    <p className='text-wrap max-w-sm'>{content}</p>
-                </TooltipContent>
+                <TooltipPrimitive.Portal>
+                    <TooltipContent
+                        className={`bg-white whitespace-normal ${contentClassName}`}
+                        side={side}
+                    >
+                        <p className="max-w-sm">{content}</p>
+                    </TooltipContent>
+                </TooltipPrimitive.Portal>
             </Tooltip>
         </TooltipProvider>
     )
@@ -58,5 +68,6 @@ export {
     TooltipTrigger,
     TooltipContent,
     TooltipProvider,
+    TooltipPortal,
 }
 export default DefaultTooltip

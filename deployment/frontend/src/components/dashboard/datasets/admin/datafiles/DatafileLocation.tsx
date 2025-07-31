@@ -15,6 +15,8 @@ import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner'
 import { UseFormReturn } from 'react-hook-form'
 import * as turf from '@turf/turf'
+import { HideBoundaries } from '@/components/_shared/HideBoundaries'
+import DefaultTooltip from '@/components/_shared/Tooltip'
 
 export function DatafileLocation({
     formObj,
@@ -123,7 +125,6 @@ export function DatafileLocation({
                     )
                         .with('geom', () => 0)
                         .with('address', () => 1)
-                        .with('global', () => 2)
                         .otherwise(() => undefined)}
                 >
                     <Tab.List
@@ -155,18 +156,23 @@ export function DatafileLocation({
                                 )
                             }}
                             id="locationUpload"
-                            className={classNames(
-                                'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2'
-                            )}
                         >
-                            <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                            <div
-                                className={classNames(
-                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
-                                )}
-                            >
-                                Upload a GeoJSON file
-                            </div>
+                            <DefaultTooltip content="Upload a GeoJSON file when the desired area cannot be mapped directly to an administrative boundary">
+                                <span
+                                    className={classNames(
+                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2'
+                                    )}
+                                >
+                                    <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                    <div
+                                        className={classNames(
+                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
+                                        )}
+                                    >
+                                        Upload a GeoJSON file
+                                    </div>
+                                </span>
+                            </DefaultTooltip>
                         </Tab>
                         <Tab
                             id="locationString"
@@ -200,42 +206,6 @@ export function DatafileLocation({
                                 </span>
                             )}
                         </Tab>
-                        <Tab
-                            id="tabLink"
-                            onClick={() => {
-                                setValue(
-                                    `resources.${index}.spatial_type`,
-                                    'global'
-                                )
-                                setValue(
-                                    `resources.${index}.spatial_geom`,
-                                    undefined
-                                )
-                                setValue(
-                                    `resources.${index}.spatial_address`,
-                                    'Global'
-                                )
-                            }}
-                        >
-                            {({ selected }) => (
-                                <span
-                                    className={classNames(
-                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                        selected ? 'bg-amber-400' : ''
-                                    )}
-                                >
-                                    <GlobeEuropeAfricaIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                    <div
-                                        className={classNames(
-                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
-                                            selected ? 'font-bold' : ''
-                                        )}
-                                    >
-                                        Global Datafile
-                                    </div>
-                                </span>
-                            )}
-                        </Tab>
                     </Tab.List>
                     <Tab.Panels as="div" className="mt-2">
                         <Tab.Panel>
@@ -248,6 +218,7 @@ export function DatafileLocation({
                                     touchZoomRotate={false}
                                     initialViewState={{ zoom: 2 }}
                                 >
+                                    <HideBoundaries />
                                     <Source
                                         type="geojson"
                                         data={watch(
@@ -285,6 +256,7 @@ export function DatafileLocation({
                                 dragRotate={false}
                                 touchZoomRotate={false}
                             >
+                                <HideBoundaries />
                                 <GeocoderControl
                                     mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     position="bottom-right"
@@ -308,13 +280,14 @@ export function DatafileLocation({
                                             undefined
                                         )
                                     }}
-                                    initialValue={watch(
-                                        `resources.${index}.spatial_address`
-                                    )}
+                                    initialValue={
+                                        watch(
+                                            `resources.${index}.spatial_address`
+                                        ) ?? undefined
+                                    }
                                 />
                             </Map>
                         </Tab.Panel>
-                        <Tab.Panel></Tab.Panel>
                     </Tab.Panels>
                 </Tab.Group>
             </Disclosure.Panel>

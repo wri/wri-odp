@@ -11,23 +11,37 @@ import {
 import { Button } from '@/components/_shared/Button'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { DatasetFormType } from '@/schema/dataset.schema'
-import { Controller, Path, UseFormReturn } from 'react-hook-form'
+import {
+    Controller,
+    FieldValues,
+    Path,
+    PathValue,
+    UseFormReturn,
+} from 'react-hook-form'
 
-interface MulTextProps {
-    options?: string[]
-    formObj: UseFormReturn<DatasetFormType>
-    name: Path<DatasetFormType>
+interface MulTextProps<T extends FieldValues> {
+    options?: Option[]
+    formObj: UseFormReturn<T>
+    name: Path<T>
     title: string
     tooltip?: string
+    allowsCreationOfItems?: boolean
 }
 
-export default function MulText({
+type Option = string | { label: string; value: string }
+
+function isString(option: Option): option is string {
+    return typeof option === 'string'
+}
+
+export default function MulText<T extends FieldValues>({
     options = [],
     formObj,
     name,
     title,
     tooltip = 'Remove item',
-}: MulTextProps) {
+    allowsCreationOfItems = false,
+}: MulTextProps<T>) {
     const { control } = formObj
     const [open, setOpen] = useState(false)
     const ref = useRef<HTMLButtonElement>(null)
@@ -37,20 +51,21 @@ export default function MulText({
     const filteredOptions =
         query === ''
             ? options
-            : options.filter((item) => {
+            : options.filter((_item) => {
+                  const item = isString(_item) ? _item : _item.label
                   return item.toLowerCase().includes(query.toLowerCase())
               })
 
     return (
         <Controller
             control={control}
-            name={name}
-            defaultValue={[]}
+            name={name as any}
+            defaultValue={[] as PathValue<T, Path<T>>}
             render={({ field: { onChange, value } }) => (
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                         <Button
-                            aria-label='Open dropdown'
+                            aria-label="Open dropdown"
                             variant="outline"
                             role="combobox"
                             ref={ref}
@@ -58,7 +73,7 @@ export default function MulText({
                         >
                             <div className="flex w-full items-start justify-between">
                                 {value.length === 0 ? (
-                                    <span className="font-acumin text-base font-light text-zinc-500">
+                                    <span className="font-light text-zinc-500">
                                         {title}
                                     </span>
                                 ) : (
@@ -70,7 +85,20 @@ export default function MulText({
                                                     className="flex items-center gap-x-2 rounded-[3px] border border-blue-800 hover:bg-neutral-50 transition bg-white px-2 py-0.5"
                                                 >
                                                     <span className="font-['Acumin Pro SemiCondensed'] text-[15px] font-normal text-zinc-800">
-                                                        {item}
+                                                        {isString(item)
+                                                            ? item
+                                                            : (
+                                                                  options.find(
+                                                                      (
+                                                                          option
+                                                                      ) =>
+                                                                          !isString(
+                                                                              option
+                                                                          ) &&
+                                                                          option.value ===
+                                                                              item
+                                                                  ) as any
+                                                              )?.label}
                                                     </span>
                                                     <DefaultTooltip
                                                         content={tooltip}
@@ -111,7 +139,7 @@ export default function MulText({
                             onChange={(e) => onChange(e)}
                             multiple
                         >
-                            <span className="font-acumin text-base font-semibold text-black">
+                            <span className="font-light text-black">
                                 {title}
                             </span>
                             <div className="relative isolate">
@@ -127,7 +155,7 @@ export default function MulText({
                                 static
                                 className="overflow-auto rounded-md bg-white py-1 text-base focus:outline-none sm:text-sm"
                             >
-                                {query.length > 0 && (
+                                {allowsCreationOfItems && query.length > 0 && (
                                     <Combobox.Option
                                         value={query}
                                         className={({ active }) =>
@@ -142,9 +170,13 @@ export default function MulText({
                                         Create "{query}"
                                     </Combobox.Option>
                                 )}
-                                {filteredOptions.map((option: string) => (
+                                {filteredOptions.map((option: Option) => (
                                     <Combobox.Option
-                                        key={option}
+                                        key={
+                                            isString(option)
+                                                ? option
+                                                : option.value
+                                        }
                                         className={({ active }) =>
                                             classNames(
                                                 active
@@ -153,7 +185,11 @@ export default function MulText({
                                                 'relative group cursor-default select-none py-2 pl-3 pr-9'
                                             )
                                         }
-                                        value={option}
+                                        value={
+                                            isString(option)
+                                                ? option
+                                                : option.value
+                                        }
                                     >
                                         {({ selected }) => (
                                             <>
@@ -166,7 +202,9 @@ export default function MulText({
                                                                 : 'opacity-0'
                                                         )}
                                                     />
-                                                    {option}
+                                                    {isString(option)
+                                                        ? option
+                                                        : option.label}
                                                 </span>
                                             </>
                                         )}

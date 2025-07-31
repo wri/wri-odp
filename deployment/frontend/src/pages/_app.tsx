@@ -102,9 +102,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
             if (resource.format == 'Layer') {
                 if (
                     (resource['layerObj'] || resource['layerObjRaw']) &&
-                    !resource.url
+                    (resource.rw_id == '' || !resource.rw_id)
                 ) {
-                    layerAsLayerObj.set(resource.rw_id, 'pending')
+                    layerAsLayerObj.set(resource.id, 'pending')
                 } else {
                     layerAsLayerObj.set(resource.rw_id, 'approved')
                 }
@@ -119,7 +119,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 if (resource.format == 'Layer') {
                     if (
                         (resource['layerObj'] || resource['layerObjRaw']) &&
-                        !resource.url
+                        (resource.rw_id == '' || !resource.rw_id)
                     ) {
                         layerAsLayerObj.set(resource.rw_id, 'pending')
                     } else {
@@ -140,7 +140,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 if (resource.format == 'Layer') {
                     if (
                         (resource['layerObj'] || resource['layerObjRaw']) &&
-                        !resource.url
+                        (resource.rw_id == '' || !resource.rw_id)
                     ) {
                         tempLayerAsLayerobj.set(resource.rw_id, 'pending')
                     } else {
@@ -155,8 +155,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
         for (const resource of prevdataset?.resources) {
             if (resource.format == 'Layer') {
                 if (
-                    resource['layerObj'] ||
-                    (resource['layerObjRaw'] && !resource.url)
+                    (resource['layerObj'] || resource['layerObjRaw']) &&
+                    (resource.rw_id == '' || !resource.rw_id)
                 ) {
                     tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')
                 } else {
@@ -172,7 +172,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
         tempLayerAsLayerobj: tempLayerAsLayerobj,
         mapView: {
             ...initialZustandState?.mapView,
-            basemap: initialZustandState?.mapView?.basemap ?? 'dark',
+            basemap: initialZustandState?.mapView?.basemap ?? 'light',
+            labels: initialZustandState?.mapView?.labels ?? 'dark',
             layers: newLayersState,
             activeLayerGroups,
             viewState: {
@@ -205,6 +206,16 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
                     cardType: 'summary_large_image',
                 }}
+                dangerouslySetAllPagesToNoIndex={
+                    env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
+                        ? false
+                        : true
+                }
+                dangerouslySetAllPagesToNoFollow={
+                    env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
+                        ? false
+                        : true
+                }
             />
             <Hydrate
                 /* @ts-ignore */

@@ -20,6 +20,17 @@ Obs: Fields that have a red * are required
 
 Where the main metadata fields are defined
 
+Here you can define things like
+
+- The title of the dataset
+- The name of the dataset, which will be used in the url
+- You can attach tags, topics, applications to the dataset
+- You can define the team to which that dataset will belong
+- Define the visibility
+- Technical notes, caution, citation, update frequency and other fields
+
+![overview](./overview.png)
+
 If you select the `featured dataset` checkbox an image uploader will appear where you can define a thumbnail for your dataset
 
 ![Featured dataset](./featured_dataset.png)
@@ -169,6 +180,16 @@ You can edit the already existing ones by changing the values in the input field
 You can also delete a datafile by clicking the little red button next to the datafile id
 
 ![Delete datafile](./delete_datafile.png)
+
+## Disable betch downloading for datafile
+
+If you want to disable the downloading of a datafile, you can do that by clicking on the `This is not a downloadable link`, this will disable the ability for users to select the datafile to receive an email download, usecases can vary from when you dont want this data to be moved to the data-explorer servers location or when the data is not a file but rather a webpage for example.
+
+![Disable batch download](./not_downloadable_checkbox.png)
+
+This will be the resulting UI
+
+![Disable batch download resulting ui](./not_downloadable_result.png)
 
 ## Collaborators
 

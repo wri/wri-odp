@@ -34,12 +34,16 @@ export const env = createEnv({
         AZURE_AD_TENANT_ID: z.string(),
         AZURE_AD_CLIENT_ID: z.string(),
         AZURE_AD_CLIENT_SECRET: z.string(),
+        OKTA_CLIENT_ID: z.string(),
+        OKTA_CLIENT_SECRET: z.string(),
+        OKTA_ISSUER: z.string(),
         SMTP_SERVER: z.string(),
         SMTP_PORT: z.string(),
         SMTP_USER: z.string(),
         SMTP_PASSWORD: z.string(),
         SMTP_FROM: z.string(),
         PREFECT_INTERNAL_URL: z.string(),
+        OSANO_URL: z.string(),
     },
 
     /**
@@ -54,6 +58,8 @@ export const env = createEnv({
         NEXT_PUBLIC_DISABLE_HOTJAR: z.string(),
         NEXT_PUBLIC_HOTJAR_ID: z.string(),
         NEXT_PUBLIC_GFW_API_KEY: z.string(),
+        NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL: z.string(),
+        NEXT_PUBLIC_DEPLOYMENT_TYPE: z.string(),
     },
 
     /**
@@ -76,6 +82,9 @@ export const env = createEnv({
         AZURE_AD_TENANT_ID: process.env.AZURE_AD_TENANT_ID,
         AZURE_AD_CLIENT_ID: process.env.AZURE_AD_CLIENT_ID,
         AZURE_AD_CLIENT_SECRET: process.env.AZURE_AD_CLIENT_SECRET,
+        OKTA_CLIENT_ID: process.env.OKTA_CLIENT_ID,
+        OKTA_CLIENT_SECRET: process.env.OKTA_CLIENT_SECRET,
+        OKTA_ISSUER: process.env.OKTA_ISSUER,
         SMTP_SERVER: process.env.SMTP_SERVER,
         SMTP_PORT: process.env.SMTP_PORT,
         SMTP_USER: process.env.SMTP_USER,
@@ -86,6 +95,9 @@ export const env = createEnv({
         NEXT_PUBLIC_DISABLE_HOTJAR: process.env.NEXT_PUBLIC_DISABLE_HOTJAR || "enabled",
         NEXT_PUBLIC_HOTJAR_ID: process.env.NEXT_PUBLIC_HOTJAR_ID,
         NEXT_PUBLIC_GFW_API_KEY: process.env.NEXT_PUBLIC_GFW_API_KEY,
+        OSANO_URL: process.env.OSANO_URL,
+        NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL: process.env.NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL || "https://www.wri.org/about/privacy-policy?sitename=WRI%20Data%20Explorer&osanoid=c2a89d08-4931-4ad0-99cb-8d3aa022aaec",
+        NEXT_PUBLIC_DEPLOYMENT_TYPE: process.env.NEXT_PUBLIC_DEPLOYMENT_TYPE
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

@@ -26,8 +26,31 @@ describe("Create dataset", () => {
     cy.login(user, "test_user");
   });
 
+  it("Should fail to create dataset without team", () => {
+    cy.visit("/dashboard/datasets/new");
+
+    cy.get("input[name=title]").type(dataset);
+    cy.get("input[name=name]").should("have.value", dataset);
+    cy.get("input[name=url]").type("https://google.com");
+    cy.get("#language").click();
+    cy.get("li").contains("English").click();
+    cy.get("#visibility_type").click();
+    cy.get("li").contains("Public").click();
+    // Intentionally skip team selection
+    cy.get("#topicsButton").click();
+    cy.get("div").contains(topic).click({ force: true });
+    cy.get("button").contains("Tags").click();
+    cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
+    cy.get("textarea[name=short_description]").type("test");
+    cy.contains("Next: Data Files").click();
+
+    // Verify the validation error for missing team
+    cy.contains("Team is required").should("be.visible");
+  });
+
   it("Should create dataset", () => {
     cy.visit("/dashboard/datasets/new");
+
     cy.get("input[name=title]").type(dataset);
     cy.get("input[name=name]").should("have.value", dataset);
     cy.get("input[name=url]").type("https://google.com");
@@ -37,14 +60,13 @@ describe("Create dataset", () => {
     cy.get("li").contains("Public").click();
     cy.get("#team").click();
     cy.get("li").contains(org).click();
-    cy.get("input[name=application]").type("GFW");
     cy.get("#topicsButton").click();
     cy.get("div").contains(topic).click({ force: true });
     cy.get("button").contains("Tags").click();
-    cy.get("#tagsSearchInput").type("Tag 1{enter}").clear();
-    cy.get("#tagsSearchInput").type("Tag 2{enter}").clear();
-    cy.get("#tagsSearchInput").type("Tag 3{enter}").clear();
-    cy.get("input[name=project]").type("Project 1");
+    cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
+    cy.get("#tagsSearchInput").type("Tag 2{enter}", { force: true }).clear();
+    cy.get("#tagsSearchInput").type("Tag 3{enter}", { force: true }).clear();
+    cy.get("input[name=project]").focus().type("Project 1");
     cy.get("input[name=technical_notes]").type("https://google.com");
     cy.get("input[name=temporal_coverage_start]").type(1998);
     cy.get("input[name=temporal_coverage_end]").type(2023);
@@ -56,21 +78,46 @@ describe("Create dataset", () => {
       force: true,
     });
     cy.get("textarea[name=short_description]").type("test");
-    cy.contains("Description").parent().parent().find(".tiptap.ProseMirror").type("RICH TEXT EDITOR");
-    cy.get("input[name=author]").type("Luccas");
-    cy.get("input[name=author_email]").type("luccasmmg@gmail.com");
-    cy.get("input[name=maintainer]").type("Luccas");
-    cy.get("input[name=maintainer_email]").type("luccasmmg@gmail.com");
+    cy.contains("Description")
+      .parent()
+      .parent()
+      .find(".tiptap.ProseMirror")
+      .type("RICH TEXT EDITOR");
+
+    cy.contains("Add Author").click();
+    cy.get('input[name="authors.0.name"]').type("Test Author 1");
+    cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
+    cy.contains("Add Author").click();
+    cy.get('input[name="authors.1.name"]').type("Test Author 2");
+    cy.get('input[name="authors.1.email"]').type("test-author-2@example.com");
+
+    cy.contains("Add Maintainer").click();
+    cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
+    cy.get('input[name="maintainers.0.email"]').type(
+      "test-maintainer-1@example.com",
+    );
+    cy.contains("Add Maintainer").click();
+    cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
+    cy.get('input[name="maintainers.1.email"]').type(
+      "test-maintainer-2@example.com",
+    );
+
     cy.contains("More Details").click();
-    cy.contains("More Details").parent().parent().as("moredetails")
-    cy.get("@moredetails").get(".tiptap.ProseMirror").eq(1).type("RICH TEXT EDITOR");
-    cy.get("@moredetails").get(".tiptap.ProseMirror").eq(2).type("RICH TEXT EDITOR");
+    cy.contains("More Details").parent().parent().as("moredetails");
+    cy.get("@moredetails")
+      .get(".tiptap.ProseMirror")
+      .eq(1)
+      .type("RICH TEXT EDITOR");
+    cy.get("@moredetails")
+      .get(".tiptap.ProseMirror")
+      .eq(2)
+      .type("RICH TEXT EDITOR");
     cy.get("input[name=learn_more]").type("https://google.com");
     cy.contains("Link to Another WRI Product").click();
-    cy.get("button").contains("Add a link to another wri product").click();
+    cy.get("button").contains("Add a link to another WRI product").click();
     cy.get('input[name="open_in.0.title"]').type("Test");
     cy.get('input[name="open_in.0.url"]').type("https://google.com");
-    cy.get("button").contains("Add a link to another wri product").click();
+    cy.get("button").contains("Add a link to another WRI product").click();
     cy.get('input[name="open_in.1.title"]').type("Test");
     cy.get('input[name="open_in.1.url"]').type("https://google.com");
     cy.contains("Custom Fields").click();
@@ -80,7 +127,8 @@ describe("Create dataset", () => {
     cy.get("button").contains("Add a custom field").click();
     cy.get('input[name="extras.1.key"]').type("Test 2");
     cy.get('input[name="extras.1.value"]').type("Test 2");
-    cy.contains("Next: Datafiles").click();
+    cy.contains("Next: Data Files").click();
+    cy.get(".datafile-accordion-trigger").eq(0).click();
     cy.get("input[type=file]").selectFile("cypress/fixtures/logo.png", {
       force: true,
     });
@@ -109,8 +157,18 @@ describe("Create dataset", () => {
       cy.visit("/datasets/" + dataset);
       cy.get("h1").contains(dataset, { timeout: 15000 });
       cy.get("h2").contains(org);
-      cy.contains("Data files").click();
+      cy.contains("Data Files").click();
       cy.contains("PNG");
+      cy.contains("Contact").click();
+
+      cy.contains("Test Author 1");
+      cy.contains("test-author-1@example.com");
+      cy.contains("Test Author 2");
+      cy.contains("test-author-2@example.com");
+      cy.contains("Test Maintainer 1");
+      cy.contains("test-maintainer-1@example.com");
+      cy.contains("Test Maintainer 2");
+      cy.contains("test-maintainer-2@example.com");
     },
   );
 
@@ -125,7 +183,7 @@ describe("Create dataset", () => {
     () => {
       cy.visit("/datasets/" + dataset);
       cy.contains("API").click({ force: true });
-      cy.contains("Datasets API")
+      cy.contains("Datasets API");
     },
   );
 
@@ -145,41 +203,58 @@ describe("Create dataset", () => {
     },
   );
 
-  it("Edit metadata",  {
+  it(
+    "Edit metadata",
+    {
       retries: {
         runMode: 5,
         openMode: 0,
       },
-    }, () => {
-    cy.visit("/dashboard/datasets/" + dataset + "/edit");
-    cy.get("input[name=title]")
-      .clear()
-      .type(dataset + " EDITED");
-    cy.get("input[name=url]")
-      .clear()
-      .type("https://google.com" + ".br");
-    cy.contains("More Details").click();
-    cy.contains("More Details").parent().parent().as("moredetails")
-    cy.get("@moredetails").get(".tiptap.ProseMirror").eq(1).type("EDITED");
-    cy.get("@moredetails").get(".tiptap.ProseMirror").eq(2).type("EDITED");
-    cy.contains("Data Files").click();
-    cy.wait(5000);
-    cy.get("button").contains("Add another data file").click();
-    cy.get("input[type=file]").eq(1).selectFile("cypress/fixtures/logo_2.jpg", {
-      force: true,
-    });
-    cy.get('input[name="resources.1.title"]').clear().type("jpg image");
-    cy.contains("Collaborators").click();
-    // cy.get("button").contains("Add another collaborator").click();
-    // this logic fails on second retry since dataset is actually edited
-    // cy.get("input").eq(1).click().type(user_2);
-    // cy.get("li").contains(user_2).click(); 
-    cy.get("button").contains("Update Dataset").click();
-    // cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
-    //   timeout: 30000,
-    // });
-    
-  });
+    },
+    () => {
+      cy.visit("/dashboard/datasets/" + dataset + "/edit");
+      cy.get("input[name=title]")
+        .clear()
+        .type(dataset + " EDITED");
+      cy.get("input[name=url]")
+        .clear()
+        .type("https://google.com" + ".br");
+
+      cy.contains("Remove Author").click();
+      cy.contains("Remove Maintainer").click();
+
+      cy.contains("Add Maintainer").click();
+      cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 3");
+      cy.get('input[name="maintainers.1.email"]').type(
+        "test-maintainer-3@example.com",
+      );
+
+      cy.contains("More Details").click();
+      cy.contains("More Details").parent().parent().as("moredetails");
+      cy.get("@moredetails").get(".tiptap.ProseMirror").eq(1).type("EDITED");
+      cy.get("@moredetails").get(".tiptap.ProseMirror").eq(2).type("EDITED");
+      cy.contains("Data Files").click();
+      cy.wait(5000);
+      cy.get("button").contains("Add another Data File").click();
+      cy.wait(500);
+      cy.get(".datafile-accordion-trigger").eq(1).click();
+      cy.get("input[type=file]")
+        .eq(0)
+        .selectFile("cypress/fixtures/logo_2.jpg", {
+          force: true,
+        });
+      cy.get('input[name="resources.1.title"]').clear().type("jpg image");
+      cy.contains("Collaborators").click();
+      // cy.get("button").contains("Add another collaborator").click();
+      // this logic fails on second retry since dataset is actually edited
+      // cy.get("input").eq(1).click().type(user_2);
+      // cy.get("li").contains(user_2).click();
+      cy.get("button").contains("Update Dataset").click();
+      // cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
+      //   timeout: 30000,
+      // });
+    },
+  );
 
   it(
     "Should show the basic information edited",
@@ -192,8 +267,19 @@ describe("Create dataset", () => {
     () => {
       cy.visit("/datasets/" + dataset);
       cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
-      cy.contains("Data files").click();
+      cy.contains("Data Files").click();
       cy.contains("jpg");
+      cy.contains("Contact").click();
+      cy.contains("Test Author 2");
+      cy.contains("test-author-2@example.com");
+      cy.contains("Test Maintainer 2");
+      cy.contains("test-maintainer-2@example.com");
+      cy.contains("Test Maintainer 3");
+      cy.contains("test-maintainer-3@example.com");
+      cy.contains("Test Author 1").should("not.exist");
+      cy.contains("test-author-1@example.com").should("not.exist");
+      cy.contains("Test Maintainer 1").should("not.exist");
+      cy.contains("test-maintainer-1@example.com").should("not.exist");
     },
   );
 
@@ -218,9 +304,8 @@ describe("Create dataset", () => {
   // );
 
   after(() => {
-    cy.deleteOrganizationAPI(org);
-    cy.deleteGroupAPI(topic);
     cy.deleteDatasetAPI(dataset);
+    cy.deleteGroupAPI(topic);
+    cy.deleteOrganizationAPI(org);
   });
 });
-

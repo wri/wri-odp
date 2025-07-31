@@ -24,7 +24,7 @@ function TopicCard({
     return (
         <Link
             href={`/topics/${topic.name}`}
-            className="flex w-full flex-col gap-1 font-acumin shadow-wri pb-6"
+            className="flex w-full flex-col gap-1 font-acumin pb-6"
         >
             <div className="relative aspect-square h-72 w-full bg-white">
                 <Image
@@ -35,27 +35,23 @@ function TopicCard({
                     }`}
                     alt={`Topic - ${topic.title}`}
                     fill
-                    className="object-contain"
+                    className="object-cover"
                 />
             </div>
-            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pl-4 ">
+            <p className="font-['Acumin Pro SemiCondensed'] text-xl font-semibold text-black pt-2">
                 {topic.title}
             </p>
-            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700 pl-4  ">
+            <p className="font-['Acumin Pro SemiCondensed'] w-24 text-base font-semibold text-green-700">
                 {datasetCount && datasetCount > 1
-                    ? `${datasetCount} datasets`
-                    : `${datasetCount} dataset`}
+                    ? `${datasetCount} Datasets`
+                    : `${datasetCount} Dataset`}
             </p>
         </Link>
     )
 }
 
 export function TopicsCarousel() {
-    const { data, isLoading, error } = api.topics.getGeneralTopics.useQuery({
-        search: '',
-        page: { start: 0, rows: 50 },
-        allTree: true,
-    })
+    const { data, isLoading, error } = api.topics.getTopicsHomePage.useQuery()
     return (
         <div className="relative">
             <div className="peer">
@@ -66,7 +62,7 @@ export function TopicsCarousel() {
                 >
                     {error && (
                         <ErrorAlert
-                            title="Error loading topics"
+                            title="Error loading Topics"
                             text={error.message}
                         />
                     )}
@@ -77,16 +73,22 @@ export function TopicsCarousel() {
                         </div>
                     )}
 
-                    {data?.topics.map((topic, index) => (
-                        <SwiperSlide key={index} className="">
-                            <div className=" w-80 pr-6">
-                                <TopicCard
-                                    topic={topic}
-                                    topicDetails={data.topicDetails}
-                                />
-                            </div>
-                        </SwiperSlide>
-                    ))}
+                    {data?.topics
+                        .filter((topic) => {
+                            const datasetCount =
+                                data.topicDetails[topic.id]?.package_count ?? 0
+                            return datasetCount > 0
+                        })
+                        .map((topic, index) => (
+                            <SwiperSlide key={index} className="">
+                                <div className=" w-80 pr-6">
+                                    <TopicCard
+                                        topic={topic}
+                                        topicDetails={data.topicDetails}
+                                    />
+                                </div>
+                            </SwiperSlide>
+                        ))}
                 </AutoCarousel>
             </div>
         </div>

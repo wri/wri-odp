@@ -1,13 +1,10 @@
 import Header from '@/components/_shared/Header'
 import Footer from '@/components/_shared/Footer'
-import TeamsSearch from '@/components/team/TeamsSearch'
-// import TeamsSearchResults from '@/components/team/TeamsSearchResults'
 import { NextSeo } from 'next-seo'
 import { api } from '@/utils/api'
 import { useState, useEffect } from 'react'
 import Spinner from '@/components/_shared/Spinner'
 import type { SearchInput } from '@/schema/search.schema'
-import { useQuery } from 'react-query'
 import Pagination from '@/components/datasets/Pagination'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { getServerAuthSession } from '@/server/auth'
@@ -18,16 +15,21 @@ import superjson from 'superjson'
 import { env } from '@/env.mjs'
 import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
+import { Organization as CkanOrg } from '@portaljs/ckan'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
+import TopicsSearch from '@/components/topics/TopicsSearch'
 
 const TeamsSearchResults = dynamic(
     () => import('@/components/team/TeamsSearchResults')
 )
 
+type Organization = CkanOrg & { numSubTeams: number }
+
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context)
     const helpers = createServerSideHelpers({
         router: appRouter,
-        ctx: { session },
+        ctx: { session, ip: undefined },
         transformer: superjson,
     })
     await helpers.teams.getGeneralTeam.prefetch({
@@ -55,15 +57,21 @@ export default function TeamsPage(
 
     const { data, isLoading } = api.teams.getGeneralTeam.useQuery({
         search: '',
-        page: { start: 0, rows: 1000 },
+        page: { start: 0, rows: 10000 },
         allTree: true,
     })
     const indexTeams = new Index({
         tokenize: 'full',
     })
-    if (data?.teams) {
-        data?.teams.forEach((team) => {
-            indexTeams.add(team.id, JSON.stringify(team))
+    if (data?.allTeams) {
+        data?.allTeams.forEach((team) => {
+            indexTeams.add(
+                team.id,
+                JSON.stringify({
+                    title: team.title,
+                    description: team.description || team.notes,
+                })
+            )
         })
     }
 
@@ -71,19 +79,26 @@ export default function TeamsPage(
         if (!data) return { teams: [], teamsDetails: {}, count: 0 }
         const filteredTeams =
             query !== ''
-                ? data.teams.filter((t) =>
-                      indexTeams.search(query).includes(t.id)
-                  )
-                : data.teams
+                ? (data?.allTeams
+                      ?.filter((t) => indexTeams.search(query).includes(t.id))
+                      .filter(
+                          (obj, index, self) =>
+                              index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+                      ) ?? [])
+                : data.teams.filter(
+                      (obj, index, self) =>
+                          index === self.findIndex((t) => t.id === obj.id)
+                  ) // Compare based on 'id' property
         const teams = filteredTeams.slice(
             pagination.page.start,
             pagination.page.start + pagination.page.rows
-        )
+        ) as GroupTree[] | Organization[]
         const teamsDetails = data?.teamsDetails
         return { teams, teamsDetails, count: filteredTeams.length }
     }
 
     const filteredTeams = ProcessTeams()
+    const links = [{ label: 'Teams', url: '/teams', current: true }]
 
     return (
         <>
@@ -98,10 +113,12 @@ export default function TeamsPage(
                 }}
             />
             <Header />
-            <TeamsSearch
+            <Breadcrumbs links={links} />
+            <TopicsSearch
                 isLoading={isLoading}
                 setQuery={setQuery}
                 query={query}
+                groupType="Teams"
             />
 
             <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
@@ -112,10 +129,10 @@ export default function TeamsPage(
                         a specific WRI project or team.
                         <br />
                         If you have questions about a project&apos;s data reach
-                        out to the point of contact in the dataset or to{' '}
+                        out to the point of contact in the Dataset or to{' '}
                         <a
                             href="mailto:data@wri.org"
-                            className="text-blue-700"
+                            className="text-blue-700 underline"
                         >
                             {' '}
                             data@wri.org
@@ -125,10 +142,17 @@ export default function TeamsPage(
             </section>
 
             {isLoading ? (
-                <Spinner className="mx-auto" />
+                <div className="mx-auto h-[2898px] lg:h-[2406px]">
+                    <Spinner className="mx-auto" />
+                </div>
             ) : (
                 <>
                     <TeamsSearchResults
+                        filtered={
+                            query !== '' &&
+                            query !== null &&
+                            typeof query !== 'undefined'
+                        }
                         count={filteredTeams.count}
                         teams={filteredTeams?.teams}
                         teamsDetails={filteredTeams?.teamsDetails}
@@ -145,8 +169,11 @@ export default function TeamsPage(
 
             <Footer
                 links={{
-                    primary: { title: 'Advanced Search', href: '/search' },
-                    secondary: { title: 'Explore Topics', href: '/topics' },
+                    primary: { title: 'Explore Topics', href: '/topics' },
+                    secondary: {
+                        title: 'Explore Applications',
+                        href: '/applications',
+                    },
                 }}
             />
         </>

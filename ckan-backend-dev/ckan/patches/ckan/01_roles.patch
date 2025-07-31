@@ -7,7 +7,7 @@ diff --git a/ckan/ckan/authz.py b/ckan/ckan/authz.py
      if _has_user_permission_for_groups(user_id, permission, [group_id]):
          return True
 -    capacities = check_config_permission('roles_that_cascade_to_sub_groups')
-+    capacities = ['admin']
++    capacities = ['admin', 'editor']
      assert isinstance(capacities, list)
      # Handle when permissions cascade. Check the user's roles on groups higher
      # in the group hierarchy for permission.

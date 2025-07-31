@@ -1,20 +1,22 @@
 //@ts-ignore
-import { PluginMapboxGl } from 'layer-manager'
+import { PluginMapboxGl } from 'wri-layer-manager'
 import { useMap } from 'react-map-gl'
 import {
     Layer,
     LayerManager as VizzLayerManager,
+    //@ts-ignore
+} from 'wri-layer-manager/dist/components'
 //@ts-ignore
-} from 'layer-manager/dist/components'
 import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
 import pick from 'lodash/pick'
 import { CartoProvider } from '@/utils/providers/cartoProvider'
 import { TileProvider } from '@/utils/providers/tileProvider'
 import { GeeProvider } from '@/utils/providers/geeProvider'
+import { VectorTileProvider } from '@/utils/providers/vectorProvider'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import { useMemo } from 'react'
 
-export const parseLayers = (layers: APILayerSpec[]): LayerSpec[] => {
+const parseLayers = (layers: APILayerSpec[]): LayerSpec[] => {
     return layers.map((layer): LayerSpec => {
         const { id, layerConfig } = layer
         let layerProps: any = pick(layerConfig, [
@@ -42,7 +44,9 @@ export const parseLayers = (layers: APILayerSpec[]): LayerSpec[] => {
 const geeProvider = new GeeProvider()
 const cartoProvider = new CartoProvider()
 const tileProvider = new TileProvider()
+const vectorLayerProvider = new VectorTileProvider()
 const providers: Record<string, ProviderMaker['handleData']> = {
+    [vectorLayerProvider.name]: vectorLayerProvider.handleData,
     [geeProvider.name]: geeProvider.handleData,
     [cartoProvider.name]: cartoProvider.handleData,
     [tileProvider.name]: tileProvider.handleData,

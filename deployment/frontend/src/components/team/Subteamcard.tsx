@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 
-export interface SubtopicProps {
+interface SubtopicProps {
     title: string
     numOfDatasets: number
     img: string
@@ -30,7 +30,7 @@ export default function Subteamcard({
                     }`}
                     alt="higlight"
                     fill
-                    className="object-contain"
+                    className="object-cover"
                 />
             </div>
             <div className="text-black text-lg font-normal line-clamp-1">

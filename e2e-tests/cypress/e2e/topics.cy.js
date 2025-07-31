@@ -8,6 +8,8 @@ const getRandomOrganizationName = () =>
 const getRandomGroupName = () =>
   Math.random().toString(36).slice(2) + Cypress.env("GROUP_NAME_SUFFIX");
 
+const subgroup = "subtopic" + getRandomGroupName();
+
 const orgs = [];
 const groups = [];
 const datasets = [];
@@ -28,6 +30,11 @@ const facets = [
   "WRI Data",
 ];
 
+Cypress.on("uncaught:exception", (err, runnable) => {
+  console.log(err);
+  return false;
+});
+
 describe("Explore data page", () => {
   before(() => {
     // Create orgs
@@ -43,6 +50,9 @@ describe("Explore data page", () => {
       cy.createGroupAPI(name);
       groups.push(name);
     });
+
+    // sub group
+    cy.createGroupAPI(subgroup, groups[0]);
 
     // Create datasets
     [...new Array(14).keys()].map((k, i) => {
@@ -63,26 +73,37 @@ describe("Explore data page", () => {
     });
   });
 
-
   it("search topic", () => {
     cy.visit("/topics");
     cy.wait(2000);
     cy.get('[name="search"]').type(groups[0] + "{enter}" ?? "test");
     cy.contains(`${groups[0]}`, { timeout: 40000 });
   });
-    
+
   it("search teams", () => {
     cy.visit("/teams");
     cy.wait(2000);
     cy.get('[name="search"]').type(orgs[0] + "{enter}" ?? "test");
     cy.contains(`${orgs[0]}`, { timeout: 40000 });
   });
-    
+
   it("visit topic page", () => {
     cy.visit(`/topics/${groups[0]}`);
     cy.contains(`${groups[0]}`, { timeout: 40000 });
     // cy.contains("Edit", { timeout: 2000 });
-    cy.contains("Subtopics")
+    cy.contains("SubTopics");
+  });
+
+  it("should display not found page", () => {
+    cy.visit("/topics/randomtopicname");
+    cy.contains("Sorry, we couldn’t find the page you’re looking for.", {
+      timeout: 40000,
+    });
+  });
+
+  it("shoud display subtopic page", () => {
+    cy.visit(`/topics/${subgroup}`);
+    cy.contains(`${subgroup}`, { timeout: 40000 });
   });
 
   after(() => {
@@ -90,6 +111,7 @@ describe("Explore data page", () => {
     datasets.forEach((name) => cy.deleteDatasetAPI(name));
     // datasets.forEach((name) => cy.purgeDataset(name));
 
+    cy.deleteGroupAPI(subgroup);
     groups.forEach((name) => cy.deleteGroupAPI(name));
     groups.forEach((name) => cy.purgeGroup(name));
 

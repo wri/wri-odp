@@ -12,6 +12,7 @@ export interface State {
     prevLayerGroups: ActiveLayerGroup[]
     storeDirtyFields: string[]
     mapView: {
+        initialrender: boolean
         isEmbedding: boolean
         isAddingLayers?: boolean
         viewState: ViewState
@@ -40,7 +41,7 @@ export type Basemap =
     | 'aqueduct'
     | 'none'
 
-export interface DatasetState {
+interface DatasetState {
     id: string
     layers: LayerState[]
 }
@@ -55,6 +56,7 @@ export interface LayerState {
     zIndex?: number
     opacity?: number
     threshold?: number
+    layerSource?: 'ckan' | 'rw'
 }
 
 export type Labels = 'dark' | 'light' | 'none'

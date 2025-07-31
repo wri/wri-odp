@@ -169,6 +169,7 @@ export function AddDataFile({
                 remove={remove}
                 icon={<FolderPlusIcon className="h-7 w-7" />}
                 title={`Data File ${index + 1}`}
+                id={`datafile-accordion-${datafile.id}`}
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
                         {match(datafile.type)
@@ -311,6 +312,7 @@ export function AddDataFile({
                                                 resourceId: uuidv4(),
                                                 title: '',
                                                 type: 'empty-file',
+                                                not_downloadable: false,
                                                 schema: [],
                                                 layerObj: null,
                                             })

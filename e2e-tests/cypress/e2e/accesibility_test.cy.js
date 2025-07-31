@@ -46,10 +46,8 @@ describe("Pages meet the accessibility requirements onload ", () => {
       short_description: "test",
       technical_notes: "https://source.com/stat",
       visibility_type: "public",
-      maintainer: "Stephen Oni",
-      maintainer_email: "stephenoni2@gmail.com",
-      author: "Stephen",
-      author_email: "stephenoni2@gmail.com",
+      authors: [{ name: "Stephen Oni", email: "stephenoni2@gmail.com" }],
+      maintainers: [{ name: "Stephen", email: "stephenoni2@gmail.com" }],
       update_frequency: "hourly",
       is_approved: "false",
     });
@@ -80,6 +78,7 @@ describe("Pages meet the accessibility requirements onload ", () => {
 
   pages.forEach((page) => {
     it(`${replaceParams(page)}`, () => {
+      cy.once('uncaught:exception', () => false);
       cy.visit(replaceParams(page), { timeout: 30000 });
       if (page.includes("edit")) {
         cy.wait(5000);

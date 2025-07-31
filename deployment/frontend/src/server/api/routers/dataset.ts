@@ -29,6 +29,8 @@ import {
     fetchDatasetCollabIds,
     approvePendingDataset,
     getDatasetReleaseNotes,
+    getCollaboratorPackages,
+    getAllOrganizations
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -95,7 +97,7 @@ export async function getLayerRw(layerUrl: string) {
     return { ...layerRw.data.attributes, id: layerRw.data.id }
 }
 
-export async function fetchDatasetCollaborators(
+async function fetchDatasetCollaborators(
     datasetId: string,
     userApiKey: string,
     sysAdminApiKey: string
@@ -155,13 +157,18 @@ export const DatasetRouter = createTRPCRouter({
                         ? input.tags.map((tag) => ({ name: tag }))
                         : [],
                     groups: input.topics
-                        ? input.topics.map((topic) => ({ name: topic }))
+                        ? [
+                              ...input.topics.map((topic) => ({ name: topic })),
+                              ...input.applications.map((app) => ({
+                                  name: app,
+                              })),
+                          ]
                         : [],
                     open_in: JSON.stringify(input.open_in) ?? '',
                     language: input.language?.value ?? '',
                     license_id: input.license_id?.value ?? '',
                     license_title: input.license_id?.label ?? '',
-                    owner_org: input.team ? input.team.value : '',
+                    owner_org: input.team.value,
                     collaborators: null,
                     rw_id: '',
                     update_frequency: input.update_frequency?.value ?? '',
@@ -174,6 +181,14 @@ export const DatasetRouter = createTRPCRouter({
                                 : input.featured_image
                             : null,
                     visibility_type: input.visibility_type?.value ?? '',
+                    authors: input.authors.map((author) => ({
+                        name: author.name,
+                        email: author.email,
+                    })),
+                    maintainers: input.maintainers.map((maintainer) => ({
+                        name: maintainer.name,
+                        email: maintainer.email,
+                    })),
                     resources: input.resources
                         .filter(
                             (resource) =>
@@ -211,21 +226,21 @@ export const DatasetRouter = createTRPCRouter({
                                     format: resource.format
                                         ? resource.format
                                         : resource.layerObj ||
-                                          resource.layerObjRaw
-                                        ? 'Layer'
-                                        : '',
+                                            resource.layerObjRaw
+                                          ? 'Layer'
+                                          : '',
                                     layer: resource.layerObj
                                         ? convertFormToLayerObj(
                                               resource.layerObj
                                           )
                                         : resource.layerObjRaw
-                                        ? getApiSpecFromRawObj(
-                                              resource.layerObjRaw as Record<
-                                                  string,
-                                                  any
-                                              >
-                                          )
-                                        : null,
+                                          ? getApiSpecFromRawObj(
+                                                resource.layerObjRaw as Record<
+                                                    string,
+                                                    any
+                                                >
+                                            )
+                                          : null,
                                     layerObj: resource.layerObj
                                         ? convertFormToLayerObj(
                                               resource.layerObj
@@ -251,7 +266,7 @@ export const DatasetRouter = createTRPCRouter({
                                     // schema: resource.schema
                                     //     ? { value: resource.schema }
                                     //     : '{}',
-                                    url: resource.url ?? resource.name,
+                                    url: resource.url ?? 'https://example.com',
                                 }
                             } else {
                                 return {
@@ -272,14 +287,15 @@ export const DatasetRouter = createTRPCRouter({
                         input.spatial && input.spatial_address
                             ? null
                             : JSON.stringify(input.spatial)
-                            ? JSON.stringify(input.spatial)
-                            : null,
+                              ? JSON.stringify(input.spatial)
+                              : null,
 
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
                 }
 
+                console.log('calling package_create')
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
                     {
@@ -293,14 +309,25 @@ export const DatasetRouter = createTRPCRouter({
                 )
                 const dataset: CkanResponse<Dataset> = await datasetRes.json()
                 if (!dataset.success && dataset.error) {
+                    console.log('dataset', dataset)
+                    if (
+                        //@ts-ignore
+                        dataset.error.name &&
+                        dataset.error.name[0] === 'That URL is already in use.'
+                    ) {
+                        throw Error(
+                            '[!] A page with this URL slug already exists. Please try something different in the URL field.'
+                        )
+                    }
                     if (dataset.error.message)
                         throw Error(dataset.error.message)
                     throw Error(
-                        JSON.stringify(dataset.error).concat(' datastet create')
+                        JSON.stringify(dataset.error).concat(' Dataset create')
                     )
                 }
                 return dataset.result
             } catch (e) {
+                console.log('E', e)
                 let error =
                     'Something went wrong please contact the system administrator'
                 if (e instanceof Error) error = e.message
@@ -403,6 +430,7 @@ export const DatasetRouter = createTRPCRouter({
                     approval_status: org.approval_status,
                     is_organization: org.is_organization,
                     state: org.state,
+                    visibility: org.visibility,
                 }
             }
 
@@ -425,28 +453,38 @@ export const DatasetRouter = createTRPCRouter({
                                   }
                               })
                             : [],
-                        groups: input.topics
-                            ? input.topics.map((topic) => {
-                                  const pgroups = datasetDetails?.groups?.find(
-                                      (x) => x.name === topic
-                                  )
-                                  return {
-                                      ...pgroups,
-                                      name: topic,
-                                  }
-                              })
-                            : [],
+                        groups: [
+                            ...(input.topics?.map((topic) => {
+                                const pgroups = datasetDetails?.groups?.find(
+                                    (x) => x.name === topic
+                                )
+                                return {
+                                    ...pgroups,
+                                    name: topic,
+                                }
+                            }) ?? []),
+                            ...(input.applications?.map((app) => {
+                                const pgroups = datasetDetails?.groups?.find(
+                                    (x) => x.name === app
+                                )
+                                return {
+                                    ...pgroups,
+                                    name: app,
+                                }
+                            }) ?? []),
+                        ],
+                        topics: undefined,
+                        applications: undefined,
                         open_in: JSON.stringify(input.open_in) ?? '',
                         language: input.language?.value ?? '',
                         license_id: input.license_id?.value ?? '',
                         license_title: input.license_id?.label ?? '',
                         rw_id: rw_id ?? '',
-                        owner_org: input.team
-                            ? datasetDetails.organization?.name ===
-                              input.team.value
+                        owner_org:
+                            datasetDetails.organization?.name ===
+                            input.team?.value
                                 ? datasetDetails.owner_org
-                                : input.team.value
-                            : '',
+                                : input.team?.value,
                         organization: org,
                         collaborators: null,
                         update_frequency: input.update_frequency?.value ?? '',
@@ -459,6 +497,14 @@ export const DatasetRouter = createTRPCRouter({
                                     : input.featured_image
                                 : null,
                         visibility_type: input.visibility_type?.value ?? '',
+                        authors: input.authors?.map((author) => ({
+                            name: author.name,
+                            email: author.email,
+                        })),
+                        maintainers: input.maintainers?.map((maintainer) => ({
+                            name: maintainer.name,
+                            email: maintainer.email,
+                        })),
                         resources: input.resources
                             ?.filter(
                                 (resource) =>
@@ -513,20 +559,20 @@ export const DatasetRouter = createTRPCRouter({
                                                   resource.layerObj
                                               )
                                             : resource.layerObjRaw
-                                            ? getApiSpecFromRawObj(
-                                                  resource.layerObjRaw as Record<
-                                                      string,
-                                                      any
-                                                  >
-                                              )
-                                            : null,
+                                              ? getApiSpecFromRawObj(
+                                                    resource.layerObjRaw as Record<
+                                                        string,
+                                                        any
+                                                    >
+                                                )
+                                              : null,
                                         package_id: input.id ?? '',
                                         format: resource.format
                                             ? resource.format
                                             : resource.layerObj ||
-                                              resource.layerObjRaw
-                                            ? 'Layer'
-                                            : '',
+                                                resource.layerObjRaw
+                                              ? 'Layer'
+                                              : '',
                                         id: resource.resourceId,
                                         datastore_active:
                                             resource.datastore_active === true
@@ -549,13 +595,14 @@ export const DatasetRouter = createTRPCRouter({
                                         description:
                                             resource.type === 'layer-raw'
                                                 ? description
-                                                : resource.layerObj
-                                                      ?.description ?? '',
+                                                : (resource.layerObj
+                                                      ?.description ?? ''),
                                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                                         title:
                                             resource.type === 'layer-raw'
                                                 ? title
-                                                : resource.layerObj?.name ?? '',
+                                                : (resource.layerObj?.name ??
+                                                  ''),
                                         url_type: resource.type,
                                         // schema: resource.schema
                                         //     ? { value: resource.schema }
@@ -598,13 +645,14 @@ export const DatasetRouter = createTRPCRouter({
                             input.spatial && input.spatial_address
                                 ? null
                                 : JSON.stringify(input.spatial)
-                                ? JSON.stringify(input.spatial)
-                                : null,
+                                  ? JSON.stringify(input.spatial)
+                                  : null,
                         spatial_address: input.spatial_address
                             ? input.spatial_address
                             : null,
                     }
 
+                    console.log('body data applications', body.applications)
                     const newBodyDataset = filterDatasetFields(
                         body
                     ) as WriDataset
@@ -618,7 +666,7 @@ export const DatasetRouter = createTRPCRouter({
                     }
 
                     // update main data to pending also
-                    await patchDataset({
+                    const result = await patchDataset({
                         dataset: {
                             id: responseData.id,
                             approval_status: 'pending',
@@ -627,6 +675,7 @@ export const DatasetRouter = createTRPCRouter({
                         },
                         session: ctx.session,
                     })
+                    console.log('result', result)
 
                     const response = await fetch(
                         `${env.CKAN_URL}/api/3/action/pending_dataset_update`,
@@ -645,6 +694,7 @@ export const DatasetRouter = createTRPCRouter({
 
                     let data =
                         (await response.json()) as CkanResponse<PendingDataset>
+                    // console.log('DATA', data)
                     if (!data.success && data.error) {
                         const error = JSON.stringify(data.error).toLowerCase()
                         if (!error.includes('not found')) {
@@ -674,7 +724,7 @@ export const DatasetRouter = createTRPCRouter({
                                 // get dataset collaborators id
                                 const collab = await fetchDatasetCollabIds(
                                     pendingDataset.id,
-                                    ctx.session.user.apikey
+                                    env.SYS_ADMIN_API_KEY
                                 )
                                 if (
                                     !['private', 'draft'].includes(
@@ -748,7 +798,7 @@ export const DatasetRouter = createTRPCRouter({
                     )
                 ) {
                     try {
-                        approvePendingDataset(input.id ?? '', ctx.session)
+                        await approvePendingDataset(input.id ?? '', ctx.session)
                     } catch (e) {
                         console.error(e)
                     }
@@ -889,6 +939,29 @@ export const DatasetRouter = createTRPCRouter({
                 fq += '+is_approved:true'
             }
 
+            let user_organization: WriOrganization[] = []
+            let collab: Collaborator[] = []
+
+            if (!ctx.session?.user.sysadmin) {
+                try {
+                    ;[user_organization, collab] = await Promise.all([
+                        getUserOrganizations({
+                            userId: ctx.session?.user.id || '',
+                            apiKey: ctx.session?.user.apikey || '',
+                        }),
+                        getCollaboratorPackages({
+                            userId: ctx.session?.user.id || '',
+                            apiKey: ctx.session?.user.apikey || '',
+                        }),
+                    ])
+                } catch (e) {
+                    let error =
+                        'Something went wrong, please contact the system administrator'
+                    if (e instanceof Error) error = e.message
+                    throw Error(error)
+                }
+            }
+
             const dataset = (await getAllDatasetFq({
                 apiKey: ctx.session?.user.apikey ?? '',
                 fq: `${fq}${input.appendRawFq ?? ''}`,
@@ -909,16 +982,56 @@ export const DatasetRouter = createTRPCRouter({
                       })),
                   }))
                 : dataset.datasets
+
+            if (user_organization || collab) {
+                _datasets.forEach((d) => {
+                    d.is_authorized =
+                        user_organization.some(
+                            (org) =>
+                                org.id === d.owner_org &&
+                                (org.capacity === 'admin' ||
+                                    org.capacity === 'editor')
+                        ) ||
+                        collab.some(
+                            (c) =>
+                                c.package_id === d.id &&
+                                (c.capacity === 'admin' ||
+                                    c.capacity === 'editor')
+                        )
+                })
+            }
+
+            const orgSlugs = [
+              ...new Set(
+                dataset.datasets.map((d) => d.organization?.name).filter(Boolean)
+              ),
+            ]
+            console.log('orgSlugs in getAllDataset', JSON.stringify(orgSlugs, null, 2))
+
+            const allOrgs = await getAllOrganizations({
+              apiKey: ctx.session?.user.apikey ?? '',
+            })
+            console.log('allOrgs in getAllDataset', JSON.stringify(allOrgs, null, 2))
+
+            const teamVisibility = Object.fromEntries(
+              allOrgs.map((org) => [org.name, org.visibility || 'public'])
+            )
+            console.log('teamVisibility in getAllDataset', JSON.stringify(teamVisibility, null, 2))
+
             return {
                 datasets: _datasets as unknown as WriDataset[],
                 count: dataset.count,
                 searchFacets: dataset.searchFacets,
+                teamVisibility: teamVisibility,
             }
         }),
     getDatasetCollaborators: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
             const user = ctx.session?.user
+            if (env.SYS_ADMIN_API_KEY == ' ') {
+                return []
+            }
             return fetchDatasetCollaborators(
                 input.id,
                 user?.apikey ?? '',
@@ -1540,7 +1653,7 @@ export const DatasetRouter = createTRPCRouter({
                 id: z.string(),
                 isPending: z.boolean(),
                 noLayer: z.boolean().optional(),
-           })
+            })
         )
         .query(async ({ input, ctx }) => {
             if (input.isPending) {
@@ -1727,7 +1840,6 @@ export const DatasetRouter = createTRPCRouter({
             if (!input.bbox && !input.point) {
                 return null
             }
-            console.log('INPUT', input)
             const bbox = input.bbox ? `&bbox=${input.bbox?.join(',')}` : ''
             const point = input.point ? `&point=${input.point?.join(',')}` : ''
             const spatial_address = input.location

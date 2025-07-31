@@ -23,6 +23,8 @@ import { z } from 'zod'
 import { TabularResource } from '../datasets/visualizations/Visualizations'
 import { ArrowDownCircleIcon } from '@heroicons/react/20/solid'
 import { DefaultTooltip } from '../_shared/Tooltip'
+import { DownloadPopup } from '../_shared/DownloadPopup'
+import { useDataset } from '@/utils/storeHooks'
 
 export function DownloadButton({
     sql,
@@ -33,11 +35,59 @@ export function DownloadButton({
     sql: string
     numOfRows: number
 }) {
+    const { dataset } = useDataset()
     const conversibleFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
     const [convertTo, setConvertTo] = useState<'CSV' | 'XLSX' | 'TSV' | 'XML'>(
         'CSV'
     )
     const [open, setOpen] = useState(false)
+    const downloadSubset = api.dataset.downloadSubsetOfData.useMutation()
+    const createDownloadEvent = api.downloadEvents.createEvents.useMutation({
+        onError: (err) => {
+            toast('Failed to send your information', {
+                type: 'error',
+            }),
+                setOpen(false)
+        },
+    })
+    const handleFormSubmit = (data: any) => {
+        downloadSubset.mutate(
+            {
+                email: data.email,
+                format: convertTo,
+                provider: tabularResource.provider,
+                dataset_id: tabularResource.datasetId,
+                sql: sql,
+                numOfRows: numOfRows,
+                connectorUrl: tabularResource.connectorUrl,
+                id: tabularResource.id,
+            },
+            {
+                onSuccess: () => {
+                    toast("You'll receive an email when the file is ready", {
+                        type: 'success',
+                    })
+                    const _data = {
+                        ...data,
+                        resources: [tabularResource.id],
+                        package_id: tabularResource.datasetId ?? '',
+                        typeOfForm: 'email-download',
+                        package_name: tabularResource.datasetName,
+                    }
+                    createDownloadEvent.mutate(_data)
+
+                    setOpen(false)
+                },
+                onError: (err) => {
+                    console.error(err)
+
+                    toast('Failed to request file', {
+                        type: 'error',
+                    })
+                },
+            }
+        )
+    }
     return (
         <>
             <Popover>
@@ -71,131 +121,24 @@ export function DownloadButton({
                     ))}
                 </PopoverContent>
             </Popover>
-            <DownloadModal
-                numOfRows={numOfRows}
-                format={convertTo}
-                open={open}
-                setOpen={setOpen}
-                sql={sql}
-                tabularResource={tabularResource}
+            <DownloadPopup
+                title={`This ${convertTo} file is being prepared for download`}
+                subtitle="Please enter your email address so that you receive the download link via email when it's ready."
+                isOpen={open}
+                onClose={() => setOpen(false)}
+                dataset={dataset}
+                onSubmit={handleFormSubmit}
+                downloadButton={
+                    <LoaderButton
+                        className="whitespace-nowrap"
+                        type="submit"
+                        loading={downloadSubset.isLoading}
+                    >
+                        <PaperAirplaneIcon className="mr-2 h-5 w-5" />
+                        Submit
+                    </LoaderButton>
+                }
             />
         </>
-    )
-}
-
-function DownloadModal({
-    open,
-    setOpen,
-    format,
-    sql,
-    numOfRows,
-    tabularResource,
-}: {
-    open: boolean
-    setOpen: (open: boolean) => void
-    format: 'XLSX' | 'CSV' | 'TSV' | 'XML'
-    tabularResource: TabularResource
-    numOfRows: number
-    sql: string
-}) {
-    const formSchema = z.object({
-        email: z.string().email(),
-    })
-
-    type FormSchema = z.infer<typeof formSchema>
-
-    const downloadSubset = api.dataset.downloadSubsetOfData.useMutation()
-
-    const formObj = useForm<FormSchema>({ resolver: zodResolver(formSchema) })
-    const {
-        handleSubmit,
-        formState: { errors },
-        register,
-    } = formObj
-
-    let isLoading = false
-    return (
-        <Modal open={open} setOpen={setOpen} className="max-w-[48rem]">
-            <div className="p-6">
-                <div className="border-b border-zinc-100 pb-5">
-                    <div className="font-acumin text-3xl font-normal text-black">
-                        This {format} file is being prepared for download
-                    </div>
-                    <div className="font-acumin text-base font-light text-neutral-600">
-                        Please enter your email address so that you receive the
-                        download link via email when it's ready.
-                    </div>
-                </div>
-                {isLoading && (
-                    <div className="w-full flex items-center my-10 justify-center">
-                        <Spinner />
-                    </div>
-                )}
-                {!isLoading && (
-                    <form
-                        id="download"
-                        data-resource={tabularResource.name}
-                        onSubmit={handleSubmit(
-                            async (data) => {
-                                downloadSubset.mutate(
-                                    {
-                                        email: data.email,
-                                        format: format,
-                                        provider: tabularResource.provider,
-                                        dataset_id: tabularResource.datasetId,
-                                        sql: sql,
-                                        numOfRows: numOfRows,
-                                        connectorUrl:
-                                            tabularResource.connectorUrl,
-                                        id: tabularResource.id,
-                                    },
-                                    {
-                                        onSuccess: () => {
-                                            toast(
-                                                "You'll receive an email when the file is ready",
-                                                { type: 'success' }
-                                            )
-
-                                            setOpen(false)
-                                        },
-                                        onError: (err) => {
-                                            console.error(err)
-
-                                            toast('Failed to request file', {
-                                                type: 'error',
-                                            })
-                                        },
-                                    }
-                                )
-                            },
-                            (err) => {
-                                console.error(err)
-                                toast('Failed to request file', {
-                                    type: 'error',
-                                })
-                            }
-                        )}
-                        className="flex flex-col sm:flex-row gap-5 pt-6"
-                    >
-                        <input
-                            type="email"
-                            id="email"
-                            className="block w-full rounded-md border-b border-wri-green py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
-                            placeholder="you@example.com"
-                            {...register('email')}
-                        />
-                        <LoaderButton
-                            className="whitespace-nowrap"
-                            type="submit"
-                            loading={downloadSubset.isLoading}
-                        >
-                            <PaperAirplaneIcon className="mr-2 h-5 w-5" />
-                            Get via email
-                        </LoaderButton>
-                    </form>
-                )}
-                <ErrorDisplay errors={errors} name="email" />
-            </div>
-        </Modal>
     )
 }

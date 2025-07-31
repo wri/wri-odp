@@ -34,7 +34,7 @@ interface InteractionFormProps {
     onPrev: () => void
 }
 
-export function RampObjExplanation() {
+function RampObjExplanation() {
     return (
         <Popover>
             <PopoverTrigger className="cursor-pointer">

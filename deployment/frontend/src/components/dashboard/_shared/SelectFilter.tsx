@@ -23,7 +23,14 @@ export default function SelectFilter({
     reset?: React.Dispatch<React.SetStateAction<SearchInput>>
 }) {
     const [selected, setSelected] = useState(
-        options[0] ? options[0] : { id: '0', label: '' }
+        query.fq && query.fq[filtername]
+            ? options.find(
+                  (o) =>
+                      o.id === (query.fq as Record<string, string>)[filtername]
+              )
+            : options[0]
+            ? options[0]
+            : { id: '0', label: '' }
     )
 
     const handleSelect = (option: Option) => {
@@ -71,22 +78,42 @@ export default function SelectFilter({
                     prev['timestamp'] = timestamp
                 }
 
-                updateQuery = {
-                    page: { ...query?.page, start: 0 },
-                    search: query.search,
-                    fq: {
-                        ...prev,
-                        [filtername]: option.label === 'All' ? '' : option.id,
-                    },
+                if (
+                    option.id.toLowerCase() === 'none' ||
+                    option.id.toLowerCase() === 'all'
+                ) {
+                    updateQuery = {
+                        page: { ...query?.page, start: 0 },
+                        search: query.search,
+                    }
+                } else {
+                    updateQuery = {
+                        page: { ...query?.page, start: 0 },
+                        search: query.search,
+                        fq: {
+                            ...prev,
+                            [filtername]: option.id,
+                        },
+                    }
                 }
             } else {
-                updateQuery = {
-                    page: { ...query?.page, start: 0 },
-                    search: query.search,
-                    fq: {
-                        ...query.fq,
-                        [filtername]: option.label === 'All' ? '' : option.id,
-                    },
+                if (
+                    option.id.toLowerCase() === 'none' ||
+                    option.id.toLowerCase() === 'all'
+                ) {
+                    updateQuery = {
+                        page: { ...query?.page, start: 0 },
+                        search: query.search,
+                    }
+                } else {
+                    updateQuery = {
+                        page: { ...query?.page, start: 0 },
+                        search: query.search,
+                        fq: {
+                            ...query.fq,
+                            [filtername]: option.id,
+                        },
+                    }
                 }
             }
 
@@ -101,7 +128,7 @@ export default function SelectFilter({
                     <div className="relative w-32 sm:w-48 ">
                         <Listbox.Button className="relative w-full cursor-default rounded-sm bg-wri-gray py-2 pl-3 pr-8 text-left shadow-sm border-b-wri-gold border-b-2 focus:outline-none  sm:leading-6 text-black text-sm font-normal font-['Acumin Pro SemiCondensed']">
                             <span className="block truncate text-wri-black">
-                                {selected.label}
+                                {selected!.label}
                             </span>
                             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                 <ChevronDownIcon

@@ -1,24 +1,23 @@
-//import VizzLayerManager from './VizzLayerManager'
 //@ts-ignore
-import { PluginMapboxGl } from 'layer-manager'
+import { PluginMapboxGl } from 'wri-layer-manager'
 import { useMap } from 'react-map-gl'
-import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
 import {
     Layer,
     LayerManager as VizzLayerManager,
     //@ts-ignore
-} from 'layer-manager/dist/components'
+} from 'wri-layer-manager/dist/components'
 import pick from 'lodash/pick'
 import { CartoProvider } from '@/utils/providers/cartoProvider'
 import { TileProvider } from '@/utils/providers/tileProvider'
 import { GeeProvider } from '@/utils/providers/geeProvider'
+import { VectorTileProvider } from '@/utils/providers/vectorProvider'
 import { APILayerSpec, DeckLayerSpec } from '@/interfaces/layer.interface'
 import { useLayerStates } from '@/utils/storeHooks'
 import { LayerState } from '@/interfaces/state.interface'
 import { useMemo } from 'react'
 import { createDeckLayer } from '@/utils/decodeFunctions'
 
-export const parseLayers = (
+const parseLayers = (
     layers: APILayerSpec[],
     layerStates: Map<string, LayerState>
 ): any[] => {
@@ -62,7 +61,9 @@ export const parseLayers = (
 const geeProvider = new GeeProvider()
 const cartoProvider = new CartoProvider()
 const tileProvider = new TileProvider()
-const providers: Record<string, ProviderMaker['handleData']> = {
+const vectorProvider = new VectorTileProvider()
+const providers: Record<string, any['handleData']> = {
+    [vectorProvider.name]: vectorProvider.handleData,
     [geeProvider.name]: geeProvider.handleData,
     [cartoProvider.name]: cartoProvider.handleData,
     [tileProvider.name]: tileProvider.handleData,

@@ -54,7 +54,7 @@ export function TopicsSelect({
         />
     )
 }
-export function TopicsInner({
+function TopicsInner({
     topicHierarchy,
     onChange,
     value,
@@ -114,6 +114,10 @@ export function TopicsInner({
                   })
                   .flat()
 
+    function getTopicByName(topicName: string) {
+        return flattenedTopicHierarchy.find((topic) => topic.name === topicName)
+    }
+
     function BuildHierarchy(
         topic: TopicHierarchy,
         level: number
@@ -157,16 +161,16 @@ export function TopicsInner({
                         }
                         content={
                             <span className="text-black">
-                                You are not part of this topic therefore you
-                                cant add a dataset to it
+                                You are not part of this Topic therefore you
+                                cant add a Dataset to it
                             </span>
                         }
                     >
                         <div
                             className={classNames(
                                 topic.children
-                                    ? 'font-acumin text-base font-normal text-black group-hover:text-white'
-                                    : 'font-acumin text-base font-normal text-neutral-600 group-hover:text-white',
+                                    ? 'text-base font-normal text-black group-hover:text-white'
+                                    : 'text-base font-normal text-neutral-600 group-hover:text-white',
                                 userTopics && !userTopics.includes(topic.name)
                                     ? 'text-gray-400'
                                     : ''
@@ -188,7 +192,7 @@ export function TopicsInner({
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
-                    aria-label='topics button'
+                    aria-label="topics button"
                     variant="outline"
                     role="combobox"
                     id="topicsButton"
@@ -196,9 +200,9 @@ export function TopicsInner({
                     className="relative flex h-auto min-h-[7rem] w-full flex-row items-start justify-between rounded-md border-0 px-5 py-3 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 hover:bg-white focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
                 >
                     <div className="flex w-full items-start justify-between">
-                        <span className="font-acumin text-base font-light text-zinc-500">
+                        <span className="font-light text-zinc-500">
                             {value.length === 0 ? (
-                                'Start typing in a topic or select topics from the dropdown'
+                                'Start typing in a Topic or select Topics from the dropdown'
                             ) : (
                                 <div className="flex flex-wrap gap-2">
                                     {value.map((item, index) => (
@@ -207,9 +211,10 @@ export function TopicsInner({
                                             className="flex items-center gap-x-2 rounded-[3px] border border-blue-800 hover:bg-neutral-50 transition bg-white px-2 py-0.5"
                                         >
                                             <span className="font-['Acumin Pro SemiCondensed'] text-[15px] font-normal text-zinc-800">
-                                                {item}
+                                                {getTopicByName(item)?.title ??
+                                                    item}
                                             </span>
-                                            <DefaultTooltip content="Remove topic">
+                                            <DefaultTooltip content="Remove Topic">
                                                 <XMarkIcon
                                                     onClick={(e) => {
                                                         e.stopPropagation()
@@ -286,7 +291,7 @@ export function TopicsInner({
                     <CommandInput
                         value={query}
                         onValueChange={setQuery}
-                        placeholder="Search framework..."
+                        placeholder="Search Topics..."
                     />
                     <CommandEmpty>No framework found.</CommandEmpty>
                     <div className="pr-3">

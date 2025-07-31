@@ -105,7 +105,7 @@ const QueryInstructions = () => {
         : publicCkanUrl
 
     const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
-    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.id}`
+    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`
 
     const rwBaseUrl = `https://api.resourcewatch.org/v1`
     const rwDatasetGetUrl = `${rwBaseUrl}/dataset/${dataset.rw_id}`
@@ -116,7 +116,7 @@ const QueryInstructions = () => {
         <>
             <h2 className="text-lg font-bold mb-5">Datasets API</h2>
             <QueryEndpoint
-                description="Get this dataset's metadata"
+                description="Get this Dataset's metadata"
                 url={ckanDatasetGetUrl}
             />
 
@@ -128,18 +128,18 @@ const QueryInstructions = () => {
                         Resource Watch API
                     </h2>
                     <QueryEndpoint
-                        description="Get the metadata stored on the Resource Watch API for this dataset"
+                        description="Get the metadata stored on the Resource Watch API for this Dataset"
                         url={rwDatasetGetUrl}
                     />
 
                     {dataset.provider && (
                         <>
                             <QueryEndpoint
-                                description="Get this dataset's records metadata"
+                                description="Get this Dataset's records metadata"
                                 url={rwFieldsUrl}
                             />
                             <QueryEndpoint
-                                description="Run a SQL query against this dataset's records"
+                                description="Run a SQL query against this Dataset's records"
                                 url={rwQueryUrl}
                             />
                         </>
@@ -165,7 +165,7 @@ const UseCases = ({ usecases }: { usecases: string }) => {
         : publicCkanUrl
 
     const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
-    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.id}`
+    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`
 
     useEffect(() => {
         if (!highlighted && divRef.current) {
@@ -210,7 +210,7 @@ const SnippetInstructions = ({
         : publicCkanUrl
     const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
 
-    const ckanPackageShowUrl = `${ckanBaseUrl}/package_show?id=${dataset.id}`
+    const ckanPackageShowUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`
     const ckanPackageShowSnippet = getSnippetFn(ckanPackageShowUrl)
 
     const rwBaseUrl = `https://api.resourcewatch.org/v1`
@@ -228,7 +228,7 @@ const SnippetInstructions = ({
         <>
             <h2 className="text-lg font-bold mb-5">Datasets API</h2>
             <SnippetEndpoint
-                description="Get this dataset's metadata"
+                description="Get this Dataset's metadata"
                 snippet={ckanPackageShowSnippet}
                 language={language}
             />
@@ -241,7 +241,7 @@ const SnippetInstructions = ({
                         Resource Watch API
                     </h2>
                     <SnippetEndpoint
-                        description="Get the metadata stored on the Resource Watch API for this dataset"
+                        description="Get the metadata stored on the Resource Watch API for this Dataset"
                         snippet={rwGetDatasetSnippet}
                         language={language}
                     />
@@ -249,12 +249,12 @@ const SnippetInstructions = ({
                     {dataset.provider && (
                         <>
                             <SnippetEndpoint
-                                description="Get this dataset's records metadata"
+                                description="Get this Dataset's records metadata"
                                 snippet={rwGetFieldsSnippet}
                                 language={language}
                             />
                             <SnippetEndpoint
-                                description="Run a SQL query against this dataset's records"
+                                description="Run a SQL query against this Dataset's records"
                                 snippet={rwQuerySnippet}
                                 language={language}
                             />
@@ -267,7 +267,7 @@ const SnippetInstructions = ({
     )
 }
 
-export function APITabs({
+function APITabs({
     tabs,
 }: {
     tabs: { name: string; count?: number; highlighted?: boolean }[]
