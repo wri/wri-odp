@@ -19,6 +19,7 @@ import dynamic from 'next/dynamic'
 import { Index } from 'flexsearch'
 import { Group as CkanGroup } from '@portaljs/ckan'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
+import Topic from '@/interfaces/topic.interface'
 type Group = CkanGroup & { numSubtopics: number }
 
 const TopicsSearchResults = dynamic(
@@ -95,7 +96,7 @@ export default function TopicsPage(
             .filter(
                 (obj, index, self) =>
                     index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
-            ) as GroupTree[] | Organization[]
+            ) as GroupTree[] | Group[]
         const topicDetails = data.topicDetails
         return { topics, topicDetails, count: filteredTopics?.length }
     }
