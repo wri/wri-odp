@@ -310,12 +310,6 @@ export function AddLayer({
                                     index={index}
                                 />
                             </Tab.Panel>
-                            <Tab.Panel>
-                                <DerivedLayerForm
-                                    formObj={formObj}
-                                    index={index}
-                                />
-                            </Tab.Panel>
                         </Tab.Panels>
                     </Tab.Group>
                 </div>
