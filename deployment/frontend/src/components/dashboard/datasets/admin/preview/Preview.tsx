@@ -253,7 +253,7 @@ export function Preview({
                                             }}
                                         ></div>
                                     </FullDescription>
-                                    <FullDescription label="Rstrictions">
+                                    <FullDescription label="Restrictions">
                                         <div
                                             dangerouslySetInnerHTML={{
                                                 __html:
