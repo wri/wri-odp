@@ -77,14 +77,25 @@ export default function TopicsPage(
         if (!data) return { topics: [], topicDetails: {}, count: 0 }
         const filteredTopics =
             query !== ''
-                ? data?.allTopics?.filter((t) =>
-                      indexTopics.search(query).includes(t.id)
-                  )
-                : data.topics
-        const topics = filteredTopics?.slice(
-            pagination.page.start,
-            pagination.page.start + pagination.page.rows
-        ) as GroupTree[] | Group[]
+                ? (data?.allTopics
+                      ?.filter((t) => indexTopics.search(query).includes(t.id))
+                      .filter(
+                          (obj, index, self) =>
+                              index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+                      ) ?? [])
+                : data.topics.filter(
+                      (obj, index, self) =>
+                          index === self.findIndex((t) => t.id === obj.id)
+                  ) // Compare based on 'id' property
+        const topics = filteredTopics
+            ?.slice(
+                pagination.page.start,
+                pagination.page.start + pagination.page.rows
+            )
+            .filter(
+                (obj, index, self) =>
+                    index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+            ) as GroupTree[] | Organization[]
         const topicDetails = data.topicDetails
         return { topics, topicDetails, count: filteredTopics?.length }
     }

@@ -322,7 +322,7 @@ export const DatasetRouter = createTRPCRouter({
                     if (dataset.error.message)
                         throw Error(dataset.error.message)
                     throw Error(
-                        JSON.stringify(dataset.error).concat(' datastet create')
+                        JSON.stringify(dataset.error).concat(' Dataset create')
                     )
                 }
                 return dataset.result
@@ -1006,17 +1006,17 @@ export const DatasetRouter = createTRPCRouter({
                 dataset.datasets.map((d) => d.organization?.name).filter(Boolean)
               ),
             ]
+            console.log('orgSlugs in getAllDataset', JSON.stringify(orgSlugs, null, 2))
 
             const allOrgs = await getAllOrganizations({
               apiKey: ctx.session?.user.apikey ?? '',
             })
+            console.log('allOrgs in getAllDataset', JSON.stringify(allOrgs, null, 2))
 
             const teamVisibility = Object.fromEntries(
-              orgSlugs.map((slug) => {
-                const org = allOrgs.find((o) => o.name === slug)
-                return [slug, org?.visibility || 'public']
-              })
+              allOrgs.map((org) => [org.name, org.visibility || 'public'])
             )
+            console.log('teamVisibility in getAllDataset', JSON.stringify(teamVisibility, null, 2))
 
             return {
                 datasets: _datasets as unknown as WriDataset[],

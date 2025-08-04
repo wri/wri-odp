@@ -13,7 +13,6 @@ export const OrganizationRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       let groupTree: GroupTree[] = []
       const allOrg = await getAllOrganizations({ apiKey: ctx.session.user.apikey })
-      console.log('ALL ORG', allOrg)
       const Org2Image = allOrg.reduce((acc, org) => {
         acc[org.id] = org.image_display_url!
         return acc

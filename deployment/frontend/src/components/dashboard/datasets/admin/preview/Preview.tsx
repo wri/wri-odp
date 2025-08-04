@@ -321,7 +321,7 @@ export function Preview({
                     {watch('resources') && watch('resources').length > 0 && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
-                                Data files
+                                Data Files
                             </h3>
                             <div>
                                 {watch('resources')

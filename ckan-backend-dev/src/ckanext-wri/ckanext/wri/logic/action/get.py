@@ -1148,10 +1148,7 @@ def organization_list_for_user_wri(context: Context, data_dict: DataDict):
 
     user = context['user']
 
-    if user:
-        user_orgs = orgs
-
-    results = get_hierarchy_group(context, orgs, "organization", q, user_orgs=user_orgs)
+    results = get_hierarchy_group(context, orgs, "organization", q, user_orgs=orgs)
 
     if all_fields and full_orgs != orgs:
         results = _set_orgs_or_groups_fields(full_orgs, results, ["visibility", "notes"], all_fields)

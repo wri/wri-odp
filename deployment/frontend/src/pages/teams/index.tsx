@@ -79,10 +79,16 @@ export default function TeamsPage(
         if (!data) return { teams: [], teamsDetails: {}, count: 0 }
         const filteredTeams =
             query !== ''
-                ? (data?.allTeams?.filter((t) =>
-                      indexTeams.search(query).includes(t.id)
-                  ) ?? [])
-                : data.teams
+                ? (data?.allTeams
+                      ?.filter((t) => indexTeams.search(query).includes(t.id))
+                      .filter(
+                          (obj, index, self) =>
+                              index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+                      ) ?? [])
+                : data.teams.filter(
+                      (obj, index, self) =>
+                          index === self.findIndex((t) => t.id === obj.id)
+                  ) // Compare based on 'id' property
         const teams = filteredTeams.slice(
             pagination.page.start,
             pagination.page.start + pagination.page.rows
