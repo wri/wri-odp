@@ -102,9 +102,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
             if (resource.format == 'Layer') {
                 if (
                     (resource['layerObj'] || resource['layerObjRaw']) &&
-                    !resource.url
+                    (resource.rw_id == '' || !resource.rw_id)
                 ) {
-                    layerAsLayerObj.set(resource.rw_id, 'pending')
+                    layerAsLayerObj.set(resource.id, 'pending')
                 } else {
                     layerAsLayerObj.set(resource.rw_id, 'approved')
                 }
@@ -119,7 +119,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 if (resource.format == 'Layer') {
                     if (
                         (resource['layerObj'] || resource['layerObjRaw']) &&
-                        !resource.url
+                        (resource.rw_id == '' || !resource.rw_id)
                     ) {
                         layerAsLayerObj.set(resource.rw_id, 'pending')
                     } else {
@@ -140,7 +140,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 if (resource.format == 'Layer') {
                     if (
                         (resource['layerObj'] || resource['layerObjRaw']) &&
-                        !resource.url
+                        (resource.rw_id == '' || !resource.rw_id)
                     ) {
                         tempLayerAsLayerobj.set(resource.rw_id, 'pending')
                     } else {
@@ -155,8 +155,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
         for (const resource of prevdataset?.resources) {
             if (resource.format == 'Layer') {
                 if (
-                    resource['layerObj'] ||
-                    (resource['layerObjRaw'] && !resource.url)
+                    (resource['layerObj'] || resource['layerObjRaw']) &&
+                    (resource.rw_id == '' || !resource.rw_id)
                 ) {
                     tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')
                 } else {

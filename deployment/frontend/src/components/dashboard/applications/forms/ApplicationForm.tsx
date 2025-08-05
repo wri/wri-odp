@@ -83,7 +83,7 @@ export default function ApplicationForm({
                         type="text"
                         className="h-[8.4rem]"
                         icon={
-                            <DefaultTooltip content="Long form description of the application and its purpose.">
+                            <DefaultTooltip content="Long form description of the Application and its purpose.">
                                 <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                             </DefaultTooltip>
                         }
@@ -96,7 +96,7 @@ export default function ApplicationForm({
                         placeholder="https://wri.org"
                         type="text"
                         icon={
-                            <DefaultTooltip content="Link to the preferred way to reach out to the application support team. This could be a “contact us form” or a “mailto:app-help@wri.org” style link.">
+                            <DefaultTooltip content="Link to the preferred way to reach out to the Application support Team. This could be a “contact us form” or a “mailto:app-help@wri.org” style link.">
                                 <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                             </DefaultTooltip>
                         }
@@ -109,7 +109,7 @@ export default function ApplicationForm({
                         placeholder="https://wri.org"
                         type="text"
                         icon={
-                            <DefaultTooltip content="Homepage of the application, typically the landing page or root of the application’s web domain.">
+                            <DefaultTooltip content="Homepage of the Application, typically the landing page or root of the Application’s web domain.">
                                 <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                             </DefaultTooltip>
                         }
@@ -128,7 +128,7 @@ export default function ApplicationForm({
                         placeholder="https://wri.org"
                         type="text"
                         icon={
-                            <DefaultTooltip content="Link to self-service documentation and user support resources. This could be the application’s “about page” or “FAQs”.">
+                            <DefaultTooltip content="Link to self-service documentation and user support resources. This could be the Application’s “about page” or “FAQs”.">
                                 <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                             </DefaultTooltip>
                         }

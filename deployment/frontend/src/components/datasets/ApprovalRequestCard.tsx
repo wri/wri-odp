@@ -73,7 +73,7 @@ export default function ApprovalRequestCard({
             })
             setApproveOpen(false)
             notify(
-                `Successfully approved the dataset ${datasetTitle ?? datasetName}`,
+                `Successfully approved the Dataset ${datasetTitle ?? datasetName}`,
                 'success'
             )
             router.push(`/dashboard/datasets`)
@@ -208,7 +208,7 @@ export default function ApprovalRequestCard({
                         </Dialog.Title>
                         <div className="mt-2">
                             <p className="text-sm text-gray-500">
-                                Are you sure you want to approve this dataset?
+                                Are you sure you want to approve this Dataset?
                             </p>
                         </div>
                     </div>

@@ -31,7 +31,7 @@ export default function DerivedLayerForm({
                         <p className="mt-1 text-sm text-blue-700">
                             This layer references an existing RW layer by ID. It
                             is read-only and cannot be edited through this
-                            application.
+                            Application.
                         </p>
                     </div>
                 </div>
@@ -54,6 +54,17 @@ export default function DerivedLayerForm({
                 <p className="mt-1 text-sm text-gray-500">
                     The UUID of the existing layer in the RW API that you want
                     to reference.
+                </p>
+            </InputGroup>
+            <InputGroup label="RW Layer URL">
+                <Input
+                    {...register(`resources.${index}.url`)}
+                    placeholder="Enter the existing RW URL ID (e.g., 'https://api.resourcewatch.org/v1/dataset/9085715d-8a32-40b1-ba7b-cd9830333284/layer/ada08d85-6d12-4c2f-9c3c-479de6b9214f')"
+                />
+                <ErrorDisplay name="id" errors={errors} />
+                <p className="mt-1 text-sm text-gray-500">
+                    The URL of the existing layer in the RW API that you want to
+                    reference.
                 </p>
             </InputGroup>
 

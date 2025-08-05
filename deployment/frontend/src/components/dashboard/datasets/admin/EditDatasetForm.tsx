@@ -232,7 +232,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
             notify(
-                `Successfully edited the "${title ?? name}" dataset`,
+                `Successfully edited the "${title ?? name}" Dataset`,
                 'success'
             )
 
@@ -513,7 +513,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                     return editDataset.mutate(toBeSavedData)
                                 } else {
                                     notify(
-                                        'No changes to the dataset',
+                                        'No changes to the Dataset',
                                         'success'
                                     )
                                     router.push(`/datasets/${dataset.name}`)

@@ -49,6 +49,36 @@ import Image from 'next/image'
 import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover'
 import { env } from '@/env.mjs'
 import { useRouter } from 'next/router'
+import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
+
+
+const CopyButton = ({ content }: { content: string }) => {
+  const [copied, setCopied] = useState(false)
+  const handleClick = () => {
+      navigator.clipboard.writeText(content)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500) 
+  }
+  return (
+      <DefaultTooltip
+          content={copied ? 'Dataset URL copied!' : 'Copy simple page URL'}
+          contentClassName={`${copied ? 'bg-green-500 text-white' : ''}`}
+          delayDuration={copied ? 0 : 100}
+          onOpenChange={(open) => {
+              if (copied && open) return
+          }}
+          open={copied ? true : undefined}
+      >
+          <Button
+              aria-label="copy button"
+              className={`h-auto rounded-full p-1`}
+              onClick={handleClick}
+          >
+              <DocumentDuplicateIcon className="w-3 text-white" />
+          </Button>
+      </DefaultTooltip>
+  )
+}
 
 function OpenInButton({
   open_in,
@@ -438,7 +468,7 @@ export function DatasetHeader({
       setOpen(false)
       notify(
         `Successfully added the ${dataset?.title ?? dataset?.name
-        } dataset to your favorites`,
+        } Dataset to your favourites`,
         'success'
       )
     },
@@ -450,7 +480,7 @@ export function DatasetHeader({
       setFOpen(false)
       notify(
         `Successfully removed the ${dataset?.title ?? dataset?.name
-        } dataset from your favorites`,
+        } Dataset from your favourites`,
         'error'
       )
     },
@@ -525,11 +555,11 @@ export function DatasetHeader({
               <Spinner className="w-2 h-2" />
             ) : data !== undefined && data ? (
               <DefaultTooltip
-                content="remove from favorites"
+                content="remove from favourites"
                 side="bottom"
               >
                 <button
-                  aria-label="remove from favorites"
+                  aria-label="remove from favourites"
                   className="p-0 m-0 "
                   onClick={() => setFOpen(true)}
                 >
@@ -538,11 +568,11 @@ export function DatasetHeader({
               </DefaultTooltip>
             ) : (
               <DefaultTooltip
-                content="Add to favorites"
+                content="Add to favourites"
                 side="bottom"
               >
                 <button
-                  aria-label="add to favorite"
+                  aria-label="add to favourite"
                   className="p-0 m-0 "
                   onClick={() => setOpen(true)}
                 >
@@ -581,13 +611,13 @@ export function DatasetHeader({
                     as="h3"
                     className="text-base font-semibold leading-6 text-gray-900"
                   >
-                    Add to favorites
+                    Add to favourites
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
                       Are you sure you want to add{' '}
                       {dataset?.title ?? dataset?.name} to
-                      your favorites?
+                      your favourites?
                     </p>
                   </div>
                 </div>
@@ -634,13 +664,13 @@ export function DatasetHeader({
                     as="h3"
                     className="text-base font-semibold leading-6 text-gray-900"
                   >
-                    Remove from favorites
+                    Remove from favourites
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
                       Are you sure you want to remove{' '}
                       {dataset?.title ?? dataset?.name}{' '}
-                      from your favorites?
+                      from your favourites?
                     </p>
                   </div>
                 </div>
@@ -688,16 +718,25 @@ export function DatasetHeader({
           )}
         </div>
         <div className="flex max-w-[560px] flex-col gap-y-2">
-          <h2 className="text-xs font-bold uppercase leading-none tracking-wide text-green-700">
-            <span
-              className={classNames(
-                'w-fit',
-                highlighted('organization')
-              )}
-            >
-              {dataset?.organization?.title ?? 'No Team'}
-            </span>
-          </h2>
+          <div className="flex items-center gap-x-2">
+            <h2 className="text-xs font-bold uppercase leading-none tracking-wide text-green-700">
+              <span
+                className={classNames(
+                  'w-fit',
+                  highlighted('organization')
+                )}
+              >
+                {dataset?.organization?.title ?? 'No Team'}
+              </span>
+            </h2>
+            {session?.data?.user && dataset?.organization?.visibility === "private" && (
+              <span
+                className={`rounded-full h-fit text-sm lg:text-xs px-2 py-y border border-gray-400 capitalize`}
+              >
+                {dataset?.organization?.visibility}
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-x-3">
             <h1
               className={`w-fit text-3xl font-bold text-black ${dataset?.title
@@ -716,6 +755,9 @@ export function DatasetHeader({
                 {dataset?.visibility_type}
               </span>
             )}
+            <div className=''>
+                <CopyButton content={`${env.NEXT_PUBLIC_NEXTAUTH_URL.replace(/\/+$/, '')}/datasets/${dataset?.name}`} />
+            </div>
           </div>
           <p
             className={`text-justify text-base font-light leading-snug text-stone-900 w-fit ${highlighted(
@@ -900,32 +942,12 @@ export function DatasetHeader({
           ) : (
             ''
           )}
-          {session.data?.user ? (
-            dataset?.technical_notes && (
-              <div
-                className={classNames(
-                  'flex items-center rounded-[3px] border border-green-500 bg-green-800',
-                  highlighted('technical_notes'),
-                  highlighted('technical_notes') !== ''
-                    ? 'border-yellow-200'
-                    : ''
-                )}
-              >
-                <div className="px-2 font-acumin text-xs font-medium text-white">
-                  RDI approved
-                </div>
-              </div>
-            )
-          ) : (
-            <></>
-          )}
           {dataset?.resources &&
             dataset?.resources.filter((resource) => resource.format)
               .length > 0 && (
               <div
                 className={classNames(
-                  'flex gap-x-2 border-zinc-300',
-                  session.data?.user ? 'border-l pl-3' : ''
+                  'flex gap-x-2 border-zinc-300'
                 )}
               >
                 {[

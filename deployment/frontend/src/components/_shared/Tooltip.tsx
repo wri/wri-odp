@@ -32,17 +32,23 @@ const DefaultTooltip = ({
     disabled = false,
     side = 'top',
     contentClassName = '',
+    open,
+    onOpenChange,
+    delayDuration = 100,
 }: {
     children: React.ReactNode
     content: React.ReactNode | string
     disabled?: boolean
     side?: 'top' | 'bottom' | 'left' | 'right'
     contentClassName?: string
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
+    delayDuration?: number
 }) => {
     if (disabled) return <>{children}</>
     return (
-        <TooltipProvider delayDuration={100}>
-            <Tooltip>
+        <TooltipProvider delayDuration={delayDuration}>
+            <Tooltip open={open} onOpenChange={onOpenChange}>
                 <TooltipTrigger asChild>{children}</TooltipTrigger>
                 <TooltipPrimitive.Portal>
                     <TooltipContent

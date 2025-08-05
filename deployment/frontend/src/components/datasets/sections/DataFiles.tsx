@@ -236,7 +236,7 @@ export function DataFiles({
                         className="block w-full rounded-l-md py-3 pl-4 border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
                         onChange={(e) => setQ(e.target.value)}
                         value={q}
-                        placeholder="Search datafiles by title or description"
+                        placeholder="Search Data Files by title or description"
                     />
                     <Button
                         onClick={handleSearch}
@@ -303,7 +303,7 @@ export function DataFiles({
                                 ></path>
                             </svg>
                         )}{' '}
-                        ({datafilesToDownload.length} Selected datafiles
+                        ({datafilesToDownload.length} Selected Data Files
                         {notDownloadable.length > 0
                             ? `, ${notDownloadable.length} not available to download)`
                             : ')'}
@@ -342,7 +342,7 @@ export function DataFiles({
                                     }
                                     className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                                 >
-                                    Select all datafiles
+                                    Select all Data Files
                                 </button>
                             )}
                             {datafilesToDownload.length > 0 && (
@@ -353,7 +353,7 @@ export function DataFiles({
                                     }}
                                     className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                                 >
-                                    Unselect all datafiles
+                                    Unselect all Data Files
                                 </button>
                             )}
                         </>
@@ -410,7 +410,7 @@ export function DataFiles({
                     onClick={() => setOpenDownload(true)}
                     className="group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3"
                 >
-                    Download Selected Datafiles
+                    Download Selected Data Files
                     <ArrowDownCircleIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
                 </Button>
             )}
@@ -418,7 +418,7 @@ export function DataFiles({
                 {datafiles?.length === 0 ? (
                     <div className="flex items-center justify-center h-20">
                         <p className="font-acumin text-base font-normal text-black">
-                            No data files found
+                            No Data Files found
                         </p>
                     </div>
                 ) : (
@@ -448,7 +448,7 @@ export function DataFiles({
                 )}
             </div>
             <DownloadPopup
-                title="The selected datafiles are being prepared for download"
+                title="The selected Data Files are being prepared for download"
                 subtitle="Please enter your information so that you receive the download link via email"
                 isOpen={openDownload}
                 onClose={() => setOpenDownload(false)}
@@ -631,19 +631,20 @@ function DatafileCard({
                         </div>
                         <div className="gap-x-2 hidden sm:flex">
                             {/* @ts-ignore */}
-                            {datafile?.rw_id && (
+                            {['layer', 'layer-raw', 'reference-layer'].includes(
+                                datafile.type
+                            ) && (
                                 <>
-                                    {activeLayers.some(
-                                        (a) =>
-                                            datafile.url?.endsWith(a.id) ||
-                                            datafile.id === a.id
-                                    ) ? (
+                                    {activeLayers.some((a) => {
+                                        return (
+                                            datafile.url?.endsWith(a?.id) ||
+                                            datafile.id === a?.id
+                                        )
+                                    }) ? (
                                         <Button
                                             variant="light"
                                             size="sm"
                                             onClick={() => {
-                                                {
-                                                }
                                                 // @ts-ignore
                                                 if (datafile.rw_id) {
                                                     removeLayerFromLayerGroup(
@@ -652,6 +653,11 @@ function DatafileCard({
                                                         dataset.id
                                                     )
                                                 }
+                                                removeLayerFromLayerGroup(
+                                                    // @ts-ignore
+                                                    datafile?.id,
+                                                    dataset.id
+                                                )
                                             }}
                                         >
                                             <span className="mt-1 text-xs 2xl:text-sm whitespace-nowrap">
@@ -666,19 +672,33 @@ function DatafileCard({
                                             className="text-xs 2xl:text-sm whitespace-nowrap"
                                             onClick={() => {
                                                 // @ts-ignore
-                                                if (datafile.rw_id) {
-                                                    if (!mapDisplaypreview) {
-                                                        setMapDisplayPreview(
-                                                            true
-                                                        )
-                                                    }
+                                                if (!mapDisplaypreview) {
+                                                    setMapDisplayPreview(true)
+                                                }
+                                                if (
+                                                    datafile.layerObj
+                                                        ?.layerConfig ||
+                                                    datafile.layerObjRaw
+                                                        ?.layerConfig
+                                                ) {
                                                     addLayerToLayerGroup(
                                                         // @ts-ignore
-                                                        datafile.rw_id,
-                                                        dataset.id
+                                                        datafile.id,
+                                                        dataset.id,
+                                                        'ckan'
+                                                    )
+                                                } else {
+                                                    addLayerToLayerGroup(
+                                                        // @ts-ignore
+                                                        datafile.rw_id != '' &&
+                                                            datafile.rw_id !=
+                                                                null
+                                                            ? datafile.rw_id
+                                                            : datafile.id,
+                                                        dataset.id,
+                                                        'rw'
                                                     )
                                                 }
-
                                                 customDataLayer({
                                                     event: 'gtm.click',
                                                     resource_name:

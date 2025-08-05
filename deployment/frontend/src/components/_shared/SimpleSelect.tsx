@@ -38,7 +38,10 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
     id,
     onChange: _onChange = (val) => {},
     disabled,
-}: SimpleSelectProps<T, V> & { onChange?: (val: any) => void, disabled?: boolean }) {
+}: SimpleSelectProps<T, V> & {
+    onChange?: (val: any) => void
+    disabled?: boolean
+}) {
     const { control } = formObj ?? useForm()
     return (
         <Controller
@@ -51,7 +54,10 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                     label: '',
                 } as PathValue<T, Path<T> & Option<V>>)
             }
-            render={({ field: { onChange: setSelected, value: selected } }) => (
+            render={({ field: { onChange: setSelected, value: selected } }) => {
+                const selectedFull = options.find((o) => o.value === selected?.value)
+                console.log('Selected value:', selectedFull)
+                return (
                 <Listbox
                     value={selected}
                     onChange={(e) => {
@@ -78,20 +84,20 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                         !placeholder ? 'min-h-[2.5rem]' : ''
                                     )}
                                 >
-                                    <span
-                                        className={classNames(
-                                            selected && selected.label
-                                                ? ''
-                                                : 'text-zinc-500',
-                                            'block'
+                                    <span className="flex items-center gap-2 truncate">
+                                        <span
+                                            className={classNames(
+                                                selected && selected.label ? '' : 'text-zinc-500',
+                                                'truncate'
+                                            )}
+                                        >
+                                            {selected && selected.label
+                                                ? selected.label.charAt(0).toUpperCase() + selected.label.slice(1)
+                                                : placeholder}
+                                        </span>
+                                        {selected?.visibility === 'private' && selected?.value != 'private' && (
+                                            <>&#128274;</>
                                         )}
-                                    >
-                                        {selected && selected.label
-                                            ? selected.label
-                                                  .charAt(0)
-                                                  .toUpperCase() +
-                                              selected.label.slice(1)
-                                            : placeholder}
                                     </span>
                                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                         <ChevronDownIcon
@@ -136,8 +142,8 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                                             {option.label}
                                                             {option?.visibility &&
                                                             option.visibility ===
-                                                                'private' ? (
-                                                                <> &#128274;</>
+                                                                'private' && option.value != 'private' ? (
+                                                                <span className='ml-1'> &#128274;</span>
                                                             ) : (
                                                                 ''
                                                             )}
@@ -153,6 +159,7 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                     )}
                 </Listbox>
             )}
+        }
         />
     )
 }

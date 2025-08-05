@@ -150,7 +150,7 @@ export default function LocationSearch({
             <GeocoderControl
                 mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                 position="bottom-right"
-                placeholder="Search datafiles by location"
+                placeholder="Search Data Files by location"
                 initialValue={formObj.getValues('location')}
                 onResult={(e) => {
                     setValue('bbox', [

@@ -286,23 +286,19 @@ function SubCardProfile({
             diff.old_dataset?.authors &&
             typeof diff.old_dataset?.authors === 'string'
                 ? JSON.parse(diff.old_dataset?.authors)
-                : diff.old_dataset?.authors ?? []
+                : (diff.old_dataset?.authors ?? [])
         let newAuthors =
             diff.new_dataset?.authors &&
             typeof diff.new_dataset?.authors === 'string'
                 ? JSON.parse(diff.new_dataset?.authors)
-                : diff.new_dataset?.authors ?? []
+                : (diff.new_dataset?.authors ?? [])
         diff2 = {
             ...diff2,
             Authors: {
                 old_value:
-                    oldAuthors?.map(
-                        (a: any) => `${a.name} (${a.email})`
-                    ) ?? [],
+                    oldAuthors?.map((a: any) => `${a.name} (${a.email})`) ?? [],
                 new_value:
-                    newAuthors?.map(
-                        (a: any) => `${a.name} (${a.email})`
-                    ) ?? [],
+                    newAuthors?.map((a: any) => `${a.name} (${a.email})`) ?? [],
             },
         }
     }
@@ -317,23 +313,21 @@ function SubCardProfile({
             diff.old_dataset?.maintainers &&
             typeof diff.old_dataset?.maintainers === 'string'
                 ? JSON.parse(diff.old_dataset?.maintainers)
-                : diff.old_dataset?.maintainers ?? []
+                : (diff.old_dataset?.maintainers ?? [])
         let newMaintainers =
             diff.new_dataset?.maintainers &&
             typeof diff.new_dataset?.maintainers === 'string'
                 ? JSON.parse(diff.new_dataset?.maintainers)
-                : diff.new_dataset?.maintainers ?? []
+                : (diff.new_dataset?.maintainers ?? [])
         diff2 = {
             ...diff2,
             Maintainers: {
                 old_value:
-                    oldMaintainers?.map(
-                        (a: any) => `${a.name} (${a.email})`
-                    ) ?? [],
+                    oldMaintainers?.map((a: any) => `${a.name} (${a.email})`) ??
+                    [],
                 new_value:
-                    newMaintainers?.map(
-                        (a: any) => `${a.name} (${a.email})`
-                    ) ?? [],
+                    newMaintainers?.map((a: any) => `${a.name} (${a.email})`) ??
+                    [],
             },
         }
     }
@@ -382,7 +376,7 @@ function SubCardProfile({
                                                         )
                                                             ? key.replace(
                                                                   'resources',
-                                                                  'datafiles'
+                                                                  'data files'
                                                               )
                                                             : key
                                                     )}
@@ -414,7 +408,7 @@ function SubCardProfile({
             ) : (
                 <>
                     <p className="mb-3">
-                        This is a new dataset, a previous version does not
+                        This is a new Dataset, a previous version does not
                         exist. Table shows the current values.
                     </p>
                     <Table>
@@ -493,7 +487,7 @@ export default function ApprovalRow({
                     icon: <CheckIcon className="w-4 h-4 text-white" />,
                     tooltip: {
                         id: `approve-tooltip-${approvalInfo.name}`,
-                        content: 'Approve dataset',
+                        content: 'Approve Dataset',
                     },
                     onClick: () => handleOpenModal(approvalInfo, 'approve'),
                 },
@@ -503,7 +497,7 @@ export default function ApprovalRow({
                     icon: <XMarkIcon className="w-4 h-4 text-white" />,
                     tooltip: {
                         id: `delete-tooltip-${approvalInfo.name}`,
-                        content: 'Reject dataset',
+                        content: 'Reject Dataset',
                     },
                     onClick: () => handleOpenModal(approvalInfo, 'reject'),
                 },

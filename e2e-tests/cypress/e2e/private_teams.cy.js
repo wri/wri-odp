@@ -64,7 +64,7 @@ describe("Create and edit team", () => {
         .click();
       cy.get("li").contains(parentOrg).click();
       cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${org} team`);
+      cy.contains(`Successfully edited the ${org} Team`);
       cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
         cy.get("input[name=title]").should("have.value", org);
       });
@@ -85,7 +85,7 @@ describe("Create and edit team", () => {
       cy.get("button#visibility").click();
       cy.get("li").contains("Private").click();
       cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${parentOrg} team`);
+      cy.contains(`Successfully edited the ${parentOrg} Team`);
       cy.wait(5000);
     });
   });
@@ -103,7 +103,7 @@ describe("Create and edit team", () => {
       cy.get("button#visibility").click();
       cy.get("li").contains("Public").click();
       cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${parentOrg} team`);
+      cy.contains(`Successfully edited the ${parentOrg} Team`);
     });
   });
 
@@ -133,14 +133,14 @@ describe("Create and edit team", () => {
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
     cy.get('input[name="maintainers.0.email"]').type(
-      "test-maintainer-1@example.com"
+      "test-maintainer-1@example.com",
     );
 
-    cy.contains("Next: Datafiles").click();
+    cy.contains("Next: Data Files").click();
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
-    cy.contains(`Successfully created the "${datasetName}" dataset`, {
+    cy.contains(`Successfully created the "${datasetName}" Dataset`, {
       timeout: 20000,
     });
 
@@ -151,7 +151,7 @@ describe("Create and edit team", () => {
       cy.get("button[type=submit]").click();
       cy.wait(5000);
       cy.contains(
-        "Team has 1 public dataset(s) and cannot be made private"
+        "Team has 1 public Dataset(s) and cannot be made private",
       ).should("exist");
     });
   });
@@ -163,7 +163,7 @@ describe("Create and edit team", () => {
       cy.get("input[name=title]").should("have.value", parentOrg);
       cy.get("textarea[name=description]").clear().type("Test description");
       cy.get("button[type=submit]").click();
-      cy.contains(`Successfully edited the ${parentOrg} team`);
+      cy.contains(`Successfully edited the ${parentOrg} Team`);
     });
 
     cy.wait(5000);
@@ -172,7 +172,7 @@ describe("Create and edit team", () => {
       cy.get("input[name=title]").should("have.value", parentOrg);
       cy.get("textarea[name=description]").should(
         "have.value",
-        "Test description"
+        "Test description",
       );
     });
   });
@@ -231,14 +231,14 @@ describe("Create and edit team", () => {
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
     cy.get('input[name="maintainers.0.email"]').type(
-      "test-maintainer-1@example.com"
+      "test-maintainer-1@example.com",
     );
 
-    cy.contains("Next: Datafiles").click();
+    cy.contains("Next: Data Files").click();
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
-    cy.contains(`Successfully created the "${datasetName2}" dataset`, {
+    cy.contains(`Successfully created the "${datasetName2}" Dataset`, {
       timeout: 20000,
     });
   });
@@ -286,14 +286,14 @@ describe("Create and edit team", () => {
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
     cy.get('input[name="maintainers.0.email"]').type(
-      "test-maintainer-1@example.com"
+      "test-maintainer-1@example.com",
     );
 
-    cy.contains("Next: Datafiles").click();
+    cy.contains("Next: Data Files").click();
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
-    cy.contains(`Successfully created the "${datasetName3}" dataset`, {
+    cy.contains(`Successfully created the "${datasetName3}" Dataset`, {
       timeout: 20000,
     });
   });

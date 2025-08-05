@@ -253,7 +253,7 @@ export function Preview({
                                             }}
                                         ></div>
                                     </FullDescription>
-                                    <FullDescription label="Rstrictions">
+                                    <FullDescription label="Restrictions">
                                         <div
                                             dangerouslySetInnerHTML={{
                                                 __html:
@@ -304,15 +304,15 @@ export function Preview({
                         text={
                             <ul className="list-disc">
                                 <li>
-                                    To add a chart view to your dataset, the
-                                    system first needs to load your data file.
+                                    To add a chart view to your Dataset, the
+                                    system first needs to load your Data File.
                                     Please wait 10-15 minutes and then choose to
-                                    edit your dataset. You will then be able to
+                                    edit your Dataset. You will then be able to
                                     add a chart.
                                 </li>
                                 <li>
                                     Charts views cannot be created while the
-                                    dataset is awaiting approval
+                                    Dataset is awaiting approval
                                 </li>
                             </ul>
                         }
@@ -321,7 +321,7 @@ export function Preview({
                     {watch('resources') && watch('resources').length > 0 && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
-                                Data files
+                                Data Files
                             </h3>
                             <div>
                                 {watch('resources')

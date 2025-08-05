@@ -173,7 +173,7 @@ export function AddLayer({
                                 }
                             >
                                 {({ selected }) => (
-                                    <DefaultTooltip content="This option will try to guide you torward building some of the most common map specs, its more limited but easier overrall">
+                                    <DefaultTooltip content="This option will try to guide you towards building some of the most common map specs; it's more limited but easier overall">
                                         <span
                                             className={classNames(
                                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
@@ -213,7 +213,7 @@ export function AddLayer({
                                 }
                             >
                                 {({ selected }) => (
-                                    <DefaultTooltip content="This require you to understand the layer config that our maps expect, useful if you want to use less common providers, such as GFW, Document, ArcGIS etc">
+                                    <DefaultTooltip content="This requires you to understand the layer config that our maps expect, useful if you want to use less common providers, such as GFW, Document, ArcGIS, etc">
                                         <span
                                             className={classNames(
                                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
@@ -287,10 +287,25 @@ export function AddLayer({
                         <Tab.Panels as="div" className="mt-2">
                             <Tab.Panel className="hidden"></Tab.Panel>
                             <Tab.Panel>
-                                <BuildALayer formObj={formObj} index={index} />
+                                {formObj.getValues(`resources.${index}.type`) ==
+                                    'layer' && (
+                                    <BuildALayer
+                                        formObj={formObj}
+                                        index={index}
+                                    />
+                                )}
                             </Tab.Panel>
                             <Tab.Panel>
-                                <BuildALayerRaw
+                                {formObj.getValues(`resources.${index}.type`) ==
+                                    'layer-raw' && (
+                                    <BuildALayerRaw
+                                        formObj={formObj}
+                                        index={index}
+                                    />
+                                )}
+                            </Tab.Panel>
+                            <Tab.Panel>
+                                <DerivedLayerForm
                                     formObj={formObj}
                                     index={index}
                                 />

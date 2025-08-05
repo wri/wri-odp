@@ -22,7 +22,7 @@ import { useQuery } from 'react-query';
 
 
 function TopicProfile({ team, topic2Image }: { team: GroupTree, topic2Image: Record<string, string> }) {
-  const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
+  const description = team?.children?.length ? `${team?.children?.length} SubTopics` : 'No SubTopics'
   const TopicProfile = team as IRowProfile
   TopicProfile.description = description
   TopicProfile.image_display_url = topic2Image[team.id]
@@ -34,7 +34,7 @@ function TopicProfile({ team, topic2Image }: { team: GroupTree, topic2Image: Rec
 }
 
 function SubTopicProfile({ team, topic2Image }: { team: GroupTree, topic2Image: Record<string, string> }) {
-  const description = team?.children?.length ? `${team?.children?.length} subtopics` : 'No subtopics'
+  const description = team?.children?.length ? `${team?.children?.length} SubTopics` : 'No SubTopics'
   const TopicProfile = team as IRowProfile
   TopicProfile.description = description
   TopicProfile.image_display_url = topic2Image[team.id]
@@ -59,7 +59,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
     onSuccess: async (data) => {
       await utils.topics.getUsersTopics.invalidate({ search: '', page: { start: 0, rows: 10000 } })
       setOpen(false)
-      notify(`Successfully deleted the ${selectedTopic?.name} topic`, 'error')
+      notify(`Successfully deleted the ${selectedTopic?.name} Topic`, 'error')
     }
   })
 
@@ -96,7 +96,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
                                   />
                               }
                               linkButton={{
-                                  label: 'View topic',
+                                  label: 'View Topic',
                                   link: `../topics/${team.name}`,
                               }}
                               controlButtons={[
@@ -108,7 +108,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
                                       ),
                                       tooltip: {
                                           id: `edit-tooltip-${team.name}`,
-                                          content: 'Edit topic',
+                                          content: 'Edit Topic',
                                       },
                                       onClick: () => {
                                           router.push(
@@ -124,7 +124,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
                                       ),
                                       tooltip: {
                                           id: `delete-tooltip-${team.name}`,
-                                          content: 'Delete topic',
+                                          content: 'Delete Topic',
                                       },
                                       onClick: () =>
                                           handleOpenModal(team as GroupTree),
@@ -157,7 +157,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
                                   </div>
                               }
                               linkButton={{
-                                  label: 'View topic',
+                                  label: 'View Topic',
                                   link: `../topics/${team.name}`,
                               }}
                               controlButtons={[
@@ -169,7 +169,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
                                       ),
                                       tooltip: {
                                           id: `edit-tooltip-${team.name}`,
-                                          content: 'Edit topic',
+                                          content: 'Edit Topic',
                                       },
                                       onClick: () => {
                                           router.push(
@@ -185,7 +185,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
                                       ),
                                       tooltip: {
                                           id: `delete-tooltip-${team.name}`,
-                                          content: 'Delete topic',
+                                          content: 'Delete Topic',
                                       },
                                       onClick: () =>
                                           handleOpenModal(team as GroupTree),
@@ -221,7 +221,7 @@ function SubCardProfile({ teams, highlighted, topic2Image }:
                 </Dialog.Title>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    Are you sure you want to delete this topic?
+                    Are you sure you want to delete this Topic?
                   </p>
                 </div>
               </div>
@@ -263,7 +263,7 @@ export default function TopicCard() {
     onSuccess: async (data) => {
       await refetch();
       setOpen(false)
-      notify(`Successfully deleted the ${selectedTopic?.name} topic`, 'error')
+      notify(`Successfully deleted the ${selectedTopic?.name} Topic`, 'error')
     }
   })
 
@@ -305,7 +305,7 @@ export default function TopicCard() {
                     authorized={topic?.capacity === 'admin'}
                     rowMain={<TopicProfile team={topic} topic2Image={data?.topic2Image as Record<string, string>} />}
                     linkButton={{
-                      label: "View topic",
+                      label: "View Topic",
                       link: `../topics/${topic.name}`,
                     }}
                     controlButtons={[
@@ -315,7 +315,7 @@ export default function TopicCard() {
                         icon: <PencilSquareIcon className='w-4 h-4 text-white' />,
                         tooltip: {
                           id: `edit-tooltip-${topic.name}`,
-                          content: "Edit topic"
+                          content: "Edit Topic"
                         },
                         onClick: () => {
                           router.push(`/dashboard/topics/${topic.name}/edit`)
@@ -327,7 +327,7 @@ export default function TopicCard() {
                         icon: <TrashIcon className='w-4 h-4 text-white' />,
                         tooltip: {
                           id: `delete-tooltip-${topic.name}`,
-                          content: "Delete topic"
+                          content: "Delete Topic"
                         },
                         onClick: () => handleOpenModal(topic)
                       },
@@ -365,7 +365,7 @@ export default function TopicCard() {
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      Are you sure you want to delete this topic?
+                      Are you sure you want to delete this Topic?
                     </p>
                   </div>
                 </div>

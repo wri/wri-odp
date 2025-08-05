@@ -57,7 +57,7 @@ export default function RedirectedSearchInput() {
             <div className="mx-auto my-auto flex flex-col w-full max-w-[1380px] space-x-4 px-4 font-acumin sm:px-6 xxl:px-0">
                 <div className="w-full max-w-[819px] pl-12  ">
                     <h1 className="text-[40px]  leading-[48px] font-['Acumin Pro SemiCondensed'] font-semibold text-white mb-[20px]">
-                        Search datasets
+                        Search Datasets
                     </h1>
                 </div>
                 <form
