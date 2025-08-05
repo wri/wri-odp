@@ -826,7 +826,6 @@ def group_activity_list_wri(context: Context, data_dict: DataDict):
     return results
 
 
-
 @logic.side_effect_free
 def user_list_wri(context: Context, data_dict: DataDict):
     model = context["model"]
@@ -972,16 +971,18 @@ def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any, 
             else:
                 org["private"] = False
 
-        
         for child in org["children"]:
             recurcive_tree_ids(child, group_hierarchy_ids)
+
         return group_hierarchy_ids
 
     group_hierarchy_ids = []
     results = []
+
     for group in groups:
         if group in group_hierarchy_ids:
             continue
+
         group_tree = get_action("group_tree_section")(
             context, {"id": group, "type": group_type}
         )
@@ -992,61 +993,166 @@ def get_hierarchy_group(context: Context, groups: Any, group_type: str, q: Any, 
             group_tree["highlighted"] = False
 
         group_hierarchy_ids += recurcive_tree_ids(group_tree)
+
         if not context['user'] and (private_orgs and group_tree["name"] in private_orgs):
             continue
+
         results.append(group_tree)
+    return results
+
+
+# def _get_orgs_or_groups_visibility(orgs: list[dict[str, Any]]) -> dict[str, str]:
+#     """
+#     Returns a dictionary with the name of the organization or group as key
+#     and its visibility as value.
+#     """
+#     org_visibility_by_name = {}
+#
+#     for org in orgs:
+#         visibility = org.get('visibility', 'public')
+#
+#         if visibility not in ('public', 'private'):
+#             visibility = 'public'
+#
+#         org_visibility_by_name[org['name']] = visibility
+#
+#     return org_visibility_by_name
+#
+
+# def _set_orgs_or_groups_visibility(orgs: list[dict[str, Any]], orgs_visibility_by_name: dict[str, str]):
+#     """
+#     Sets the visibility of each organization or group in the list to the given value.
+#     """
+#     for org in orgs:
+#         visibility = orgs_visibility_by_name.get(org['name'], 'public')
+#
+#         if visibility not in ('public', 'private'):
+#             visibility = 'public'
+#
+#         org['visibility'] = visibility
+#         org['private'] = (visibility == 'private')
+#
+#     return orgs
+
+
+def _set_orgs_or_groups_fields(orgs: list[dict[str, Any]], results: list[dict[str, Any]], fields: list[str], all_fields: bool = False):
+    """
+    Copy fields and values from the orgs list to the hierarchy results.
+    If all_fields is True, it will copy all fields from orgs to results.
+    """
+    for org in orgs:
+        if all_fields:
+            for field in fields:
+                if field in org:
+                    for result in results:
+                        if result['name'] == org['name']:
+                            result[field] = org[field]
+                            if field == 'notes':
+                                result['description'] = org[field]
+        else:
+            for field in fields:
+                if field in org and field not in result:
+                    for result in results:
+                        if result['name'] == org['name']:
+                            result[field] = org[field]
+                            if field == 'notes':
+                                result['description'] = org[field]
+
     return results
 
 
 @logic.side_effect_free
 def organization_list_wri(context: Context, data_dict: DataDict):
+    all_fields = data_dict.get("all_fields", False)
+
     orgs = get_action("organization_list")(context, data_dict)
+
+    if all_fields:
+        orgs_list = [org["name"] for org in orgs]
+    else:
+        orgs_list = orgs
+
     user = context['user']
     q = data_dict.get("q", False)
     private_orgs = None
     user_orgs = None
+
     if not user:
        private_orgs = get_private_organizations(context)
 
     if user:
-        user_orgs = orgs
-    results = get_hierarchy_group(context, orgs, "organization", q, private_orgs, user_orgs)
+        user_orgs = orgs_list
+
+    results = get_hierarchy_group(context, orgs_list, "organization", q, private_orgs, user_orgs)
+
+    if all_fields:
+        results = _set_orgs_or_groups_fields(orgs, results, ["visibility", "notes"], all_fields)
+
     return results
 
 
 @logic.side_effect_free
 def group_list_wri(context: Context, data_dict: DataDict):
+    all_fields = data_dict.get("all_fields", False)
+
     orgs = get_action("group_list")(context, data_dict)
+
+    if all_fields:
+        orgs_list = [org["name"] for org in orgs]
+    else:
+        orgs_list = orgs
+
     q = data_dict.get("q", False)
-    results = get_hierarchy_group(context, orgs, "group", q)
+
+    results = get_hierarchy_group(context, orgs_list, "group", q)
+
+    if all_fields:
+        results = _set_orgs_or_groups_fields(orgs, results, ["visibility", "notes"], all_fields)
+
     return results
 
 
 @logic.side_effect_free
 def group_list_authz_wri(context: Context, data_dict: DataDict):
+    all_fields = data_dict.get("all_fields", False)
     orgs = get_action("group_list_authz")(context, data_dict)
+
     # get list of name
     q = data_dict.get("q", False)
+
     if q:
         grp_names = [org["name"] for org in orgs if q in org["name"]]
+        results = grp_names
     else:
         grp_names = [org["name"] for org in orgs]
         results = get_hierarchy_group(context, grp_names, "group", q)
+
+    if all_fields:
+        results = _set_orgs_or_groups_fields(orgs, results, ["visibility", "notes"], all_fields)
+
     return results
 
 
 @logic.side_effect_free
 def organization_list_for_user_wri(context: Context, data_dict: DataDict):
+    all_fields = data_dict.get("all_fields", False)
     orgs = get_action("organization_list_for_user")(context, data_dict)
+    full_orgs = orgs
+
     q = data_dict.get("q", False)
+
     if q:
         orgs = [org["name"] for org in orgs if q in org["name"]]
     else:
         orgs = [org["name"] for org in orgs]
+
     user = context['user']
-    if user:
-        user_orgs = orgs
-    results = get_hierarchy_group(context, orgs, "organization", q, user_orgs=user_orgs)
+
+    results = get_hierarchy_group(context, orgs, "organization", q, user_orgs=orgs)
+
+    if all_fields and full_orgs != orgs:
+        results = _set_orgs_or_groups_fields(full_orgs, results, ["visibility", "notes"], all_fields)
+
     return results
 
 
@@ -1471,9 +1577,6 @@ def organization_list_for_user(context: Context,
     return orgs_list
 
 
-
-
-
 @logic.side_effect_free
 def organization_list(context: Context,
                       data_dict: DataDict) -> ActionResult.OrganizationList:
@@ -1535,7 +1638,6 @@ def organization_list(context: Context,
     data_dict['groups'] = data_dict.pop('organizations', [])
     data_dict.setdefault('type', 'organization')
     return _group_or_org_list(context, data_dict, is_org=True)
-
 
 
 def _group_or_org_list(
@@ -1809,7 +1911,7 @@ def organization_patch(context, data_dict):
         old_org = get_action("organization_show")(temp_context, data_dict)
         if old_org.get("visibility", "public") == "private" and visibility == "public":
             raise ValidationError({"message": 
-                                   _("Team has private visibility and cannot be updated; Only sysadmin can switch private to public")
+                                   _("User is unauthorized to change visibility from private to public. Please contact a SysAdmin.")
                                    })
         
 
@@ -1820,7 +1922,7 @@ def organization_patch(context, data_dict):
             temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
             parent_org = get_action("organization_show")(temp_context, {"id": parent_org})
             if parent_org.get("visibility", "public") == "private":
-                raise ValidationError({"message": _("Parent Team has private visibility and cannot create public teams")})
+                raise ValidationError({"message": _("Team visibility cannot be set to public if selected parent Team is private.")})
             
     if visibility == "private":
         rdata_dict = {
@@ -1831,7 +1933,7 @@ def organization_patch(context, data_dict):
         temp_context = {"model": context["model"], "session": context["session"], "user": context["user"]}
         public_package = get_action("package_search")(temp_context, rdata_dict)
         if public_package.get("count") > 0:
-            raise ValidationError({"message": _(f"Team has {public_package.get('count')} public dataset(s) and cannot be made private")})
+            raise ValidationError({"message": _(f"Team has {public_package.get('count')} public Dataset(s) and cannot be made private")})
     return old_organization_patch(context, data_dict)
 
 def validate_visibility(context, data_dict):
@@ -1842,9 +1944,7 @@ def validate_visibility(context, data_dict):
         org = get_action("organization_show")(context, {"id": owner_org})
         org_visibility = org.get("visibility", "public")
         if org_visibility == "private":
-            raise ValidationError({"message": _("Organization has private visibility and cannot create public datasets")})
-        
-
+            raise ValidationError({"message": _("Organization has private visibility and cannot create public Datasets")})
 
 
 @logic.side_effect_free

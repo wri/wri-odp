@@ -311,7 +311,7 @@ def migrate_dataset(context: Context, data_dict: DataDict):
             raise tk.ValidationError(_("'rw_application' is required when no 'gfw_dataset' is provided"))
 
     if not dx_application:
-        raise tk.ValidationError(_("'dx_application' is required to associate the dataset with a DX application"))
+        raise tk.ValidationError(_("'dx_application' is required to associate the Dataset with a DX Application"))
 
     try:
         tk.get_action("group_show")(
@@ -352,7 +352,7 @@ def migrate_dataset(context: Context, data_dict: DataDict):
         else:
             raise tk.ValidationError(
                 _(
-                    "Topics must be a string (comma separated if it contains multiple topics)"
+                    "Topics must be a string (comma separated if it contains multiple Topics)"
                 )
             )
 
@@ -375,7 +375,7 @@ def _black_white_list(list_type: str, data_dict: DataDict):
                 if field in [
                     "owner_org",
                     "organization",
-                    "orgainzations",
+                    "organizations",
                     "team",
                     "teams",
                     "groups",
@@ -895,13 +895,13 @@ def organization_create(context, data_dict):
         if users and not authz.is_sysadmin(context.get("user")):
             user_capacity = [user.get("capacity") for user in users if user.get("name") == username]
             if not any(role in user_capacity for role in ["admin", "editor"]):
-                raise ValidationError({"message": _("User does not have admin access to create a sub team")})
+                raise ValidationError({"message": _("User does not have admin access to create a SubTeam")})
         if parent_org.get("visibility", "public") == "private" and visibility == "public":
-            raise ValidationError({"message": _("Parent Organization has private visibility and cannot create public teams")})
+            raise ValidationError({"message": _("Team visibility cannot be set to public if selected parent Team is private.")})
         
     else:
         if not authz.is_sysadmin(context.get("user")):
-            raise ValidationError({"message": _("Only sysadmins can create public teams without a parent")})
+            raise ValidationError({"message": _("Only sysadmins can create public Teams without a parent")})
 
     
     result = old_organization_create(context, data_dict)

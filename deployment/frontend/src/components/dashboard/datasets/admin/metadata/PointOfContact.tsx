@@ -59,7 +59,7 @@ export function PointOfContactForm({
                                 Authors{' '}
                             <span className="text-red-500">*</span>
                             </span>
-                            <DefaultTooltip content="Authors are the people who created the dataset. They might not be involved in the day-to-day maintenance of the dataset anymore.">
+                            <DefaultTooltip content="Authors are the people who created the Dataset. They might not be involved in the day-to-day maintenance of the Dataset anymore.">
                                 <InformationCircleIcon
                                     className="h-5 w-5 text-neutral-500"
                                     aria-hidden="true"
@@ -74,7 +74,7 @@ export function PointOfContactForm({
                         <div>
                             <span className={errors?.authors ? "text-red-600" : "text-gray-600"}>
                                 <i>
-                                    {errors?.authors?.message || "At least one (1) Author Name and Author Email is required."}
+                                    {errors?.authors?.message || "At least one (1) Author Name is required."}
                                 </i>
                             </span>
                         </div>
@@ -130,7 +130,7 @@ export function PointOfContactForm({
                                 Maintainers{' '}
                             <span className="text-red-500">*</span>
                             </span>
-                            <DefaultTooltip content="Maintainers are the people who are responsible for the day-to-day maintenance of the dataset.">
+                            <DefaultTooltip content="Maintainers are the people who are responsible for the day-to-day maintenance of the Dataset.">
                                 <InformationCircleIcon
                                     className="h-5 w-5 text-neutral-500"
                                     aria-hidden="true"

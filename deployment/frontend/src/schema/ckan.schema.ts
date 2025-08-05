@@ -40,6 +40,7 @@ export interface CkanResponse<T> {
     success: boolean
     error?: {
         __type: string
+        name?: string
         message: string
     }
     result: T
@@ -172,6 +173,7 @@ export interface Organization {
     display_name?: string
     type?: string
     description?: string
+    notes?: string
     image_url?: string
     image_display_url?: string
     created?: string
@@ -183,7 +185,7 @@ export interface Organization {
     activity_stream?: Array<CkanActivity>
     users?: Array<User>
     tags?: Array<Tag>
-    visibility?: 'public' | 'private'
+    visibility: string
 }
 
 export type Application = Group & {
@@ -203,6 +205,7 @@ export type Application = Group & {
     packages?: Array<Dataset>
     package_count: number
     state: 'active'
+    visibility?: string
 }
 
 export interface WriOrganization extends Organization {
@@ -224,10 +227,13 @@ export interface GroupTree {
     highlighted: boolean
     children: GroupTree[]
     title?: string
+    description?: string
+    notes?: string
     image_display_url?: string
     parent_name?: string
     private?: boolean
     capacity?: string
+    visibility: string
 }
 
 export interface Collaborator {
@@ -275,8 +281,10 @@ export interface FolloweeList {
 export interface GroupsmDetails {
     img_url: string
     description: string
+    notes?: string
     package_count: number
-    name: string
+    name: string,
+    visibility?: string
 }
 
 interface Member {

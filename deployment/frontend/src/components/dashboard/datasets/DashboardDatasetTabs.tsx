@@ -49,7 +49,7 @@ export default function DashboardDatasetTabs({ tabs }: { tabs: TabProps[] }) {
                                             : ''
                                     } `}
                                 >
-                                    {tab.title === 'Add dataset' ? (
+                                    {tab.title === 'Add Dataset' ? (
                                         <div className="flex lg:px-12 2xl:px-14 px-6 sm:px-8 ">
                                             <div className="mr-2  mt-[0.2rem] flex h-4 w-4 items-center  justify-center rounded-full bg-wri-gold">
                                                 <PlusSmallIcon className="h-3 w-3 text-white" />

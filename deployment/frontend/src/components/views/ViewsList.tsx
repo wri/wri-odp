@@ -105,7 +105,7 @@ export default function ViewsList(props: ViewsListProps) {
                         }
                         <PopoverClose className="w-full">
                             <DefaultTooltip
-                                content={'Data file must be in DataStore '}
+                                content={'Data File must be in DataStore '}
                                 disabled={isCanCreateChartview}
                             >
                                 <div className='flex items-center'>

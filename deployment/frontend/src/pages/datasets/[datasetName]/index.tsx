@@ -450,7 +450,7 @@ export default function DatasetPage(
 
     const tabs = [
         {
-            name: 'Data files',
+            name: 'Data Files',
             enabled: true,
             highlighted:
                 !isCurrentVersion &&
@@ -545,7 +545,13 @@ export default function DatasetPage(
             if (LayerResource) {
                 removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id!)
                 setMapDisplayPreview(true)
-                addLayerToLayerGroup(LayerResource.rw_id!, dataset.id)
+                addLayerToLayerGroup(
+                    LayerResource.rw_id!,
+                    dataset.id,
+                    undefined,
+                    true
+                )
+
                 customDataLayer({
                     event: 'layer_view_event',
                     resource_name: LayerResource.title ?? LayerResource.name!,

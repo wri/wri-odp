@@ -33,20 +33,26 @@ describe("Chart view", () => {
 
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
-    cy.get('input[name="maintainers.0.email"]').type("test-maintainer-1@example.com");
+    cy.get('input[name="maintainers.0.email"]').type(
+      "test-maintainer-1@example.com",
+    );
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
-    cy.get('input[name="maintainers.1.email"]').type("test-maintainer-2@example.com");
+    cy.get('input[name="maintainers.1.email"]').type(
+      "test-maintainer-2@example.com",
+    );
 
-    cy.contains("Next: Datafiles").click();
-    cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/airtravel.csv", {
-      force: true,
-    });
+    cy.contains("Next: Data Files").click();
+    cy.get("input[type=file]")
+      .eq(0)
+      .selectFile("cypress/fixtures/airtravel.csv", {
+        force: true,
+      });
     cy.wait(5000);
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
-    cy.contains(`Successfully created the "${datasetName}" dataset`, {
+    cy.contains(`Successfully created the "${datasetName}" Dataset`, {
       timeout: 20000,
     });
   });
@@ -61,7 +67,7 @@ describe("Chart view", () => {
     },
     () => {
       cy.visit(`/datasets/${datasetName}`);
-      cy.contains("Dataset not found")
+      cy.contains("Dataset not found");
     },
   );
   it(
@@ -75,7 +81,7 @@ describe("Chart view", () => {
     () => {
       cy.login(ckanUserName, ckanUserPassword);
       cy.visit(`/datasets/${datasetName}`);
-      cy.contains(datasetName)
+      cy.contains(datasetName);
     },
   );
 });

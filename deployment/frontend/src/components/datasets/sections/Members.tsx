@@ -17,10 +17,10 @@ export function Members({ members }: { members: DatasetMembers }) {
             {members.length === 0 ? (
                 <div className="flex flex-col gap-y-4">
                     <span className="font-['Acumin Pro SemiCondensed'] text-lg font-normal leading-tight text-black">
-                        No collaborators yet
+                        No Collaborators yet
                     </span>
                     <span className="font-['Acumin Pro SemiCondensed'] text-sm font-normal leading-tight text-black">
-                        Add collaborators to help you manage this dataset
+                        Add Collaborators to help you manage this Dataset
                     </span>
                 </div>
             ) : (

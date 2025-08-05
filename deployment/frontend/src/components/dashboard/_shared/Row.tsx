@@ -36,6 +36,7 @@ type RowProps = {
     className?: string
     authorized?: boolean
     highlighted?: boolean
+    isPrivate?: boolean
 }
 
 export default function Row({
@@ -48,6 +49,7 @@ export default function Row({
     className,
     authorized,
     highlighted = false,
+    isPrivate = false,
 }: RowProps) {
     const [isShowSubRow, setIsShowSubRow] = useState(highlighted)
     const { data: session } = useSession()

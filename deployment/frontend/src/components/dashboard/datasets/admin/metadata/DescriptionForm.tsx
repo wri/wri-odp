@@ -29,13 +29,14 @@ export function DescriptionForm({
         >
             <Disclosure.Panel className="flex flex-col gap-y-8 pb-12 pt-5">
                 <InputGroup
+                    required
                     label={
                         <div className="flex items-center gap-x-1">
                             <span>
                                 Short Description{' '}
                                 <span className="text-red-500">*</span>
                             </span>
-                            <DefaultTooltip content="This description will appear in search results">
+                            <DefaultTooltip content="This description will appear in search results and Dataset thumbnails. We suggest keeping this around 200 characters.">
                                 <InformationCircleIcon
                                     className="h-5 w-5 text-neutral-500"
                                     aria-hidden="true"
@@ -46,7 +47,7 @@ export function DescriptionForm({
                     className="mb-2 flex  flex-col items-start whitespace-nowrap sm:flex-col"
                 >
                     <TextArea
-                        aria-label='Short Description'
+                        aria-label="Short Description"
                         placeholder=""
                         type="text"
                         {...register('short_description')}
@@ -58,7 +59,7 @@ export function DescriptionForm({
                     label={
                         <div className="flex items-center gap-x-1">
                             <span>Description</span>
-                            <DefaultTooltip content="This description will appear in the About section when a user previews this dataset">
+                            <DefaultTooltip content="This description will appear in the About section when a user previews this Dataset">
                                 <InformationCircleIcon
                                     className="h-5 w-5 text-neutral-500"
                                     aria-hidden="true"

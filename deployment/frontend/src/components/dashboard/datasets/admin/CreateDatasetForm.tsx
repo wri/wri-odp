@@ -92,7 +92,7 @@ export default function CreateDatasetForm() {
     const createDataset = api.dataset.createDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
             notify(
-                `Successfully created the "${title ?? name}" dataset`,
+                `Successfully created the "${title ?? name}" Dataset`,
                 'success'
             )
             setIsOpen(false)
@@ -111,6 +111,7 @@ export default function CreateDatasetForm() {
         formState: { dirtyFields, errors },
     } = formObj
 
+    console.log('ERRORS', errors)
     useEffect(() => {
         if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
     }, [watch('title')])
@@ -257,7 +258,7 @@ export default function CreateDatasetForm() {
                         >
                             Next:{' '}
                             {match(selectedIndex)
-                                .with(0, () => 'Datafiles')
+                                .with(0, () => 'Data Files')
                                 .with(1, () => 'Map Visualizations')
                                 .otherwise(() => 'Preview')}
                         </Button>
@@ -293,7 +294,7 @@ export default function CreateDatasetForm() {
                             </Dialog.Title>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
-                                    Are you sure you want to save this dataset
+                                    Are you sure you want to save this Dataset
                                     as draft?
                                 </p>
                             </div>

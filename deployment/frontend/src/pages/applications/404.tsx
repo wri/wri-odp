@@ -31,7 +31,7 @@ export default function ApplicationsNotFound() {
                             href="/applications"
                             className="text-sm font-semibold text-gray-900"
                         >
-                            Go back to the applications search page
+                            Go back to the Applications search page
                         </a>
                     </div>
                 </div>

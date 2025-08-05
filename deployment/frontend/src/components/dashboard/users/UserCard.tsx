@@ -60,7 +60,7 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
     onSuccess: async (data) => {
       await utils.user.getAllUsers.invalidate({ search: '', page: { start: 0, rows: 100 } })
       setOpen(false)
-      notify(`Successfully deleted user from ${selectedTeam?.name} team`, 'error')
+      notify(`Successfully deleted user from ${selectedTeam?.name} Team`, 'error')
     },
   })
 

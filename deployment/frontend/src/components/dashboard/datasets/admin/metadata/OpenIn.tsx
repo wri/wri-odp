@@ -39,7 +39,7 @@ function OpenIn({
                         errors={errors}
                     />
                 </InputGroup>
-                <InputGroup label="Url">
+                <InputGroup label="URL">
                     <Input
                         placeholder=""
                         {...register(`open_in.${index}.url`)}
@@ -95,7 +95,7 @@ export function OpenInForm({
                     />
                 ))}
                 <div className="w-full flex justify-end">
-                    <DefaultTooltip content="This allows you to link your dataset to an external application, you could for example add a link to the same dataset in the Global Forest Watch website">
+                    <DefaultTooltip content="This allows you to link your Dataset to an external Application. For example, you could add a link to the same Dataset on the Global Forest Watch website. This appears as an “Open in” link at the top of the Dataset Detail page and will open in a new tab.">
                         <button
                             type="button"
                             onClick={() =>
@@ -108,7 +108,7 @@ export function OpenInForm({
                         >
                             <PlusCircleIcon className="h-5 w-5 text-amber-400" />
                             <div className="font-['Acumin Pro SemiCondensed'] text-xl font-normal leading-tight text-black">
-                                Add a link to another wri product
+                                Add a link to another WRI product
                             </div>
                         </button>
                     </DefaultTooltip>

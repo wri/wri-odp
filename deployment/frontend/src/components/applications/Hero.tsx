@@ -33,7 +33,7 @@ export function Hero({ application }: { application: Application }) {
                         className="whitespace-nowrap inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-400 text-stone-900 font-bold font-acumin hover:bg-yellow-500 h-11 px-6 py-4 rounded-[3px] text-base"
                     >
                         <ChevronLeftIcon className="mb-1 lg:mr-1 h-6 w-6" />
-                        <span>See all applications</span>
+                        <span>See all Applications</span>
                     </Link>
                 </div>
             </div>
@@ -54,7 +54,7 @@ export function Hero({ application }: { application: Application }) {
                 </p>
                 <div className="flex items-center gap-3">
                     <div className="text-base font-light text-black">
-                        {application.package_count} associated dataset
+                        {application.package_count} associated Dataset
                         {application.package_count > 1 ? 's' : ''}
                     </div>
                 </div>

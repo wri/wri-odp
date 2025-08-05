@@ -46,10 +46,15 @@ export function LinkExternalForm({
             </InputGroup>
             <InputGroup label="Description" className="whitespace-nowrap">
                 <TextArea
-                    placeholder="Add description"
+                    placeholder="Add a short description. If there are additional steps for accessing data not stored directly in the Data Explorer, you may want to include them here."
                     {...register(`resources.${index}.description`)}
                     type="text"
                     maxWidth="max-w-[70rem]"
+                    icon={
+                        <DefaultTooltip content="Recommended: 150-200 characters">
+                            <InformationCircleIcon className="h-5 w-5" />
+                        </DefaultTooltip>
+                    }
                 />
             </InputGroup>
             <InputGroup label="Format" className="whitespace-nowrap">
@@ -74,7 +79,7 @@ export function LinkExternalForm({
                     >
                         This is not a directly downloadable link (i.e. directs
                         to another URL where further steps may be needed to
-                        access the data file)
+                        access the Data File)
                     </label>
                 </div>
             </div>
@@ -82,7 +87,7 @@ export function LinkExternalForm({
                 label={
                     <span className="flex items-center gap-x-1">
                         Advanced API Usage
-                        <DefaultTooltip content="This field will end up in the Datafile API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
+                        <DefaultTooltip content="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
                             <InformationCircleIcon className="h-5 w-5" />
                         </DefaultTooltip>
                     </span>
@@ -99,7 +104,7 @@ export function LinkExternalForm({
             <div className="mt-10">
                 <h2 className="font-semibold text-lg flex items-center gap-x-2">
                     Location Coverage
-                    <DefaultTooltip content="This field defines whether a data file will show up on the results or not when doing a search by location">
+                    <DefaultTooltip content="Complete this section if the Data File should be included in search results when doing a search by location">
                         <InformationCircleIcon
                             className="h-5 w-5 text-neutral-500"
                             aria-hidden="true"
