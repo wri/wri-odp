@@ -30,7 +30,7 @@ import {
     approvePendingDataset,
     getDatasetReleaseNotes,
     getCollaboratorPackages,
-    getAllOrganizations
+    getAllOrganizations,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -1002,21 +1002,20 @@ export const DatasetRouter = createTRPCRouter({
             }
 
             const orgSlugs = [
-              ...new Set(
-                dataset.datasets.map((d) => d.organization?.name).filter(Boolean)
-              ),
+                ...new Set(
+                    dataset.datasets
+                        .map((d) => d.organization?.name)
+                        .filter(Boolean)
+                ),
             ]
-            console.log('orgSlugs in getAllDataset', JSON.stringify(orgSlugs, null, 2))
 
             const allOrgs = await getAllOrganizations({
-              apiKey: ctx.session?.user.apikey ?? '',
+                apiKey: ctx.session?.user.apikey ?? '',
             })
-            console.log('allOrgs in getAllDataset', JSON.stringify(allOrgs, null, 2))
 
             const teamVisibility = Object.fromEntries(
-              allOrgs.map((org) => [org.name, org.visibility || 'public'])
+                allOrgs.map((org) => [org.name, org.visibility || 'public'])
             )
-            console.log('teamVisibility in getAllDataset', JSON.stringify(teamVisibility, null, 2))
 
             return {
                 datasets: _datasets as unknown as WriDataset[],
