@@ -33,12 +33,18 @@ export function CreateLayersSection({
 
     const layers = fields.filter(
         (r) =>
-            r.type !== 'upload' && r.type !== 'link' && r.type !== 'empty-file'
+            r.type !== 'upload' &&
+            r.type !== 'link' &&
+            r.type !== 'empty-file' &&
+            r.type !== 'tile-cache'
     )
 
     const notLayers = fields.filter(
         (r) =>
-            r.type === 'upload' || r.type === 'link' || r.type === 'empty-file'
+            r.type === 'upload' ||
+            r.type === 'link' ||
+            r.type === 'empty-file' ||
+            r.type === 'tile-cache'
     )
 
     return (
