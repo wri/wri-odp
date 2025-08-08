@@ -60,6 +60,7 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                 const selectedFull = options.find(
                     (o) => o.value === (str ? selected : selected?.value)
                 )
+                console.log('SELECTED', selected)
                 return (
                     <Listbox
                         value={selected}
@@ -96,7 +97,9 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                                                     'truncate'
                                                 )}
                                             >
-                                                {selectedFull
+                                                {selected &&
+                                                selectedFull &&
+                                                (str ? true : selected.label)
                                                     ? selectedFull.label
                                                           .charAt(0)
                                                           .toUpperCase() +
