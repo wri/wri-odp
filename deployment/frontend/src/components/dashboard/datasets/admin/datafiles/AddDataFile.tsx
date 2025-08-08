@@ -28,6 +28,7 @@ import { useDataDictionary } from '@/utils/getDataDictionary'
 import { Field } from 'tableschema'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { TileCacheForm } from './sections/TileCacheForm'
 
 export function AddDataFile({
     remove,
@@ -286,6 +287,7 @@ export function AddDataFile({
                                                     ? 'hidden'
                                                     : ''
                                             )}
+                                            id="link-button"
                                         >
                                             <LinkIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                             <div
@@ -317,6 +319,7 @@ export function AddDataFile({
                                                     ? 'hidden'
                                                     : ''
                                             )}
+                                            id="tile-cache-link-button"
                                         >
                                             <Squares2X2Icon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                             <div
@@ -354,6 +357,12 @@ export function AddDataFile({
                                 </Tab.Panel>
                                 <Tab.Panel>
                                     <LinkExternalForm
+                                        formObj={formObj}
+                                        index={index}
+                                    />
+                                </Tab.Panel>
+                                <Tab.Panel>
+                                    <TileCacheForm
                                         formObj={formObj}
                                         index={index}
                                     />

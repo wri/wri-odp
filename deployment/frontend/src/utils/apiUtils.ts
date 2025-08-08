@@ -278,6 +278,10 @@ export async function getOrgDetails({
     apiKey: string
 }): Promise<WriOrganization | null> {
     try {
+        console.log(
+            'URL',
+            `${env.CKAN_URL}/api/3/action/organization_show?id=${orgId}`
+        )
         const response = await fetch(
             `${env.CKAN_URL}/api/3/action/organization_show?id=${orgId}`,
             {
@@ -288,6 +292,7 @@ export async function getOrgDetails({
         )
         const data =
             (await response.json()) as CkanResponse<WriOrganization | null>
+        console.log('DATA', data)
         const organization: WriOrganization | null =
             data.success === true ? data.result : null
         return organization
@@ -1046,7 +1051,7 @@ export async function getOrganizationTreeDetails({
                 description: org.description ?? '',
                 package_count: org.package_count!,
                 name: org.name,
-                visibility: org.visibility!
+                visibility: org.visibility!,
             }
             return acc
         },

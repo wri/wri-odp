@@ -41,6 +41,7 @@ export interface Dataset {
 export interface Resource {
     cache_last_updated?: string
     cache_url?: string
+    cache_type?: 'raster' | 'vector'
     created?: string
     datastore_active?: boolean | null
     description?: string
