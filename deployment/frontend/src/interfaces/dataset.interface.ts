@@ -71,7 +71,14 @@ export interface Resource {
     connectorUrl?: string
     provider?: string
     tableName?: string
-    type: 'link' | 'upload' | 'layer' | 'empty' | 'layer-raw'
+    type:
+        | 'link'
+        | 'upload'
+        | 'layer'
+        | 'empty'
+        | 'layer-raw'
+        | 'tile-cache'
+        | 'reference-layer'
     _hasChartView?: boolean
     _views?: View[]
     total_record_count?: number
