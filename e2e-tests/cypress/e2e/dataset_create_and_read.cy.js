@@ -322,8 +322,7 @@ describe("Create dataset", () => {
       cy.visit("/datasets/" + dataset);
       cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
       cy.contains("Data Files").click();
-      cy.contains("Raster");
-      cy.contains("Tile cache");
+      cy.contains("Tile cache").click();
       cy.contains("https://google.com");
     },
   );
