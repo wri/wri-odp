@@ -41,6 +41,7 @@ export interface Dataset {
 export interface Resource {
     cache_last_updated?: string
     cache_url?: string
+    cache_type?: 'raster' | 'vector'
     created?: string
     datastore_active?: boolean | null
     description?: string
@@ -70,7 +71,14 @@ export interface Resource {
     connectorUrl?: string
     provider?: string
     tableName?: string
-    type: 'link' | 'upload' | 'layer' | 'empty' | 'layer-raw'
+    type:
+        | 'link'
+        | 'upload'
+        | 'layer'
+        | 'empty'
+        | 'layer-raw'
+        | 'tile-cache'
+        | 'reference-layer'
     _hasChartView?: boolean
     _views?: View[]
     total_record_count?: number

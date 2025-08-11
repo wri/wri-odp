@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react'
 import Spinner from '@/components/_shared/Spinner'
 import type { SearchInput } from '@/schema/search.schema'
 import { useQuery } from 'react-query'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { GroupTree } from '@/schema/ckan.schema'
 import Pagination from '@/components/datasets/Pagination'
 import { getServerAuthSession } from '@/server/auth'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
@@ -95,7 +95,7 @@ export default function TopicsPage(
             .filter(
                 (obj, index, self) =>
                     index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
-            ) as GroupTree[] | Organization[]
+            ) as GroupTree[] | Group[]
         const topicDetails = data.topicDetails
         return { topics, topicDetails, count: filteredTopics?.length }
     }

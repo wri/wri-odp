@@ -283,6 +283,50 @@ describe("Create dataset", () => {
     },
   );
 
+  it(
+    "Add a new datafile of type tilecache",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/dashboard/datasets/" + dataset + "/edit");
+      cy.contains("Data Files").click();
+      cy.wait(5000);
+      cy.get("button").contains("Add another Data File").click();
+      cy.wait(500);
+      cy.get(".datafile-accordion-trigger").eq(2).click();
+      cy.get("#tile-cache-link-button").click();
+      cy.get('input[name="resources.2.url"]').type("https://google.com");
+      cy.get('input[name="resources.2.title"]').type("Tile cache");
+      cy.contains("Select cache type").click();
+      cy.contains("Raster").click();
+      cy.get("button").contains("Update Dataset").click();
+      // cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
+      //   timeout: 30000,
+      // });
+    },
+  );
+
+  it(
+    "Should show the basic information edited",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/datasets/" + dataset);
+      cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
+      cy.contains("Data Files").click();
+      cy.contains("Tile cache").click();
+      cy.contains("https://google.com");
+    },
+  );
+
   // it(
   //   "Should show the new member",
   //   {
