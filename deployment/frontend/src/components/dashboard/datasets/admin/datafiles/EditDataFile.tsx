@@ -4,6 +4,7 @@ import {
     PaperClipIcon,
     MinusCircleIcon,
     InformationCircleIcon,
+    Squares2X2Icon,
 } from '@heroicons/react/24/outline'
 import { UseFormReturn } from 'react-hook-form'
 import { DataFileAccordion } from './DatafileAccordion'
@@ -31,6 +32,8 @@ import { DatafileLocation } from './DatafileLocation'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
 import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm'
+import { LinkExternalForm } from './sections/LinkExternalForm'
+import { TileCacheForm } from './sections/TileCacheForm'
 
 export function EditDataFile({
     remove,
@@ -56,7 +59,8 @@ export function EditDataFile({
         (datafile) =>
             datafile.type === 'upload' ||
             datafile.type === 'link' ||
-            datafile.type === 'empty-file'
+            datafile.type === 'empty-file' ||
+            datafile.type === 'tile-cache'
     )
     const notLayersCount = notLayers.length ?? 0
 
@@ -65,7 +69,8 @@ export function EditDataFile({
     const isLayer =
         datafile.type !== 'upload' &&
         datafile.type !== 'link' &&
-        datafile.type !== 'empty-file'
+        datafile.type !== 'empty-file' &&
+        datafile.type !== 'tile-cache'
 
     const heading = isLayer
         ? `Layer ${index + 1 - notLayersCount}`
@@ -108,6 +113,23 @@ export function EditDataFile({
                                 <>
                                     <div className="flex items-center gap-x-2">
                                         <LinkIcon className="h-6 w-6 text-blue-800" />
+                                        <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
+                                            {field.title}
+                                        </span>
+                                    </div>
+                                    <button
+                                        aria-label="remove"
+                                        type="button"
+                                        onClick={() => remove()}
+                                    >
+                                        <MinusCircleIcon className="h-6 w-6 text-red-500" />
+                                    </button>
+                                </>
+                            ))
+                            .with('tile-cache', () => (
+                                <>
+                                    <div className="flex items-center gap-x-2">
+                                        <Squares2X2Icon className="h-6 w-6 text-blue-800" />
                                         <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
                                             {field.title}
                                         </span>
@@ -169,6 +191,9 @@ export function EditDataFile({
                             .with('link', () => (
                                 <LinkIcon className="h-6 w-6 text-blue-800" />
                             ))
+                            .with('tile-cache', () => (
+                                <Squares2X2Icon className="h-6 w-6 text-blue-800" />
+                            ))
                             .with('layer', () => (
                                 <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
                             ))
@@ -204,6 +229,10 @@ export function EditDataFile({
                         <BuildALayerRaw formObj={formObj} index={index} />
                     ) : datafile.type === 'reference-layer' ? (
                         <DerivedLayerForm formObj={formObj} index={index} />
+                    ) : datafile.type === 'link' ? (
+                        <LinkExternalForm formObj={formObj} index={index} />
+                    ) : datafile.type === 'tile-cache' ? (
+                        <TileCacheForm formObj={formObj} index={index} />
                     ) : (
                         <Tab.Group>
                             <div>
@@ -363,35 +392,6 @@ export function EditDataFile({
                                                     />
                                                 </div>
                                             </InputGroup>
-                                            {datafile.type === 'link' && (
-                                                <div className="relative flex justify-start">
-                                                    <div className="flex h-6 items-center">
-                                                        <input
-                                                            id="not_downloadable"
-                                                            {...register(
-                                                                `resources.${index}.not_downloadable`
-                                                            )}
-                                                            type="checkbox"
-                                                            className="h-5 w-5 rounded border-gray-300 text-blue-800 shadow focus:ring-blue-800"
-                                                        />
-                                                    </div>
-                                                    <div className="ml-3 text-sm leading-6">
-                                                        <label
-                                                            htmlFor="not_downloadable"
-                                                            className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
-                                                        >
-                                                            This is not a
-                                                            directly
-                                                            downloadable link
-                                                            (i.e. directs to
-                                                            another URL where
-                                                            further steps may be
-                                                            needed to access the
-                                                            Data File)
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            )}
                                             <InputGroup
                                                 label={
                                                     <span className="flex items-center gap-x-1">

@@ -30,7 +30,7 @@ import {
     approvePendingDataset,
     getDatasetReleaseNotes,
     getCollaboratorPackages,
-    getAllOrganizations
+    getAllOrganizations,
 } from '@/utils/apiUtils'
 import { searchSchema } from '@/schema/search.schema'
 import type {
@@ -337,6 +337,7 @@ export const DatasetRouter = createTRPCRouter({
     editDataset: protectedProcedure
         .input(DatasetSchemaForEdit)
         .mutation(async ({ ctx, input }) => {
+            console.log('ERROR HERE')
             const user = ctx.session.user
             const existingCollaboratorsDetails =
                 await fetchDatasetCollaborators(
@@ -350,6 +351,7 @@ export const DatasetRouter = createTRPCRouter({
                     capacity: collaborator.capacity.label.toLowerCase(),
                 })
             )
+            console.log('ERROR HERE 2')
             const existingCollaborators = existingCollaboratorsDetails.map(
                 (existingCollaborator) => ({
                     name: existingCollaborator.name,
@@ -368,9 +370,11 @@ export const DatasetRouter = createTRPCRouter({
                     )
                 }
             } catch (e) {
+                console.log('ERROR HERE')
                 console.error(e)
             }
 
+            console.log('ERROR HERE 3')
             const inputKeys = Object.keys(input)
             const isUpdate = !(
                 inputKeys.length == 2 && inputKeys.includes('collaborators')
@@ -385,6 +389,7 @@ export const DatasetRouter = createTRPCRouter({
                     },
                 }
             )
+            console.log('ERROR HERE 4')
             const pendingData =
                 (await pendingResponse.json()) as CkanResponse<PendingDataset | null>
             if (!pendingData.success && pendingData.error) {
@@ -412,6 +417,7 @@ export const DatasetRouter = createTRPCRouter({
 
             const rw_id = input.rw_id ?? null
 
+            console.log('ERROR HERE 5')
             let org: WriOrganization | null = null
             if (input.team && input.team?.value && isUpdate) {
                 org = (await getOrgDetails({
@@ -419,6 +425,8 @@ export const DatasetRouter = createTRPCRouter({
                     apiKey: ctx.session.user.apikey,
                 }))!
 
+                console.log('TEAM VALUE', input.team)
+                console.log('ORG', org)
                 org = {
                     id: org.id,
                     name: org.name,
@@ -433,6 +441,7 @@ export const DatasetRouter = createTRPCRouter({
                     visibility: org.visibility,
                 }
             }
+            console.log('ERROR HERE 5.5')
 
             try {
                 if (isUpdate) {
@@ -512,6 +521,7 @@ export const DatasetRouter = createTRPCRouter({
                                     resource.type !== 'empty-layer'
                             )
                             .map((resource) => {
+                                console.log('ERROR HERE 6')
                                 const rr = prevDataset?.resources.find(
                                     (r) => r.id === resource.id
                                 )
@@ -1002,21 +1012,20 @@ export const DatasetRouter = createTRPCRouter({
             }
 
             const orgSlugs = [
-              ...new Set(
-                dataset.datasets.map((d) => d.organization?.name).filter(Boolean)
-              ),
+                ...new Set(
+                    dataset.datasets
+                        .map((d) => d.organization?.name)
+                        .filter(Boolean)
+                ),
             ]
-            console.log('orgSlugs in getAllDataset', JSON.stringify(orgSlugs, null, 2))
 
             const allOrgs = await getAllOrganizations({
-              apiKey: ctx.session?.user.apikey ?? '',
+                apiKey: ctx.session?.user.apikey ?? '',
             })
-            console.log('allOrgs in getAllDataset', JSON.stringify(allOrgs, null, 2))
 
             const teamVisibility = Object.fromEntries(
-              allOrgs.map((org) => [org.name, org.visibility || 'public'])
+                allOrgs.map((org) => [org.name, org.visibility || 'public'])
             )
-            console.log('teamVisibility in getAllDataset', JSON.stringify(teamVisibility, null, 2))
 
             return {
                 datasets: _datasets as unknown as WriDataset[],
