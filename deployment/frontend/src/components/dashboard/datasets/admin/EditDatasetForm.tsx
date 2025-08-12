@@ -207,6 +207,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 }
                 return {
                     ...resource,
+                    title: resource.title ?? resource.name,
                     type: resource.url_type as any,
                     resourceId: resource.id as string,
                     schema: resource.schema ? schema.value : undefined,
