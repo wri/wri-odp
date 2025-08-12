@@ -188,10 +188,23 @@ function SubCardProfile({
                                     groupStyle="group/item group-hover/item:visible "
                                     className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                                     rowMain={
+                                    <>
                                         <SubTeamProfile
                                             team={team as GroupTree}
                                             org2img={org2img}
                                         />
+                                       {team.visibility === 'private' && (
+                                        <div className='ml-2 py-3'>
+                                            <Chip
+                                                text={
+                                                    visibilityTypeLabels[
+                                                    team.visibility
+                                                    ] ?? ''
+                                                }
+                                            />
+                                        </div>
+                                    )}
+                                    </>
                                     }
                                     linkButton={{
                                         label: 'View Team',
@@ -262,6 +275,7 @@ function SubCardProfile({
                                     groupStyle="group/item group-hover/item:visible "
                                     className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                                     rowMain={
+                                        <>
                                         <div className="flex pl-4 sm:pl-6  ">
                                             <RowProfile
                                                 imgStyle="w-8 h-8 mt-2"
@@ -271,7 +285,19 @@ function SubCardProfile({
                                                 )}
                                                 defaultImg="/images/placeholders/teams/teamdefault.png"
                                             />
+                                                {team.visibility === 'private' && (
+                                                    <div className='ml-2 py-3'>
+                                                        <Chip
+                                                            text={
+                                                                visibilityTypeLabels[
+                                                                team.visibility
+                                                                ] ?? ''
+                                                            }
+                                                        />
+                                                    </div>
+                                                )}
                                         </div>
+                                        </>
                                     }
                                     linkButton={{
                                         label: 'View Team',
