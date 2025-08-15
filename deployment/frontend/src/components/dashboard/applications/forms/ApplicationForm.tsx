@@ -37,6 +37,11 @@ export default function ApplicationForm({
                         {...register('name')}
                         disabled={editing}
                         placeholder="name-of-application"
+                        icon={
+                            <DefaultTooltip content="Please choose a URL that is not already in use for another Topic, Team, or Application.">
+                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                            </DefaultTooltip>
+                        }
                         type="text"
                         className="pl-[4.6rem] lg:pl-[6.4rem]"
                     >
@@ -54,6 +59,7 @@ export default function ApplicationForm({
                         <div className="w-[11rem]">
                             <ImageUploader
                                 clearImage={() => setValue('image_url', '')}
+                                tooltip="Appears on /applications, /applications/application-name, and homepage carousels. We recommend a horizontal image between 5-10 MB."
                                 defaultImage={
                                     watch('image_url') &&
                                     watch('image_display_url')
