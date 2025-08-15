@@ -55,7 +55,7 @@ RUN apk del build-base python3-dev && \
     rm -rf /var/cache/apk/*
 
 RUN apk add proj proj-dev proj-util musl-dev python3-dev
-RUN pip3 install pyproj --no-binary pyproj
+RUN pip3 install pyproj==3.7.1 --no-binary pyproj
 
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
