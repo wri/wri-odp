@@ -1263,7 +1263,7 @@ function TilecacheCard({
                             </div>
                             <div className="mt-4">
                                 <QueryEndpoint
-                                    description="Copy the tile cache Link for use in your GIS application"
+                                    description="Copy the tile cache link for use in your GIS application"
                                     url={datafile.url ?? ''}
                                     method={''}
                                     copyButton={
