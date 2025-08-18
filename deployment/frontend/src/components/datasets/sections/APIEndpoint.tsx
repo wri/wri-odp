@@ -4,6 +4,7 @@ import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { Button } from '@/components/_shared/Button'
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { useState } from 'react'
 
 export const QueryEndpoint = ({
     description,
@@ -12,34 +13,44 @@ export const QueryEndpoint = ({
     body = '',
     lang = '',
     headers = {},
+    copyButton,
 }: {
-    description: string
+    description?: string
     url: string
     method?: string
     body?: string
     lang?: string
     headers?: Record<string, string>
+    copyButton?: React.ReactNode
 }) => {
     return (
         <div className="mb-10 pr-5">
-            <div className="font-acumin text-base font-normal text-zinc-800">
-                {description}
-            </div>
-            <div className="rounded-sm border border-zinc-300 bg-white px-5 py-4 my-5">
+            {description && (
+                <div className="font-acumin text-base font-normal text-zinc-800">
+                    {description}
+                </div>
+            )}
+            <div className="rounded-sm border border-zinc-300 bg-white px-5 py-4 mb-5 mt-2">
                 <div className="font-acumin text-base font-light text-stone-500 flex justify-between">
                     <div className="flex justify-between w-full space-x-2">
                         <div className="flex items-center">
                             <div className="">
-                                <HttpMethodChip className="mr-5">
-                                    {method}
-                                </HttpMethodChip>
+                                {method !== '' && (
+                                    <HttpMethodChip className="mr-5">
+                                        {method}
+                                    </HttpMethodChip>
+                                )}
                             </div>
                             <Link target="_blank" href={url}>
                                 {url}
                             </Link>
                         </div>
                         <div>
-                            <CopyButton content={url} />
+                            {copyButton ? (
+                                copyButton
+                            ) : (
+                                <CopyButton content={url} />
+                            )}
                         </div>
                     </div>
                 </div>
