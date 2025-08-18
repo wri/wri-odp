@@ -49,6 +49,7 @@ export const ResourceSchema = z
         new: z.boolean().optional(),
         package_id: z.string().optional().nullable(),
         url: z.string().optional(),
+        cache_type: z.enum(['raster', 'vector']).optional(),
         name: z.string().optional(),
         key: z.string().optional(),
         format: z.string().optional().nullable(),
@@ -64,6 +65,7 @@ export const ResourceSchema = z
             'upload',
             'layer',
             'empty-file',
+            'tile-cache',
             'empty-layer',
             'layer-raw',
             'reference-layer',
@@ -71,6 +73,7 @@ export const ResourceSchema = z
         url_type: z
             .enum([
                 'link',
+                'tile-cache',
                 'upload',
                 'layer',
                 'empty-file',

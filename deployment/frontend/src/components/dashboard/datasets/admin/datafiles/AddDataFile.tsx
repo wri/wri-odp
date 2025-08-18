@@ -8,6 +8,7 @@ import {
     GlobeAsiaAustraliaIcon,
     PaperClipIcon,
     MinusCircleIcon,
+    Squares2X2Icon,
 } from '@heroicons/react/24/outline'
 import classNames from '@/utils/classnames'
 import { LinkExternalForm } from './sections/LinkExternalForm'
@@ -27,6 +28,7 @@ import { useDataDictionary } from '@/utils/getDataDictionary'
 import { Field } from 'tableschema'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { TileCacheForm } from './sections/TileCacheForm'
 
 export function AddDataFile({
     remove,
@@ -235,6 +237,7 @@ export function AddDataFile({
                                 .with('empty-file', () => 0)
                                 .with('upload', () => 1)
                                 .with('link', () => 2)
+                                .with('tile-cache', () => 3)
                                 .otherwise(() => 0)}
                         >
                             <Tab.List
@@ -284,6 +287,7 @@ export function AddDataFile({
                                                     ? 'hidden'
                                                     : ''
                                             )}
+                                            id="link-button"
                                         >
                                             <LinkIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
                                             <div
@@ -293,6 +297,38 @@ export function AddDataFile({
                                                 )}
                                             >
                                                 Link to file in cloud storage
+                                            </div>
+                                        </span>
+                                    )}
+                                </Tab>
+                                <Tab
+                                    id="tabLink"
+                                    onClick={() =>
+                                        setValue(
+                                            `resources.${index}.type`,
+                                            'tile-cache'
+                                        )
+                                    }
+                                >
+                                    {({ selected }) => (
+                                        <span
+                                            className={classNames(
+                                                'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                                selected ? 'bg-amber-400' : '',
+                                                datafile.type === 'upload'
+                                                    ? 'hidden'
+                                                    : ''
+                                            )}
+                                            id="tile-cache-link-button"
+                                        >
+                                            <Squares2X2Icon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                            <div
+                                                className={classNames(
+                                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                    selected ? 'font-bold' : ''
+                                                )}
+                                            >
+                                                Define a tile cache link
                                             </div>
                                         </span>
                                     )}
@@ -321,6 +357,12 @@ export function AddDataFile({
                                 </Tab.Panel>
                                 <Tab.Panel>
                                     <LinkExternalForm
+                                        formObj={formObj}
+                                        index={index}
+                                    />
+                                </Tab.Panel>
+                                <Tab.Panel>
+                                    <TileCacheForm
                                         formObj={formObj}
                                         index={index}
                                     />

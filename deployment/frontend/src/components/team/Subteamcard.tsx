@@ -2,6 +2,8 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { visibilityTypeLabels } from '@/utils/constants'
+import Chip from '@/components/_shared/Chip'
 
 interface SubtopicProps {
     title: string
@@ -28,7 +30,7 @@ export default function Subteamcard({
                             ? teamsDetails[team.id]?.img_url
                             : '/images/placeholders/teams/teamdefault.png'
                     }`}
-                    alt="higlight"
+                    alt="highlight"
                     fill
                     className="object-cover"
                 />
@@ -36,6 +38,18 @@ export default function Subteamcard({
             <div className="text-black text-lg font-normal line-clamp-1">
                 {team.title}
             </div>
+            {'visibility' in team && team.visibility === 'private' && (
+                <div className="mt-2 mb-1">
+                    <Chip
+                        text={
+                            visibilityTypeLabels[
+                            team.visibility
+                            ] ?? ''
+                        }
+                        className={""}
+                    />
+                </div>
+            )}
             <div className="text-black text-sm font-normal">
                 {teamsDetails[team.id]?.package_count} Datasets
             </div>
