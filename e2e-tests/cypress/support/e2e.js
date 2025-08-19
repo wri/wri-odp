@@ -24,6 +24,7 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 import "cypress-axe";
+import 'cypress-plugin-tab';
 
 const cypressUpload = require("cypress-file-upload");
 const headers = { Authorization: Cypress.env("API_KEY") };
@@ -659,3 +660,42 @@ Cypress.Commands.add(
     );
   }
 );
+
+Cypress.Commands.add(
+  'tabTo',
+  (options = {}) => {
+    const { selector = null, numberOfTabs = 0, max = 100 } = options;
+
+    if (!selector && numberOfTabs === 0) {
+      throw new Error(
+        'tabTo: must provide a selector or numberOfTabs (or both)'
+      );
+    }
+
+    if (numberOfTabs > 0) {
+      let chain = cy.focused();
+      for (let i = 0; i < numberOfTabs; i++) {
+        chain = chain.tab();
+      }
+
+      if (selector) {
+        return chain.should('match', selector);
+      }
+      return chain;
+    }
+
+    if (selector) {
+      function step(i = 0) {
+        if (i > max) {
+          throw new Error(`tabTo(${selector}) exceeded ${max} tabs`);
+        }
+        return cy.focused().then($el => {
+          if ($el.is(selector)) return cy.wrap($el);
+          return cy.wrap($el).tab().then(() => step(i + 1));
+        });
+      }
+      return cy.focused().then(() => step());
+    }
+  }
+);
+
