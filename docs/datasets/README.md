@@ -137,6 +137,10 @@ If you want to just link some data that lives outside the system, you can just s
 
 ![Link datafile](./link_external_file.png)
 
+If you want to link a tilecache URL you can click on ¨Define a tile cache link", this is essentially a resource with `url_type` set to `tilecache` and with the `cache_type` field set to 'raster' or 'vector'
+
+![Link tilecache](./select_tile_cache.png)
+
 You can add multiple datafiles by selecting the `Add another datafile button`
 
 ![Add another datafile](./add_another_datafile.png)
