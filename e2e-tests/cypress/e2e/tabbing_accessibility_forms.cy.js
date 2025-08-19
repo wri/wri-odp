@@ -43,15 +43,14 @@ describe("Create dataset via tabbing", () => {
       ..."Test dataset short description",
     ]);
     cy.tabTo({ numberOfTabs: 11 }).realPress(["Enter"]);
-    cy.focused().realPress([..."Test Author"]);
+    cy.realPress([..."Test Author"]);
     cy.tabTo({ numberOfTabs: 4 }).realPress(["Enter"]);
-    cy.focused()
-      .realPress([..."Test Maintainer"])
+    cy.realPress([..."Test Maintainer"])
       .tab()
       .realPress([..."test.maintainer@example.com"]);
     cy.tabTo({ numberOfTabs: 18 }).realPress(["Enter"]);
-    cy.focused().realPress(["Enter"]);
-    cy.focused().realPress(["Enter"]);
+    cy.realPress(["Enter"]);
+    cy.realPress(["Enter"]);
     cy.contains("Save as Draft").focus();
     cy.tabTo({ numberOfTabs: 3 }).realPress(["Enter"]);
 
