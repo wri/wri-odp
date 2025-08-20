@@ -13,7 +13,8 @@
   "devDependencies": {
     "cypress": "^13.5.0",
     "cypress-plugin-tab": "^1.0.5",
-    "cypress-real-events": "^1.14.0"
+    "cypress-real-events": "^1.14.0",
+    "cypress-terminal-report": "^7.2.1"
   },
   "dependencies": {
     "axe-core": "^4.8.4",
