@@ -29,6 +29,7 @@ import { Field } from 'tableschema'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { TileCacheForm } from './sections/TileCacheForm'
+import { GeeAssetForm } from './sections/GeeAssetForm'
 
 export function AddDataFile({
     remove,
@@ -396,6 +397,12 @@ export function AddDataFile({
                                 </Tab.Panel>
                                 <Tab.Panel>
                                     <TileCacheForm
+                                        formObj={formObj}
+                                        index={index}
+                                    />
+                                </Tab.Panel>
+                                <Tab.Panel>
+                                    <GeeAssetForm
                                         formObj={formObj}
                                         index={index}
                                     />
