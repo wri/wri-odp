@@ -34,6 +34,7 @@ import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE
 import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm'
 import { LinkExternalForm } from './sections/LinkExternalForm'
 import { TileCacheForm } from './sections/TileCacheForm'
+import { GeeAssetForm } from './sections/GeeAssetForm'
 
 export function EditDataFile({
     remove,
@@ -213,7 +214,7 @@ export function EditDataFile({
                             .with('tile-cache', () => (
                                 <Squares2X2Icon className="h-6 w-6 text-blue-800" />
                             ))
-                            .with('geet-asset', () => (
+                            .with('gee-asset', () => (
                                 <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
                             ))
                             .with('layer', () => (
