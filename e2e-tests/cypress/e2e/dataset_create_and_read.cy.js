@@ -327,6 +327,50 @@ describe("Create dataset", () => {
     },
   );
 
+  it(
+    "Add a new datafile of type gee asset",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/dashboard/datasets/" + dataset + "/edit");
+      cy.contains("Data Files").click();
+      cy.wait(5000);
+      cy.get("button").contains("Add another Data File").click();
+      cy.wait(500);
+      cy.get(".datafile-accordion-trigger").eq(3).click();
+      cy.get("#gee-asset-button").click();
+      cy.get('input[name="resources.3.asset_id"]').type("gee asset id");
+      cy.get('input[name="resources.3.title"]').type("Gee asset");
+      cy.contains("Select an asset type").click();
+      cy.contains("Raster").click();
+      cy.get("button").contains("Update Dataset").click();
+      // cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
+      //   timeout: 30000,
+      // });
+    },
+  );
+
+  it(
+    "Should show the new asset id resource",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/datasets/" + dataset);
+      cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
+      cy.contains("Data Files").click();
+      cy.contains("Gee asset").click();
+      cy.contains("gee asset id");
+    },
+  );
+
   // it(
   //   "Should show the new member",
   //   {
