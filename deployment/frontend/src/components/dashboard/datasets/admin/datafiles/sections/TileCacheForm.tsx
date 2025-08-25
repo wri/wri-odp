@@ -57,7 +57,7 @@ export function TileCacheForm({
           }
         />
       </InputGroup>
-      <InputGroup label="Cache Type" className="whitespace-nowrap">
+      <InputGroup label="Cache Type" className="whitespace-nowrap" required>
         <SimpleSelect
           name={`resources.${index}.cache_type`}
           id="cache_type"

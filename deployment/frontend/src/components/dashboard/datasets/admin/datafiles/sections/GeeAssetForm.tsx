@@ -57,7 +57,7 @@ export function GeeAssetForm({
           }
         />
       </InputGroup>
-      <InputGroup label="Asset Type" className="whitespace-nowrap">
+      <InputGroup label="Asset Type" className="whitespace-nowrap" required>
         <SimpleSelect
           name={`resources.${index}.asset_type`}
           id="asset_type"
