@@ -17,7 +17,7 @@ export default function ApplicationSearch({
             id="search"
             className="bg-cover bg-center bg-no-repeat w-full flex flex-col justify-center font-acumin h-[245px]"
             style={{
-                backgroundImage: 'url(/images/bg.png)',
+                backgroundImage: 'url(/images/banner-applications.png)',
             }}
         >
             <form
