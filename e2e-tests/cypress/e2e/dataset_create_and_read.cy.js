@@ -22,7 +22,7 @@ describe("Create dataset", () => {
     cy.createGroupAPI(topic);
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     cy.login(user, "test_user");
   });
 
@@ -345,7 +345,7 @@ describe("Create dataset", () => {
       cy.get("#gee-asset-button").click();
       cy.get('input[name="resources.3.asset_id"]').type("gee asset id");
       cy.get('input[name="resources.3.title"]').type("Gee asset");
-      cy.contains("Select an asset type").click();
+      cy.contains("Select asset type").click();
       cy.contains("Raster").click();
       cy.get("button").contains("Update Dataset").click();
       // cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
