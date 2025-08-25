@@ -1144,7 +1144,7 @@ function TilecacheCard({
                 content={
                     copied ? 'Tile Cache URL copied!' : 'Copy Tile Cache URL'
                 }
-                contentClassName={`${copied ? 'bg-green-500 text-white' : ''}`}
+                contentClassName={`${copied ? 'bg-wri-green text-white' : ''}`}
                 delayDuration={copied ? 0 : 100}
                 onOpenChange={(open) => {
                     if (copied && open) return
@@ -1349,7 +1349,7 @@ function GeeAssetCard({
         return (
             <DefaultTooltip
                 content={copied ? 'Asset ID copied!' : 'Copy Asset ID'}
-                contentClassName={`${copied ? 'bg-green-500 text-white' : ''}`}
+                contentClassName={`${copied ? 'bg-wri-green text-white' : ''}`}
                 delayDuration={copied ? 0 : 100}
                 onOpenChange={(open) => {
                     if (copied && open) return

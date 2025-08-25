@@ -55,28 +55,28 @@ import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
 const CopyButton = ({ content }: { content: string }) => {
   const [copied, setCopied] = useState(false)
   const handleClick = () => {
-      navigator.clipboard.writeText(content)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500) 
+    navigator.clipboard.writeText(content)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
   }
   return (
-      <DefaultTooltip
-          content={copied ? 'Dataset URL copied!' : 'Copy simple page URL'}
-          contentClassName={`${copied ? 'bg-green-500 text-white' : ''}`}
-          delayDuration={copied ? 0 : 100}
-          onOpenChange={(open) => {
-              if (copied && open) return
-          }}
-          open={copied ? true : undefined}
+    <DefaultTooltip
+      content={copied ? 'Dataset URL copied!' : 'Copy simple page URL'}
+      contentClassName={`${copied ? 'bg-wri-green text-white' : ''}`}
+      delayDuration={copied ? 0 : 100}
+      onOpenChange={(open) => {
+        if (copied && open) return
+      }}
+      open={copied ? true : undefined}
+    >
+      <Button
+        aria-label="copy button"
+        className={`h-auto rounded-full p-1`}
+        onClick={handleClick}
       >
-          <Button
-              aria-label="copy button"
-              className={`h-auto rounded-full p-1`}
-              onClick={handleClick}
-          >
-              <DocumentDuplicateIcon className="w-3 text-white" />
-          </Button>
-      </DefaultTooltip>
+        <DocumentDuplicateIcon className="w-3 text-white" />
+      </Button>
+    </DefaultTooltip>
   )
 }
 
@@ -740,8 +740,8 @@ export function DatasetHeader({
           <div className="flex items-center gap-x-3">
             <h1
               className={`w-fit text-3xl font-bold text-black ${dataset?.title
-                  ? highlighted('title')
-                  : highlighted('name')
+                ? highlighted('title')
+                : highlighted('name')
                 }  `}
             >
               {dataset?.title ?? dataset?.name}{' '}
@@ -756,7 +756,7 @@ export function DatasetHeader({
               </span>
             )}
             <div className=''>
-                <CopyButton content={`${env.NEXT_PUBLIC_NEXTAUTH_URL.replace(/\/+$/, '')}/datasets/${dataset?.name}`} />
+              <CopyButton content={`${env.NEXT_PUBLIC_NEXTAUTH_URL.replace(/\/+$/, '')}/datasets/${dataset?.name}`} />
             </div>
           </div>
           <p
