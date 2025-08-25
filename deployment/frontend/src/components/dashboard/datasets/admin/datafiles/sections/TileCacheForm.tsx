@@ -69,6 +69,10 @@ export function TileCacheForm({
             { label: 'Vector', value: 'vector' },
           ]}
         />
+        <ErrorDisplay
+          name={`resources.${index}.cache_type`}
+          errors={errors}
+        />
       </InputGroup>
       <InputGroup
         label={

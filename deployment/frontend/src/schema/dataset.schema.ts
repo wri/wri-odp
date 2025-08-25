@@ -50,8 +50,8 @@ export const ResourceSchema = z
     new: z.boolean().optional(),
     package_id: z.string().optional().nullable(),
     url: z.string().optional(),
-    cache_type: z.enum(['raster', 'vector']).optional(),
-    asset_type: z.enum(['raster', 'vector']).optional(),
+    cache_type: z.enum(['raster', 'vector'], { message: 'Cache type is required' }).optional().nullish(),
+    asset_type: z.enum(['raster', 'vector'], { message: 'Asset type is required' }).optional().nullish(),
     name: z.string().optional(),
     key: z.string().optional(),
     format: z.string().optional().nullable(),
@@ -98,7 +98,7 @@ export const ResourceSchema = z
   })
   .refine(
     (obj) => {
-      if (obj.type !== 'link') return true
+      if (obj.type !== 'link' && obj.type !== 'tile-cache') return true
       if (!obj.url) return false
       if (
         !obj.url.startsWith('http://') &&
@@ -110,6 +110,28 @@ export const ResourceSchema = z
     {
       message: 'Invalid URL',
       path: ['url'],
+    }
+  )
+  .refine(
+    (obj) => {
+      if (obj.type !== 'gee-asset') return true
+      if (!obj.asset_type) return false
+      return true
+    },
+    {
+      message: 'Required',
+      path: ['asset_type'],
+    }
+  )
+  .refine(
+    (obj) => {
+      if (obj.type !== 'tile-cache') return true
+      if (!obj.cache_type) return false
+      return true
+    },
+    {
+      message: 'Required',
+      path: ['cache_type'],
     }
   )
 

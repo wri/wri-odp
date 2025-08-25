@@ -69,6 +69,10 @@ export function GeeAssetForm({
             { label: 'Vector', value: 'vector' },
           ]}
         />
+        <ErrorDisplay
+          name={`resources.${index}.asset_type`}
+          errors={errors}
+        />
       </InputGroup>
     </div>
   )
