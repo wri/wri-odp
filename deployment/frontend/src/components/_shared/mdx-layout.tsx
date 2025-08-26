@@ -55,7 +55,7 @@ export default function MdxLayout({
                 id="search"
                 className="flex h-[245px] w-full flex-col bg-cover bg-center bg-no-repeat font-acumin"
                 style={{
-                    backgroundImage: 'url(/images/bg.png)',
+                    backgroundImage: 'url(/images/banner-userguide.png)',
                 }}
             >
                 <Breadcrumbs links={links} />

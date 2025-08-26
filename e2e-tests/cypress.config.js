@@ -1,4 +1,5 @@
 import { defineConfig } from "cypress";
+import installLogsPrinter from "cypress-terminal-report/src/installLogsPrinter.js";
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -22,7 +23,16 @@ export default defineConfig({
           console.table(violations);
           return null;
         },
+        headlessLog({ args }) {
+          console.log(...args);
+          return null;
+        },
       });
+      installLogsPrinter(on, {
+        printLogsToConsole: 'always',
+      });
+
+      return config;
     },
   },
-});
+})

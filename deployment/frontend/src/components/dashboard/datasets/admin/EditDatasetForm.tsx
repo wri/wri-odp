@@ -245,7 +245,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     })
 
     const {
-        formState: { dirtyFields, touchedFields },
+        formState: { dirtyFields, touchedFields, errors },
     } = formObj
 
     const tabs = [

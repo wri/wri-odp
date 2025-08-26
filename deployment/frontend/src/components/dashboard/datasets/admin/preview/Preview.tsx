@@ -470,6 +470,7 @@ interface DatafilePreviewProps {
         | 'layer-raw'
         | 'reference-layer'
         | 'tile-cache'
+        | 'gee-asset'
     name: string
     title: string
     format: string
@@ -533,6 +534,14 @@ function Datafile({
                                     .with('tile-cache', () => (
                                         <>
                                             <Squares2X2Icon className="h-6 w-6 text-blue-800" />
+                                            <span className="text-lg font-light text-black">
+                                                {name}
+                                            </span>
+                                        </>
+                                    ))
+                                    .with('gee-asset', () => (
+                                        <>
+                                            <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
                                             <span className="text-lg font-light text-black">
                                                 {name}
                                             </span>

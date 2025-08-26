@@ -4,13 +4,10 @@ import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { DatasetFormType } from '@/schema/dataset.schema'
 import { UseFormReturn } from 'react-hook-form'
-import FormatInput from '../FormatInput'
-import { DatafileLocation } from '../DatafileLocation'
 import DefaultTooltip from '@/components/_shared/Tooltip'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { SimpleEditor } from '../../metadata/RTE/SimpleEditor'
 
-export function TileCacheForm({
+export function GeeAssetForm({
   formObj,
   index,
 }: {
@@ -23,14 +20,17 @@ export function TileCacheForm({
   } = formObj
   return (
     <div className="flex flex-col gap-y-4">
-      <InputGroup label="Link" required className="whitespace-nowrap">
+      <InputGroup label="Asset ID" required className="whitespace-nowrap">
         <Input
-          placeholder="https://source/to/original/data"
-          {...register(`resources.${index}.url`)}
+          placeholder={`ex. ee.ImageCollection("projects/project-name/assets/asset-details…”)`}
+          {...register(`resources.${index}.asset_id`)}
           type="text"
           maxWidth="max-w-[70rem]"
         />
-        <ErrorDisplay name={`resources.${index}.url`} errors={errors} />
+        <ErrorDisplay
+          name={`resources.${index}.asset_id`}
+          errors={errors}
+        />
       </InputGroup>
       <InputGroup label="Title" required className="whitespace-nowrap">
         <Input
@@ -57,12 +57,12 @@ export function TileCacheForm({
           }
         />
       </InputGroup>
-      <InputGroup label="Cache Type" className="whitespace-nowrap" required>
+      <InputGroup label="Asset Type" className="whitespace-nowrap" required>
         <SimpleSelect
-          name={`resources.${index}.cache_type`}
-          id="cache_type"
+          name={`resources.${index}.asset_type`}
+          id="asset_type"
           formObj={formObj}
-          placeholder="Select cache type"
+          placeholder="Select asset type"
           str
           options={[
             { label: 'Raster', value: 'raster' },
@@ -70,26 +70,8 @@ export function TileCacheForm({
           ]}
         />
         <ErrorDisplay
-          name={`resources.${index}.cache_type`}
+          name={`resources.${index}.asset_type`}
           errors={errors}
-        />
-      </InputGroup>
-      <InputGroup
-        label={
-          <span className="flex items-center gap-x-1">
-            Advanced API Usage
-            <DefaultTooltip content="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
-              <InformationCircleIcon className="h-5 w-5" />
-            </DefaultTooltip>
-          </span>
-        }
-        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
-      >
-        <SimpleEditor
-          formObj={formObj}
-          name={`resources.${index}.advanced_api_usage`}
-          className="min-h-[320px]"
-          defaultValue=""
         />
       </InputGroup>
     </div>

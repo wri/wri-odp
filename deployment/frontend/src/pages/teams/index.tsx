@@ -18,6 +18,7 @@ import { Index } from 'flexsearch'
 import { Organization as CkanOrg } from '@portaljs/ckan'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
 import TopicsSearch from '@/components/topics/TopicsSearch'
+import TeamsSearch from '@/components/team/TeamsSearch'
 
 const TeamsSearchResults = dynamic(
     () => import('@/components/team/TeamsSearchResults')

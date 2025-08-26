@@ -19,7 +19,10 @@ export default function TopicsSearch({
             id="search"
             className="bg-cover bg-center bg-no-repeat w-full flex flex-col justify-center font-acumin h-[245px] "
             style={{
-                backgroundImage: 'url(/images/bg.png)',
+                backgroundImage:
+                    groupType == 'Topics'
+                        ? 'url(/images/banner-topics.png)'
+                        : 'url(/images/banner-teams.png)',
             }}
         >
             <form

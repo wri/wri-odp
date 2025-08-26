@@ -51,7 +51,7 @@ export default function Search({
             id="search"
             className="flex h-[245px] w-full flex-col bg-cover bg-center justify-center  bg-no-repeat font-acumin"
             style={{
-                backgroundImage: 'url(/images/bg.png)',
+                backgroundImage: 'url(/images/banner-search.png)',
             }}
         >
             <form
