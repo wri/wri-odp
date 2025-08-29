@@ -145,8 +145,8 @@ const DatasetSchemaObject = z.object({
     .string()
     .min(1, { message: 'Name is required' })
     .regex(
-      /^[^\(\) +]+$/,
-      'Name must be URL-compatible and cannot include spaces or the dot(.) character.'
+        /^[a-z0-9_-]+$/,
+        '[!] Name must consist only of lowercase ASCII letters, numbers, hyphens, and underscores.'
     ),
   url: z
     .string()
