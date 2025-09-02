@@ -86,7 +86,7 @@
         "mapbox-gl-draw-rectangle-mode": "^1.0.4",
         "math.gl": "^3.4.2",
         "moment": "^2.29.2",
-        "next": "^13.5.7",
+        "next": "^14.2.32",
         "next-auth": "^4.24.5",
         "next-seo": "^6.1.0",
         "next-sitemap": "^4.2.3",
