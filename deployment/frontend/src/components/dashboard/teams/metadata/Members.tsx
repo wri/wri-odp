@@ -16,9 +16,26 @@ import { capacityOptions } from '../../datasets/admin/formOptions'
 import notify from '@/utils/notify'
 import { TeamFormType } from '@/schema/team.schema'
 import { RouterOutput } from '@/server/api/root'
+import { InformationCircleIcon } from '@heroicons/react/24/outline'
 
 type TeamOutput = RouterOutput['teams']['getTeam']
 
+function Membertooltip() {
+    return (
+        <>
+            <p>
+                <b>Admins</b> can view, create, edit, or delete Datasets within
+                the Team. Admins manage Team details, including membership.
+            </p>
+            <p>
+                <b>Editors</b> can view, create, edit, and delete Datasets.
+            </p>
+            <p>
+                <b>Members</b> can view Datasets.
+            </p>
+        </>
+    )
+}
 export function Members({
     team,
     formObj,
@@ -36,8 +53,14 @@ export function Members({
         <div className="mx-auto w-full max-w-[1380px] sm:px-6 xxl:px-0">
             <div className="w-full border-b border-blue-800 bg-white shadow">
                 <div className="col-span-full flex w-full justify-between border-b border-stone-50 py-5 px-4 sm:px-6">
-                    <h3 className="flex w-full items-center gap-x-2 font-acumin text-xl font-semibold text-blue-800">
-                        Members
+                    <h3 className="flex w-full items-center font-acumin text-xl font-semibold text-blue-800">
+                        Members{' '}
+                        <DefaultTooltip content={Membertooltip()}>
+                            <InformationCircleIcon
+                                className="h-5 w-5 text-neutral-500 ml-1 mb-1 shrink-0"
+                                aria-hidden="true"
+                            />
+                        </DefaultTooltip>
                     </h3>
                 </div>
                 <div className="py-4">
@@ -98,7 +121,11 @@ function MemberForm({
     return (
         <div className="flex items-center gap-x-2">
             <div className="grid grow grid-cols-1 items-start gap-x-24 md:grid-cols-2">
-                <span className="hidden" id={`members-${index}-user`} data-value={formObj.watch(`members.${index}.user`).value}/>
+                <span
+                    className="hidden"
+                    id={`members-${index}-user`}
+                    data-value={formObj.watch(`members.${index}.user`).value}
+                />
                 <InputGroup label="User">
                     {match(allUsers)
                         .with({ isLoading: true }, () => (
@@ -129,7 +156,13 @@ function MemberForm({
                             </span>
                         ))}
                 </InputGroup>
-                <span className="hidden" id={`members-${index}-capacity`} data-value={formObj.watch(`members.${index}.capacity`).value}/>
+                <span
+                    className="hidden"
+                    id={`members-${index}-capacity`}
+                    data-value={
+                        formObj.watch(`members.${index}.capacity`).value
+                    }
+                />
                 <InputGroup label="Capacity">
                     <SimpleSelect
                         formObj={formObj}

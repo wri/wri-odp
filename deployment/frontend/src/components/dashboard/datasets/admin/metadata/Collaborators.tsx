@@ -17,6 +17,24 @@ import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { capacityOptions } from '../formOptions'
 import { WriDataset } from '@/schema/ckan.schema'
 import notify from '@/utils/notify'
+import { InformationCircleIcon } from '@heroicons/react/24/outline'
+
+function Collabtooltip() {
+    return (
+        <>
+            <p>
+                <b>Admins</b> can edit the Dataset and manage Collaborator
+                access.
+            </p>
+            <p>
+                <b>Editors</b> can edit the Dataset.
+            </p>
+            <p>
+                <b>Members</b> can view the Dataset.
+            </p>
+        </>
+    )
+}
 
 export function Collaborators({
     dataset,
@@ -36,7 +54,13 @@ export function Collaborators({
             <div className="w-full border-b border-blue-800 bg-white shadow">
                 <div className="col-span-full flex w-full justify-between border-b border-stone-50 py-5 px-4 sm:px-6">
                     <h3 className="flex w-full items-center gap-x-2 font-acumin text-xl font-semibold text-blue-800">
-                        Collaborators
+                        Collaborators{' '}
+                        <DefaultTooltip content={Collabtooltip()}>
+                            <InformationCircleIcon
+                                className="h-5 w-5 text-neutral-500 ml-1 mb-1 shrink-0"
+                                aria-hidden="true"
+                            />
+                        </DefaultTooltip>
                     </h3>
                 </div>
                 <div className="py-4">
@@ -53,7 +77,7 @@ export function Collaborators({
                             ))}
                         </div>
                         <button
-              type="button"
+                            type="button"
                             onClick={() =>
                                 append({
                                     package_id: dataset.id,

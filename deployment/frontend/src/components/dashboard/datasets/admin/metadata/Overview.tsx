@@ -300,7 +300,7 @@ export function OverviewForm({
                         <div className="flex flex-col items-center justify-between gap-5 lg:flex-row xxl:w-[28rem]">
                             <Input
                                 {...register('temporal_coverage_start', {
-                                    valueAsNumber: true,
+                                    setValueAs: v => v === '' ? undefined : Number(v),
                                 })}
                                 placeholder="Start year"
                                 type="number"
@@ -308,7 +308,7 @@ export function OverviewForm({
                             <span className="hidden xxl:block">to</span>
                             <Input
                                 {...register('temporal_coverage_end', {
-                                    valueAsNumber: true,
+                                    setValueAs: v => v === '' ? undefined : Number(v),
                                 })}
                                 placeholder="End year"
                                 type="number"
