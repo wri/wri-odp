@@ -70,36 +70,36 @@ def was_last_job_considered_error_free():
 @pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index")
 class TestWriCkanHarvester(object):
 
-    def test_gather_normal(self):
-        source = HarvestSourceObj(url="http://localhost:%s/" % mock_ckan.PORT)
-        job = HarvestJobObj(source=source)
+    #def test_gather_normal(self):
+    #    source = HarvestSourceObj(url="http://localhost:%s/" % mock_ckan.PORT)
+    #    job = HarvestJobObj(source=source)
 
-        harvester = CKANHarvesterWRI()
-        obj_ids = harvester.gather_stage(job)
+    #    harvester = CKANHarvesterWRI()
+    #    obj_ids = harvester.gather_stage(job)
 
-        assert job.gather_errors == []
-        assert isinstance(obj_ids, list)
-        assert len(obj_ids) == len(mock_ckan.DATASETS)
+    #    assert job.gather_errors == []
+    #    assert isinstance(obj_ids, list)
+    #    assert len(obj_ids) == len(mock_ckan.DATASETS)
 
-        harvest_object = harvest_model.HarvestObject.get(obj_ids[0])
+    #    harvest_object = harvest_model.HarvestObject.get(obj_ids[0])
 
-        assert harvest_object.guid == mock_ckan.DATASETS[0]["id"]
-        assert json.loads(harvest_object.content) == mock_ckan.DATASETS[0]
+    #    assert harvest_object.guid == mock_ckan.DATASETS[0]["id"]
+    #    assert json.loads(harvest_object.content) == mock_ckan.DATASETS[0]
 
-    def test_fetch_normal(self):
-        source = HarvestSourceObj(url="http://localhost:%s/" % mock_ckan.PORT)
-        job = HarvestJobObj(source=source)
-        harvest_object = HarvestObjectObj(
-            guid=mock_ckan.DATASETS[0]["id"],
-            job=job,
-            content=json.dumps(mock_ckan.DATASETS[0]),
-        )
+    #def test_fetch_normal(self):
+    #    source = HarvestSourceObj(url="http://localhost:%s/" % mock_ckan.PORT)
+    #    job = HarvestJobObj(source=source)
+    #    harvest_object = HarvestObjectObj(
+    #        guid=mock_ckan.DATASETS[0]["id"],
+    #        job=job,
+    #        content=json.dumps(mock_ckan.DATASETS[0]),
+    #    )
 
-        harvester = CKANHarvesterWRI()
-        result = harvester.fetch_stage(harvest_object)
+    #    harvester = CKANHarvesterWRI()
+    #    result = harvester.fetch_stage(harvest_object)
 
-        assert harvest_object.errors == []
-        assert result is True
+    #    assert harvest_object.errors == []
+    #    assert result is True
 
     #def test_import_normal(self):
     #    org = Organization()

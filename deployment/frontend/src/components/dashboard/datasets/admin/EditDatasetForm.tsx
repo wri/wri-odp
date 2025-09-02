@@ -207,6 +207,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 }
                 return {
                     ...resource,
+                    title: resource.title ?? resource.name,
                     type: resource.url_type as any,
                     resourceId: resource.id as string,
                     schema: resource.schema ? schema.value : undefined,
@@ -244,7 +245,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     })
 
     const {
-        formState: { dirtyFields, touchedFields },
+        formState: { dirtyFields, touchedFields, errors },
     } = formObj
 
     const tabs = [

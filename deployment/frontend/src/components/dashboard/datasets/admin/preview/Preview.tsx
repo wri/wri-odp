@@ -5,6 +5,7 @@ import {
     ChevronDownIcon,
     GlobeAsiaAustraliaIcon,
     LinkIcon,
+    Squares2X2Icon,
     XMarkIcon,
 } from '@heroicons/react/24/outline'
 import {
@@ -468,6 +469,8 @@ interface DatafilePreviewProps {
         | 'empty-layer'
         | 'layer-raw'
         | 'reference-layer'
+        | 'tile-cache'
+        | 'gee-asset'
     name: string
     title: string
     format: string
@@ -523,6 +526,22 @@ function Datafile({
                                     .with('link', () => (
                                         <>
                                             <LinkIcon className="h-6 w-6 text-blue-800" />
+                                            <span className="text-lg font-light text-black">
+                                                {name}
+                                            </span>
+                                        </>
+                                    ))
+                                    .with('tile-cache', () => (
+                                        <>
+                                            <Squares2X2Icon className="h-6 w-6 text-blue-800" />
+                                            <span className="text-lg font-light text-black">
+                                                {name}
+                                            </span>
+                                        </>
+                                    ))
+                                    .with('gee-asset', () => (
+                                        <>
+                                            <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
                                             <span className="text-lg font-light text-black">
                                                 {name}
                                             </span>

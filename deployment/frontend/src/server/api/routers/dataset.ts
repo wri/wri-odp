@@ -337,6 +337,7 @@ export const DatasetRouter = createTRPCRouter({
     editDataset: protectedProcedure
         .input(DatasetSchemaForEdit)
         .mutation(async ({ ctx, input }) => {
+            console.log('ERROR HERE')
             const user = ctx.session.user
             const existingCollaboratorsDetails =
                 await fetchDatasetCollaborators(
@@ -350,6 +351,7 @@ export const DatasetRouter = createTRPCRouter({
                     capacity: collaborator.capacity.label.toLowerCase(),
                 })
             )
+            console.log('ERROR HERE 2')
             const existingCollaborators = existingCollaboratorsDetails.map(
                 (existingCollaborator) => ({
                     name: existingCollaborator.name,
@@ -368,9 +370,11 @@ export const DatasetRouter = createTRPCRouter({
                     )
                 }
             } catch (e) {
+                console.log('ERROR HERE')
                 console.error(e)
             }
 
+            console.log('ERROR HERE 3')
             const inputKeys = Object.keys(input)
             const isUpdate = !(
                 inputKeys.length == 2 && inputKeys.includes('collaborators')
@@ -385,6 +389,7 @@ export const DatasetRouter = createTRPCRouter({
                     },
                 }
             )
+            console.log('ERROR HERE 4')
             const pendingData =
                 (await pendingResponse.json()) as CkanResponse<PendingDataset | null>
             if (!pendingData.success && pendingData.error) {
@@ -412,6 +417,7 @@ export const DatasetRouter = createTRPCRouter({
 
             const rw_id = input.rw_id ?? null
 
+            console.log('ERROR HERE 5')
             let org: WriOrganization | null = null
             if (input.team && input.team?.value && isUpdate) {
                 org = (await getOrgDetails({
@@ -419,6 +425,8 @@ export const DatasetRouter = createTRPCRouter({
                     apiKey: ctx.session.user.apikey,
                 }))!
 
+                console.log('TEAM VALUE', input.team)
+                console.log('ORG', org)
                 org = {
                     id: org.id,
                     name: org.name,
@@ -433,6 +441,7 @@ export const DatasetRouter = createTRPCRouter({
                     visibility: org.visibility,
                 }
             }
+            console.log('ERROR HERE 5.5')
 
             try {
                 if (isUpdate) {
@@ -512,6 +521,7 @@ export const DatasetRouter = createTRPCRouter({
                                     resource.type !== 'empty-layer'
                             )
                             .map((resource) => {
+                                console.log('ERROR HERE 6')
                                 const rr = prevDataset?.resources.find(
                                     (r) => r.id === resource.id
                                 )

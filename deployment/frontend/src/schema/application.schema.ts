@@ -7,10 +7,10 @@ export const ApplicationSchema = z.object({
     name: z
         .string()
         .regex(
-            /^[^\(\) +]+$/,
-            'The name cant have spaces nor the dot(.) character, it needs to be URL Compatible'
+            /^[a-z0-9_-]+$/,
+            '[!] Name must consist only of lowercase ASCII letters, numbers, hyphens, and underscores.'
         ),
-    title: z.string(),
+    title: z.string().min(2, 'Title is required (minimum 2 characters)'),
     image_display_url: z.string().optional().nullable(),
     image_url: z.string().optional().nullable(),
     description: z.string().optional().nullable(),

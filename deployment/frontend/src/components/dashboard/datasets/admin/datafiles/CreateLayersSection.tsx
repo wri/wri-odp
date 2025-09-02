@@ -33,12 +33,20 @@ export function CreateLayersSection({
 
     const layers = fields.filter(
         (r) =>
-            r.type !== 'upload' && r.type !== 'link' && r.type !== 'empty-file'
+            r.type !== 'upload' &&
+            r.type !== 'link' &&
+            r.type !== 'empty-file' &&
+            r.type !== 'tile-cache' &&
+            r.type !== 'gee-asset'
     )
 
     const notLayers = fields.filter(
         (r) =>
-            r.type === 'upload' || r.type === 'link' || r.type === 'empty-file'
+            r.type === 'upload' ||
+            r.type === 'link' ||
+            r.type === 'empty-file' ||
+            r.type === 'tile-cache' ||
+            r.type === 'gee-asset'
     )
 
     return (
@@ -303,12 +311,6 @@ export function AddLayer({
                                         index={index}
                                     />
                                 )}
-                            </Tab.Panel>
-                            <Tab.Panel>
-                                <DerivedLayerForm
-                                    formObj={formObj}
-                                    index={index}
-                                />
                             </Tab.Panel>
                             <Tab.Panel>
                                 <DerivedLayerForm
