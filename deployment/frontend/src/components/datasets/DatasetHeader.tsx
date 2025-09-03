@@ -756,7 +756,8 @@ export function DatasetHeader({
               </span>
             )}
             <div className=''>
-              <CopyButton content={`${env.NEXT_PUBLIC_NEXTAUTH_URL.replace(/\/+$/, '')}/datasets/${dataset?.name}`} />
+              {/* TODO: FIX THIS */}
+              <CopyButton content={`https://datasets.wri.org/datasets/${dataset?.name}`} />
             </div>
           </div>
           <p
