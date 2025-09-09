@@ -1,3 +1,29 @@
+diff --git a/ckanext/activity/logic/validators.py b/ckanext/activity/logic/validators.py
+index 7922d2f48..972660fab 100644
+--- a/ckanext/activity/logic/validators.py
++++ b/ckanext/activity/logic/validators.py
+@@ -51,6 +51,13 @@ VALIDATORS_GROUP_ACTIVITY_TYPES = {
+     "follow group": "group_id_exists",
+ }
+ 
++VALIDATORS_APPLICATION_ACTIVITY_TYPES = {
++    "new application": "group_id_exists",
++    "changed application": "group_id_exists",
++    "deleted application": "group_id_exists",
++    "follow application": "group_id_exists",
++}
++
+ VALIDATORS_ORGANIZATION_ACTIVITY_TYPES = {
+     "new organization": "group_id_exists",
+     "changed organization": "group_id_exists",
+@@ -64,6 +71,7 @@ object_id_validators = {
+     **VALIDATORS_PACKAGE_ACTIVITY_TYPES,
+     **VALIDATORS_USER_ACTIVITY_TYPES,
+     **VALIDATORS_GROUP_ACTIVITY_TYPES,
++    **VALIDATORS_APPLICATION_ACTIVITY_TYPES,
+     **VALIDATORS_ORGANIZATION_ACTIVITY_TYPES
+ }
+ 
 diff --git a/ckanext/activity/subscriptions.py b/ckanext/activity/subscriptions.py
 index 56dcb257e..bab365952 100644
 --- a/ckanext/activity/subscriptions.py
