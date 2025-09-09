@@ -1,0 +1,12 @@
+diff --git a/ckanext/activity/subscriptions.py b/ckanext/activity/subscriptions.py
+index 56dcb257e..bab365952 100644
+--- a/ckanext/activity/subscriptions.py
++++ b/ckanext/activity/subscriptions.py
+@@ -248,6 +248,7 @@ def group_or_org_changed(sender: str, **kwargs: Any):
+         raise tk.ObjectNotFound("group")
+ 
+     type_, action = sender.split("_")
++    type_ = group.type if group.type else type_
+ 
+     user_obj = _get_user_or_raise(context["user"])
+ 
