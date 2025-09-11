@@ -22,6 +22,7 @@ import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/20/solid'
 import classNames from '@/utils/classnames'
 import { ApplicationsCarousel } from '@/components/home/ApplicationCarousel'
 import { ArrowRightIcon } from '@heroicons/react/24/solid'
+import { WriDataset } from '@/schema/ckan.schema'
 
 const ErrorAlert = dynamic<{ text: string; title?: string }>(
   () =>
@@ -284,7 +285,10 @@ export default function Home(
                   id="highlights"
                   className="max-w-[90.5vw] mx-auto flex flex-col font-acumin gap-y-6"
                 >
-                  <HighlightsCarousel />
+                  <Recent
+                    datasets={featuredDatasets.datasets as WriDataset[]}
+                    title="Featured Datasets"
+                  />
                 </div>
               )}
             </Tab.Panel>

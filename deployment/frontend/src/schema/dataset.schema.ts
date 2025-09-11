@@ -145,8 +145,8 @@ const DatasetSchemaObject = z.object({
     .string()
     .min(1, { message: 'Name is required' })
     .regex(
-        /^[a-z0-9_-]+$/,
-        '[!] Name must consist only of lowercase ASCII letters, numbers, hyphens, and underscores.'
+      /^[a-z0-9_-]+$/,
+      '[!] Name must consist only of lowercase ASCII letters, numbers, hyphens, and underscores.'
     ),
   url: z
     .string()
@@ -297,7 +297,8 @@ const DatasetSchemaObject = z.object({
 export const DatasetSchema = DatasetSchemaObject.refine(
   (obj) => {
     if (!obj.featured_dataset) return true
-    if (obj.featured_dataset && !obj.featured_image) return false
+    // ODP-520
+    //if (obj.featured_dataset && !obj.featured_image) return false
     return true
   },
   {
