@@ -90,7 +90,7 @@ export default function ApplicationForm({
             type="text"
             className="h-[8.4rem]"
             icon={
-              <DefaultTooltip content="Long form description of the Application and its purpose.">
+              <DefaultTooltip content="Long form description of the application and its purpose.">
                 <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
               </DefaultTooltip>
             }
