@@ -1,104 +1,58 @@
 import MdxLayout from '@/components/_shared/mdx-layout'
 
-1. [Facets](#Facets)
+The most robust and effective way to discover data on the Data Explorer is through search. You can begin a search from the homepage banner or by selecting **Search** from the top navigation. Queries entered in these two locations will return results for Datasets only. If you need to search for a specific Team, Topic, or Application, you can search directly on the /teams, /topics, or /applications pages, respectively.
 
-2. [Full text search](#Full-text-search)
+[Image here]
 
-3. [Share search Url](#Share-search-Url)
+## Start with a Keyword 
 
-4. [Dataset metadata](#Dataset-metadata)
+Dataset search functionality is keyword-based and scans all metadata (not just dataset titles) across all datasets in the portal.
 
-5. [Sorting](#Sorting)
+## Advanced Search Filters
 
-You can visit `Search` page via `/search `or by clicking on the Search link in the navbar
+On the /search page, select from a list of advanced filters in the left panel to narrow your search results. Search results will update dynamically as you change filter settings and can be removed just above the search results. To reset the search page to default, click on ‘Clear all filters’ on the right side.
 
-Users can move to the Advance search page by hitting enter in the basic search or by clicking the Advanced search tab
+[Image here]
 
-<img src="/images/user-guide/explore5.webp" />
+Available filters include:
 
-## Facets
+- Location 
+- Project 
+- Team 
+- Topics 
+- Tags (less rigid than Topics; can vary) 
+- Temporal Coverage 
+- Update Frequency 
+- Format 
+- License 
+- Language 
+- WRI Data (Yes or no) 
+- Visibility 
 
-The page contains various facets by which you can filter Datasets, and here are the facets:
+## Search by Location
 
-- Location
+If you are trying to narrow down geospatial datasets for a particular geography, you can also filter by location. Expand the ‘Location’ filter from the filter menu to expose a map widget (powered by Mapbox) and complete an autocomplete text search to match data files against geography names or addresses.
 
-- Application
+[Image here]
 
-- Project
+To learn how to search by location within a specific dataset, see Search and Filter Data Files by Location.
 
-- Team
+## Viewing Search Results
 
-- Topics
+Only some metadata will appear on search results cards. Clicking on a result will direct you to a **Dataset Detail Page**, where you will find more metadata, visualization previews (if applicable), and options to access the data. You can also **sort** results or change how many results are displayed.
 
-- Tags
+[Image here]
 
-- Temporal Coverage (start and end)
+### Back to Filtered Results
 
-- Update Frequency
+After clicking a dataset, if you want to return to filtered search results from your last query, click ‘Go Back' or use the back button in your browser.
 
-- Format (of the Data Files)
+Clicking on the ‘Datasets’ breadcrumb in the sub-navigation will take you back to the /search page but without any queries or filters.
 
-- License
+### Sharing Searches with Other Users 
 
-- Language
+As you refine your search on the /search page, the page’s URL will also continue to update. This makes it possible to copy the URL and share the search results and any filters with other users.
 
-- WRI Data (Yes or no)
-
-- Visibility
-
-<img src="/images/user-guide/explore6.webp" />
-
-For example to search by location, take your mouse pointer to the location facet and click on the expansion icon and then search by your desired location
-
-<img src="/images/user-guide/explore7.webp" />
-
-Also for other facet that involves selecting, they have a default count of zero but has you select the count increases to show that some, facet options have been selected. e.g
-
-<img src="/images/user-guide/explore_add1.webp" />
-
-### Full text search
-
-The search functionality also searches through all the metadata of each Dataset to get Datasets that match the text, e.g we can search for Dataset having this description shown below
-
-<img src="/images/user-guide/explore8.webp" />
-
-If you’ve use different filters and you want to reset the search page to default, click on `Clear all filters`.
-
-### Share search Url
-
-When a user searches on the advanced search page, the URL gets updated containing the state of the current page. This URL can be shared with other users, which will be able to see the same results.
-
-### Dataset metadata
-
-Results are displayed using the following card:
-
-<img src="/images/user-guide/explore9.webp" />
-
-1. Team
-
-2. Temporal coverage
-
-3.Title
-
-4. Short Description
-
-5. Resource format
-
-### Sorting
-
-Available sorting options are:
-
-- Relevance
-
-- Name Ascending
-
-- Name Descending
-
-- Last Modified
-
-- Featured
-
-- WRI Data
 
 <img src="/images/user-guide/explore10.webp" />
 
@@ -107,7 +61,7 @@ export default function MDXPage({ children }) {
         <MdxLayout
             label="Search Page"
             url="/user-guide/search-page"
-            title="Search Page"
+            title="Searching for Datasets"
         >
             {children}
         </MdxLayout>

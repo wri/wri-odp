@@ -1,47 +1,264 @@
-1.  #### [Dataset View Page](user-guide/dataset-view-pages)
+- [Searching for Datasets](#Searching-for-Datasets)
+- [Browsing by Team, Application, or Topic](#Browsing-by-Team,-Application,-or-Topic)
+- [Diving into a Dataset](#Diving-into-a-Dataset)
+    - [Metadata](#Where-to-find-metadata)
+    - [Data Files](#Data-Files)
+    - [Previews & Maps](#Previewing-Data)
 
-    a. [Dataset Metadata](user-guide/dataset-view-pages#Dataset-Metadata)
+# Searching for Datasets
 
-    b. [ Dataset Tabs](user-guide/dataset-view-pages#Dataset-Tabs)
+The most robust and effective way to discover data on the Data Explorer is through search. You can begin a search from the homepage banner or by selecting **Search** from the top navigation. Queries entered in these two locations will return results for Datasets only. If you need to search for a specific Team, Topic, or Application, you can search directly on the /teams, /topics, or /applications pages, respectively.
 
-        1. [Data Files](user-guide/dataset-view-pages#Data-Files)
+[Image here]
 
-            1. [Location Search](user-guide/dataset-view-pages#Location-Search)
+## Start with a Keyword 
 
-            2. [Data File list section](user-guide/dataset-view-pages#Data-file-list-section)
+Dataset search functionality is keyword-based and scans all metadata (not just dataset titles) across all datasets in the portal.
 
-                a. [Data File download](user-guide/dataset-view-pages#Data-file-download)
+## Advanced Search Filters
 
-                b. [Tabular Previews](user-guide/dataset-view-pages#Tabular-Previews)
+On the /search page, select from a list of advanced filters in the left panel to narrow your search results. Search results will update dynamically as you change filter settings and can be removed just above the search results. To reset the search page to default, click on ‘Clear all filters’ on the right side.
 
-                c. [Chart Preview](user-guide/dataset-view-pages#Chart-Preview)
+[Image here]
 
-                d. [Map preview](user-guide/dataset-view-pages#Map-Preview)
+Available filters include:
 
-        2. [About Tab](user-guide/dataset-view-pages#About-tab)
+- Location 
+- Project 
+- Team 
+- Topics 
+- Tags (less rigid than Topics; can vary) 
+- Temporal Coverage 
+- Update Frequency 
+- Format 
+- License 
+- Language 
+- WRI Data (Yes or no) 
+- Visibility 
 
-        3. [Related Datasets](user-guide/dataset-view-pages#Related-Datasets)
+## Search by Location
 
-        4. [Contact Tab](user-guide/dataset-view-pages#Contact-Tab)
+If you are trying to narrow down geospatial datasets for a particular geography, you can also filter by location. Expand the ‘Location’ filter from the filter menu to expose a map widget (powered by Mapbox) and complete an autocomplete text search to match data files against geography names or addresses.
 
-        5. [Api Tab](user-guide/dataset-view-pages#Api-Tab)
+[Image here]
 
-        6. [Collaborators Tab](user-guide/dataset-view-pages#Collaborators-Tab)
+To learn how to search by location within a specific dataset, see Search and Filter Data Files by Location.
 
-        7. [Release Note tab](user-guide/dataset-view-pages#Release-Note-Tab)
+## Viewing Search Results
 
-2.  #### [Search Page](user-guide/search-page)
+Only some metadata will appear on search results cards. Clicking on a result will direct you to a **Dataset Detail Page**, where you will find more metadata, visualization previews (if applicable), and options to access the data. You can also **sort** results or change how many results are displayed.
 
-    1. [Facets](#Facets)
+[Image here]
 
-    2. [Full text search](#Full-text-search)
+### Back to Filtered Results
 
-    3. [Share search Url](#Share-search-Url)
+After clicking a dataset, if you want to return to filtered search results from your last query, click ‘Go Back' or use the back button in your browser.
 
-    4. [Dataset metadata](#Dataset-metadata)
+Clicking on the ‘Datasets’ breadcrumb in the sub-navigation will take you back to the /search page but without any queries or filters.
 
-    5. [Sorting](#Sorting)
+### Sharing Searches with Other Users 
 
-3.  #### [Teams / Topics Discovery Page](user-guide/teams-topics)
+As you refine your search on the /search page, the page’s URL will also continue to update. This makes it possible to copy the URL and share the search results and any filters with other users.
 
-4.  #### [Basic Definition](user-guide/basic-definition)
+# Browsing by Team, Application, or Topic
+
+For more organic, curiosity-driven data discovery, you can also browse datasets by what they have in common: if they are owned and managed by the same Team, if they are associated with the same digital Application(s), or if they fall under the same Topic of interest.
+
+## Browsing by Team 
+
+You can browse datasets by the WRI **Team** that owns them. A Team is the organizational unit responsible for publishing and maintaining a dataset. In many cases, a Team represents a larger program or project team at WRI and can have Sub-Teams nested within them. A dataset can only belong to one Team (or Sub-Team).
+
+Navigate to /teams from the main menu to browse datasets by Team or Sub-Team.
+
+[Image here]
+
+## Browsing by Application 
+
+**Applications** are WRI-owned platforms or digital products that use datasets also listed in the Data Explorer. In many cases, the application may be involved with the publication of the dataset or have a direct connection to the Team that owns it (they may even be the same entity). Unlike with Teams, a dataset can be associated with more than one application.
+
+You can 'Explore by Application’ via the homepage or navigate to /applications from the main menu to browse for datasets by Application.
+
+If you are interested in accessing the application itself, you will find direct links on the respective Application page.
+
+[Image here]
+
+## Browsing by Topic 
+
+**Topics** are collections of datasets based on subject areas aligning with WRI's programming. Many Topics contain Subtopics for more specificity (e.g. Land → Forests → Commercial Deforestation). Topics are curated by WRI Data Explorer Administrators and should not change often.
+
+ You can 'Explore by Topic’ via the homepage or navigate to /topics from the main menu to browse for datasets by Topic.
+
+ [Image here]
+
+# Diving into a Dataset
+
+Clicking on a dataset anywhere in the Data Explorer will take you to the **Dataset Detail Page** where you can:
+
+- **View metadata** describing the dataset 
+- **Access** the **data files** 
+- **Visualize** the data in a **preview**
+- **Visit linked resources** (e.g., Global Forest Watch) 
+- **Copy API queries** for use in advanced analysis in a third-party tool
+
+## Where to find metadata 
+
+### Where to find metadata 
+
+Key metadata is summarized at the top of each dataset detail page and includes the following:
+
+Team Name (the team that published the dataset/is responsible for maintaining it) 
+
+- Dataset Title 
+- Short Description 
+- Created Date (when the dataset was first published on Data Explorer) 
+- Last Updated (most recent changes made to the dataset on Data Explorer) 
+- Temporal Coverage 
+- Indication if the data is WRI DATA or not 
+- File types available for that dataset (CSV, XLSX, LAYER, etc.) 
+- Preview options available for that dataset (chart, map, or table view) 
+- “Open-In” external link (if available)
+
+[Image here]
+
+### Extended metadata 
+
+Additional metadata can be found in various tabs below the top-level metadata:
+
+- See the **About** tab for longer dataset descriptions, tags, license, and citation info 
+- See the **Related Datasets** for other datasets that share similar topics. 
+- See the **Contact** tab for Author(s) and Maintainer(s) and their contact information, if available.  
+- See the **Release Note** tab for a history of changes or updates made to the dataset over time.
+
+[Image here]
+
+### APIs
+
+See the **API** tab for code samples and instructions for viewing Datasets via provided APIs. 
+
+Select from the available programming options (Query, Javascript, Python, or R) and copy the provided code to get the Dataset’s metadata. 
+
+[DX_userguide_10.png] 
+
+For more information on how to use the CKAN API, please refer to the [CKAN API documentation](https://docs.ckan.org/en/2.10/api/index.html).
+
+## Data Files 
+
+The Data Files tab is where you can access the data, as well as download files and configure any available previews.
+
+### Search and Filter Data Files by Title/Description 
+
+If a dataset contains multiple data files, you can filter down the results by entering a keyword in the Search field.  
+
+[DX_userguide_11.png]
+
+### Search and Filter Data Files by Location 
+
+If a dataset contains geospatial data, a map widget will load automatically in the left panel.  
+
+There are a few ways you can filter files based on geography:
+
+- Select tiles – Click to select specific tiles one by one 
+- Area Select Tool – Use this tool to draw a bounding box around the desired areas: 
+  - Step 1: Select the tool in the upper right corner. The tool is enabled when you see the crosshair cursor.  
+  - Step 2: Click and release to set the first corner of the bounding box (no need to hold the cursor). The box outlines will appear and will move with your cursor.  
+  - Step 3: Once you have drawn the box as desired, click once more to close the box. The tool will automatically turn off. Repeat all steps if you still need to select more areas. 
+- Autocomplete Search – match data files against geography names or addresses by typing in the Search field.
+
+[DX_userguide_12.png]
+
+### Data Files List 
+
+In this section, you will see a list of available Data Files. If you have used any of the above Search features, the relevant files will automatically be selected in this list. List filter options include: ‘Show Selected', ‘Select all', and 'Unselect all’. You can also manually select and deselect individual Data Files. 
+
+If there is a preview available, that file will appear as the first item in the list. For map layers, this resource is tagged as a ‘Layer’. See Previewing Data section for what you can do with these resource types.
+
+[DX_userguide_13.png]
+
+### Downloading Data Files 
+
+In many cases, you will be able to download data directly from the Dataset Detail page. You will know a Data File can be downloaded if you see the square ‘Download’ button (when module is expanded).
+
+To download a **single** Data File:
+
+- Step 1: Click the square ‘Download’ button. If multiple file formats are available, a dropdown list will appear. Make a selection to proceed. 
+- Step 2: Fill out and submit the form. (You may also dismiss the form by clicking ‘No thank you”)  
+- Step 3: A download will begin directly in your browser
+
+[DX_userguide_14.png]
+
+You may also download **multiple** Data Files at once. To download a **batch** of Data Files: 
+
+- Step 1: Select multiple Data Files. You can do this by manually checking the selection box for each file, or by using Search features to dynamically select relevant files. 
+- Step 2: A button will appear at the top of the Data Files list that says “Download Selected Data Files” 
+- Step 3: Fill out and submit the form. This form cannot be dismissed. You must provide your email address to receive the files. You might not see this form if you have previously opted into WRI communications on Data Explorer. See Privacy Policy and Cookie Preferences (both links in footer) for more details. 
+- Step 4: Check your email for a link to download your zipped files.
+
+[DX_userguide_15.png]
+
+### Accessing Data Files via non-downloadable link 
+
+Some data files live outside the Data Explorer and cannot be directly downloaded. This may be for licensing reasons or because there is additional security on the data’s external storage location. For these types of resources: 
+
+- Step 1: Click the square 'Access the Data’ button nested within in. 
+- Step 2: Fill out and submit the form. (You may also dismiss the form by clicking ‘No thank you”) 
+- Step 3: A link to the data will open in a new tab
+
+[DX_userguide_16.png]
+
+### Accessing Data Files via tile cache link or Google Earth Engine 
+
+For data stored on a **tile cache server** and not easily accessible in a browser or as a download, you will see a “copy to clipboard” input instead of a large button. Simply hit the copy button to grab the provided URL for use in your GIS application of choice.
+
+[DX_userguide_tilecache.png]
+
+For data that lives on **Google Earth Engine**, a similar “copy to clipboard” input will appear. Instead of a URL, the copy button will grab the GEE asset ID, which can be used in GEE’s Editor.
+
+[DX_userguide_GEE.png]
+
+### Using API Endpoints 
+
+Similar to what appears in the API tab, you can get metadata via API: 
+
+- Step 1: Click the square ‘API Endpoints’ button.  
+- Step 2: Select from the available programming options (Query, Javascript, Python, or R) and copy the provided code to get the Dataset’s metadata. 
+
+For more information on the CKAN API, see the [CKAN API documentation](https://docs.ckan.org/en/2.10/api/index.html). For the Datastore API, see the [Datastore API documentation](https://docs.ckan.org/en/2.10/maintaining/datastore.html). Also, see [GFW API key documentation](https://www.globalforestwatch.org/help/developers/guides/create-and-use-an-api-key/) to generate an API token to access the raw file.
+
+## Previewing Data 
+
+Data files may support a visual preview in the form of a table, chart, or map. If a preview is available, it will load by default as a flyout on the right, which can collapse.
+
+### Tabular Preview 
+
+If a tabular file supports preview, a **View Table Preview** button will appear with the file listing under Data Files. Features include:
+
+- Pagination 
+- **Download data** button for filtered results 
+- **Sort** columns (ascending/descending) 
+- **Pin** columns to the left 
+- **Show/Hide** columns using the **Show Columns** menu 
+- **Filter** data by column using the funnel icon
+
+### Chart Preview 
+
+Some files offer a **View Chart Preview** option. Features include: 
+
+- Predefined chart options from a dropdown menu 
+- Copy iframe code to embed the chart 
+- Download snapshot via the camera icon
+
+### Map Preview 
+
+Datasets with geospatial data show a map with interactive tools. Features include:
+
+- **Basic Map Controls** – Zoom In, Zoom Out, Geolocation Search 
+- **Map Settings** – Change basemap and label styling 
+- **Export As** – Embed the map elsewhere using the embed code 
+- **Legend** – Reorder, hide, or change opacity of layers; select a different threshold value (if other thresholds are available) 
+- **Add Layers** from other Datasets – Click ‘+ Add Layers’ on the map preview for a list of other Datasets to ‘Add to Map’. If you’ve added additional layers to the map, this will also be reflected in the legend (bottom right). Reordering layers in the legend will also affect how the layers are layered on top of each other.
+
+[DX_userguide_17.png] 
+[DX_userguide_18.png] 
+[DX_userguide_19.png] 
+
+
