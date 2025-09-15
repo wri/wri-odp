@@ -6,7 +6,7 @@ export default function Page() {
         <MdxLayout
             label="User Guide"
             url="/user-guide"
-            title="WRI Data Explorer User Guide for all Users"
+            title="Data Explorer User Guide"
         >
             <TableContent />
         </MdxLayout>
