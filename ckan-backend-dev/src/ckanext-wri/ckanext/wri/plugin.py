@@ -382,8 +382,6 @@ class WriPlugin(plugins.SingletonPlugin):
             log.critical(e)
             pass
 
-    # IPackageController
-
     def after_dataset_create(self, context, pkg_dict):
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
@@ -393,6 +391,17 @@ class WriPlugin(plugins.SingletonPlugin):
         #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
+        # We want to ignore changes when its only setting approve to pending
+        if context.get('original_metadata_modified'):
+            model = context['model']
+            original_timestamp = context.get('original_metadata_modified')
+            if original_timestamp:
+                model.Session.query(model.Package).filter_by(
+                    id=pkg_dict['id']
+                ).update({"metadata_modified": original_timestamp})
+                model.Session.commit()
+                # Update the returned dict to reflect the restored timestamp
+                pkg_dict['metadata_modified'] = original_timestamp.isoformat()
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment
@@ -472,9 +481,6 @@ class WriPlugin(plugins.SingletonPlugin):
         # spatial field is geojson coordinate data, not needed in SOLR either
         pkg_dict.pop("extras_spatial", None)
         pkg_dict.pop("spatial", None)
-
-        print("PACKAGE DICT", flush=True)
-        print(pkg_dict, flush=True)
         return pkg_dict
 
     def before_dataset_search(self, search_params):

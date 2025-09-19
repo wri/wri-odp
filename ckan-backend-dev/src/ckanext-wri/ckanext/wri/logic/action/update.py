@@ -26,6 +26,8 @@ from ckan.common import _
 import json
 import requests
 from ckanext.wri.logic.action.get import validate_visibility
+import json
+from typing import Any, Dict, List, Tuple
 
 # encoding: utf-8
 
@@ -287,9 +289,122 @@ def package_patch(context: Context, data_dict: DataDict):
             )
     return pending_update.get("package_data")
 
+def find_differences(original: Dict[str, Any], new: Dict[str, Any], path: str = "") -> List[Tuple[str, Any, Any]]:
+    """
+    Recursively find differences between two dictionaries.
+    
+    Returns:
+        List of tuples containing (field_path, original_value, new_value)
+    """
+    differences = []
+    
+    # Check all keys in both dictionaries
+    all_keys = set(original.keys()) | set(new.keys())
+    
+    for key in all_keys:
+        current_path = f"{path}.{key}" if path else key
+        
+        # Key only in original
+        if key in original and key not in new:
+            differences.append((current_path, original[key], None))
+        
+        # Key only in new
+        elif key not in original and key in new:
+            differences.append((current_path, None, new[key]))
+        
+        # Key in both - check values
+        else:
+            original_val = original[key]
+            new_val = new[key]
+            
+            # If both are dictionaries, recurse
+            if isinstance(original_val, dict) and isinstance(new_val, dict):
+                differences.extend(find_differences(original_val, new_val, current_path))
+            
+            # If both are lists, compare them
+            elif isinstance(original_val, list) and isinstance(new_val, list):
+                list_diffs = compare_lists(original_val, new_val, current_path)
+                differences.extend(list_diffs)
+
+                  # Consider equivalent "empty" values as equal
+            elif are_equivalent_empty_values(original_val, new_val):
+                pass
+            
+            elif original_val != new_val:
+                differences.append((current_path, original_val, new_val))
+    
+    return differences
+
+def are_equivalent_empty_values(val1: Any, val2: Any) -> bool:
+    empty_equivalents = [
+        (None, {}),
+        (None, "{}"),
+        ({}, None),
+        ("{}", None),
+        (None, []),
+        ([], None),
+        (None, ""),
+        ("", None),
+        ({}, []),
+        ("{}", []),
+        ([], {}),
+        ([], "{}"),
+    ]
+    
+    for a, b in empty_equivalents:
+        if (val1 == a and val2 == b) or (val1 == b and val2 == a):
+            return True
+    return False
+
+def compare_lists(original_list: List[Any], new_list: List[Any], path: str) -> List[Tuple[str, Any, Any]]:
+    """Compare two lists and find differences."""
+    differences = []
+    
+    # Compare lengths
+    if len(original_list) != len(new_list):
+        differences.append((f"{path}[length]", len(original_list), len(new_list)))
+    
+    # Compare elements up to the shorter length
+    min_length = min(len(original_list), len(new_list))
+    for i in range(min_length):
+        if isinstance(original_list[i], dict) and isinstance(new_list[i], dict):
+            differences.extend(find_differences(original_list[i], new_list[i], f"{path}[{i}]"))
+        elif original_list[i] != new_list[i]:
+            differences.append((f"{path}[{i}]", original_list[i], new_list[i]))
+    
+    # Handle extra elements in longer list
+    if len(original_list) > min_length:
+        for i in range(min_length, len(original_list)):
+            differences.append((f"{path}[{i}]", original_list[i], None))
+    
+    if len(new_list) > min_length:
+        for i in range(min_length, len(new_list)):
+            differences.append((f"{path}[{i}]", None, new_list[i]))
+    
+    return differences
+
+def only_ignored_fields_changed(original_pkg, new_pkg):
+    ignore_fields = {
+        'approval_status',
+        'metadata_modified',
+        'schema'
+    }
+    differences = find_differences(original_pkg, new_pkg)
+    # Filter out ignored fields (by field path suffix)
+    differences = [
+        d for d in differences if not any(d[0].endswith(field) for field in ignore_fields)
+    ]
+    if len(differences) > 0:
+        log.info(f"Differences: {differences[0]}")
+    if len(differences) == 0:
+        return True
+    for difference in differences:
+        log.info(f"Dataset {new_pkg['name']} has changed field {difference[0]} from {difference[1]} to {difference[2]}")
+    return False
 
 # IMPORTANT: This function includes an override/change for authors/maintainers (the call to stringify_actor_objects).
 # This is not a 1:1 match with the original function, though all other logic is the same.
+# Besides that, it also includes a check to see if only the approval_status field was changed
 def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.PackageUpdate:
     """Update a dataset (package).
 
@@ -327,6 +442,7 @@ def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.Pa
         raise ValidationError({"id": _("Missing value")})
 
     pkg = model.Package.get(name_or_id)
+    old_pkg = tk.get_action("package_show")(context, {"id": name_or_id})
     if pkg is None:
         raise NotFound(_("Package was not found."))
     context["package"] = pkg
@@ -442,6 +558,15 @@ def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.Pa
             context, {"id": data_dict["id"], "include_plugin_data": include_plugin_data}
         )
     )
+    new_pkg = tk.get_action("package_show")(context, {"id": data_dict["id"]})
+    if only_ignored_fields_changed(old_pkg, new_pkg):
+        log.info("Only ignored fields changed, making sure metadata_modified is not updated")
+        context['original_metadata_modified'] = old_pkg['metadata_modified']
+        model.Session.query(model.Package).filter_by(
+                        id=pkg.id
+        ).update({"metadata_modified": old_pkg['metadata_modified']})
+        model.Session.commit()
+        output['metadata_modified'] = old_pkg['metadata_modified']
     return output
 
 
