@@ -21,7 +21,7 @@ describe("Create dataset via tabbing", () => {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
-  // This test is a bit fragile due to so many tabs, differences between 
+  // This test is a bit fragile due to so many tabs, differences between
   // headless electron (even with the same version locally and in CI), etc.
   // Any slight change to the form can break it.
   it("Should tab through the create dataset form without validation errors", () => {
@@ -36,9 +36,12 @@ describe("Create dataset via tabbing", () => {
     cy.tab().realPress([...dataset]);
 
     // Team
-    cy.tabTo({ selector: "#team" })
+    cy.tabTo({ selector: "#team", timeout: 10000 })
+      .should("be.visible")
+      .should("be.focused")
       .type(org)
       .realPress(["Enter"])
+      .wait(500)
       .realPress([...org])
       .realPress(["Enter"]);
 
