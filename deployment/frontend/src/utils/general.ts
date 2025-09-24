@@ -121,6 +121,8 @@ export function matchesAnyPattern(item: string): boolean {
         /preview/,
         /hash/,
         /total_record_count/,
+        /organization.visibility/,
+        /num_resources/,
     ]
     return !patterns.some((pattern) => pattern.test(item))
 }
