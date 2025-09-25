@@ -51,7 +51,7 @@ export default function Search({
             id="search"
             className="flex h-[245px] w-full flex-col bg-cover bg-center justify-center  bg-no-repeat font-acumin"
             style={{
-                backgroundImage: 'url(/images/bg.png)',
+                backgroundImage: 'url(/images/banner-search.png)',
             }}
         >
             <form
@@ -98,7 +98,7 @@ export default function Search({
             >
                 <div className="w-full max-w-[819px] xxl:pl-8 2xl:px-0 ">
                     <h1 className="text-[40px]  leading-[48px] font-['Acumin Pro SemiCondensed'] font-semibold text-white mb-[25px]">
-                        Search datasets
+                        Search Datasets
                     </h1>
                 </div>
                 <div className="relative flex w-full max-w-[819px] items-start justify-start gap-x-6 xxl:pl-8 2xl:px-0 h-[54.393px] ">

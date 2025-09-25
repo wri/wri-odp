@@ -10,6 +10,8 @@ import { api } from '@/utils/api'
 import { convertBytes } from '@/utils/convertBytes'
 import {
     ArrowDownTrayIcon,
+    ArrowTopRightOnSquareIcon,
+    LinkIcon,
     PaperAirplaneIcon,
 } from '@heroicons/react/24/outline'
 import { env } from '@/env.mjs'
@@ -101,7 +103,7 @@ export function DownloadButton({
             package_id: datafile.package_id ?? '',
             acceptTerms: true,
             typeOfForm: 'direct-download' as any,
-            package_name: datafile.title ?? datafile.name!,
+            package_name: `${dataset.name}: ${datafile.title ?? datafile.name}`,
         }
         createDownloadEvent.mutate(_data)
     }
@@ -155,8 +157,17 @@ export function DownloadButton({
         return (
             <>
                 <DirectDownloadPopup
-                    title="Download Data"
+                    title={
+                        datafile.not_downloadable
+                            ? 'Tell us about yourself'
+                            : 'Download Data'
+                    }
                     isOpen={showDownloadForm}
+                    subtitle={
+                        datafile.not_downloadable
+                            ? 'The data you’re looking for is located outside the Data Explorer. Before directing you to the Dataset’s location, we’d love to learn more about you.'
+                            : ''
+                    }
                     onClose={() => setShowDownloadForm(false)}
                     dataset={dataset}
                     onSubmit={handleFormSubmit}
@@ -175,7 +186,9 @@ export function DownloadButton({
                             onClick={handleSkip}
                             className="whitespace-nowrap underline"
                         >
-                            No thanks, proceed to download
+                            {datafile.not_downloadable
+                                ? 'No thanks, proceed to data'
+                                : 'No thanks, proceed to download'}
                         </button>
                     }
                 />
@@ -185,11 +198,17 @@ export function DownloadButton({
                     data-resource={datafile.title ?? datafile.name!}
                     className="cursor-pointer download-datafile w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400"
                 >
-                    <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                    {datafile.not_downloadable ? (
+                        <ArrowTopRightOnSquareIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                    ) : (
+                        <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                    )}
                     <div className="font-acumin text-xs sm:text-sm font-normal text-black">
                         {isLoading && mode == 'SIGNED_URL'
                             ? 'Loading'
-                            : 'Download'}
+                            : datafile.not_downloadable
+                              ? 'Access the Data'
+                              : 'Download'}
                     </div>
                     {size && (
                         <div className="font-acumin text-xs sm:text-xs font-normal text-black">
@@ -203,8 +222,17 @@ export function DownloadButton({
     return (
         <>
             <DirectDownloadPopup
-                title="Download Data"
+                title={
+                    datafile.not_downloadable
+                        ? 'Tell us about yourself'
+                        : 'Download Data'
+                }
                 isOpen={showDownloadForm}
+                subtitle={
+                    datafile.not_downloadable
+                        ? 'The data you’re looking for is located outside the Data Explorer. Before directing you to the Dataset’s location, we’d love to learn more about you.'
+                        : ''
+                }
                 onClose={() => setShowDownloadForm(false)}
                 onSubmit={handleFormSubmit}
                 dataset={dataset}
@@ -214,7 +242,7 @@ export function DownloadButton({
                         className="whitespace-nowrap"
                         type="submit"
                     >
-                        Sign up
+                        Submit
                     </LoaderButton>
                 }
                 skipButton={
@@ -223,17 +251,25 @@ export function DownloadButton({
                         type="button"
                         className="whitespace-nowrap underline"
                     >
-                        No thanks, proceed to download
+                        {datafile.not_downloadable
+                            ? 'Not thanks, proceed to data'
+                            : 'No thanks, proceed to download'}
                     </button>
                 }
             />
             <Popover>
                 <Component className="download-datafile w-full flex aspect-square flex-col items-center justify-center md:gap-y-2 rounded-sm border-2 border-wri-green bg-white shadow transition hover:bg-amber-400">
-                    <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                    {datafile.not_downloadable ? (
+                        <ArrowTopRightOnSquareIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                    ) : (
+                        <ArrowDownTrayIcon className="h-5 w-5 sm:h-9 sm:w-9" />
+                    )}
                     <div className="font-acumin text-xs sm:text-sm font-normal text-black">
                         {isLoading && mode == 'SIGNED_URL'
                             ? 'Loading'
-                            : 'Download'}
+                            : datafile.not_downloadable
+                              ? 'Access the Data'
+                              : 'Download'}
                     </div>
                     {size && (
                         <div className="font-acumin text-xs sm:text-xs font-normal text-black">
@@ -308,7 +344,7 @@ export function DownloadButton({
             </Popover>
             {convertTo && (
                 <DownloadPopup
-                    title="The selected datafiles are being prepared for download"
+                    title="The selected Data Files are being prepared for download"
                     subtitle="Please enter your information so that you receive the download link via email"
                     isOpen={open}
                     onClose={() => setOpen(false)}

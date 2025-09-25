@@ -137,6 +137,14 @@ If you want to just link some data that lives outside the system, you can just s
 
 ![Link datafile](./link_external_file.png)
 
+If you want to link a tilecache URL you can click on ¨Define a tile cache link", this is essentially a resource with `url_type` set to `tilecache` and with the `cache_type` field set to 'raster' or 'vector'
+
+![Link tilecache](./select_tile_cache.png)
+
+If you want to describe a GEE Asset you can click on ¨Link to GEE Asset", this is essentially a resource with `url_type` set to `gee-asset` and with the `asset_type` field set to 'raster' or 'vector' and the `asset_id` field pointing to the asset id in GEE.
+
+![Link gee-asset](./select_gee_asset.png)
+
 You can add multiple datafiles by selecting the `Add another datafile button`
 
 ![Add another datafile](./add_another_datafile.png)
@@ -180,6 +188,16 @@ You can edit the already existing ones by changing the values in the input field
 You can also delete a datafile by clicking the little red button next to the datafile id
 
 ![Delete datafile](./delete_datafile.png)
+
+## Disable betch downloading for datafile
+
+If you want to disable the downloading of a datafile, you can do that by clicking on the `This is not a downloadable link`, this will disable the ability for users to select the datafile to receive an email download, usecases can vary from when you dont want this data to be moved to the data-explorer servers location or when the data is not a file but rather a webpage for example.
+
+![Disable batch download](./not_downloadable_checkbox.png)
+
+This will be the resulting UI
+
+![Disable batch download resulting ui](./not_downloadable_result.png)
 
 ## Collaborators
 

@@ -23,7 +23,9 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import 'cypress-terminal-report/src/installLogsCollector';
 import "cypress-axe";
+import 'cypress-plugin-tab';
 
 const cypressUpload = require("cypress-file-upload");
 const headers = { Authorization: Cypress.env("API_KEY") };
@@ -39,7 +41,22 @@ const apiUrl = (path) => {
 
 Cypress.Commands.add("login", (username, password) => {
   cy.session([username, password], () => {
+    cy.on('window:before:load', (win) => {
+      const origAppendChild = win.document.head.appendChild;
+      win.document.head.appendChild = function(el) {
+        if (el.tagName === 'SCRIPT' && el.src && el.src.includes('osano')) {
+          return; // block injection
+        }
+        return origAppendChild.call(this, el);
+      };
+    });
     cy.visit("/");
+    cy.get('body').then(($body) => {
+      if ($body.find('.osano-cm-manage').length) {
+        cy.get('.osano-cm-manage').click({ force: true });
+        cy.contains('button', 'Save').click({ force: true });
+      }
+    });
     cy.get("#nav-login-button").click();
     cy.get("#login-modal").as("login-modal");
 
@@ -204,15 +221,24 @@ Cypress.Commands.add("deleteOrganization", (orgName) => {
 });
 
 // Command for frontend test sepecific
-Cypress.Commands.add("createOrganizationAPI", (name) => {
+Cypress.Commands.add("createOrganizationAPI", (name, visibility = "public", parent = null) => {
   cy.request({
     method: "POST",
     url: apiUrl("organization_create"),
     headers: headers,
-    body: {
-      name: name,
-      title: name,
-      description: "Some organization description",
+    body: parent
+      ? {
+          name: name,
+          title: name,
+          description: "Some organization description",
+          visibility: visibility,
+          groups: [{ name: parent }],
+        }
+      : {
+          name: name,
+          title: name,
+          description: "Some organization description",
+          visibility: visibility,
     },
   });
 });
@@ -228,7 +254,7 @@ Cypress.Commands.add(
       body: {
         id: org,
         username: member,
-        role,
+        role: role,
       },
     });
   }
@@ -644,3 +670,117 @@ Cypress.Commands.add(
     );
   }
 );
+
+Cypress.Commands.add('tabTo', (opts = {}) => {
+  /* Tabs through the page until the element matching `selector` is focused,
+  or tabs `numberOfTabs` times. If both are provided, it will tab the given number of times
+  and then assert that the given selector is focused.
+
+  Usage:
+    cy.tabTo({ selector: '#team' })
+    cy.tabTo({ selector: '#team', numberOfTabs: 5 })
+    cy.tabTo({ numberOfTabs: 5 })
+
+  Options:
+    - selector: (string) CSS selector of the element to focus
+    - numberOfTabs: (number) Number of times to tab
+    - max: (number, default 100) Maximum number of tabs to perform when searching
+      for the selector. Prevents infinite loops if the selector is not found.
+      Ignored if numberOfTabs is provided.
+  */
+  const { selector, numberOfTabs = 0, max = 100 } = opts;
+  if (!selector && numberOfTabs === 0) throw new Error('tabTo: selector or numberOfTabs required');
+
+  const ensureAnchor = () =>
+    cy.window({ log: false }).then(w => { if (!w.document.hasFocus()) w.focus(); })
+      .then(() => cy.document({ log: false }).then(doc => {
+        return (doc.activeElement && doc.activeElement !== doc.body)
+          ? cy.wrap(doc.activeElement, { log: false })
+          : cy.get('body', { log: false }).click('topLeft', { force: true });
+      }));
+
+  const tabNFrom = (startChain, n) => {
+    let c = startChain;
+    for (let i = 0; i < n; i++) c = c.tab();
+    return c;
+  };
+
+  if (numberOfTabs > 0) {
+    return ensureAnchor()
+      .then(() => cy.focused())
+      .then($start => {
+        const r = tabNFrom(cy.wrap($start), numberOfTabs);
+        return selector ? r.should('match', selector) : r;
+      });
+  }
+
+  return ensureAnchor().then(() => {
+    const step = (i = 0) =>
+      cy.focused().then($el => {
+        if ($el.is(selector)) return cy.wrap($el);
+        if (i >= max) throw new Error(`tabTo(${selector}) exceeded ${max} tabs`);
+        return cy.wrap($el).tab().then(() => step(i + 1));
+      });
+    return step();
+  });
+});
+
+Cypress.Commands.add('headlessLog', (...args) => {
+  /* Outputs debug information to the terminal.
+  Should work similarly to `console.log`.
+
+  Example usage:
+    const datasetTitle = "Dataset Test " + Math.random().toString(36).slice(2);
+    cy.debugLog("Dataset Title: ", datasetTitle);
+
+  Example output:
+    Dataset Title: Dataset Test 1a2b3c4d5e6f7g8h9i0j
+  */
+  cy.task('headlessLog', { args });
+});
+
+Cypress.Commands.add('dumpFocus', (label = '') => {
+  /* Output info about the currently focused element to the terminal and take a screenshot of the current step.
+  The screenshot is saved to the default screenshots folder with the name 'step-N.png'.
+  Useful for debugging tabbing sequences or other focus-related issues in headless mode.
+
+  It also highlights the focused element with a red outline and takes a screenshot of the viewport at every step.
+
+  Example usage:
+    cy.get('input[name=title]').click().realPress([...datasetName]);
+    cy.dumpFocus("after dataset title");
+
+  Example output:
+    STEP "after dataset title": {
+      "tag": "INPUT",
+      "id": null,
+      "name": "name",
+      "role": null,
+      "tabIndex": 0,
+      "text": "",
+      "class": "shadow-wri-small block w-full rounded-md border-0 px-5 py-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 disabled:bg-gray-100 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 min-w-0 pl-[5.9rem] sm:pl-[5.6rem] md:pl-[5.2rem] lg:pl-[5.4rem]"
+    }
+  */
+  cy.document({ log: false }).then(doc => {
+    const el = doc.activeElement;
+    const info = el && el !== doc.body ? {
+      tag: el.tagName,
+      id: el.id || null,
+      name: el.getAttribute('name'),
+      role: el.getAttribute('role'),
+      tabIndex: el.tabIndex,
+      text: (el.innerText || '').slice(0, 80),
+      class: el.className,
+    } : 'BODY/none';
+
+    if (el && el.style) {
+      el.dataset.__oldOutline = el.style.outline || '';
+      el.style.outline = '3px solid red';
+    }
+
+    cy.headlessLog(`${label}:`, info);
+    cy.screenshot(`step-${label}`, { capture: 'viewport' }).then(() => {
+      if (el && el.style) el.style.outline = el.dataset.__oldOutline || '';
+    });
+  });
+});

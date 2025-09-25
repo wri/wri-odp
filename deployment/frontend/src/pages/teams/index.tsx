@@ -18,6 +18,7 @@ import { Index } from 'flexsearch'
 import { Organization as CkanOrg } from '@portaljs/ckan'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
 import TopicsSearch from '@/components/topics/TopicsSearch'
+import TeamsSearch from '@/components/team/TeamsSearch'
 
 const TeamsSearchResults = dynamic(
     () => import('@/components/team/TeamsSearchResults')
@@ -69,7 +70,7 @@ export default function TeamsPage(
                 team.id,
                 JSON.stringify({
                     title: team.title,
-                    description: team.description,
+                    description: team.description || team.notes,
                 })
             )
         })
@@ -79,10 +80,16 @@ export default function TeamsPage(
         if (!data) return { teams: [], teamsDetails: {}, count: 0 }
         const filteredTeams =
             query !== ''
-                ? (data?.allTeams?.filter((t) =>
-                      indexTeams.search(query).includes(t.id)
-                  ) ?? [])
-                : data.teams
+                ? (data?.allTeams
+                      ?.filter((t) => indexTeams.search(query).includes(t.id))
+                      .filter(
+                          (obj, index, self) =>
+                              index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+                      ) ?? [])
+                : data.teams.filter(
+                      (obj, index, self) =>
+                          index === self.findIndex((t) => t.id === obj.id)
+                  ) // Compare based on 'id' property
         const teams = filteredTeams.slice(
             pagination.page.start,
             pagination.page.start + pagination.page.rows
@@ -123,7 +130,7 @@ export default function TeamsPage(
                         a specific WRI project or team.
                         <br />
                         If you have questions about a project&apos;s data reach
-                        out to the point of contact in the dataset or to{' '}
+                        out to the point of contact in the Dataset or to{' '}
                         <a
                             href="mailto:data@wri.org"
                             className="text-blue-700 underline"

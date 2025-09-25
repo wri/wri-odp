@@ -114,19 +114,19 @@ describe("Dashboard Test", () => {
 
   it("Should test activity stream", () => {
     cy.visit("/dashboard/activity-stream");
-    cy.contains(`${ckanUserName} created the dataset ${datasetName}`);
+    cy.contains(`${ckanUserName} created the Dataset ${datasetName}`);
     cy.get('[id^="headlessui-listbox-button"]').first().click();
     cy.contains('[role="option"]', "new").click();
-    cy.contains(`${ckanUserName} created the dataset ${datasetName}`);
+    cy.contains(`${ckanUserName} created the Dataset ${datasetName}`);
   });
   it("Should test activity stream select", () => {
     cy.visit("/dashboard/activity-stream");
-    cy.contains(`${ckanUserName} created the dataset ${datasetName}`);
+    cy.contains(`${ckanUserName} created the Dataset ${datasetName}`);
     cy.get('[id^="headlessui-listbox-button"]').eq(1).click();
-    cy.contains('[role="option"]', "teams").click();
+    cy.contains('[role="option"]', "Teams").click();
     cy.get('[id^="headlessui-listbox-button"]').eq(2).click();
     cy.contains('[role="option"]', `${parentOrg}`).click();
-    cy.contains(`${ckanUserName} created the dataset ${datasetName}`);
+    cy.contains(`${ckanUserName} created the Dataset ${datasetName}`);
   });
 
   it("Should test user form", () => {
@@ -157,7 +157,7 @@ describe("Dashboard Test", () => {
       .first()
       .click({ force: true });
     cy.get(`button#${datasetName2}`).click();
-    cy.contains(`Successfully deleted the ${datasetName2} dataset`);
+    cy.contains(`Successfully deleted the ${datasetName2} Dataset`);
   });
   it("should delete Team", () => {
     cy.visit("/dashboard/teams");
@@ -167,7 +167,7 @@ describe("Dashboard Test", () => {
       .first()
       .click({ force: true });
     cy.get(`button#${parentOrg2}`).click();
-    cy.contains(`Successfully deleted the ${parentOrg2} team`);
+    cy.contains(`Successfully deleted the ${parentOrg2} Team`);
   });
 
   it("should delete application", () => {
@@ -177,7 +177,7 @@ describe("Dashboard Test", () => {
       .first()
       .click({ force: true });
     cy.get(`button#${application}`).click();
-    cy.contains(`Successfully deleted the ${application} application`);
+    cy.contains(`Successfully deleted the ${application} Application`);
   });
 
   it("should delete topic", () => {
@@ -186,7 +186,7 @@ describe("Dashboard Test", () => {
     cy.contains(group).should("exist", { timeout: 15000 });
     cy.get(`button#delete-tooltip-${group}`).first().click({ force: true });
     cy.get(`button#${group}`).click();
-    cy.contains(`Successfully deleted the ${group} topic`);
+    cy.contains(`Successfully deleted the ${group} Topic`);
   });
 
   it(
@@ -200,7 +200,7 @@ describe("Dashboard Test", () => {
     () => {
       cy.viewport(1440, 900);
       cy.visit("/dashboard/notifications");
-      cy.contains("deleted dataset");
+      cy.contains("deleted Dataset");
       cy.get("#select_all_notifications").click();
       cy.get("#markasread_hidden").click({ force: true });
       cy.get("#headlessui-portal-root", { timeout: 15000, force: true }).then(

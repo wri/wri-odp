@@ -21,6 +21,7 @@ import GeocoderControl from '@/components/search/GeocoderControl'
 import { Layer, Map, Source } from 'react-map-gl'
 import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner'
+import { HideBoundaries } from '@/components/_shared/HideBoundaries'
 
 export function LocationForm({
     formObj,
@@ -96,7 +97,7 @@ export function LocationForm({
                 <>
                     <MapPinIcon className="h-7 w-7" />
                     Location Coverage
-                    <DefaultTooltip content="This field defines whether a dataset will show up on the results or not when doing a search by location">
+                    <DefaultTooltip content="Complete this section if the Dataset should be included in search results when doing a search by location">
                         <InformationCircleIcon
                             className="h-5 w-5 text-neutral-500"
                             aria-hidden="true"
@@ -137,18 +138,23 @@ export function LocationForm({
                                 setValue('spatial_address', null)
                             }}
                             id="tabUpload"
-                            className={classNames(
-                                'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2'
-                            )}
                         >
-                            <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                            <div
-                                className={classNames(
-                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
-                                )}
-                            >
-                                Upload a GeoJSON file
-                            </div>
+                            <DefaultTooltip content="Upload a GeoJSON file when the desired area cannot be mapped directly to an administrative boundary">
+                                <span
+                                    className={classNames(
+                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2'
+                                    )}
+                                >
+                                    <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                    <div
+                                        className={classNames(
+                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm'
+                                        )}
+                                    >
+                                        Upload a GeoJSON file
+                                    </div>
+                                </span>
+                            </DefaultTooltip>
                         </Tab>
                         <Tab
                             id="tabLink"
@@ -185,22 +191,24 @@ export function LocationForm({
                             }}
                         >
                             {({ selected }) => (
-                                <span
-                                    className={classNames(
-                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                        selected ? 'bg-amber-400' : ''
-                                    )}
-                                >
-                                    <GlobeEuropeAfricaIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                    <div
+                                <DefaultTooltip content="Select this option to indicate that the Dataset covers global geographic scope and will be available broadly across the Data Explorer">
+                                    <span
                                         className={classNames(
-                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
-                                            selected ? 'font-bold' : ''
+                                            'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                            selected ? 'bg-amber-400' : ''
                                         )}
                                     >
-                                        Global Dataset
-                                    </div>
-                                </span>
+                                        <GlobeEuropeAfricaIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                        <div
+                                            className={classNames(
+                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                selected ? 'font-bold' : ''
+                                            )}
+                                        >
+                                            Global Dataset
+                                        </div>
+                                    </span>
+                                </DefaultTooltip>
                             )}
                         </Tab>
                         <Tab
@@ -215,22 +223,24 @@ export function LocationForm({
                             }}
                         >
                             {({ selected }) => (
-                                <span
-                                    className={classNames(
-                                        'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                        selected ? 'bg-amber-400' : ''
-                                    )}
-                                >
-                                    <FolderArrowDownIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
-                                    <div
+                                <DefaultTooltip content="Select this option if the Dataset’s location should be derived from the combined locations of all included Data Files.">
+                                    <span
                                         className={classNames(
-                                            'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
-                                            selected ? 'font-bold' : ''
+                                            'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                            selected ? 'bg-amber-400' : ''
                                         )}
                                     >
-                                        Derived from Datafiles
-                                    </div>
-                                </span>
+                                        <FolderArrowDownIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                        <div
+                                            className={classNames(
+                                                'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                selected ? 'font-bold' : ''
+                                            )}
+                                        >
+                                            Derived from Datafiles
+                                        </div>
+                                    </span>
+                                </DefaultTooltip>
                             )}
                         </Tab>
                     </Tab.List>
@@ -245,6 +255,7 @@ export function LocationForm({
                                     touchZoomRotate={false}
                                     initialViewState={{ zoom: 2 }}
                                 >
+                                    <HideBoundaries />
                                     <Source
                                         type="geojson"
                                         data={watch('spatial')}
@@ -280,6 +291,7 @@ export function LocationForm({
                                 dragRotate={false}
                                 touchZoomRotate={false}
                             >
+                                <HideBoundaries />
                                 <GeocoderControl
                                     mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
                                     position="bottom-right"
@@ -292,7 +304,9 @@ export function LocationForm({
                                     onClear={(e) => {
                                         setValue('spatial_address', '')
                                     }}
-                                    initialValue={watch('spatial_address') ?? undefined}
+                                    initialValue={
+                                        watch('spatial_address') ?? undefined
+                                    }
                                 />
                             </Map>
                         </Tab.Panel>

@@ -105,12 +105,18 @@ def package_update(up_func, context, data_dict):
         if package.owner_org:
             # if there is an owner org then we must have update_dataset
             # permission for that organization
-            if authz.users_role_for_group_or_org(package.owner_org, user) != "admin":
-                return {
-                    "success": False,
-                    "msg": _("User %s not authorized to edit package %s")
-                    % (str(user), package.id),
-                }
+            if authz.users_role_for_group_or_org(package.owner_org, user) not in ["admin", "editor"]:
+                 if not  (authz.has_user_permission_for_group_or_org(
+                    package.owner_org, user, "admin"
+                ) or authz.has_user_permission_for_group_or_org(
+                    package.owner_org, user, "editor"
+                )):
+                    return {
+                        "success": False,
+                        "msg": _("User %s not authorized to edit package %s")
+                        % (str(user), package.id),
+                    }
+
         else:
             if authz.check_config_permission("allow_dataset_collaborators"):
                 # if org-level auth failed, check dataset-level auth

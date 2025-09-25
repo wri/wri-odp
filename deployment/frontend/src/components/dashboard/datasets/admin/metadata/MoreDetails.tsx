@@ -38,9 +38,14 @@ export function MoreDetailsForm({
                         className="mb-2 flex flex-col items-start whitespace-nowrap sm:flex-col"
                     >
                         <Input
-                            placeholder="Please visit our website for more information: LINK TO WEBSITE"
+                            placeholder="https://wri.org"
                             {...register('learn_more')}
                             type="text"
+                            icon={
+                                <DefaultTooltip content="Optional field to add an additional URL related to the Dataset, such as a link to the original paper. This will appear as a ‘Learn More' button in the About section.">
+                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                </DefaultTooltip>
+                            }
                         />
                         <ErrorDisplay name="learn_more" errors={errors} />
                     </InputGroup>
@@ -80,6 +85,7 @@ export function MoreDetailsForm({
                     <InputGroup
                         label="Cautions"
                         className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                        info="Describe any quality issues or limitations that data users should know about"
                     >
                         <SimpleEditor
                             formObj={formObj}
@@ -103,13 +109,13 @@ export function MoreDetailsForm({
                         label={
                             <span className="relative flex items-center gap-x-1">
                                 Advanced API Usage
-                                    <DefaultTooltip
-                                        contentClassName="max-w-sm whitespace-normal lg:max-w-xl"
-                                        side="right"
-                                        content="This field will end up next to the API tab in the dataset page, you can use it to provide code samples that are useful for this particular data, the string {% DATASET_URL %} will get replaced with the actual url for this particular dataset"
-                                    >
-                                        <InformationCircleIcon className="h-5 w-5" />
-                                    </DefaultTooltip>
+                                <DefaultTooltip
+                                    contentClassName="max-w-sm whitespace-normal lg:max-w-xl"
+                                    side="right"
+                                    content="This field will end up next to the API tab in the Dataset page, you can use it to provide code samples that are useful for this particular data, the string {% DATASET_URL %} will get replaced with the actual url for this particular Dataset"
+                                >
+                                    <InformationCircleIcon className="h-5 w-5" />
+                                </DefaultTooltip>
                             </span>
                         }
                         className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"

@@ -10,6 +10,12 @@ import { env } from '@/env.mjs'
 import { api } from '@/utils/api'
 import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'
+import DefaultTooltip from '@/components/_shared/Tooltip'
+import {
+    ArrowsPointingInIcon,
+    ExclamationCircleIcon,
+    InformationCircleIcon,
+} from '@heroicons/react/24/outline'
 
 export default function TopicForm({
     formObj,
@@ -26,12 +32,15 @@ export default function TopicForm({
     } = formObj
     const possibleParents = api.topics.getAllTopics.useQuery()
     return (
-        <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
+        <div
+            id="topicsForm"
+            className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24"
+        >
             <div className="flex flex-col justify-start gap-y-4">
                 <InputGroup label="Title" required>
                     <Input
                         {...register('title')}
-                        placeholder="My topic"
+                        placeholder="My Topic"
                         type="text"
                     />
                     <ErrorDisplay name="title" errors={errors} />
@@ -41,6 +50,11 @@ export default function TopicForm({
                         {...register('name')}
                         disabled={editing}
                         placeholder="name-of-topic"
+                        icon={
+                            <DefaultTooltip content="Please choose a URL that is not already in use for another Topic, Team, or Application.">
+                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                            </DefaultTooltip>
+                        }
                         type="text"
                         className="pl-[4.6rem] lg:pl-[4rem]"
                     >
@@ -53,6 +67,7 @@ export default function TopicForm({
                 <InputGroup
                     label="Image"
                     className="items-start justify-start gap-x-[2.7rem]"
+                    info="Appears on /topics, /topics/topic-name, and homepage carousels. We recommend a horizontal image between 5-10 MB."
                 >
                     <div className="col-span-full lg:col-span-2">
                         <div className="w-[11rem]">
@@ -100,11 +115,15 @@ export default function TopicForm({
                                 <span className="mt-1">Loading parents...</span>
                             </span>
                         ))
-                        .with({ isError: true, errors: P.select() }, (errors) => (
-                            <span className="flex items-center text-sm text-red-600">
-                                Error({JSON.stringify(errors)}) loading parents, please refresh the page
-                            </span>
-                        ))
+                        .with(
+                            { isError: true, errors: P.select() },
+                            (errors) => (
+                                <span className="flex items-center text-sm text-red-600">
+                                    Error({JSON.stringify(errors)}) loading
+                                    parents, please refresh the page
+                                </span>
+                            )
+                        )
                         .with({ isSuccess: true, data: P.select() }, (data) => (
                             <SimpleSelect
                                 formObj={formObj}

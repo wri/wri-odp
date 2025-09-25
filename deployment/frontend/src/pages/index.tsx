@@ -22,6 +22,7 @@ import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/20/solid'
 import classNames from '@/utils/classnames'
 import { ApplicationsCarousel } from '@/components/home/ApplicationCarousel'
 import { ArrowRightIcon } from '@heroicons/react/24/solid'
+import { WriDataset } from '@/schema/ckan.schema'
 
 const ErrorAlert = dynamic<{ text: string; title?: string }>(
   () =>
@@ -139,7 +140,7 @@ export default function Home(
                 our Open Data Commitment
               </a>
               {'. '}
-              We are still in the process of adding more datasets
+              We are still in the process of adding more Datasets
               — check back regularly for updates. This page is
               managed by the{' '}
               <a
@@ -194,7 +195,7 @@ export default function Home(
                         : ''
                     )}
                   >
-                    Explore by application
+                    Explore by Application
                   </div>
                 )}
               </Tab>
@@ -284,7 +285,10 @@ export default function Home(
                   id="highlights"
                   className="max-w-[90.5vw] mx-auto flex flex-col font-acumin gap-y-6"
                 >
-                  <HighlightsCarousel />
+                  <Recent
+                    datasets={featuredDatasets.datasets as WriDataset[]}
+                    title="Featured Datasets"
+                  />
                 </div>
               )}
             </Tab.Panel>
@@ -295,7 +299,7 @@ export default function Home(
                 </div>
               ) : errorRecentlyAdded ? (
                 <ErrorAlert
-                  title="Failed to load recently added datasets"
+                  title="Failed to load recently added Datasets"
                   text={errorRecentlyAdded.message}
                 />
               ) : (
@@ -317,7 +321,7 @@ export default function Home(
                 </div>
               ) : errorRecentlyUpdated ? (
                 <ErrorAlert
-                  title="Failed to load recently updated datasets"
+                  title="Failed to load recently updated Datasets"
                   text={errorRecentlyUpdated.message}
                 />
               ) : (

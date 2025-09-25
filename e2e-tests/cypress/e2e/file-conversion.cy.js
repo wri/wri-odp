@@ -10,9 +10,13 @@ const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 // TODO: this test is not robust enoguh
-describe("Data files", () => {
+describe("Data Files", () => {
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
+  });
+
+  before(() => {
+    cy.createOrganizationAPI(org);
   });
 
   it("Should create dataset", () => {
@@ -21,6 +25,8 @@ describe("Data files", () => {
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("textarea[name=short_description]").type("test");
 
+    cy.get("#team").click();
+    cy.get("li").contains(org).click();
     cy.contains("Add Author").click();
     cy.get('input[name="authors.0.name"]').type("Test Author 1");
     cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
@@ -30,16 +36,22 @@ describe("Data files", () => {
 
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
-    cy.get('input[name="maintainers.0.email"]').type("test-maintainer-1@example.com");
+    cy.get('input[name="maintainers.0.email"]').type(
+      "test-maintainer-1@example.com",
+    );
     cy.contains("Add Maintainer").click();
     cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
-    cy.get('input[name="maintainers.1.email"]').type("test-maintainer-2@example.com");
+    cy.get('input[name="maintainers.1.email"]').type(
+      "test-maintainer-2@example.com",
+    );
 
-    cy.contains("Next: Datafiles").click();
-    cy.get('.datafile-accordion-trigger').eq(0).click()
-    cy.get("input[type=file]").eq(0).selectFile("cypress/fixtures/airtravel.csv", {
-      force: true,
-    });
+    cy.contains("Next: Data Files").click();
+    cy.get(".datafile-accordion-trigger").eq(0).click();
+    cy.get("input[type=file]")
+      .eq(0)
+      .selectFile("cypress/fixtures/airtravel.csv", {
+        force: true,
+      });
     cy.wait(5000);
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
@@ -60,10 +72,10 @@ describe("Data files", () => {
     () => {
       cy.visit("/dashboard/datasets/" + datasetName + "/edit");
       cy.contains("Data Files").click();
-      cy.get('.datafile-accordion-trigger').eq(0).click()
+      cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.contains("Datapusher").click();
-      cy.contains("Submit to Datapusher", { timeout: 50000}).click();
-      cy.contains(`Successfully submited datafile to the datapusher`, {
+      cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
+      cy.contains(`Successfully submited Data File to the datapusher`, {
         timeout: 15000,
       });
       cy.wait(15000);
@@ -75,4 +87,3 @@ describe("Data files", () => {
     cy.deleteDatasetAPI(datasetName);
   });
 });
-

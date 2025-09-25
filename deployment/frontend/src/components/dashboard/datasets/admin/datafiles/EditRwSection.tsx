@@ -37,14 +37,22 @@ export function EditRwSection({
     )
 
     const layers = fields.filter(
-        (r) => r.type !== 'upload' &&
+        (r) =>
+            r.type !== 'upload' &&
             r.type !== 'link' &&
-            r.type !== 'empty-file')
+            r.type !== 'empty-file' &&
+            r.type !== 'tile-cache' &&
+            r.type !== 'gee-asset'
+    )
 
     const notLayers = fields.filter(
-        (r) => r.type === 'upload' ||
+        (r) =>
+            r.type === 'upload' ||
             r.type === 'link' ||
-            r.type === 'empty-file')
+            r.type === 'empty-file' ||
+            r.type === 'tile-cache' ||
+            r.type === 'gee-asset'
+    )
 
     return (
         <>
@@ -98,6 +106,7 @@ export function EditRwSection({
                     onClick={() =>
                         append({
                             resourceId: uuidv4(),
+                            not_downloadable: false,
                             package_id: watch('id'),
                             title: '',
                             type: 'empty-layer',

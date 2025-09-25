@@ -54,7 +54,6 @@ export function EditDataFilesSection({
                     return (
                         <SortableItem key={field.id}>
                             <div>
-
                                 {field.new ? (
                                     <AddDataFile
                                         key={index}
@@ -88,6 +87,7 @@ export function EditDataFilesSection({
                             type: 'empty-file',
                             format: '',
                             new: true,
+                            not_downloadable: false,
                             schema: [],
                         })
                     }
@@ -95,7 +95,7 @@ export function EditDataFilesSection({
                 >
                     <PlusCircleIcon className="h-5 w-5 text-amber-400" />
                     <span className="font-['Acumin Pro SemiCondensed'] text-lg font-normal leading-tight text-black">
-                        Add another data file
+                        Add another Data File
                     </span>
                 </button>
             </div>

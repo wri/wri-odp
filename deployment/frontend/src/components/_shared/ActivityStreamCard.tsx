@@ -33,7 +33,7 @@ export default function ActivityStreamCard({ activity }: { activity: activity })
     new: "add",
     deleted: "update",
   }
-  
+
   return (
     <div className='w-full flex gap-x-3'>
       <DefaultTooltip content={activity.actionType}>
@@ -45,7 +45,7 @@ export default function ActivityStreamCard({ activity }: { activity: activity })
       </DefaultTooltip>
 
       <div className='flex flex-col'>
-        <p className=' line-clamp-1 font-normal text-base'>{activity.description.replace(" the package ", " the dataset ")}</p>
+        <p className=' line-clamp-1 font-normal text-base'>{activity.description.replace(" the package ", " the Dataset ")}</p>
         <span className='font-normal text-xs text-wri-dark-gray'>{activity.time}</span>
       </div>
     </div>

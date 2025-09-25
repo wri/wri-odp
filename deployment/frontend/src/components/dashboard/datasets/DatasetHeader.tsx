@@ -31,7 +31,7 @@ function LeftNode({
             <div className="flex  gap-x-3">
                 <SelectFilter
                     options={[
-                        { id: '1', label: 'All teams' },
+                        { id: '1', label: 'All Teams' },
                         { id: '2', label: 'Name' },
                         { id: '3', label: 'Title' },
                     ]}
@@ -41,7 +41,7 @@ function LeftNode({
                 />
                 <SelectFilter
                     options={[
-                        { id: '1', label: 'All topics' },
+                        { id: '1', label: 'All Topics' },
                         { id: '2', label: 'Name' },
                         { id: '3', label: 'Title' },
                     ]}
@@ -56,7 +56,7 @@ function LeftNode({
         <div className="flex  gap-x-3" key="selectrender">
             <SelectFilter
                 key="teamselect"
-                options={[{ id: 'None', label: 'All teams' }].concat(
+                options={[{ id: 'None', label: 'All Teams' }].concat(
                     getKeyValues(team as WriOrganization[], 'title', 'name')
                 )}
                 filtername="organization"
@@ -65,7 +65,7 @@ function LeftNode({
             />
             <SelectFilter
                 key="topicselect"
-                options={[{ id: 'None', label: 'All topics' }].concat(
+                options={[{ id: 'None', label: 'All Topics' }].concat(
                     getKeyValues(topics as Group[], 'name', 'name')
                 )}
                 setQuery={setQuery}

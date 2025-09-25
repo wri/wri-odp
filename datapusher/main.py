@@ -33,6 +33,8 @@ DATASTORE_URLS = {
     "resource_update": "{ckan_url}/api/action/resource_patch",
 }
 
+DEPLOYMENT_ENV = os.environ["FLOW_DEPLOYMENT_ENV"]
+
 
 @flow(log_prints=True)
 def push_to_datastore(resource_id, api_key):
@@ -131,7 +133,6 @@ def convert_store_to_file(
     try:
         logger = get_run_logger()
         ckan_url = config.get("CKAN_URL")
-
         logger.info("Fetching data...")
         data = query_datastore(
             api_key, ckan_url, sql, provider, rw_id, carto_account, format
@@ -169,7 +170,8 @@ def convert_store_to_file(
             "prefect_send_error_callback",
             {
                 "task_id": task_id,
-                "url": url,
+                "url": "",
+                "task_type": "download",
                 "state": "complete",
                 "entity_id": resource_id,
                 "entity_type": "resource",
@@ -195,7 +197,6 @@ async def download_subset_of_data(
     try:
         logger = get_run_logger()
         ckan_url = config.get("CKAN_URL")
-
         logger.info("Fetching data...")
         data = []
         if provider == "datastore":
@@ -237,6 +238,7 @@ async def download_subset_of_data(
             "prefect_send_error_callback",
             {
                 "task_id": task_id,
+                "task_type": "download_subset",
                 "url": "",
                 "state": "failed",
                 "entity_id": id if provider == "datastore" else dataset_id,
@@ -260,7 +262,6 @@ async def download_resources_zipped(
     try:
         logger = get_run_logger()
         ckan_url = config.get("CKAN_URL")
-        print("Filename", filename)
         with tempfile.TemporaryDirectory() as temp_dir:
             tasks = await download_keys(keys, filename, temp_dir)
             data = list(tasks)
@@ -295,6 +296,7 @@ async def download_resources_zipped(
             {
                 "task_id": task_id,
                 "url": "",
+                "task_type": "download_zipped",
                 "state": "failed",
                 "entity_id": dataset_id,
                 "entity_type": "dataset",
@@ -311,6 +313,7 @@ if __name__ == "__main__":
         parameters={"resource_id": "test_id", "api_key": "api_key"},
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     download_zipped_deployment = download_resources_zipped.to_deployment(
         name=config.get("DEPLOYMENT_NAME"),
@@ -324,6 +327,7 @@ if __name__ == "__main__":
         },
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     conversion_deployment = convert_store_to_file.to_deployment(
         name=config.get("DEPLOYMENT_NAME"),
@@ -341,6 +345,7 @@ if __name__ == "__main__":
         },
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     download_subset_deployment = download_subset_of_data.to_deployment(
         name=config.get("DEPLOYMENT_NAME"),
@@ -359,6 +364,7 @@ if __name__ == "__main__":
         },
         enforce_parameter_schema=False,
         is_schedule_active=False,
+        tags=[DEPLOYMENT_ENV]
     )
     serve(
         datastore_deployment,
