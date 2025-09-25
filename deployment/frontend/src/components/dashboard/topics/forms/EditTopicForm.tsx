@@ -63,7 +63,7 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
     const editTopic = api.topics.editTopic.useMutation({
         onSuccess: async ({ title, name }) => {
             await utils.topics.getTopic.invalidate({ id: name })
-            notify(`Successfully edited the ${title ?? name} topic`, 'success')
+            notify(`Successfully edited the ${title ?? name} Topic`, 'success')
             router.push('/dashboard/topics')
             formObj.reset()
         },
@@ -76,7 +76,7 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
         onSuccess: async () => {
             await utils.topics.getTopic.invalidate({ id: topic.name })
             notify(
-                `Successfully deleted the ${topic.title ?? topic.name} team`,
+                `Successfully deleted the ${topic.title ?? topic.name} Team`,
                 'error'
             )
             setDeleteOpen(false)
@@ -116,7 +116,7 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                         </Dialog.Title>
                         <div className="mt-2">
                             <p className="text-sm text-gray-500">
-                                Are you sure you want to delete this topic?
+                                Are you sure you want to delete this Topic?
                             </p>
                         </div>
                     </div>

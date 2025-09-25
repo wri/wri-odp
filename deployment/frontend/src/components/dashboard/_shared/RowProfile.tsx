@@ -9,6 +9,7 @@ export interface IRowProfile {
     image_display_url?: string
     name?: string
     capacity?: string
+    visibility?: string
 }
 
 export default function RowProfile({

@@ -232,12 +232,13 @@ export function DownloadPopup({
                                         </Dialog.Title>
                                         <Dialog.Title
                                             as="h4"
-                                            className="text-xl font-light leading-6 text-gray-600"
+                                            className="mt-2 font-normal leading-6 text-gray-600"
                                         >
                                             {subtitle}
                                         </Dialog.Title>
                                         <form
                                             onSubmit={handleSubmit(onSubmit)}
+                                            form-id="email-download"
                                             className="mt-6 text-left flex flex-col gap-y-2"
                                         >
                                             <div>
@@ -580,11 +581,12 @@ export function DirectDownloadPopup({
                                         </Dialog.Title>
                                         <Dialog.Title
                                             as="h4"
-                                            className="text-xl font-light leading-6 text-gray-600"
+                                            className="mt-2 font-normal leading-6 text-gray-600"
                                         >
                                             {subtitle}
                                         </Dialog.Title>
                                         <form
+                                            form-id="direct-download"
                                             onSubmit={handleSubmit(onSubmit)}
                                             className="mt-6 text-left flex flex-col gap-y-2"
                                         >
@@ -751,7 +753,7 @@ export function DirectDownloadPopup({
                                                 </div>
                                             )}
                                             <div>
-                                                <label className="ml-2 text-sm text-gray-500">
+                                                <label className="text-sm text-gray-500">
                                                     By sharing your contact
                                                     information you agree to
                                                     receive updates from WRI.

@@ -55,7 +55,7 @@ export default function MdxLayout({
                 id="search"
                 className="flex h-[245px] w-full flex-col bg-cover bg-center bg-no-repeat font-acumin"
                 style={{
-                    backgroundImage: 'url(/images/bg.png)',
+                    backgroundImage: 'url(/images/banner-userguide.png)',
                 }}
             >
                 <Breadcrumbs links={links} />
@@ -65,7 +65,7 @@ export default function MdxLayout({
                     </h1>
                 </div>
             </section>
-            <main className="px-8 mb-20 xxl:px-0  max-w-4xl mx-auto flex flex-col font-acumin mt-16 prose sm:prose-sm md:prose-base prose-headings:mt-8 prose-headings:font-semibold prose-headings:text-black prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-md prose-h6:text-lg prose-p:my-1 prose-li:my-1 dark:prose-headings:text-white">
+            <main className="px-8 mb-20 xxl:px-0  max-w-4xl mx-auto flex flex-col font-acumin mt-16 prose sm:prose-sm md:prose-base prose-headings:mt-8 prose-headings:font-semibold prose-headings:text-black prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-md prose-h6:text-lg prose-p:my-1 prose-li:my-1">
                 {children}
             </main>
 

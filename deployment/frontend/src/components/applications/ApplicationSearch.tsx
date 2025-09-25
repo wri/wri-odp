@@ -17,7 +17,7 @@ export default function ApplicationSearch({
             id="search"
             className="bg-cover bg-center bg-no-repeat w-full flex flex-col justify-center font-acumin h-[245px]"
             style={{
-                backgroundImage: 'url(/images/bg.png)',
+                backgroundImage: 'url(/images/banner-applications.jpeg)',
             }}
         >
             <form
@@ -35,7 +35,7 @@ export default function ApplicationSearch({
                         onChange={(e) => setQuery(e.target.value)}
                         value={query}
                         name="search"
-                        placeholder={`Search applications`}
+                        placeholder={`Search Applications`}
                         aria-label="search"
                         className="h-full  block w-full border-0 px-5 py-2 text-[#000000] shadow-wri-small rounded-tr-[3px] rounded-br-[3px]  placeholder:text-gray-900 placeholder:text-base  focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 leading-[19.2px] rounded-tl-[3px] rounded-bl-[3px] border-r-0"
                     />

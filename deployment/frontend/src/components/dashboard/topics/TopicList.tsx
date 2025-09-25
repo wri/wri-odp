@@ -3,16 +3,19 @@ import { Tab } from '@headlessui/react'
 import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import TopicCard from './TopicCard'
+import { useSession } from 'next-auth/react'
 
 const tabs = [
     {
         id: 'allteams',
         content: <TopicCard />,
-        title: 'All topics',
+        title: 'All Topics',
     },
 ]
 
 export default function TopicList() {
+    const { data: session } = useSession()
+    
     return (
         <section id="teamtab" className="w-full max-w-8xl  font-acumin ">
             <Tab.Group>
@@ -35,17 +38,19 @@ export default function TopicList() {
                             )}
                         </Tab>
                     ))}
-                    <Link
-                        href="/dashboard/topics/new"
-                        className="font-normal  px-6 py-4 focus:outline-0  w-full" role='tab'
-                    >
-                        <div className="flex">
-                            <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">
-                                <PlusSmallIcon className="w-3 h-3 text-white" />
+                    {session?.user.sysadmin && (
+                        <Link
+                            href="/dashboard/topics/new"
+                            className="font-normal  px-6 py-4 focus:outline-0  w-full" role='tab'
+                        >
+                            <div className="flex">
+                                <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">
+                                    <PlusSmallIcon className="w-3 h-3 text-white" />
+                                </div>
+                                <span>Add Topic</span>
                             </div>
-                            <span>Add topic</span>
-                        </div>
-                    </Link>
+                        </Link>
+                    )}
                 </Tab.List>
                 <Tab.Panels className="mt-2">
                     {tabs.map((tab) => (

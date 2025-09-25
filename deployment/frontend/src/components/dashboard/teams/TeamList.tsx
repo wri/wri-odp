@@ -8,7 +8,7 @@ const tabs = [
     {
         id: 'allteams',
         content: <TeamCard />,
-        title: 'All teams',
+        title: 'All Teams',
     },
 ]
 
@@ -44,7 +44,7 @@ export default function TeamList() {
                             <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">
                                 <PlusSmallIcon className="w-3 h-3 text-white" />
                             </div>
-                            <span>Add team</span>
+                            <span>Add Team</span>
                         </div>
                     </Link>
                 </Tab.List>

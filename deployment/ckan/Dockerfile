@@ -14,7 +14,7 @@ RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf285
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/signed-url/dev-requirements.txt' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@a9e42702b797eaf3ffe967040867519219d32224#egg=ckanext-auth' && \
     pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
-    pip3 install -e 'git+https://github.com/datopian/ckanext-hierarchy.git@wri#egg=ckanext-hierarchy' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-hierarchy.git@1547962cc3f86fd008ee7ba45fd41c5afebe8ae9#egg=ckanext-hierarchy' && \
     pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ea2b3cbace924a162de009fd8e5626052ebc99e1#egg=ckanext-issues' && \
     # Required by ckanext-issues, but it's no longer included in any of the requirements files or the subdependencies
     pip3 install mock && \
@@ -32,7 +32,8 @@ RUN chmod 777 ${APP_DIR}/src/ckanext-s3filestore
 # Required by shapely dependency
 RUN apk --update add build-base libxslt-dev python3-dev 
 RUN apk update
-RUN apk add postgresql15-client=15.11-r0
+RUN apk add git=2.40.4-r0
+
 
 RUN pip install --force-reinstall -v "Pillow==11.0.0"
 
@@ -54,7 +55,7 @@ RUN apk del build-base python3-dev && \
     rm -rf /var/cache/apk/*
 
 RUN apk add proj proj-dev proj-util musl-dev python3-dev
-RUN pip3 install pyproj --no-binary pyproj
+RUN pip3 install pyproj
 
 COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
@@ -89,16 +90,14 @@ USER ckan
 ENV CKAN__PLUGINS text_view image_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest hierarchy_display wri wri_harvester auth issues envvars
 
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
-RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = false"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_user_via_web = False"
 RUN ckan config-tool ${CKAN_INI} "ckan.root_path = /private-admin/{{LANG}}"
 RUN ckan config-tool ${CKAN_INI} "ckan.plugins = ${CKAN__PLUGINS}"
+RUN ckan config-tool ${CKAN_INI} "ckan.auth.create_unowned_dataset = False"
+RUN ckan config-tool ${CKAN_INI} "ckan.views.default_views = 'image_view'"
 
 RUN if [ "$GITHUB_ACTIONS" = "true" ]; then ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"; fi
 
-
-RUN if [ "$GITHUB_ACTIONS" = "true" ]; then \
-      ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"; \
-    fi
 
 USER root
 

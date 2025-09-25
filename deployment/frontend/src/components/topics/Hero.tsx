@@ -41,7 +41,7 @@ export function Hero({
                 >
                     <ChevronLeftIcon className="mb-1 lg:mr-1 h-6 w-6 p-0" />
                     <span className="pr-2">{`${
-                        topic.parent_name ? 'back' : 'See all topics'
+                        topic.parent_name ? 'back' : 'See all Topics'
                     } `}</span>
                 </Link>
             </div>
@@ -98,7 +98,7 @@ export function Hero({
                             </div>
                             <div className="h-[18px] w-[1px] border border-black"></div>
                             <div className="text-base font-light text-black">
-                                {topic.children.length} Subtopic(s)
+                                {topic.children.length} SubTopic(s)
                             </div>
                         </div>
                         <CopyLink />

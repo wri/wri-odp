@@ -12,6 +12,7 @@ import pick from 'lodash/pick'
 import { CartoProvider } from '@/utils/providers/cartoProvider'
 import { TileProvider } from '@/utils/providers/tileProvider'
 import { GeeProvider } from '@/utils/providers/geeProvider'
+import { VectorTileProvider } from '@/utils/providers/vectorProvider'
 import { APILayerSpec } from '@/interfaces/layer.interface'
 import { useMemo } from 'react'
 
@@ -43,7 +44,9 @@ const parseLayers = (layers: APILayerSpec[]): LayerSpec[] => {
 const geeProvider = new GeeProvider()
 const cartoProvider = new CartoProvider()
 const tileProvider = new TileProvider()
+const vectorLayerProvider = new VectorTileProvider()
 const providers: Record<string, ProviderMaker['handleData']> = {
+    [vectorLayerProvider.name]: vectorLayerProvider.handleData,
     [geeProvider.name]: geeProvider.handleData,
     [cartoProvider.name]: cartoProvider.handleData,
     [tileProvider.name]: tileProvider.handleData,

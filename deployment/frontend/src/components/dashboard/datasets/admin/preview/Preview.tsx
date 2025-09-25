@@ -5,6 +5,7 @@ import {
     ChevronDownIcon,
     GlobeAsiaAustraliaIcon,
     LinkIcon,
+    Squares2X2Icon,
     XMarkIcon,
 } from '@heroicons/react/24/outline'
 import {
@@ -160,7 +161,7 @@ export function Preview({
                         </div>
                     )}
                     {(watch('authors')?.length > 0 ||
-                      watch('maintainers')?.length > 0) && (
+                        watch('maintainers')?.length > 0) && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
                                 Points of Contact
@@ -181,18 +182,24 @@ export function Preview({
                                     ))}
                                 </dl>
                                 <dl className="flex flex-col gap-y-6">
-                                    {watch('maintainers')?.map((maintainer, index) => (
-                                        <div key={`maintainer-${index}`}>
-                                            <SimpleDescription
-                                                label="Maintainer Name"
-                                                text={maintainer.name ?? '_'}
-                                            />
-                                            <SimpleDescription
-                                                label="Maintainer Email"
-                                                text={maintainer.email ?? '_'}
-                                            />
-                                        </div>
-                                    ))}
+                                    {watch('maintainers')?.map(
+                                        (maintainer, index) => (
+                                            <div key={`maintainer-${index}`}>
+                                                <SimpleDescription
+                                                    label="Maintainer Name"
+                                                    text={
+                                                        maintainer.name ?? '_'
+                                                    }
+                                                />
+                                                <SimpleDescription
+                                                    label="Maintainer Email"
+                                                    text={
+                                                        maintainer.email ?? '_'
+                                                    }
+                                                />
+                                            </div>
+                                        )
+                                    )}
                                 </dl>
                             </div>
                         </div>
@@ -247,7 +254,7 @@ export function Preview({
                                             }}
                                         ></div>
                                     </FullDescription>
-                                    <FullDescription label="Rstrictions">
+                                    <FullDescription label="Restrictions">
                                         <div
                                             dangerouslySetInnerHTML={{
                                                 __html:
@@ -298,15 +305,15 @@ export function Preview({
                         text={
                             <ul className="list-disc">
                                 <li>
-                                    To add a chart view to your dataset, the
-                                    system first needs to load your data file.
+                                    To add a chart view to your Dataset, the
+                                    system first needs to load your Data File.
                                     Please wait 10-15 minutes and then choose to
-                                    edit your dataset. You will then be able to
+                                    edit your Dataset. You will then be able to
                                     add a chart.
                                 </li>
                                 <li>
                                     Charts views cannot be created while the
-                                    dataset is awaiting approval
+                                    Dataset is awaiting approval
                                 </li>
                             </ul>
                         }
@@ -315,7 +322,7 @@ export function Preview({
                     {watch('resources') && watch('resources').length > 0 && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
-                                Data files
+                                Data Files
                             </h3>
                             <div>
                                 {watch('resources')
@@ -461,6 +468,9 @@ interface DatafilePreviewProps {
         | 'empty-file'
         | 'empty-layer'
         | 'layer-raw'
+        | 'reference-layer'
+        | 'tile-cache'
+        | 'gee-asset'
     name: string
     title: string
     format: string
@@ -516,6 +526,22 @@ function Datafile({
                                     .with('link', () => (
                                         <>
                                             <LinkIcon className="h-6 w-6 text-blue-800" />
+                                            <span className="text-lg font-light text-black">
+                                                {name}
+                                            </span>
+                                        </>
+                                    ))
+                                    .with('tile-cache', () => (
+                                        <>
+                                            <Squares2X2Icon className="h-6 w-6 text-blue-800" />
+                                            <span className="text-lg font-light text-black">
+                                                {name}
+                                            </span>
+                                        </>
+                                    ))
+                                    .with('gee-asset', () => (
+                                        <>
+                                            <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
                                             <span className="text-lg font-light text-black">
                                                 {name}
                                             </span>

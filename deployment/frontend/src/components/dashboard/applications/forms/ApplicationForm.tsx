@@ -37,6 +37,11 @@ export default function ApplicationForm({
                         {...register('name')}
                         disabled={editing}
                         placeholder="name-of-application"
+                        icon={
+                            <DefaultTooltip content="Please choose a URL that is not already in use for another Topic, Team, or Application.">
+                                <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                            </DefaultTooltip>
+                        }
                         type="text"
                         className="pl-[4.6rem] lg:pl-[6.4rem]"
                     >
@@ -54,6 +59,7 @@ export default function ApplicationForm({
                         <div className="w-[11rem]">
                             <ImageUploader
                                 clearImage={() => setValue('image_url', '')}
+                                tooltip="Appears on /applications, /applications/application-name, and homepage carousels. We recommend a horizontal image between 5-10 MB."
                                 defaultImage={
                                     watch('image_url') &&
                                     watch('image_display_url')
@@ -83,7 +89,7 @@ export default function ApplicationForm({
                         type="text"
                         className="h-[8.4rem]"
                         icon={
-                            <DefaultTooltip content="Long form description of the application and its purpose.">
+                            <DefaultTooltip content="Long form description of the Application and its purpose.">
                                 <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                             </DefaultTooltip>
                         }
@@ -96,7 +102,7 @@ export default function ApplicationForm({
                         placeholder="https://wri.org"
                         type="text"
                         icon={
-                            <DefaultTooltip content="Link to the preferred way to reach out to the application support team. This could be a “contact us form” or a “mailto:app-help@wri.org” style link.">
+                            <DefaultTooltip content="Link to the preferred way to reach out to the Application support Team. This could be a “contact us form” or a “mailto:app-help@wri.org” style link.">
                                 <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                             </DefaultTooltip>
                         }
@@ -109,7 +115,7 @@ export default function ApplicationForm({
                         placeholder="https://wri.org"
                         type="text"
                         icon={
-                            <DefaultTooltip content="Homepage of the application, typically the landing page or root of the application’s web domain.">
+                            <DefaultTooltip content="Homepage of the Application, typically the landing page or root of the Application’s web domain.">
                                 <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                             </DefaultTooltip>
                         }
@@ -128,7 +134,7 @@ export default function ApplicationForm({
                         placeholder="https://wri.org"
                         type="text"
                         icon={
-                            <DefaultTooltip content="Link to self-service documentation and user support resources. This could be the application’s “about page” or “FAQs”.">
+                            <DefaultTooltip content="Link to self-service documentation and user support resources. This could be the Application’s “about page” or “FAQs”.">
                                 <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                             </DefaultTooltip>
                         }

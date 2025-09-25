@@ -5,6 +5,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import {
   ArrowDownCircleIcon,
   ArrowPathIcon,
+  DocumentDuplicateIcon,
   FingerPrintIcon,
   GlobeAmericasIcon,
   MagnifyingGlassIcon,
@@ -42,6 +43,7 @@ import {
 import { env } from '@/env.mjs'
 import { DownloadPopup } from '@/components/_shared/DownloadPopup'
 import dynamic from 'next/dynamic'
+import { QueryEndpoint } from './APIEndpoint'
 
 const LocationSearch = dynamic(() => import('./LocationSearch'), {
   ssr: false,
@@ -206,7 +208,7 @@ export function DataFiles({
             resources: datafilesToDownload.map((r) => r.id),
             package_id: dataset.id ?? '',
             typeOfForm: 'email-download',
-            package_name: dataset.title ?? dataset.name,
+            package_name: dataset.name,
           }
           console.log('Creating download event with data:', _data)
           createDownloadEvent.mutate(_data)
@@ -225,6 +227,9 @@ export function DataFiles({
     )
   }
   const [openDownload, setOpenDownload] = useState(false)
+  const notDownloadable = uploadedDatafiles.filter(
+    (r) => r.not_downloadable === true
+  )
   return (
     <>
       <div className="py-4">
@@ -233,7 +238,7 @@ export function DataFiles({
             className="block w-full rounded-l-md py-3 pl-4 border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset focus:ring-wri-green sm:text-sm sm:leading-6"
             onChange={(e) => setQ(e.target.value)}
             value={q}
-            placeholder="Search datafiles by title or description"
+            placeholder="Search Data Files by title or description"
           />
           <Button
             onClick={handleSearch}
@@ -300,7 +305,10 @@ export function DataFiles({
                 ></path>
               </svg>
             )}{' '}
-            ({datafilesToDownload.length} Selected datafiles)
+            ({datafilesToDownload.length} Selected Data Files
+            {notDownloadable.length > 0
+              ? `, ${notDownloadable.length} not available to download)`
+              : ')'}
           </span>
         ) : (
           ''
@@ -328,12 +336,15 @@ export function DataFiles({
                     <button
                       onClick={() =>
                         setDatafilesToDownload(
-                          uploadedDatafiles
+                          uploadedDatafiles.filter(
+                            (r) =>
+                              r.not_downloadable !== true
+                          )
                         )
                       }
                       className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                     >
-                      Select all datafiles
+                      Select all Data Files
                     </button>
                   )}
                 {datafilesToDownload.length > 0 && (
@@ -344,7 +355,7 @@ export function DataFiles({
                     }}
                     className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                   >
-                    Unselect all datafiles
+                    Unselect all Data Files
                   </button>
                 )}
               </>
@@ -401,7 +412,7 @@ export function DataFiles({
           onClick={() => setOpenDownload(true)}
           className="group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3"
         >
-          Download Selected Datafiles
+          Download Selected Data Files
           <ArrowDownCircleIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
         </Button>
       )}
@@ -409,37 +420,63 @@ export function DataFiles({
         {datafiles?.length === 0 ? (
           <div className="flex items-center justify-center h-20">
             <p className="font-acumin text-base font-normal text-black">
-              No data files found
+              No Data Files found
             </p>
           </div>
         ) : (
           <>
-            {datafileList.map((datafile, index) => (
-              <DatafileCard
-                setMapDisplayPreview={setMapDisplayPreview}
-                mapDisplaypreview={mapDisplaypreview}
-                tabularResource={tabularResource}
-                setTabularResource={setTabularResource}
-                selected={datafilesToDownload.some(
-                  (r) => r.id === datafile.id
-                )}
-                addDatafileToDownload={addDatafileToDownload}
-                removeDatafileToDownload={
-                  removeDatafileToDownload
-                }
-                key={datafile.id}
-                datafile={datafile}
-                dataset={dataset}
-                diffFields={diffFields}
-                isCurrentVersion={isCurrentVersion}
-                index={index}
-              />
-            ))}
+            {datafileList.map((datafile, index) => {
+              if (datafile.type === 'tile-cache') {
+                return (
+                  <TilecacheCard
+                    datafile={datafile}
+                    dataset={dataset}
+                    diffFields={diffFields}
+                    isCurrentVersion={isCurrentVersion}
+                    index={index}
+                  />
+                )
+              }
+              if (datafile.type === 'gee-asset') {
+                return (
+                  <GeeAssetCard
+                    datafile={datafile}
+                    dataset={dataset}
+                    diffFields={diffFields}
+                    isCurrentVersion={isCurrentVersion}
+                    index={index}
+                  />
+                )
+              }
+              return (
+                <DatafileCard
+                  setMapDisplayPreview={setMapDisplayPreview}
+                  mapDisplaypreview={mapDisplaypreview}
+                  tabularResource={tabularResource}
+                  setTabularResource={setTabularResource}
+                  selected={datafilesToDownload.some(
+                    (r) => r.id === datafile.id
+                  )}
+                  addDatafileToDownload={
+                    addDatafileToDownload
+                  }
+                  removeDatafileToDownload={
+                    removeDatafileToDownload
+                  }
+                  key={datafile.id}
+                  datafile={datafile}
+                  dataset={dataset}
+                  diffFields={diffFields}
+                  isCurrentVersion={isCurrentVersion}
+                  index={index}
+                />
+              )
+            })}
           </>
         )}
       </div>
       <DownloadPopup
-        title="The selected datafiles are being prepared for download"
+        title="The selected Data Files are being prepared for download"
         subtitle="Please enter your information so that you receive the download link via email"
         isOpen={openDownload}
         onClose={() => setOpenDownload(false)}
@@ -544,7 +581,8 @@ function DatafileCard({
             <div className="flex items-center gap-3">
               {['upload', 'link'].includes(
                 datafile.url_type ?? ''
-              ) && (
+              ) &&
+                datafile.not_downloadable !== true && (
                   <DefaultTooltip content="Select to download">
                     <input
                       aria-label={`Select ${datafile.title}`}
@@ -557,9 +595,25 @@ function DatafileCard({
                             datafile
                           )
                         } else {
-                          addDatafileToDownload(datafile)
+                          addDatafileToDownload(
+                            datafile
+                          )
                         }
                       }}
+                    />
+                  </DefaultTooltip>
+                )}
+              {['upload', 'link'].includes(
+                datafile.url_type ?? ''
+              ) &&
+                datafile.not_downloadable && (
+                  <DefaultTooltip content="Not selectable for direct download">
+                    <input
+                      aria-label={`Select ${datafile.title}`}
+                      type="checkbox"
+                      className="h-4 w-4  rounded  bg-gray-200 border-gray-300"
+                      disabled
+                      checked={false}
                     />
                   </DefaultTooltip>
                 )}
@@ -604,67 +658,87 @@ function DatafileCard({
             </div>
             <div className="gap-x-2 hidden sm:flex">
               {/* @ts-ignore */}
-              {datafile?.rw_id && (
-                <>
-                  {activeLayers.some(
-                    (a) =>
-                      datafile.url?.endsWith(a.id) ||
-                      datafile.id === a.id
-                  ) ? (
-                    <Button
-                      variant="light"
-                      size="sm"
-                      onClick={() => {
-                        {
-                        }
-                        // @ts-ignore
-                        if (datafile.rw_id) {
-                          removeLayerFromLayerGroup(
-                            // @ts-ignore
-                            datafile?.rw_id,
-                            dataset.id
-                          )
-                        }
-                      }}
-                    >
-                      <span className="mt-1 text-xs 2xl:text-sm whitespace-nowrap">
-                        Remove Layer
-                      </span>
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      id={`layerviews-${datafile.id}`}
-                      className="text-xs 2xl:text-sm whitespace-nowrap"
-                      onClick={() => {
-                        // @ts-ignore
-                        if (datafile.rw_id) {
-                          if (!mapDisplaypreview) {
-                            setMapDisplayPreview(
-                              true
+              {['layer', 'layer-raw', 'reference-layer'].includes(
+                datafile.type
+              ) && (
+                  <>
+                    {activeLayers.some((a) => {
+                      return (
+                        datafile.url?.endsWith(a?.id) ||
+                        datafile.id === a?.id
+                      )
+                    }) ? (
+                      <Button
+                        variant="light"
+                        size="sm"
+                        onClick={() => {
+                          // @ts-ignore
+                          if (datafile.rw_id) {
+                            removeLayerFromLayerGroup(
+                              // @ts-ignore
+                              datafile?.rw_id,
+                              dataset.id
                             )
                           }
-                          addLayerToLayerGroup(
+                          removeLayerFromLayerGroup(
                             // @ts-ignore
-                            datafile.rw_id,
+                            datafile?.id,
                             dataset.id
                           )
-                        }
-
-                        customDataLayer({
-                          event: 'gtm.click',
-                          resource_name:
-                            datafile.title ??
-                            datafile.name!,
-                        })
-                      }}
-                    >
-                      Show Layer
-                    </Button>
-                  )}
-                </>
-              )}
+                        }}
+                      >
+                        <span className="mt-1 text-xs 2xl:text-sm whitespace-nowrap">
+                          Remove Layer
+                        </span>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        id={`layerviews-${datafile.id}`}
+                        className="text-xs 2xl:text-sm whitespace-nowrap"
+                        onClick={() => {
+                          // @ts-ignore
+                          if (!mapDisplaypreview) {
+                            setMapDisplayPreview(true)
+                          }
+                          if (
+                            datafile.layerObj
+                              ?.layerConfig ||
+                            datafile.layerObjRaw
+                              ?.layerConfig
+                          ) {
+                            addLayerToLayerGroup(
+                              // @ts-ignore
+                              datafile.id,
+                              dataset.id,
+                              'ckan'
+                            )
+                          } else {
+                            addLayerToLayerGroup(
+                              // @ts-ignore
+                              datafile.rw_id != '' &&
+                                datafile.rw_id !=
+                                null
+                                ? datafile.rw_id
+                                : datafile.id,
+                              dataset.id,
+                              'rw'
+                            )
+                          }
+                          customDataLayer({
+                            event: 'gtm.click',
+                            resource_name:
+                              datafile.title ??
+                              datafile.name!,
+                          })
+                        }}
+                      >
+                        Show Layer
+                      </Button>
+                    )}
+                  </>
+                )}
               {datafile.datastore_active && (
                 <>
                   {tabularResource &&
@@ -999,6 +1073,412 @@ function DatafileCard({
                 )}
                 {/*<LearnMoreButton datafile={datafile} dataset={dataset} />*/}
                 <APIButton datafile={datafile} />
+              </div>
+            </Disclosure.Panel>
+          </Transition>
+        </div>
+      )}
+    </Disclosure>
+  )
+}
+
+function TilecacheCard({
+  datafile,
+  dataset,
+  diffFields,
+  isCurrentVersion,
+  index,
+}: {
+  datafile: Resource
+  dataset: WriDataset
+  isCurrentVersion?: boolean
+  diffFields: Array<Record<string, { old_value: string; new_value: string }>>
+  index: number
+}) {
+  const created_at = new Date(datafile?.created ?? '')
+  const last_updated = new Date(datafile?.metadata_modified ?? '')
+  const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  } as const
+
+  const higlighted = (field: string, value: string) => {
+    if (diffFields && !isCurrentVersion) {
+      if (
+        diffFields.some(
+          (diffField) =>
+            diffField[field] &&
+            diffField[field]?.new_value === value
+        )
+      ) {
+        return 'bg-yellow-200'
+      }
+    }
+    return ''
+  }
+  const newDatafile = () => {
+    if (diffFields && !isCurrentVersion) {
+      if (
+        diffFields[index] &&
+        diffFields[index]?.undefined?.old_value === null
+      ) {
+        return 'bg-yellow-200'
+      }
+    }
+    return ''
+  }
+
+  const CopyButton = ({ content }: { content: string }) => {
+    const [copied, setCopied] = useState(false)
+    const handleClick = () => {
+      navigator.clipboard.writeText(content)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    }
+    return (
+      <DefaultTooltip
+        content={
+          copied ? 'Tile Cache URL copied!' : 'Copy Tile Cache URL'
+        }
+        contentClassName={`${copied ? 'bg-wri-green text-white' : ''}`}
+        delayDuration={copied ? 0 : 100}
+        onOpenChange={(open) => {
+          if (copied && open) return
+        }}
+        open={copied ? true : undefined}
+      >
+        <Button
+          aria-label="copy button"
+          className={`h-auto rounded-full p-2`}
+          onClick={handleClick}
+        >
+          <DocumentDuplicateIcon className="w-3 text-white" />
+        </Button>
+      </DefaultTooltip>
+    )
+  }
+  return (
+    <Disclosure>
+      {({ open }) => (
+        <div
+          className={classNames(
+            'flex flex-col gap-y-2 border-b-2 border-green-700 p-5 shadow transition hover:bg-slate-100',
+            open ? 'bg-slate-100' : '',
+            newDatafile()
+          )}
+        >
+          <div
+            className={classNames(
+              'flex flex-row items-center justify-between',
+              open ? 'border-b border-neutral-400 pb-2' : ''
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <DefaultTooltip content="Not selectable for direct download">
+                <input
+                  aria-label={`Select ${datafile.title}`}
+                  type="checkbox"
+                  className="h-4 w-4  rounded  bg-gray-200 border-gray-300"
+                  disabled
+                  checked={false}
+                />
+              </DefaultTooltip>
+              {datafile?.cache_type && (
+                <span
+                  className={classNames(
+                    'hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',
+                    getFormatColor(
+                      datafile?.cache_type ?? ''
+                    )
+                  )}
+                >
+                  <span className="my-auto capitalize">
+                    {datafile.cache_type}
+                  </span>
+                </span>
+              )}
+              <Disclosure.Button>
+                <h3
+                  className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${datafile.title
+                      ? higlighted(
+                        'title',
+                        datafile.title
+                      )
+                      : higlighted('name', datafile.name!)
+                    }`}
+                >
+                  {datafile.title ?? datafile.name}
+                </h3>
+              </Disclosure.Button>
+            </div>
+            <div className="gap-x-2 hidden sm:flex">
+              <Disclosure.Button
+                role="button"
+                aria-label="expand"
+              >
+                <ChevronDownIcon
+                  className={`${open
+                      ? 'rotate-180 transform  transition'
+                      : ''
+                    } h-5 w-5 text-stone-900`}
+                />
+              </Disclosure.Button>
+            </div>
+          </div>
+          <Transition
+            enter="transition duration-100 ease-out"
+            enterFrom="transform scale-95 opacity-0"
+            enterTo="transform scale-100 opacity-100"
+            leave="transition duration-75 ease-out"
+            leaveFrom="transform scale-100 opacity-100"
+            leaveTo="transform scale-95 opacity-0"
+          >
+            <Disclosure.Panel className="py-3">
+              <p
+                className={`font-acumin text-base font-light text-stone-900 ${datafile.description
+                    ? higlighted(
+                      'description',
+                      datafile.description
+                    )
+                    : ''
+                  }`}
+              >
+                {datafile.description ?? 'No Description'}
+              </p>
+              <div className="mt-[0.33rem] flex justify-start gap-x-3">
+                <div className="flex flex-row items-center gap-x-1">
+                  <FingerPrintIcon className="h-3 w-3 text-blue-800" />
+                  <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
+                    {created_at.toLocaleDateString(
+                      'en-US',
+                      options
+                    )}
+                  </p>
+                </div>
+                <div className="flex items-center gap-x-1">
+                  <ArrowPathIcon className="h-3 w-3 text-blue-800" />
+                  <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
+                    {last_updated.toLocaleDateString(
+                      'en-US',
+                      options
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4">
+                <QueryEndpoint
+                  description="Copy the tile cache link for use in your GIS application"
+                  url={datafile.url ?? ''}
+                  method={''}
+                  copyButton={
+                    <CopyButton
+                      content={datafile.url ?? ''}
+                    />
+                  }
+                />
+              </div>
+            </Disclosure.Panel>
+          </Transition>
+        </div>
+      )}
+    </Disclosure>
+  )
+}
+
+function GeeAssetCard({
+  datafile,
+  dataset,
+  diffFields,
+  isCurrentVersion,
+  index,
+}: {
+  datafile: Resource
+  dataset: WriDataset
+  isCurrentVersion?: boolean
+  diffFields: Array<Record<string, { old_value: string; new_value: string }>>
+  index: number
+}) {
+  const created_at = new Date(datafile?.created ?? '')
+  const last_updated = new Date(datafile?.metadata_modified ?? '')
+  const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  } as const
+
+  const higlighted = (field: string, value: string) => {
+    if (diffFields && !isCurrentVersion) {
+      if (
+        diffFields.some(
+          (diffField) =>
+            diffField[field] &&
+            diffField[field]?.new_value === value
+        )
+      ) {
+        return 'bg-yellow-200'
+      }
+    }
+    return ''
+  }
+  const newDatafile = () => {
+    if (diffFields && !isCurrentVersion) {
+      if (
+        diffFields[index] &&
+        diffFields[index]?.undefined?.old_value === null
+      ) {
+        return 'bg-yellow-200'
+      }
+    }
+    return ''
+  }
+
+  const CopyButton = ({ content }: { content: string }) => {
+    const [copied, setCopied] = useState(false)
+    const handleClick = () => {
+      navigator.clipboard.writeText(content)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    }
+    return (
+      <DefaultTooltip
+        content={copied ? 'Asset ID copied!' : 'Copy Asset ID'}
+        contentClassName={`${copied ? 'bg-wri-green text-white' : ''}`}
+        delayDuration={copied ? 0 : 100}
+        onOpenChange={(open) => {
+          if (copied && open) return
+        }}
+        open={copied ? true : undefined}
+      >
+        <Button
+          aria-label="copy button"
+          className={`h-auto rounded-full p-2`}
+          onClick={handleClick}
+        >
+          <DocumentDuplicateIcon className="w-3 text-white" />
+        </Button>
+      </DefaultTooltip>
+    )
+  }
+  return (
+    <Disclosure>
+      {({ open }) => (
+        <div
+          className={classNames(
+            'flex flex-col gap-y-2 border-b-2 border-green-700 p-5 shadow transition hover:bg-slate-100',
+            open ? 'bg-slate-100' : '',
+            newDatafile()
+          )}
+        >
+          <div
+            className={classNames(
+              'flex flex-row items-center justify-between',
+              open ? 'border-b border-neutral-400 pb-2' : ''
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <DefaultTooltip content="Not selectable for direct download">
+                <input
+                  aria-label={`Select ${datafile.title}`}
+                  type="checkbox"
+                  className="h-4 w-4  rounded  bg-gray-200 border-gray-300"
+                  disabled
+                  checked={false}
+                />
+              </DefaultTooltip>
+              {datafile?.asset_type && (
+                <span
+                  className={classNames(
+                    'hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',
+                    getFormatColor(
+                      datafile?.asset_type ?? ''
+                    )
+                  )}
+                >
+                  <span className="my-auto capitalize">
+                    {datafile.asset_type}
+                  </span>
+                </span>
+              )}
+              <Disclosure.Button>
+                <h3
+                  className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${datafile.title
+                      ? higlighted(
+                        'title',
+                        datafile.title
+                      )
+                      : higlighted('name', datafile.name!)
+                    }`}
+                >
+                  {datafile.title ?? datafile.name}
+                </h3>
+              </Disclosure.Button>
+            </div>
+            <div className="gap-x-2 hidden sm:flex">
+              <Disclosure.Button
+                role="button"
+                aria-label="expand"
+              >
+                <ChevronDownIcon
+                  className={`${open
+                      ? 'rotate-180 transform  transition'
+                      : ''
+                    } h-5 w-5 text-stone-900`}
+                />
+              </Disclosure.Button>
+            </div>
+          </div>
+          <Transition
+            enter="transition duration-100 ease-out"
+            enterFrom="transform scale-95 opacity-0"
+            enterTo="transform scale-100 opacity-100"
+            leave="transition duration-75 ease-out"
+            leaveFrom="transform scale-100 opacity-100"
+            leaveTo="transform scale-95 opacity-0"
+          >
+            <Disclosure.Panel className="py-3">
+              <p
+                className={`font-acumin text-base font-light text-stone-900 ${datafile.description
+                    ? higlighted(
+                      'description',
+                      datafile.description
+                    )
+                    : ''
+                  }`}
+              >
+                {datafile.description ?? 'No Description'}
+              </p>
+              <div className="mt-[0.33rem] flex justify-start gap-x-3">
+                <div className="flex flex-row items-center gap-x-1">
+                  <FingerPrintIcon className="h-3 w-3 text-blue-800" />
+                  <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
+                    {created_at.toLocaleDateString(
+                      'en-US',
+                      options
+                    )}
+                  </p>
+                </div>
+                <div className="flex items-center gap-x-1">
+                  <ArrowPathIcon className="h-3 w-3 text-blue-800" />
+                  <p className="text-xs font-normal leading-snug text-stone-900 sm:text-sm">
+                    {last_updated.toLocaleDateString(
+                      'en-US',
+                      options
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4">
+                <QueryEndpoint
+                  description="Copy the Google Earth Engine snippet for use in the Earth Engine Code Editor."
+                  url={datafile.asset_id ?? ''}
+                  method={''}
+                  copyButton={
+                    <CopyButton
+                      content={datafile.asset_id ?? ''}
+                    />
+                  }
+                />
               </div>
             </Disclosure.Panel>
           </Transition>

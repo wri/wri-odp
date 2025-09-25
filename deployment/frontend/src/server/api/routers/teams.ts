@@ -81,13 +81,6 @@ export const teamRouter = createTRPCRouter({
             try {
                 const user = ctx.session.user
 
-                // only sysadmin is allowed to create Parent teams
-                if (
-                    !user.sysadmin &&
-                    (!input.parent || input.parent.value === '')
-                )
-                    throw Error('Only sysadmin can create parent teams')
-
                 var newMembers = []
                 for (const member of input.members) {
                     newMembers.push({
@@ -138,7 +131,7 @@ export const teamRouter = createTRPCRouter({
                 return team.result
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
+                    'Something went wrong please contact the System Administrator'
                 if (e instanceof Error) error = e.message
                 throw Error(replaceNames(error, true))
             }
@@ -156,6 +149,7 @@ export const teamRouter = createTRPCRouter({
                     },
                 }
             )
+
             const team: CkanResponse<
                 WriOrganization & {
                     groups: Organization[]
@@ -169,6 +163,7 @@ export const teamRouter = createTRPCRouter({
     deleteTeam: protectedProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ ctx, input }) => {
+          try {
             const user = ctx.session.user
             const teamRes = await fetch(
                 `${env.CKAN_URL}/api/action/organization_delete`,
@@ -192,6 +187,12 @@ export const teamRouter = createTRPCRouter({
             return {
                 ...team.result,
             }
+          } catch (e) {
+            let error =
+              'Something went wrong please contact the System Administrator'
+            if (e instanceof Error) error = e.message
+            throw Error(replaceNames(error, true))
+          }
         }),
     getTeamUsers: protectedProcedure
         .input(z.object({ id: z.string(), capacity: z.string().optional() }))
@@ -223,7 +224,7 @@ export const teamRouter = createTRPCRouter({
                     !user.sysadmin &&
                     (!input.parent || input.parent.value === '')
                 )
-                    throw Error('Only sysadmin can create parent teams')
+                    throw Error('Only Sysadmins can create parent Teams')
 
                 const body = JSON.stringify({
                     ...input,
@@ -257,7 +258,7 @@ export const teamRouter = createTRPCRouter({
                 return team.result
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
+                    'Something went wrong please contact the System Administrator'
                 if (e instanceof Error) error = e.message
                 throw Error(replaceNames(error, true))
             }
@@ -265,6 +266,7 @@ export const teamRouter = createTRPCRouter({
     deleteDashboardTeam: protectedProcedure
         .input(z.string())
         .mutation(async ({ input, ctx }) => {
+          try {
             const response = await fetch(
                 `${env.CKAN_URL}/api/3/action/organization_delete`,
                 {
@@ -280,6 +282,12 @@ export const teamRouter = createTRPCRouter({
             if (!data.success && data.error)
                 throw Error(replaceNames(data.error.message, true))
             return data
+          } catch (e) {
+            let error =
+              'Something went wrong please contact the System Administrator'
+            if (e instanceof Error) error = e.message
+            throw Error(replaceNames(error, true))
+          }
         }),
     getGeneralTeam: publicProcedure
         .input(searchSchema)
@@ -311,6 +319,7 @@ export const teamRouter = createTRPCRouter({
                         description: org.description ?? '',
                         package_count: org.package_count!,
                         name: org.name,
+                        visibility: org.visibility!
                     }
                     return acc
                 },

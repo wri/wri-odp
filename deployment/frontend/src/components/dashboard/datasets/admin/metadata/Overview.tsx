@@ -63,17 +63,22 @@ export function OverviewForm({
                     <InputGroup label="Title" required>
                         <Input
                             {...register('title')}
-                            placeholder="My dataset"
+                            placeholder="My Dataset"
                             type="text"
                         />
                         <ErrorDisplay name="title" errors={errors} />
                     </InputGroup>
-                    <InputGroup label="Url" required>
+                    <InputGroup label="URL" required>
                         <Input
                             {...register('name')}
                             disabled={editing}
                             placeholder="name-of-dataset"
                             type="text"
+                            icon={
+                                <DefaultTooltip content="Please choose a URL that is not already in use for another Dataset.">
+                                    <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
+                                </DefaultTooltip>
+                            }
                             className={`pl-[5.9rem] sm:pl-[5.6rem] md:pl-[5.2rem] lg:pl-[5.4rem] ${editing ? 'hidden' : ''} `}
                         >
                             {editing ? (
@@ -96,7 +101,7 @@ export function OverviewForm({
                             placeholder="ex. https://source/to/original/data"
                             type="text"
                             icon={
-                                <DefaultTooltip content="Placeholder">
+                                <DefaultTooltip content="Optional reference link to the original data source. This will appear in the About section. To add direct links to Data Files (preferred), please go to the next page (Data Files tab)">
                                     <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                 </DefaultTooltip>
                             }
@@ -112,19 +117,23 @@ export function OverviewForm({
                             options={languageOptions}
                         />
                     </InputGroup>
-                    <InputGroup label="Team">
+                    <InputGroup
+                        label="Team"
+                        required
+                        info="Teams will only appear in the dropdown if you are an Admin or Editor of that Team. The padlock icon indicates the Team is private."
+                    >
                         {match(possibleOwners)
                             .with({ isLoading: true }, () => (
                                 <span className="flex items-center text-sm gap-x-2">
                                     <Spinner />{' '}
                                     <span className="mt-1">
-                                        Loading teams...
+                                        Loading Teams...
                                     </span>
                                 </span>
                             ))
                             .with({ isError: true }, () => (
                                 <span className="flex items-center text-sm text-red-600">
-                                    Error loading teams, please refresh the page
+                                    Error loading Teams, please refresh the page
                                 </span>
                             ))
                             .with(
@@ -135,12 +144,6 @@ export function OverviewForm({
                                         name="team"
                                         id="team"
                                         options={[
-                                            {
-                                                label: 'No team',
-                                                value: '',
-                                                id: '',
-                                                visibility: '',
-                                            },
                                             ...data.map((team) => ({
                                                 label: team.title ?? team.name,
                                                 value: team.name,
@@ -149,7 +152,7 @@ export function OverviewForm({
                                                     team.visibility ?? 'public',
                                             })),
                                         ]}
-                                        placeholder="Select a team"
+                                        placeholder="Select a Team"
                                     />
                                 )
                             )
@@ -174,13 +177,13 @@ export function OverviewForm({
                                 <span className="flex items-center text-sm gap-x-2">
                                     <Spinner />{' '}
                                     <span className="mt-1">
-                                        Loading applications...
+                                        Loading Applications...
                                     </span>
                                 </span>
                             ))
                             .with({ isError: true }, () => (
                                 <span className="flex items-center text-sm text-red-600">
-                                    Error loading applications, please refresh
+                                    Error loading Applications, please refresh
                                     the page
                                 </span>
                             ))
@@ -195,14 +198,14 @@ export function OverviewForm({
                                             value: app.name,
                                         }))}
                                         title="Applications"
-                                        tooltip="Remove application"
-                                        aria-label="Remove application"
+                                        tooltip="Remove Application"
+                                        aria-label="Remove Application"
                                     />
                                 )
                             )
                             .otherwise(() => (
                                 <span className="flex items-center text-sm text-red-600">
-                                    Error loading applications, please refresh
+                                    Error loading Applications, please refresh
                                     the page
                                 </span>
                             ))}
@@ -213,13 +216,13 @@ export function OverviewForm({
                                 <span className="flex items-center text-sm gap-x-2">
                                     <Spinner />{' '}
                                     <span className="mt-1">
-                                        Loading topics...
+                                        Loading Topics...
                                     </span>
                                 </span>
                             ))
                             .with({ isError: true }, () => (
                                 <span className="flex items-center text-sm text-red-600">
-                                    Error loading topics, please refresh the
+                                    Error loading Topics, please refresh the
                                     page
                                 </span>
                             ))
@@ -235,7 +238,7 @@ export function OverviewForm({
                             )
                             .otherwise(() => (
                                 <span className="flex items-center text-sm text-red-600">
-                                    Error loading topics, please refresh the
+                                    Error loading Topics, please refresh the
                                     page
                                 </span>
                             ))}
@@ -297,7 +300,7 @@ export function OverviewForm({
                         <div className="flex flex-col items-center justify-between gap-5 lg:flex-row xxl:w-[28rem]">
                             <Input
                                 {...register('temporal_coverage_start', {
-                                    valueAsNumber: true,
+                                    setValueAs: v => v === '' ? undefined : Number(v),
                                 })}
                                 placeholder="Start year"
                                 type="number"
@@ -305,7 +308,7 @@ export function OverviewForm({
                             <span className="hidden xxl:block">to</span>
                             <Input
                                 {...register('temporal_coverage_end', {
-                                    valueAsNumber: true,
+                                    setValueAs: v => v === '' ? undefined : Number(v),
                                 })}
                                 placeholder="End year"
                                 type="number"
@@ -335,8 +338,8 @@ export function OverviewForm({
                                 htmlFor="wri_data"
                                 className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
                             >
-                                This dataset was developed by WRI
-                                <DefaultTooltip content="This flags this dataset as having been produced and curated by WRI">
+                                This Dataset was developed by WRI
+                                <DefaultTooltip content="Checking this box flags this Dataset as having been produced and curated by WRI">
                                     <InformationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
                                 </DefaultTooltip>
                             </label>
@@ -360,15 +363,34 @@ export function OverviewForm({
                             {...register('citation')}
                             className="h-44"
                             icon={
-                                <DefaultTooltip content="Placeholder">
+                                <DefaultTooltip content="Provide a proper citation for this Dataset (e.g., author(s), year, title).">
                                     <InformationCircleIcon className="mb-auto mt-2 h-5 w-5 text-gray-300" />
                                 </DefaultTooltip>
                             }
                         />
                     </InputGroup>
-                    <InputGroup label="Visibility" required>
+                    <InputGroup
+                        label="Visibility"
+                        required
+                        info={
+                            <ul>
+                                <li>
+                                    Public Datasets are visible to any user,
+                                    including public and anonymous.
+                                </li>
+                                <li>
+                                    Private Datasets are only visible to Team
+                                    members.
+                                </li>
+                                <li>
+                                    Internal Use Datasets are visible to any
+                                    Data Explorer user with a login.
+                                </li>
+                            </ul>
+                        }
+                    >
                         <SimpleSelect
-                            placeholder="Select visiblity"
+                            placeholder="Select visibility"
                             name="visibility_type"
                             id="visibility_type"
                             formObj={formObj}
@@ -376,7 +398,25 @@ export function OverviewForm({
                         />
                         <ErrorDisplay name="visibility_type" errors={errors} />
                     </InputGroup>
-                    <InputGroup label="License">
+                    <InputGroup
+                        label="License"
+                        info={
+                            <span>
+                                License definitions and additional information
+                                can be found at{' '}
+                                <a
+                                    href="http://opendefinition.org"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    opendefinition.org
+                                </a>
+                                . The data license you select also applies to
+                                the contents of any Data Files that you add to
+                                this Dataset.
+                            </span>
+                        }
+                    >
                         {match(possibleLicenses)
                             .with({ isLoading: true }, () => (
                                 <span className="flex items-center text-sm gap-x-2">
@@ -440,8 +480,8 @@ export function OverviewForm({
                                     htmlFor="featured_dataset"
                                     className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
                                 >
-                                    Request administrator feature this dataset
-                                    <DefaultTooltip content="Setting this to true will show the dataset in the feature list both on the homepage and in the search page">
+                                    Request to be featured in Dataset Highlights
+                                    <DefaultTooltip content="Checking this box will send a feature request to an administrator. The Dataset will appear under ‘Dataset Highlights’ (on the homepage) only upon approval.">
                                         <InformationCircleIcon className="mb-auto mt-0.5 h-5 w-5 text-zinc-800" />
                                     </DefaultTooltip>
                                 </label>

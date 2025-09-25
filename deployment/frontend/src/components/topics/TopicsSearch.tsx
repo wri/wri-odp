@@ -19,7 +19,10 @@ export default function TopicsSearch({
             id="search"
             className="bg-cover bg-center bg-no-repeat w-full flex flex-col justify-center font-acumin h-[245px] "
             style={{
-                backgroundImage: 'url(/images/bg.png)',
+                backgroundImage:
+                    groupType == 'Topics'
+                        ? 'url(/images/banner-topics.png)'
+                        : 'url(/images/banner-teams.png)',
             }}
         >
             <form
@@ -37,7 +40,7 @@ export default function TopicsSearch({
                         value={query}
                         name="search"
                         placeholder={`Search ${
-                            groupType === 'Teams' ? 'teams' : 'topics'
+                            groupType === 'Teams' ? 'Teams' : 'Topics'
                         }`}
                         aria-label="search"
                         className="h-full  block w-full border-0 px-5 py-2 text-[#000000] shadow-wri-small rounded-tr-[3px] rounded-br-[3px]  placeholder:text-gray-900 placeholder:text-base focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 leading-[19.2px] rounded-tl-[3px] rounded-bl-[3px] border-r-0"

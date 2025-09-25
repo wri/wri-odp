@@ -37,6 +37,8 @@ describe("Release notes", () => {
       cy.get("input[name=title]").type(dataset);
       cy.get("input[name=name]").should("have.value", dataset);
       cy.get("input[name=url]").type("https://google.com");
+      cy.get("#team").click();
+      cy.get("li").contains(org).click();
       cy.get("#visibility_type").click();
       cy.get("li").contains("Public").click();
       cy.get("textarea[name=short_description]").type("test");
@@ -52,12 +54,16 @@ describe("Release notes", () => {
 
       cy.contains("Add Maintainer").click();
       cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
-      cy.get('input[name="maintainers.0.email"]').type("test-maintainer-1@example.com");
+      cy.get('input[name="maintainers.0.email"]').type(
+        "test-maintainer-1@example.com",
+      );
       cy.contains("Add Maintainer").click();
       cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
-      cy.get('input[name="maintainers.1.email"]').type("test-maintainer-2@example.com");
+      cy.get('input[name="maintainers.1.email"]').type(
+        "test-maintainer-2@example.com",
+      );
 
-      cy.contains("Next: Datafiles").click();
+      cy.contains("Next: Data Files").click();
       cy.contains("Next: Map Visualizations").click();
       cy.contains("Next: Preview").click();
       cy.get('button[type="submit"]').click();
@@ -65,10 +71,10 @@ describe("Release notes", () => {
       cy.contains(dataset);
 
       cy.visit(`/datasets/${dataset}`);
-      cy.contains('Related Datasets', { timeout: 10000 })
-      cy.contains('Collaborators', { timeout: 50000 })
+      cy.contains("Related Datasets", { timeout: 10000 });
+      cy.contains("Collaborators", { timeout: 50000 });
       cy.get("#release-notes", { timeout: 10000 }).click({ force: true });
-      cy.contains("This dataset is at its initial version");
+      cy.contains("This Dataset is at its initial version");
     },
   );
 
@@ -82,15 +88,19 @@ describe("Release notes", () => {
     },
     () => {
       cy.visit(`/dashboard/datasets/${dataset}/edit`);
-      cy.contains("Versioning").parent().parent().as("versioning")
-      cy.get("@versioning").get(".tiptap.ProseMirror").eq(1).type("Testing release notes", {
-        force: true,
-      });
+      cy.contains("Versioning").parent().parent().as("versioning");
+      cy.get("@versioning")
+        .get(".tiptap.ProseMirror")
+        .eq(1)
+        .type("Testing release notes", {
+          force: true,
+        });
       cy.get('[type="submit"]').click({ force: true });
-     cy.contains(`Successfully edited the "${dataset}" dataset`, {
-       timeout: 30000,
-     });
-    })
+      cy.contains(`Successfully edited the "${dataset}" Dataset`, {
+        timeout: 30000,
+      });
+    },
+  );
 
   it(
     "can be set when dataset has pending approval 2",
@@ -102,10 +112,10 @@ describe("Release notes", () => {
     },
     () => {
       cy.visit(`/datasets/${dataset}?approval=true`);
-      cy.contains('Related Datasets', { timeout: 10000 })
-      cy.contains('Collaborators', { timeout: 50000 })
+      cy.contains("Related Datasets", { timeout: 10000 });
+      cy.contains("Collaborators", { timeout: 50000 });
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
-      cy.contains("Testing release notes", { timeout: 60000});
+      cy.contains("Testing release notes", { timeout: 60000 });
       cy.contains("Approve request").click({ force: true });
       cy.contains("Approve Dataset").click({ force: true });
       cy.wait(5000);
@@ -123,16 +133,16 @@ describe("Release notes", () => {
     () => {
       cy.visit(`/datasets/${dataset}`);
       cy.visit(`/datasets/${dataset}`);
-      cy.contains('Related Datasets', { timeout: 10000 })
-      cy.contains('Collaborators', { timeout: 50000 })
+      cy.contains("Related Datasets", { timeout: 10000 });
+      cy.contains("Collaborators", { timeout: 50000 });
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
-      cy.contains("Testing release notes", { timeout: 60000});
+      cy.contains("Testing release notes", { timeout: 60000 });
     },
   );
 
   after(() => {
-    cy.deleteOrganizationAPI(org);
-    cy.deleteGroupAPI(topic);
     cy.deleteDatasetAPI(dataset);
+    cy.deleteGroupAPI(topic);
+    cy.deleteOrganizationAPI(org);
   });
 });

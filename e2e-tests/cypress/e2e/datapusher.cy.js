@@ -1,9 +1,9 @@
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
-const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
-const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
-
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
+const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
+const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
+const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
 
 const dataset = `${uuid()}-test-datasettytytyty`;
 
@@ -12,12 +12,18 @@ describe("Upload file and create dataset", () => {
     cy.login("ckan_admin", "test1234");
   });
 
+  before(() => {
+    cy.createOrganizationAPI(org);
+  });
+
   it("Should create dataset", () => {
     cy.visit("/dashboard/datasets/new");
     cy.get("input[name=title]").type(dataset);
     cy.get("input[name=name]").should("have.value", dataset);
     cy.get("#visibility_type").click();
     cy.get("li").contains("Public").click();
+    cy.get("#team").click();
+    cy.get("li").contains(org).click();
     cy.get("input[name=technical_notes]").type("https://google.com");
     cy.get("textarea[name=short_description]").type("test");
 
@@ -39,7 +45,7 @@ describe("Upload file and create dataset", () => {
       "test-maintainer-2@example.com",
     );
 
-    cy.contains("Next: Datafiles").click();
+    cy.contains("Next: Data Files").click();
     cy.get(".datafile-accordion-trigger").eq(0).click();
     cy.get("input[type=file]").selectFile("cypress/fixtures/cities.csv", {
       force: true,
@@ -79,7 +85,7 @@ describe("Upload file and create dataset", () => {
       cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.contains("Datapusher").click();
       cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
-      cy.contains(`Successfully submited datafile to the datapusher`, {
+      cy.contains(`Successfully submited Data File to the datapusher`, {
         timeout: 15000,
       });
       cy.wait(15000);

@@ -146,6 +146,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         defaultValues: {
             ...dataset,
             id: dataset.id,
+            technical_notes: dataset?.technical_notes || null,
             rw_id: dataset.rw_id,
             //author_email: dataset?.author_email ? dataset.author_email : null,
             rw_dataset: dataset.rw_id ? !!dataset.rw_id : !!dataset.rw_dataset,
@@ -206,13 +207,18 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 }
                 return {
                     ...resource,
+                    title: resource.title ?? resource.name,
                     type: resource.url_type as any,
                     resourceId: resource.id as string,
                     schema: resource.schema ? schema.value : undefined,
                 }
             }),
             spatial_type: dataset.spatial_type
-                ? dataset.spatial_type as "address" | "geom" | "global" | "derived_from_resources"
+                ? (dataset.spatial_type as
+                      | 'address'
+                      | 'geom'
+                      | 'global'
+                      | 'derived_from_resources')
                 : dataset.spatial_address === 'Global'
                   ? 'global'
                   : dataset.spatial_address
@@ -220,13 +226,14 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     : dataset.spatial
                       ? 'geom'
                       : undefined,
+            extras: dataset?.extras ? dataset.extras : [],
         },
     })
 
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
             notify(
-                `Successfully edited the "${title ?? name}" dataset`,
+                `Successfully edited the "${title ?? name}" Dataset`,
                 'success'
             )
 
@@ -238,7 +245,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     })
 
     const {
-        formState: { dirtyFields, touchedFields },
+        formState: { dirtyFields, touchedFields, errors },
     } = formObj
 
     const tabs = [
@@ -507,7 +514,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                     return editDataset.mutate(toBeSavedData)
                                 } else {
                                     notify(
-                                        'No changes to the dataset',
+                                        'No changes to the Dataset',
                                         'success'
                                     )
                                     router.push(`/datasets/${dataset.name}`)

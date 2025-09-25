@@ -7,14 +7,17 @@ import { useRouter } from 'next/router'
 export default function DatasetPageLayout({
     lhs,
     rhs,
+    hasViz,
 }: {
     lhs: React.ReactNode
     rhs: React.ReactNode
+    hasViz: boolean
 }) {
+    const showLhsByDefault = hasViz
     const { query } = useRouter()
     const isApprovalRequest = query?.approval === 'true'
     const [lhsOpen, setLhsOpen] = useState(true)
-    const [rhsOpen, setRhsOpen] = useState(true)
+    const [rhsOpen, setRhsOpen] = useState(showLhsByDefault)
     const [lhsMaxHeight, setLhsMaxHeight] = useState('auto')
     const ref = useRef<HTMLDivElement>(null)
 
@@ -32,11 +35,11 @@ export default function DatasetPageLayout({
 
     return (
         <div className="flex min-h-screen h-full flex-wrap lg:flex-nowrap lg:max-w-screen">
-            <Disclosure defaultOpen>
+            <Disclosure defaultOpen={true}>
                 {({ open }) => (
                     <>
                         <Disclosure.Button
-                            aria-label='Toggle left hand side'
+                            aria-label="Toggle left hand side"
                             onClick={() => {
                                 setLhsOpen(!open)
                             }}
@@ -45,8 +48,8 @@ export default function DatasetPageLayout({
                                 rhsOpen && open
                                     ? ''
                                     : !rhsOpen && open
-                                    ? '!hidden'
-                                    : '',
+                                      ? '!hidden'
+                                      : '',
                                 isApprovalRequest ? 'lg:top-[34vh]' : ''
                             )}
                         >
@@ -81,11 +84,11 @@ export default function DatasetPageLayout({
                 )}
             </Disclosure>
 
-            <Disclosure defaultOpen>
+            <Disclosure defaultOpen={showLhsByDefault}>
                 {({ open }) => (
                     <>
                         <Disclosure.Button
-                            aria-label='Toggle right hand side'
+                            aria-label="Toggle right hand side"
                             onClick={() => {
                                 setRhsOpen(!open)
                             }}
@@ -94,8 +97,8 @@ export default function DatasetPageLayout({
                                 lhsOpen && open
                                     ? ''
                                     : !lhsOpen && open
-                                    ? '!hidden'
-                                    : '',
+                                      ? '!hidden'
+                                      : '',
                                 isApprovalRequest ? 'lg:top-[34vh]' : ''
                             )}
                         >
@@ -106,6 +109,7 @@ export default function DatasetPageLayout({
                                             ? 'translate-y-36 xl:translate-y-12'
                                             : ''
                                     }`,
+                                    showLhsByDefault ? '' : '!hidden',
                                     open
                                         ? ''
                                         : 'translate-x-[calc(100vw-3rem)] lg:translate-x-[calc(50vw-3rem)]'

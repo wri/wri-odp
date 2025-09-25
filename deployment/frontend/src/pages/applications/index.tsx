@@ -122,7 +122,7 @@ export default function ApplicationsPage(
           <div className="default-home-container w-full border-t-[4px] border-stone-900" />
           <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
             This page lets you explore all the data associated with
-            a specific WRI application or data product.
+            a specific WRI Application or data product.
           </h3>
         </div>
       </section>

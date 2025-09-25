@@ -275,6 +275,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "download_event_create": download_event_create,
             "download_event_list": get_download_events,
             "organization_create": organization_create,
+            
             "prefect_send_error_callback": send_error_callback,
         }
 

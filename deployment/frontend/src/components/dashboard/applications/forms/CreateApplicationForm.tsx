@@ -14,7 +14,7 @@ import { useRouter } from 'next/router'
 
 const links = [
     { label: 'Applications', url: '/dashboard/applications', current: false },
-    { label: 'Create a application', url: '/dashboard/applications/new', current: true },
+    { label: 'Create an Application', url: '/dashboard/applications/new', current: true },
 ]
 
 export default function CreateApplicationForm() {
@@ -26,7 +26,7 @@ export default function CreateApplicationForm() {
 
     const createApplication = api.applications.createApplication.useMutation({
         onSuccess: async ({ name, title }) => {
-            notify(`Successfully created the ${title ?? name} application`, 'success')
+            notify(`Successfully created the ${title ?? name} Application`, 'success')
             router.push('/dashboard/applications')
             formObj.reset()
         },
@@ -36,7 +36,7 @@ export default function CreateApplicationForm() {
                 error.message.includes('Application name already exists in database')
             ) {
                 errorMessage =
-                    'Application name already exists in database or there is a team/topic with this name'
+                    'Application name already exists in database or there is a Team/Topic with this name'
             }
 
             setErrorMessage(errorMessage)
@@ -58,7 +58,7 @@ export default function CreateApplicationForm() {
             <Breadcrumbs links={links} />
             <Container className="mb-20 font-acumin">
                 <h1 className="mb-[2rem] text-[1.57rem] font-semibold">
-                    Create a application
+                    Create an Application
                 </h1>
 
                 <form

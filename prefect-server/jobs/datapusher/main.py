@@ -1,6 +1,7 @@
 import json
 import tempfile
 import time
+import os
 from datasize import DataSize
 from prefect import flow, get_run_logger
 from models import GetResource, Resource
@@ -24,6 +25,8 @@ DATASTORE_URLS = {
     "datastore_delete": "{ckan_url}/api/action/datastore_delete",
     "resource_update": "{ckan_url}/api/action/resource_update",
 }
+
+DEPLOYMENT_ENV = os.environ["FLOW_DEPLOYMENT_ENV"]
 
 
 @flow(log_prints=True)
@@ -103,4 +106,7 @@ def push_to_datastore(resource_id: str):
 
 
 if __name__ == "__main__":
-    push_to_datastore.serve(name="datapusher")
+    push_to_datastore.serve(
+        name="datapusher",
+        tags=[DEPLOYMENT_ENV]
+    )

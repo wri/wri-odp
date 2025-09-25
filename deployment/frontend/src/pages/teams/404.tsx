@@ -31,7 +31,7 @@ export default function TeamsNotFound() {
                             href="/teams"
                             className="text-sm font-semibold text-gray-900"
                         >
-                            Go back to the team search page
+                            Go back to the Team search page
                         </a>
                     </div>
                 </div>

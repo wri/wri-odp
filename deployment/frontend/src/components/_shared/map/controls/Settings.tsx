@@ -6,10 +6,10 @@ import { type MapRef } from 'react-map-gl'
 import Boundaries from './Boundaries'
 import { SettingsIcon } from '../../icons/SettingsIcon'
 
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 
 export default function Settings({
     mapRef,
@@ -18,7 +18,7 @@ export default function Settings({
 }) {
     const [open, setOpen] = useState(false)
     return (
-        <IconButton tooltip='Map settings' onClick={() => setOpen(true)}>
+        <IconButton tooltip="Map settings" onClick={() => setOpen(true)}>
             <SettingsIcon />
             <Modal open={open} setOpen={setOpen} className="max-w-[36rem]">
                 <h2 className="font-['Acumin Pro SemiCondensed'] text-3xl font-normal text-black mb-5">
@@ -31,12 +31,8 @@ export default function Settings({
                     <div className="basis-1/2 pr-2">
                         <LabelSelector />
                     </div>
-                    <div className="basis-1/2">
-                        <Boundaries mapRef={mapRef} />
-                    </div>
                 </div>
             </Modal>
         </IconButton>
     )
 }
-
