@@ -28,6 +28,7 @@ import requests
 from ckanext.wri.logic.action.get import validate_visibility
 import json
 from typing import Any, Dict, List, Tuple
+from ckan.lib.search import index_for
 
 # encoding: utf-8
 
@@ -567,6 +568,11 @@ def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.Pa
         ).update({"metadata_modified": old_pkg['metadata_modified']})
         model.Session.commit()
         output['metadata_modified'] = old_pkg['metadata_modified']
+        try:
+            package_index = index_for('package')
+            package_index.index_package(output)
+        except Exception as e:
+            log.error(f"Failed to index package {output['id']}: {e}")
     return output
 
 
