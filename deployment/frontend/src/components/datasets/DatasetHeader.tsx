@@ -756,8 +756,7 @@ export function DatasetHeader({
               </span>
             )}
             <div className=''>
-              {/* TODO: FIX THIS */}
-              <CopyButton content={`https://datasets.wri.org/datasets/${dataset?.name}`} />
+              <CopyButton content={`${env.NEXT_PUBLIC_NEXTAUTH_URL.replace(/\/+$/, '')}/datasets/${dataset?.name}`} />
             </div>
           </div>
           <p
@@ -803,8 +802,6 @@ export function DatasetHeader({
               </div>
             </div>
             {session.data?.user &&
-              dataset?.featured_image &&
-              dataset?.featured_image !== '' &&
               dataset?.featured_dataset && (
                 <div className="flex gap-x-1">
                   <TrophyIcon className="h-5 w-5 text-blue-800" />
@@ -815,52 +812,6 @@ export function DatasetHeader({
                       )}`}
                     >
                       Requested to be featured
-                    </div>
-                    <div className="block lg:hidden text-sm font-light text-stone-900">
-                      <Popover>
-                        <PopoverTrigger>
-                          <span className="flex items-center gap-x-1">
-                            <span className="mt-1.5">
-                              Click here to
-                              preview
-                            </span>
-                          </span>
-                        </PopoverTrigger>
-                        <PopoverContent className="p-1 w-64">
-                          <Image
-                            src={
-                              dataset?.featured_image
-                            }
-                            width={640}
-                            height={640}
-                            alt="featured image"
-                            className="w-64 h-64"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    <div className="hidden lg:block text-sm font-light text-stone-900">
-                      <DefaultTooltip
-                        side="bottom"
-                        content={
-                          <Image
-                            src={
-                              dataset?.featured_image
-                            }
-                            width={640}
-                            height={640}
-                            alt="featured image"
-                            className="w-64 h-64"
-                          />
-                        }
-                      >
-                        <span className="flex items-center gap-x-1">
-                          <InformationCircleIcon className="h-5 w-5 text-blue-800" />
-                          <span className="mt-1.5">
-                            Preview image here
-                          </span>
-                        </span>
-                      </DefaultTooltip>
                     </div>
                   </div>
                 </div>
