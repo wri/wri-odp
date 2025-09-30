@@ -756,8 +756,12 @@ export function DatasetHeader({
               </span>
             )}
             <div className=''>
+<<<<<<< HEAD
               {/* TODO: FIX THIS */}
               <CopyButton content={`https://datasets.wri.org/datasets/${dataset?.name}`} />
+=======
+              <CopyButton content={`${env.NEXT_PUBLIC_NEXTAUTH_URL.replace(/\/+$/, '')}/datasets/${dataset?.name}`} />
+>>>>>>> staging
             </div>
           </div>
           <p
@@ -803,8 +807,11 @@ export function DatasetHeader({
               </div>
             </div>
             {session.data?.user &&
+<<<<<<< HEAD
               dataset?.featured_image &&
               dataset?.featured_image !== '' &&
+=======
+>>>>>>> staging
               dataset?.featured_dataset && (
                 <div className="flex gap-x-1">
                   <TrophyIcon className="h-5 w-5 text-blue-800" />
@@ -816,6 +823,7 @@ export function DatasetHeader({
                     >
                       Requested to be featured
                     </div>
+<<<<<<< HEAD
                     <div className="block lg:hidden text-sm font-light text-stone-900">
                       <Popover>
                         <PopoverTrigger>
@@ -862,6 +870,8 @@ export function DatasetHeader({
                         </span>
                       </DefaultTooltip>
                     </div>
+=======
+>>>>>>> staging
                   </div>
                 </div>
               )}

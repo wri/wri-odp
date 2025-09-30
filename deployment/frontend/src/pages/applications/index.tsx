@@ -22,6 +22,10 @@ const ApplicationSearchResult = dynamic(
 )
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+<<<<<<< HEAD
+=======
+  const searchParams = context.query
+>>>>>>> staging
   const session = await getServerAuthSession(context)
   const helpers = createServerSideHelpers({
     router: appRouter,
@@ -35,6 +39,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       trpcState: helpers.dehydrate(),
+<<<<<<< HEAD
+=======
+      searchParams,
+>>>>>>> staging
     },
   }
 }
@@ -42,11 +50,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 export default function ApplicationsPage(
   props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
+<<<<<<< HEAD
   const [pagination, setPagination] = useState<SearchInput>({
     search: '',
     page: { start: 0, rows: 10 },
   })
   const [query, setQuery] = useState<string>('')
+=======
+  console.log(props)
+  const [pagination, setPagination] = useState<SearchInput>({
+    search: props.searchParams?.search as string ?? '',
+    page: { start: 0, rows: 10 },
+  })
+  const [query, setQuery] = useState<string>(props.searchParams?.search as string ?? '')
+>>>>>>> staging
   const { data: applications, isLoading } =
     api.applications.getAllApplications.useQuery()
 
