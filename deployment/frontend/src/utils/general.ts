@@ -123,6 +123,9 @@ export function matchesAnyPattern(item: string): boolean {
         /total_record_count/,
         /organization.visibility/,
         /num_resources/,
+        /organization.created/,
+        /organization.id/,
+        /owner_org/,
     ]
     return !patterns.some((pattern) => pattern.test(item))
 }
@@ -163,7 +166,8 @@ const datasetFormFieldmap: Record<string, string> = {
     usecases: 'Advanced API Usage',
     restrictions: 'Restrictions',
     reason_for_adding: 'Reason for adding',
-    owner_org: 'Team',
+    'organization.title': 'Team',
+    'organization.name': 'Team',
 }
 
 //@ts-nocheck
