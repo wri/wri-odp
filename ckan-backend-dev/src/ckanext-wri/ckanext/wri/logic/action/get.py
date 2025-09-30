@@ -695,13 +695,10 @@ def is_falsey(value):
     return False
 
 
-def _diff(existing, pending, path="", level=1):
+def _diff(existing, pending, path=""):
     diff = {}
-    if level == 1:
-        keys = set(existing.keys()) & set(pending.keys())
-        keys.add("extras")
-    else:
-        keys = set(existing.keys()) | set(pending.keys())
+    keys = set(existing.keys()) | set(pending.keys())
+
 
     for key in keys:
         full_path = f"{path}.{key}" if path else key
@@ -709,10 +706,10 @@ def _diff(existing, pending, path="", level=1):
         pending_value = pending.get(key, None)
 
         if isinstance(existing_value, dict) and isinstance(pending_value, dict):
-            nested_diff = _diff(existing_value, pending_value, full_path, level + 1)
+            nested_diff = _diff(existing_value, pending_value, full_path)
             diff.update(nested_diff)
         elif isinstance(existing_value, list) and isinstance(pending_value, list):
-            list_diff = _process_lists(existing_value, pending_value, full_path, level + 1)
+            list_diff = _process_lists(existing_value, pending_value, full_path)
             diff.update(list_diff)
         elif existing_value != pending_value:
             if is_falsey(existing_value) and is_falsey(pending_value):
@@ -723,7 +720,7 @@ def _diff(existing, pending, path="", level=1):
     return diff
 
 
-def _process_lists(existing_list, pending_list, path, level=1):
+def _process_lists(existing_list, pending_list, path):
     list_diff = {}
 
     if path == "resources":
@@ -735,7 +732,7 @@ def _process_lists(existing_list, pending_list, path, level=1):
 
             if len(item_existing_list) > 0:
                 existing_res = item_existing_list[0]
-                item_diff = _diff(existing_res, pending_res, item_path, level)
+                item_diff = _diff(existing_res, pending_res, item_path)
                 list_diff.update(item_diff)
 
         return list_diff
@@ -746,7 +743,7 @@ def _process_lists(existing_list, pending_list, path, level=1):
         item_path = f"{path}[{index}]"
 
         if isinstance(item_existing, dict) and isinstance(item_pending, dict):
-            item_diff = _diff(item_existing, item_pending, item_path, level)
+            item_diff = _diff(item_existing, item_pending, item_path)
             list_diff.update(item_diff)
         elif item_existing != item_pending:
             if is_falsey(item_existing) and is_falsey(item_pending):
