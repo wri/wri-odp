@@ -10,6 +10,7 @@ import { WriDataset } from '@/schema/ckan.schema'
 import { api } from '@/utils/api'
 import { ErrorAlert } from '../_shared/Alerts'
 import Spinner from '../_shared/Spinner'
+import Card from '@/components/Card'
 
 interface TopicProps {
     title: string
@@ -128,7 +129,7 @@ export function HighlightsCarousel() {
                     {featuredDatasets?.datasets.map((highlight, index) => (
                         <SwiperSlide key={index} className="">
                             <div className="w-72 pr-6">
-                                <HighlightCard highlight={highlight} />
+                                <Card dataset={highlight as WriDataset} />
                             </div>
                         </SwiperSlide>
                     ))}

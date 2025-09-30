@@ -33,7 +33,7 @@ export default function ActivityStreamCard({ activity }: { activity: activity })
     new: "add",
     deleted: "update",
   }
-  
+
   return (
     <div className='w-full flex gap-x-3'>
       <DefaultTooltip content={activity.actionType}>

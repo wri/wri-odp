@@ -12,7 +12,7 @@ import type { GroupTree } from '@/schema/ckan.schema';
 import notify from '@/utils/notify'
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
-    ssr: false,
+  ssr: false,
 });;
 import { useRouter } from 'next/router'
 import { LoaderButton, Button } from '@/components/_shared/Button'
@@ -25,42 +25,42 @@ import type { Application } from '@/schema/ckan.schema'
 function ApplicationProfile({ application }: { application: Application }) {
   return (
     <div className='flex py-5 pl-2' >
-        <div className="flex flex-row gap-x-4 hover:bg-slate-100  rounded-md">
-            <div className="flex gap-x-4">
-                <div
-                    className="relative rounded-md w-16 h-16 bg-[#F9F9F9]"
-                >
-                    <Image
-                        src={
-                            application?.image_display_url
-                                ? application.image_display_url
-                                : '/images/placeholders/applications/applicationsdefault.png'                        }
-                        alt=""
-                        className="rounded-md object-cover"
-                        fill
-                    />
-                </div>
-            </div>
-            <div className="flex flex-col py-3">
-                <p className="font-normal text-base">
-                    {application?.title || application.name}
-                </p>
-                {application?.description ? (
-                    <span className="text-[#666666] font-tight text-[12px] ">
-                        {application.description}
-                    </span>
-                ) : (
-                    ''
-                )}
-            </div>
+      <div className="flex flex-row gap-x-4 hover:bg-slate-100  rounded-md">
+        <div className="flex gap-x-4">
+          <div
+            className="relative rounded-md w-16 h-16 bg-[#F9F9F9]"
+          >
+            <Image
+              src={
+                application?.image_display_url
+                  ? application.image_display_url
+                  : '/images/placeholders/applications/applicationsdefault.png'}
+              alt=""
+              className="rounded-md object-cover"
+              fill
+            />
+          </div>
         </div>
+        <div className="flex flex-col py-3">
+          <p className="font-normal text-base">
+            {application?.title || application.name}
+          </p>
+          {application?.description ? (
+            <span className="text-[#666666] font-tight text-[12px] ">
+              {application.description}
+            </span>
+          ) : (
+            ''
+          )}
+        </div>
+      </div>
     </div>
   )
 }
 
 export default function ApplicationCard() {
   const [query, setQuery] = useState<SearchInput>({ search: '', page: { start: 0, rows: 10 } })
-  const { data: applications , isLoading, refetch } = api.applications.getAllApplications.useQuery()
+  const { data: applications, isLoading, refetch } = api.applications.getAllApplications.useQuery()
   const [open, setOpen] = useState(false)
   const router = useRouter()
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null)
@@ -78,7 +78,7 @@ export default function ApplicationCard() {
   }
 
   const filteredApplications = applications?.filter((application) => {
-    return application.name.toLowerCase().includes(query.search.toLowerCase())
+    return application.name.toLowerCase().includes(query.search.toLowerCase()) || application.title.toLowerCase().includes(query.search.toLowerCase()) || application.description.toLowerCase().includes(query.search.toLowerCase())
   })
   const paginatedApplications = filteredApplications?.slice(query.page.start, query.page.start + query.page.rows)
 
