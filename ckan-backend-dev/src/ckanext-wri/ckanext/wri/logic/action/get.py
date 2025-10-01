@@ -711,7 +711,7 @@ def _diff(existing, pending, path=""):
         elif isinstance(existing_value, list) and isinstance(pending_value, list):
             list_diff = _process_lists(existing_value, pending_value, full_path)
             diff.update(list_diff)
-        elif existing_value != pending_value:
+        elif str(existing_value) != str(pending_value): # lazy deep comparison
             if is_falsey(existing_value) and is_falsey(pending_value):
                 continue
             else:
