@@ -686,7 +686,7 @@ def is_falsey(value):
         
     if isinstance(value, str):
         value_str = value.strip().lower()
-        if value_str in ("", "null", "none", "0", "0.0"):
+        if value_str in ("", "null", "none", "0", "0.0", "[]"):
             return True
             
     if isinstance(value, dict) and not value:
@@ -711,7 +711,7 @@ def _diff(existing, pending, path=""):
         elif isinstance(existing_value, list) and isinstance(pending_value, list):
             list_diff = _process_lists(existing_value, pending_value, full_path)
             diff.update(list_diff)
-        elif existing_value != pending_value:
+        elif str(existing_value) != str(pending_value): # lazy deep comparison
             if is_falsey(existing_value) and is_falsey(pending_value):
                 continue
             else:
