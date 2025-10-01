@@ -686,7 +686,7 @@ def is_falsey(value):
         
     if isinstance(value, str):
         value_str = value.strip().lower()
-        if value_str in ("", "null", "none", "0", "0.0"):
+        if value_str in ("", "null", "none", "0", "0.0", "[]"):
             return True
             
     if isinstance(value, dict) and not value:
