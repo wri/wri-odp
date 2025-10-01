@@ -121,6 +121,18 @@ export function matchesAnyPattern(item: string): boolean {
         /preview/,
         /hash/,
         /total_record_count/,
+        /organization.visibility/,
+        /num_resources/,
+        /organization.created/,
+        /organization.id/,
+        /owner_org/,
+        /is_pending/,
+        /is_authorized/,
+        /issue_count/,
+        /drafts/,
+        /isopen/,
+        /has_chart_views/,
+        /is_approved/,
     ]
     return !patterns.some((pattern) => pattern.test(item))
 }
@@ -161,7 +173,9 @@ const datasetFormFieldmap: Record<string, string> = {
     usecases: 'Advanced API Usage',
     restrictions: 'Restrictions',
     reason_for_adding: 'Reason for adding',
-    owner_org: 'Team',
+    'organization.title': 'Team',
+    'organization.name': 'Team',
+    tag_string: 'Tags',
 }
 
 //@ts-nocheck
@@ -175,19 +189,27 @@ export function formatDiff(
     if (data) {
         for (const key in data) {
             if (key.startsWith('authors') || key.startsWith('maintainers')) {
-                const key_cleaned = key.includes('authors') ? 'authors' : 'maintainers'
+                const key_cleaned = key.includes('authors')
+                    ? 'authors'
+                    : 'maintainers'
                 const newKey = datasetFormFieldmap[key_cleaned]!
 
                 const old_value = data[key]?.old_value
                 const new_value = data[key]?.new_value
 
                 outputDiff[newKey] = {
-                    old_value: old_value && typeof old_value === 'string' && old_value.startsWith('[{')
-                        ? JSON.parse(old_value)
-                        : old_value || '',
-                    new_value: new_value && typeof new_value === 'string' && new_value.startsWith('[{')
-                        ? JSON.parse(new_value)
-                        : new_value || '',
+                    old_value:
+                        old_value &&
+                        typeof old_value === 'string' &&
+                        old_value.startsWith('[{')
+                            ? JSON.parse(old_value)
+                            : old_value || '',
+                    new_value:
+                        new_value &&
+                        typeof new_value === 'string' &&
+                        new_value.startsWith('[{')
+                            ? JSON.parse(new_value)
+                            : new_value || '',
                 }
             } else if (
                 !key.startsWith('resource') &&
@@ -298,15 +320,15 @@ export function formatDiff(
                                 data[key]?.old_value === null ||
                                 data[key]?.old_value === 'null'
                                     ? null
-                                    : data[key]?.old_value['name'] ??
-                                      data[key]?.old_value['title'],
+                                    : (data[key]?.old_value['name'] ??
+                                      data[key]?.old_value['title']),
 
                             new_value:
                                 data[key]?.new_value === null ||
                                 data[key]?.new_value === 'null'
                                     ? null
-                                    : data[key]?.new_value['name'] ??
-                                      data[key]?.new_value['title'],
+                                    : (data[key]?.new_value['name'] ??
+                                      data[key]?.new_value['title']),
                         }
                     }
                 }

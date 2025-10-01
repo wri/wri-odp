@@ -134,7 +134,6 @@ class SolrSpatialFieldSearchBackend:
         ]
 
     def index_dataset(self, dataset_dict):
-        print("INDEXING DATASET", flush=True)
         wkt = None
         geom_from_metadata = dataset_dict.get("spatial")
         if not geom_from_metadata:

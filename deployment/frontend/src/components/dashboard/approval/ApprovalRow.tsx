@@ -130,6 +130,7 @@ function FormatNewValue(
     if (key === 'Open In') {
         const open_in_array = JSON.parse(value as string)
         if (!Array.isArray(open_in_array)) return <span>Not specified</span>
+        if (open_in_array.length === 0) return <span>Not specified</span>
         return (
             <span className="flex gap-x-2 items-center">
                 {(open_in_array as Array<{ title: string; url: string }>).map(
@@ -159,6 +160,7 @@ function FormatNewValue(
             ({ title, name }) => <span>{title ?? name}</span>
         )
         .with('notspecified', () => <span>Not specified</span>)
+        .with(P.union('null', '', 'none'), () => <span>Not specified</span>)
         .with(P.boolean, (v) => <span>{v ? 'True' : 'False'}</span>)
         .with(P.string, (value) => {
             if (key === 'spatial_type' || key === 'Update Frequency')
@@ -166,7 +168,7 @@ function FormatNewValue(
             return <div dangerouslySetInnerHTML={{ __html: value }}></div>
         })
         .with(null, () => <span>Not specified</span>)
-        .with(P.array(P.nullish), () => <span>Empty</span>)
+        .with(P.array(P.nullish), () => <span>Not specified</span>)
         .with(P.number, (value) => <span>{value}</span>)
         .with(P.array(P.string), (value) => {
             if (
@@ -185,7 +187,9 @@ function FormatNewValue(
                             <PopoverContent className="p-4 bg-white shadow-lg rounded-lg lg:max-w-lg max-w-sm w-full">
                                 <ScrollArea className="h-[300px]">
                                     <div className="flex flex-col gap-y-4">
-                                        <pre>{value.map((v) => v)}</pre>
+                                        <pre className="whitespace-pre-wrap text-sm font-mono bg-gray-50 p-3 rounded-md overflow-auto">
+                                            {value.map((v) => v)}
+                                        </pre>
                                     </div>
                                 </ScrollArea>
                             </PopoverContent>

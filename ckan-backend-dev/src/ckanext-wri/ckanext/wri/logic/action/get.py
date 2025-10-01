@@ -677,9 +677,28 @@ def pending_diff_show(context: Context, data_dict: DataDict):
     }
 
 
+def is_falsey(value):
+    if not value and value != 0:
+        return True
+        
+    if value == 0 or value == 0.0:
+        return True
+        
+    if isinstance(value, str):
+        value_str = value.strip().lower()
+        if value_str in ("", "null", "none", "0", "0.0", "[]"):
+            return True
+            
+    if isinstance(value, dict) and not value:
+        return True
+        
+    return False
+
+
 def _diff(existing, pending, path=""):
     diff = {}
     keys = set(existing.keys()) | set(pending.keys())
+
 
     for key in keys:
         full_path = f"{path}.{key}" if path else key
@@ -692,8 +711,11 @@ def _diff(existing, pending, path=""):
         elif isinstance(existing_value, list) and isinstance(pending_value, list):
             list_diff = _process_lists(existing_value, pending_value, full_path)
             diff.update(list_diff)
-        elif existing_value != pending_value:
-            diff[full_path] = {"old_value": existing_value, "new_value": pending_value}
+        elif str(existing_value) != str(pending_value): # lazy deep comparison
+            if is_falsey(existing_value) and is_falsey(pending_value):
+                continue
+            else:
+                diff[full_path] = {"old_value": existing_value, "new_value": pending_value}
 
     return diff
 
@@ -724,10 +746,13 @@ def _process_lists(existing_list, pending_list, path):
             item_diff = _diff(item_existing, item_pending, item_path)
             list_diff.update(item_diff)
         elif item_existing != item_pending:
-            list_diff[item_path] = {
-                "old_value": item_existing,
-                "new_value": item_pending,
-            }
+            if is_falsey(item_existing) and is_falsey(item_pending):
+                continue
+            else:
+                list_diff[item_path] = {
+                    "old_value": item_existing,
+                    "new_value": item_pending,
+                }
 
     return list_diff
 
