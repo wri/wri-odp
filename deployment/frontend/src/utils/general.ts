@@ -114,6 +114,11 @@ function isWithinTimeframe(isoTimestamp: string, timeframe: string): boolean {
 export function matchesAnyPattern(item: string): boolean {
     const patterns: RegExp[] = [
         /resource\[\d+\]\.connector/,
+        /resources\[\d+\]\.layer/,
+        /resources\[\d+\]\.layerObjRaw/,
+        /resources\[\d+\]\.provider/,
+        /resources\[\d+\]\.connectorType/,
+        /resources\[\d+\]\.type/,
         /modified/,
         /datastore_active/,
         /rw_id/,
@@ -262,6 +267,14 @@ export function formatDiff(
                     const mainKey = key.split('.')[0]!
                     const subKey = key.split('.').slice(1).join('.')!
                     if (subKey) {
+                        if (subKey === 'title') {
+                            if (
+                                data[key]?.old_value === null ||
+                                data[key]?.old_value === 'null'
+                            ) {
+                                continue
+                            }
+                        }
                         outputDiff[mainKey] = outputDiff[mainKey] || {
                             old_value: [],
                             new_value: [],
