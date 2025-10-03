@@ -119,6 +119,7 @@ export function matchesAnyPattern(item: string): boolean {
         /resources\[\d+\]\.provider/,
         /resources\[\d+\]\.connectorType/,
         /resources\[\d+\]\.type/,
+        /resources\[\d+\]\.resourceId/,
         /modified/,
         /datastore_active/,
         /rw_id/,

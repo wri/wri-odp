@@ -273,9 +273,9 @@ export const DatasetRouter = createTRPCRouter({
                                     ...resource,
                                     format: resource.format ?? '',
                                     id: resource.resourceId,
-                                    resourceId: undefined,
+                                    // resourceId: undefined,
                                     url_type: resource.type,
-                                    type: undefined,
+                                    // type: undefined,
                                     layerObjRaw: null,
                                     layerObj: null,
                                     schema: resource.schema
@@ -643,8 +643,6 @@ export const DatasetRouter = createTRPCRouter({
                                         schema: resource.schema
                                             ? { value: resource.schema }
                                             : '{}',
-                                        resourceId: undefined,
-                                        type: undefined,
                                         url: resource.url ?? resource.name,
                                         created:
                                             rr?.created ??
