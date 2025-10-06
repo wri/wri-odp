@@ -1,0 +1,394 @@
+[
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/styles/v1/resourcewatch/cjzmw480d00z41cp2x81gm90h?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/styles/v1/mapbox/streets-v9?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.terrain-rgb.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/resourcewatch.52ns46bh.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/rootsearth.dp2ly0s0.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/rootsearth.5m4y2tkh.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.satellite.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/rootsearth.81zla3qr.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/resourcewatch.ain38a5v.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/rootsearth.15jle86e.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/rootsearth.dyuuxgr8.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/resourcewatch.dzbyva06.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/resourcewatch.3xrcaanz.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/resourcewatch.7tptx7ux.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/rootsearth.d8od8udq.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/styles/v1/resourcewatch/cjzmw480d00z41cp2x81gm90h/708i3gq4n3dmv0icw5atveb4x/sprite@2x.json?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/styles/v1/resourcewatch/cjzmw480d00z41cp2x81gm90h/708i3gq4n3dmv0icw5atveb4x/sprite@2x.png?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7.json?secure&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/styles/v1/mapbox/streets-v9/sprite@2x.json?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/styles/v1/mapbox/streets-v9/sprite@2x.png?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/1/0/1.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/1/1/1.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/1/0/0.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/1/1/0.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/3/4/4.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/3/4/3.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/3/3/4.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/3/3/3.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/fonts/v1/resourcewatch/DIN%20Offc%20Pro%20Regular,Arial%20Unicode%20MS%20Regular/0-255.pbf?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/fonts/v1/resourcewatch/DIN%20Offc%20Pro%20Italic,Arial%20Unicode%20MS%20Regular/0-255.pbf?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/fonts/v1/resourcewatch/DIN%20Offc%20Pro%20Bold,Arial%20Unicode%20MS%20Bold/0-255.pbf?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/fonts/v1/resourcewatch/DIN%20Offc%20Pro%20Medium,Arial%20Unicode%20MS%20Regular/0-255.pbf?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/fonts/v1/resourcewatch/DIN%20Offc%20Pro%20Regular,Arial%20Unicode%20MS%20Regular/8192-8447.pbf?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/fonts/v1/mapbox/DIN%20Offc%20Pro%20Italic,Arial%20Unicode%20MS%20Regular/0-255.pbf?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/fonts/v1/mapbox/DIN%20Offc%20Pro%20Medium,Arial%20Unicode%20MS%20Regular/0-255.pbf?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/map-sessions/v1?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/map-sessions/v1?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/3/5/4.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/3/5/3.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/3/3/5.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/3/4/5.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/3/5/5.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/4/9/8.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/4/9/9.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/4/8/8.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/4/8/9.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/4/10/9.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/4/10/8.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/18/17.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/19/17.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/18/16.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/18/18.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/17/17.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/19/16.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/17/16.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/19/18.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/17/18.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/36/34.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/36/35.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/38/34.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/37/34.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/38/35.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/37/35.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/37/33.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/36/33.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/38/33.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/7/74/69.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/7/73/69.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/7/74/68.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/7/73/68.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/7/74/70.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/7/73/70.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/7/75/68.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/7/75/69.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/7/75/70.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/38/34.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/6/38/35.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/18/18.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2/5/19/18.vector.pbf?sku=101JhcYqdf7jD&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/geocoding/v5/mapbox.places/Br.json?limit=8&types=country%2Cregion%2Cplace%2Clocality&language=en-US&session_token=-gbVnP3Z-AnFw4pcvY6Xd.1&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/geocoding/v5/mapbox.places/Bra.json?limit=8&types=country%2Cregion%2Cplace%2Clocality&language=en-US&session_token=-gbVnP3Z-AnFw4pcvY6Xd.1&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/geocoding/v5/mapbox.places/Brazi.json?limit=8&types=country%2Cregion%2Cplace%2Clocality&language=en-US&session_token=-gbVnP3Z-AnFw4pcvY6Xd.1&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/geocoding/v5/mapbox.places/Brazil.json?limit=8&types=country%2Cregion%2Cplace%2Clocality&language=en-US&session_token=-gbVnP3Z-AnFw4pcvY6Xd.1&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/2/1/1.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/2/1/2.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/2/0/2.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/2/2/2.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/2/2/1.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/2/0/1.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/3/3/4.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/3/2/4.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/4/5/9.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/4/5/8.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/4/6/9.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/4/6/8.vector.pbf?sku=101lHgMZPcqh4&access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/fonts/v1/mapbox/DIN%20Offc%20Pro%20Regular,Arial%20Unicode%20MS%20Regular/0-255.pbf?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  },
+  {
+    "method": "GET",
+    "url": "https://api.mapbox.com/fonts/v1/mapbox/DIN%20Offc%20Pro%20Bold,Arial%20Unicode%20MS%20Bold/0-255.pbf?access_token=pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+  }
+]
