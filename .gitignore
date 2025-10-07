@@ -172,3 +172,8 @@ ckan-backend-dev/src/ckan*
 !ckan-backend-dev/src/ckanext-wri
 
 test_tests.sh
+
+# Load Testing
+load-testing/results/*
+!load-testing/results/.gitkeep
+load-testing/.env
