@@ -409,12 +409,19 @@ export default function DatasetPage(
         },
     ]
 
-    let diffFields: string[] | never[] = []
+    let diffFields: string[] = []
 
     if (pendingExist && diffData) {
-        diffFields = Object.keys(diffData.diff).filter((item) =>
-            matchesAnyPattern(item)
-        )
+        diffFields = Object.keys(diffData.diff).filter((item) => {
+            if (item.includes('resources') && item.includes('title')) {
+                const rtitle = diffData.diff[item]?.old_value
+                if (rtitle === 'null' || rtitle === null) {
+                    return false
+                }
+            } else {
+                return matchesAnyPattern(item)
+            }
+        })
     }
 
     let resourceDiffValues: Array<
@@ -427,6 +434,7 @@ export default function DatasetPage(
         > = {}
 
         for (const current in diffData.diff) {
+            if( !diffFields.includes(current) ) continue; 
             if (current.includes('resource')) {
                 const resource = current.split('.')[0]!
                 const field = current.split('.')[1]!

@@ -69,7 +69,6 @@ export const activityStreamRouter = createTRPCRouter({
 
       const data = (await response.json()) as CkanResponse<Activity[]>
       const activities = data.result.map((activity: Activity) => {
-        console.log('ACTIVITY', activity)
         let user_data = activity.user_data as User
         const activityDetailsObj = activityDetails(activity)
         const parts = activityDetailsObj.description.split(' ')

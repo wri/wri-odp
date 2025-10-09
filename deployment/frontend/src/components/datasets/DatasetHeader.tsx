@@ -723,7 +723,7 @@ export function DatasetHeader({
               <span
                 className={classNames(
                   'w-fit',
-                  highlighted('organization')
+                  highlighted('organization.title')
                 )}
               >
                 {dataset?.organization?.title ?? 'No Team'}
