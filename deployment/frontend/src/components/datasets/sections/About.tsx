@@ -27,19 +27,21 @@ export function About({
         return highlighted(`extras[${index}].key`) !== ''
             ? highlighted(`extras[${index}].key`)
             : highlighted(`extras[${index}].value`) !== ''
-            ? highlighted(`extras[${index}].value`)
-            : highlighted(`extras[${index}]`)
+              ? highlighted(`extras[${index}].value`)
+              : highlighted(`extras[${index}]`)
     }
     const highlightTags = (index: number) => {
         return highlighted(`tags[${index}].display_name`) !== ''
             ? highlighted(`tags[${index}].display_name`)
             : highlighted(`tags[${index}].name`) !== ''
-            ? highlighted(`tags[${index}].name`)
-            : highlighted(`tags[${index}]`)
+              ? highlighted(`tags[${index}].name`)
+              : highlighted(`tags[${index}]`)
     }
-    const topics = dataset.groups?.filter((group) => group.type === 'group') ?? []
+    const topics =
+        dataset.groups?.filter((group) => group.type === 'group') ?? []
     //@ts-ignore
-    const applications = dataset.groups?.filter((group) => group.type === 'application') ?? []
+    const applications =
+        dataset.groups?.filter((group) => group.type === 'application') ?? []
     return (
         <div className="flex flex-col gap-y-4 py-2">
             <div className="font-acumin text-base font-normal text-black">
@@ -176,15 +178,19 @@ export function About({
                                 Applications:{' '}
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
-                                {applications.map((application, applicationIdx) => (
-                                    <span>
-                                        {application.display_name ?? application.name}
-                                        {applications &&
-                                        applicationIdx !== applications.length - 1
-                                            ? ', '
-                                            : ''}
-                                    </span>
-                                ))}
+                                {applications.map(
+                                    (application, applicationIdx) => (
+                                        <span>
+                                            {application.display_name ??
+                                                application.name}
+                                            {applications &&
+                                            applicationIdx !==
+                                                applications.length - 1
+                                                ? ', '
+                                                : ''}
+                                        </span>
+                                    )
+                                )}
                             </dd>
                         </>
                     </div>

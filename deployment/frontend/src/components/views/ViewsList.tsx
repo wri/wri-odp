@@ -49,10 +49,10 @@ export default function ViewsList(props: ViewsListProps) {
     const [views, setViews] = useState<ViewState[]>(
         ogViews
             ? ogViews.map((view) => ({
-                ...view,
-                _state: 'saved',
-                _id: getUniqueInternalId(),
-            }))
+                  ...view,
+                  _state: 'saved',
+                  _id: getUniqueInternalId(),
+              }))
             : []
     )
 
@@ -66,7 +66,7 @@ export default function ViewsList(props: ViewsListProps) {
                         provider: props.provider,
                         id:
                             props.provider == 'datastore'
-                                ? datafile?.id ?? ''
+                                ? (datafile?.id ?? '')
                                 : props.rwDatasetId,
                         props: {
                             data: [],
@@ -108,7 +108,7 @@ export default function ViewsList(props: ViewsListProps) {
                                 content={'Data File must be in DataStore '}
                                 disabled={isCanCreateChartview}
                             >
-                                <div className='flex items-center'>
+                                <div className="flex items-center">
                                     <Button
                                         variant="ghost"
                                         className="w-full"

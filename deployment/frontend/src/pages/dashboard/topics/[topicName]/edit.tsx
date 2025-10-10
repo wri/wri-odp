@@ -49,9 +49,7 @@ const EditTopicPage: NextPage<{ topicName: string }> = ({ topicName }) => {
     if (isLoading) return <Loading />
     return (
         <>
-            <NextSeo
-                title={`Edit ${topic?.title ?? topic?.name}`}
-            />
+            <NextSeo title={`Edit ${topic?.title ?? topic?.name}`} />
             <Header />
             {isError && (
                 <Container className="mb-20 font-acumin">

@@ -13,11 +13,7 @@ import Spinner from '../_shared/Spinner'
 import { Application, GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { Group } from '@portaljs/ckan'
 
-export function ApplicationCard({
-    application,
-}: {
-    application: Application
-}) {
+export function ApplicationCard({ application }: { application: Application }) {
     const datasetCount = application.package_count
     return (
         <Link
@@ -49,7 +45,8 @@ export function ApplicationCard({
 }
 
 export function ApplicationsCarousel() {
-    const { data, isLoading, error } = api.applications.getAllApplications.useQuery()
+    const { data, isLoading, error } =
+        api.applications.getAllApplications.useQuery()
     return (
         <div className="relative">
             <div className="peer">
@@ -71,20 +68,21 @@ export function ApplicationsCarousel() {
                         </div>
                     )}
 
-                    {data && data
-                        .filter((application) => {
-                            const datasetCount = application.package_count
-                            return datasetCount > 0
-                        })
-                        .map((application, index) => (
-                            <SwiperSlide key={index} className="">
-                                <div className=" w-80 pr-6">
-                                    <ApplicationCard
-                                        application={application}
-                                    />
-                                </div>
-                            </SwiperSlide>
-                        ))}
+                    {data &&
+                        data
+                            .filter((application) => {
+                                const datasetCount = application.package_count
+                                return datasetCount > 0
+                            })
+                            .map((application, index) => (
+                                <SwiperSlide key={index} className="">
+                                    <div className=" w-80 pr-6">
+                                        <ApplicationCard
+                                            application={application}
+                                        />
+                                    </div>
+                                </SwiperSlide>
+                            ))}
                 </AutoCarousel>
             </div>
         </div>

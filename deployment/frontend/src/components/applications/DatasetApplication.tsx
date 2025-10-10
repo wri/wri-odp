@@ -6,7 +6,11 @@ import { Application } from '@/schema/ckan.schema'
 import Pagination from '@/components/datasets/Pagination'
 import type { SearchInput } from '@/schema/search.schema'
 
-export default function DatasetApplication({ application }: { application: Application }) {
+export default function DatasetApplication({
+    application,
+}: {
+    application: Application
+}) {
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         fq: {

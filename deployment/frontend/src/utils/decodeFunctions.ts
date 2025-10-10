@@ -286,13 +286,13 @@ export function createDeckLayer(
             '{thresh}',
             layerState?.threshold
                 ? layerState?.threshold
-                : threshold?.default ?? 30
+                : (threshold?.default ?? 30)
         )
         .replace(
             '{threshold}',
             layerState?.threshold
                 ? layerState?.threshold
-                : threshold?.default ?? 30
+                : (threshold?.default ?? 30)
         )
     let obj = {
         ...layer,
@@ -1365,4 +1365,3 @@ const decodes = {
     }
   `,
 }
-

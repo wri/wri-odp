@@ -4,7 +4,10 @@ import { slugify } from '@/utils/slugify'
 import ApplicationForm from './ApplicationForm'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
 import Container from '@/components/_shared/Container'
-import { ApplicationFormType, ApplicationSchema } from '@/schema/application.schema'
+import {
+    ApplicationFormType,
+    ApplicationSchema,
+} from '@/schema/application.schema'
 import { LoaderButton } from '@/components/_shared/Button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '@/utils/api'
@@ -14,7 +17,11 @@ import { useRouter } from 'next/router'
 
 const links = [
     { label: 'Applications', url: '/dashboard/applications', current: false },
-    { label: 'Create an Application', url: '/dashboard/applications/new', current: true },
+    {
+        label: 'Create an Application',
+        url: '/dashboard/applications/new',
+        current: true,
+    },
 ]
 
 export default function CreateApplicationForm() {
@@ -26,14 +33,19 @@ export default function CreateApplicationForm() {
 
     const createApplication = api.applications.createApplication.useMutation({
         onSuccess: async ({ name, title }) => {
-            notify(`Successfully created the ${title ?? name} Application`, 'success')
+            notify(
+                `Successfully created the ${title ?? name} Application`,
+                'success'
+            )
             router.push('/dashboard/applications')
             formObj.reset()
         },
         onError: (error) => {
             let errorMessage = error.message
             if (
-                error.message.includes('Application name already exists in database')
+                error.message.includes(
+                    'Application name already exists in database'
+                )
             ) {
                 errorMessage =
                     'Application name already exists in database or there is a Team/Topic with this name'

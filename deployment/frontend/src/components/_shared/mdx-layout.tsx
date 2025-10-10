@@ -41,16 +41,16 @@ export default function MdxLayout({
     return (
         <>
             <NextSeo
-                title={`${label !== "User Guide" ? label+" (user guide)" : label}`}
+                title={`${label !== 'User Guide' ? label + ' (user guide)' : label}`}
                 description={`${label}`}
                 openGraph={{
-                    title: `${label !== "User Guide" ? label+" (user guide)" : label} `,
+                    title: `${label !== 'User Guide' ? label + ' (user guide)' : label} `,
                     description: `${label}`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}${url}`,
                 }}
             />
             <Header />
-            
+
             <section
                 id="search"
                 className="flex h-[245px] w-full flex-col bg-cover bg-center bg-no-repeat font-acumin"

@@ -10,8 +10,8 @@ export default interface Topic {
 }
 
 export interface TopicHierarchy {
-    id: string;
-    name: string;
+    id: string
+    name: string
     title: string
-    children: TopicHierarchy[];
+    children: TopicHierarchy[]
 }

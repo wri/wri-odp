@@ -5,10 +5,10 @@ import IconButton from '@/components/_shared/map/controls/IconButton'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { Button } from '@/components/_shared/Button'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { View } from '@/interfaces/dataset.interface'
 
 export default function ChartViewExport() {

@@ -35,9 +35,7 @@ export function VersioningForm({
                 <InputGroup
                     label={
                         <div className="flex items-center gap-x-1">
-                            <span>
-                                Release Notes{' '}
-                            </span>
+                            <span>Release Notes </span>
                             <DefaultTooltip content="Release notes describe to users what has changed since the last version">
                                 <InformationCircleIcon
                                     className="h-5 w-5 text-neutral-500"

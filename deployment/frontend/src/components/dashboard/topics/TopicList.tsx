@@ -15,7 +15,7 @@ const tabs = [
 
 export default function TopicList() {
     const { data: session } = useSession()
-    
+
     return (
         <section id="teamtab" className="w-full max-w-8xl  font-acumin ">
             <Tab.Group>
@@ -33,7 +33,7 @@ export default function TopicList() {
                                             : ''
                                     } `}
                                 >
-                                        <span>{tab.title}</span>
+                                    <span>{tab.title}</span>
                                 </div>
                             )}
                         </Tab>
@@ -41,7 +41,8 @@ export default function TopicList() {
                     {session?.user.sysadmin && (
                         <Link
                             href="/dashboard/topics/new"
-                            className="font-normal  px-6 py-4 focus:outline-0  w-full" role='tab'
+                            className="font-normal  px-6 py-4 focus:outline-0  w-full"
+                            role="tab"
                         >
                             <div className="flex">
                                 <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">

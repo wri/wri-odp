@@ -12,17 +12,17 @@ import TopicForm from './TopicForm'
 import { useRouter } from 'next/router'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog, Tab } from '@headlessui/react'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import Link from 'next/link'
 import { RouterOutput } from '@/server/api/root'
 import { Fragment } from 'react'
 import { Members } from '../metadata/Members'
 import classNames from '@/utils/classnames'
 
-type TopicOutput = RouterOutput["topics"]["getTopic"];
+type TopicOutput = RouterOutput['topics']['getTopic']
 
 export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -193,7 +193,10 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                                 >
                                     <div className="w-full py-8 border-b border-blue-800 shadow">
                                         <div className="px-2 sm:px-8">
-                                            <TopicForm formObj={formObj} editing={true} />
+                                            <TopicForm
+                                                formObj={formObj}
+                                                editing={true}
+                                            />
                                         </div>
                                     </div>
                                     {errorMessage && (
@@ -207,10 +210,7 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                                 as="div"
                                 className="flex flex-col gap-y-12 mt-8"
                             >
-                                <Members
-                                    topic={topic}
-                                    formObj={formObj}
-                                />
+                                <Members topic={topic} formObj={formObj} />
                             </Tab.Panel>
                         </Tab.Panels>
                     </div>

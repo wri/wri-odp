@@ -16,7 +16,9 @@ it('Convert a layer object from RW to our custom format and back - (democracy in
     )
     const layer_converted = convertFormToLayerObj(formObj)
     expect(democracy_index.layerConfig).toEqual(layer_converted.layerConfig)
-    expect(democracy_index.interactionConfig).toEqual(layer_converted.interactionConfig)
+    expect(democracy_index.interactionConfig).toEqual(
+        layer_converted.interactionConfig
+    )
     expect(democracy_index.legendConfig).toEqual(layer_converted.legendConfig)
 })
 
@@ -42,7 +44,9 @@ it('Convert a layer object from RW to our custom format and back - (marine_ecore
     )
     const layer_converted = convertFormToLayerObj(formObj)
     expect(marine_ecoregions.layerConfig).toEqual(layer_converted.layerConfig)
-    expect(marine_ecoregions.interactionConfig).toEqual(layer_converted.interactionConfig)
+    expect(marine_ecoregions.interactionConfig).toEqual(
+        layer_converted.interactionConfig
+    )
     expect(marine_ecoregions.legendConfig).toEqual(layer_converted.legendConfig)
 })
 
@@ -52,6 +56,8 @@ it('Convert a layer object from RW to our custom format and back - (temperature)
     )
     const layer_converted = convertFormToLayerObj(formObj)
     expect(temperature.layerConfig).toEqual(layer_converted.layerConfig)
-    expect(temperature.interactionConfig).toEqual(layer_converted.interactionConfig)
+    expect(temperature.interactionConfig).toEqual(
+        layer_converted.interactionConfig
+    )
     expect(temperature.legendConfig).toEqual(layer_converted.legendConfig)
 })

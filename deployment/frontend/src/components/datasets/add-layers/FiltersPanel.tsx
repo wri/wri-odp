@@ -6,7 +6,7 @@ import TemporalCoverageFacet from '@/components/search/TemporalCoverageFacet'
 import { Filter } from '@/interfaces/search.interface'
 import { SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
-import {updateFrequencyLabels, visibilityTypeLabels} from '@/utils/constants'
+import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants'
 import { useSession } from 'next-auth/react'
 import { Dispatch, SetStateAction, useState } from 'react'
 

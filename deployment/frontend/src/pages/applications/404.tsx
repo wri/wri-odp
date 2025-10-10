@@ -3,7 +3,9 @@ import Header from '@/components/_shared/Header'
 import { NextSeo } from 'next-seo'
 
 export default function ApplicationsNotFound() {
-    const links = [{ label: 'Applications', url: '/applications', current: false }]
+    const links = [
+        { label: 'Applications', url: '/applications', current: false },
+    ]
     return (
         <>
             <NextSeo title={`Not Found - Applications`} />

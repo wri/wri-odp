@@ -14,10 +14,10 @@ import Pagination from '@/components/dashboard/_shared/Pagination'
 import { useSession } from 'next-auth/react'
 import notify from '@/utils/notify'
 
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 
 export default function Approvallist() {
     const { data: session } = useSession()

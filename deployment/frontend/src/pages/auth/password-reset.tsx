@@ -161,8 +161,8 @@ export default function ResetUserPage({
                         {resetPassword.isLoading
                             ? 'Updating password...'
                             : isResetSuccessful
-                            ? 'Redirecting...'
-                            : 'Reset password'}
+                              ? 'Redirecting...'
+                              : 'Reset password'}
                     </button>
                 </form>
             </div>

@@ -10,7 +10,7 @@ export default function TopicsSearchResults({
     topics,
     topicDetails,
     count,
-  filtered,
+    filtered,
 }: {
     topics: GroupTree[] | Group[]
     topicDetails: Record<string, GroupsmDetails>
@@ -19,7 +19,9 @@ export default function TopicsSearchResults({
 }) {
     return (
         <Container className="mb-28">
-            <span className="font-semibold text-xl">{count} {!filtered ? 'Top-Level Topics' : 'Topics'}</span>
+            <span className="font-semibold text-xl">
+                {count} {!filtered ? 'Top-Level Topics' : 'Topics'}
+            </span>
             <CardsGrid<GroupTree | Group>
                 className="mt-5"
                 items={topics}

@@ -80,7 +80,9 @@ export default function Row({
                             ''
                         )}
                         {controlButtons &&
-                        (router.pathname.includes('/topics') ? session?.user.sysadmin : (session?.user.sysadmin || authorized))
+                        (router.pathname.includes('/topics')
+                            ? session?.user.sysadmin
+                            : session?.user.sysadmin || authorized)
                             ? controlButtons.map((button, index) => {
                                   return (
                                       <React.Fragment key={index}>

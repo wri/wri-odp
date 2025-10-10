@@ -120,46 +120,46 @@ export default function ChartFilters({
                                 </div>
                                 {i !=
                                     watch('config.query.filters').length -
-                                    1 && (
-                                        <div className="flex justify-around mt-5">
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                className={classNames(
-                                                    watch(
-                                                        `config.query.filters.${i}.link`
-                                                    ) == 'OR' &&
+                                        1 && (
+                                    <div className="flex justify-around mt-5">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            className={classNames(
+                                                watch(
+                                                    `config.query.filters.${i}.link`
+                                                ) == 'OR' &&
                                                     'bg-wri-slate font-semibold'
-                                                )}
-                                                onClick={() =>
-                                                    setValue(
-                                                        `config.query.filters.${i}.link`,
-                                                        'OR'
-                                                    )
-                                                }
-                                            >
-                                                OR
-                                            </Button>
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                className={classNames(
-                                                    watch(
-                                                        `config.query.filters.${i}.link`
-                                                    ) == 'AND' &&
+                                            )}
+                                            onClick={() =>
+                                                setValue(
+                                                    `config.query.filters.${i}.link`,
+                                                    'OR'
+                                                )
+                                            }
+                                        >
+                                            OR
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            className={classNames(
+                                                watch(
+                                                    `config.query.filters.${i}.link`
+                                                ) == 'AND' &&
                                                     'bg-wri-slate font-semibold'
-                                                )}
-                                                onClick={() =>
-                                                    setValue(
-                                                        `config.query.filters.${i}.link`,
-                                                        'AND'
-                                                    )
-                                                }
-                                            >
-                                                AND
-                                            </Button>
-                                        </div>
-                                    )}
+                                            )}
+                                            onClick={() =>
+                                                setValue(
+                                                    `config.query.filters.${i}.link`,
+                                                    'AND'
+                                                )
+                                            }
+                                        >
+                                            AND
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         )
                     })}

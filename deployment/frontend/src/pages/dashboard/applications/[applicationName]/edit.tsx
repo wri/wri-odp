@@ -23,14 +23,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props: {
             session,
             applicationName:
-                context.params && typeof context.params.applicationName === 'string'
+                context.params &&
+                typeof context.params.applicationName === 'string'
                     ? context.params.applicationName
                     : null,
         },
     }
 }
 
-const EditApplicationPage: NextPage<{ applicationName: string }> = ({ applicationName }) => {
+const EditApplicationPage: NextPage<{ applicationName: string }> = ({
+    applicationName,
+}) => {
     const {
         data: application,
         isLoading,
@@ -50,7 +53,9 @@ const EditApplicationPage: NextPage<{ applicationName: string }> = ({ applicatio
                     </h1>
                 </Container>
             )}
-            {!isError && application && <EditApplicationForm application={application} />}
+            {!isError && application && (
+                <EditApplicationForm application={application} />
+            )}
         </>
     )
 }

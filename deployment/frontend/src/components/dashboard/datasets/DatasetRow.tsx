@@ -83,7 +83,7 @@ function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
                             <Chip
                                 text={
                                     visibilityTypeLabels[
-                                    dataset.visibility_type
+                                        dataset.visibility_type
                                     ] ?? ''
                                 }
                             />

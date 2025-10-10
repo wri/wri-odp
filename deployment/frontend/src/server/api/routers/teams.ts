@@ -163,36 +163,36 @@ export const teamRouter = createTRPCRouter({
     deleteTeam: protectedProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ ctx, input }) => {
-          try {
-            const user = ctx.session.user
-            const teamRes = await fetch(
-                `${env.CKAN_URL}/api/action/organization_delete`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                    body: JSON.stringify({ id: input.id }),
+            try {
+                const user = ctx.session.user
+                const teamRes = await fetch(
+                    `${env.CKAN_URL}/api/action/organization_delete`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${user.apikey}`,
+                        },
+                        body: JSON.stringify({ id: input.id }),
+                    }
+                )
+                const team: CkanResponse<
+                    Organization & { groups: Organization[] }
+                > = await teamRes.json()
+                if (!team.success && team.error) {
+                    if (team.error.message)
+                        throw Error(replaceNames(team.error.message, true))
+                    throw Error(replaceNames(JSON.stringify(team.error), true))
                 }
-            )
-            const team: CkanResponse<
-                Organization & { groups: Organization[] }
-            > = await teamRes.json()
-            if (!team.success && team.error) {
-                if (team.error.message)
-                    throw Error(replaceNames(team.error.message, true))
-                throw Error(replaceNames(JSON.stringify(team.error), true))
+                return {
+                    ...team.result,
+                }
+            } catch (e) {
+                let error =
+                    'Something went wrong please contact the System Administrator'
+                if (e instanceof Error) error = e.message
+                throw Error(replaceNames(error, true))
             }
-            return {
-                ...team.result,
-            }
-          } catch (e) {
-            let error =
-              'Something went wrong please contact the System Administrator'
-            if (e instanceof Error) error = e.message
-            throw Error(replaceNames(error, true))
-          }
         }),
     getTeamUsers: protectedProcedure
         .input(z.object({ id: z.string(), capacity: z.string().optional() }))
@@ -266,28 +266,28 @@ export const teamRouter = createTRPCRouter({
     deleteDashboardTeam: protectedProcedure
         .input(z.string())
         .mutation(async ({ input, ctx }) => {
-          try {
-            const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/organization_delete`,
-                {
-                    method: 'POST',
-                    body: JSON.stringify({ id: input }),
-                    headers: {
-                        Authorization: ctx.session.user.apikey,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
-            const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error)
-                throw Error(replaceNames(data.error.message, true))
-            return data
-          } catch (e) {
-            let error =
-              'Something went wrong please contact the System Administrator'
-            if (e instanceof Error) error = e.message
-            throw Error(replaceNames(error, true))
-          }
+            try {
+                const response = await fetch(
+                    `${env.CKAN_URL}/api/3/action/organization_delete`,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({ id: input }),
+                        headers: {
+                            Authorization: ctx.session.user.apikey,
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                )
+                const data = (await response.json()) as CkanResponse<null>
+                if (!data.success && data.error)
+                    throw Error(replaceNames(data.error.message, true))
+                return data
+            } catch (e) {
+                let error =
+                    'Something went wrong please contact the System Administrator'
+                if (e instanceof Error) error = e.message
+                throw Error(replaceNames(error, true))
+            }
         }),
     getGeneralTeam: publicProcedure
         .input(searchSchema)
@@ -319,7 +319,7 @@ export const teamRouter = createTRPCRouter({
                         description: org.description ?? '',
                         package_count: org.package_count!,
                         name: org.name,
-                        visibility: org.visibility!
+                        visibility: org.visibility!,
                     }
                     return acc
                 },

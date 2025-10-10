@@ -17,7 +17,7 @@ export default function TeamCard({
     team,
     teamsDetails,
 }: {
-    team: GroupTree | (Organization & { numSubTeams: number, notes?: string })
+    team: GroupTree | (Organization & { numSubTeams: number; notes?: string })
     teamsDetails: Record<string, GroupsmDetails>
 }) {
     const { data: numOfSubTeams } = api.teams.getNumberOfSubTeams.useQuery()
@@ -44,18 +44,17 @@ export default function TeamCard({
             {'visibility' in team && team.visibility === 'private' && (
                 <div className="mt-2 mb-1">
                     <Chip
-                        text={
-                            visibilityTypeLabels[
-                            team.visibility
-                            ] ?? ''
-                        }
-                        className={""}
+                        text={visibilityTypeLabels[team.visibility] ?? ''}
+                        className={''}
                     />
                 </div>
             )}
             <article className=" line-clamp-3 w-[88%] font-light text-base mt-2 leading-[1.375rem] h-16">
                 {isGroupTree(team)
-                    ? teamsDetails[team.id]?.description || team.description || teamsDetails[team.id]?.notes || team.notes
+                    ? teamsDetails[team.id]?.description ||
+                      team.description ||
+                      teamsDetails[team.id]?.notes ||
+                      team.notes
                     : team.description || team.notes}
             </article>
             <div className="flex font-light text-sm text-wri-black mt-1 leading-[1.375rem] items-center">
@@ -64,8 +63,9 @@ export default function TeamCard({
                         {teamsDetails[team.id]?.package_count &&
                         (teamsDetails[team.id]?.package_count as number) <= 1
                             ? `${teamsDetails[team.id]?.package_count || 0} Dataset`
-                            : `${teamsDetails[team.id]
-                                  ?.package_count || 0} Datasets`}
+                            : `${
+                                  teamsDetails[team.id]?.package_count || 0
+                              } Datasets`}
                     </span>
                 )}
                 {!isGroupTree(team) && (

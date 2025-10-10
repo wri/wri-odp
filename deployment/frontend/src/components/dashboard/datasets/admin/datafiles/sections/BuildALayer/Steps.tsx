@@ -1,6 +1,6 @@
-import { useFormContext } from "react-hook-form"
-import { LayerFormType } from "./layer.schema"
-import classNames from "@/utils/classnames"
+import { useFormContext } from 'react-hook-form'
+import { LayerFormType } from './layer.schema'
+import classNames from '@/utils/classnames'
 
 export function Steps({ state }: { state: string }) {
     const { watch } = useFormContext<LayerFormType>() // retrieve those props
@@ -9,7 +9,8 @@ export function Steps({ state }: { state: string }) {
         {
             name: 'Render',
             state: 'setRenderConfig',
-            enabled: watch('layerConfig.source.provider.type')?.value === 'carto',
+            enabled:
+                watch('layerConfig.source.provider.type')?.value === 'carto',
         },
         { name: 'Legend', state: 'setLegendConfig', enabled: true },
         { name: 'Interaction', state: 'setInteractionConfig', enabled: true },

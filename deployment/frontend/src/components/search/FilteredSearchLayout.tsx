@@ -73,12 +73,18 @@ export default function FilteredSearchLayout({
 
     const { data: facetsData, isLoading: isLoadingFacets } =
         api.dataset.getAllDataset.useQuery(facetsQuery)
-    console.log('facetsData in FilteredSearchLayout', JSON.stringify(facetsData, null, 2))
+    console.log(
+        'facetsData in FilteredSearchLayout',
+        JSON.stringify(facetsData, null, 2)
+    )
 
     const searchFacets = facetsData?.searchFacets
 
     if (searchFacets) {
-        console.log('searchFacets in FilteredSearchLayout', JSON.stringify(searchFacets, null, 2))
+        console.log(
+            'searchFacets in FilteredSearchLayout',
+            JSON.stringify(searchFacets, null, 2)
+        )
         for (let key in searchFacets) {
             /*
              * Boolean fields look better with Yes and No options
@@ -107,23 +113,26 @@ export default function FilteredSearchLayout({
                     // @ts-ignore
                     display_name: updateFrequencyLabels[i.name],
                 }))
-            } else if (key === 'organization') { // && facetsData?.teamVisibility) {
+            } else if (key === 'organization') {
+                // && facetsData?.teamVisibility) {
                 const visibilityMap = facetsData.teamVisibility
                 // @ts-ignore
-                searchFacets[key].items = searchFacets[key].items.map((item) => {
-                    const baseName = item.display_name ?? item.name
-                    const isPrivate = visibilityMap[item.name] === 'private'
-                    const lockEmoji = '🔒'
-                    const displayName = isPrivate && !baseName.includes(lockEmoji)
-                        ? `${baseName} ${lockEmoji}`
-                        : baseName
-                    return {
-                        ...item,
-                        display_name: displayName,
+                searchFacets[key].items = searchFacets[key].items.map(
+                    (item) => {
+                        const baseName = item.display_name ?? item.name
+                        const isPrivate = visibilityMap[item.name] === 'private'
+                        const lockEmoji = '🔒'
+                        const displayName =
+                            isPrivate && !baseName.includes(lockEmoji)
+                                ? `${baseName} ${lockEmoji}`
+                                : baseName
+                        return {
+                            ...item,
+                            display_name: displayName,
+                        }
                     }
-                })
+                )
             }
-
         }
     }
 
@@ -297,7 +306,11 @@ export default function FilteredSearchLayout({
                                                                         />
                                                                     ) : ff.key ===
                                                                       'groups' ? (
-                                                                        <React.Fragment key={ff.key}>
+                                                                        <React.Fragment
+                                                                            key={
+                                                                                ff.key
+                                                                            }
+                                                                        >
                                                                             <Facet
                                                                                 text={
                                                                                     'Topics'

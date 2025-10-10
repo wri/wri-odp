@@ -4,10 +4,10 @@ import {
     XMarkIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 import { useRouter } from 'next/router'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { useForm } from 'react-hook-form'
@@ -95,7 +95,10 @@ export default function ApprovalRequestCard({
             formObj.reset()
             setOpen(false)
             notify('Issue successfully created', 'success')
-            notify(`Dataset ${datasetTitle ?? datasetName} successfully rejected`, 'error')
+            notify(
+                `Dataset ${datasetTitle ?? datasetName} successfully rejected`,
+                'error'
+            )
             router.push('/dashboard/datasets')
         },
         onError: (error) => setErrorMessage(error.message),

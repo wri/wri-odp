@@ -22,7 +22,12 @@ export function DatastoreViewCard({
     const createMutation = api.dataset.createResourceView.useMutation()
     const updateMutation = api.dataset.updateResourceView.useMutation()
 
-    const onSave = (mode: string, view: View, onError: () => void, onSuccess: () => void) => {
+    const onSave = (
+        mode: string,
+        view: View,
+        onError: () => void,
+        onSuccess: () => void
+    ) => {
         if (mode == 'new') {
             createMutation.mutate(
                 {

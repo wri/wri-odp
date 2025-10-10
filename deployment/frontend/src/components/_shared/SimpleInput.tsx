@@ -1,8 +1,7 @@
 import classNames from '@/utils/classnames'
 import * as React from 'react'
 
-interface InputProps
-    extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     name?: string
     type?: string
     icon?: React.ReactNode
@@ -44,7 +43,8 @@ export function DebouncedInput({
     value: string
     onChange: (value: string) => void
     debounce?: number
-} & InputProps & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
+} & InputProps &
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
     const [value, setValue] = React.useState(initialValue)
 
     React.useEffect(() => {

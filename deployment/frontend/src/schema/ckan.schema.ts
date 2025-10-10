@@ -283,7 +283,7 @@ export interface GroupsmDetails {
     description: string
     notes?: string
     package_count: number
-    name: string,
+    name: string
     visibility?: string
 }
 

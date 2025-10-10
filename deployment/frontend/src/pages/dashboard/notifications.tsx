@@ -13,46 +13,46 @@ import { env } from '@/env.mjs'
 import { getServerAuthSession } from '@/server/auth'
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(context)
-  const helpers = createServerSideHelpers({
-    router: appRouter,
-    ctx: { session, ip: undefined },
-    transformer: superjson,
-  })
-  await helpers.notification.getAllNotifications.prefetch({
-    returnLength: true,
-  })
-  await helpers.user.getUserCapacity.prefetch()
+    const session = await getServerAuthSession(context)
+    const helpers = createServerSideHelpers({
+        router: appRouter,
+        ctx: { session, ip: undefined },
+        transformer: superjson,
+    })
+    await helpers.notification.getAllNotifications.prefetch({
+        returnLength: true,
+    })
+    await helpers.user.getUserCapacity.prefetch()
 
-  await helpers.dataset.getPendingDatasets.prefetch({
-    search: '',
-    page: { start: 0, rows: 10 },
-    sortBy: 'metadata_modified desc',
-  })
-  return {
-    props: {
-      trpcState: helpers.dehydrate(),
-    },
-  }
+    await helpers.dataset.getPendingDatasets.prefetch({
+        search: '',
+        page: { start: 0, rows: 10 },
+        sortBy: 'metadata_modified desc',
+    })
+    return {
+        props: {
+            trpcState: helpers.dehydrate(),
+        },
+    }
 }
 
 export default function Notifications() {
-  return (
-    <>
-      <NextSeo
-        title={`Notifications - Dashboard`}
-        description={`Notifications - Dashboard -- WRI Open Data Catalog`}
-        openGraph={{
-          title: `Notifications - Dashboard`,
-          description: `Notifications - Dashboard -- WRI Open Data Catalog`,
-          url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/notifications`,
-        }}
-      />
-      <Header />
-      <Layout>
-        <NotificationList />
-      </Layout>
-      <Footer style="mt-0" />
-    </>
-  )
+    return (
+        <>
+            <NextSeo
+                title={`Notifications - Dashboard`}
+                description={`Notifications - Dashboard -- WRI Open Data Catalog`}
+                openGraph={{
+                    title: `Notifications - Dashboard`,
+                    description: `Notifications - Dashboard -- WRI Open Data Catalog`,
+                    url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/notifications`,
+                }}
+            />
+            <Header />
+            <Layout>
+                <NotificationList />
+            </Layout>
+            <Footer style="mt-0" />
+        </>
+    )
 }

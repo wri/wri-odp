@@ -53,8 +53,8 @@ export default function Pagination({
         } else {
             setCurrentPage(Math.ceil(query.page.start / query.page.rows) + 1)
         }
-        if(window) {
-            window.scrollTo({top: 0, behavior: 'smooth'})
+        if (window) {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
         }
     }, [query.page.rows])
 
@@ -69,12 +69,10 @@ export default function Pagination({
             page: { ...prev.page, start: destination },
         }))
 
-        if(window) {
-            window.scrollTo({top: 0, behavior: 'smooth'})
+        if (window) {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
         }
     }, [currentPage, query.page.rows])
-
-    
 
     return (
         <div className="flex items-center justify-between bg-white py-3 overflow-x-auto">

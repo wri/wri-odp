@@ -12,7 +12,7 @@ export default function TeamsSearchResults({
     teams,
     teamsDetails,
     count,
-    filtered
+    filtered,
 }: {
     teams: GroupTree[] | Organization[]
     teamsDetails: Record<string, GroupsmDetails>
@@ -21,7 +21,9 @@ export default function TeamsSearchResults({
 }) {
     return (
         <Container className="mb-28">
-            <span className="font-semibold text-xl">{count} {!filtered ? 'Top-Level Teams' : 'Teams'}</span>
+            <span className="font-semibold text-xl">
+                {count} {!filtered ? 'Top-Level Teams' : 'Teams'}
+            </span>
             <CardsGrid<GroupTree | Organization>
                 className="mt-5 mb-5"
                 items={teams}

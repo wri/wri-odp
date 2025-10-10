@@ -9,7 +9,7 @@ export const roads = {
     thumbnailUrl:
         'https://s3.amazonaws.com/wri-api-backups/resourcewatch/prod/thumbnails/1baa17a0-51bb-4d97-8876-4980013e81de-1659074506951.png',
     layerConfig: {
-        type: "vector",
+        type: 'vector',
         account: 'wri-rw',
         source: {
             type: 'vector',

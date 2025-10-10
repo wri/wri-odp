@@ -39,9 +39,7 @@ const EditTeamPage: NextPage<{ teamName: string }> = ({ teamName }) => {
     if (isLoading) return <Loading />
     return (
         <>
-            <NextSeo
-                title={`Edit ${team?.title ?? team?.name}`}
-            />
+            <NextSeo title={`Edit ${team?.title ?? team?.name}`} />
             <Header />
             {isError && (
                 <Container className="mb-20 font-acumin">

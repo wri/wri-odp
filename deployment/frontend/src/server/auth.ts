@@ -127,7 +127,10 @@ export const authOptions: NextAuthOptions = {
                     // teams: token.teams ? token.teams : { name: '', id: '' },
                     sysadmin: token?.sysadmin ? token.sysadmin : false,
                     id: token.sub,
-                    image: typeof token.image === 'string' ? token.image : JSON.stringify(token.image || {}),
+                    image:
+                        typeof token.image === 'string'
+                            ? token.image
+                            : JSON.stringify(token.image || {}),
                 },
             }
         },

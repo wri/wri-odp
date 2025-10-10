@@ -5,10 +5,10 @@ import { DocumentDuplicateIcon } from '@heroicons/react/20/solid'
 import { useDataset } from '@/utils/storeHooks'
 import { Button } from '../../Button'
 import { DefaultTooltip, Tooltip } from '../../Tooltip'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 
 export default function Export() {
     const { dataset } = useDataset()
@@ -20,7 +20,7 @@ export default function Export() {
 
     const iFrameHtml = `<iframe src="${embedUrl}" width="1000" height="800" /></iframe>`
     return (
-        <IconButton tooltip='Export as' onClick={() => setOpen(true)}>
+        <IconButton tooltip="Export as" onClick={() => setOpen(true)}>
             <ExportIcon />
 
             <Modal

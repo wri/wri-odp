@@ -41,12 +41,8 @@ export default function Subteamcard({
             {'visibility' in team && team.visibility === 'private' && (
                 <div className="mt-2 mb-1">
                     <Chip
-                        text={
-                            visibilityTypeLabels[
-                            team.visibility
-                            ] ?? ''
-                        }
-                        className={""}
+                        text={visibilityTypeLabels[team.visibility] ?? ''}
+                        className={''}
                     />
                 </div>
             )}

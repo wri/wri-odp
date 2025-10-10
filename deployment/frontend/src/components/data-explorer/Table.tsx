@@ -61,7 +61,9 @@ export function TopBar({
         <>
             <span className="text-base font-regular leading-5 text-[#3E3E3E] flex items-center">
                 <TableCellsIcon className="w-5 h-5 mr-2 text-blue-800" />
-                {numOfColumns} columns, {numOfRows} rows
+                {
+                    numOfColumns
+                } columns, {numOfRows} rows
             </span>
             <div>
                 <div className="flex items-center gap-x-3">
@@ -71,7 +73,7 @@ export function TopBar({
                         {(pageIndex + 1) * pageSize} of {numOfRows}
                     </span>
                     <button
-                        aria-label='left-icon'
+                        aria-label="left-icon"
                         className={`w-4 h-4 ${
                             !table.getCanPreviousPage()
                                 ? 'opacity-25'
@@ -83,7 +85,7 @@ export function TopBar({
                         <ChevronLeftIcon />
                     </button>
                     <button
-                        aria-label='right-icon'
+                        aria-label="right-icon"
                         className={`w-4 h-4 ${
                             !table.getCanNextPage()
                                 ? 'opacity-25'
@@ -107,14 +109,18 @@ function ToggleColumns({ table }: { table: TableType<any> }) {
         q === ''
             ? table.getAllLeafColumns()
             : table.getAllLeafColumns().filter((column) => {
-                  return column.id.toLowerCase().includes(q.toLowerCase()) || typeof column.columnDef.header === 'string' && column.columnDef.header.toLowerCase().includes(q.toLowerCase())
+                  return (
+                      column.id.toLowerCase().includes(q.toLowerCase()) ||
+                      (typeof column.columnDef.header === 'string' &&
+                          column.columnDef.header
+                              .toLowerCase()
+                              .includes(q.toLowerCase()))
+                  )
               })
     return (
         <Popover as="div" className="relative inline-block text-left">
             <Popover.Button className=" p-4 flex items-center justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs ">
-               
-                    Show Columns
-               
+                Show Columns
             </Popover.Button>
             <Transition
                 as={Fragment}
@@ -191,7 +197,9 @@ function ToggleColumns({ table }: { table: TableType<any> }) {
                                     htmlFor={column.id}
                                     className="font-medium text-gray-900 truncate"
                                 >
-                                    {typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id}
+                                    {typeof column.columnDef.header === 'string'
+                                        ? column.columnDef.header
+                                        : column.id}
                                 </label>
                             </div>
                         </div>
@@ -315,7 +323,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 .with(false, () => (
                     <DefaultTooltip content="Sort by this column">
                         <button
-                            aria-label='sort'
+                            aria-label="sort"
                             onClick={() => h.column.toggleSorting(false, true)}
                         >
                             <ArrowsUpDownIcon className="w-4 h-4 opacity-75" />
@@ -325,7 +333,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 .with('asc', () => (
                     <DefaultTooltip content="Sorting asc">
                         <button
-                            aria-label='asc sorting'
+                            aria-label="asc sorting"
                             onClick={() => h.column.toggleSorting(true, true)}
                         >
                             <ArrowUpIcon className="w-4 h-4" />
@@ -334,7 +342,10 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 ))
                 .with('desc', () => (
                     <DefaultTooltip content="Sorting desc">
-                        <button aria-label='desc sorting' onClick={() => h.column.clearSorting()}>
+                        <button
+                            aria-label="desc sorting"
+                            onClick={() => h.column.clearSorting()}
+                        >
                             <ArrowDownIcon className="w-4 h-4" />
                         </button>
                     </DefaultTooltip>
@@ -358,7 +369,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                         </DefaultTooltip>
                     ) : (
                         <DefaultTooltip content="Unpin">
-                                <button
+                            <button
                                 aria-label="unpin"
                                 onClick={() => {
                                     h.column.pin(false)
@@ -380,7 +391,7 @@ function FilterColumn({ column }: { column: Column<any, unknown> }) {
             {({ open }) => (
                 <>
                     <Popover.Button aria-label="filter">
-                        <DefaultTooltip content="Filter" >
+                        <DefaultTooltip content="Filter">
                             {open || column.getIsFiltered() ? (
                                 <FunnelIconSolid className="w-4 h-4" />
                             ) : (
@@ -445,11 +456,7 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
     )
 }
 
-function Filters({
-    datePicker = false,
-}: {
-    datePicker?: boolean
-}) {
+function Filters({ datePicker = false }: { datePicker?: boolean }) {
     const formObj = useFormContext<FilterFormType>()
     const { register, control, setValue, watch, getValues } = formObj
     const { append, fields, remove } = useFieldArray({

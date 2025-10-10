@@ -65,7 +65,7 @@ export default function DatasetHorizontalCard({
                                 <Chip
                                     text={
                                         visibilityTypeLabels[
-                                        dataset.visibility_type
+                                            dataset.visibility_type
                                         ] ?? ''
                                     }
                                 />

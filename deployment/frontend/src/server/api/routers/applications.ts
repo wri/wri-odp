@@ -25,7 +25,8 @@ export const applicationRouter = createTRPCRouter({
                 },
             }
         )
-        const applications: CkanResponse<Application[]> = await applicationRes.json()
+        const applications: CkanResponse<Application[]> =
+            await applicationRes.json()
         if (!applications.success && applications.error)
             throw Error(replaceNames(applications.error.message))
         return applications.result.filter(
@@ -39,7 +40,7 @@ export const applicationRouter = createTRPCRouter({
                 const user = ctx.session.user
                 const body = JSON.stringify({
                     ...input,
-                    type: 'application'
+                    type: 'application',
                 })
                 const applicationRes = await fetch(
                     `${env.CKAN_URL}/api/action/group_patch`,
@@ -80,9 +81,8 @@ export const applicationRouter = createTRPCRouter({
                     },
                 }
             )
-            const application: CkanResponse<
-                Application
-            > = await applicationRes.json()
+            const application: CkanResponse<Application> =
+                await applicationRes.json()
             if (!application.result) throw Error('Application not found')
             if (!application.success && application.error)
                 throw Error(replaceNames(application.error.message))
@@ -123,7 +123,7 @@ export const applicationRouter = createTRPCRouter({
                 const user = ctx.session.user
                 const body = JSON.stringify({
                     ...input,
-                    type: 'application'
+                    type: 'application',
                 })
                 const applicationRes = await fetch(
                     `${env.CKAN_URL}/api/action/group_create`,

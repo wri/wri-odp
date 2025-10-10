@@ -1,2 +1,2 @@
-export { default as Range } from './range';
-export default { Range };
+export { default as Range } from './range'
+export default { Range }

@@ -11,7 +11,7 @@ export const temperature = {
         'https://s3.amazonaws.com/wri-api-backups/resourcewatch/prod/thumbnails/eb22d3f8-343c-4981-ab11-f0c2e091896a-1644338760798.png',
     layerConfig: {
         account: 'wri-rw',
-        type: "vector",
+        type: 'vector',
         source: {
             type: 'vector',
             provider: {

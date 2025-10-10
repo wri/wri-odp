@@ -29,8 +29,8 @@ export default function SelectFilter({
                       o.id === (query.fq as Record<string, string>)[filtername]
               )
             : options[0]
-            ? options[0]
-            : { id: '0', label: '' }
+              ? options[0]
+              : { id: '0', label: '' }
     )
 
     const handleSelect = (option: Option) => {

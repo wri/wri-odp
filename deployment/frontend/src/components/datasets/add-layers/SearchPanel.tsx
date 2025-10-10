@@ -62,7 +62,7 @@ export default function SearchPanel({
     ]
 
     showOptions.forEach((o) => {
-        if (o.value == "10") o.default = true
+        if (o.value == '10') o.default = true
     })
 
     return (

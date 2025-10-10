@@ -434,7 +434,7 @@ export default function DatasetPage(
         > = {}
 
         for (const current in diffData.diff) {
-            if( !diffFields.includes(current) ) continue; 
+            if (!diffFields.includes(current)) continue
             if (current.includes('resource')) {
                 const resource = current.split('.')[0]!
                 const field = current.split('.')[1]!

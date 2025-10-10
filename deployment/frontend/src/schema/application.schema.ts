@@ -14,8 +14,18 @@ export const ApplicationSchema = z.object({
     image_display_url: z.string().optional().nullable(),
     image_url: z.string().optional().nullable(),
     description: z.string().optional().nullable(),
-    contact_url: z.string().url().optional().nullable().or(emptyStringToUndefined),
-    homepage_url: z.string().url().optional().nullable().or(emptyStringToUndefined),
+    contact_url: z
+        .string()
+        .url()
+        .optional()
+        .nullable()
+        .or(emptyStringToUndefined),
+    homepage_url: z
+        .string()
+        .url()
+        .optional()
+        .nullable()
+        .or(emptyStringToUndefined),
     help_url: z.string().url().optional().nullable().or(emptyStringToUndefined),
 })
 

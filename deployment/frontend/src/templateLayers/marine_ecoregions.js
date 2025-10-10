@@ -11,7 +11,7 @@ export const marine_ecoregions = {
         'https://s3.amazonaws.com/wri-api-backups/resourcewatch/prod/thumbnails/2dd860af-21be-47c6-8e1d-0b8eb63bfa46-1644347940829.png',
     layerConfig: {
         account: 'wri-rw',
-        type: "vector",
+        type: 'vector',
         source: {
             type: 'vector',
             provider: {

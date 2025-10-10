@@ -37,7 +37,14 @@ export async function getServerSideProps(
     try {
         let dataset = await getOneDataset(datasetName, session)
         // remove layerObj and layerObjRaw from resources (makes page faster + avoids serializing errors )
-        dataset = {...dataset, resources: dataset.resources.map(r => ({...r, layerObj: null, layerObjRaw: null }))}
+        dataset = {
+            ...dataset,
+            resources: dataset.resources.map((r) => ({
+                ...r,
+                layerObj: null,
+                layerObjRaw: null,
+            })),
+        }
 
         return {
             props: {

@@ -14,9 +14,7 @@ export default function ApplicationSearchResults({
 }) {
     return (
         <Container className="mb-28">
-            <span className="font-semibold text-xl">
-                {count} Applications
-            </span>
+            <span className="font-semibold text-xl">{count} Applications</span>
             <CardsGrid<Application>
                 className="mt-5"
                 items={applications}

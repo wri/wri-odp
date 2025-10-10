@@ -30,7 +30,9 @@ export function Contact({
                         img="/images/placeholders/user/userdefault.png"
                         title="Author"
                         email={author.email ?? ''}
-                        highlighted={(field) => highlighted(`authors[${index}].${field}`)}
+                        highlighted={(field) =>
+                            highlighted(`authors[${index}].${field}`)
+                        }
                     />
                 ))}
             </div>
@@ -43,13 +45,14 @@ export function Contact({
                         img="/images/placeholders/user/userdefault.png"
                         title="Maintainer"
                         email={maintainer.email ?? ''}
-                        highlighted={(field) => highlighted(`maintainers[${index}].${field}`)}
+                        highlighted={(field) =>
+                            highlighted(`maintainers[${index}].${field}`)
+                        }
                     />
                 ))}
             </div>
         </div>
     )
-
 }
 
 interface TeamMemberProps {

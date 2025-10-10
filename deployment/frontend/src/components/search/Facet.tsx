@@ -67,7 +67,7 @@ export default function Facet({
                             </p>
                             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 p-1 text-xs font-normal text-black">
                                 {facetSelectedCount
-                                    ? facetSelectedCount[fqKey] ?? 0
+                                    ? (facetSelectedCount[fqKey] ?? 0)
                                     : options.length}
                             </span>
                         </div>

@@ -1,6 +1,6 @@
-import classNames from "@/utils/classnames"
-import { Disclosure, Transition } from "@headlessui/react"
-import { ChevronDownIcon } from "@heroicons/react/20/solid"
+import classNames from '@/utils/classnames'
+import { Disclosure, Transition } from '@headlessui/react'
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
 export function Accordion({
     text,
@@ -49,4 +49,3 @@ export function Accordion({
         </Disclosure>
     )
 }
-

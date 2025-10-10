@@ -1,73 +1,76 @@
 // @ts-nocheck
-import SortableContainer from '../../../../react-sortable-hoc/src/SortableContainer/index';
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import SortableContainer from '../../../../react-sortable-hoc/src/SortableContainer/index'
+import React, { PureComponent } from 'react'
+import PropTypes from 'prop-types'
 
 class LegendList extends PureComponent {
-  static propTypes = {
-    sortable: PropTypes.bool,
-    children: PropTypes.node
-  }
-
-  static defaultProps = {
-    sortable: true,
-    children: []
-  }
-
-  timeout: any;
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      scrolling: false
-    };
-
-    this.timeout = null;
-  }
-
-  onScroll = (e) => {
-    if (e.target.id !== 'vizzuality-legend-list') {
-      return false;
+    static propTypes = {
+        sortable: PropTypes.bool,
+        children: PropTypes.node,
     }
 
-    const { scrolling } = this.state;
-    if (this.timeout) {
-      // if there is already a timeout in process cancel it
-      clearTimeout(this.timeout);
+    static defaultProps = {
+        sortable: true,
+        children: [],
     }
 
-    this.timeout = setTimeout(() => {
-      this.timeout = null;
-      this.setState({
-        scrolling: false
-      });
-    }, 250);
+    timeout: any
 
-    if (!scrolling) {
-      this.setState({
-        scrolling: true
-      });
-    }
-
-  }
-
-  render() {
-    const { sortable, children } = this.props;
-    const { scrolling } = this.state;
-
-    return (
-      <ul id="vizzuality-legend-list" className="m-0 p-0 w-full overflow-y-auto overflow-x-hidden" onScroll={this.onScroll}>
-        {React.Children.map(children, (child, index) =>
-          React.cloneElement(child, {
-            sortable,
-            index,
-            i: index,
-            scrolling
-          }))
+    constructor(props) {
+        super(props)
+        this.state = {
+            scrolling: false,
         }
-      </ul>
-    );
-  }
+
+        this.timeout = null
+    }
+
+    onScroll = (e) => {
+        if (e.target.id !== 'vizzuality-legend-list') {
+            return false
+        }
+
+        const { scrolling } = this.state
+        if (this.timeout) {
+            // if there is already a timeout in process cancel it
+            clearTimeout(this.timeout)
+        }
+
+        this.timeout = setTimeout(() => {
+            this.timeout = null
+            this.setState({
+                scrolling: false,
+            })
+        }, 250)
+
+        if (!scrolling) {
+            this.setState({
+                scrolling: true,
+            })
+        }
+    }
+
+    render() {
+        const { sortable, children } = this.props
+        const { scrolling } = this.state
+
+        return (
+            <ul
+                id="vizzuality-legend-list"
+                className="m-0 p-0 w-full overflow-y-auto overflow-x-hidden"
+                onScroll={this.onScroll}
+            >
+                {React.Children.map(children, (child, index) =>
+                    React.cloneElement(child, {
+                        sortable,
+                        index,
+                        i: index,
+                        scrolling,
+                    })
+                )}
+            </ul>
+        )
+    }
 }
 
-export default SortableContainer(LegendList);
+export default SortableContainer(LegendList)

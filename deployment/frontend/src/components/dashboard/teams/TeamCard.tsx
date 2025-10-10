@@ -25,7 +25,6 @@ import { ErrorAlert } from '@/components/_shared/Alerts'
 import { visibilityTypeLabels } from '@/utils/constants'
 import Chip from '../../_shared/Chip'
 
-
 function downloadCsv(data: string, filename: string) {
     const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' })
 
@@ -75,15 +74,9 @@ function TeamProfile({
                 defaultImg="/images/placeholders/teams/teamdefault.png"
             />
             {team.visibility === 'private' && (
-              <div className='ml-2 py-3'>
-                <Chip
-                    text={
-                        visibilityTypeLabels[
-                            team.visibility
-                        ] ?? ''
-                    }
-                />
-              </div>
+                <div className="ml-2 py-3">
+                    <Chip text={visibilityTypeLabels[team.visibility] ?? ''} />
+                </div>
             )}
         </div>
     )
@@ -111,14 +104,8 @@ function SubTeamProfile({
                 defaultImg="/images/placeholders/teams/teamdefault.png"
             />
             {team.visibility === 'private' && (
-                <div className='ml-2 py-3'>
-                    <Chip
-                        text={
-                            visibilityTypeLabels[
-                            team.visibility
-                            ] ?? ''
-                        }
-                    />
+                <div className="ml-2 py-3">
+                    <Chip text={visibilityTypeLabels[team.visibility] ?? ''} />
                 </div>
             )}
         </div>
@@ -152,8 +139,8 @@ function SubCardProfile({
             )
         },
         onError: (error) => {
-          console.log('DELETION ERROR', error)
-          setErrorMessage(error.message)
+            console.log('DELETION ERROR', error)
+            setErrorMessage(error.message)
         },
     })
     const getDownloadEvents = api.downloadEvents.getAllEvents.useMutation({
@@ -188,23 +175,23 @@ function SubCardProfile({
                                     groupStyle="group/item group-hover/item:visible "
                                     className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                                     rowMain={
-                                    <>
-                                        <SubTeamProfile
-                                            team={team as GroupTree}
-                                            org2img={org2img}
-                                        />
-                                       {team.visibility === 'private' && (
-                                        <div className='ml-2 py-3'>
-                                            <Chip
-                                                text={
-                                                    visibilityTypeLabels[
-                                                    team.visibility
-                                                    ] ?? ''
-                                                }
+                                        <>
+                                            <SubTeamProfile
+                                                team={team as GroupTree}
+                                                org2img={org2img}
                                             />
-                                        </div>
-                                    )}
-                                    </>
+                                            {team.visibility === 'private' && (
+                                                <div className="ml-2 py-3">
+                                                    <Chip
+                                                        text={
+                                                            visibilityTypeLabels[
+                                                                team.visibility
+                                                            ] ?? ''
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
+                                        </>
                                     }
                                     linkButton={{
                                         label: 'View Team',
@@ -276,27 +263,29 @@ function SubCardProfile({
                                     className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                                     rowMain={
                                         <>
-                                        <div className="flex pl-4 sm:pl-6  ">
-                                            <RowProfile
-                                                imgStyle="w-8 h-8 mt-2"
-                                                isPad
-                                                profile={Team(
-                                                    team as GroupTree
-                                                )}
-                                                defaultImg="/images/placeholders/teams/teamdefault.png"
-                                            />
-                                                {team.visibility === 'private' && (
-                                                    <div className='ml-2 py-3'>
+                                            <div className="flex pl-4 sm:pl-6  ">
+                                                <RowProfile
+                                                    imgStyle="w-8 h-8 mt-2"
+                                                    isPad
+                                                    profile={Team(
+                                                        team as GroupTree
+                                                    )}
+                                                    defaultImg="/images/placeholders/teams/teamdefault.png"
+                                                />
+                                                {team.visibility ===
+                                                    'private' && (
+                                                    <div className="ml-2 py-3">
                                                         <Chip
                                                             text={
                                                                 visibilityTypeLabels[
-                                                                team.visibility
+                                                                    team
+                                                                        .visibility
                                                                 ] ?? ''
                                                             }
                                                         />
                                                     </div>
                                                 )}
-                                        </div>
+                                            </div>
                                         </>
                                     }
                                     linkButton={{
@@ -399,12 +388,12 @@ function SubCardProfile({
                         >
                             Cancel
                         </Button>
-                    {errorMessage ? (
-                        <ErrorAlert
-                            text={errorMessage}
-                            title="Delete Team failed"
-                        />
-                    ) : null}
+                        {errorMessage ? (
+                            <ErrorAlert
+                                text={errorMessage}
+                                title="Delete Team failed"
+                            />
+                        ) : null}
                     </div>
                 </Modal>
             )}
@@ -437,8 +426,8 @@ export default function TeamCard() {
             )
         },
         onError: (error) => {
-          console.log('DELETION ERROR', error)
-          setErrorMessage(error.message)
+            console.log('DELETION ERROR', error)
+            setErrorMessage(error.message)
         },
     })
     const getDownloadEvents = api.downloadEvents.getAllEvents.useMutation({
@@ -643,7 +632,7 @@ export default function TeamCard() {
                                 title="Delete Team failed"
                             />
                         ) : null}
-                        </div>
+                    </div>
                 </Modal>
             )}
         </section>

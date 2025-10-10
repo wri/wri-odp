@@ -209,12 +209,19 @@ export default function TeamForm({
                                       },
                                   ]
                                 : [
-                                      { label: 'Public', value: 'public', visibility: 'public' },
-                                      { label: 'Private', value: 'private', visibility: 'private' },
+                                      {
+                                          label: 'Public',
+                                          value: 'public',
+                                          visibility: 'public',
+                                      },
+                                      {
+                                          label: 'Private',
+                                          value: 'private',
+                                          visibility: 'private',
+                                      },
                                   ]
                         }
                         placeholder="Select visibility"
-                        
                     />
                     <ErrorDisplay name="visibility" errors={errors} />
                 </InputGroupCustom>
