@@ -139,6 +139,7 @@ function TipTapEditor({
     const [url, setUrl] = useState<string>('');
 
     const openModal = useCallback(() => {
+        if (!editor) return;
         setUrl(editor.getAttributes('link').href);
         setIsOpen(true);
     }, [editor]);
@@ -149,6 +150,7 @@ function TipTapEditor({
     }, []);
 
     const saveLink = useCallback(() => {
+        if (!editor) return;
         if (url) {
             editor
                 .chain()
@@ -163,35 +165,43 @@ function TipTapEditor({
     }, [editor, url, closeModal]);
 
     const removeLink = useCallback(() => {
+        if (!editor) return;
         editor.chain().focus().extendMarkRange('link').unsetLink().run();
         closeModal();
     }, [editor, closeModal]);
 
     const toggleBold = useCallback(() => {
+        if (!editor) return;
         editor.chain().focus().toggleBold().run();
     }, [editor]);
 
     const toggleUnderline = useCallback(() => {
+        if (!editor) return;
         editor.chain().focus().toggleUnderline().run();
     }, [editor]);
 
     const toggleItalic = useCallback(() => {
+        if (!editor) return;
         editor.chain().focus().toggleItalic().run();
     }, [editor]);
 
     const toggleStrike = useCallback(() => {
+        if (!editor) return;
         editor.chain().focus().toggleStrike().run();
     }, [editor]);
 
     const toggleCode = useCallback(() => {
+        if (!editor) return;
         editor.chain().focus().toggleCode().run();
     }, [editor]);
 
     const toggleList = useCallback(() => {
+        if (!editor) return;
         editor.chain().focus().toggleBulletList().run();
     }, [editor]);
 
     const toggleCodeBlock = useCallback(() => {
+        if (!editor) return;
         editor.chain().focus().toggleCodeBlock().run();
     }, [editor]);
 
